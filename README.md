@@ -10,3 +10,6 @@ using the following references, we can implement the beginnings of a conductor c
 
 
 Connor proposes that we run tests against https://github.com/holochain/happ-build-tutorial
+
+
+## Proposed API
