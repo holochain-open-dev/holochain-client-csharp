@@ -15,3 +15,7 @@ There are a whole bunch of forum posts, Dev Camp discord chatter, and github iss
 
 
 ## Proposed API
+
+One class which hosts the open websocket connection
+
+One class which needs an instance of that websocket class passed to it, which is an abstraction over a Zome. So it is a Zome client. That way, one only needs to pass in an argument to make a zome call telling it which 'function' you wish to call in holochain. 
