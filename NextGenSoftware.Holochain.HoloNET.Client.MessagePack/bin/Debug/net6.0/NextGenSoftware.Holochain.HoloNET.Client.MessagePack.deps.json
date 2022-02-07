@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v6.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v6.0": {
+      "NextGenSoftware.Holochain.HoloNET.Client.MessagePack/1.0.0": {
+        "runtime": {
+          "NextGenSoftware.Holochain.HoloNET.Client.MessagePack.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "NextGenSoftware.Holochain.HoloNET.Client.MessagePack/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

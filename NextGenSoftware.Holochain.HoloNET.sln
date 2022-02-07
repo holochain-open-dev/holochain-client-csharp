@@ -1,0 +1,54 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32112.339
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NextGenSoftware.Holochain.HoloNET.Client.Core", "NextGenSoftware.Holochain.HoloNET.Client.Core\NextGenSoftware.Holochain.HoloNET.Client.Core.csproj", "{6F3C884A-8FB0-49F8-8BC0-C84A09E2EE2F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NextGenSoftware.Holochain.HoloNET.Client.Desktop", "NextGenSoftware.Holochain.HoloNET.Client.Desktop\NextGenSoftware.Holochain.HoloNET.Client.Desktop.csproj", "{66521E74-644E-4E09-AD48-BDA206EB98DB}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NextGenSoftware.Holochain.HoloNET.Client.MessagePack", "NextGenSoftware.Holochain.HoloNET.Client.MessagePack\NextGenSoftware.Holochain.HoloNET.Client.MessagePack.csproj", "{D742C653-479D-4AE8-A75B-D609F88A71E6}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NextGenSoftware.Holochain.HoloNET.Client.TestHarness", "NextGenSoftware.Holochain.HoloNET.Client.TestHarness\NextGenSoftware.Holochain.HoloNET.Client.TestHarness.csproj", "{BD7ED37D-38B0-4EB9-AA71-C8733CCFE215}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NextGenSoftware.Holochain.HoloNET.Client.Unity", "NextGenSoftware.Holochain.HoloNET.Client.Unity\NextGenSoftware.Holochain.HoloNET.Client.Unity.csproj", "{607B68F8-B778-479F-9D6C-5915A5C18AFA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NextGenSoftware.WebSocket", "NextGenSoftware.WebSocket\NextGenSoftware.WebSocket.csproj", "{7A787B83-9868-4CA0-A966-0E5C9087BFA2}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6F3C884A-8FB0-49F8-8BC0-C84A09E2EE2F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6F3C884A-8FB0-49F8-8BC0-C84A09E2EE2F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6F3C884A-8FB0-49F8-8BC0-C84A09E2EE2F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6F3C884A-8FB0-49F8-8BC0-C84A09E2EE2F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{66521E74-644E-4E09-AD48-BDA206EB98DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{66521E74-644E-4E09-AD48-BDA206EB98DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{66521E74-644E-4E09-AD48-BDA206EB98DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{66521E74-644E-4E09-AD48-BDA206EB98DB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D742C653-479D-4AE8-A75B-D609F88A71E6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D742C653-479D-4AE8-A75B-D609F88A71E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D742C653-479D-4AE8-A75B-D609F88A71E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D742C653-479D-4AE8-A75B-D609F88A71E6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BD7ED37D-38B0-4EB9-AA71-C8733CCFE215}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BD7ED37D-38B0-4EB9-AA71-C8733CCFE215}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BD7ED37D-38B0-4EB9-AA71-C8733CCFE215}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BD7ED37D-38B0-4EB9-AA71-C8733CCFE215}.Release|Any CPU.Build.0 = Release|Any CPU
+		{607B68F8-B778-479F-9D6C-5915A5C18AFA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{607B68F8-B778-479F-9D6C-5915A5C18AFA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{607B68F8-B778-479F-9D6C-5915A5C18AFA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{607B68F8-B778-479F-9D6C-5915A5C18AFA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7A787B83-9868-4CA0-A966-0E5C9087BFA2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7A787B83-9868-4CA0-A966-0E5C9087BFA2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7A787B83-9868-4CA0-A966-0E5C9087BFA2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7A787B83-9868-4CA0-A966-0E5C9087BFA2}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {597DC6F9-2ECC-4F79-BDFB-086320E2CF0F}
+	EndGlobalSection
+EndGlobal
