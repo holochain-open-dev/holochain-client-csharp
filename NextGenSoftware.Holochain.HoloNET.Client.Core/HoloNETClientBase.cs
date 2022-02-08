@@ -24,11 +24,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Core
     //    public string Desc { get; set; }
     //}
 
-    [MessagePackObject]
-    //[Serializable]
+    [MessagePackObject] // The .NET MessagePack Serializer needs all classes to have this attribute added.
+    //[Serializable] // The Unity MessagePack Serializer needs all classes to have this attribute added.
     public class Temp
     {
-        [Key(0)]
+        [Key(0)] // The .NET MessagePack Serializer needs all Properties to have this attribute added (the Unity one does not require any).
         public int number { get; set; }
     }
 
@@ -389,7 +389,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Core
 
                 case HolochainVersion.RSM:
                     {
-                        MessagePackFormatter formatter = new MessagePackFormatter();
+                        //This is the Unity MessagePack Serialiser ported from Unity but this doesn't seem to work because the packets sent are too small.
+                        //MessagePackFormatter formatter = new MessagePackFormatter();
+                        
                         HoloNETData holoNETData = new HoloNETData()
                         {
                             type = "zome_call",
@@ -402,7 +404,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Core
                                 // payload = formatter.Serialize(paramsObject),
                                 //payload = formatter.Serialize(new Temp() {number = 10 }),
                                 //payload = MessagePackSerializer.Serialize(new Temp() { Name = "blah", Desc = "moooooo!" }),
-                                payload = MessagePackSerializer.Serialize(new Temp() { number = 10 }),
+                                payload = MessagePackSerializer.Serialize(new Temp() { number = 10 }), 
                                 //payload = formatter.Serialize(new Temp() { Name = "blah", Desc = "moooooo!" }),
                                 provenance = Encoding.UTF8.GetBytes(Config.AgentPubKey),
                                 cap = null
@@ -418,15 +420,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Core
                             //data = formatter.Serialize(holoNETData)
                         };
 
-                        // await webSocket2.Send(formatter.Serialize(request));
-                        //await webSocket2.Send(MessagePackSerializer.Serialize(request));
-
-                        //await WebSocket.SendRawDataAsync(formatter.Serialize(request));
-                        await WebSocket.SendRawDataAsync(MessagePackSerializer.Serialize(request));
-
-                        //var serializer = MessagePackSerializer.Get<Foo>();
-                        //serializer.Pack(stream, foo);
-                        //stream.Position = 0;
+                        //await WebSocket.SendRawDataAsync(formatter.Serialize(request)); //This is the Unity MessagePack Serialiser ported from Unity but this doesn't seem to work because the packets sent are too small.
+                        await WebSocket.SendRawDataAsync(MessagePackSerializer.Serialize(request)); //This is the fastest and most popular .NET MessagePack Serializer.
                     }
                     break;
             }

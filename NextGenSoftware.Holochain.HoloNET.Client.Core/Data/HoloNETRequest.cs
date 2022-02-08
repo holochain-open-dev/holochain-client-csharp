@@ -14,7 +14,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Core
         public string type { get; set; }
 
         [Key(2)]
-        //public HoloNETData data { get; set; }
         public byte[] data { get; set; }
 
         /*

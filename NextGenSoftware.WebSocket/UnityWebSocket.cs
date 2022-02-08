@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 
 namespace NextGenSoftware.WebSocket
 {
+    //PORTED UNITY WEBSOCKET CODE (UNITY SPECEFIC CODE HAS BEEN COMMENTED OUT BELOW):
+
     //public class MainThreadUtil 
     //{
     //    public static MainThreadUtil Instance { get; private set; }

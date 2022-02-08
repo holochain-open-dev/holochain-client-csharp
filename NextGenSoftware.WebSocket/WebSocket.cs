@@ -28,8 +28,8 @@ namespace NextGenSoftware.WebSocket
 
         // Properties
         public string EndPoint { get; private set; }
-        public ClientWebSocket ClientWebSocket { get; private set; }
-        public UnityWebSocket UnityWebSocket { get; private set; }
+        public ClientWebSocket ClientWebSocket { get; private set; } // Original HoloNET WebSocket (still works):
+        public UnityWebSocket UnityWebSocket { get; private set; } //Temporily using UnityWebSocket code until can find out why not working with RSM Conductor...
         public WebSocketConfig Config
         {
             get
@@ -71,11 +71,11 @@ namespace NextGenSoftware.WebSocket
         public WebSocket(string endPointURI, ILogger logger)
         {
             Logger = logger;
-            // ClientWebSocket = new ClientWebSocket();
+            // ClientWebSocket = new ClientWebSocket(); // The original built-in HoloNET WebSocket
             // ClientWebSocket.Options.KeepAliveInterval = TimeSpan.FromSeconds(Config.KeepAliveSeconds);
             
-            UnityWebSocket = new UnityWebSocket(endPointURI);
-            UnityWebSocket.OnOpen += UnityWebSocket_OnOpen;
+            UnityWebSocket = new UnityWebSocket(endPointURI); //The Unity Web Socket code I ported wraps around the ClientWebSocket.
+            UnityWebSocket.OnOpen += UnityWebSocket_OnOpen; 
             UnityWebSocket.OnClose += UnityWebSocket_OnClose;
             UnityWebSocket.OnError += UnityWebSocket_OnError;
             UnityWebSocket.OnMessage += UnityWebSocket_OnMessage;
@@ -83,32 +83,26 @@ namespace NextGenSoftware.WebSocket
             EndPoint = endPointURI;
 
             _cancellationToken = _cancellationTokenSource.Token; //TODO: do something with this!
-
-            //UnityWebSocket = new UnityWebSocket(endPointURI);
-            //UnityWebSocket.OnOpen += WebSocket2_OnOpen;
-            //UnityWebSocket.OnClose += WebSocket2_OnClose;
-            //UnityWebSocket.OnError += WebSocket2_OnError;
-            //UnityWebSocket.OnMessage += WebSocket2_OnMessage;
         }
 
         private void UnityWebSocket_OnMessage(byte[] data)
         {
-            //throw new NotImplementedException();
+            
         }
 
         private void UnityWebSocket_OnError(string errorMsg)
         {
-            //throw new NotImplementedException();
+            
         }
 
         private void UnityWebSocket_OnClose(WebSocketCloseCode closeCode)
         {
-          //  throw new NotImplementedException();
+          
         }
 
         private void UnityWebSocket_OnOpen()
         {
-          //  throw new NotImplementedException();
+          
         }
 
         public async Task Connect()
@@ -117,6 +111,7 @@ namespace NextGenSoftware.WebSocket
            // await UnityWebSocket.Receive();
         }
 
+        // The original HoloNET Connect method (still works).
         //public async Task Connect()
         //{
         //    try
@@ -147,6 +142,7 @@ namespace NextGenSoftware.WebSocket
         //    }
         //}
 
+        // Original HoloNET code (still works):
         public async Task Disconnect()
         {
             try
@@ -177,6 +173,7 @@ namespace NextGenSoftware.WebSocket
             Logger.Log("Sending Raw Data...", LogType.Info);
             await UnityWebSocket.Send(data);
 
+            // Original HoloNET code (still works):
             /*
             if (ClientWebSocket.State != WebSocketState.Open)
             {
@@ -204,6 +201,7 @@ namespace NextGenSoftware.WebSocket
             Logger.Log("Sending Raw Data... Done!", LogType.Info);
         }
 
+        // Original HoloNET code (still works):
         private async Task StartListen()
         {
             var buffer = new byte[Config.ReceiveChunkSize];
@@ -279,6 +277,7 @@ namespace NextGenSoftware.WebSocket
         //    return cache.ContainsKey(id) ? cache[id] : null;
         //}
 
+        // Original HoloNET code (still works):
         private async Task AttemptReconnect()
         {
             for (int i = 0; i < (Config.ReconnectionAttempts); i++)
@@ -292,6 +291,7 @@ namespace NextGenSoftware.WebSocket
             }
         }
 
+        // Original HoloNET code (still works):
         private void HandleError(string message, Exception exception)
         {
             message = string.Concat(message, "\nError Details: ", exception != null ? exception.ToString() : "");
