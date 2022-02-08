@@ -6,7 +6,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NextGenSoftware.Holochain.H
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NextGenSoftware.Holochain.HoloNET.Client.Desktop", "NextGenSoftware.Holochain.HoloNET.Client.Desktop\NextGenSoftware.Holochain.HoloNET.Client.Desktop.csproj", "{66521E74-644E-4E09-AD48-BDA206EB98DB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NextGenSoftware.Holochain.HoloNET.Client.MessagePack", "NextGenSoftware.Holochain.HoloNET.Client.MessagePack\NextGenSoftware.Holochain.HoloNET.Client.MessagePack.csproj", "{D742C653-479D-4AE8-A75B-D609F88A71E6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NextGenSoftware.Holochain.HoloNET.Client.UnityMessagePack", "NextGenSoftware.Holochain.HoloNET.Client.MessagePack\NextGenSoftware.Holochain.HoloNET.Client.UnityMessagePack.csproj", "{D742C653-479D-4AE8-A75B-D609F88A71E6}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NextGenSoftware.Holochain.HoloNET.Client.TestHarness", "NextGenSoftware.Holochain.HoloNET.Client.TestHarness\NextGenSoftware.Holochain.HoloNET.Client.TestHarness.csproj", "{BD7ED37D-38B0-4EB9-AA71-C8733CCFE215}"
 EndProject

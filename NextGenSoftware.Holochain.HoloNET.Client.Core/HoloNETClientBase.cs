@@ -9,7 +9,7 @@ using System.IO;
 using System.Diagnostics;
 using MessagePack;
 using NextGenSoftware.WebSocket;
-using NextGenSoftware.Holochain.HoloNET.Client.MessagePack;
+//using NextGenSoftware.Holochain.HoloNET.Client.MessagePack;  //Ported MessagePack Serializer From Unity.
 
 namespace NextGenSoftware.Holochain.HoloNET.Client.Core
 {
