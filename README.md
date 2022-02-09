@@ -146,7 +146,7 @@ https://www.ourworldthegame.com/single-post/announcing-star-odk-hdk-cosmic
 
 All of the above you can find more info on the OASIS API main repo as well as the Our World site & blogs:
 
-http://www.ourworldthegame.com
+http://www.ourworldthegame.com <br>
 https://github.com/NextGenSoftwareUK/Our-World-OASIS-API-HoloNET-HoloUnity-And-.NET-HDK
 
 The Future Is Bright, The Future Is Holochain...
