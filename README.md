@@ -28,7 +28,16 @@ https://github.com/NextGenSoftwareUK/Our-World-OASIS-API-HoloNET-HoloUnity-And-.
 
 ### Background
 
-Original HoloNET code (world's first .NET & Unity client for Holochain written back in 2019 and was fully operational with the previous version of Holochain (Redux), but unfortunately had issues getting it working with RSM. The previous version also came bundled with the holochain conductor so it could auto-start/shutdown the conductor and be fully integrated with any .NET or Unity application. This code/functionality is still in there and will now work again that we have a Windows binary again (NixOS broke this feature previously).
+Original HoloNET code (world's first .NET & Unity client for Holochain) written back in 2019 and was fully operational with the previous version of Holochain (Redux), but unfortuntley had issues getting it working with RSM. 
+
+https://www.ourworldthegame.com/single-post/2019/08/14/world-exclusive-holochain-talking-to-unity
+
+The previous version also came bundled with the holochain conductor so it could auto-start/shutdown the conductor and be fully integrated with any .NET or Unity application. This code/fuctionaility is still in there and will now work again that we have a Windows binary again (NixOS broke this feature previously).
+
+It was featured on Dev Pulse 44 here:
+https://medium.com/holochain/updated-quick-start-guide-the-gift-of-holonet-and-conversations-that-matter-on-the-holochain-8e08efde1f58
+
+https://www.ourworldthegame.com/single-post/2019/09/10/holonet-was-featured-in-the-latest-holochain-dev-pulse
 
 ### Current Issues
 
