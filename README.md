@@ -120,7 +120,7 @@ Once we crack this nuget we can get it packaged up onto the .NET NuGet Package s
 
 #### .NET HDK Low Code Generator
 
-We can then get back to the .NET HDK Low Code Generator (will migrate this <a href='https://github.com/NextGenSoftwareUK/Our-World-OASIS-API-HoloNET-HoloUnity-And-.NET-HDK/tree/master/NextGenSoftware.Holochain.HoloNET.HDK.Core' repo</a> over to here soon...), this uses HoloNET to call into the dynamically generated rust and c# code. The rust code acts as a DAL (Data Access Layer) and the C# code acts as the BLL (Business Logic Layer). The generated C# code wraps around calls to HoloNET. This code has also already been written and is working with the previous version of Holochain (Redux).
+We can then get back to the .NET HDK Low Code Generator (will migrate this <a href='https://github.com/NextGenSoftwareUK/Our-World-OASIS-API-HoloNET-HoloUnity-And-.NET-HDK/tree/master/NextGenSoftware.Holochain.HoloNET.HDK.Core'>repo</a> over to here soon...), this uses HoloNET to call into the dynamically generated rust and c# code. The rust code acts as a DAL (Data Access Layer) and the C# code acts as the BLL (Business Logic Layer). The generated C# code wraps around calls to HoloNET. This code has also already been written and is working with the previous version of Holochain (Redux).
 
 This also allows devs to make use of all the libraries and resources available them in Rust, .NET & Unity! 😊
 
@@ -150,7 +150,7 @@ http://www.ourworldthegame.com
 https://github.com/NextGenSoftwareUK/Our-World-OASIS-API-HoloNET-HoloUnity-And-.NET-HDK
 
 The Future Is Bright, The Future Is Holochain...
-
-In Love, Light & Hope,
+<br>
+In Love, Light & Hope, <br>
 The Our World Tribe.
 
