@@ -150,7 +150,7 @@ http://www.ourworldthegame.com
 https://github.com/NextGenSoftwareUK/Our-World-OASIS-API-HoloNET-HoloUnity-And-.NET-HDK
 
 The Future Is Bright, The Future Is Holochain...
-<br>
+<br><br>
 In Love, Light & Hope, <br>
 The Our World Tribe.
 
