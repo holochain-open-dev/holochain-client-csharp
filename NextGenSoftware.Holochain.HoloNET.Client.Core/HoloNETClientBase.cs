@@ -28,7 +28,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Core
     //[Serializable] // The Unity MessagePack Serializer needs all classes to have this attribute added.
     public class Temp
     {
-        [Key(0)] // The .NET MessagePack Serializer needs all Properties to have this attribute added (the Unity one does not require any).
+        [Key("number")] // The .NET MessagePack Serializer needs all Properties to have this attribute added (the Unity one does not require any).
         public int number { get; set; }
     }
 
