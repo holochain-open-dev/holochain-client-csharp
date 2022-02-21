@@ -71,11 +71,11 @@ namespace NextGenSoftware.WebSocket
         public WebSocket(string endPointURI, ILogger logger)
         {
             Logger = logger;
-            // ClientWebSocket = new ClientWebSocket(); // The original built-in HoloNET WebSocket
-            // ClientWebSocket.Options.KeepAliveInterval = TimeSpan.FromSeconds(Config.KeepAliveSeconds);
-            
+            //ClientWebSocket = new ClientWebSocket(); // The original built-in HoloNET WebSocket
+            //ClientWebSocket.Options.KeepAliveInterval = TimeSpan.FromSeconds(Config.KeepAliveSeconds);
+
             UnityWebSocket = new UnityWebSocket(endPointURI); //The Unity Web Socket code I ported wraps around the ClientWebSocket.
-            UnityWebSocket.OnOpen += UnityWebSocket_OnOpen; 
+            UnityWebSocket.OnOpen += UnityWebSocket_OnOpen;
             UnityWebSocket.OnClose += UnityWebSocket_OnClose;
             UnityWebSocket.OnError += UnityWebSocket_OnError;
             UnityWebSocket.OnMessage += UnityWebSocket_OnMessage;
@@ -87,7 +87,7 @@ namespace NextGenSoftware.WebSocket
 
         private void UnityWebSocket_OnMessage(byte[] data)
         {
-            
+            OnDataReceived?.Invoke(this, new DataReceivedEventArgs { EndPoint = EndPoint, RawBinaryData = data });
         }
 
         private void UnityWebSocket_OnError(string errorMsg)
@@ -108,39 +108,40 @@ namespace NextGenSoftware.WebSocket
         public async Task Connect()
         {
             await UnityWebSocket.Connect();
-           // await UnityWebSocket.Receive();
+            // await UnityWebSocket.Receive();
         }
 
+        /*
         // The original HoloNET Connect method (still works).
-        //public async Task Connect()
-        //{
-        //    try
-        //    {
-        //        if (Logger == null)
-        //            throw new WebSocketException("ERROR: No Logger Has Been Specified! Please set a Logger with the Logger Property.");
+        public async Task Connect()
+        {
+            try
+            {
+                if (Logger == null)
+                    throw new WebSocketException("ERROR: No Logger Has Been Specified! Please set a Logger with the Logger Property.");
 
-        //        if (ClientWebSocket.State != WebSocketState.Connecting && ClientWebSocket.State != WebSocketState.Open && ClientWebSocket.State != WebSocketState.Aborted)
-        //        {
-        //            Logger.Log(string.Concat("Connecting to ", EndPoint, "..."), LogType.Info);
+                if (ClientWebSocket.State != WebSocketState.Connecting && ClientWebSocket.State != WebSocketState.Open && ClientWebSocket.State != WebSocketState.Aborted)
+                {
+                    Logger.Log(string.Concat("Connecting to ", EndPoint, "..."), LogType.Info);
 
-        //            await ClientWebSocket.ConnectAsync(new Uri(EndPoint), CancellationToken.None);
-        //            //NetworkServiceProvider.Connect(new Uri(EndPoint));
-        //            //TODO: need to be able to await this.
+                    await ClientWebSocket.ConnectAsync(new Uri(EndPoint), CancellationToken.None);
+                    //NetworkServiceProvider.Connect(new Uri(EndPoint));
+                    //TODO: need to be able to await this.
 
-        //            //if (NetworkServiceProvider.NetSocketState == NetSocketState.Open)
-        //            if (ClientWebSocket.State == WebSocketState.Open)
-        //            {
-        //                Logger.Log(string.Concat("Connected to ", EndPoint), LogType.Info);
-        //                OnConnected?.Invoke(this, new ConnectedEventArgs { EndPoint = EndPoint });
-        //                StartListen();
-        //            }
-        //        }
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        HandleError(string.Concat("Error occured connecting to ", EndPoint), e);
-        //    }
-        //}
+                    //if (NetworkServiceProvider.NetSocketState == NetSocketState.Open)
+                    if (ClientWebSocket.State == WebSocketState.Open)
+                    {
+                        Logger.Log(string.Concat("Connected to ", EndPoint), LogType.Info);
+                        OnConnected?.Invoke(this, new ConnectedEventArgs { EndPoint = EndPoint });
+                        StartListen();
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                HandleError(string.Concat("Error occured connecting to ", EndPoint), e);
+            }
+        }*/
 
         // Original HoloNET code (still works):
         public async Task Disconnect()

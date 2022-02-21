@@ -683,6 +683,10 @@ namespace NextGenSoftware.WebSocket
                             m_MessageListMutex.WaitOne();
                             m_MessageList.Add(ms.ToArray());
                             m_MessageListMutex.ReleaseMutex();
+
+                            //OnMessage?.Invoke(this, new MessageEventArgs(message));
+                            OnMessage?.Invoke(ms.ToArray());
+
                         }
                         else if (result.MessageType == WebSocketMessageType.Close)
                         {

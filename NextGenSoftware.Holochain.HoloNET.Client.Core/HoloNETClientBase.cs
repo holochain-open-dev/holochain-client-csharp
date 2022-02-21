@@ -219,6 +219,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Core
                     {
                         OnDataReceived?.Invoke(this, new HoloNETDataReceivedEventArgs { EndPoint = e.EndPoint, RawJSONData = e.RawJSONData, RawBinaryData = e.RawBinaryData, WebSocketResult = e.WebSocketResult });
 
+                        StringBuilder sb = new StringBuilder();
+                        sb.Append(Encoding.UTF8.GetString(e.RawBinaryData, 0, e.RawBinaryData.Length));
+                        string result = sb.ToString();
+
+                        //MemoryStream ms = new MemoryStream(e.RawBinaryData);
+                        //ms.WriteTo(new )
+
                         var options = MessagePackSerializerOptions.Standard.WithSecurity(MessagePackSecurity.UntrustedData);
                         HoloNETResponse response = MessagePackSerializer.Deserialize<HoloNETResponse>(e.RawBinaryData, options);
 
