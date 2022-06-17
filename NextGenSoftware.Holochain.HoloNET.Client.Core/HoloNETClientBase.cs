@@ -402,9 +402,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Core
                         HoloNETData holoNETData = new HoloNETData()
                         {
                             type = "zome_call",
+                            //type = "Buffer",
                             data = new HoloNETDataZomeCall()
                             {
-                                cell_id = new byte[2][] { Encoding.UTF8.GetBytes(Config.HoloHash), Encoding.UTF8.GetBytes(Config.AgentPubKey) },
+                                cell_id = new byte[2][] { Encoding.UTF8.GetBytes(Config.DnaHash), Encoding.UTF8.GetBytes(Config.AgentPubKey) },
                                 fn_name = function,
                                 zome_name = zome,
                                 //payload = MessagePackSerializer.Serialize(paramsObject),
