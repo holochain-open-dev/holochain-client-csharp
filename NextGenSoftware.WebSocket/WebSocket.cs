@@ -171,7 +171,14 @@ namespace NextGenSoftware.WebSocket
 
         public async Task SendRawDataAsync(byte[] data)
         {
+            string rawBytes = "";
+
+            foreach (byte b in data)
+                rawBytes = string.Concat(rawBytes, ", ", b.ToString());
+
             Logger.Log("Sending Raw Data...", LogType.Info);
+            Logger.Log($"UTF8: {Encoding.UTF8.GetString(data, 0, data.Length)}", LogType.Debug);
+            Logger.Log($"Bytes: {rawBytes}", LogType.Debug);
             await UnityWebSocket.Send(data);
 
             // Original HoloNET code (still works):
