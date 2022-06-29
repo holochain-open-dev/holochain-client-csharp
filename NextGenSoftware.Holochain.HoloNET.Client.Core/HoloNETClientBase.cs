@@ -259,7 +259,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Core
 
                 if (WebSocket.State != WebSocketState.Connecting && WebSocket.State != WebSocketState.Open && WebSocket.State != WebSocketState.Aborted)
                 {
-                    if (Config.AutoStartConductor)
+                    if (Config.AutoStartConductor && !string.IsNullOrEmpty(Config.FullPathToHolochainAppDNA))
                     {
                         DirectoryInfo info = new DirectoryInfo(Config.FullPathToHolochainAppDNA);
                         Logger.Log("Starting Holochain Conductor...", LogType.Info);
@@ -351,6 +351,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Core
             Logger.Log("CallZomeFunctionAsync ENTER", LogType.Debug);
             _cacheZomeReturnDataLookup[id] = cachReturnData;
 
+            if (WebSocket.State == WebSocketState.Closed || WebSocket.State == WebSocketState.None)
+                await Connect();
+
             if (cachReturnData)
             {
                 if (_zomeReturnDataLookup.ContainsKey(id))
@@ -382,15 +385,18 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Core
             {
                 case HolochainVersion.Redux:
                     {
-                        await WebSocket.SendRawDataAsync(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(
-                            new
-                            {
-                                jsonrpc = "2.0",
-                                id,
-                                method = "call",
-                                @params = new { instance_id = instanceId, zome, function, args = paramsObject }
-                            }
-                        )));
+                        if (WebSocket.State == WebSocketState.Open)
+                        {
+                            await WebSocket.SendRawDataAsync(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(
+                                new
+                                {
+                                    jsonrpc = "2.0",
+                                    id,
+                                    method = "call",
+                                    @params = new { instance_id = instanceId, zome, function, args = paramsObject }
+                                }
+                            )));
+                        }
                     }
                     break;
 
@@ -429,7 +435,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Core
                         };
 
                         //await WebSocket.SendRawDataAsync(formatter.Serialize(request)); //This is the Unity MessagePack Serialiser ported from Unity but this doesn't seem to work because the packets sent are too small.
-                        await WebSocket.SendRawDataAsync(MessagePackSerializer.Serialize(request)); //This is the fastest and most popular .NET MessagePack Serializer.
+
+                        if (WebSocket.State == WebSocketState.Open)
+                            await WebSocket.SendRawDataAsync(MessagePackSerializer.Serialize(request)); //This is the fastest and most popular .NET MessagePack Serializer.
                     }
                     break;
             }
