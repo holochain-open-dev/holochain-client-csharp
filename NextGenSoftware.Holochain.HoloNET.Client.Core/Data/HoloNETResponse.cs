@@ -1,6 +1,7 @@
 ﻿
 using MessagePack;
 using System;
+using System.Collections.Generic;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client.Core
 {
@@ -9,7 +10,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Core
     public class HoloNETResponse
     {
         [Key("id")]
-        public string id { get; set; }
+        public ulong id { get; set; }
 
         [Key("type")]
         public string type { get; set; }
@@ -17,4 +18,16 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Core
         [Key("data")]
         public byte[] data { get; set; }
     }
+
+    [MessagePackObject]
+    public struct HolonNETAppResponse
+    {
+        [Key("type")]
+        public string type { get; set; }
+
+        [Key("data")]
+        public byte[] data { get; set; }
+    }
+
+    //[MessagePackObject]
 }

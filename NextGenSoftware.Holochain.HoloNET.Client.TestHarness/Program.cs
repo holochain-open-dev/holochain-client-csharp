@@ -10,7 +10,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
     {
         static async Task Main(string[] args)
         {
-            Console.WriteLine("NextGenSoftware.Holochain.HoloNET.Client Test Harness v1.3");
+            Console.WriteLine("NextGenSoftware.Holochain.HoloNET.Client Test Harness v1.4");
             Console.WriteLine("");
             await TestHoloNETClient();
             Console.ReadKey();
@@ -56,9 +56,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                 // await holoNETClient.GetHolochainInstancesAsync();
                 //await holoNETClient.CallZomeFunctionAsync("1", "test-instance", "our_world_core", "test", ZomeCallback, null);
 
-                await holoNETClient.CallZomeFunctionAsync("1", "test-instance", "whoami", "whoami", ZomeCallback, null);
+                //await holoNETClient.CallZomeFunctionAsync("1", "test-instance", "whoami", "whoami", ZomeCallback, null);
 
-              //  await holoNETClient.CallZomeFunctionAsync("1", "test-instance", "numbers", "add_ten", ZomeCallback, new { number = 10 });
+                await holoNETClient.CallZomeFunctionAsync("1", "test-instance", "numbers", "add_ten", ZomeCallback, new { number = 10 });
 
                  //await holoNETClient.CallZomeFunctionAsync("1", "test-instance", "our_world_core", "test", ZomeCallback, new { message = new { content = "blah!" } });
                 //await holoNETClient.CallZomeFunctionAsync("2", "test-instance", "our_world_core", "test2", ZomeCallback, new { _message = "blah!" });

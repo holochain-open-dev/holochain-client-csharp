@@ -77,6 +77,7 @@ namespace NextGenSoftware.WebSocket
             UnityWebSocket = new UnityWebSocket(endPointURI); //The Unity Web Socket code I ported wraps around the ClientWebSocket.
             UnityWebSocket.OnOpen += UnityWebSocket_OnOpen;
             UnityWebSocket.OnClose += UnityWebSocket_OnClose;
+
             UnityWebSocket.OnError += UnityWebSocket_OnError;
             UnityWebSocket.OnMessage += UnityWebSocket_OnMessage;
 

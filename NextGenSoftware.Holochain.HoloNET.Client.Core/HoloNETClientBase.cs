@@ -222,24 +222,23 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Core
                         StringBuilder sb = new StringBuilder();
                         sb.Append(Encoding.UTF8.GetString(e.RawBinaryData, 0, e.RawBinaryData.Length));
                         string result = sb.ToString();
-
-                        //MemoryStream ms = new MemoryStream(e.RawBinaryData);
-                        //ms.WriteTo(new )
+                        Logger.Log("Raw Data Received: " + result, LogType.Debug);
 
                         var options = MessagePackSerializerOptions.Standard.WithSecurity(MessagePackSecurity.UntrustedData);
                         HoloNETResponse response = MessagePackSerializer.Deserialize<HoloNETResponse>(e.RawBinaryData, options);
 
-                        Console.WriteLine("RSM RESPONSE");
-                        Console.WriteLine("ID: " + response.id);
-                        Console.WriteLine("TYPE: " + response.type);
-                        Console.WriteLine("ENCODED DATA: " + response.data);
+                        Logger.Log("RSM Response", LogType.Debug);
+                        Logger.Log($"Id: {response.id}", LogType.Debug);
+                        Logger.Log($"Type: {response.type}", LogType.Debug);
 
-                        string responseData2 = MessagePackSerializer.Deserialize<string>(response.data, options);
-                        byte[] responseData = MessagePackSerializer.Deserialize<byte[]>(response.data, options);
-                        var responseDataString = Encoding.UTF8.GetString(responseData, 0, responseData.Length);
+                        HolonNETAppResponse appResponse = MessagePackSerializer.Deserialize<HolonNETAppResponse>(response.data, options);
 
-                        Console.WriteLine("DECODED DATA: " + responseDataString);
-                        Console.WriteLine("DECODED DATA2: " + responseData2);
+                        Dictionary<object, object> appResponseData = MessagePackSerializer.Deserialize<Dictionary<object, object>>(appResponse.data, options);
+                        string data = "";
+                        foreach (string key in appResponseData.Keys)
+                            data = string.Concat(data, "key=", key, " value=", appResponseData[key]);
+
+                        Logger.Log($"Decoded Data = {data}", LogType.Debug  );
                     }
                     break;
             }
@@ -404,6 +403,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Core
                     {
                         //This is the Unity MessagePack Serialiser ported from Unity but this doesn't seem to work because the packets sent are too small.
                         //MessagePackFormatter formatter = new MessagePackFormatter();
+
                         
                         HoloNETData holoNETData = new HoloNETData()
                         {
@@ -411,19 +411,20 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Core
                             //type = "Buffer",
                             data = new HoloNETDataZomeCall()
                             {
-                                cell_id = new byte[2][] { Encoding.UTF8.GetBytes(Config.DnaHash), Encoding.UTF8.GetBytes(Config.AgentPubKey) },
+                                cell_id = new byte[2][] { System.Convert.FromBase64String(Config.DnaHash), System.Convert.FromBase64String(Config.AgentPubKey) },
                                 fn_name = function,
                                 zome_name = zome,
-                                //payload = MessagePackSerializer.Serialize(paramsObject),
+                                payload = MessagePackSerializer.Serialize(paramsObject),
                                 // payload = formatter.Serialize(paramsObject),
                                 //payload = formatter.Serialize(new Temp() {number = 10 }),
                                 //payload = MessagePackSerializer.Serialize(new Temp() { Name = "blah", Desc = "moooooo!" }),
-                                payload = MessagePackSerializer.Serialize(new Temp() { number = 10 }), 
+                                //payload = MessagePackSerializer.Serialize(new Temp() { number = 10 }), 
                                 //payload = formatter.Serialize(new Temp() { Name = "blah", Desc = "moooooo!" }),
-                                provenance = Encoding.UTF8.GetBytes(Config.AgentPubKey),
+                                provenance = System.Convert.FromBase64String(Config.AgentPubKey),
                                 cap = null
                             }
                         };
+
 
                         HoloNETRequest request = new HoloNETRequest()
                         {
