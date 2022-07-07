@@ -41,69 +41,20 @@ https://www.ourworldthegame.com/single-post/2019/09/10/holonet-was-featured-in-t
 
 ### Current Issues
 
-The current issue is to do with that the Holochain conductor not recognising the data format that is sent from the .NET MessagePack Serialiser. In the code you will find two different types, one is the fastest and most popular .NET MessagePack Serialiser (https://github.com/neuecc/MessagePack-CSharp). This is the one currently active. The other one (currently commented out) is the Unity one that was used by Jakintosh Unity implementation above but unfortunately even though I did my best to port this to .NET it appears not to be compatible because the data packets it sends are too small as spotted by @connor.
-
-The WebSocket code is in it's own library/project and currently uses the one ported from the Unity project Jakintosh implemented. This one does appear to be compatible with .NET. The original HoloNET WebSocket code is still there and will likely be the one to be used again once we have tracked down what the issues are. I attempted to port both the WebSocket and MessagePack libraries uses in the Unity implementation to attempt to track down what the issue was.
-
-As far as I can see the rest of the code is equivalent and is sending the same data formats etc across to the conductor. Currently the error message I get back from the Conductor is below:
-
-```
-←[1;34mhc-sandbox:←[0m Created ["C:\\Users\\david\\AppData\\Local\\Temp\\IQUXzSuv8uMAoWMUaGz0A"]
-
-Conductor ready.
-←[1;34mhc-sandbox:←[0m Running conductor on admin port 52212
-←[1;34mhc-sandbox:←[0m Attaching app port 8888
-←[1;34mhc-sandbox:←[0m App port attached at 8888
-←[1;34mhc-sandbox:←[0m Connected successfully to a running holochain
-←[2mFeb 02 20:36:43.785←[0m ←[31mERROR←[0m holochain_websocket::websocket: Websocket failed to deserialize SerializedBytesError(Deserialize("invalid type: string \"Request\", expected u64"))
-←[2mFeb 02 20:36:43.788←[0m ←[31mERROR←[0m holochain_websocket::websocket: Websocket: Bad message type Pong([])
-←[2mFeb 02 20:36:43.788←[0m ←[31mERROR←[0m holochain_websocket::websocket: Websocket: Bad message type Pong([])
-←[2mFeb 02 20:37:13.728←[0m ←[31mERROR←[0m holochain_websocket::websocket: Websocket: Bad message type Pong([])
-```
-
-This is very odd because it appears it is expecting a U64 for the RequestType rather than a string?
-
-Looking at Jakintosh code you can see that the request is surrounded by additional quotes:
-
-```
-[Serializable]
-	public class WireMessage : RustEnum<byte[]> {
-
-		public long id;
-
-		public WireMessage (
-			string type,
-			byte[] data,
-			long id
-		) : base( type, data ) {
-			this.id = id;
-		}
-
-		public override string ToString () => $"{{\n  type: \"{type}\",\n  id: {id},\n  data: {System.Text.Encoding.UTF8.GetString( data )}\n}}";
-	}
-```
-
-If I attempt to do the same with the HoloNET code then I get back this error from the conductor:
-
-```
-Conductor ready.
-←[1;34mhc-sandbox:←[0m Running conductor on admin port 54443
-←[1;34mhc-sandbox:←[0m Attaching app port 8888
-←[1;34mhc-sandbox:←[0m App port attached at 8888
-←[1;34mhc-sandbox:←[0m Connected successfully to a running holochain
-←[2mFeb 03 13:59:17.168←[0m ←[31mERROR←[0m holochain_websocket::websocket: Websocket failed to deserialize SerializedBytesError(Deserialize("invalid type: string \"\\\"Request\\\"\", expected u64"))
-←[2mFeb 03 13:59:34.580←[0m ←[31mERROR←[0m holochain_websocket::websocket: Websocket: Bad message type Pong([])
-←[2mFeb 03 14:00:04.538←[0m ←[31mERROR←[0m holochain_websocket::websocket: Websocket: Bad message type Pong([])
-←[2mFeb 03 14:00:34.552←[0m ←[31mERROR←[0m holochain_websocket::websocket: Websocket: Bad message type Pong([])
-←[2mFeb 03 14:00:42.297←[0m ←[31mERROR←[0m holochain_websocket::websocket: websocket_error_from_network=Io(Os { code: 10054, kind: ConnectionReset, message: "An existing connection was forcibly closed by the remote host." })
-```
-
-This is as far as I have got to date so would appreciate any help I can get on this please, thank you. :)
-
 You can view the full discussion going on since Aug to get this to work here:
 https://github.com/holochain/holochain/issues/905
 
 It actually goes back further than this but this is the latest thread regarding this... :)
+
+### Rewards
+
+If anyone can crack this we will gift £3000+ worth of OLAND (virtual land in Our World) NFTs and earn 7777 karma points and tokens plus maybe more... please share around... thanks 🙏
+
+https://opensea.io/collection/theoasisandourworld
+
+This is urgent and a top priority now, because we can then complete the HOLOOASIS provider meaning we can bridge holochain to all web2 (dbs, clouds, etc) and web3 blockchains etc giving a easy migration path to holochain. 
+
+It also allows the STAR Omniverse Low Code Generator to dynamically generate rust and c# code allowing people to focus on their idea rather than the lower level implementations and allow them to build metaverse experiences on top of holochain. 
 
 ### Why this is important & vital to the holochain community
 
