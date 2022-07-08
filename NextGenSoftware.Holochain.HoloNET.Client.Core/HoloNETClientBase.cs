@@ -9,29 +9,9 @@ using System.IO;
 using System.Diagnostics;
 using MessagePack;
 using NextGenSoftware.WebSocket;
-//using NextGenSoftware.Holochain.HoloNET.Client.MessagePack;  //Ported MessagePack Serializer From Unity.
 
 namespace NextGenSoftware.Holochain.HoloNET.Client.Core
 {
-    //[MessagePackObject]
-    //[Serializable]
-    //public class Temp
-    //{
-    //    [Key(0)]
-    //    public string Name { get; set; }
-
-    //    [Key(1)]
-    //    public string Desc { get; set; }
-    //}
-
-    [MessagePackObject] // The .NET MessagePack Serializer needs all classes to have this attribute added.
-    //[Serializable] // The Unity MessagePack Serializer needs all classes to have this attribute added.
-    public class Temp
-    {
-        [Key("number")] // The .NET MessagePack Serializer needs all Properties to have this attribute added (the Unity one does not require any).
-        public int number { get; set; }
-    }
-
     public abstract class HoloNETClientBase
     {
         private TaskCompletionSource<GetInstancesCallBackEventArgs> _taskCompletionSourceGetInstance = new TaskCompletionSource<GetInstancesCallBackEventArgs>();
@@ -249,7 +229,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Core
             OnConnected?.Invoke(this, new ConnectedEventArgs { EndPoint = e.EndPoint });
         }
 
-        public async Task Connect()
+        public async Task Connect(bool getAgentPubKeyAndDnaHashFromhApp = true)
         {
             try
             {
@@ -315,12 +295,62 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Core
 
                     Logger.Log(string.Concat("Connecting to ", WebSocket.EndPoint, "..."), LogType.Info);
                     await WebSocket.Connect();
+
+                    if (getAgentPubKeyAndDnaHashFromhApp)
+                    {
+                        AgentPubKeyDnaHash agentPubKeyDnaHash = GetAgentPubKeyAndDnaHashFromhApp();
+
+                        if (agentPubKeyDnaHash != null)
+                        {
+                            Config.AgentPubKey = agentPubKeyDnaHash.AgentPubKey;
+                            Config.DnaHash = agentPubKeyDnaHash.DnaHash;
+                        }
+                    }
                 }
             }
             catch (Exception e)
             {
                 HandleError(string.Concat("Error occured connecting to ", WebSocket.EndPoint), e);
             }
+        }
+
+        public AgentPubKeyDnaHash GetAgentPubKeyAndDnaHashFromhApp(bool updateConfig = true)
+        {
+            try
+            {
+                Process pProcess = new Process();
+                pProcess.StartInfo.WorkingDirectory = Config.FullPathToHapp;
+                pProcess.StartInfo.FileName = "hc";
+                pProcess.StartInfo.Arguments = "sandbox call list-cells";
+                pProcess.StartInfo.UseShellExecute = false;
+                pProcess.StartInfo.RedirectStandardOutput = true;
+                pProcess.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
+                pProcess.StartInfo.CreateNoWindow = false;
+                pProcess.Start();
+
+                string output = pProcess.StandardOutput.ReadToEnd();
+                int dnaStart = output.IndexOf("DnaHash") + 8;
+                int dnaEnd = output.IndexOf(")", dnaStart);
+                int agentStart = output.IndexOf("AgentPubKey") + 12;
+                int agentEnd = output.IndexOf(")", agentStart);
+
+                string dnaHash = output.Substring(dnaStart, dnaEnd - dnaStart);
+                string agentPubKey = output.Substring(agentStart, agentEnd - agentStart);
+
+                if (updateConfig)
+                {
+                    Config.AgentPubKey = agentPubKey;
+                    Config.DnaHash = dnaHash;
+                }
+
+                return new AgentPubKeyDnaHash() { DnaHash = dnaHash, AgentPubKey = agentPubKey };
+            }
+            catch (Exception ex)
+            {
+                HandleError("Error in HoloNETClientBase.GetAgentPubKeyAndDnaHashFromhApp getting DnaHash & AgentPubKey from hApp.", ex);
+            }
+
+            return null;
         }
 
         public async Task Disconnect()
@@ -401,41 +431,26 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Core
 
                 case HolochainVersion.RSM:
                     {
-                        //This is the Unity MessagePack Serialiser ported from Unity but this doesn't seem to work because the packets sent are too small.
-                        //MessagePackFormatter formatter = new MessagePackFormatter();
-
-                        
                         HoloNETData holoNETData = new HoloNETData()
                         {
                             type = "zome_call",
-                            //type = "Buffer",
                             data = new HoloNETDataZomeCall()
                             {
-                                cell_id = new byte[2][] { System.Convert.FromBase64String(Config.DnaHash), System.Convert.FromBase64String(Config.AgentPubKey) },
+                                cell_id = new byte[2][] { ConvertHoloHashToBytes(Config.DnaHash), ConvertHoloHashToBytes(Config.AgentPubKey) },
                                 fn_name = function,
                                 zome_name = zome,
                                 payload = MessagePackSerializer.Serialize(paramsObject),
-                                // payload = formatter.Serialize(paramsObject),
-                                //payload = formatter.Serialize(new Temp() {number = 10 }),
-                                //payload = MessagePackSerializer.Serialize(new Temp() { Name = "blah", Desc = "moooooo!" }),
-                                //payload = MessagePackSerializer.Serialize(new Temp() { number = 10 }), 
-                                //payload = formatter.Serialize(new Temp() { Name = "blah", Desc = "moooooo!" }),
-                                provenance = System.Convert.FromBase64String(Config.AgentPubKey),
+                                provenance = ConvertHoloHashToBytes(Config.AgentPubKey),
                                 cap = null
                             }
                         };
 
-
                         HoloNETRequest request = new HoloNETRequest()
                         {
                             id = Convert.ToUInt64(id),
-                            //type = "\"Request\"",
                             type = "Request",
                             data = MessagePackSerializer.Serialize(holoNETData)
-                            //data = formatter.Serialize(holoNETData)
                         };
-
-                        //await WebSocket.SendRawDataAsync(formatter.Serialize(request)); //This is the Unity MessagePack Serialiser ported from Unity but this doesn't seem to work because the packets sent are too small.
 
                         if (WebSocket.State == WebSocketState.Open)
                             await WebSocket.SendRawDataAsync(MessagePackSerializer.Serialize(request)); //This is the fastest and most popular .NET MessagePack Serializer.
@@ -531,6 +546,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Core
                 foreach (Process process in Process.GetProcessesByName(conductorInfo.Name))
                     process.Kill();
             }
+        }
+
+        private byte[] ConvertHoloHashToBytes(string hash)
+        {
+            string test = hash.Replace('-', '+').Replace('_', '/').Substring(1, hash.Length - 1);
+            return Convert.FromBase64String(hash.Replace('-', '+').Replace('_', '/').Substring(1, hash.Length - 1)); //also remove the u prefix.
         }
     }
 }

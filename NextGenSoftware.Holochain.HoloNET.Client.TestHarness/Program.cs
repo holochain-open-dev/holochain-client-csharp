@@ -37,7 +37,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
             //holoNETClient.Config.ErrorHandlingBehaviour = ErrorHandlingBehaviour.OnlyThrowExceptionIfNoErrorHandlerSubscribedToOnErrorEvent
             holoNETClient.Config.AutoStartConductor = false;
             holoNETClient.Config.AutoShutdownConductor = false;
-            holoNETClient.Config.FullPathToHolochainAppDNA = @"D:\Dropbox\Our World\OASIS API\NextGenSoftware.Holochain.hApp.OurWorld\our_world\dist\our_world.dna.json";
+            //holoNETClient.Config.FullPathToHolochainAppDNA = @"D:\Dropbox\Our World\OASIS API\NextGenSoftware.Holochain.hApp.OurWorld\our_world\dist\our_world.dna.json";
+            holoNETClient.Config.FullPathToHapp = string.Concat(Environment.CurrentDirectory, @"\hApps\happ-build-tutorial-develop");
 
             holoNETClient.OnConnected += HoloNETClient_OnConnected;
             holoNETClient.OnDataReceived += HoloNETClient_OnDataReceived;
@@ -51,8 +52,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
             await holoNETClient.Connect();
 
             if (holoNETClient.State == System.Net.WebSockets.WebSocketState.Open)
-            //if (holoNETClient.State2 == WebSocketState2.Open)
             {
+                //AgentPubKeyDnaHash agentPubKeyDnaHash = holoNETClient.GetAgentPubKeyAndDnaHashFromhApp();
+                //holoNETClient.Config.AgentPubKey = agentPubKeyDnaHash.AgentPubKey;
+                //holoNETClient.Config.DnaHash = agentPubKeyDnaHash.DnaHash;
+
                 // await holoNETClient.GetHolochainInstancesAsync();
                 //await holoNETClient.CallZomeFunctionAsync("1", "test-instance", "our_world_core", "test", ZomeCallback, null);
 
