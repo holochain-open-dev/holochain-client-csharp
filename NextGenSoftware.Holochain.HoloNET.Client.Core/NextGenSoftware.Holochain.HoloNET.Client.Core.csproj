@@ -12,7 +12,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\NextGenSoftware.Holochain.HoloNET.Client.MessagePack\NextGenSoftware.Holochain.HoloNET.Client.UnityMessagePack.csproj" />
     <ProjectReference Include="..\NextGenSoftware.WebSocket\NextGenSoftware.WebSocket.csproj" />
   </ItemGroup>
 

@@ -7,7 +7,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Desktop
     {
         public void Log(string message, LogType type)
         {
-            Console.WriteLine($"{type}: {message}");
+            if (type != LogType.Debug && type != LogType.Info)
+                Console.WriteLine($"{type}: {message}");
+            else
+                Console.WriteLine(message);
         }
     }
 }

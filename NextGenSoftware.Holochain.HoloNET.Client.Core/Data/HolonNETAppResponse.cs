@@ -4,11 +4,8 @@ using MessagePack;
 namespace NextGenSoftware.Holochain.HoloNET.Client.Core
 {
     [MessagePackObject]
-    public class HoloNETResponse
+    public struct HolonNETAppResponse
     {
-        [Key("id")]
-        public ulong id { get; set; }
-
         [Key("type")]
         public string type { get; set; }
 

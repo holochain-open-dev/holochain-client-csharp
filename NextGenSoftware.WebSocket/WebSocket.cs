@@ -93,17 +93,17 @@ namespace NextGenSoftware.WebSocket
 
         private void UnityWebSocket_OnError(string errorMsg)
         {
-            
+            OnError?.Invoke(this, new WebSocketErrorEventArgs() { EndPoint = EndPoint, Reason = errorMsg });
         }
 
         private void UnityWebSocket_OnClose(WebSocketCloseCode closeCode)
         {
-          
+            OnDisconnected?.Invoke(this, new DisconnectedEventArgs() { EndPoint = EndPoint, Reason = closeCode.ToString() });
         }
 
         private void UnityWebSocket_OnOpen()
         {
-          
+            OnConnected?.Invoke(this, new ConnectedEventArgs { EndPoint = EndPoint });
         }
 
         public async Task Connect()

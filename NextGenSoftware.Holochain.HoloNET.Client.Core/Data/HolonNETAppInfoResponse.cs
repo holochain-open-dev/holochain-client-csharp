@@ -4,15 +4,12 @@ using MessagePack;
 namespace NextGenSoftware.Holochain.HoloNET.Client.Core
 {
     [MessagePackObject]
-    public class HoloNETResponse
+    public struct HolonNETAppInfoResponse
     {
-        [Key("id")]
-        public ulong id { get; set; }
-
         [Key("type")]
         public string type { get; set; }
 
         [Key("data")]
-        public byte[] data { get; set; }
+        public HoloNETDataAppInfoCall data { get; set; }
     }
 }
