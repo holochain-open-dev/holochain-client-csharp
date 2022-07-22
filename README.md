@@ -13,7 +13,7 @@ https://www.ourworldthegame.com/single-post/2019/08/14/world-exclusive-holochain
 
 The previous version also came bundled with the holochain conductor so it could auto-start/shutdown the conductor and be fully integrated with any .NET or Unity application. This code/fuctionaility is still in there and will now work again that we have a Windows binary again (NixOS broke this feature previously).
 
-It was featured on Dev Pulse 44 here:
+It was featured on Dev Pulse 44 here:<br>
 https://medium.com/holochain/updated-quick-start-guide-the-gift-of-holonet-and-conversations-that-matter-on-the-holochain-8e08efde1f58
 
 https://www.ourworldthegame.com/single-post/2019/09/10/holonet-was-featured-in-the-latest-holochain-dev-pulse
