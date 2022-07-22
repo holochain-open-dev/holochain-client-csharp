@@ -1,26 +1,5 @@
 # holochain-client-csharp
 
-using the following references, we can implement the beginnings of a conductor client library for C#. 
-- https://hackmd.io/wRoLSZRHRniiq_FlMcmHrA
-- https://github.com/holochain/holochain-client-rust
-- https://github.com/holochain/holochain-client-js 
-- https://github.com/Sprillow/electron-holochain-template/blob/main/web/src/simpleZomeClient.ts
-- Basically a full implementation (but not working for dellams?) https://gist.github.com/Jakintosh/8578f39a66e50c4beb24bc34275e6ce5
-
-Connor proposes that we run tests against https://github.com/holochain/happ-build-tutorial
-
-There are a whole bunch of forum posts, Dev Camp discord chatter, and github issues that all precede and provide background on why to start this:
-- https://github.com/holochain/holochain/issues/905
-- (C++ but related) https://forum.holochain.org/t/wanted-a-c-client/6669
-
-
-## Proposed API
-
-One class which hosts the open websocket connection
-  - reason, being able to hold open a persistent connection, and not needing to have many open connections with the conductor
-
-One class which needs an instance of that websocket class passed to it, which is an abstraction over a Zome. So it is a Zome client. That way, one only needs to pass in an argument to make a zome call telling it which 'function' you wish to call in holochain. 
-
 ## HoloNET Code Has Migrated
 
 This code was migrated from the main OASIS API/STAR Metaverse/HoloNET/.NET HDK code found here:
@@ -39,20 +18,11 @@ https://medium.com/holochain/updated-quick-start-guide-the-gift-of-holonet-and-c
 
 https://www.ourworldthegame.com/single-post/2019/09/10/holonet-was-featured-in-the-latest-holochain-dev-pulse
 
-### Current Issues
+### Initial RSM Version
 
-You can view the full discussion going on since Aug to get this to work here:
-https://github.com/holochain/holochain/issues/905
+We are pleased that after nearly 2 years we have now finally got this upgraded to work with RSM thanks to Connors help, who we are eternally grateful to! :)
 
-It actually goes back further than this but this is the latest thread regarding this... :)
-
-### Rewards
-
-If anyone can crack this we will gift £3000+ worth of OLAND (virtual land in Our World) NFTs and earn 7777 karma points and tokens plus maybe more... please share around... thanks 🙏
-
-https://opensea.io/collection/theoasisandourworld
-
-This is urgent and a top priority now, because we can then complete the HOLOOASIS provider meaning we can bridge holochain to all web2 (dbs, clouds, etc) and web3 blockchains etc giving a easy migration path to holochain. 
+We can now complete HOLOOASIS provider meaning we can bridge holochain to all web2 (dbs, clouds, etc) and web3 blockchains etc giving a easy migration path to holochain. 
 
 It also allows the STAR Omniverse Low Code Generator to dynamically generate rust and c# code allowing people to focus on their idea rather than the lower level implementations and allow them to build metaverse experiences on top of holochain. 
 
@@ -67,7 +37,7 @@ So I hope now this has been split out into it's own indepenent repo and been off
 
 #### NuGet Package & Unity Asset
 
-Once we crack this nuget we can get it packaged up onto the .NET NuGet Package store as well as create a Unity Asset making it easier for other .NET & Unity devs to get involved with Holochain and get building hApps... 
+We plan to get it packaged up onto the .NET NuGet Package store as well as create a Unity Asset making it easier for other .NET & Unity devs to get involved with Holochain and get building hApps... 
 
 #### .NET HDK Low Code Generator
 
@@ -83,19 +53,21 @@ All of this helps bring yet more C# devs to Holochain who do not have time to le
 
 #### Restore Holochain Support For The OASIS API
 
-Once HoloNET is working the OASIS API will then once again support Holochain, which will allow bridging to other Blockchains, DB's etc such as Ethereum, EOS, Solana, MongoDB, SQLLite, Neo4j, ThreeFold, ActivityPub, SOLID, IPFS, etc...
+Now HoloNET is working again we can add support for the OASIS API, which will then support Holochain as well as allow bridging to other Blockchains, DB's etc such as Ethereum, EOS, Solana, MongoDB, SQLLite, Neo4j, ThreeFold, ActivityPub, SOLID, IPFS, etc...
 
 Read more here:
 https://github.com/NextGenSoftwareUK/Our-World-OASIS-API-HoloNET-HoloUnity-And-.NET-HDK
 
-#### STAR Metaverse
+#### WEB5 STAR Omniverse Interoperable Metaverse Low Code Generator
 
-We can also then add Holochain support to the STAR Metaverse/Omniverse, which the back-end is very close to completion and the front-end is in progress... :)
+We can also now add Holochain support to the STAR Metaverse/Omniverse, which the back-end is very close to completion and the front-end is in progress... :)
+
+This is an evolution of the .NET HDK Low Code Generator so works the same way in that is generates dynamic rust and c# code, except it now also generates moons, planets, stars, galaxies, universes, etc and allows them to run across any blockchain, web2 cloud/db, IPFS, Holochain, etc. Everything that the OASIS API supports. STAR integrates both the .NET HDK (containing HoloNET) as well as the OASIS API and then expresses it in a cyberspace ontolgy and soooooo much more! ;-) It also allows other metaverses to be integrated in the Open Omniverse, which is the game of and simulation of life...
 
 Read more here:
 https://www.ourworldthegame.com/single-post/announcing-star-odk-hdk-cosmic
 
-All of the above you can find more info on the OASIS API main repo as well as the Our World site & blogs:
+For all of the above you can find more info on the OASIS API main repo as well as the Our World site & blogs:
 
 http://www.ourworldthegame.com <br>
 https://github.com/NextGenSoftwareUK/Our-World-OASIS-API-HoloNET-HoloUnity-And-.NET-HDK
