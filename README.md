@@ -22,6 +22,12 @@ https://www.ourworldthegame.com/single-post/2019/09/10/holonet-was-featured-in-t
 
 We are pleased that after nearly 2 years we have now finally got this upgraded to work with RSM thanks to Connors help, who we are eternally grateful to! :)
 
+https://www.ourworldthegame.com/single-post/holonet-rsm-breakthrough-at-long-last
+
+Please check out the above link, there you will find more details on what has changed from the previous Redux HoloNET version as well as some documentation on how to use it... :)
+
+We will also add it here soon...
+
 We can now complete HOLOOASIS provider meaning we can bridge holochain to all web2 (dbs, clouds, etc) and web3 blockchains etc giving a easy migration path to holochain. 
 
 It also allows the STAR Omniverse Low Code Generator to dynamically generate rust and c# code allowing people to focus on their idea rather than the lower level implementations and allow them to build metaverse experiences on top of holochain. 
