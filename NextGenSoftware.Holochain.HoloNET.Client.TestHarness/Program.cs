@@ -40,6 +40,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
             _holoNETClient.OnError += HoloNETClient_OnError;
             _holoNETClient.OnConductorDebugCallBack += HoloNETClient_OnConductorDebugCallBack;
 
+            //Use this if you to manually pass in the AgentPubKey & DnaHash (otherwise it will be automatically queried from the conductor or sandbox).
+            //_holoNETClient.Config.AgentPubKey = "YOUR KEY";
+            //_holoNETClient.Config.DnaHash = "YOUR HASH";
+
+            //await _holoNETClient.Connect(false, false);
+
             await _holoNETClient.Connect();
         }
 
