@@ -1,7 +1,8 @@
-# HoloNET Holochain .NET/Unity Client
+﻿# HoloNET Holochain .NET/Unity Client
 
-The world's first .NET & Unity client for <a href="holochain.org">Holochain</a>.
+The world's first .NET & Unity client for [Holochain](http://holochain.org).
 
+This library will allow you to connect any .NET or Unity client to Holochain and enjoy the power of a fully de-centralised distributed multi-network agent-centric architecture.
 ## HoloNET Code Has Migrated
 
 This code was migrated from the main OASIS API/STAR Metaverse/HoloNET/.NET HDK code found here:
@@ -15,7 +16,7 @@ https://www.ourworldthegame.com/single-post/2019/08/14/world-exclusive-holochain
 
 The previous version also came bundled with the holochain conductor so it could auto-start/shutdown the conductor and be fully integrated with any .NET or Unity application. This code/fuctionaility is still in there and will now work again that we have a Windows binary again (NixOS broke this feature previously).
 
-It was featured on Dev Pulse 44 here:<br>
+It was featured on Dev Pulse 44 here:
 https://medium.com/holochain/updated-quick-start-guide-the-gift-of-holonet-and-conversations-that-matter-on-the-holochain-8e08efde1f58
 
 https://www.ourworldthegame.com/single-post/2019/09/10/holonet-was-featured-in-the-latest-holochain-dev-pulse
@@ -47,6 +48,8 @@ So I hope now this has been split out into it's own indepenent repo and been off
 
 We plan to get it packaged up onto the .NET NuGet Package store as well as create a Unity Asset making it easier for other .NET & Unity devs to get involved with Holochain and get building hApps... 
 
+This is thr NuGet Package, we will release the Unity Asset very soon...
+
 #### .NET HDK Low Code Generator
 
 We can then get back to the .NET HDK Low Code Generator (will migrate this <a href='https://github.com/NextGenSoftwareUK/Our-World-OASIS-API-HoloNET-HoloUnity-And-.NET-HDK/tree/master/NextGenSoftware.Holochain.HoloNET.HDK.Core'>repo</a> over to here soon...), this uses HoloNET to call into the dynamically generated rust and c# code. The rust code acts as a DAL (Data Access Layer) and the C# code acts as the BLL (Business Logic Layer). The generated C# code wraps around calls to HoloNET. This code has also already been written and is working with the previous version of Holochain (Redux).
@@ -77,11 +80,11 @@ https://www.ourworldthegame.com/single-post/announcing-star-odk-hdk-cosmic
 
 For all of the above you can find more info on the OASIS API main repo as well as the Our World site & blogs:
 
-http://www.ourworldthegame.com <br>
+http://www.ourworldthegame.com
 https://github.com/NextGenSoftwareUK/Our-World-OASIS-API-HoloNET-HoloUnity-And-.NET-HDK
 
-The Future Is Bright, The Future Is Holochain...
-<br><br>
-In Love, Light & Hope, <br>
-The Our World Tribe.
+The Future Is Bright, 
+The Future Is Holochain...
 
+In Love, Light & Hope, 
+The Our World Tribe.

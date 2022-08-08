@@ -1,6 +1,9 @@
-# HoloNET Holochain .NET/Unity Client
+﻿# HoloNET Holochain .NET/Unity Client
 
 The world's first .NET & Unity client for <a href="holochain.org">Holochain</a>.
+
+This is for the Unity version. Check out the Desktop verion here:
+https://github.com/holochain-open-dev/holochain-client-csharp/tree/main/NextGenSoftware.Holochain.HoloNET.Client.Desktop
 
 ## HoloNET Code Has Migrated
 

@@ -1,6 +1,19 @@
-# HoloNET Holochain .NET/Unity Client
+﻿# HoloNET Holochain .NET/Unity Client
 
 The world's first .NET & Unity client for <a href="holochain.org">Holochain</a>.
+
+This is for the desktop version, which uses NLog (which does not work in Unity) & a basic built-in lightweight ConsoleLogger.
+
+Check out the Unity verion here:
+https://github.com/holochain-open-dev/holochain-client-csharp/tree/main/NextGenSoftware.Holochain.HoloNET.Client.Unity
+Uses basic built-in lightweight ConsoleLogger and will soon support a Unity Only Logger.
+
+Check out the core abstract base class here:
+https://github.com/holochain-open-dev/holochain-client-csharp/tree/main/NextGenSoftware.Holochain.HoloNET.Client.Core
+This is the core abstract base class that must be extended/inherited from to use for the target platform/enviroment, etc. It uses Constructor DI (Dependency Injection) to allow the extended class to inject in the Logger they wish to use.
+
+You are free to create your own versions for your target platform/enviroment and custom logger (must implement the ILogger Interface).
+
 
 ## HoloNET Code Has Migrated
 

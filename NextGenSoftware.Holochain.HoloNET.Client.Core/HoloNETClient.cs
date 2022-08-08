@@ -11,7 +11,7 @@ using NextGenSoftware.WebSocket;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client.Core
 {
-    public abstract class HoloNETClientBase
+    public class HoloNETClient
     {
         private bool _getAgentPubKeyAndDnaHashFromConductor;
         private bool _updateDnaHashAndAgentPubKey = true;
@@ -87,13 +87,23 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Core
         }
 
         public ILogger Logger { get; set; }
-        public HolochainVersion HolochainVersion { get; set; }
-       
-        public HoloNETClientBase(string holochainConductorURI, HolochainVersion version, ILogger logger)
+
+        public HoloNETClient(string holochainConductorURI)
         {
-            HolochainVersion = version;
+            Logger = new ConsoleLogger();
+            Init(holochainConductorURI);
+        }
+
+        public HoloNETClient(string holochainConductorURI, ILogger logger)
+        {
             Logger = logger;
-            WebSocket = new WebSocket.WebSocket(holochainConductorURI, logger);
+            Init(holochainConductorURI);
+        }
+
+        private void Init(string holochainConductorURI)
+        {
+            //HolochainVersion = version;
+            WebSocket = new WebSocket.WebSocket(holochainConductorURI, Logger);
 
             //TODO: Impplemnt IDispoasable to unsubscribe event handlers to prevent memory leaks... 
             WebSocket.OnConnected += WebSocket_OnConnected;
@@ -117,91 +127,84 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Core
         {
             try
             {
-                switch (HolochainVersion)
+                OnDataReceived?.Invoke(this, new HoloNETDataReceivedEventArgs { EndPoint = e.EndPoint, RawJSONData = e.RawJSONData, RawBinaryData = e.RawBinaryData, WebSocketResult = e.WebSocketResult });
+
+                StringBuilder sb = new StringBuilder();
+                sb.Append(Encoding.UTF8.GetString(e.RawBinaryData, 0, e.RawBinaryData.Length));
+                string rawData = sb.ToString();
+                Logger.Log("Raw Data Received: " + rawData, LogType.Debug);
+
+                var options = MessagePackSerializerOptions.Standard.WithSecurity(MessagePackSecurity.UntrustedData);
+                HoloNETResponse response = MessagePackSerializer.Deserialize<HoloNETResponse>(e.RawBinaryData, options);
+
+                Logger.Log("RSM Response", LogType.Debug);
+                Logger.Log($"Id: {response.id}", LogType.Debug);
+                Logger.Log($"Type: {response.type}", LogType.Debug);
+
+                if (rawData.Substring(32, 8) == "app_info")
                 {
-                    case HolochainVersion.RSM:
-                        {
-                            OnDataReceived?.Invoke(this, new HoloNETDataReceivedEventArgs { EndPoint = e.EndPoint, RawJSONData = e.RawJSONData, RawBinaryData = e.RawBinaryData, WebSocketResult = e.WebSocketResult });
+                    Logger.Log("\nAPP INFO RESPONSE DATA DETECTED\n", LogType.Debug);
+                    HolonNETAppInfoResponse appInfoResponse = MessagePackSerializer.Deserialize<HolonNETAppInfoResponse>(response.data, options);
 
-                            StringBuilder sb = new StringBuilder();
-                            sb.Append(Encoding.UTF8.GetString(e.RawBinaryData, 0, e.RawBinaryData.Length));
-                            string rawData = sb.ToString();
-                            Logger.Log("Raw Data Received: " + rawData, LogType.Debug);
+                    string dnHash = ConvertHoloHashToString(appInfoResponse.data.cell_data[0].cell_id[0]);
+                    string agentPubKey = ConvertHoloHashToString(appInfoResponse.data.cell_data[0].cell_id[1]);
 
-                            var options = MessagePackSerializerOptions.Standard.WithSecurity(MessagePackSecurity.UntrustedData);
-                            HoloNETResponse response = MessagePackSerializer.Deserialize<HoloNETResponse>(e.RawBinaryData, options);
+                    if (_updateDnaHashAndAgentPubKey)
+                    {
+                        Config.AgentPubKey = agentPubKey;
+                        Config.DnaHash = dnHash;
+                    }
 
-                            Logger.Log("RSM Response", LogType.Debug);
-                            Logger.Log($"Id: {response.id}", LogType.Debug);
-                            Logger.Log($"Type: {response.type}", LogType.Debug);
+                    AppInfoCallBackEventArgs args = new AppInfoCallBackEventArgs(response.id.ToString(), EndPoint, true, e.RawBinaryData, e.RawJSONData, dnHash, agentPubKey, appInfoResponse.data.installed_app_id, appInfoResponse, e.WebSocketResult);
+                    Logger.Log(string.Concat("Id: ", args.Id, ", Is Call Successful: ", args.IsCallSuccessful ? "True" : "False", ", AgentPubKey: ", args.AgentPubKey, ", DnaHash: ", args.DnaHash, ", Installed App Id: ", args.InstalledAppId, ", Raw Binary Data: ",  e.RawBinaryData, ", Raw JSON Data: ", args.RawJSONData), LogType.Info);
+                    OnAppInfoCallBack?.Invoke(this, args);
 
-                            if (rawData.Substring(32, 8) == "app_info")
-                            {
-                                Logger.Log("\nAPP INFO RESPONSE DATA DETECTED\n", LogType.Debug);
-                                HolonNETAppInfoResponse appInfoResponse = MessagePackSerializer.Deserialize<HolonNETAppInfoResponse>(response.data, options);
+                    //If either the AgentPubKey or DnaHash is empty then attempt to get from the sandbox cmd.
+                    if (string.IsNullOrEmpty(Config.AgentPubKey) || string.IsNullOrEmpty(Config.DnaHash))
+                        GetAgentPubKeyAndDnaHashFromSandbox();
+                    else
+                        OnReadyForZomeCalls?.Invoke(this, new ReadyForZomeCallsEventArgs(dnHash, agentPubKey));
+                }
+                else
+                {
+                    HolonNETAppResponse appResponse = MessagePackSerializer.Deserialize<HolonNETAppResponse>(response.data, options);
+                    Dictionary<object, object> rawAppResponseData = MessagePackSerializer.Deserialize<Dictionary<object, object>>(appResponse.data, options);
+                    Dictionary<string, object> appResponseData = new Dictionary<string, object>();
 
-                                string dnHash = ConvertHoloHashToString(appInfoResponse.data.cell_data[0].cell_id[0]);
-                                string agentPubKey = ConvertHoloHashToString(appInfoResponse.data.cell_data[0].cell_id[1]);
+                    string data = "";
+                    string value = "";
+                    foreach (string key in rawAppResponseData.Keys)
+                    {
+                        byte[] bytes = rawAppResponseData[key] as byte[];
 
-                                if (_updateDnaHashAndAgentPubKey)
-                                {
-                                    Config.AgentPubKey = agentPubKey;
-                                    Config.DnaHash = dnHash;
-                                }
+                        if (bytes != null)
+                            value = ConvertHoloHashToString(bytes);
+                        else
+                            value = rawAppResponseData[key].ToString();
 
-                                AppInfoCallBackEventArgs args = new AppInfoCallBackEventArgs(response.id.ToString(), EndPoint, true, e.RawBinaryData, e.RawJSONData, dnHash, agentPubKey, appInfoResponse.data.installed_app_id, appInfoResponse, e.WebSocketResult);
-                                Logger.Log(string.Concat("Id: ", args.Id, ", Is Call Successful: ", args.IsCallSuccessful ? "True" : "False", ", AgentPubKey: ", args.AgentPubKey, ", DnaHash: ", args.DnaHash, ", Installed App Id: ", args.InstalledAppId, ", Raw Binary Data: ",  e.RawBinaryData, ", Raw JSON Data: ", args.RawJSONData), LogType.Info);
-                                OnAppInfoCallBack?.Invoke(this, args);
+                        data = string.Concat(data, key, "=", value, "\n");
+                        appResponseData[key] = value;
+                    }
+                    Logger.Log("\nZOME RESPONSE DATA DETECTED\n", LogType.Debug);
+                    Logger.Log($"Decoded Data:\n{data}", LogType.Debug);
 
-                                //If either the AgentPubKey or DnaHash is empty then attempt to get from the sandbox cmd.
-                                if (string.IsNullOrEmpty(Config.AgentPubKey) || string.IsNullOrEmpty(Config.DnaHash))
-                                    GetAgentPubKeyAndDnaHashFromSandbox();
-                                else
-                                    OnReadyForZomeCalls?.Invoke(this, new ReadyForZomeCallsEventArgs(dnHash, agentPubKey));
-                            }
-                            else
-                            {
-                                HolonNETAppResponse appResponse = MessagePackSerializer.Deserialize<HolonNETAppResponse>(response.data, options);
-                                Dictionary<object, object> rawAppResponseData = MessagePackSerializer.Deserialize<Dictionary<object, object>>(appResponse.data, options);
-                                Dictionary<string, object> appResponseData = new Dictionary<string, object>();
+                    string id = response.id.ToString();
+                    ZomeFunctionCallBackEventArgs args = new ZomeFunctionCallBackEventArgs(id, e.EndPoint, GetItemFromCache(id, _instanceLookup), GetItemFromCache(id, _zomeLookup), GetItemFromCache(id, _funcLookup), true, rawData, rawAppResponseData, appResponseData, e.RawBinaryData, e.RawJSONData, e.WebSocketResult);
+                    Logger.Log(string.Concat("Id: ", args.Id, ", Instance: ", args.Instance, ", Zome: ", args.Zome, ", Zome Function: ", args.ZomeFunction, ", Is Zome Call Successful: ", args.IsCallSuccessful ? "True" : "False", ", Raw Zome Return Data: ", args.RawZomeReturnData, ", Zome Return Data: ", args.ZomeReturnData, ", Raw Binary Data: ", e.RawBinaryData, ", Raw JSON Data: ", args.RawJSONData), LogType.Info);
 
-                                string data = "";
-                                string value = "";
-                                foreach (string key in rawAppResponseData.Keys)
-                                {
-                                    byte[] bytes = rawAppResponseData[key] as byte[];
+                    if (_callbackLookup.ContainsKey(id) && _callbackLookup[id] != null)
+                        _callbackLookup[id].DynamicInvoke(this, args);
 
-                                    if (bytes != null)
-                                        value = ConvertHoloHashToString(bytes);
-                                    else
-                                        value = rawAppResponseData[key].ToString();
+                    OnZomeFunctionCallBack?.Invoke(this, args);
 
-                                    data = string.Concat(data, key, "=", value, "\n");
-                                    appResponseData[key] = value;
-                                }
-                                Logger.Log("\nZOME RESPONSE DATA DETECTED\n", LogType.Debug);
-                                Logger.Log($"Decoded Data:\n{data}", LogType.Debug);
+                    // If the zome call requested for this to be cached then stick it in cache.
+                    if (_cacheZomeReturnDataLookup[id])
+                        _zomeReturnDataLookup[id] = args;
 
-                                string id = response.id.ToString();
-                                ZomeFunctionCallBackEventArgs args = new ZomeFunctionCallBackEventArgs(id, e.EndPoint, GetItemFromCache(id, _instanceLookup), GetItemFromCache(id, _zomeLookup), GetItemFromCache(id, _funcLookup), true, rawData, rawAppResponseData, appResponseData, e.RawBinaryData, e.RawJSONData, e.WebSocketResult);
-                                Logger.Log(string.Concat("Id: ", args.Id, ", Instance: ", args.Instance, ", Zome: ", args.Zome, ", Zome Function: ", args.ZomeFunction, ", Is Zome Call Successful: ", args.IsCallSuccessful ? "True" : "False", ", Raw Zome Return Data: ", args.RawZomeReturnData, ", Zome Return Data: ", args.ZomeReturnData, ", Raw Binary Data: ", e.RawBinaryData, ", Raw JSON Data: ", args.RawJSONData), LogType.Info);
-
-                                if (_callbackLookup.ContainsKey(id) && _callbackLookup[id] != null)
-                                    _callbackLookup[id].DynamicInvoke(this, args);
-
-                                OnZomeFunctionCallBack?.Invoke(this, args);
-
-                                // If the zome call requested for this to be cached then stick it in cache.
-                                if (_cacheZomeReturnDataLookup[id])
-                                    _zomeReturnDataLookup[id] = args;
-
-                                _instanceLookup.Remove(id);
-                                _zomeLookup.Remove(id);
-                                _funcLookup.Remove(id);
-                                _callbackLookup.Remove(id);
-                            }
-                        }
-                        break;
+                    _instanceLookup.Remove(id);
+                    _zomeLookup.Remove(id);
+                    _funcLookup.Remove(id);
+                    _callbackLookup.Remove(id);
                 }
             }
             catch (Exception ex)
@@ -447,27 +450,27 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Core
                     _callbackLookup[id] = callback;
 
 
-                switch (HolochainVersion)
-                {
-                    case HolochainVersion.Redux:
-                        {
-                            if (WebSocket.State == WebSocketState.Open)
-                            {
-                                await WebSocket.SendRawDataAsync(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(
-                                    new
-                                    {
-                                        jsonrpc = "2.0",
-                                        id,
-                                        method = "call",
-                                        @params = new { instance_id = instanceId, zome, function, args = paramsObject }
-                                    }
-                                )));
-                            }
-                        }
-                        break;
+                //switch (HolochainVersion)
+                //{
+                //    case HolochainVersion.Redux:
+                //        {
+                //            if (WebSocket.State == WebSocketState.Open)
+                //            {
+                //                await WebSocket.SendRawDataAsync(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(
+                //                    new
+                //                    {
+                //                        jsonrpc = "2.0",
+                //                        id,
+                //                        method = "call",
+                //                        @params = new { instance_id = instanceId, zome, function, args = paramsObject }
+                //                    }
+                //                )));
+                //            }
+                //        }
+                //        break;
 
-                    case HolochainVersion.RSM:
-                        {
+                //    case HolochainVersion.RSM:
+                //        {
                             HoloNETData holoNETData = new HoloNETData()
                             {
                                 type = "zome_call",
@@ -483,9 +486,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Core
                             };
 
                             await SendHoloNETRequest(id, holoNETData);
-                        }
-                        break;
-                }
+                        //}
+                        //break;
+               // }
             }
             catch (Exception ex)
             {

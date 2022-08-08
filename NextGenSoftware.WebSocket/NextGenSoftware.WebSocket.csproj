@@ -2,6 +2,35 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+	  <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+	  <PackageId>NextGenSoftware.WebSocket</PackageId>
+	  <Company>NextGen Software Ltd</Company>
+	  <Product>NextGen Software WebSocket</Product>
+	  <Title>NextGen Software WebSocket</Title>
+	  <Summary>WebSocket library used for other NextGen Software libraries such as HoloNET.</Summary>
+	  <Description>WebSocket library used for other NextGen Software libraries such as HoloNET.</Description>
+	  <PackageProjectUrl>https://github.com/NextGenSoftwareUK/holochain-client-csharp</PackageProjectUrl>
+	  <PackageIcon>hc logo.png</PackageIcon>
+	  <Authors>David Ellams (NextGen Software Ltd)</Authors>
+	  <PackageTags>websocket;net;unity</PackageTags>
+	  <PackageReleaseNotes>Initial Release</PackageReleaseNotes>
+	  <RepositoryType>git</RepositoryType>
+	  <RepositoryUrl>https://github.com/NextGenSoftwareUK/holochain-client-csharp</RepositoryUrl>
+	  <Copyright>Copyright © NextGen Software Ltd 2022</Copyright>
+	  <PackageReadmeFile>README.md</PackageReadmeFile>
+	  <!--<PackageLicenseExpression>GNU GPLv3</PackageLicenseExpression>-->
+	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
+	  <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+	  <Version>1.0.0</Version>
+	  <!--<PackageLicenseFile>..\LICENSE</PackageLicenseFile>-->
   </PropertyGroup>
+
+	<ItemGroup>
+		<None Include="..\..\..\..\OneDrive\Dropbox\Our World\Prototype\holochain\hc logo.png">
+		  <Pack>True</Pack>
+		  <PackagePath>\</PackagePath>
+		</None>
+	</ItemGroup>
+
 
 </Project>

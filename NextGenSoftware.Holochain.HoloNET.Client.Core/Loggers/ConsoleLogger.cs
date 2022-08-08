@@ -1,7 +1,7 @@
 ﻿using NextGenSoftware.WebSocket;
 using System;
 
-namespace NextGenSoftware.Holochain.HoloNET.Client.Desktop
+namespace NextGenSoftware.Holochain.HoloNET.Client
 {
     public class ConsoleLogger : ILogger
     {

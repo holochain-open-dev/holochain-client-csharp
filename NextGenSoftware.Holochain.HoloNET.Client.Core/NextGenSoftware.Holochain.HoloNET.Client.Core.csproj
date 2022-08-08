@@ -11,9 +11,9 @@
     <Description>The world's first .NET &amp; Unity client for Holochain.</Description>
     <PackageProjectUrl>https://github.com/NextGenSoftwareUK/holochain-client-csharp</PackageProjectUrl>
     <PackageIcon>hc logo.png</PackageIcon>
-    <Authors>David Ellams</Authors>
+    <Authors>David Ellams (NextGen Software Ltd)</Authors>
     <PackageTags>holochain;net;unity</PackageTags>
-    <PackageReleaseNotes>Initial Release</PackageReleaseNotes>
+    <PackageReleaseNotes>Main HoloNETClient class is no longer abstract, you can inject in your own logger or use the built-in simple lightweight ConsoleLogger. Also removed HolochainVersion (Redux/RSM). Only RSM (Refactored State Model/Latest Version) code remains.</PackageReleaseNotes>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/NextGenSoftwareUK/holochain-client-csharp</RepositoryUrl>
     <Copyright>Copyright © NextGen Software Ltd 2022</Copyright>
@@ -21,15 +21,12 @@
 	  <!--<PackageLicenseExpression>GNU GPLv3</PackageLicenseExpression>-->
 	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+    <Version>1.0.2</Version>
     <!--<PackageLicenseFile>..\LICENSE</PackageLicenseFile>-->
   </PropertyGroup>
 
   <ItemGroup>
     <None Include="..\..\..\..\OneDrive\Dropbox\Our World\Prototype\holochain\hc logo.png">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
-    <None Include="..\README.md">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
@@ -44,6 +41,13 @@
 
   <ItemGroup>
     <ProjectReference Include="..\NextGenSoftware.WebSocket\NextGenSoftware.WebSocket.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>

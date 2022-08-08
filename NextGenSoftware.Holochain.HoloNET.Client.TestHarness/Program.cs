@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using NextGenSoftware.Holochain.HoloNET.Client.Core;
-using NextGenSoftware.Holochain.HoloNET.Client.Desktop;
 using NextGenSoftware.WebSocket;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
@@ -20,7 +19,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
 
         private static async Task TestHoloNETClient()
         {
-            _holoNETClient = new HoloNETClient("ws://localhost:8888", HolochainVersion.RSM);
+            //_holoNETClient = new HoloNETClient("ws://localhost:8888", HolochainVersion.RSM);
+            _holoNETClient = new HoloNETClient("ws://localhost:8888");
 
             // holoNETClient.HolochainVersion = HolochainVersion.RSM;
             _holoNETClient.WebSocket.Config.NeverTimeOut = true;
