@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace NextGenSoftware.Holochain.HoloNET.Client.Core
+namespace NextGenSoftware.Holochain.HoloNET.Client
 {
     public class HoloNETException : Exception
     {

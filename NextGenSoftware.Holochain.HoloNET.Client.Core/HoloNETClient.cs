@@ -9,7 +9,7 @@ using System.Diagnostics;
 using MessagePack;
 using NextGenSoftware.WebSocket;
 
-namespace NextGenSoftware.Holochain.HoloNET.Client.Core
+namespace NextGenSoftware.Holochain.HoloNET.Client
 {
     public class HoloNETClient
     {

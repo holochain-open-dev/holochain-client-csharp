@@ -4,7 +4,7 @@ using System.Net.WebSockets;
 using Newtonsoft.Json.Linq;
 using NextGenSoftware.WebSocket;
 
-namespace NextGenSoftware.Holochain.HoloNET.Client.Core
+namespace NextGenSoftware.Holochain.HoloNET.Client
 {
     public class HoloNETErrorEventArgs : EventArgs
     {

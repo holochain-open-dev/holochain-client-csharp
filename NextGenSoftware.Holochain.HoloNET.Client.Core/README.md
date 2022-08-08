@@ -2,7 +2,7 @@
 
 The world's first .NET & Unity client for [Holochain](http://holochain.org).
 
-This library will allow you to connect any .NET or Unity client to Holochain and enjoy the power of a fully de-centralised distributed multi-network agent-centric architecture.
+This library will allow you to connect any .NET or Unity client to Holochain and enjoy the power of a fully de-centralised distributed P2P multi-network agent-centric architecture.
 ## HoloNET Code Has Migrated
 
 This code was migrated from the main OASIS API/STAR Metaverse/HoloNET/.NET HDK code found here:

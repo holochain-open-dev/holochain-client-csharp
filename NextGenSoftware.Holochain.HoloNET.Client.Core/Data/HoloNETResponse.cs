@@ -1,7 +1,7 @@
 ﻿
 using MessagePack;
 
-namespace NextGenSoftware.Holochain.HoloNET.Client.Core
+namespace NextGenSoftware.Holochain.HoloNET.Client
 {
     [MessagePackObject]
     public class HoloNETResponse

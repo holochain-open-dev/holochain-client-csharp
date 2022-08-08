@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using NextGenSoftware.Holochain.HoloNET.Client.Core;
 using NextGenSoftware.WebSocket;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
