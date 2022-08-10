@@ -8,7 +8,7 @@ This library will allow you to connect any .NET or Unity client to Holochain and
 This code was migrated from the main OASIS API/STAR Metaverse/HoloNET/.NET HDK code found here:
 https://github.com/NextGenSoftwareUK/Our-World-OASIS-API-HoloNET-HoloUnity-And-.NET-HDK
 
-### Background
+## Background
 
 Original HoloNET code was written back in 2019 and was fully operational with the previous version of Holochain (Redux), but unfortuntley had issues getting it working with RSM. 
 
@@ -20,7 +20,7 @@ It was featured on Dev Pulse 44 here: \
 https://medium.com/holochain/updated-quick-start-guide-the-gift-of-holonet-and-conversations-that-matter-on-the-holochain-8e08efde1f58 \
 https://www.ourworldthegame.com/single-post/2019/09/10/holonet-was-featured-in-the-latest-holochain-dev-pulse
 
-### Initial RSM Version
+## Initial RSM Version
 
 We are pleased that after nearly 2 years we have now finally got this upgraded to work with RSM thanks to Connors help, who we are eternally grateful to! :)
 
@@ -41,15 +41,15 @@ This is really vital and important to the wonderful holochain commnity because i
 So I hope now this has been split out into it's own indepenent repo and been officially handed over to the holochain open source community others can now jump in and get involved...
 
 
-### What's Next? 
+## What's Next? 
 
-#### NuGet Package & Unity Asset
+### NuGet Package & Unity Asset
 
 We plan to get it packaged up onto the .NET NuGet Package store as well as create a Unity Asset making it easier for other .NET & Unity devs to get involved with Holochain and get building hApps... 
 
 This is the NuGet Package, we will release the Unity Asset very soon...
 
-#### .NET HDK Low Code Generator
+### .NET HDK Low Code Generator
 
 We can then get back to the .NET HDK Low Code Generator (will migrate this [repo](https://github.com/NextGenSoftwareUK/Our-World-OASIS-API-HoloNET-HoloUnity-And-.NET-HDK/tree/master/NextGenSoftware.Holochain.HoloNET.HDK.Core) over to here soon...), this uses HoloNET to call into the dynamically generated rust and c# code. The rust code acts as a DAL (Data Access Layer) and the C# code acts as the BLL (Business Logic Layer). The generated C# code wraps around calls to HoloNET. This code has also already been written and is working with the previous version of Holochain (Redux).
 
@@ -61,14 +61,14 @@ Then, we can add the WASM compilation option to allow it to directly generate th
 
 All of this helps bring yet more C# devs to Holochain who do not have time to learn Rust... :)
 
-#### Restore Holochain Support For The OASIS API
+### Restore Holochain Support For The OASIS API
 
 Now HoloNET is working again, we can add support for the OASIS API, which will then support Holochain as well as allow bridging to other Blockchains, DB's etc such as Ethereum, EOS, Solana, MongoDB, SQLLite, Neo4j, ThreeFold, ActivityPub, SOLID, IPFS, etc...
 
 Read more here: \
 https://github.com/NextGenSoftwareUK/Our-World-OASIS-API-HoloNET-HoloUnity-And-.NET-HDK
 
-#### WEB5 STAR Omniverse Interoperable Metaverse Low Code Generator
+### WEB5 STAR Omniverse Interoperable Metaverse Low Code Generator
 
 We can also now add Holochain support to the STAR Metaverse/Omniverse, which the back-end is very close to completion and the front-end is in progress... :)
 
