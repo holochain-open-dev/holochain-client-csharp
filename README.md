@@ -34,7 +34,7 @@ We can now complete HOLOOASIS provider meaning we can bridge holochain to all we
 
 It also allows the STAR Omniverse Low Code Generator to dynamically generate rust and c# code allowing people to focus on their idea rather than the lower level implementations and allow them to build metaverse experiences on top of holochain. 
 
-### Why this is important & vital to the holochain community
+## Why this is important & vital to the holochain community
 
 This is really vital and important to the wonderful holochain commnity because it will open the doors to the massive .NET, Unity and Enterprise sectors bringing the flood of devs, resources and exposure we all really want holochain to see... :)
 
