@@ -2,11 +2,12 @@
 
 # Table of contents
 
-  - [Overview](#overview)
+- [Overview](#overview)
   - [HoloNET Code Has Migrated](#holonet-code-has-migrated)
   - [Background](#background)
   - [Initial RSM Version](#initial-rsm-version)
-  - [How To Use HoloNET (Quick Start)](#how-to-use-holonet-quick-start)
+  - [How To Use HoloNET](#how-to-use-holonet)
+    - [Quick Start](#quick-start)
     - [The Power of .NET Async Methods](#the-power-of-net-async-methods)
     - [Events](#events)
       - [OnConnected](#onconnected)
@@ -101,10 +102,12 @@ Please check out the above link, there you will find more details on what has ch
 
 We will also add it here soon...
 
-## How To Use HoloNET (Quick Start)
+
+## How To Use HoloNET 
 
 **NOTE: This documentation is a WIP, it will be completed soon, please bare with us, thank you! :)**
 
+### Quick Start
 
 You start by instantiating a new HoloNETClient class passing in the holochain websocket URI to the constructor as seen below:
 
