@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Text;
 using System.Net.WebSockets;
-using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.IO;
@@ -16,7 +15,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         private bool _getAgentPubKeyAndDnaHashFromConductor;
         private bool _updateDnaHashAndAgentPubKey = true;
         //private TaskCompletionSource<GetInstancesCallBackEventArgs> _taskCompletionSourceGetInstance = new TaskCompletionSource<GetInstancesCallBackEventArgs>();
-        private Dictionary<string, string> _instanceLookup = new Dictionary<string, string>();
+        //private Dictionary<string, string> _instanceLookup = new Dictionary<string, string>();
         private Dictionary<string, string> _zomeLookup = new Dictionary<string, string>();
         private Dictionary<string, string> _funcLookup = new Dictionary<string, string>();
         private Dictionary<string, ZomeFunctionCallBack> _callbackLookup = new Dictionary<string, ZomeFunctionCallBack>();
@@ -127,7 +126,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         {
             try
             {
-                OnDataReceived?.Invoke(this, new HoloNETDataReceivedEventArgs { EndPoint = e.EndPoint, RawJSONData = e.RawJSONData, RawBinaryData = e.RawBinaryData, WebSocketResult = e.WebSocketResult });
+                //OnDataReceived?.Invoke(this, new HoloNETDataReceivedEventArgs { EndPoint = e.EndPoint, RawJSONData = e.RawJSONData, RawBinaryData = e.RawBinaryData, WebSocketResult = e.WebSocketResult });                
 
                 StringBuilder sb = new StringBuilder();
                 sb.Append(Encoding.UTF8.GetString(e.RawBinaryData, 0, e.RawBinaryData.Length));
@@ -140,6 +139,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 Logger.Log("RSM Response", LogType.Debug);
                 Logger.Log($"Id: {response.id}", LogType.Debug);
                 Logger.Log($"Type: {response.type}", LogType.Debug);
+
+                OnDataReceived?.Invoke(this, new HoloNETDataReceivedEventArgs(response.id.ToString(), EndPoint, true, e.RawBinaryData, e.RawJSONData, e.WebSocketResult, false));
 
                 if (rawData.Substring(32, 8) == "app_info")
                 {
@@ -189,8 +190,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     Logger.Log($"Decoded Data:\n{data}", LogType.Debug);
 
                     string id = response.id.ToString();
-                    ZomeFunctionCallBackEventArgs args = new ZomeFunctionCallBackEventArgs(id, e.EndPoint, GetItemFromCache(id, _instanceLookup), GetItemFromCache(id, _zomeLookup), GetItemFromCache(id, _funcLookup), true, rawData, rawAppResponseData, appResponseData, e.RawBinaryData, e.RawJSONData, e.WebSocketResult);
-                    Logger.Log(string.Concat("Id: ", args.Id, ", Instance: ", args.Instance, ", Zome: ", args.Zome, ", Zome Function: ", args.ZomeFunction, ", Is Zome Call Successful: ", args.IsCallSuccessful ? "True" : "False", ", Raw Zome Return Data: ", args.RawZomeReturnData, ", Zome Return Data: ", args.ZomeReturnData, ", Raw Binary Data: ", e.RawBinaryData, ", Raw JSON Data: ", args.RawJSONData), LogType.Info);
+                    //ZomeFunctionCallBackEventArgs args = new ZomeFunctionCallBackEventArgs(id, e.EndPoint, GetItemFromCache(id, _instanceLookup), GetItemFromCache(id, _zomeLookup), GetItemFromCache(id, _funcLookup), true, rawData, rawAppResponseData, appResponseData, e.RawBinaryData, e.RawJSONData, e.WebSocketResult);
+                    ZomeFunctionCallBackEventArgs args = new ZomeFunctionCallBackEventArgs(id, e.EndPoint, GetItemFromCache(id, _zomeLookup), GetItemFromCache(id, _funcLookup), true, rawData, rawAppResponseData, appResponseData, e.RawBinaryData, e.RawJSONData, e.WebSocketResult);
+                    //Logger.Log(string.Concat("Id: ", args.Id, ", Instance: ", args.Instance, ", Zome: ", args.Zome, ", Zome Function: ", args.ZomeFunction, ", Is Zome Call Successful: ", args.IsCallSuccessful ? "True" : "False", ", Raw Zome Return Data: ", args.RawZomeReturnData, ", Zome Return Data: ", args.ZomeReturnData, ", Raw Binary Data: ", e.RawBinaryData, ", Raw JSON Data: ", args.RawJSONData), LogType.Info);
+                    Logger.Log(string.Concat("Id: ", args.Id, ", Zome: ", args.Zome, ", Zome Function: ", args.ZomeFunction, ", Is Zome Call Successful: ", args.IsCallSuccessful ? "True" : "False", ", Raw Zome Return Data: ", args.RawZomeReturnData, ", Zome Return Data: ", args.ZomeReturnData, ", Raw Binary Data: ", e.RawBinaryData, ", Raw JSON Data: ", args.RawJSONData), LogType.Info);
 
                     if (_callbackLookup.ContainsKey(id) && _callbackLookup[id] != null)
                         _callbackLookup[id].DynamicInvoke(this, args);
@@ -201,7 +204,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     if (_cacheZomeReturnDataLookup[id])
                         _zomeReturnDataLookup[id] = args;
 
-                    _instanceLookup.Remove(id);
+                    //_instanceLookup.Remove(id);
                     _zomeLookup.Remove(id);
                     _funcLookup.Remove(id);
                     _callbackLookup.Remove(id);
@@ -398,24 +401,30 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             await WebSocket.Disconnect();
         }
 
-        public async Task CallZomeFunctionAsync(string instanceId, string zome, string function, object paramsObject, bool cachReturnData = false)
+        //public async Task CallZomeFunctionAsync(string instanceId, string zome, string function, object paramsObject, bool cachReturnData = false)
+        public async Task CallZomeFunctionAsync(string zome, string function, object paramsObject, bool cachReturnData = false)
         {
             _currentId++;
-            await CallZomeFunctionAsync(_currentId.ToString(), instanceId, zome, function, null, paramsObject, true, cachReturnData);
+            await CallZomeFunctionAsync(_currentId.ToString(), zome, function, null, paramsObject, true, cachReturnData);
         }
 
-        public async Task CallZomeFunctionAsync(string id, string instanceId, string zome, string function, object paramsObject, bool matchIdToInstanceZomeFuncInCallback = true, bool cachReturnData = false)
+        //public async Task CallZomeFunctionAsync(string id, string instanceId, string zome, string function, object paramsObject, bool matchIdToInstanceZomeFuncInCallback = true, bool cachReturnData = false)
+        public async Task CallZomeFunctionAsync(string id, string zome, string function, object paramsObject, bool matchIdToInstanceZomeFuncInCallback = true, bool cachReturnData = false)
         {
-            await CallZomeFunctionAsync(id, instanceId, zome, function, null, paramsObject, matchIdToInstanceZomeFuncInCallback, cachReturnData);
+            await CallZomeFunctionAsync(id, zome, function, null, paramsObject, matchIdToInstanceZomeFuncInCallback, cachReturnData);
+            //await CallZomeFunctionAsync(id, instanceId, zome, function, null, paramsObject, matchIdToInstanceZomeFuncInCallback, cachReturnData);
         }
 
-        public async Task CallZomeFunctionAsync(string instanceId, string zome, string function, ZomeFunctionCallBack callback, object paramsObject, bool cachReturnData = false)
+        //public async Task CallZomeFunctionAsync(string instanceId, string zome, string function, ZomeFunctionCallBack callback, object paramsObject, bool cachReturnData = false)
+        public async Task CallZomeFunctionAsync(string zome, string function, ZomeFunctionCallBack callback, object paramsObject, bool cachReturnData = false)
         {
             _currentId++;
-            await CallZomeFunctionAsync(_currentId.ToString(), instanceId, zome, function, callback, paramsObject, true, cachReturnData);
+            //await CallZomeFunctionAsync(_currentId.ToString(), instanceId, zome, function, callback, paramsObject, true, cachReturnData);
+            await CallZomeFunctionAsync(_currentId.ToString(), zome, function, callback, paramsObject, true, cachReturnData);
         }
 
-        public async Task CallZomeFunctionAsync(string id, string instanceId, string zome, string function, ZomeFunctionCallBack callback, object paramsObject, bool matchIdToInstanceZomeFuncInCallback = true, bool cachReturnData = false)
+        //public async Task CallZomeFunctionAsync(string id, string instanceId, string zome, string function, ZomeFunctionCallBack callback, object paramsObject, bool matchIdToInstanceZomeFuncInCallback = true, bool cachReturnData = false)
+        public async Task CallZomeFunctionAsync(string id, string zome, string function, ZomeFunctionCallBack callback, object paramsObject, bool matchIdToInstanceZomeFuncInCallback = true, bool cachReturnData = false)
         {
             _cacheZomeReturnDataLookup[id] = cachReturnData;
 
@@ -429,7 +438,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     if (_zomeReturnDataLookup.ContainsKey(id))
                     {
                         Logger.Log("Caching Enabled so returning data from cach...", LogType.Warn);
-                        Logger.Log(string.Concat("Id: ", _zomeReturnDataLookup[id].Id, ", Instance: ", _zomeReturnDataLookup[id].Instance, ", Zome: ", _zomeReturnDataLookup[id].Zome, ", Zome Function: ", _zomeReturnDataLookup[id].ZomeFunction, ", Is Zome Call Successful: ", _zomeReturnDataLookup[id].IsCallSuccessful ? "True" : "False", ", Raw Zome Return Data: ", _zomeReturnDataLookup[id].RawZomeReturnData, ", Zome Return Data: ", _zomeReturnDataLookup[id].ZomeReturnData, ", JSON Raw Data: ", _zomeReturnDataLookup[id].RawJSONData), LogType.Info);
+                        //Logger.Log(string.Concat("Id: ", _zomeReturnDataLookup[id].Id, ", Instance: ", _zomeReturnDataLookup[id].Instance, ", Zome: ", _zomeReturnDataLookup[id].Zome, ", Zome Function: ", _zomeReturnDataLookup[id].ZomeFunction, ", Is Zome Call Successful: ", _zomeReturnDataLookup[id].IsCallSuccessful ? "True" : "False", ", Raw Zome Return Data: ", _zomeReturnDataLookup[id].RawZomeReturnData, ", Zome Return Data: ", _zomeReturnDataLookup[id].ZomeReturnData, ", JSON Raw Data: ", _zomeReturnDataLookup[id].RawJSONData), LogType.Info);
+                        Logger.Log(string.Concat("Id: ", _zomeReturnDataLookup[id].Id, ", Zome: ", _zomeReturnDataLookup[id].Zome, ", Zome Function: ", _zomeReturnDataLookup[id].ZomeFunction, ", Is Zome Call Successful: ", _zomeReturnDataLookup[id].IsCallSuccessful ? "True" : "False", ", Raw Zome Return Data: ", _zomeReturnDataLookup[id].RawZomeReturnData, ", Zome Return Data: ", _zomeReturnDataLookup[id].ZomeReturnData, ", JSON Raw Data: ", _zomeReturnDataLookup[id].RawJSONData), LogType.Info);
 
                         if (callback != null)
                             callback.DynamicInvoke(this, _zomeReturnDataLookup[id]);
@@ -441,7 +451,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                 if (matchIdToInstanceZomeFuncInCallback)
                 {
-                    _instanceLookup[id] = instanceId;
+                    //_instanceLookup[id] = instanceId;
                     _zomeLookup[id] = zome;
                     _funcLookup[id] = function;
                 }

@@ -15,16 +15,22 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
     public class HoloNETDataReceivedEventArgs : DataReceivedEventArgs
     {
+        public HoloNETDataReceivedEventArgs(string id, string endPoint, bool isCallSuccessful, byte[] rawBinaryData, string rawJSONData, WebSocketReceiveResult webSocketResult, bool isConductorDebugInfo) : base(id, endPoint, isCallSuccessful, rawBinaryData, rawJSONData, webSocketResult)
+        {
+            IsConductorDebugInfo = isConductorDebugInfo;
+        }
+
         public bool IsConductorDebugInfo { get; set; }
     }
 
 
-    public class ZomeFunctionCallBackEventArgs : CallBackBaseEventArgs
+    public class ZomeFunctionCallBackEventArgs : CallBackBaseEventArgsWithId
     {
-        public ZomeFunctionCallBackEventArgs(string id, string endPoint, string instance, string zome, string zomeFunction, bool isCallSuccessful, string rawData, Dictionary<object, object> rawZomeReturnData, Dictionary<string, object> zomeReturnData, byte[] rawBinaryData, string rawJSONData, WebSocketReceiveResult webSocketResult)
+        //public ZomeFunctionCallBackEventArgs(string id, string endPoint, string instance, string zome, string zomeFunction, bool isCallSuccessful, string rawData, Dictionary<object, object> rawZomeReturnData, Dictionary<string, object> zomeReturnData, byte[] rawBinaryData, string rawJSONData, WebSocketReceiveResult webSocketResult)
+        public ZomeFunctionCallBackEventArgs(string id, string endPoint, string zome, string zomeFunction, bool isCallSuccessful, string rawData, Dictionary<object, object> rawZomeReturnData, Dictionary<string, object> zomeReturnData, byte[] rawBinaryData, string rawJSONData, WebSocketReceiveResult webSocketResult)
             : base(id, endPoint, isCallSuccessful, rawBinaryData, rawJSONData, webSocketResult)
         {
-            Instance = instance;
+            //Instance = instance;
             Zome = zome;
             ZomeFunction = zomeFunction;
             RawData = rawData;
@@ -32,7 +38,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             ZomeReturnData = zomeReturnData;
         }
 
-        public string Instance { get; private set; }
+        //public string Instance { get; private set; }
         public string Zome { get; private set; }
         public string ZomeFunction { get; private set; }
         public string RawData { get; private set; }
@@ -40,7 +46,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public Dictionary<object, object> RawZomeReturnData { get; private set; }
     }
 
-    public class AppInfoCallBackEventArgs : CallBackBaseEventArgs
+    public class AppInfoCallBackEventArgs : CallBackBaseEventArgsWithId
     {
         public AppInfoCallBackEventArgs(string id, string endPoint, bool isCallSuccessful, byte[] rawBinaryData, string rawJSONData, string dnaHash, string agentPubKey, string installedAppId, HolonNETAppInfoResponse appInfo, WebSocketReceiveResult webSocketResult)
             : base(id, endPoint, isCallSuccessful, rawBinaryData, rawJSONData, webSocketResult)
@@ -65,31 +71,34 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             AgentPubKey = agentPubKey;
         }
 
-        public HolonNETAppInfoResponse AppInfo { get; private set; }
-        public string InstalledAppId { get; private set; }
+        public string EndPoint { get; private set; }
+
+        //public HolonNETAppInfoResponse AppInfo { get; private set; }
+        //public string InstalledAppId { get; private set; }
         public string DnaHash { get; private set; }
         public string AgentPubKey { get; private set; }
     }
 
-    public class SignalsCallBackEventArgs : CallBackBaseEventArgs
+    public class SignalsCallBackEventArgs : CallBackBaseEventArgsWithId
     {
-        public SignalsCallBackEventArgs(string id, string endPoint, bool isCallSuccessful, SignalTypes signalType, string name, JToken args, byte[] rawBinaryData, string rawJSONData, WebSocketReceiveResult webSocketResult)
+        public SignalsCallBackEventArgs(string id, string endPoint, bool isCallSuccessful, SignalTypes signalType, string name, JToken signalData, byte[] rawBinaryData, string rawJSONData, WebSocketReceiveResult webSocketResult)
             : base(id, endPoint, isCallSuccessful, rawBinaryData, rawJSONData, webSocketResult)
         {
             this.SignalType = signalType;
             this.Name = name;
-            this.Arguments = args;
+            this.SignalData = signalData;
         }
 
         public enum SignalTypes
         {
-            User
+            User,
+            Admin
         }
 
         //TODO: Check Signals Return Data And Add Properties Here
        public SignalTypes SignalType { get; set; }
        public string Name { get; set; }
-       public JToken Arguments { get; set; }
+       public JToken SignalData { get; set; }
     }
 
     public class ConductorDebugCallBackEventArgs 
