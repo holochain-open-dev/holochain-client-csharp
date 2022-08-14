@@ -1,5 +1,19 @@
 # HoloNET Holochain .NET/Unity Client
 
+# Table of contents
+
+- [HoloNET Holochain .NET/Unity Client](#holonet-holochain-netunity-client)
+  - [Overview](#overview)
+  - [HoloNET Code Has Migrated](#holonet-code-has-migrated)
+  - [Background](#background)
+  - [Initial RSM Version](#initial-rsm-version)
+  - [How To Use HoloNET (Quick Start)](#how-to-use-holonet-quick-start)
+  - [HoloOASIS](#holooasis)
+  - [OASIS API Core](#oasis-api-core)
+  - [HoloUnity](#holounity)
+
+## Overview
+
 The world's first .NET & Unity client for [Holochain](http://holochain.org).
 
 This library will allow you to connect any .NET or Unity client to Holochain and enjoy the power of a fully de-centralised distributed P2P multi-network agent-centric architecture.
