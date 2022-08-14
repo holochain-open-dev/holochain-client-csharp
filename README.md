@@ -2,7 +2,6 @@
 
 # Table of contents
 
-- [HoloNET Holochain .NET/Unity Client](#holonet-holochain-netunity-client)
   - [Overview](#overview)
   - [HoloNET Code Has Migrated](#holonet-code-has-migrated)
   - [Background](#background)
