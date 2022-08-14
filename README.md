@@ -56,13 +56,13 @@
     - [Events](#events)
     - [Methods](#methods)
     - [Properties](#properties)
-    - [Why this is important & vital to the holochain community](#why-this-is-important--vital-to-the-holochain-community)
-    - [What's Next?](#whats-next)
-      - [Unity Asset](#unity-asset)
-      - [.NET HDK Low Code Generator](#net-hdk-low-code-generator)
-      - [Restore Holochain Support For The OASIS API](#restore-holochain-support-for-the-oasis-api)
-      - [WEB5 STAR Omniverse Interoperable Metaverse Low Code Generator](#web5-star-omniverse-interoperable-metaverse-low-code-generator)
-    - [Donations Welcome! Thank you!](#donations-welcome-thank-you)
+  - [Why this is important & vital to the holochain community](#why-this-is-important--vital-to-the-holochain-community)
+  - [What's Next?](#whats-next)
+    - [Unity Asset](#unity-asset)
+    - [.NET HDK Low Code Generator](#net-hdk-low-code-generator)
+    - [Restore Holochain Support For The OASIS API](#restore-holochain-support-for-the-oasis-api)
+    - [WEB5 STAR Omniverse Interoperable Metaverse Low Code Generator](#web5-star-omniverse-interoperable-metaverse-low-code-generator)
+  - [Donations Welcome! Thank you!](#donations-welcome-thank-you)
 
 ## Overview
 
@@ -1245,16 +1245,16 @@ Of course if they wanted use the OASIS API then the first code listing is how it
 
 
 
-### Why this is important & vital to the holochain community
+## Why this is important & vital to the holochain community
 
 This is really vital and important to the wonderful holochain commnity because it will open the doors to the massive .NET, Unity and Enterprise sectors bringing the flood of devs, resources and exposure we all really want holochain to see... :)
 
 So I hope now this has been split out into it's own indepenent repo and been officially handed over to the holochain open source community others can now jump in and get involved...
 
 
-### What's Next? 
+## What's Next? 
 
-#### Unity Asset
+### Unity Asset
 
 We plan to create a Unity Asset making it easier for other .NET & Unity devs to get involved with Holochain and get building hApps... 
 
@@ -1262,7 +1262,7 @@ We will release this soon...
 
 In the meantime people can make use of this NuGet package.
 
-#### .NET HDK Low Code Generator
+### .NET HDK Low Code Generator
 
 We can then get back to the .NET HDK Low Code Generator (will migrate this [repo](https://github.com/NextGenSoftwareUK/Our-World-OASIS-API-HoloNET-HoloUnity-And-.NET-HDK/tree/master/NextGenSoftware.Holochain.HoloNET.HDK.Core) over to here soon...), this uses HoloNET to call into the dynamically generated rust and c# code. The rust code acts as a DAL (Data Access Layer) and the C# code acts as the BLL (Business Logic Layer). The generated C# code wraps around calls to HoloNET. This code has also already been written and is working with the previous version of Holochain (Redux).
 
@@ -1274,7 +1274,7 @@ Then, we can add the WASM compilation option to allow it to directly generate th
 
 All of this helps bring yet more C# devs to Holochain who do not have time to learn Rust... :)
 
-#### Restore Holochain Support For The OASIS API
+### Restore Holochain Support For The OASIS API
 
 Now HoloNET is working again, we can add support for the OASIS API, which will then support Holochain as well as allow bridging to other Blockchains, DB's etc such as Ethereum, EOS, Solana, MongoDB, SQLLite, Neo4j, ThreeFold, ActivityPub, SOLID, IPFS, etc...
 
@@ -1283,7 +1283,7 @@ We can now complete HOLOOASIS provider meaning we can bridge holochain to all WE
 Read more here: \
 https://github.com/NextGenSoftwareUK/Our-World-OASIS-API-HoloNET-HoloUnity-And-.NET-HDK
 
-#### WEB5 STAR Omniverse Interoperable Metaverse Low Code Generator
+### WEB5 STAR Omniverse Interoperable Metaverse Low Code Generator
 
 It also allows the STAR Omniverse Interoperable Metaverse Low Code Generator to dynamically generate rust and c# code allowing people to focus on their idea rather than the lower level implementations and allow them to build metaverse experiences on top of holochain. 
 
@@ -1301,7 +1301,7 @@ http://www.ourworldthegame.com \
 https://github.com/NextGenSoftwareUK/Our-World-OASIS-API-HoloNET-HoloUnity-And-.NET-HDK
 
 
-### Donations Welcome! Thank you!
+## Donations Welcome! Thank you!
 
 **HoloNET is totally free and Open Sourced to be used anyway you wish as long as we are credited. If you find it helpful, we would REALLY appreciate a donation to our crowd funding page, because this is our full-time job and so have no other income and will help keep us alive so we can continue to improve it for you all (as well as the WEB4 OASIS API, .NET HDK Low Code Generator & WEB5 STAR ODK Ominverse Interoperable Metaverse Low Code Generator), thank you! :)**
 
