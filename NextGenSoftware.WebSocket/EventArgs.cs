@@ -20,9 +20,9 @@ namespace NextGenSoftware.WebSocket
         public string Reason { get; set; }
         public Exception ErrorDetails { get; set; }
     }
-    public class DataReceivedEventArgs : CallBackBaseEventArgs
+    public class DataReceivedEventArgs : CallBackBaseEventArgsWithId
     {
-        public DataReceivedEventArgs(string id, string endPoint, bool isCallSuccessful, byte[] rawBinaryData, string rawJSONData, WebSocketReceiveResult webSocketResult) : base(endPoint, isCallSuccessful, rawBinaryData, rawJSONData, webSocketResult)
+        public DataReceivedEventArgs(string id, string endPoint, bool isCallSuccessful, byte[] rawBinaryData, string rawJSONData, WebSocketReceiveResult webSocketResult) : base(id, endPoint, isCallSuccessful, rawBinaryData, rawJSONData, webSocketResult)
         {
             
         }

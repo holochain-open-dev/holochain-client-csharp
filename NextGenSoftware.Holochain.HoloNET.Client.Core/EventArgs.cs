@@ -65,16 +65,14 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
     public class ReadyForZomeCallsEventArgs
     {
-        public ReadyForZomeCallsEventArgs(string dnaHash, string agentPubKey)
+        public ReadyForZomeCallsEventArgs(string endPoint, string dnaHash, string agentPubKey)
         {
+            EndPoint = endPoint;
             DnaHash = dnaHash;
             AgentPubKey = agentPubKey;
         }
 
         public string EndPoint { get; private set; }
-
-        //public HolonNETAppInfoResponse AppInfo { get; private set; }
-        //public string InstalledAppId { get; private set; }
         public string DnaHash { get; private set; }
         public string AgentPubKey { get; private set; }
     }

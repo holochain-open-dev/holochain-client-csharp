@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using NextGenSoftware.Logging;
 using NextGenSoftware.WebSocket;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
@@ -18,16 +19,23 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
 
         private static async Task TestHoloNETClient()
         {
-            //_holoNETClient = new HoloNETClient("ws://localhost:8888", HolochainVersion.RSM);
             _holoNETClient = new HoloNETClient("ws://localhost:8888");
-
-            // holoNETClient.HolochainVersion = HolochainVersion.RSM;
             _holoNETClient.WebSocket.Config.NeverTimeOut = true;
+
+            //If no LoggingMode is set then it will default to WarningsErrorsAndInfo.
+            _holoNETClient.Config.LoggingMode = LoggingMode.WarningsErrorsInfoAndDebug;
+            //_holoNETClient.Config.LoggingMode = LoggingMode.WarningsAndErrors;
+
+
             //holoNETClient.Config.ErrorHandlingBehaviour = ErrorHandlingBehaviour.OnlyThrowExceptionIfNoErrorHandlerSubscribedToOnErrorEvent
-            _holoNETClient.Config.AutoStartConductor = false;
-            _holoNETClient.Config.AutoShutdownConductor = false;
+            _holoNETClient.Config.AutoStartHolochainConductor = true;
+            _holoNETClient.Config.AutoShutdownHolochainConductor = true;
+            _holoNETClient.Config.ShutDownALLHolochainConductors = true; //Normally default's to false, but if you want to make sure no holochain processes are left running set this to true.
+            _holoNETClient.Config.ShowHolochainConductorWindow = true; //Defaults to false.
+
             //holoNETClient.Config.FullPathToHolochainAppDNA = @"D:\Dropbox\Our World\OASIS API\NextGenSoftware.Holochain.hApp.OurWorld\our_world\dist\our_world.dna.json";
-            _holoNETClient.Config.FullPathToHapp = string.Concat(Environment.CurrentDirectory, @"\hApps\happ-build-tutorial-develop");
+            _holoNETClient.Config.FullPathToHappFolder = string.Concat(Environment.CurrentDirectory, @"\hApps\happ-build-tutorial-develop");
+            //_holoNETClient.Config.FullPathToHapp = string.Concat(Environment.CurrentDirectory, @"\hApps\numbers-hApp");
 
             _holoNETClient.OnConnected += HoloNETClient_OnConnected;
             _holoNETClient.OnDataReceived += HoloNETClient_OnDataReceived;
@@ -68,7 +76,14 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
 
         private static void HoloNETClient_OnAppInfoCallBack(object sender, AppInfoCallBackEventArgs e)
         {
-            Console.WriteLine(string.Concat("TEST HARNESS: APPINFO CALLBACK EVENT HANDLER: EndPoint: ", e.EndPoint, ", Id: ", e.Id, ", AgentPubKey: ", e.AgentPubKey, ", DnaHash: ", e.DnaHash, ", Installed App Id: ", e.InstalledAppId, ", Raw Binary Data: ",  e.RawBinaryData, ", Raw JSON Data: ", e.RawJSONData), LogType.Info);
+            //Console.WriteLine(string.Concat("TEST HARNESS: APPINFO CALLBACK EVENT HANDLER: EndPoint: ", e.EndPoint, ", Id: ", e.Id, ", AgentPubKey: ", e.AgentPubKey, ", DnaHash: ", e.DnaHash, ", Installed App Id: ", e.InstalledAppId, ", Raw Binary Data: ",  e.RawBinaryData, ", Raw JSON Data: ", e.RawJSONData), LogType.Info);
+            //Console.WriteLine(string.Concat("TEST HARNESS: APPINFO CALLBACK EVENT HANDLER: EndPoint: ", e.EndPoint, ", Id: ", e.Id, ", AgentPubKey: ", e.AgentPubKey, ", DnaHash: ", e.DnaHash, ", Installed App Id: ", e.InstalledAppId, ", Raw Binary Data: ", e.RawBinaryData, $", Raw JSON Data: {e.RawJSONData}"), LogType.Info);
+            //Console.WriteLine($"TEST HARNESS: APPINFO CALLBACK EVENT HANDLER: EndPoint: { e.EndPoint}, Id: {e.Id}, AgentPubKey: {e.AgentPubKey}, DnaHash: {e.DnaHash}, Installed App Id: {e.InstalledAppId}, Raw Binary Data: {e.RawBinaryData}, Raw JSON Data: {e.RawJSONData}", LogType.Info);
+            string msg = $"TEST HARNESS: APPINFO CALLBACK EVENT HANDLER: EndPoint: { e.EndPoint}, Id: {e.Id}, AgentPubKey: {e.AgentPubKey}, DnaHash: {e.DnaHash}, Installed App Id: {e.InstalledAppId}, Raw Binary Data: {e.RawBinaryData}";
+            //msg = msg + ", Raw JSON Data: " + e.RawJSONData;
+           // msg = string.Concat(msg, ", Raw JSON Data: ", e.RawJSONData);
+            Console.WriteLine(string.Concat(msg, ", Raw JSON Data: ", e.RawJSONData));
+
             Console.WriteLine("");
         }
 
@@ -94,6 +109,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
         {
             Console.WriteLine(string.Concat("\nTEST HARNESS: ZOME CALLBACK DELEGATE EVENT HANDLER: ", ProcessZomeFunctionCallBackEventArgs(e)));
             Console.WriteLine("");
+
+            _holoNETClient.Disconnect();
         }
 
         private static void HoloNETClient_OnDisconnected(object sender, DisconnectedEventArgs e)
