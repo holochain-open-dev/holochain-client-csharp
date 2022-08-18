@@ -1,4 +1,7 @@
 ﻿
+using System;
+using System.IO;
+
 namespace NextGenSoftware.Logging
 {
     public class DefaultLogger : ILogger
