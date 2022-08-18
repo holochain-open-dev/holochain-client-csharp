@@ -7,15 +7,20 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
     {
         public string AgentPubKey { get; set; } = "";
         public string DnaHash { get; set; } = "";
-        public string FullPathToHappFolder { get; set; }
+        public string FullPathToRootHappFolder { get; set; }
+        public string FullPathToCompiledHappFolder { get; set; }
+        public HolochainConductorModeEnum HolochainConductorMode { get; set; } = HolochainConductorModeEnum.UseSystemGlobal;
         public string FullPathToExternalHolochainConductorBinary { get; set; } //= "HolochainBinaries\\holochain.exe";
         public string FullPathToExternalHCToolBinary { get; set; } //= "HolochainBinaries\\hc.exe";
+        
         //public string FullPathToHolochainAppDNA { get; set; }
         public int SecondsToWaitForHolochainConductorToStart { get; set; } = 7;
         public bool AutoStartHolochainConductor { get; set; } = true;
         public bool ShowHolochainConductorWindow { get; set; } = false;
         public bool AutoShutdownHolochainConductor { get; set; } = true;
         public bool ShutDownALLHolochainConductors { get; set; } = false;
+        public HolochainConductorEnum HolochainConductorToUse { get; set; } = HolochainConductorEnum.HcDevTool; //Will soon default to HolochainProductionConductor once figured out how to pass a hApp to it! ;-)
+        public bool OnlyAllowOneHolochainConductorToRunAtATime { get; set; } = false;
 
         public LoggingMode LoggingMode
         {

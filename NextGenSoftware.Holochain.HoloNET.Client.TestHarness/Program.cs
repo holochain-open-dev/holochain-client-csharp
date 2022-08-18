@@ -32,9 +32,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
             _holoNETClient.Config.AutoShutdownHolochainConductor = true;
             _holoNETClient.Config.ShutDownALLHolochainConductors = true; //Normally default's to false, but if you want to make sure no holochain processes are left running set this to true.
             _holoNETClient.Config.ShowHolochainConductorWindow = true; //Defaults to false.
+            //_holoNETClient.Config.HolochainConductorMode = HolochainConductorModeEnum.UseSystemGlobal;
+            _holoNETClient.Config.HolochainConductorMode = HolochainConductorModeEnum.UseEmbedded;
+            _holoNETClient.Config.HolochainConductorToUse = HolochainConductorEnum.HcDevTool;
 
             //holoNETClient.Config.FullPathToHolochainAppDNA = @"D:\Dropbox\Our World\OASIS API\NextGenSoftware.Holochain.hApp.OurWorld\our_world\dist\our_world.dna.json";
-            _holoNETClient.Config.FullPathToHappFolder = string.Concat(Environment.CurrentDirectory, @"\hApps\happ-build-tutorial-develop");
+            _holoNETClient.Config.FullPathToRootHappFolder = string.Concat(Environment.CurrentDirectory, @"\hApps\happ-build-tutorial-develop");
+            _holoNETClient.Config.FullPathToCompiledHappFolder = string.Concat(Environment.CurrentDirectory, @"\hApps\happ-build-tutorial-develop\workdir\happ");
             //_holoNETClient.Config.FullPathToHapp = string.Concat(Environment.CurrentDirectory, @"\hApps\numbers-hApp");
 
             _holoNETClient.OnConnected += HoloNETClient_OnConnected;
