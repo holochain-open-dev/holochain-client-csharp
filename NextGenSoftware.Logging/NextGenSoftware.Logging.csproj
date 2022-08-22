@@ -13,7 +13,7 @@
 		<PackageIcon>hc logo.png</PackageIcon>
 		<Authors>David Ellams (NextGen Software Ltd)</Authors>
 		<PackageTags>logging;net;unity</PackageTags>
-		<PackageReleaseNotes>Inital Release</PackageReleaseNotes>
+		<PackageReleaseNotes>Multiple loggers can now be passed in and the DefaultLogger now uses colour &amp; animation (configurable).</PackageReleaseNotes>
 		<RepositoryType>git</RepositoryType>
 		<RepositoryUrl>https://github.com/NextGenSoftwareUK/holochain-client-csharp</RepositoryUrl>
 		<Copyright>Copyright © NextGen Software Ltd 2022</Copyright>
@@ -21,7 +21,7 @@
 		<!--<PackageLicenseExpression>GNU GPLv3</PackageLicenseExpression>-->
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-		<Version>1.0.0</Version>
+		<Version>1.1.0</Version>
 		<!--<PackageLicenseFile>..\LICENSE</PackageLicenseFile>-->
 	</PropertyGroup>
 
@@ -30,6 +30,10 @@
 			<Pack>True</Pack>
 			<PackagePath>\</PackagePath>
 		</None>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\..\Our-World-OASIS-API-HoloNET-HoloUnity-And-.NET-HDK\NextGenSoftware.CLI.Engine\NextGenSoftware.CLI.Engine.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

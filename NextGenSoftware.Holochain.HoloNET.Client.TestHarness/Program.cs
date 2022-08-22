@@ -31,9 +31,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
             _holoNETClient.Config.AutoStartHolochainConductor = true;
             _holoNETClient.Config.AutoShutdownHolochainConductor = true;
             _holoNETClient.Config.ShutDownALLHolochainConductors = true; //Normally default's to false, but if you want to make sure no holochain processes are left running set this to true.
-            _holoNETClient.Config.ShowHolochainConductorWindow = true; //Defaults to false.
-            //_holoNETClient.Config.HolochainConductorMode = HolochainConductorModeEnum.UseSystemGlobal;
-            _holoNETClient.Config.HolochainConductorMode = HolochainConductorModeEnum.UseEmbedded;
+            _holoNETClient.Config.ShowHolochainConductorWindow = false; //Defaults to false.
+            _holoNETClient.Config.HolochainConductorMode = HolochainConductorModeEnum.UseSystemGlobal;
+            //_holoNETClient.Config.HolochainConductorMode = HolochainConductorModeEnum.UseEmbedded;
             _holoNETClient.Config.HolochainConductorToUse = HolochainConductorEnum.HcDevTool;
 
             //holoNETClient.Config.FullPathToHolochainAppDNA = @"D:\Dropbox\Our World\OASIS API\NextGenSoftware.Holochain.hApp.OurWorld\our_world\dist\our_world.dna.json";
@@ -113,8 +113,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
         {
             Console.WriteLine(string.Concat("\nTEST HARNESS: ZOME CALLBACK DELEGATE EVENT HANDLER: ", ProcessZomeFunctionCallBackEventArgs(e)));
             Console.WriteLine("");
-
-            _holoNETClient.Disconnect();
         }
 
         private static void HoloNETClient_OnDisconnected(object sender, DisconnectedEventArgs e)
@@ -127,6 +125,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
         {
             Console.WriteLine(string.Concat("TEST HARNESS: ZOME FUNCTION CALLBACK EVENT HANDLER: ", ProcessZomeFunctionCallBackEventArgs(e)));
             Console.WriteLine("");
+
+            _holoNETClient.Disconnect();
         }
 
         private static string ProcessZomeFunctionCallBackEventArgs(ZomeFunctionCallBackEventArgs args)

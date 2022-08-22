@@ -1,4 +1,6 @@
 ﻿
+using System;
+
 namespace NextGenSoftware.Logging
 {
     public static class LogConfig

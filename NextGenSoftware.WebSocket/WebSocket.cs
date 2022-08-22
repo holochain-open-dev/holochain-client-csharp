@@ -10,8 +10,8 @@ namespace NextGenSoftware.WebSocket
 {
     public class WebSocket
     {
-        private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
-        private readonly CancellationToken _cancellationToken;
+        private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+        private CancellationToken _cancellationToken;
         private WebSocketConfig _config = null;
 
         //Events
@@ -56,19 +56,32 @@ namespace NextGenSoftware.WebSocket
             }
         }
 
-        public ILogger Logger { get; set; }
-
         //public IWebSocketClientNET NetworkServiceProvider { get; set; }
         //public NetworkServiceProviderMode NetworkServiceProviderMode { get; set; }
 
-        public WebSocket(string endPointURI)
+        public WebSocket(string endPointURI, bool logToConsole = true, bool logToFile = true, string releativePathToLogFolder = "Logs", string logFileName = "NextGenSoftwareWebSocket.log", bool addAdditionalSpaceAfterEachLogEntry = false, bool showColouredLogs = true, ConsoleColor debugColour = ConsoleColor.White, ConsoleColor infoColour = ConsoleColor.Green, ConsoleColor warningColour = ConsoleColor.Yellow, ConsoleColor errorColour = ConsoleColor.Red)
         {
-            Logger = new DefaultLogger(true, true, "Logs", "NextGenSoftwareWebSocket.log");
+            EndPoint = endPointURI;
+            Logging.Logging.Loggers.Add(new DefaultLogger(logToConsole, logToFile, releativePathToLogFolder, logFileName, addAdditionalSpaceAfterEachLogEntry, showColouredLogs, debugColour, infoColour, warningColour, errorColour));
+            Init();
+        }
+
+        public WebSocket(string endPointURI, IEnumerable<ILogger> loggers)
+        {
+            EndPoint = endPointURI;
+            Logging.Logging.Loggers = new List<ILogger>(loggers);
+            Init();
         }
 
         public WebSocket(string endPointURI, ILogger logger)
         {
-            Logger = logger;
+            Logging.Logging.Loggers.Add(logger);
+            EndPoint = endPointURI;
+            Init();
+        }
+
+        private void Init()
+        {
             ClientWebSocket = new ClientWebSocket(); // The original built-in HoloNET WebSocket
             ClientWebSocket.Options.KeepAliveInterval = TimeSpan.FromSeconds(Config.KeepAliveSeconds);
 
@@ -79,7 +92,6 @@ namespace NextGenSoftware.WebSocket
             //UnityWebSocket.OnError += UnityWebSocket_OnError;
             //UnityWebSocket.OnMessage += UnityWebSocket_OnMessage;
 
-            EndPoint = endPointURI;
 
             _cancellationToken = _cancellationTokenSource.Token; //TODO: do something with this!
         }
@@ -118,12 +130,12 @@ namespace NextGenSoftware.WebSocket
         {
             try
             {
-                if (Logger == null)
-                    throw new WebSocketException("ERROR: No Logger Has Been Specified! Please set a Logger with the Logger Property.");
+                if (Logging.Logging.Loggers.Count == 0)
+                    throw new WebSocketException("ERROR: No Logger Has Been Specified! Please set a Logger with the Logging.Logging.Loggers Property.");
 
                 if (ClientWebSocket.State != WebSocketState.Connecting && ClientWebSocket.State != WebSocketState.Open && ClientWebSocket.State != WebSocketState.Aborted)
                 {
-                    Logger.Log(string.Concat("Connecting to ", EndPoint, "..."), LogType.Info);
+                    Logging.Logging.Log(string.Concat("Connecting to ", EndPoint, "..."), LogType.Info, true);
 
                     await ClientWebSocket.ConnectAsync(new Uri(EndPoint), CancellationToken.None);
                     //NetworkServiceProvider.Connect(new Uri(EndPoint));
@@ -132,7 +144,7 @@ namespace NextGenSoftware.WebSocket
                     //if (NetworkServiceProvider.NetSocketState == NetSocketState.Open)
                     if (ClientWebSocket.State == WebSocketState.Open)
                     {
-                        Logger.Log(string.Concat("Connected to ", EndPoint), LogType.Info);
+                        Logging.Logging.Log(string.Concat("Connected to ", EndPoint), LogType.Info);
                         OnConnected?.Invoke(this, new ConnectedEventArgs { EndPoint = EndPoint });
                         StartListen();
                     }
@@ -148,17 +160,17 @@ namespace NextGenSoftware.WebSocket
         {
             try
             {
-                if (Logger == null)
-                    throw new WebSocketException("ERROR: No Logger Has Been Specified! Please set a Logger with the Logger Property.");
+                if (Logging.Logging.Loggers.Count == 0)
+                    throw new WebSocketException("ERROR: No Logger Has Been Specified! Please set a Logger with the Logging.Logging.Loggers Property.");
 
                 if (ClientWebSocket != null && ClientWebSocket.State != WebSocketState.Connecting && ClientWebSocket.State != WebSocketState.Closed && ClientWebSocket.State != WebSocketState.Aborted && ClientWebSocket.State != WebSocketState.CloseSent && ClientWebSocket.State != WebSocketState.CloseReceived)
                 {
-                    Logger.Log(string.Concat("Disconnecting from ", EndPoint, "..."), LogType.Info);
+                    Logging.Logging.Log(string.Concat("Disconnecting from ", EndPoint, "..."), LogType.Info, true);
                     await ClientWebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Client manually disconnected.", CancellationToken.None);
 
                     if (ClientWebSocket.State == WebSocketState.Closed)
                     {
-                        Logger.Log(string.Concat("Disconnected from ", EndPoint), LogType.Info);
+                        Logging.Logging.Log(string.Concat("Disconnected from ", EndPoint), LogType.Info);
                         OnDisconnected?.Invoke(this, new DisconnectedEventArgs { EndPoint = EndPoint, Reason = "Disconnected Method Called." });
                     }
                 }
@@ -176,9 +188,9 @@ namespace NextGenSoftware.WebSocket
             foreach (byte b in data)
                 rawBytes = string.Concat(rawBytes, ", ", b.ToString());
 
-            Logger.Log("Sending Raw Data...", LogType.Info);
-            Logger.Log($"UTF8: {Encoding.UTF8.GetString(data, 0, data.Length)}", LogType.Debug);
-            Logger.Log($"Bytes: {rawBytes}", LogType.Debug);
+            Logging.Logging.Log("Sending Raw Data...", LogType.Info);
+            Logging.Logging.Log($"UTF8: {Encoding.UTF8.GetString(data, 0, data.Length)}", LogType.Debug);
+            Logging.Logging.Log($"Bytes: {rawBytes}", LogType.Debug);
             //await UnityWebSocket.Send(data);
 
             // Original HoloNET code (still works):
@@ -200,18 +212,18 @@ namespace NextGenSoftware.WebSocket
                 if ((count * (i + 1)) > data.Length)
                     count = data.Length - offset;
 
-                Logger.Log(string.Concat("Sending Data Packet ", (i + 1), " of ", messagesCount, "..."), LogType.Debug);
+                Logging.Logging.Log(string.Concat("Sending Data Packet ", (i + 1), " of ", messagesCount, "..."), LogType.Debug, true);
                 //await ClientWebSocket.SendAsync(new ArraySegment<byte>(data, offset, count), WebSocketMessageType.Text, lastMessage, _cancellationToken);
                 await ClientWebSocket.SendAsync(new ArraySegment<byte>(data, offset, count), WebSocketMessageType.Binary, lastMessage, _cancellationToken);
             }
-            
-            Logger.Log("Sending Raw Data... Done!", LogType.Info);
+
+            Logging.Logging.Log("Sending Raw Data... Done!", LogType.Info);
         }
 
         private async Task StartListen()
         {
             var buffer = new byte[Config.ReceiveChunkSize];
-            Logger.Log(string.Concat("Listening on ", EndPoint, "..."), LogType.Info);
+            Logging.Logging.Log(string.Concat("Listening on ", EndPoint, "..."), LogType.Info, true);
 
             try
             {
@@ -236,14 +248,14 @@ namespace NextGenSoftware.WebSocket
                             string msg = "Closing because received close message."; //TODO: Move all strings to constants at top or resources.strings
                             await ClientWebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, msg, CancellationToken.None);
                             OnDisconnected?.Invoke(this, new DisconnectedEventArgs { EndPoint = EndPoint, Reason = msg });
-                            Logger.Log(msg, LogType.Info);
+                            Logging.Logging.Log(msg, LogType.Info);
 
                             //AttemptReconnect(); //TODO: Not sure re-connect here?
                         }
                         else
                         {
-                            stringResult.Append(Encoding.UTF8.GetString(buffer, 0, result.Count));   
-                            Logger.Log(string.Concat("Received Data: ", stringResult), LogType.Info);
+                            stringResult.Append(Encoding.UTF8.GetString(buffer, 0, result.Count));
+                            Logging.Logging.Log(string.Concat("Received Data: ", stringResult), LogType.Info);
                             OnDataReceived?.Invoke(this, new DataReceivedEventArgs(null, EndPoint, true, buffer, stringResult.ToString(), result));
                         }
                     } while (!result.EndOfMessage);
@@ -278,7 +290,7 @@ namespace NextGenSoftware.WebSocket
                 if (ClientWebSocket.State == WebSocketState.Open)
                     break;
 
-                Logger.Log(string.Concat("Attempting to reconnect... Attempt ", +i), LogType.Info);
+                Logging.Logging.Log(string.Concat("Attempting to reconnect... Attempt ", +i), LogType.Info, true);
                 await Connect();
                 await Task.Delay(Config.ReconnectionIntervalSeconds);
             }
@@ -287,7 +299,7 @@ namespace NextGenSoftware.WebSocket
         private void HandleError(string message, Exception exception)
         {
             message = string.Concat(message, "\nError Details: ", exception != null ? exception.ToString() : "");
-            Logger.Log(message, LogType.Error);
+            Logging.Logging.Log(message, LogType.Error);
 
             OnError?.Invoke(this, new WebSocketErrorEventArgs { EndPoint = EndPoint, Reason = message, ErrorDetails = exception });
 

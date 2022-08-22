@@ -8,7 +8,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NextGenSoftware.Holochain.H
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NextGenSoftware.WebSocket", "NextGenSoftware.WebSocket\NextGenSoftware.WebSocket.csproj", "{7A787B83-9868-4CA0-A966-0E5C9087BFA2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NextGenSoftware.Logging", "NextGenSoftware.Logging\NextGenSoftware.Logging.csproj", "{1849910C-0ECE-4ADF-8405-53D0840204A9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NextGenSoftware.Logging", "NextGenSoftware.Logging\NextGenSoftware.Logging.csproj", "{1849910C-0ECE-4ADF-8405-53D0840204A9}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NextGenSoftware.CLI.Engine", "..\Our-World-OASIS-API-HoloNET-HoloUnity-And-.NET-HDK\NextGenSoftware.CLI.Engine\NextGenSoftware.CLI.Engine.csproj", "{4D8A04A1-47E6-42AE-B964-D376748CDFAB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -32,6 +34,10 @@ Global
 		{1849910C-0ECE-4ADF-8405-53D0840204A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1849910C-0ECE-4ADF-8405-53D0840204A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1849910C-0ECE-4ADF-8405-53D0840204A9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4D8A04A1-47E6-42AE-B964-D376748CDFAB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4D8A04A1-47E6-42AE-B964-D376748CDFAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4D8A04A1-47E6-42AE-B964-D376748CDFAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4D8A04A1-47E6-42AE-B964-D376748CDFAB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
