@@ -86,19 +86,19 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
         }
 
-        public HoloNETClient(string holochainConductorURI = "http://localhost:8888", bool logToConsole = true, bool logToFile = true, string releativePathToLogFolder = "Logs", string logFileName = "HoloNET.log", bool addAdditionalSpaceAfterEachLogEntry = false, bool showColouredLogs = true, ConsoleColor debugColour = ConsoleColor.White, ConsoleColor infoColour = ConsoleColor.Green, ConsoleColor warningColour = ConsoleColor.Yellow, ConsoleColor errorColour = ConsoleColor.Red)
+        public HoloNETClient(string holochainConductorURI = "ws://localhost:8888", bool logToConsole = true, bool logToFile = true, string releativePathToLogFolder = "Logs", string logFileName = "HoloNET.log", bool addAdditionalSpaceAfterEachLogEntry = false, bool showColouredLogs = true, ConsoleColor debugColour = ConsoleColor.White, ConsoleColor infoColour = ConsoleColor.Green, ConsoleColor warningColour = ConsoleColor.Yellow, ConsoleColor errorColour = ConsoleColor.Red)
         {
             Logging.Logging.Loggers.Add(new DefaultLogger(logToConsole, logToFile, releativePathToLogFolder, logFileName, addAdditionalSpaceAfterEachLogEntry, showColouredLogs, debugColour, infoColour, warningColour, errorColour));
             Init(holochainConductorURI);
         }
 
-        public HoloNETClient(ILogger logger, string holochainConductorURI = "http://localhost:8888")
+        public HoloNETClient(ILogger logger, string holochainConductorURI = "ws://localhost:8888")
         {
             Logging.Logging.Loggers.Add(logger);
             Init(holochainConductorURI);
         }
 
-        public HoloNETClient(IEnumerable<ILogger> loggers, string holochainConductorURI = "http://localhost:8888")
+        public HoloNETClient(IEnumerable<ILogger> loggers, string holochainConductorURI = "ws://localhost:8888")
         {
             Logging.Logging.Loggers = new List<ILogger>(loggers);
             Init(holochainConductorURI);

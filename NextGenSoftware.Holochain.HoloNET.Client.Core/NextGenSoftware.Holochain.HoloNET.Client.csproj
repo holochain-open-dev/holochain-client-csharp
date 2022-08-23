@@ -13,7 +13,7 @@
     <PackageIcon>hc logo.png</PackageIcon>
     <Authors>David Ellams (NextGen Software Ltd)</Authors>
     <PackageTags>holochain;net;unity</PackageTags>
-    <PackageReleaseNotes>Holochain binaries are now 'Content' again rather than 'Embedded' (will look into this option later...). The holochainConductorURI also now defaults to localhost:8888 (the default for the hc conductor).</PackageReleaseNotes>
+    <PackageReleaseNotes>Fixed bug where new holochainConductorURI default param defaulted to http://localhost:8888 rather than ws://localhost:8888.</PackageReleaseNotes>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/NextGenSoftwareUK/holochain-client-csharp</RepositoryUrl>
     <Copyright>Copyright © NextGen Software Ltd 2022</Copyright>
@@ -21,7 +21,7 @@
 	  <!--<PackageLicenseExpression>GNU GPLv3</PackageLicenseExpression>-->
 	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-    <Version>1.1.3</Version>
+    <Version>1.1.4</Version>
     <!--<PackageLicenseFile>..\LICENSE</PackageLicenseFile>-->
 
 	  <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
