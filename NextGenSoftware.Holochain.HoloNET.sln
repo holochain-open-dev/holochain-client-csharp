@@ -12,6 +12,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NextGenSoftware.Logging", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NextGenSoftware.CLI.Engine", "..\Our-World-OASIS-API-HoloNET-HoloUnity-And-.NET-HDK\NextGenSoftware.CLI.Engine\NextGenSoftware.CLI.Engine.csproj", "{4D8A04A1-47E6-42AE-B964-D376748CDFAB}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NextGenSoftware.Utilities", "..\Our-World-OASIS-API-HoloNET-HoloUnity-And-.NET-HDK\NextGenSoftware.Utilities\NextGenSoftware.Utilities.csproj", "{0EBFBD4A-1198-4092-AD47-336210A6B92A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NextGenSoftware.Holochain.HoloNET.Client.Embedded", "NextGenSoftware.Holochain.HoloNET.Client.Embedded\NextGenSoftware.Holochain.HoloNET.Client.Embedded.csproj", "{CDCA158F-D500-407F-BA08-B1D225CA9028}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -38,6 +42,14 @@ Global
 		{4D8A04A1-47E6-42AE-B964-D376748CDFAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4D8A04A1-47E6-42AE-B964-D376748CDFAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4D8A04A1-47E6-42AE-B964-D376748CDFAB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0EBFBD4A-1198-4092-AD47-336210A6B92A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0EBFBD4A-1198-4092-AD47-336210A6B92A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0EBFBD4A-1198-4092-AD47-336210A6B92A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0EBFBD4A-1198-4092-AD47-336210A6B92A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CDCA158F-D500-407F-BA08-B1D225CA9028}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CDCA158F-D500-407F-BA08-B1D225CA9028}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CDCA158F-D500-407F-BA08-B1D225CA9028}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CDCA158F-D500-407F-BA08-B1D225CA9028}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
