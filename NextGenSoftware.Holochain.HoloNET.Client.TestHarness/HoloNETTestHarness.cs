@@ -5,20 +5,19 @@ using NextGenSoftware.WebSocket;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
 {
-    class Program
+    public class HoloNETTestHarness
     {
         private static HoloNETClient _holoNETClient = null;
 
         static async Task Main(string[] args)
         {
-            Console.WriteLine("NextGenSoftware.Holochain.HoloNET.Client Test Harness v1.4");
-            Console.WriteLine("");
-            await TestHoloNETClient();
-            Console.ReadKey();
+            await TestHoloNETClientAsync();
         }
 
-        private static async Task TestHoloNETClient()
+        public static async Task TestHoloNETClientAsync()
         {
+            Console.WriteLine("NextGenSoftware.Holochain.HoloNET.Client Test Harness v1.0");
+            Console.WriteLine("");
             _holoNETClient = new HoloNETClient("ws://localhost:8888");
             _holoNETClient.WebSocket.Config.NeverTimeOut = true;
 
@@ -26,20 +25,22 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
             _holoNETClient.Config.LoggingMode = LoggingMode.WarningsErrorsInfoAndDebug;
             //_holoNETClient.Config.LoggingMode = LoggingMode.WarningsAndErrors;
 
-
+            /*
             //holoNETClient.Config.ErrorHandlingBehaviour = ErrorHandlingBehaviour.OnlyThrowExceptionIfNoErrorHandlerSubscribedToOnErrorEvent
             _holoNETClient.Config.AutoStartHolochainConductor = true;
             _holoNETClient.Config.AutoShutdownHolochainConductor = true;
             _holoNETClient.Config.ShutDownALLHolochainConductors = true; //Normally default's to false, but if you want to make sure no holochain processes are left running set this to true.
-            _holoNETClient.Config.ShowHolochainConductorWindow = false; //Defaults to false.
-            _holoNETClient.Config.HolochainConductorMode = HolochainConductorModeEnum.UseSystemGlobal;
-            //_holoNETClient.Config.HolochainConductorMode = HolochainConductorModeEnum.UseEmbedded;
+            _holoNETClient.Config.ShowHolochainConductorWindow = true; //Defaults to false.
+           // _holoNETClient.Config.HolochainConductorMode = HolochainConductorModeEnum.UseSystemGlobal;
+            _holoNETClient.Config.HolochainConductorMode = HolochainConductorModeEnum.UseEmbedded;
             _holoNETClient.Config.HolochainConductorToUse = HolochainConductorEnum.HcDevTool;
+            */
 
             //holoNETClient.Config.FullPathToHolochainAppDNA = @"D:\Dropbox\Our World\OASIS API\NextGenSoftware.Holochain.hApp.OurWorld\our_world\dist\our_world.dna.json";
             _holoNETClient.Config.FullPathToRootHappFolder = string.Concat(Environment.CurrentDirectory, @"\hApps\happ-build-tutorial-develop");
             _holoNETClient.Config.FullPathToCompiledHappFolder = string.Concat(Environment.CurrentDirectory, @"\hApps\happ-build-tutorial-develop\workdir\happ");
             //_holoNETClient.Config.FullPathToHapp = string.Concat(Environment.CurrentDirectory, @"\hApps\numbers-hApp");
+           
 
             _holoNETClient.OnConnected += HoloNETClient_OnConnected;
             _holoNETClient.OnDataReceived += HoloNETClient_OnDataReceived;
@@ -119,6 +120,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
         {
             Console.WriteLine(string.Concat("TEST HARNESS: DISCONNECTED CALL BACK: Disconnected from ", e.EndPoint, ". Resason: ", e.Reason));
             Console.WriteLine("");
+            Console.ReadKey();
         }
 
         private static void HoloNETClient_OnZomeFunctionCallBack(object sender, ZomeFunctionCallBackEventArgs e)

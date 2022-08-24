@@ -3,10 +3,48 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
+	<TargetFramework>net6.0</TargetFramework>
+	<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+	<PackageId>NextGenSoftware.Holochain.HoloNET.Client.TestHarness</PackageId>
+	<Company>NextGen Software Ltd</Company>
+	<Product>HoloNET Test Harness</Product>
+	<Title>HoloNET Test Harness</Title>
+	<Summary>Test harness for the world's first .NET &amp; Unity client for Holochain.</Summary>
+	<Description>Test harness for the world's first .NET &amp; Unity client for Holochain.</Description>
+	<PackageProjectUrl>https://github.com/NextGenSoftwareUK/holochain-client-csharp</PackageProjectUrl>
+	<PackageIcon>hc logo.png</PackageIcon>
+	<Authors>David Ellams (NextGen Software Ltd)</Authors>
+	<PackageTags>holochain;net;unity</PackageTags>
+	<PackageReleaseNotes>Updated README and made bug fixes.</PackageReleaseNotes>
+	<RepositoryType>git</RepositoryType>
+	<RepositoryUrl>https://github.com/NextGenSoftwareUK/holochain-client-csharp</RepositoryUrl>
+	<Copyright>Copyright © NextGen Software Ltd 2022</Copyright>
+	<PackageReadmeFile>README.md</PackageReadmeFile>
+	<!--<PackageLicenseExpression>GNU GPLv3</PackageLicenseExpression>-->
+	<PackageLicenseExpression>MIT</PackageLicenseExpression>
+	<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+	<Version>1.0.1</Version>
+	<!--<PackageLicenseFile>..\LICENSE</PackageLicenseFile>-->
+
+	<AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\NextGenSoftware.Holochain.HoloNET.Client.Core\NextGenSoftware.Holochain.HoloNET.Client.csproj" />
   </ItemGroup>
+
+	<ItemGroup>
+		<None Include="..\..\..\..\OneDrive\Dropbox\Our World\Prototype\holochain\hc logo.png">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="README.md">
+	    <PackagePath>\</PackagePath>
+	    <Pack>True</Pack>
+	  </None>
+	</ItemGroup>
 
 </Project>
