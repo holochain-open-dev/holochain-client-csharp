@@ -10,10 +10,10 @@
 	  <Summary>WebSocket library used for other NextGen Software libraries such as HoloNET.</Summary>
 	  <Description>WebSocket library used for other NextGen Software libraries such as HoloNET.</Description>
 	  <PackageProjectUrl>https://github.com/NextGenSoftwareUK/holochain-client-csharp</PackageProjectUrl>
-	  <PackageIcon>hc logo.png</PackageIcon>
+	  <PackageIcon>STARJPG.JPG</PackageIcon>
 	  <Authors>David Ellams (NextGen Software Ltd)</Authors>
 	  <PackageTags>websocket;net;unity</PackageTags>
-	  <PackageReleaseNotes>Updated to work with NextGenSoftware.Logging v1.1 and minor bug fixed.</PackageReleaseNotes>
+	  <PackageReleaseNotes>Updated Logo.</PackageReleaseNotes>
 	  <RepositoryType>git</RepositoryType>
 	  <RepositoryUrl>https://github.com/NextGenSoftwareUK/holochain-client-csharp</RepositoryUrl>
 	  <Copyright>Copyright © NextGen Software Ltd 2022</Copyright>
@@ -21,12 +21,12 @@
 	  <!--<PackageLicenseExpression>GNU GPLv3</PackageLicenseExpression>-->
 	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
 	  <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-	  <Version>1.1.1</Version>
+	  <Version>1.1.2</Version>
 	  <!--<PackageLicenseFile>..\LICENSE</PackageLicenseFile>-->
   </PropertyGroup>
 
 	<ItemGroup>
-		<None Include="..\..\..\..\OneDrive\Dropbox\Our World\Prototype\holochain\hc logo.png">
+		<None Include="..\..\..\..\OneDrive\Dropbox\Our World\Logo\STAR\STARJPG.JPG">
 		  <Pack>True</Pack>
 		  <PackagePath>\</PackagePath>
 		</None>

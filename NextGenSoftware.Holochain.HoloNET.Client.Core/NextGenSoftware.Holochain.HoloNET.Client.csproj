@@ -3,17 +3,20 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <PackageId>NextGenSoftware.Holochain.HoloNET.Client</PackageId>
+    <!--<PackageId>NextGenSoftware.Holochain.HoloNET.Client.Embedded</PackageId>-->
+	  <PackageId>NextGenSoftware.Holochain.HoloNET.Client</PackageId>
     <Company>NextGen Software Ltd</Company>
     <Product>HoloNET Holochain Client</Product>
 	<Title>HoloNET Holochain Client</Title>
-	<Summary>The world's first .NET &amp; Unity client for Holochain.</Summary>
-    <Description>The world's first .NET &amp; Unity client for Holochain.</Description>
+	  <Summary>The world's first .NET &amp; Unity client for Holochain.</Summary>
+	  <!--<Summary>The world's first .NET &amp; Unity client for Holochain. This version comes with the Holochain binaries built in.</Summary>-->
+	  <Description>The world's first .NET &amp; Unity client for Holochain.</Description>
+	  <!--<Description>The world's first .NET &amp; Unity client for Holochain. This version comes with the Holochain binaries built in.</Description>-->
     <PackageProjectUrl>https://github.com/NextGenSoftwareUK/holochain-client-csharp</PackageProjectUrl>
     <PackageIcon>hc logo.png</PackageIcon>
     <Authors>David Ellams (NextGen Software Ltd)</Authors>
     <PackageTags>holochain;net;unity</PackageTags>
-    <PackageReleaseNotes>Fixed bug where new holochainConductorURI default param defaulted to http://localhost:8888 rather than ws://localhost:8888.</PackageReleaseNotes>
+    <PackageReleaseNotes>Bumped version so stays in sync with Embedded version.</PackageReleaseNotes>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/NextGenSoftwareUK/holochain-client-csharp</RepositoryUrl>
     <Copyright>Copyright © NextGen Software Ltd 2022</Copyright>
@@ -21,24 +24,16 @@
 	  <!--<PackageLicenseExpression>GNU GPLv3</PackageLicenseExpression>-->
 	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-    <Version>1.1.4</Version>
+    <Version>1.1.6</Version>
     <!--<PackageLicenseFile>..\LICENSE</PackageLicenseFile>-->
 
 	  <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="HolochainBinaries\hc.exe" />
-    <None Remove="HolochainBinaries\holochain.exe" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="HolochainBinaries\hc.exe">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="HolochainBinaries\holochain.exe">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <Compile Remove="HolochainBinaries\**" />
+    <EmbeddedResource Remove="HolochainBinaries\**" />
+    <None Remove="HolochainBinaries\**" />
   </ItemGroup>
 
   <ItemGroup>
