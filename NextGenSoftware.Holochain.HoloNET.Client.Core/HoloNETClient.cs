@@ -219,15 +219,22 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         private void WebSocket_OnConnected(object sender, ConnectedEventArgs e)
         {
-            OnConnected?.Invoke(this, new ConnectedEventArgs { EndPoint = e.EndPoint });
+            try
+            {
+                OnConnected?.Invoke(this, new ConnectedEventArgs { EndPoint = e.EndPoint });
 
-            //If the AgentPubKey & DnaHash have already been retreived from the hc sandbox command then raise the OnReadyForZomeCalls event.
-            if (WebSocket.State == WebSocketState.Open && !string.IsNullOrEmpty(Config.AgentPubKey) && !string.IsNullOrEmpty(Config.DnaHash))
-                OnReadyForZomeCalls?.Invoke(this, new ReadyForZomeCallsEventArgs(EndPoint, Config.DnaHash, Config.AgentPubKey));
+                //If the AgentPubKey & DnaHash have already been retreived from the hc sandbox command then raise the OnReadyForZomeCalls event.
+                if (WebSocket.State == WebSocketState.Open && !string.IsNullOrEmpty(Config.AgentPubKey) && !string.IsNullOrEmpty(Config.DnaHash))
+                    OnReadyForZomeCalls?.Invoke(this, new ReadyForZomeCallsEventArgs(EndPoint, Config.DnaHash, Config.AgentPubKey));
 
-            //Otherwise, if the getAgentPubKeyAndDnaHashFromConductor param was set to true when calling the Connect method, retreive them now...
-            else if (_getAgentPubKeyAndDnaHashFromConductor)
-                GetAgentPubKeyAndDnaHashFromConductor();
+                //Otherwise, if the getAgentPubKeyAndDnaHashFromConductor param was set to true when calling the Connect method, retreive them now...
+                else if (_getAgentPubKeyAndDnaHashFromConductor)
+                    GetAgentPubKeyAndDnaHashFromConductor();
+            }
+            catch (Exception ex)
+            {
+                HandleError("Error in HoloNETClient.WebSocket_OnDataReceived.", ex);
+            }
         }
 
         public async Task Connect(bool getAgentPubKeyAndDnaHashFromConductor = true, bool getAgentPubKeyAndDnaHashFromSandbox = false)
@@ -260,115 +267,122 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
             catch (Exception e)
             {
-                HandleError(string.Concat("Error occured connecting to ", WebSocket.EndPoint), e);
+                HandleError(string.Concat("Error occured in HoloNETClient.Connect method connecting to ", WebSocket.EndPoint), e);
             }
         }
 
         public async Task StartConductor()
         {
-            string fullPathToEmbeddedHolochainConductorBinary = string.Concat(Directory.GetCurrentDirectory(), "\\HolochainBinaries\\holochain.exe");
-            string fullPathToEmbeddedHCToolBinary = string.Concat(Directory.GetCurrentDirectory(), "\\HolochainBinaries\\hc.exe");
-
-            _conductorProcess = new Process();
-
-            if (string.IsNullOrEmpty(Config.FullPathToExternalHolochainConductorBinary) && Config.HolochainConductorMode == HolochainConductorModeEnum.UseExternal && Config.HolochainConductorToUse == HolochainConductorEnum.HolochainProductionConductor)
-                throw new ArgumentNullException("FullPathToExternalHolochainConductorBinary", "When HolochainConductorMode is set to 'UseExternal' and HolochainConductorToUse is set to 'HolochainProductionConductor', FullPathToExternalHolochainConductorBinary cannot be empty.");
-
-            if (string.IsNullOrEmpty(Config.FullPathToExternalHCToolBinary) && Config.HolochainConductorMode == HolochainConductorModeEnum.UseExternal && Config.HolochainConductorToUse == HolochainConductorEnum.HcDevTool)
-                throw new ArgumentNullException("FullPathToExternalHCToolBinary", "When HolochainConductorMode is set to 'UseExternal' and HolochainConductorToUse is set to 'HcDevTool', FullPathToExternalHCToolBinary cannot be empty.");
-
-            if (!File.Exists(Config.FullPathToExternalHolochainConductorBinary) && Config.HolochainConductorMode == HolochainConductorModeEnum.UseExternal && Config.HolochainConductorToUse == HolochainConductorEnum.HolochainProductionConductor)
-                throw new FileNotFoundException($"When HolochainConductorMode is set to 'UseExternal' and HolochainConductorToUse is set to 'HolochainProductionConductor', FullPathToExternalHolochainConductorBinary ({Config.FullPathToExternalHolochainConductorBinary}) must point to a valid file.");
-
-            if (!File.Exists(Config.FullPathToExternalHCToolBinary) && Config.HolochainConductorMode == HolochainConductorModeEnum.UseExternal && Config.HolochainConductorToUse == HolochainConductorEnum.HcDevTool)
-                throw new FileNotFoundException($"When HolochainConductorMode is set to 'UseExternal' and HolochainConductorToUse is set to 'HcDevTool', FullPathToExternalHCToolBinary ({Config.FullPathToExternalHCToolBinary}) must point to a valid file.");
-
-
-            if (!File.Exists(fullPathToEmbeddedHolochainConductorBinary) && Config.HolochainConductorMode == HolochainConductorModeEnum.UseEmbedded && Config.HolochainConductorToUse == HolochainConductorEnum.HolochainProductionConductor)
-                throw new FileNotFoundException($"When HolochainConductorMode is set to 'UseEmbedded' and HolochainConductorToUse is set to 'HolochainProductionConductor', you must ensure the holochain.exe is found here: {fullPathToEmbeddedHolochainConductorBinary}.");
-
-            if (!File.Exists(fullPathToEmbeddedHCToolBinary) && Config.HolochainConductorMode == HolochainConductorModeEnum.UseEmbedded && Config.HolochainConductorToUse == HolochainConductorEnum.HcDevTool)
-                throw new FileNotFoundException($"When HolochainConductorMode is set to 'UseEmbedded' and HolochainConductorToUse is set to 'HcDevTool', you must ensure the hc.exe is found here: {fullPathToEmbeddedHCToolBinary}.");
-
-            if (!Directory.Exists(Config.FullPathToRootHappFolder))
-                throw new DirectoryNotFoundException($"The path for Config.FullPathToRootHappFolder ({Config.FullPathToRootHappFolder}) was not found.");
-
-            if (!Directory.Exists(Config.FullPathToCompiledHappFolder))
-                throw new DirectoryNotFoundException($"The path for Config.FullPathToCompiledHappFolder ({Config.FullPathToCompiledHappFolder}) was not found.");
-
-
-            if (Config.HolochainConductorToUse == HolochainConductorEnum.HcDevTool)
+            try
             {
-                switch (Config.HolochainConductorMode)
-                {
-                    case HolochainConductorModeEnum.UseExternal:
-                        _conductorProcess.StartInfo.FileName = Config.FullPathToExternalHCToolBinary;
-                        break;
+                string fullPathToEmbeddedHolochainConductorBinary = string.Concat(Directory.GetCurrentDirectory(), "\\HolochainBinaries\\holochain.exe");
+                string fullPathToEmbeddedHCToolBinary = string.Concat(Directory.GetCurrentDirectory(), "\\HolochainBinaries\\hc.exe");
 
-                    case HolochainConductorModeEnum.UseEmbedded:
-                        _conductorProcess.StartInfo.FileName = fullPathToEmbeddedHCToolBinary;
-                        break;
+                _conductorProcess = new Process();
 
-                    case HolochainConductorModeEnum.UseSystemGlobal:
-                        _conductorProcess.StartInfo.FileName = "hc.exe";
-                        break;
-                }
-            }
-            else
-            {
-                switch (Config.HolochainConductorMode)
-                {
-                    case HolochainConductorModeEnum.UseExternal:
-                        _conductorProcess.StartInfo.FileName = Config.FullPathToExternalHolochainConductorBinary;
-                        break;
+                if (string.IsNullOrEmpty(Config.FullPathToExternalHolochainConductorBinary) && Config.HolochainConductorMode == HolochainConductorModeEnum.UseExternal && Config.HolochainConductorToUse == HolochainConductorEnum.HolochainProductionConductor)
+                    throw new ArgumentNullException("FullPathToExternalHolochainConductorBinary", "When HolochainConductorMode is set to 'UseExternal' and HolochainConductorToUse is set to 'HolochainProductionConductor', FullPathToExternalHolochainConductorBinary cannot be empty.");
 
-                    case HolochainConductorModeEnum.UseEmbedded:
-                        _conductorProcess.StartInfo.FileName = fullPathToEmbeddedHolochainConductorBinary;
-                        break;
+                if (string.IsNullOrEmpty(Config.FullPathToExternalHCToolBinary) && Config.HolochainConductorMode == HolochainConductorModeEnum.UseExternal && Config.HolochainConductorToUse == HolochainConductorEnum.HcDevTool)
+                    throw new ArgumentNullException("FullPathToExternalHCToolBinary", "When HolochainConductorMode is set to 'UseExternal' and HolochainConductorToUse is set to 'HcDevTool', FullPathToExternalHCToolBinary cannot be empty.");
 
-                    case HolochainConductorModeEnum.UseSystemGlobal:
-                        _conductorProcess.StartInfo.FileName = "holochain.exe";
-                        break;
-                }
-            }
+                if (!File.Exists(Config.FullPathToExternalHolochainConductorBinary) && Config.HolochainConductorMode == HolochainConductorModeEnum.UseExternal && Config.HolochainConductorToUse == HolochainConductorEnum.HolochainProductionConductor)
+                    throw new FileNotFoundException($"When HolochainConductorMode is set to 'UseExternal' and HolochainConductorToUse is set to 'HolochainProductionConductor', FullPathToExternalHolochainConductorBinary ({Config.FullPathToExternalHolochainConductorBinary}) must point to a valid file.");
 
-            //Make sure the condctor is not already running
-            if (!Config.OnlyAllowOneHolochainConductorToRunAtATime || (Config.OnlyAllowOneHolochainConductorToRunAtATime && !Process.GetProcesses().Any(x => x.ProcessName == _conductorProcess.StartInfo.FileName)))
-            {
-                Logging.Logging.Log("Starting Holochain Conductor...", LogType.Info, true);
-                _conductorProcess.StartInfo.WorkingDirectory = Config.FullPathToRootHappFolder;
+                if (!File.Exists(Config.FullPathToExternalHCToolBinary) && Config.HolochainConductorMode == HolochainConductorModeEnum.UseExternal && Config.HolochainConductorToUse == HolochainConductorEnum.HcDevTool)
+                    throw new FileNotFoundException($"When HolochainConductorMode is set to 'UseExternal' and HolochainConductorToUse is set to 'HcDevTool', FullPathToExternalHCToolBinary ({Config.FullPathToExternalHCToolBinary}) must point to a valid file.");
+
+
+                if (!File.Exists(fullPathToEmbeddedHolochainConductorBinary) && Config.HolochainConductorMode == HolochainConductorModeEnum.UseEmbedded && Config.HolochainConductorToUse == HolochainConductorEnum.HolochainProductionConductor)
+                    throw new FileNotFoundException($"When HolochainConductorMode is set to 'UseEmbedded' and HolochainConductorToUse is set to 'HolochainProductionConductor', you must ensure the holochain.exe is found here: {fullPathToEmbeddedHolochainConductorBinary}.");
+
+                if (!File.Exists(fullPathToEmbeddedHCToolBinary) && Config.HolochainConductorMode == HolochainConductorModeEnum.UseEmbedded && Config.HolochainConductorToUse == HolochainConductorEnum.HcDevTool)
+                    throw new FileNotFoundException($"When HolochainConductorMode is set to 'UseEmbedded' and HolochainConductorToUse is set to 'HcDevTool', you must ensure the hc.exe is found here: {fullPathToEmbeddedHCToolBinary}.");
+
+                if (!Directory.Exists(Config.FullPathToRootHappFolder))
+                    throw new DirectoryNotFoundException($"The path for Config.FullPathToRootHappFolder ({Config.FullPathToRootHappFolder}) was not found.");
+
+                if (!Directory.Exists(Config.FullPathToCompiledHappFolder))
+                    throw new DirectoryNotFoundException($"The path for Config.FullPathToCompiledHappFolder ({Config.FullPathToCompiledHappFolder}) was not found.");
+
 
                 if (Config.HolochainConductorToUse == HolochainConductorEnum.HcDevTool)
                 {
-                    //_conductorProcess.StartInfo.Arguments = "sandbox run 0";
-                    _conductorProcess.StartInfo.Arguments = $"hc sandbox generate {Config.FullPathToCompiledHappFolder}";
-                }
+                    switch (Config.HolochainConductorMode)
+                    {
+                        case HolochainConductorModeEnum.UseExternal:
+                            _conductorProcess.StartInfo.FileName = Config.FullPathToExternalHCToolBinary;
+                            break;
 
-                _conductorProcess.StartInfo.UseShellExecute = true;
-                _conductorProcess.StartInfo.RedirectStandardOutput = false;
+                        case HolochainConductorModeEnum.UseEmbedded:
+                            _conductorProcess.StartInfo.FileName = fullPathToEmbeddedHCToolBinary;
+                            break;
 
-                if (Config.ShowHolochainConductorWindow)
-                {
-                    _conductorProcess.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
-                    _conductorProcess.StartInfo.CreateNoWindow = false;
+                        case HolochainConductorModeEnum.UseSystemGlobal:
+                            _conductorProcess.StartInfo.FileName = "hc.exe";
+                            break;
+                    }
                 }
                 else
                 {
-                    _conductorProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-                    _conductorProcess.StartInfo.CreateNoWindow = true;
+                    switch (Config.HolochainConductorMode)
+                    {
+                        case HolochainConductorModeEnum.UseExternal:
+                            _conductorProcess.StartInfo.FileName = Config.FullPathToExternalHolochainConductorBinary;
+                            break;
+
+                        case HolochainConductorModeEnum.UseEmbedded:
+                            _conductorProcess.StartInfo.FileName = fullPathToEmbeddedHolochainConductorBinary;
+                            break;
+
+                        case HolochainConductorModeEnum.UseSystemGlobal:
+                            _conductorProcess.StartInfo.FileName = "holochain.exe";
+                            break;
+                    }
                 }
 
-                _conductorProcess.Start();
-
-                if (Config.HolochainConductorToUse == HolochainConductorEnum.HcDevTool)
+                //Make sure the condctor is not already running
+                if (!Config.OnlyAllowOneHolochainConductorToRunAtATime || (Config.OnlyAllowOneHolochainConductorToRunAtATime && !Process.GetProcesses().Any(x => x.ProcessName == _conductorProcess.StartInfo.FileName)))
                 {
-                    await Task.Delay(3000);
-                    _conductorProcess.Close();
-                    _conductorProcess.StartInfo.Arguments = "sandbox run 0";
-                    _conductorProcess.Start();
-                }
+                    Logging.Logging.Log("Starting Holochain Conductor...", LogType.Info, true);
+                    _conductorProcess.StartInfo.WorkingDirectory = Config.FullPathToRootHappFolder;
 
-                await Task.Delay(Config.SecondsToWaitForHolochainConductorToStart * 1000); // Give the conductor 7 (default) seconds to start up...
+                    if (Config.HolochainConductorToUse == HolochainConductorEnum.HcDevTool)
+                    {
+                        //_conductorProcess.StartInfo.Arguments = "sandbox run 0";
+                        _conductorProcess.StartInfo.Arguments = $"hc sandbox generate {Config.FullPathToCompiledHappFolder}";
+                    }
+
+                    _conductorProcess.StartInfo.UseShellExecute = true;
+                    _conductorProcess.StartInfo.RedirectStandardOutput = false;
+
+                    if (Config.ShowHolochainConductorWindow)
+                    {
+                        _conductorProcess.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
+                        _conductorProcess.StartInfo.CreateNoWindow = false;
+                    }
+                    else
+                    {
+                        _conductorProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                        _conductorProcess.StartInfo.CreateNoWindow = true;
+                    }
+
+                    _conductorProcess.Start();
+
+                    if (Config.HolochainConductorToUse == HolochainConductorEnum.HcDevTool)
+                    {
+                        await Task.Delay(3000);
+                        _conductorProcess.Close();
+                        _conductorProcess.StartInfo.Arguments = "sandbox run 0";
+                        _conductorProcess.Start();
+                    }
+
+                    await Task.Delay(Config.SecondsToWaitForHolochainConductorToStart * 1000); // Give the conductor 7 (default) seconds to start up...
+                }
+            }
+            catch (Exception ex)
+            {
+                HandleError("Error in HoloNETClient.StartConductor.", ex);
             }
         }
 
@@ -416,7 +430,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
             catch (Exception ex)
             {
-                HandleError("Error in HoloNETClient.GetAgentPubKeyAndDnaHashFromhApp getting DnaHash & AgentPubKey from hApp.", ex);
+                HandleError("Error in HoloNETClient.GetAgentPubKeyAndDnaHashFromSandbox getting DnaHash & AgentPubKey from hApp.", ex);
             }
 
             return null;
@@ -442,7 +456,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
             catch (Exception ex)
             {
-                HandleError("Error occured in HoloNETClient.GetAgentPubKeyAndDnaHash.", ex);
+                HandleError("Error occured in HoloNETClient.GetAgentPubKeyAndDnaHashFromConductor  getting DnaHash & AgentPubKey from hApp.", ex);
             }
         }
 
@@ -466,7 +480,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
             catch (Exception ex)
             {
-                HandleError("Error occured in HoloNETClient.SendHoloNETRequest.", ex);
+                HandleError("Error occured in HoloNETClient.SendHoloNETRequest method.", ex);
             }
         }
 
@@ -545,7 +559,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
             catch (Exception ex)
             {
-                HandleError("Error occured in HoloNETClient.CallZomeFunctionAsync", ex);
+                HandleError("Error occured in HoloNETClient.CallZomeFunctionAsync method.", ex);
             }
         }
 
@@ -567,79 +581,89 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         public async Task ShutDownAllConductors()
         {
-            //FileInfo conductorInfo = new FileInfo(Config.FullPathToExternalHCToolBinary);
-            //string[] parts = conductorInfo.Name.Split('.');
-
-            Logging.Logging.Log("Shutting Down All Holochain Conductors...", LogType.Info, true);
-
-            foreach (Process process in Process.GetProcessesByName("hc"))
+            try
             {
-                if (Config.ShowHolochainConductorWindow)
-                    process.CloseMainWindow();
+                Logging.Logging.Log("Shutting Down All Holochain Conductors...", LogType.Info, true);
 
-                process.Kill();
-                process.Close();
+                foreach (Process process in Process.GetProcessesByName("hc"))
+                {
+                    if (Config.ShowHolochainConductorWindow)
+                        process.CloseMainWindow();
 
-                //process.WaitForExit();
-                process.Dispose();
+                    process.Kill();
+                    process.Close();
+
+                    //process.WaitForExit();
+                    process.Dispose();
+                }
+
+                //conductorInfo = new FileInfo(Config.FullPathToExternalHolochainConductorBinary);
+                //parts = conductorInfo.Name.Split('.');
+
+                foreach (Process process in Process.GetProcessesByName("holochain"))
+                {
+                    if (Config.ShowHolochainConductorWindow)
+                        process.CloseMainWindow();
+
+                    process.Kill();
+                    process.Close();
+
+                    //process.WaitForExit();
+                    process.Dispose();
+                }
+
+                foreach (Process process in Process.GetProcessesByName("rustc"))
+                {
+                    if (Config.ShowHolochainConductorWindow)
+                        process.CloseMainWindow();
+
+                    process.Kill();
+                    process.Close();
+
+                    //process.WaitForExit();
+                    process.Dispose();
+                }
+
+                Logging.Logging.Log("All Holochain Conductors Successfully Shutdown.", LogType.Info);
             }
-
-            //conductorInfo = new FileInfo(Config.FullPathToExternalHolochainConductorBinary);
-            //parts = conductorInfo.Name.Split('.');
-
-            foreach (Process process in Process.GetProcessesByName("holochain"))
+            catch (Exception ex)
             {
-                if (Config.ShowHolochainConductorWindow)
-                    process.CloseMainWindow();
-
-                process.Kill();
-                process.Close();
-
-                //process.WaitForExit();
-                process.Dispose();
+                HandleError("Error occured in HoloNETClient.ShutDownAllConductors method", ex);
             }
-
-            foreach (Process process in Process.GetProcessesByName("rustc"))
-            {
-                if (Config.ShowHolochainConductorWindow)
-                    process.CloseMainWindow();
-
-                process.Kill();
-                process.Close();
-
-                //process.WaitForExit();
-                process.Dispose();
-            }
-
-            Logging.Logging.Log("All Holochain Conductors Successfully Shutdown.", LogType.Info);
         }
 
         private async Task ShutDownConductorsInternal()
         {
-            // Close any conductors down if necessary.
-            if (Config.AutoShutdownHolochainConductor)
+            try
             {
-                if (Config.ShutDownALLHolochainConductors)
-                    await ShutDownAllConductors();
-
-                else if (_conductorProcess != null)
+                // Close any conductors down if necessary.
+                if (Config.AutoShutdownHolochainConductor)
                 {
-                    Logging.Logging.Log("Shutting Down Holochain Conductor...", LogType.Info, true);
+                    if (Config.ShutDownALLHolochainConductors)
+                        await ShutDownAllConductors();
 
-                    if (Config.ShowHolochainConductorWindow)
-                        _conductorProcess.CloseMainWindow();
+                    else if (_conductorProcess != null)
+                    {
+                        Logging.Logging.Log("Shutting Down Holochain Conductor...", LogType.Info, true);
 
-                    _conductorProcess.Kill();
-                    _conductorProcess.Close();
+                        if (Config.ShowHolochainConductorWindow)
+                            _conductorProcess.CloseMainWindow();
 
-                    // _conductorProcess.WaitForExit();
-                    _conductorProcess.Dispose();
+                        _conductorProcess.Kill();
+                        _conductorProcess.Close();
 
-                    Logging.Logging.Log("Holochain Conductor Successfully Shutdown.", LogType.Info);
+                        // _conductorProcess.WaitForExit();
+                        _conductorProcess.Dispose();
+
+                        Logging.Logging.Log("Holochain Conductor Successfully Shutdown.", LogType.Info);
+                    }
                 }
             }
+            catch (Exception ex)
+            {
+                HandleError("Error occured in HoloNETClient.ShutDownConductorsInternal method.", ex);
+            }
         }
-
 
         private string GetItemFromCache(string id, Dictionary<string, string> cache)
         {
