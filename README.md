@@ -417,17 +417,21 @@ private static void HoloNETClient_OnError(object sender, HoloNETErrorEventArgs e
 ### Methods
 
 HoloNETClient contains the following methods:
-<br>
 
 |Method|Description  |
 |--|--|
 |[Connect](#connect)  | This method simply connects to the Holochain conductor. It raises the [OnConnected](#onconnected) event once it is has successfully established a connection. Please see the [Events](#events) section above for more info on how to use this event.
+|[StartConductor](#startconductor)  | This method will start the Holochain Conducutor using the approprtiate settings defined in the [HoloNETConfig](#holonetconfig).
+|[GetAgentPubKeyAndDnaHashFromSandbox](#getagentpubkeyanddnahashfromsandbox) | This method gets the AgentPubKey & DnaHash from the HC Sandbox command. It will raise the [OnReadyForZomeCalls](onreadyforzomecalls) event once it successfully retreives them and the WebSocket has connected to the Holochain Conductor. Otherwise it will call the |[GetAgentPubKeyAndDnaHashFromConductor](#getagentpubkeyanddnahashfromconductor) method to attempt to retreive them directly from the conductor (default). 
+|[GetAgentPubKeyAndDnaHashFromConductor](#getagentpubkeyanddnahashfromconductor) | This method gets the AgentPubKey & DnaHash from the Holochain Conductor (the |[Connect](#connect) method will automatically call this by default). Once it has retreived them and the WebSocket has connceted to the Holochain Conductor it will raise the [OnReadyForZomeCalls](onreadyforzomecalls) event, otherwise it will call the |[GetAgentPubKeyAndDnaHashFromSandbox](#getagentpubkeyanddnahashfromsandbox) method.
+|[SendHoloNETRequest](#sendholonetrequest) |This method allows you to send your own raw request to holochain. This method raises the [OnDataReceived](#ondatareceived) event once it has received a response from the Holochain conductor. Please see the [Events](#events) section above for more info on how to use this event. You would rarely need to use this and we highly recommend you use the [CallZomeFunctionAsync](#callzomefunctionasync) method instead.
 |[CallZomeFunctionAsync](#callzomefunctionasync)| This is the main method you will be using to invoke zome functions on your given zome. It has a number of handy overloads making it easier and more powerful to call your zome functions and manage the returned data. This method raises the [OnZomeFunctionCallBack](#onzomefunctioncallback) event once it has received a response from the Holochain conductor. Please see the [Events](#events) section above for more info on how to use this event.
-|[ClearCache](#clearcache) | Call this method to clear all of HoloNETClient's internal cache. This includes the JSON responses that have been cached using the [GetHolochainInstancesAsync](#getholochaininstancesasync) & [CallZomeFunctionAsync](#callzomefunctionasync) methods if the `cacheData` parm was set to true for any of the calls. |
 |[Disconnect](#disconnect) | This method disconnects the client from Holochain conductor. It raises the [OnDisconnected](#ondisconnected) event once it is has successfully disconnected. Please see the [Events](#events) section above for more info on how to use this event. |
-|[SendMessageAsync](#sendmessageasync) |This method allows you to send your own raw JSON request to holochain. This method raises the [OnDataReceived](#ondatareceived) event once it has received a response from the Holochain conductor. Please see the [Events](#events) section above for more info on how to use this event. You would rarely need to use this and we highly recommend you use the [CallZomeFunctionAsync](#callzomefunctionasync) method instead.
+|[ShutDownAllConductors](#ShutDownAllConductors) | Will automatically shutdown all active Holochain Conductors. The [Disconnect](#disconnect) will automatically call this. |
+|[ClearCache](#clearcache) | Call this method to clear all of HoloNETClient's internal cache. This includes the JSON responses that have been cached using the [GetHolochainInstancesAsync](#getholochaininstancesasync) & [CallZomeFunctionAsync](#callzomefunctionasync) methods if the `cacheData` parm was set to true for any of the calls. |
+|[ConvertHoloHashToBytes](#ConvertHoloHashToBytes) | Utiltity method to convert a string to base64 encoded bytes (Holochain Conductor format). This is used to convert the AgentPubKey & DnaHash when making a zome call.|
+|[ConvertHoloHashToString](#ConvertHoloHashToString) | Utiltity method to convert from base64 bytes (Holochain Conductor format) to a friendly C# format. This is used to convert the AgentPubKey & DnaHash retreived from the Conductor.|
 
-<br>
 
 #### Connect
 
@@ -442,6 +446,54 @@ public async Task Connect(bool getAgentPubKeyAndDnaHashFromConductor = true, boo
 | getAgentPubKeyAndDnaHashFromSandbox   | Set this to true if you wish HoloNET to automatically retreive the AgentPubKey & DnaHash from the hc sandbox after it has connected. This defaults to true.  |
 
 **NOTE: If both params are set to true it will first attempt to retreive the AgentPubKey & DnaHash from the Conductor, if that fails it will then attempt to retreive them from the hc sandbox command (it will still do this even if getAgentPubKeyAndDnaHashFromSandbox is set to false).**
+
+
+#### StartConductor
+
+This method will start the Holochain Conducutor using the approprtiate settings defined in the [HoloNETConfig](#holonetconfig).
+
+```c#
+public async Task StartConductor()
+```
+
+#### GetAgentPubKeyAndDnaHashFromSandbox
+
+This method gets the AgentPubKey & DnaHash from the HC Sandbox command. It will raise the [OnReadyForZomeCalls](onreadyforzomecalls) event once it successfully retreives them and the WebSocket has connected to the Holochain Conductor. Otherwise it will call the |[GetAgentPubKeyAndDnaHashFromConductor](#getagentpubkeyanddnahashfromconductor) method to attempt to retreive them directly from the conductor (default). 
+
+```c#
+public async Task<AgentPubKeyDnaHash> GetAgentPubKeyAndDnaHashFromSandbox(bool updateConfig = true)
+```
+| Parameter                             | Description                                                                                    
+| ------------------------------------- | ---------------------------------------------------------------------------------------------|
+| updateConfig |Set this to true (default) to automatically update the [HoloNETConfig](#holonetconfig) once it has retreived the DnaHash & AgentPubKey. |
+
+
+#### GetAgentPubKeyAndDnaHashFromConductor
+
+This method gets the AgentPubKey & DnaHash from the HC Sandbox command. It will raise the [OnReadyForZomeCalls](onreadyforzomecalls) event once it successfully retreives them and the WebSocket has connected to the Holochain Conductor. Otherwise it will call the |[GetAgentPubKeyAndDnaHashFromConductor](#getagentpubkeyanddnahashfromconductor) method to attempt to retreive them directly from the conductor (default). 
+
+```c#
+ public async Task GetAgentPubKeyAndDnaHashFromConductor(bool updateConfig = true)
+```
+| Parameter                             | Description                                                                                    
+| ------------------------------------- | ---------------------------------------------------------------------------------------------|
+| updateConfig |Set this to true (default) to automatically update the [HoloNETConfig](#holonetconfig) once it has retreived the DnaHash & AgentPubKey. |
+
+
+#### SendHoloNETRequest
+
+This method allows you to send your own raw request to holochain. This method raises the [OnDataRecived](#ondatareceived) event once it has received a response from the Holochain conductor. Please see the [Events](#events) section above for more info on how to use this event.
+
+You would rarely need to use this and we highly recommend you use the [CallZomeFunctionAsync](#callzomefunctionasync) method instead.
+
+````c#
+public async Task SendHoloNETRequest(string id, HoloNETData holoNETData)
+ ````
+
+| Paramameter |Description  |
+|--|--|
+| holoNETData | The raw data packet you wish to send to the Holochain conductor.  |
+
 
 
 #### CallZomeFunctionAsync
@@ -494,14 +546,6 @@ public async Task CallZomeFunctionAsync(string zome, string function, object par
 This overload is similar to the one above except it omits the `id` and `matchIdToInstanceZomeFuncInCallback` param's forcing HoloNET to auto-generate and manage the id's itself. It is also missing the `callback` param. For this overload you would subscribe to the `OnZomeFunctionCallBack` event. You can of course subscribe to this event for the other overloads too, it just means you will then get two callbacks, one for the event handler for `OnZomeFunctionalCallBack` and one for the callback delegate you pass in as a param to this method. The choice is yours on how you wish to use this method...
 
 
-#### ClearCache
-
-Call this method to clear all of HoloNETClient's internal cache. This includes the responses that have been cached using the [CallZomeFunctionAsync](#callzomefunctionasync) methods if the `cacheData` parm was set to true for any of the calls.
-
-````c#
-public void ClearCache()
-````
-
 #### Disconnect
 
 This method disconnects the client from the Holochain conductor. It raises the [OnDisconnected](#ondisconnected) event once it is has
@@ -510,29 +554,43 @@ This method disconnects the client from the Holochain conductor. It raises the [
 ```c#
 public async Task Disconnect()
 ```
-NOTE: Currently when you call this method, you will receive the follow error:
 
-> "The remote party closed the WebSocket connection without completing
-> the close handshake."
+#### ShutDownAllConductors
 
-This looks like an issue with the Holochain conductor and we will be raising this bug with them to see if it is something they need to address...
+Will automatically shutdown all active Holochain Conductors. The [Disconnect](#disconnect) will automatically call this. |
+
+```c#
+public async Task ShutDownAllConductors()
+```
 
 
-#### SendMessageAsync
+#### ClearCache
 
-This method allows you to send your own raw JSON request to holochain. This method raises the [OnDataRecived](#ondatareceived) event once it has received a response from the Holochain conductor. Please see the [Events](#events) section above for more info on how to use this event.
-
-You would rarely need to use this and we highly recommend you use the [CallZomeFunctionAsync](#callzomefunctionasync) method instead.
+Call this method to clear all of HoloNETClient's internal cache. This includes the responses that have been cached using the [CallZomeFunctionAsync](#callzomefunctionasync) methods if the `cacheData` parm was set to true for any of the calls.
 
 ````c#
-public async Task SendMessageAsync(string jsonMessage)
- ````
-<br>
+public void ClearCache()
+````
 
-| Paramameter |Description  |
-|--|--|
-| jsonMessage | The raw JSON message you wish to send to the Holochain conductor.  |
-<br>
+
+#### ConvertHoloHashToBytes
+
+Utiltity method to convert a string to base64 encoded bytes (Holochain Conductor format). This is used to convert the AgentPubKey & DnaHash when making a zome call.|
+
+````c#
+public byte[] ConvertHoloHashToBytes(string hash)
+````
+
+#### ConvertHoloHashToString
+
+Utiltity method to convert from base64 bytes (Holochain Conductor format) to a friendly C# format. This is used to convert the AgentPubKey & DnaHash retreived from the Conductor.|
+
+````c#
+public string ConvertHoloHashToString(byte[] bytes)
+````
+
+
+
 
 ### Properties
 

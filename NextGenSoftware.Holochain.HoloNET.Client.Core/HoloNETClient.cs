@@ -264,7 +264,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
         }
 
-        private async Task StartConductor()
+        public async Task StartConductor()
         {
             string fullPathToEmbeddedHolochainConductorBinary = string.Concat(Directory.GetCurrentDirectory(), "\\HolochainBinaries\\holochain.exe");
             string fullPathToEmbeddedHCToolBinary = string.Concat(Directory.GetCurrentDirectory(), "\\HolochainBinaries\\hc.exe");
@@ -565,7 +565,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             return string.Concat("u", Convert.ToBase64String(bytes).Replace("+", "-").Replace("/", "_"));
         }
 
-        public void ShutDownAllConductors()
+        public async Task ShutDownAllConductors()
         {
             //FileInfo conductorInfo = new FileInfo(Config.FullPathToExternalHCToolBinary);
             //string[] parts = conductorInfo.Name.Split('.');
@@ -614,13 +614,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             Logging.Logging.Log("All Holochain Conductors Successfully Shutdown.", LogType.Info);
         }
 
-        private void ShutDownConductorsInternal()
+        private async Task ShutDownConductorsInternal()
         {
             // Close any conductors down if necessary.
             if (Config.AutoShutdownHolochainConductor)
             {
                 if (Config.ShutDownALLHolochainConductors)
-                    ShutDownAllConductors();
+                    await ShutDownAllConductors();
 
                 else if (_conductorProcess != null)
                 {
