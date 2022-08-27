@@ -694,6 +694,29 @@ public HoloNETClient(IEnumerable<ILogger> loggers, string holochainConductorURI 
 }
 ````
 
+````c#
+public WebSocket(string endPointURI, bool logToConsole = true, bool logToFile = true, string releativePathToLogFolder = "Logs", string logFileName = "NextGenSoftwareWebSocket.log", bool addAdditionalSpaceAfterEachLogEntry = false, bool showColouredLogs = true, ConsoleColor debugColour = ConsoleColor.White, ConsoleColor infoColour = ConsoleColor.Green, ConsoleColor warningColour = ConsoleColor.Yellow, ConsoleColor errorColour = ConsoleColor.Red)
+{
+    EndPoint = endPointURI;
+    Logging.Logging.Loggers.Add(new DefaultLogger(logToConsole, logToFile, releativePathToLogFolder, logFileName, addAdditionalSpaceAfterEachLogEntry, showColouredLogs, debugColour, infoColour, warningColour, errorColour));
+    Init();
+}
+
+public WebSocket(string endPointURI, IEnumerable<ILogger> loggers)
+{
+    EndPoint = endPointURI;
+    Logging.Logging.Loggers = new List<ILogger>(loggers);
+    Init();
+}
+
+public WebSocket(string endPointURI, ILogger logger)
+{
+    Logging.Logging.Loggers.Add(logger);
+    EndPoint = endPointURI;
+    Init();
+}
+````
+
 All NextGen Software libraries such as HoloNET, WebSocket etc use [NextGenSoftware.Logging](https://www.nuget.org/packages/NextGenSoftware.Logging). By default if no ILogger is injected in then they will automatically use the built in 'DefaultLogger', which comes with both File & Animated Coloured Console logging out of the box. Under the hood it uses the [NextGenSoftware.CLI.Engine](https://www.nuget.org/packages/NextGenSoftware.CLI.Engine) package to enable the colour and animation.
 
 The DefaultLogger has the following options that can also be configured:
