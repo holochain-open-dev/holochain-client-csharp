@@ -74,6 +74,17 @@ This will help massively turbo charge the holochain ecosystem by opening it up t
 
 **We are a BIG fan of Holochain and are very passionate about it and see a BIG future for it! We feel this is the gateway to taking Holochain mainstream! ;-)**
 
+There are two versions of HoloNET:
+
+[NextGenSoftware.Holochain.HoloNET.Client](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.Client) - Lightweight version that does not come with the holochain binaries (hc.exe and holochain.exe).
+
+[NextGenSoftware.Holochain.HoloNET.Client.Embedded](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.Client.Embedded) - This version comes with the holochain binaries (hc.exe and holochain.exe) integrated.
+
+You can also find the Test Harness here:
+
+[NextGenSoftware.Holochain.HoloNET.Client.TestHarness](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.Client.TestHarness)
+
+Readn more on how to use the [Test Harness here](https://github.com/holochain-open-dev/holochain-client-csharp/tree/main/NextGenSoftware.Holochain.HoloNET.Client.TestHarness).
 
 ## HoloNET Code Has Migrated
 
@@ -618,18 +629,18 @@ This property contains a struct called `HoloNETConfig` containing the following 
 | DnaHash | The DnaHash to use for Zome calls. If this is not set then HoloNET will automatically retreive this along with the AgentPubKey after it connects (if the [Connect](#connect) method defaults are not overriden). |
 | FullPathToRootHappFolder | The full path to the root of the hApp that HoloNET will start the Holochain Conductor (currenty uses hc.exe) with and then make zome calls to. |
 | FullPathToCompiledHappFolder | The full path to the compiled hApp that HoloNET will start the Holochain Conductor (currenty uses hc.exe) with and then make zome calls to. |
-| HolochainConductorMode | Tells HoloNET how to auto-start the Holochain Conductor. It can be one of the following values: 'UseExternal' - Will use the hc.exe specififed in the 'FullPathToExternalHCToolBinary' property if 'HolochainConductorToUse' property is set to 'Hc'. It will use the holochain.exe specefied in the 'FullPathToExternalHolochainConductorBinary' property if 'HolochainConductorToUse' property is set to 'Holochain'. If 'HolochainConductorMode' is set to 'UseEmbedded' then it will use the embdedded/integrated hc.exe/holochain.exe if the app is using the [NextGenSoftware.Holochain.HoloNET.Client.Embedded](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.Client.Embedded) package, otherwise it will throw an exception. Finally, if 'HolochainConductorMode' is set to 'UseSystemGlobal' (default), then it will automatically use the installed version of hc.exe & holochain.exe on the target machine. |
-| HolochainConductorToUse | This is the Holochain Conductor to use for the auto-start Holochain Conductor feature. It can be either 'Holochain' or 'Hc'.
-| FullPathToExternalHolochainConductorBinary| The full path to the Holochain Conductor exe (holochain.exe) that HoloNET will auto-start if 'HolochainConductorToUse' is set to 'Holochain'. |
-| FullPathToExternalHCToolBinary| The full path to the Holochain Conductor exe (hc.exe) that HoloNET will auto-start if 'HolochainConductorToUse' is set to 'Hc'.|
+| HolochainConductorMode | Tells HoloNET how to auto-start the Holochain Conductor. It can be one of the following values: `UseExternal` - Will use the hc.exe specififed in the `FullPathToExternalHCToolBinary` property if `HolochainConductorToUse` property is set to `Hc`. It will use the holochain.exe specefied in the `FullPathToExternalHolochainConductorBinary` property if `HolochainConductorToUse` property is set to `Holochain`. If `HolochainConductorMode` is set to `UseEmbedded` then it will use the embdedded/integrated hc.exe/holochain.exe if the app is using the [NextGenSoftware.Holochain.HoloNET.Client.Embedded](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.Client.Embedded) package, otherwise it will throw an exception. Finally, if `HolochainConductorMode` is set to `UseSystemGlobal` (default), then it will automatically use the installed version of hc.exe & holochain.exe on the target machine. |
+| HolochainConductorToUse | This is the Holochain Conductor to use for the auto-start Holochain Conductor feature. It can be either `Holochain` or `Hc`.
+| FullPathToExternalHolochainConductorBinary| The full path to the Holochain Conductor exe (holochain.exe) that HoloNET will auto-start if `HolochainConductorToUse` is set to `Holochain`. |
+| FullPathToExternalHCToolBinary| The full path to the Holochain Conductor exe (hc.exe) that HoloNET will auto-start if `HolochainConductorToUse` is set to `Hc`.|
 | SecondsToWaitForHolochainConductorToStart | The seconds to wait for the Holochain Conductor to start before attempting to [connect](#connect) to it.|
-| AutoStartHolochainConductor | Set this to true if you with HoloNET to auto-start the Holochain Conductor defined in the 'FullPathToExternalHolochainConductorBinary parameter if 'HolochainConductorToUse' is 'Holochain', otherwise if it's 'Hc' then it will use 'FullPathToExternalHCToolBinary'. Default is true. |
-| ShowHolochainConductorWindow | Set this to true if you wish HoloNET to show the Holochain Conductor window whilst it is starting it (will be left open until the conductor is automatically shutdown again when HoloNET disconects if 'AutoShutdownHolochainConductor' is true.)
+| AutoStartHolochainConductor | Set this to true if you with HoloNET to auto-start the Holochain Conductor defined in the `FullPathToExternalHolochainConductorBinary parameter if `HolochainConductorToUse` is `Holochain`, otherwise if it`s `Hc` then it will use `FullPathToExternalHCToolBinary`. Default is true. |
+| ShowHolochainConductorWindow | Set this to true if you wish HoloNET to show the Holochain Conductor window whilst it is starting it (will be left open until the conductor is automatically shutdown again when HoloNET disconects if `AutoShutdownHolochainConductor` is true.)
 | AutoShutdownHolochainConductor | Set this to true if you wish HoloNET to auto-shutdown the Holochain Conductor after it [disconnects](#disconnect). Default is true.
 | ShutDownALLHolochainConductors | Set this to true if you wish HoloNET to auto-shutdown ALL Holochain Conductors after it [disconnects](#disconnect). Default is false. Set this to true if you wish to make sure there are none left running to prevent memory leaks. You can also of course manually call the [ShutDownAllConductors](#ShutDownAllConductors) if you wish.
 | OnlyAllowOneHolochainConductorToRunAtATime | Set this to true if you wish HoloNET to allow only ONE Holochain Conductor to run at a time. The default is false. |
-| LoggingMode | This passes through to the static LogConfig.LoggingMode property in [NextGenSoftware.Logging](https://www.nuget.org/packages/NextGenSoftware.Logging) package. It can be either 'WarningsErrorsInfoAndDebug', 'WarningsErrorsAndInfo', 'WarningsAndErrors' or 'ErrorsOnly'.
-| ErrorHandlingBehaviour | An enum that specifies what to do when anm error occurs. The options are: 'AlwaysThrowExceptionOnError', 'OnlyThrowExceptionIfNoErrorHandlerSubscribedToOnErrorEvent' & 'NeverThrowExceptions'). The default is 'OnlyThrowExceptionIfNoErrorHandlerSubscribedToOnErrorEvent' meaning it will only throw an error if the 'OnError' event has not been subscribed to. This delegates error handling to the caller. If no event has been subscribed then HoloNETClient will throw an error. 'AlwaysThrowExceptionOnError' will always throw an error even if the 'OnError' event has been subscribed to. The 'NeverThrowException' enum option will never throw an error even if the 'OnError' event has not been subscribed to. Regardless of what enum is selected, the error will always be logged using whatever ILogger`s have been injected into the constructor or set on the static Logging.Loggers property.
+| LoggingMode | This passes through to the static LogConfig.LoggingMode property in [NextGenSoftware.Logging](https://www.nuget.org/packages/NextGenSoftware.Logging) package. It can be either `WarningsErrorsInfoAndDebug`, `WarningsErrorsAndInfo`, `WarningsAndErrors` or `ErrorsOnly`.
+| ErrorHandlingBehaviour | An enum that specifies what to do when anm error occurs. The options are: `AlwaysThrowExceptionOnError`, `OnlyThrowExceptionIfNoErrorHandlerSubscribedToOnErrorEvent` & `NeverThrowExceptions`). The default is `OnlyThrowExceptionIfNoErrorHandlerSubscribedToOnErrorEvent` meaning it will only throw an error if the `OnError` event has not been subscribed to. This delegates error handling to the caller. If no event has been subscribed then HoloNETClient will throw an error. `AlwaysThrowExceptionOnError` will always throw an error even if the `OnError` event has been subscribed to. The `NeverThrowException` enum option will never throw an error even if the `OnError` event has not been subscribed to. Regardless of what enum is selected, the error will always be logged using whatever ILogger`s have been injected into the constructor or set on the static Logging.Loggers property.
 
 #### WebSocket
 
@@ -641,13 +652,13 @@ It has a sub-property called Config that contains the following options:
 
 |Property|Description  |
 |--|--|
-|TimeOutSeconds  | The time in seconds before the connection times out when calling either method `SendMessage` or `CalLZomeFunction`. This defaults to 30 seconds.|
-|NeverTimeOut|Set this to true if you wish the connection to never time out when making a call from methods 'SendMessage' and `CallZomeFunction`. This defaults to false.
+|TimeOutSeconds  | The time in seconds before the connection times out when calling either method `SendHoloNETRequest` or `CalLZomeFunction`. This defaults to 30 seconds.|
+|NeverTimeOut|Set this to true if you wish the connection to never time out when making a call from methods `SendHoloNETRequest` and `CallZomeFunction`. This defaults to false.
 |KeepAliveSeconds| This is the time to keep the connection alive in seconds. This defaults to 30 seconds.
 |ReconnectionAttempts| The number of times HoloNETClient will attempt to re-connect if the connection is dropped. The default is 5.|
 |ReconnectionIntervalSeconds|The time to wait between each re-connection attempt. The default is 5 seconds.|
-|SendChunkSize| The size of the buffer to use when sending data to the Holochain conductor. The default is 1024 bytes.
-|ReceiveChunkSizeDefault| The size of the buffer to use when receiving data from the Holochain conductor. The default is 1024 bytes. |
+|SendChunkSize| The size of the buffer to use when sending data to the Holochain Conductor. The default is 1024 bytes.
+|ReceiveChunkSizeDefault| The size of the buffer to use when receiving data from the Holochain Conductor. The default is 1024 bytes. |
 |ErrorHandlingBehaviour | An enum that specifies what to do when anm error occurs. The options are: `AlwaysThrowExceptionOnError`, `OnlyThrowExceptionIfNoErrorHandlerSubscribedToOnErrorEvent` & `NeverThrowExceptions`). The default is `OnlyThrowExceptionIfNoErrorHandlerSubscribedToOnErrorEvent` meaning it will only throw an error if the `OnError` event has not been subscribed to. This delegates error handling to the caller. If no event has been subscribed then HoloNETClient will throw an error. `AlwaysThrowExceptionOnError` will always throw an error even if the `OnError` event has been subscribed to. The `NeverThrowException` enum option will never throw an error even if the `OnError` event has not been subscribed to. Regardless of what enum is selected, the error will always be logged using whatever `ILogger`s have been injected into the constructor or set on the static Logging.Loggers property.
 
 ##### State
@@ -717,7 +728,7 @@ public WebSocket(string endPointURI, ILogger logger)
 }
 ````
 
-All NextGen Software libraries such as HoloNET, WebSocket etc use [NextGenSoftware.Logging](https://www.nuget.org/packages/NextGenSoftware.Logging). By default if no ILogger is injected in then they will automatically use the built in 'DefaultLogger', which comes with both File & Animated Coloured Console logging out of the box. Under the hood it uses the [NextGenSoftware.CLI.Engine](https://www.nuget.org/packages/NextGenSoftware.CLI.Engine) package to enable the colour and animation.
+All NextGen Software libraries such as HoloNET, WebSocket etc use [NextGenSoftware.Logging](https://www.nuget.org/packages/NextGenSoftware.Logging). By default if no ILogger is injected in then they will automatically use the built in `DefaultLogger`, which comes with both File & Animated Coloured Console logging out of the box. Under the hood it uses the [NextGenSoftware.CLI.Engine](https://www.nuget.org/packages/NextGenSoftware.CLI.Engine) package to enable the colour and animation.
 
 The DefaultLogger has the following options that can also be configured:
 
@@ -729,10 +740,10 @@ The DefaultLogger has the following options that can also be configured:
 |LogToFile| Set this to true to log to the file. The default is true. |
 |AddAdditionalSpaceAfterEachLogEntry| Set this to true to add additional space after each log entry. The default is false. |
 |ShowColouredLogs| Set this to true to enable coloured logs in the console. This default to true. |
-|DebugColour| The colour to use for 'Debug' log enries to the console. |
-|InfoColour| The colour to use for 'Info' log enries to the console. |
-|WarningColour| The colour to use for 'Warning' log enries to the console. |
-|ErrorColour| The colour to use for 'Error' log enries to the console. |
+|DebugColour| The colour to use for `Debug` log enries to the console. |
+|InfoColour| The colour to use for `Info` log enries to the console. |
+|WarningColour| The colour to use for `Warning` log enries to the console. |
+|ErrorColour| The colour to use for `Error` log enries to the console. |
 
 You are welcome to create your own loggers to inject in, you simply need to implement the simple ILogger interface:
 
@@ -745,7 +756,7 @@ public interface ILogger
     }
 ````
 
-The Shutdown method is not used by the 'DefaultLogger', and so far is only used by the [NextGenSoftware.Logging.NLog](https://www.nuget.org/packages/NextGenSoftware.Logging.Nlog) package.
+The Shutdown method is not used by the `DefaultLogger`, and so far is only used by the [NextGenSoftware.Logging.NLog](https://www.nuget.org/packages/NextGenSoftware.Logging.Nlog) package.
 
 <!--
 #### Logger
