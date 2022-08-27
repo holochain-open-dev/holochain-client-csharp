@@ -816,18 +816,18 @@ The External enum was to be used by any other external implementation that imple
 
 ## HoloOASIS
 
-`HoloOASIS` uses the [HoloNETClient](#holonet) to implement a Storage Provider ([IOASISStorage](https://github.com/NextGenSoftwareUK/Our-World-OASIS-API-HoloNET-HoloUnity-And-.NET-HDK#ioasisstorage)) for the OASIS System. It will soon also implement a Network Provider ([IOASISNET](https://github.com/NextGenSoftwareUK/Our-World-OASIS-API-HoloNET-HoloUnity-And-.NET-HDK#ioasisnet))
- for the OASIS System that will leverage Holochain to create it's own private de-centralised distributed network called `ONET` (as seen on the [OASIS Architecture Diagram](#the-oasis-architecture)).
+`HoloOASIS` uses the [HoloNETClient](#how-to-use-holonet) to implement a Storage Provider ([IOASISStorage](https://github.com/NextGenSoftwareUK/Our-World-OASIS-API-HoloNET-HoloUnity-And-.NET-HDK#ioasisstorage)) for the OASIS System. It will soon also implement a Network Provider ([IOASISNET](https://github.com/NextGenSoftwareUK/Our-World-OASIS-API-HoloNET-HoloUnity-And-.NET-HDK#ioasisnet))
+ for the OASIS System that will leverage Holochain to create it's own private de-centralised distributed network called `ONET` (as seen on the [OASIS Architecture Diagram](https://github.com/NextGenSoftwareUK/Our-World-OASIS-API-HoloNET-HoloUnity-And-.NET-HDK#the-oasis-architecture)).
 
-This is a good example to see how to use [HoloNETClient](#holonet) in a real world game/platform (OASIS/Our World).
+This is a good example to see how to use [HoloNETClient](#how-to-use-holonet) in a real world game/platform (OASIS/Our World).
 
 Check out the [full documentation here](https://github.com/NextGenSoftwareUK/Our-World-OASIS-API-HoloNET-HoloUnity-And-.NET-HDK/#holooasis).
 
 ## HoloUnity
 
-We will soon be creating a Asset for the Unity Asset Store that will include [HoloNET](#holonet) along with Unity wrappers and examples of how to use [HoloNET](#holonet) inside Unity.
+We will soon be creating a Asset for the Unity Asset Store that will include [HoloNET](#how-to-use-holonet) along with Unity wrappers and examples of how to use [HoloNET](#how-to-use-holonet) inside Unity.
 
-In the codebase you will find a project called [NextGenSoftware.OASIS.API.FrontEnd.Unity](#project-structure), which shows how the `ProfileManager` found inside the `OASIS API Core` ([NextGenSoftware.OASIS.API.Core](#project-structure)) is used. When you instantiate the `ProfileManager` you inject into a Storage Provider that implements the [IOASISStorage](#ioasisstorage) interface. Currently the only provider implemented is the [HoloOASIS](#holooasis) Provider.
+In the codebase you will find a project called [NextGenSoftware.OASIS.API.FrontEnd.Unity](https://github.com/NextGenSoftwareUK/Our-World-OASIS-API-HoloNET-HoloUnity-And-.NET-HDK#project-structure), which shows how the `AvatarManager` found inside the `OASIS API Core` ([NextGenSoftware.OASIS.API.Core](https://github.com/NextGenSoftwareUK/Our-World-OASIS-API-HoloNET-HoloUnity-And-.NET-HDK#project-structure)) is used. When you instantiate the `ProfileManager` you inject into a Storage Provider that implements the [IOASISStorage](https://github.com/NextGenSoftwareUK/Our-World-OASIS-API-HoloNET-HoloUnity-And-.NET-HDK#ioasisstorage) interface. Currently the only provider implemented is the [HoloOASIS](https://github.com/NextGenSoftwareUK/Our-World-OASIS-API-HoloNET-HoloUnity-And-.NET-HDK#holooasis) Provider.
 
 The actual Our World Unity code is not currently stored in this repo due to size restrictions but we may consider using GitHub LFS (Large File Storage) later on. We are also looking at GitLab and other alternatives to see if they allow greater storage capabilities free out of the box (since we are currently working on a very tight budget but you could change that by donating below! ;-) ).
 
@@ -839,7 +839,7 @@ Here is a preview of the OASIS API/Avatar/Karma System... more to come soon... ;
 
 ### Using HoloUnity
 
-You start by instantiating the `AvatarManager` class found within the [NextGenSoftware.OASIS.API.Core](#project-structure) project.
+You start by instantiating the `AvatarManager` class found within the [NextGenSoftware.OASIS.API.Core](#https://github.com/NextGenSoftwareUK/Our-World-OASIS-API-HoloNET-HoloUnity-And-.NET-HDKproject-structure) project.
 
 ````c#
 // Inject in the HoloOASIS Storage Provider (this could be moved to a config file later so the 
