@@ -84,7 +84,7 @@ You can also find the Test Harness here:
 
 [NextGenSoftware.Holochain.HoloNET.Client.TestHarness](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.Client.TestHarness)
 
-Readn more on how to use the [Test Harness here](https://github.com/holochain-open-dev/holochain-client-csharp/tree/main/NextGenSoftware.Holochain.HoloNET.Client.TestHarness).
+Read more on how to use the [Test Harness here](https://github.com/holochain-open-dev/holochain-client-csharp/tree/main/NextGenSoftware.Holochain.HoloNET.Client.TestHarness).
 
 ## HoloNET Code Has Migrated
 
@@ -758,75 +758,15 @@ public interface ILogger
 
 The Shutdown method is not used by the `DefaultLogger`, and so far is only used by the [NextGenSoftware.Logging.NLog](https://www.nuget.org/packages/NextGenSoftware.Logging.Nlog) package.
 
-<!--
-#### Logger
+### Test Harness
 
-Property to inject in a `ILogger` implementation.
+You can find the Test Harness here:
 
-`HoloNETClientBase` is an abstract class meaning it cannot be instantiated directly. You must inherit from it to use it.  This is where all the code for the HoloNETClient is.
- 
-`NextGenSoftware.Holochain.HoloNET.Client.Desktop` and `NextGenSoftware.Holochain.HoloNET.Client.Unity` projects both contain a `HoloNETClient` class that do just this.
+[NextGenSoftware.Holochain.HoloNET.Client.TestHarness](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.Client.TestHarness)
 
-They contain very little code. All they do is inject into the `Logger` property the logger implementation they wish to use. The implementation must implement the `ILogger` interface. 
+Read more on how to use the [Test Harness here](https://github.com/holochain-open-dev/holochain-client-csharp/tree/main/NextGenSoftware.Holochain.HoloNET.Client.TestHarness).
 
-````c#
 
-using NextGenSoftware.Holochain.HoloNET.Client.Core;
-
-namespace NextGenSoftware.Holochain.HoloNET.Client.Desktop
-{
-    public class HoloNETClient : HoloNETClientBase
-    {
-        public HoloNETClient(string holochainURI) : base(holochainURI)
-        {
-            this.Logger = new NLogger();
-        }
-    }
-}
-
-````
-
-````c#
-
-using NextGenSoftware.Holochain.HoloNET.Client.Core;
-
-namespace NextGenSoftware.Holochain.HoloNET.Client.Unity
-{
-    public class HoloNETClient : HoloNETClientBase
-    {
-        public HoloNETClient(string holochainURI) : base(holochainURI)
-        {
-            //TODO: Add Unity Compat Logger Here (hopefully the Unity NLogger Download/Asset I found)
-            // this.Logger = new NLogger();
-            this.Logger = new DumbyLogger();
-        }
-    }
-}
-````
-
-The desktop version uses a wrapper around the popular `NLog` logging framework, but unfortunately Unity does not support NLog so this is why this has had to be split out. We are currently looking into a good Logging Solution for Unity. We have found a possible port of NLog for Unity that so far is looking promising but this is still a different dll/library so the code must still remain as it is. This is also good practice to decouple the code as much as possible especially external dependencies such as logging.
-
-<a name="ilogger"></a>
-The ILogger interface is very simple:
-
-````c#
-namespace NextGenSoftware.Holochain.HoloNET.Client.Core
-{
-    public interface ILogger
-    {
-        void Log(string message, LogType type);
-    }
-
-    public enum LogType
-    {
-        Debug,
-        Info,
-        Warn,
-        Error
-    }
-}
-````
--->
 
 <!--
 #### NetworkServiceProvider
@@ -878,313 +818,12 @@ The External enum was to be used by any other external implementation that imple
 
 ## HoloOASIS
 
-`HoloOASIS` uses the [HoloNETClient](#holonet) to implement a Storage Provider ([IOASISStorage](#ioasisstorage)) for the OASIS System. It will soon also implement a Network Provider ([IOASISNET](#ioasisnet))
- for the OASIS System that will leverage Holochain to create it's own private de-centralised distributed network called `ONET` (as seen on the [OASIS Architecture Diagram](#the-oasis-architecture) below).
+`HoloOASIS` uses the [HoloNETClient](#holonet) to implement a Storage Provider ([IOASISStorage](https://github.com/NextGenSoftwareUK/Our-World-OASIS-API-HoloNET-HoloUnity-And-.NET-HDK#ioasisstorage)) for the OASIS System. It will soon also implement a Network Provider ([IOASISNET](https://github.com/NextGenSoftwareUK/Our-World-OASIS-API-HoloNET-HoloUnity-And-.NET-HDK#ioasisnet))
+ for the OASIS System that will leverage Holochain to create it's own private de-centralised distributed network called `ONET` (as seen on the [OASIS Architecture Diagram](#the-oasis-architecture)).
 
 This is a good example to see how to use [HoloNETClient](#holonet) in a real world game/platform (OASIS/Our World).
 
-### Using HoloOASIS
-
-You start by instantiating a new HoloOASIS class from either the [NextGenSoftware.OASIS.API.Providers.HoloOASIS.Desktop](#project-structure) project or the [NextGenSoftware.OASIS.API.Providers.HoloOASIS.Unity](#project-structure) project.
-
-````c#
-Desktop.HoloOASIS _holoOASIS = new Desktop.HoloOASIS("ws://localhost:8888");
-````
-
-You pass into the constructor the URI to the Holochain conductor.
-
-Next, wire up the events:
-
-````c#
-_holoOASIS.HoloNETClient.OnConnected += HoloNETClient_OnConnected;
-_holoOASIS.OnInitialized += _holoOASIS_OnInitialized;
-_holoOASIS.OnPlayerProfileLoaded += _holoOASIS_OnPlayerProfileLoaded;
-_holoOASIS.OnPlayerProfileSaved += _holoOASIS_OnPlayerProfileSaved;
-_holoOASIS.OnHoloOASISError += _holoOASIS_OnHoloOASISError;
-````
-<br>
-Once HoloOASIS has finished initializing after the `OnInitialzed` event has fired you can create a new user Profile by creating a new Profile object and populating it with the required properties.
-
-You can also add karma by calling the `AddKarma` method on the `Profile` object.
-
-Finally you call the `SaveProfileAsync` method passing in the `Profile` object to save the profile to your local chain on Holochain.
-
-````c#
-private static void _holoOASIS_OnInitialized(object sender, EventArgs e)
-{
-            Console.WriteLine("Initialized.");
-            Console.WriteLine("Saving Profile...");
-
-            _savedProfile = new Profile { Username = "dellams", Email = "david@nextgensoftware.co.uk", Password = "1234", FirstName = "David", LastName = "Ellams", DOB = "11/04/1980", Id = Guid.NewGuid(), Title = "Mr", PlayerAddress = "blahahahaha" };
-            _savedProfile.AddKarma(999);
-
-            _holoOASIS.SaveProfileAsync(_savedProfile);
-}
-````
-<br>
-To load the `Profile` object back from your local chain on Holochain you simply call the `LoadProfileAsync` method passing in the desired profiles Holochain hash, which is returned as a param in the `OnPlayerProfileSaved` event handler.
-
-````c#
-private static void _holoOASIS_OnPlayerProfileSaved(object sender, ProfileSavedEventArgs e)
-{
-            Console.WriteLine("Profile Saved.");
-            Console.WriteLine("Profile Entry Hash: " + e.Profile.HcAddressHash);
-            Console.WriteLine("Loading Profile...");
-            //_savedProfile.Id = new Guid(e.ProfileEntryHash);
-            _holoOASIS.LoadProfileAsync(e.Profile.HcAddressHash);
-}
-````
-
-### Events
-
-HoloOASIS contains the following events:
-
-|Event|Description |
-|--|--|
-| OnInitialized |Fired when the HoloOASIS Provider has initialized. This is after the embedded [HoloNETClient](#holonet) has finished connecting to the Holochain Conductor.  |
-| OnPlayerProfileSaved|Fired when the users profile has finished saving. |
-| OnPlayerProfileLoaded|Fired when the users profile has finished loading. |
-| OnHoloOASISError|Fired when an error occurs within the provider. 
-| OnStorageProviderError|This implements part of the [IOASISStorage](#ioasisstorage) interface. This is a way for the OASIS Providers to bubble up any errors to the ProfileManager contained in the [NextGenSoftware.OASIS.API.Core](#oasisapi) |
-
-#### OnInitialized 
-
-Fired when the HoloOASIS Provider has initialized. This is after the embedded [HoloNETClient](#holonet) has finished connecting to the Holochain Conductor.
-
-````c#
-_holoOASIS.OnInitialized += _holoOASIS_OnInitialized;
-
-private static void _holoOASIS_OnInitialized(object sender, EventArgs e)
-{
-            Console.WriteLine("Initialized.");
-            Console.WriteLine("Saving Profile...");
-
-            _savedProfile = new Profile { Username = "dellams", Email = "david@nextgensoftware.co.uk", Password = "1234", FirstName = "David", LastName = "Ellams", DOB = "11/04/1980", Id = Guid.NewGuid(), Title = "Mr", PlayerAddress = "blahahahaha" };
-            _savedProfile.AddKarma(999);
-
-            _holoOASIS.SaveProfileAsync(_savedProfile);
-}
-````
-<br>
-
-#### OnPlayerProfileSaved
-
-Fired when the users profile has finished saving.
-
-````c#
-_holoOASIS.OnPlayerProfileSaved += _holoOASIS_OnPlayerProfileSaved;
-
-private static void _holoOASIS_OnPlayerProfileSaved(object sender, ProfileSavedEventArgs e)
-{
-            Console.WriteLine("Profile Saved.");
-            Console.WriteLine("Profile Entry Hash: " + e.Profile.HcAddressHash);
-            Console.WriteLine("Loading Profile...");
-            //_savedProfile.Id = new Guid(e.ProfileEntryHash);
-            _holoOASIS.LoadProfileAsync(e.Profile.HcAddressHash);
-}
-````
-<br>
-
-|Parameter|Description |
-|--|--|
-|Profile  | The profile object that has just been saved.  |
-<br>
-
-#### OnPlayerProfileLoaded
-Fired when the users profile has finished loading.
-
-````c#
- _holoOASIS.OnPlayerProfileLoaded += _holoOASIS_OnPlayerProfileLoaded;
-
- private static void _holoOASIS_OnPlayerProfileLoaded(object sender, ProfileLoadedEventArgs e)
-        {
-            Console.WriteLine("Profile Loaded.");
-            Console.WriteLine(string.Concat("Id: ", e.Profile.Id));
-            Console.WriteLine(string.Concat("HC Address Hash: ", e.Profile.HcAddressHash));
-            Console.WriteLine(string.Concat("Name: ", e.Profile.Title, " ", e.Profile.FirstName, " ", e.Profile.LastName));
-            Console.WriteLine(string.Concat("Username: ", e.Profile.Username));
-            Console.WriteLine(string.Concat("Password: ", e.Profile.Password));
-            Console.WriteLine(string.Concat("Email: ", e.Profile.Email));
-            Console.WriteLine(string.Concat("DOB: ", e.Profile.DOB));
-            Console.WriteLine(string.Concat("Address: ", e.Profile.PlayerAddress));
-            Console.WriteLine(string.Concat("Karma: ", e.Profile.Karma));
-            Console.WriteLine(string.Concat("Level: ", e.Profile.Level));
-        }
-````
-<br>
-
-#### OnHoloOASISError
-
-Fired when an error occurs within the provider.
-
-````c#
- _holoOASIS.OnHoloOASISError += _holoOASIS_OnHoloOASISError;
-
-private static void _holoOASIS_OnHoloOASISError(object sender, HoloOASISErrorEventArgs e)
-        {
-            Console.WriteLine(string.Concat("Error Occured. Reason: ", e.Reason, (e.HoloNETErrorDetails != null ? string.Concat(", HoloNET Reason: ", e.HoloNETErrorDetails.Reason) : ""), (e.HoloNETErrorDetails != null ? string.Concat(", HoloNET Details: ", e.HoloNETErrorDetails.ErrorDetails.ToString()) : ""), "\n"));
-        }
-````
-<br>
-
-|Parameter|Description  |
-|--|--|
-| EndPoint | The URI EndPoint of the Holochain conductor.
-| Reason | The reason for the error.  |
-| ErrorDetails| More detailed technical details including stack trace.
-| HoloNETErrorDetails| If the error was caused by HoloNET, then the error details returned from HoloNET will appear here.
-
-
-### Methods
-
-HoloOASIS contains the following methods:
-
-| Method |Description  |
-|--|--|
-| AddKarmaToProfileAsync |This implements part of the [IOASISStorage](#ioasisstorage) interface. Call this method to add karma to the users profile/avatar.  |
-|ConvertProfileToHoloOASISProfile | Internal utility method that converts a `OASIS.API.Core.Profile` object to a `HoloOASIS.Profile` object. The `HoloOASIS.Profile` object extends the `OASIS.API.Core.Profile` object by adding the `HcAddressHash` property to store the address hash returned from Holochain when adding new entries to the chain.
-| GetHolonsNearMe | This implements part of the IOASISNET interface. This has not been implemented yet and is just a stub. This method will get a list of the Holons (items/objects) near the user/avatar.
-|GetPlayersNearMe|This implements part of the IOASISNET interface. This has not been implemented yet and is just a stub. This method will get a list of the players/avatars near the player's user/avatar.
-|HandleError| This is a private method where all errors are funnelled and handled.
-|Initialize| Call this method to initilize the provider. Internally this will call the [Connect](#connect) method on the [HoloNETClient](#holonet) class.
-|LoadProfileAsync| Call this method to load the users profile/avatar data and return it in a `Profile` object. This has 3 overloads.
-|RemoveKarmaFromProfileAsync| Call this method to remove karma from the users profile/avatar.
-| SaveProfileAsync | Call this method to save the user's profile/avatar.
-
-### Properties
-
-HoloOASIS contains the following properties:
-
-|Property|Description  |
-|--|--|
-| HoloNETClient | This contains a ref to the [HoloNETClient](#holonet). You can use this property to access the underlying [HoloNETClient](#holonet) including all [events](#events), [methods](#methods) & [properties](#properties). |
-
-
-**More to come soon...**
-
-## OASIS API Core
-
-This is where the main OASIS API is located and contains all of the interfaces that the various providers implement along with the base objects & managers to power the OASIS API.
-
-It is located in the `NextGenSoftware.OASIS.API.Core` project.
-
-#### Using The OASIS API Core
-
-The API is still being developed so at the time of writing,  only the`ProfileManager` is available.
-
-You start by instantiating the `ProfileManager` class:
-
-````c#
-// Inject in the HoloOASIS Storage Provider (this could be moved to a config file later so the 
-// providers can be sweapped without having to re-compile.
-ProfileManager = new ProfileManager(new HoloOASIS("ws://localhost:8888"));
-````
-
-The `ProfileManager` takes one param for the constructor of type [IOASISStorage](#ioasisstorage). This is where you inject in a Provider that implements the [IOASISStorage](#ioasisstorage) interface. Currently the only provider that has implemented this is the [HoloOASIS](#holooasis) provider. but expect more to follow soon...
-
-````c#
-public ProfileManager(IOASISStorage
- OASISStorageProvider)
-{
-            this.OASISStorageProvider = OASISStorageProvider;
-            this.OASISStorageProvider.OnStorageProviderError += OASISStorageProvider_OnStorageProviderError;
-}
-````
-
-Part of the [IOASISStorage](#ioasisstorage) interface has an event called OnStorageProviderError, which the provider fires to send errors back to the `ProfileManager`.
-
-Once the `ProfileManager` has been instantiated. you can load the users Profile using the `LoadProfileAsync` method:
-
-````c#
-IProfile profile = await ProfileManager.LoadProfileAsync(username, password);
-
-if (profile != null)
-{
-	//TODO: Bind profile info to Unity Avatar UI here.
-}
-````
-
-### Interfaces
-
-The OASIS API currently has the following interfaces defined:
-
-|Interface|Description  |
-|--|--|
-|[IOASISStorage](#ioasisstorage)  | This is what a Storage Provider implements so the OASIS API can read & write the users profile/avatar to the storage medium/network. Currently only the HoloOASIS provider exists but more will follow soon...the first will be EthereumOASIS & SOLIDOASIS so the API can talk to both Ethereum & SOLID.  |
-|[IOASISNET](#ioasisnet)| This is what a Network Provider implements so the OASIS API can share the users profile/avatar as well as fine Holons and players near them. 
-
-**NOTE: Currently the interfaces are pretty basic, but expect a LOT more to be added in the future...  Additional interfaces will also be added such as the IOASISRenderer interface.**
-
-#### IOASISStorage  
-
-This is what a Storage Provider implements so the OASIS API can read & write the users profile/avatar to the storage medium/network. Currently only the [HoloOASIS](#holooasis) provider exists but more will follow soon...the first will be EthereumOASIS & SOLIDOASIS so the API can talk to both Ethereum & SOLID.
-
-````c#
-namespace NextGenSoftware.OASIS.API.Core
-{
-    // This interface is responsible for persisting data/state to storage, this could be a local DB or other local 
-    // storage or through a distributed/decentralised provider such as IPFS or Holochain (these two implementations 
-    // will be implemented soon (IPFSOASIS & HoloOASIS).
-    public interface IOASISStorage
-    {
-        Task<IProfile> LoadProfileAsync(string providerKey);
-        Task<IProfile> LoadProfileAsync(Guid Id);
-        Task<IProfile> LoadProfileAsync(string username, string password);
-
-        //Task<bool> SaveProfileAsync(IProfile profile);
-        Task<IProfile> SaveProfileAsync(IProfile profile);
-        Task<bool> AddKarmaToProfileAsync(IProfile profile, int karma);
-        Task<bool> RemoveKarmaFromProfileAsync(IProfile profile, int karma);
-
-        event StorageProviderError OnStorageProviderError;
-
-        //TODO: Lots more to come! ;-)
-    }
-}
-````
-<br>
-
-| Item|Description  |
-|--|--|
-| LoadProfileAsync | Loads the users profile/avatar. This has 3 overloads, one takes a providerKey (a unique key that the provider can use to identify a profile, [HoloOASIS](#holooasis) uses the address hash for this), one takes a username & password and the final one takes a Guid for the profileID, which is a unique id for the profile irrespective of which provider is providing it.  |
-| SaveProfileAsync | Saves the users profile/avatar. 
-| AddKarmaToProfileAsync | Add karma to the users profile/avatar.
-| RemoveKarmaFromProfileAsync | Remove karma from the users profile/avatar.
-| StorageProviderError | An event the provider fires when an error occurs that the `ProfileManager` can then handle.
-
-#### IOASISNET
-
-This is what a Network Provider implements so the OASIS API can share the users profile/avatar as well as find Holon's and players near them. 
-
-````c#
-namespace NextGenSoftware.OASIS.API.Core
-{
-    // This interface provides methods to discover and interact with other nodes/peers on the distributed/decentralised network (ONET)
-    // This will involve peer to peer communication.
-    public interface IOASISNET
-    {
-        List<IPlayer> GetPlayersNearMe();
-        List<IHolon> GetHolonsNearMe(HolonType Type);
-    }
-}
-````
-
-Currently the [HoloOASIS](#holooasis) Provider defines some stubs for this interface, which will be fully implemented soon...
-
-| Item | Description  |
-|--|--|
-| GetPlayersNearMe  | Gets a list of players near the user's current location.  |
-| GetHolonsNearMe | Get a list of holon's near the user's current location.
-
-
-### Events
-
-### Methods
-
-### Properties
-
-**More to come soon...**
-
+Check out the [full documentation here](https://github.com/NextGenSoftwareUK/Our-World-OASIS-API-HoloNET-HoloUnity-And-.NET-HDK/#holooasis).
 
 ## HoloUnity
 
@@ -1202,7 +841,7 @@ Here is a preview of the OASIS API/Avatar/Karma System... more to come soon... ;
 
 ### Using HoloUnity
 
-You start by instantiating the `ProfileManager` class found within the [NextGenSoftware.OASIS.API.Core](#project-structure) project.
+You start by instantiating the `AvatarManager` class found within the [NextGenSoftware.OASIS.API.Core](#project-structure) project.
 
 ````c#
 // Inject in the HoloOASIS Storage Provider (this could be moved to a config file later so the 
@@ -1420,6 +1059,7 @@ Of course if they wanted use the OASIS API then the first code listing is how it
 ### Properties
 
 **More to come soon...**
+
 
 
 
