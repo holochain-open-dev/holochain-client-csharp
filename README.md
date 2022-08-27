@@ -596,21 +596,48 @@ public string ConvertHoloHashToString(byte[] bytes)
 
 HoloNETClient contains the following properties:
 
-<br>
-
 | Property | Description  |
 |--|--|
-| [Config](#config)  | This property contains a struct called `HoloNETConfig` containing the sub-properties: TimeOutSeconds, NeverTimeOut, KeepAliveSeconds, ReconnectionAttempts, ReconnectionIntervalSeconds, SendChunkSize, ReceiveChunkSizeDefault, ErrorHandlingBehaviour, FullPathToExternalHolochainConductor, FullPathToHolochainAppDNA, SecondsToWaitForHolochainConductorToStart, AutoStartConductor & AutoShutdownConductor
+| [Config](#config)  | This property contains a struct called `HoloNETConfig` containing the sub-properties: AgentPubKey, DnaHash, FullPathToRootHappFolder, FullPathToCompiledHappFolder, HolochainConductorMode, FullPathToExternalHolochainConductorBinary, FullPathToExternalHCToolBinary, SecondsToWaitForHolochainConductorToStart, AutoStartHolochainConductor, ShowHolochainConductorWindow, AutoShutdownHolochainConductor, ShutDownALLHolochainConductors, HolochainConductorToUse, OnlyAllowOneHolochainConductorToRunAtATime, LoggingMode & ErrorHandlingBehaviour. |
+| [WebSocket](#websocket) | This property contains the internal [NextGenSoftware WebSocket](https://www.nuget.org/packages/NextGenSoftware.WebSocket) that HoloNET uses. You can use this property to access the current state of the WebSocket as well as configure more options. |
+| [State](#state) | This property is a shortcut to the State property on the [WebSocket](#websocket) property above. |
+| [EndPoint](#endpoint) | This property is a shortcut to the EndPoint property on the [WebSocket](#websocket) property above. |
+<!--
 | [Logger](#logger) | Property to inject in a [ILogger](#ilogger) implementation. |
 | [NetworkServiceProvider](#networkserviceprovider) | This is a property where the network service provider can be injected. The provider needs to implement the `IHoloNETClientNET` interface.  |
 | [NetworkServiceProviderMode](#networkserviceprovidermode) |This is a simple enum, which currently has these values: Websockets, HTTP & External. |
-
-<br>
+-->
 
 #### Config
 
 This property contains a struct called `HoloNETConfig` containing the following sub-properties:
-<br>
+
+|Property|Description  |
+|-----|--|
+| AgentPubKey | The AgentPubKey to use for Zome calls. If this is not set then HoloNET will automatically retreive this along with the DnaHash after it connects (if the [Connect](#connect) method defaults are not overriden). |
+| DnaHash | The DnaHash to use for Zome calls. If this is not set then HoloNET will automatically retreive this along with the AgentPubKey after it connects (if the [Connect](#connect) method defaults are not overriden). |
+| FullPathToRootHappFolder | The full path to the root of the hApp that HoloNET will start the Holochain Conductor (currenty uses hc.exe) with and then make zome calls to. |
+| FullPathToCompiledHappFolder | The full path to the compiled hApp that HoloNET will start the Holochain Conductor (currenty uses hc.exe) with and then make zome calls to. |
+| HolochainConductorMode | Tells HoloNET how to auto-start the Holochain Conductor. It can be one of the following values: 'UseExternal' - Will use the hc.exe specififed in the 'FullPathToExternalHCToolBinary' property if 'HolochainConductorToUse' property is set to 'Hc'. It will use the holochain.exe specefied in the 'FullPathToExternalHolochainConductorBinary' property if 'HolochainConductorToUse' property is set to 'Holochain'. If 'HolochainConductorMode' is set to 'UseEmbedded' then it will use the embdedded/integrated hc.exe/holochain.exe if the app is using the [NextGenSoftware.Holochain.HoloNET.Client.Embedded](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.Client.Embedded) package, otherwise it will throw an exception. Finally, if 'HolochainConductorMode' is set to 'UseSystemGlobal' (default), then it will automatically use the installed version of hc.exe & holochain.exe on the target machine. |
+| HolochainConductorToUse | This is the Holochain Conductor to use for the auto-start Holochain Conductor feature. It can be either 'Holochain' or 'Hc'.
+| FullPathToExternalHolochainConductorBinary| The full path to the Holochain Conductor exe (holochain.exe) that HoloNET will auto-start if 'HolochainConductorToUse' is set to 'Holochain'. |
+| FullPathToExternalHCToolBinary| The full path to the Holochain Conductor exe (hc.exe) that HoloNET will auto-start if 'HolochainConductorToUse' is set to 'Hc'.|
+| SecondsToWaitForHolochainConductorToStart | The seconds to wait for the Holochain Conductor to start before attempting to [connect](#connect) to it.|
+| AutoStartHolochainConductor | Set this to true if you with HoloNET to auto-start the Holochain Conductor defined in the 'FullPathToExternalHolochainConductorBinary parameter if 'HolochainConductorToUse' is 'Holochain', otherwise if it's 'Hc' then it will use 'FullPathToExternalHCToolBinary'. Default is true. |
+| ShowHolochainConductorWindow | Set this to true if you wish HoloNET to show the Holochain Conductor window whilst it is starting it (will be left open until the conductor is automatically shutdown again when HoloNET disconects if 'AutoShutdownHolochainConductor' is true.)
+| AutoShutdownHolochainConductor | Set this to true if you wish HoloNET to auto-shutdown the Holochain Conductor after it [disconnects](#disconnect). Default is true.
+| ShutDownALLHolochainConductors | Set this to true if you wish HoloNET to auto-shutdown ALL Holochain Conductors after it [disconnects](#disconnect). Default is false. Set this to true if you wish to make sure there are none left running to prevent memory leaks. You can also of course manually call the [ShutDownAllConductors](#ShutDownAllConductors) if you wish.
+| OnlyAllowOneHolochainConductorToRunAtATime | Set this to true if you wish HoloNET to allow only ONE Holochain Conductor to run at a time. The default is false. |
+| LoggingMode | This passes through to the static LogConfig.LoggingMode property in [NextGenSoftware.Logging](https://www.nuget.org/packages/NextGenSoftware.Logging) package. It can be either 'WarningsErrorsInfoAndDebug', 'WarningsErrorsAndInfo', 'WarningsAndErrors' or 'ErrorsOnly'.
+| ErrorHandlingBehaviour | An enum that specifies what to do when anm error occurs. The options are: 'AlwaysThrowExceptionOnError', 'OnlyThrowExceptionIfNoErrorHandlerSubscribedToOnErrorEvent' & 'NeverThrowExceptions'). The default is 'OnlyThrowExceptionIfNoErrorHandlerSubscribedToOnErrorEvent' meaning it will only throw an error if the 'OnError' event has not been subscribed to. This delegates error handling to the caller. If no event has been subscribed then HoloNETClient will throw an error. 'AlwaysThrowExceptionOnError' will always throw an error even if the 'OnError' event has been subscribed to. The 'NeverThrowException' enum option will never throw an error even if the 'OnError' event has not been subscribed to. Regardless of what enum is selected, the error will always be logged using whatever ILogger`s have been injected into the constructor or set on the static Logging.Loggers property.
+
+#### WebSocket
+
+This property contains a refrence to the internal [NextGenSoftware WebSocket](https://www.nuget.org/packages/NextGenSoftware.WebSocket) that HoloNET uses. You can use this property to access the current state of the WebSocket as well as configure more options.
+
+##### Config
+
+It has a sub-property called Config that contains the following options:
 
 |Property|Description  |
 |--|--|
@@ -621,18 +648,83 @@ This property contains a struct called `HoloNETConfig` containing the following 
 |ReconnectionIntervalSeconds|The time to wait between each re-connection attempt. The default is 5 seconds.|
 |SendChunkSize| The size of the buffer to use when sending data to the Holochain conductor. The default is 1024 bytes.
 |ReceiveChunkSizeDefault| The size of the buffer to use when receiving data from the Holochain conductor. The default is 1024 bytes. |
-| ErrorHandlingBehaviour | An enum that specifies what to do when anm error occurs. The options are: `AlwaysThrowExceptionOnError`, `OnlyThrowExceptionIfNoErrorHandlerSubscribedToOnErrorEvent` & `NeverThrowExceptions`). The default is `OnlyThrowExceptionIfNoErrorHandlerSubscribedToOnErrorEvent` meaning it will only throw an error if the `OnError` event has not been subscribed to. This delegates error handling to the caller. If no event has been subscribed then HoloNETClient will throw an error. `AlwaysThrowExceptionOnError` will always throw an error even if the `OnError` event has been subscribed to. The `NeverThrowException` enum option will never throw an error even if the `OnError` event has not been subscribed to. Regardless of what enum is selected, the error will always be logged using whatever `ILogger` has been injected into the [Logger]("#logger") property. 
-| FullPathToExternalHolochainConductor| The full path to the conductor exe (hc.exe) that HoloNET will auto-start.|
-| FullPathToHolochainAppDNA | The full path to the hApp (Holochain App) DNA file that is the compiled WASM (compiled byt the conductor build options). |
-| SecondsToWaitForHolochainConductorToStart | The seconds to wait for the Holochain Conductor to start before attempting to [connect](#connect) to it.|
-| AutoStartConductor | Set this to true if you with HoloNET to auto-start the Holochain Conductor defined in the `FullPathToExternalHolochainConductor` parameter. Default is true. |
-| AutoShutdownConductor | Set this to true if you wish HoloNET to auto-shutdown the Holochain Conductor after it [disconnects](#disconnect). Default is true.
+|ErrorHandlingBehaviour | An enum that specifies what to do when anm error occurs. The options are: `AlwaysThrowExceptionOnError`, `OnlyThrowExceptionIfNoErrorHandlerSubscribedToOnErrorEvent` & `NeverThrowExceptions`). The default is `OnlyThrowExceptionIfNoErrorHandlerSubscribedToOnErrorEvent` meaning it will only throw an error if the `OnError` event has not been subscribed to. This delegates error handling to the caller. If no event has been subscribed then HoloNETClient will throw an error. `AlwaysThrowExceptionOnError` will always throw an error even if the `OnError` event has been subscribed to. The `NeverThrowException` enum option will never throw an error even if the `OnError` event has not been subscribed to. Regardless of what enum is selected, the error will always be logged using whatever `ILogger`s have been injected into the constructor or set on the static Logging.Loggers property.
 
+##### State
 
- 
+Contains an enumeration that can be one of the following values:
 
-<br>
+None,
+Connecting,
+Open,
+CloseSent,
+CloseReceived,
+Closed,
+Aborted
 
+#### State
+
+Is a shortcut to the WebSocket.State enumeration above.
+
+#### EndPoint
+
+Is the endpoint URI that HoloNET is running on.
+
+### Logging
+
+Both HoloNET & the [NextGenSoftware.WebSocket](https://www.nuget.org/packages/NextGenSoftware.WebSocket) package that HoloNET uses allow either a ILogger or collection of ILogger's to be injected in through Constuctor DI (Depenecy Injection). 
+
+````c#
+ public HoloNETClient(string holochainConductorURI = "ws://localhost:8888", bool logToConsole = true, bool logToFile = true, string releativePathToLogFolder = "Logs", string logFileName = "HoloNET.log", bool addAdditionalSpaceAfterEachLogEntry = false, bool showColouredLogs = true, ConsoleColor debugColour = ConsoleColor.White, ConsoleColor infoColour = ConsoleColor.Green, ConsoleColor warningColour = ConsoleColor.Yellow, ConsoleColor errorColour = ConsoleColor.Red)
+{
+    Logging.Logging.Loggers.Add(new DefaultLogger(logToConsole, logToFile, releativePathToLogFolder, logFileName, addAdditionalSpaceAfterEachLogEntry, showColouredLogs, debugColour, infoColour, warningColour, errorColour));
+    Init(holochainConductorURI);
+}
+
+public HoloNETClient(ILogger logger, string holochainConductorURI = "ws://localhost:8888")
+{
+    Logging.Logging.Loggers.Add(logger);
+    Init(holochainConductorURI);
+}
+
+public HoloNETClient(IEnumerable<ILogger> loggers, string holochainConductorURI = "ws://localhost:8888")
+{
+    Logging.Logging.Loggers = new List<ILogger>(loggers);
+    Init(holochainConductorURI);
+}
+````
+
+All NextGen Software libraries such as HoloNET, WebSocket etc use [NextGenSoftware.Logging](https://www.nuget.org/packages/NextGenSoftware.Logging). By default if no ILogger is injected in then they will automatically use the built in 'DefaultLogger', which comes with both File & Animated Coloured Console logging out of the box. Under the hood it uses the [NextGenSoftware.CLI.Engine](https://www.nuget.org/packages/NextGenSoftware.CLI.Engine) package to enable the colour and animation.
+
+The DefaultLogger has the following options that can also be configured:
+
+|Property|Description  |
+|--|--|
+|LogDirectory  | The directory where logs will be created.|
+|LogFileName| The name of the log file to create. |
+|LogToConsole| Set this to true to log to the console. The default is true. |
+|LogToFile| Set this to true to log to the file. The default is true. |
+|AddAdditionalSpaceAfterEachLogEntry| Set this to true to add additional space after each log entry. The default is false. |
+|ShowColouredLogs| Set this to true to enable coloured logs in the console. This default to true. |
+|DebugColour| The colour to use for 'Debug' log enries to the console. |
+|InfoColour| The colour to use for 'Info' log enries to the console. |
+|WarningColour| The colour to use for 'Warning' log enries to the console. |
+|ErrorColour| The colour to use for 'Error' log enries to the console. |
+
+You are welcome to create your own loggers to inject in, you simply need to implement the simple ILogger interface:
+
+````c#
+public interface ILogger
+    {
+        void Log(string message, LogType type, bool showWorkingAnimation = false);
+        void Log(string message, LogType type, ConsoleColor consoleColour, bool showWorkingAnimation = false);
+        void Shutdown();
+    }
+````
+
+The Shutdown method is not used by the 'DefaultLogger', and so far is only used by the [NextGenSoftware.Logging.NLog](https://www.nuget.org/packages/NextGenSoftware.Logging.Nlog) package.
+
+<!--
 #### Logger
 
 Property to inject in a `ILogger` implementation.
@@ -700,9 +792,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Core
     }
 }
 ````
+-->
 
-<br>
-
+<!--
 #### NetworkServiceProvider
 
 This is a property where the network service provider can be injected. The provider needs to implement the `IHoloNETClientNET` interface. 
@@ -728,7 +820,6 @@ The two currently planned providers will be WebSockets & HTTP but if for whateve
 
 Currently the WebSocket JSON RPC implementation is deeply integrated into the HoloNETClient so this needs splitting out into its own project. We hope to get this done soon... We can then also at the same time implement the HTTP implementation. 
 
-<br>
 
 #### NetworkServiceProviderMode
 
@@ -746,10 +837,10 @@ public enum NetworkServiceProviderMode
 The plan was to have WebSockets and HTTP built into the current implementation (but will still be injected in from a separate project). If there is a need a cut-down lite version of HoloNETClient can easily be implemented with just one of them injected in.
 
 The External enum was to be used by any other external implementation that implements the `IHoloNETClientNET` and would be for future use if Holochain decide they wish to use another protocol.
+-->
 
 **More to come soon...**
 
-<br>
 
 ## HoloOASIS
 
