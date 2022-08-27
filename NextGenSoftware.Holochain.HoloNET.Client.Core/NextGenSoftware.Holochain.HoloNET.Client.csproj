@@ -3,20 +3,20 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <!--<PackageId>NextGenSoftware.Holochain.HoloNET.Client.Embedded</PackageId>-->
-	  <PackageId>NextGenSoftware.Holochain.HoloNET.Client</PackageId>
+    <PackageId>NextGenSoftware.Holochain.HoloNET.Client.Embedded</PackageId>
+	  <!--<PackageId>NextGenSoftware.Holochain.HoloNET.Client</PackageId>-->
     <Company>NextGen Software Ltd</Company>
     <Product>HoloNET Holochain Client</Product>
 	<Title>HoloNET Holochain Client</Title>
-	  <Summary>The world's first .NET &amp; Unity client for Holochain.</Summary>
-	  <!--<Summary>The world's first .NET &amp; Unity client for Holochain. This version comes with the Holochain binaries built in.</Summary>-->
-	  <Description>The world's first .NET &amp; Unity client for Holochain.</Description>
-	  <!--<Description>The world's first .NET &amp; Unity client for Holochain. This version comes with the Holochain binaries built in.</Description>-->
+	  <!--<Summary>The world's first .NET &amp; Unity client for Holochain.</Summary>-->
+	  <Summary>The world's first .NET &amp; Unity client for Holochain. This version comes with the Holochain binaries built in.</Summary>
+	  <!--<Description>The world's first .NET &amp; Unity client for Holochain.</Description>-->
+	 <Description>The world's first .NET &amp; Unity client for Holochain. This version comes with the Holochain binaries built in.</Description>
     <PackageProjectUrl>https://github.com/NextGenSoftwareUK/holochain-client-csharp</PackageProjectUrl>
     <PackageIcon>hc logo.png</PackageIcon>
     <Authors>David Ellams (NextGen Software Ltd)</Authors>
     <PackageTags>holochain;net;unity</PackageTags>
-    <PackageReleaseNotes>Improved error handling &amp; updated documentation.</PackageReleaseNotes>
+    <PackageReleaseNotes>Improved error handling &amp; reporting. Upgraded supported packages NextGenSoftware.WebSocket from v1.1.2 to v1.1.3, NextGenSoftware.Logging from v1.1.1 to v1.1.3, NextGenSoftware.CLI.Engine from v1.0.3 to v1.1.1 &amp; NextGenSoftware.Utilities from v1.0.2 to v1.0.3. Also updated &amp; completed documentation.</PackageReleaseNotes>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/NextGenSoftwareUK/holochain-client-csharp</RepositoryUrl>
     <Copyright>Copyright © NextGen Software Ltd 2022</Copyright>
@@ -31,9 +31,17 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="HolochainBinaries\**" />
-    <EmbeddedResource Remove="HolochainBinaries\**" />
-    <None Remove="HolochainBinaries\**" />
+    <None Remove="HolochainBinaries\hc.exe" />
+    <None Remove="HolochainBinaries\holochain.exe" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="HolochainBinaries\hc.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="HolochainBinaries\holochain.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
@@ -51,7 +59,7 @@
     <PackageReference Include="MessagePack" Version="2.4.35" />
     <PackageReference Include="MsgPack.Cli" Version="1.0.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="NextGenSoftware.WebSocket" Version="1.1.2" />
+    <PackageReference Include="NextGenSoftware.WebSocket" Version="1.1.3" />
     <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
   </ItemGroup>
 

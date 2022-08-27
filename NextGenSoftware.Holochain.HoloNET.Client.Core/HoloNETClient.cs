@@ -88,31 +88,38 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         public HoloNETClient(string holochainConductorURI = "ws://localhost:8888", bool logToConsole = true, bool logToFile = true, string releativePathToLogFolder = "Logs", string logFileName = "HoloNET.log", bool addAdditionalSpaceAfterEachLogEntry = false, bool showColouredLogs = true, ConsoleColor debugColour = ConsoleColor.White, ConsoleColor infoColour = ConsoleColor.Green, ConsoleColor warningColour = ConsoleColor.Yellow, ConsoleColor errorColour = ConsoleColor.Red)
         {
-            Logging.Logging.Loggers.Add(new DefaultLogger(logToConsole, logToFile, releativePathToLogFolder, logFileName, addAdditionalSpaceAfterEachLogEntry, showColouredLogs, debugColour, infoColour, warningColour, errorColour));
+            Logger.Loggers.Add(new DefaultLogger(logToConsole, logToFile, releativePathToLogFolder, logFileName, addAdditionalSpaceAfterEachLogEntry, showColouredLogs, debugColour, infoColour, warningColour, errorColour));
             Init(holochainConductorURI);
         }
 
         public HoloNETClient(ILogger logger, string holochainConductorURI = "ws://localhost:8888")
         {
-            Logging.Logging.Loggers.Add(logger);
+            Logger.Loggers.Add(logger);
             Init(holochainConductorURI);
         }
 
         public HoloNETClient(IEnumerable<ILogger> loggers, string holochainConductorURI = "ws://localhost:8888")
         {
-            Logging.Logging.Loggers = new List<ILogger>(loggers);
+            Logger.Loggers = new List<ILogger>(loggers);
             Init(holochainConductorURI);
         }
 
         private void Init(string holochainConductorURI)
         {
-            WebSocket = new WebSocket.WebSocket(holochainConductorURI, Logging.Logging.Loggers);
+            try
+            {
+                WebSocket = new WebSocket.WebSocket(holochainConductorURI, Logger.Loggers);
 
-            //TODO: Impplemnt IDispoasable to unsubscribe event handlers to prevent memory leaks... 
-            WebSocket.OnConnected += WebSocket_OnConnected;
-            WebSocket.OnDataReceived += WebSocket_OnDataReceived;
-            WebSocket.OnDisconnected += WebSocket_OnDisconnected;
-            WebSocket.OnError += WebSocket_OnError;
+                //TODO: Impplemnt IDispoasable to unsubscribe event handlers to prevent memory leaks... 
+                WebSocket.OnConnected += WebSocket_OnConnected;
+                WebSocket.OnDataReceived += WebSocket_OnDataReceived;
+                WebSocket.OnDisconnected += WebSocket_OnDisconnected;
+                WebSocket.OnError += WebSocket_OnError;
+            }
+            catch (Exception ex)
+            {
+                HandleError("Error in HoloNETClient.Init method.", ex);
+            }
         }
 
         private void WebSocket_OnError(object sender, WebSocketErrorEventArgs e)
@@ -122,32 +129,39 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         private void WebSocket_OnDisconnected(object sender, DisconnectedEventArgs e)
         {
-            ShutDownConductorsInternal();
-            OnDisconnected?.Invoke(this, new DisconnectedEventArgs { EndPoint = e.EndPoint, Reason = e.Reason });
+            try
+            {
+                ShutDownConductorsInternal();
+                OnDisconnected?.Invoke(this, new DisconnectedEventArgs { EndPoint = e.EndPoint, Reason = e.Reason });
+            }
+            catch (Exception ex)
+            {
+                HandleError("Error in HoloNETClient.WebSocket_OnDisconnected method.", ex);
+            }
         }
 
         private void WebSocket_OnDataReceived(object sender, WebSocket.DataReceivedEventArgs e)
         {
             try
             {
-                Logging.Logging.Log("DATA RECEIVED", LogType.Info);
+                Logger.Log("DATA RECEIVED", LogType.Info);
                 StringBuilder sb = new StringBuilder();
                 sb.Append(Encoding.UTF8.GetString(e.RawBinaryData, 0, e.RawBinaryData.Length));
                 string rawData = sb.ToString();
-                Logging.Logging.Log("Raw Data Received: " + rawData, LogType.Debug);
+                Logger.Log("Raw Data Received: " + rawData, LogType.Debug);
 
                 var options = MessagePackSerializerOptions.Standard.WithSecurity(MessagePackSecurity.UntrustedData);
                 HoloNETResponse response = MessagePackSerializer.Deserialize<HoloNETResponse>(e.RawBinaryData, options);
 
-                Logging.Logging.Log("RSM Response", LogType.Info);
-                Logging.Logging.Log($"Id: {response.id}", LogType.Info);
-                Logging.Logging.Log($"Type: {response.type}", LogType.Info);
+                Logger.Log("RSM Response", LogType.Info);
+                Logger.Log($"Id: {response.id}", LogType.Info);
+                Logger.Log($"Type: {response.type}", LogType.Info);
 
                 OnDataReceived?.Invoke(this, new HoloNETDataReceivedEventArgs(response.id.ToString(), EndPoint, true, e.RawBinaryData, e.RawJSONData, e.WebSocketResult, false));
 
                 if (rawData.Substring(32, 8) == "app_info")
                 {
-                    Logging.Logging.Log("APP INFO RESPONSE DATA DETECTED\n", LogType.Info);
+                    Logger.Log("APP INFO RESPONSE DATA DETECTED\n", LogType.Info);
                     HolonNETAppInfoResponse appInfoResponse = MessagePackSerializer.Deserialize<HolonNETAppInfoResponse>(response.data, options);
 
                     string dnHash = ConvertHoloHashToString(appInfoResponse.data.cell_data[0].cell_id[0]);
@@ -160,7 +174,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     }
 
                     AppInfoCallBackEventArgs args = new AppInfoCallBackEventArgs(response.id.ToString(), EndPoint, true, e.RawBinaryData, e.RawJSONData, dnHash, agentPubKey, appInfoResponse.data.installed_app_id, appInfoResponse, e.WebSocketResult);
-                    Logging.Logging.Log(string.Concat("Id: ", args.Id, ", Is Call Successful: ", args.IsCallSuccessful ? "True" : "False", ", AgentPubKey: ", args.AgentPubKey, ", DnaHash: ", args.DnaHash, ", Installed App Id: ", args.InstalledAppId, ", Raw Binary Data: ",  e.RawBinaryData, ", Raw JSON Data: ", args.RawJSONData, "\n"), LogType.Info);
+                    Logger.Log(string.Concat("Id: ", args.Id, ", Is Call Successful: ", args.IsCallSuccessful ? "True" : "False", ", AgentPubKey: ", args.AgentPubKey, ", DnaHash: ", args.DnaHash, ", Installed App Id: ", args.InstalledAppId, ", Raw Binary Data: ",  e.RawBinaryData, ", Raw JSON Data: ", args.RawJSONData, "\n"), LogType.Info);
                     OnAppInfoCallBack?.Invoke(this, args);
 
                     //If either the AgentPubKey or DnaHash is empty then attempt to get from the sandbox cmd.
@@ -190,12 +204,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                         appResponseData[key] = value;
                     }
 
-                    Logging.Logging.Log("ZOME RESPONSE DATA DETECTED\n", LogType.Info);
-                    Logging.Logging.Log($"Decoded Data:\n{data}", LogType.Info);
+                    Logger.Log("ZOME RESPONSE DATA DETECTED\n", LogType.Info);
+                    Logger.Log($"Decoded Data:\n{data}", LogType.Info);
 
                     string id = response.id.ToString();
                     ZomeFunctionCallBackEventArgs args = new ZomeFunctionCallBackEventArgs(id, e.EndPoint, GetItemFromCache(id, _zomeLookup), GetItemFromCache(id, _funcLookup), true, rawData, rawAppResponseData, appResponseData, e.RawBinaryData, e.RawJSONData, e.WebSocketResult);
-                    Logging.Logging.Log(string.Concat("Id: ", args.Id, ", Zome: ", args.Zome, ", Zome Function: ", args.ZomeFunction, ", Is Zome Call Successful: ", args.IsCallSuccessful ? "True" : "False", ", Raw Zome Return Data: ", args.RawZomeReturnData, ", Zome Return Data: ", args.ZomeReturnData, ", Raw Binary Data: ", e.RawBinaryData, ", Raw JSON Data: ", args.RawJSONData), LogType.Info);
+                    Logger.Log(string.Concat("Id: ", args.Id, ", Zome: ", args.Zome, ", Zome Function: ", args.ZomeFunction, ", Is Zome Call Successful: ", args.IsCallSuccessful ? "True" : "False", ", Raw Zome Return Data: ", args.RawZomeReturnData, ", Zome Return Data: ", args.ZomeReturnData, ", Raw Binary Data: ", e.RawBinaryData, ", Raw JSON Data: ", args.RawJSONData), LogType.Info);
 
                     if (_callbackLookup.ContainsKey(id) && _callbackLookup[id] != null)
                         _callbackLookup[id].DynamicInvoke(this, args);
@@ -213,7 +227,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
             catch (Exception ex)
             {
-                HandleError("Error in HoloNETClient.WebSocket_OnDataReceived.", ex);
+                HandleError("Error in HoloNETClient.WebSocket_OnDataReceived method.", ex);
             }
         }
 
@@ -233,7 +247,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
             catch (Exception ex)
             {
-                HandleError("Error in HoloNETClient.WebSocket_OnDataReceived.", ex);
+                HandleError("Error in HoloNETClient.WebSocket_OnDataReceived method.", ex);
             }
         }
 
@@ -243,8 +257,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             {
                 _getAgentPubKeyAndDnaHashFromConductor = getAgentPubKeyAndDnaHashFromConductor;
 
-                if (Logging.Logging.Loggers.Count == 0)
-                    throw new HoloNETException("ERROR: No Logger Has Been Specified! Please set a Logger with the Logging.Logging.Loggers Property.");
+                if (Logger.Loggers.Count == 0)
+                    throw new HoloNETException("ERROR: No Logger Has Been Specified! Please set a Logger with the Logger.Loggers Property.");
 
                 if (WebSocket.State != WebSocketState.Connecting && WebSocket.State != WebSocketState.Open && WebSocket.State != WebSocketState.Aborted)
                 {
@@ -344,7 +358,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 //Make sure the condctor is not already running
                 if (!Config.OnlyAllowOneHolochainConductorToRunAtATime || (Config.OnlyAllowOneHolochainConductorToRunAtATime && !Process.GetProcesses().Any(x => x.ProcessName == _conductorProcess.StartInfo.FileName)))
                 {
-                    Logging.Logging.Log("Starting Holochain Conductor...", LogType.Info, true);
+                    Logger.Log("Starting Holochain Conductor...", LogType.Info, true);
                     _conductorProcess.StartInfo.WorkingDirectory = Config.FullPathToRootHappFolder;
 
                     if (Config.HolochainConductorToUse == HolochainConductorEnum.HcDevTool)
@@ -382,7 +396,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
             catch (Exception ex)
             {
-                HandleError("Error in HoloNETClient.StartConductor.", ex);
+                HandleError("Error in HoloNETClient.StartConductor method.", ex);
             }
         }
 
@@ -390,7 +404,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         {
             try
             {
-                Logging.Logging.Log("Attempting To Retreive AgentPubKey & DnaHash From hc sandbox...", LogType.Info, true);
+                Logger.Log("Attempting To Retreive AgentPubKey & DnaHash From hc sandbox...", LogType.Info, true);
 
                 if (string.IsNullOrEmpty(Config.FullPathToExternalHCToolBinary))
                     Config.FullPathToExternalHCToolBinary = string.Concat(Directory.GetCurrentDirectory(), "\\HolochainBinaries\\hc.exe"); //default to the current path
@@ -421,7 +435,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     Config.DnaHash = dnaHash;
                 }
 
-                Logging.Logging.Log("AgentPubKey & DnaHash successfully retreived from hc sandbox.", LogType.Info, false);
+                Logger.Log("AgentPubKey & DnaHash successfully retreived from hc sandbox.", LogType.Info, false);
 
                 if (WebSocket.State == WebSocketState.Open && !string.IsNullOrEmpty(Config.AgentPubKey) && !string.IsNullOrEmpty(Config.DnaHash))
                     OnReadyForZomeCalls?.Invoke(this, new ReadyForZomeCallsEventArgs(EndPoint, dnaHash, agentPubKey));
@@ -430,7 +444,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
             catch (Exception ex)
             {
-                HandleError("Error in HoloNETClient.GetAgentPubKeyAndDnaHashFromSandbox getting DnaHash & AgentPubKey from hApp.", ex);
+                HandleError("Error in HoloNETClient.GetAgentPubKeyAndDnaHashFromSandbox method getting DnaHash & AgentPubKey from hApp.", ex);
             }
 
             return null;
@@ -441,7 +455,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             try
             {
                 _updateDnaHashAndAgentPubKey = updateConfig;
-                Logging.Logging.Log("Attempting To Retreive AgentPubKey & DnaHash from Holochain Conductor...", LogType.Info, true);
+                Logger.Log("Attempting To Retreive AgentPubKey & DnaHash from Holochain Conductor...", LogType.Info, true);
 
                 HoloNETData holoNETData = new HoloNETData()
                 {
@@ -456,7 +470,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
             catch (Exception ex)
             {
-                HandleError("Error occured in HoloNETClient.GetAgentPubKeyAndDnaHashFromConductor  getting DnaHash & AgentPubKey from hApp.", ex);
+                HandleError("Error occured in HoloNETClient.GetAgentPubKeyAndDnaHashFromConductor method getting DnaHash & AgentPubKey from hApp.", ex);
             }
         }
 
@@ -473,9 +487,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                 if (WebSocket.State == WebSocketState.Open)
                 {
-                    Logging.Logging.Log("Sending HoloNET Request to Holochain Conductor...", LogType.Info, true);
+                    Logger.Log("Sending HoloNET Request to Holochain Conductor...", LogType.Info, true);
                     await WebSocket.SendRawDataAsync(MessagePackSerializer.Serialize(request)); //This is the fastest and most popular .NET MessagePack Serializer.
-                    Logging.Logging.Log("HoloNET Request Successfully Sent To Holochain Conductor.", LogType.Info, false);
+                    Logger.Log("HoloNET Request Successfully Sent To Holochain Conductor.", LogType.Info, false);
                 }
             }
             catch (Exception ex)
@@ -515,14 +529,14 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 if (WebSocket.State == WebSocketState.Closed || WebSocket.State == WebSocketState.None)
                     await Connect();
 
-                Logging.Logging.Log($"Calling Zome Function {function} on Zome {zome} with Id {id} On Holochain Conductor...", LogType.Info, true);
+                Logger.Log($"Calling Zome Function {function} on Zome {zome} with Id {id} On Holochain Conductor...", LogType.Info, true);
 
                 if (cachReturnData)
                 {
                     if (_zomeReturnDataLookup.ContainsKey(id))
                     {
-                        Logging.Logging.Log("Caching Enabled so returning data from cache...", LogType.Info);
-                        Logging.Logging.Log(string.Concat("Id: ", _zomeReturnDataLookup[id].Id, ", Zome: ", _zomeReturnDataLookup[id].Zome, ", Zome Function: ", _zomeReturnDataLookup[id].ZomeFunction, ", Is Zome Call Successful: ", _zomeReturnDataLookup[id].IsCallSuccessful ? "True" : "False", ", Raw Zome Return Data: ", _zomeReturnDataLookup[id].RawZomeReturnData, ", Zome Return Data: ", _zomeReturnDataLookup[id].ZomeReturnData, ", JSON Raw Data: ", _zomeReturnDataLookup[id].RawJSONData), LogType.Info);
+                        Logger.Log("Caching Enabled so returning data from cache...", LogType.Info);
+                        Logger.Log(string.Concat("Id: ", _zomeReturnDataLookup[id].Id, ", Zome: ", _zomeReturnDataLookup[id].Zome, ", Zome Function: ", _zomeReturnDataLookup[id].ZomeFunction, ", Is Zome Call Successful: ", _zomeReturnDataLookup[id].IsCallSuccessful ? "True" : "False", ", Raw Zome Return Data: ", _zomeReturnDataLookup[id].RawZomeReturnData, ", Zome Return Data: ", _zomeReturnDataLookup[id].ZomeReturnData, ", JSON Raw Data: ", _zomeReturnDataLookup[id].RawJSONData), LogType.Info);
 
                         if (callback != null)
                             callback.DynamicInvoke(this, _zomeReturnDataLookup[id]);
@@ -583,7 +597,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         {
             try
             {
-                Logging.Logging.Log("Shutting Down All Holochain Conductors...", LogType.Info, true);
+                Logger.Log("Shutting Down All Holochain Conductors...", LogType.Info, true);
 
                 foreach (Process process in Process.GetProcessesByName("hc"))
                 {
@@ -624,7 +638,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     process.Dispose();
                 }
 
-                Logging.Logging.Log("All Holochain Conductors Successfully Shutdown.", LogType.Info);
+                Logger.Log("All Holochain Conductors Successfully Shutdown.", LogType.Info);
             }
             catch (Exception ex)
             {
@@ -644,7 +658,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                     else if (_conductorProcess != null)
                     {
-                        Logging.Logging.Log("Shutting Down Holochain Conductor...", LogType.Info, true);
+                        Logger.Log("Shutting Down Holochain Conductor...", LogType.Info, true);
 
                         if (Config.ShowHolochainConductorWindow)
                             _conductorProcess.CloseMainWindow();
@@ -655,7 +669,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                         // _conductorProcess.WaitForExit();
                         _conductorProcess.Dispose();
 
-                        Logging.Logging.Log("Holochain Conductor Successfully Shutdown.", LogType.Info);
+                        Logger.Log("Holochain Conductor Successfully Shutdown.", LogType.Info);
                     }
                 }
             }
@@ -673,7 +687,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         private void HandleError(string message, Exception exception)
         {
             message = string.Concat(message, exception != null ? $". Error Details: {exception}" : "");
-            Logging.Logging.Log(message, LogType.Error);
+            Logger.Log(message, LogType.Error);
 
             OnError?.Invoke(this, new HoloNETErrorEventArgs { EndPoint = WebSocket.EndPoint, Reason = message, ErrorDetails = exception });
 
