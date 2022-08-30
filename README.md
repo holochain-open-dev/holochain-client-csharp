@@ -2,8 +2,6 @@
 
 # Table of contents
 
-  # Table of contents
-
   - [Overview](#overview)
   - [HoloNET Code Has Migrated](#holonet-code-has-migrated)
   - [Background](#background)
