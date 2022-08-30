@@ -1,7 +1,5 @@
 # HoloNET Holochain .NET/Unity Client
 
-# Table of contents
-
   # Table of contents
 
   - [Overview](#overview)
