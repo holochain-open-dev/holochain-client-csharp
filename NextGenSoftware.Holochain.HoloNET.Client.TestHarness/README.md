@@ -2,7 +2,7 @@
 
 Test Harness for HoloNET Holochain Client.
 
-https://github.com/holochain-open-dev/holochain-client-csharp
+https://github.com/holochain-open-dev/holochain-client-csharp \
 https://github.com/NextGenSoftwareUK/holochain-client-csharp
 
 You need to clone the following repo:
