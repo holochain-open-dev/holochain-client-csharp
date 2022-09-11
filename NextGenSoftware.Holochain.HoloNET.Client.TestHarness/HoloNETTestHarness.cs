@@ -36,6 +36,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
             _holoNETClient.Config.HolochainConductorToUse = HolochainConductorEnum.HcDevTool;
             */
 
+            _holoNETClient.Config.HolochainConductorMode = HolochainConductorModeEnum.UseEmbedded;
+            _holoNETClient.Config.ShowHolochainConductorWindow = true;
+
             //holoNETClient.Config.FullPathToHolochainAppDNA = @"D:\Dropbox\Our World\OASIS API\NextGenSoftware.Holochain.hApp.OurWorld\our_world\dist\our_world.dna.json";
             _holoNETClient.Config.FullPathToRootHappFolder = string.Concat(Environment.CurrentDirectory, @"\hApps\happ-build-tutorial-develop");
             _holoNETClient.Config.FullPathToCompiledHappFolder = string.Concat(Environment.CurrentDirectory, @"\hApps\happ-build-tutorial-develop\workdir\happ");

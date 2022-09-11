@@ -9,6 +9,7 @@ using System.Linq;
 using MessagePack;
 using NextGenSoftware.WebSocket;
 using NextGenSoftware.Logging;
+using NextGenSoftware.Holochain.HoloNET.Client.Properties;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
@@ -289,8 +290,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         {
             try
             {
-                string fullPathToEmbeddedHolochainConductorBinary = string.Concat(Directory.GetCurrentDirectory(), "\\HolochainBinaries\\holochain.exe");
-                string fullPathToEmbeddedHCToolBinary = string.Concat(Directory.GetCurrentDirectory(), "\\HolochainBinaries\\hc.exe");
+                // Was used when they were set to Content rather than Embedded.
+                //string fullPathToEmbeddedHolochainConductorBinary = string.Concat(Directory.GetCurrentDirectory(), "\\HolochainBinaries\\holochain.exe");
+                //string fullPathToEmbeddedHCToolBinary = string.Concat(Directory.GetCurrentDirectory(), "\\HolochainBinaries\\hc.exe");
 
                 _conductorProcess = new Process();
 
@@ -307,11 +309,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     throw new FileNotFoundException($"When HolochainConductorMode is set to 'UseExternal' and HolochainConductorToUse is set to 'HcDevTool', FullPathToExternalHCToolBinary ({Config.FullPathToExternalHCToolBinary}) must point to a valid file.");
 
 
-                if (!File.Exists(fullPathToEmbeddedHolochainConductorBinary) && Config.HolochainConductorMode == HolochainConductorModeEnum.UseEmbedded && Config.HolochainConductorToUse == HolochainConductorEnum.HolochainProductionConductor)
-                    throw new FileNotFoundException($"When HolochainConductorMode is set to 'UseEmbedded' and HolochainConductorToUse is set to 'HolochainProductionConductor', you must ensure the holochain.exe is found here: {fullPathToEmbeddedHolochainConductorBinary}.");
+                //if (!File.Exists(fullPathToEmbeddedHolochainConductorBinary) && Config.HolochainConductorMode == HolochainConductorModeEnum.UseEmbedded && Config.HolochainConductorToUse == HolochainConductorEnum.HolochainProductionConductor)
+                //    throw new FileNotFoundException($"When HolochainConductorMode is set to 'UseEmbedded' and HolochainConductorToUse is set to 'HolochainProductionConductor', you must ensure the holochain.exe is found here: {fullPathToEmbeddedHolochainConductorBinary}.");
 
-                if (!File.Exists(fullPathToEmbeddedHCToolBinary) && Config.HolochainConductorMode == HolochainConductorModeEnum.UseEmbedded && Config.HolochainConductorToUse == HolochainConductorEnum.HcDevTool)
-                    throw new FileNotFoundException($"When HolochainConductorMode is set to 'UseEmbedded' and HolochainConductorToUse is set to 'HcDevTool', you must ensure the hc.exe is found here: {fullPathToEmbeddedHCToolBinary}.");
+                //if (!File.Exists(fullPathToEmbeddedHCToolBinary) && Config.HolochainConductorMode == HolochainConductorModeEnum.UseEmbedded && Config.HolochainConductorToUse == HolochainConductorEnum.HcDevTool)
+                //    throw new FileNotFoundException($"When HolochainConductorMode is set to 'UseEmbedded' and HolochainConductorToUse is set to 'HcDevTool', you must ensure the hc.exe is found here: {fullPathToEmbeddedHCToolBinary}.");
 
                 if (!Directory.Exists(Config.FullPathToRootHappFolder))
                     throw new DirectoryNotFoundException($"The path for Config.FullPathToRootHappFolder ({Config.FullPathToRootHappFolder}) was not found.");
@@ -329,7 +331,22 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                             break;
 
                         case HolochainConductorModeEnum.UseEmbedded:
-                            _conductorProcess.StartInfo.FileName = fullPathToEmbeddedHCToolBinary;
+                            {
+                                //_conductorProcess.StartInfo.FileName = fullPathToEmbeddedHCToolBinary;
+
+                                string hcPath = Path.Combine(Directory.GetCurrentDirectory(), "hc.exe");
+
+                                if (!File.Exists(hcPath))
+                                {
+                                    using (FileStream fsDst = new FileStream(hcPath, FileMode.CreateNew, FileAccess.Write))
+                                    {
+                                        byte[] bytes = Resources.hc;
+                                        fsDst.Write(bytes, 0, bytes.Length);
+                                    }
+                                }
+
+                                _conductorProcess.StartInfo.FileName = hcPath;
+                            }
                             break;
 
                         case HolochainConductorModeEnum.UseSystemGlobal:
@@ -346,7 +363,22 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                             break;
 
                         case HolochainConductorModeEnum.UseEmbedded:
-                            _conductorProcess.StartInfo.FileName = fullPathToEmbeddedHolochainConductorBinary;
+                            {
+                                //_conductorProcess.StartInfo.FileName = fullPathToEmbeddedHolochainConductorBinary;
+
+                                string holochainPath = Path.Combine(Directory.GetCurrentDirectory(), "holochain.exe");
+
+                                if (!File.Exists(holochainPath))
+                                {
+                                    using (FileStream fsDst = new FileStream(holochainPath, FileMode.CreateNew, FileAccess.Write))
+                                    {
+                                        byte[] bytes = Resources.holochain;
+                                        fsDst.Write(bytes, 0, bytes.Length);
+                                    }
+                                }
+
+                                _conductorProcess.StartInfo.FileName = holochainPath;
+                            }
                             break;
 
                         case HolochainConductorModeEnum.UseSystemGlobal:
