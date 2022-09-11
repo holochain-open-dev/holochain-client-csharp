@@ -308,7 +308,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 if (!File.Exists(Config.FullPathToExternalHCToolBinary) && Config.HolochainConductorMode == HolochainConductorModeEnum.UseExternal && Config.HolochainConductorToUse == HolochainConductorEnum.HcDevTool)
                     throw new FileNotFoundException($"When HolochainConductorMode is set to 'UseExternal' and HolochainConductorToUse is set to 'HcDevTool', FullPathToExternalHCToolBinary ({Config.FullPathToExternalHCToolBinary}) must point to a valid file.");
 
-
                 //if (!File.Exists(fullPathToEmbeddedHolochainConductorBinary) && Config.HolochainConductorMode == HolochainConductorModeEnum.UseEmbedded && Config.HolochainConductorToUse == HolochainConductorEnum.HolochainProductionConductor)
                 //    throw new FileNotFoundException($"When HolochainConductorMode is set to 'UseEmbedded' and HolochainConductorToUse is set to 'HolochainProductionConductor', you must ensure the holochain.exe is found here: {fullPathToEmbeddedHolochainConductorBinary}.");
 
@@ -332,6 +331,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                         case HolochainConductorModeEnum.UseEmbedded:
                             {
+                                //throw new InvalidOperationException("You must install the Embedded version if you wish to use HolochainConductorMode.UseEmbedded.");
+
                                 //_conductorProcess.StartInfo.FileName = fullPathToEmbeddedHCToolBinary;
 
                                 string hcPath = Path.Combine(Directory.GetCurrentDirectory(), "hc.exe");
@@ -364,6 +365,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                         case HolochainConductorModeEnum.UseEmbedded:
                             {
+                                //throw new InvalidOperationException("You must install the Embedded version if you wish to use HolochainConductorMode.UseEmbedded.");
+
                                 //_conductorProcess.StartInfo.FileName = fullPathToEmbeddedHolochainConductorBinary;
 
                                 string holochainPath = Path.Combine(Directory.GetCurrentDirectory(), "holochain.exe");
