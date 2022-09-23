@@ -25,19 +25,16 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
             _holoNETClient.Config.LoggingMode = LoggingMode.WarningsErrorsInfoAndDebug;
             //_holoNETClient.Config.LoggingMode = LoggingMode.WarningsAndErrors;
 
-            /*
+            
             //holoNETClient.Config.ErrorHandlingBehaviour = ErrorHandlingBehaviour.OnlyThrowExceptionIfNoErrorHandlerSubscribedToOnErrorEvent
-            _holoNETClient.Config.AutoStartHolochainConductor = true;
-            _holoNETClient.Config.AutoShutdownHolochainConductor = true;
-            _holoNETClient.Config.ShutDownALLHolochainConductors = true; //Normally default's to false, but if you want to make sure no holochain processes are left running set this to true.
-            _holoNETClient.Config.ShowHolochainConductorWindow = true; //Defaults to false.
+            _holoNETClient.Config.AutoStartHolochainConductor = false;
+            _holoNETClient.Config.AutoShutdownHolochainConductor = false;
+            _holoNETClient.Config.ShutDownALLHolochainConductors = false; //Normally default's to false, but if you want to make sure no holochain processes are left running set this to true.
+            _holoNETClient.Config.ShowHolochainConductorWindow = false; //Defaults to false.
            // _holoNETClient.Config.HolochainConductorMode = HolochainConductorModeEnum.UseSystemGlobal;
             _holoNETClient.Config.HolochainConductorMode = HolochainConductorModeEnum.UseEmbedded;
             _holoNETClient.Config.HolochainConductorToUse = HolochainConductorEnum.HcDevTool;
-            */
-
-            _holoNETClient.Config.HolochainConductorMode = HolochainConductorModeEnum.UseEmbedded;
-            _holoNETClient.Config.ShowHolochainConductorWindow = true;
+           
 
             //holoNETClient.Config.FullPathToHolochainAppDNA = @"D:\Dropbox\Our World\OASIS API\NextGenSoftware.Holochain.hApp.OurWorld\our_world\dist\our_world.dna.json";
             _holoNETClient.Config.FullPathToRootHappFolder = string.Concat(Environment.CurrentDirectory, @"\hApps\happ-build-tutorial-develop");
@@ -73,7 +70,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
             //await _holoNETClient.CallZomeFunctionAsync("1", "our_world_core", "test", ZomeCallback, null);
             //await _holoNETClient.CallZomeFunctionAsync("1", "whoami", "whoami", ZomeCallback, null);
             //await _holoNETClient.CallZomeFunctionAsync("1", "whoami", "whoami", ZomeCallback, null);
-            await _holoNETClient.CallZomeFunctionAsync("1", "numbers", "add_ten", ZomeCallback, new { number = 10 });
+            //await _holoNETClient.CallZomeFunctionAsync("1", "numbers", "add_ten", ZomeCallback, new { number = 10 });
+            //await _holoNETClient.CallZomeFunctionAsync("1", "oasis", "get_entry_avatar", ZomeCallback, new { id = 1 });
+
+            await _holoNETClient.CallZomeFunctionAsync("oasis", "create_entry_avatar", ZomeCallback, new { id = 1, first_name = "David", last_name = "Ellams", email = "davidellams@hotmail.com", dob = "11/04/1980" });
 
             // Load testing
             //   for (int i = 0; i < 100; i++)
@@ -131,18 +131,29 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
             Console.WriteLine(string.Concat("TEST HARNESS: ZOME FUNCTION CALLBACK EVENT HANDLER: ", ProcessZomeFunctionCallBackEventArgs(e)));
             Console.WriteLine("");
 
-            _holoNETClient.Disconnect();
+            if (!string.IsNullOrEmpty(e.ZomeReturnHash))
+                _holoNETClient.CallZomeFunctionAsync("oasis", "get_entry_avatar", ZomeCallback, e.ZomeReturnHash);
+            else
+                _holoNETClient.Disconnect();
         }
 
         private static string ProcessZomeFunctionCallBackEventArgs(ZomeFunctionCallBackEventArgs args)
         {
+            string result = "";
             string zomeData = "";
+            
+            if (args.ZomeReturnData != null)
+            {
+                foreach (string key in args.ZomeReturnData.Keys)
+                    zomeData = string.Concat(zomeData, key, "=", args.ZomeReturnData[key], "\n");
+            }
 
-            foreach (string key in args.ZomeReturnData.Keys)
-                zomeData = string.Concat(zomeData, key, "=", args.ZomeReturnData[key], "\n");
+            result = string.Concat("\nEndPoint: ", args.EndPoint, "\nId: ", args.Id, "\nZome: ", args.Zome, "\nZomeFunction: ", args.ZomeFunction, "\n\nRaw Data: ", args.RawData, "\n\nZomeReturnData: ", args.ZomeReturnData, "\nZomeReturnHash: ", args.ZomeReturnHash, "\nRaw Zome Return Data: ", args.RawZomeReturnData, "\nRaw Binary Daya: ", args.RawBinaryData, "\nRaw JSON Data: ", args.RawJSONData, "\nIsCallSuccessful: ", args.IsCallSuccessful ? "true" : "false");
 
-            //return string.Concat("\nEndPoint: ", args.EndPoint, "\nId: ", args.Id, "\nInstance: ", args.Instance, "\nZome: ", args.Zome, "\nZomeFunction: ", args.ZomeFunction, "\n\nRaw Data: ", args.RawData, "\n\nZomeReturnData: ", args.ZomeReturnData, "\nRaw Zome Return Data: ", args.RawZomeReturnData, "\nRaw Binary Daya: ", args.RawBinaryData, "\nRaw JSON Data: ", args.RawJSONData, "\nIsCallSuccessful: ", args.IsCallSuccessful ? "true" : "false", "\n\nProcessed Zome Return Data:\n", zomeData);
-            return string.Concat("\nEndPoint: ", args.EndPoint, "\nId: ", args.Id, "\nZome: ", args.Zome, "\nZomeFunction: ", args.ZomeFunction, "\n\nRaw Data: ", args.RawData, "\n\nZomeReturnData: ", args.ZomeReturnData, "\nRaw Zome Return Data: ", args.RawZomeReturnData, "\nRaw Binary Daya: ", args.RawBinaryData, "\nRaw JSON Data: ", args.RawJSONData, "\nIsCallSuccessful: ", args.IsCallSuccessful ? "true" : "false", "\n\nProcessed Zome Return Data:\n", zomeData);
+            if (zomeData != "")
+                result = string.Concat(result, "\n\nProcessed Zome Return Data:\n", zomeData);
+
+            return result;
         }
 
         private static void HoloNETClient_OnDataReceived(object sender, HoloNETDataReceivedEventArgs e)
