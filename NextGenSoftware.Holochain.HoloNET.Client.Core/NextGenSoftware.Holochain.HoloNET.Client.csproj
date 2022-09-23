@@ -16,7 +16,10 @@
     <PackageIcon>hc logo.png</PackageIcon>
     <Authors>David Ellams (NextGen Software Ltd)</Authors>
     <PackageTags>holochain;net;unity</PackageTags>
-    <PackageReleaseNotes>Holochain binaries now truly embedded as a resource rather than external Content Files.</PackageReleaseNotes>
+    <PackageReleaseNotes>
+		- Added support for HoloNET to be able to send a ActionHash into a zome call and return a ActionHash.
+		- Also added support to return a previously committed entry. It also make the entry easier to get to from the zome call because the conductor for some reason buries it deep in a nested structure.
+	</PackageReleaseNotes>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/NextGenSoftwareUK/holochain-client-csharp</RepositoryUrl>
     <Copyright>Copyright © NextGen Software Ltd 2022</Copyright>
