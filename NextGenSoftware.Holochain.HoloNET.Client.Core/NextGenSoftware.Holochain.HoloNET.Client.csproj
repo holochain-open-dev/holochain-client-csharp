@@ -19,6 +19,7 @@
     <PackageReleaseNotes>
 		- Changed EntryData.Entry from object to Dictionary to save callers having to cast, manually convert etc.
         - Added new KeyValuePair &amp; KeyValuePairAsString (useful for logging, displaying etc) properties to ZomeFunctionCallBackEventArgs so can easily and quickly access all returned data from the zome call (the conductor currently nests it in many levels and is complicated and tedious to get to it all, this raw data is stored in  RawZomeReturnData &amp; ZomeReturnData (decoded version)).
+		- Documentation Updated.
 	</PackageReleaseNotes>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/NextGenSoftwareUK/holochain-client-csharp</RepositoryUrl>
