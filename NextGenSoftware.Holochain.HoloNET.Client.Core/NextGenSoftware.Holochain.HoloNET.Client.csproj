@@ -3,22 +3,21 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <PackageId>NextGenSoftware.Holochain.HoloNET.Client.Embedded</PackageId>
-	<!--<PackageId>NextGenSoftware.Holochain.HoloNET.Client</PackageId>-->
+    <!--<PackageId>NextGenSoftware.Holochain.HoloNET.Client.Embedded</PackageId>-->
+	<PackageId>NextGenSoftware.Holochain.HoloNET.Client</PackageId>
     <Company>NextGen Software Ltd</Company>
     <Product>HoloNET Holochain Client</Product>
 	<Title>HoloNET Holochain Client</Title>
-	 <!--<Summary>The world's first .NET &amp; Unity client for Holochain.</Summary>-->
-	  <Summary>The world's first .NET &amp; Unity client for Holochain. This version comes with the Holochain binaries built in.</Summary>
-	  <!--<Description>The world's first .NET &amp; Unity client for Holochain.</Description>-->
-	<Description>The world's first .NET &amp; Unity client for Holochain. This version comes with the Holochain binaries built in.</Description>
+	 <Summary>The world's first .NET &amp; Unity client for Holochain.</Summary>
+	  <!--<Summary>The world's first .NET &amp; Unity client for Holochain. This version comes with the Holochain binaries built in.</Summary>-->
+	  <Description>The world's first .NET &amp; Unity client for Holochain.</Description>
+	<!--<Description>The world's first .NET &amp; Unity client for Holochain. This version comes with the Holochain binaries built in.</Description>-->
     <PackageProjectUrl>https://github.com/NextGenSoftwareUK/holochain-client-csharp</PackageProjectUrl>
     <PackageIcon>hc logo.png</PackageIcon>
     <Authors>David Ellams (NextGen Software Ltd)</Authors>
     <PackageTags>holochain;net;unity</PackageTags>
     <PackageReleaseNotes>
-		- Changed EntryData.Entry from object to Dictionary to save callers having to cast, manually convert etc.
-        - Added new KeyValuePair &amp; KeyValuePairAsString (useful for logging, displaying etc) properties to ZomeFunctionCallBackEventArgs so can easily and quickly access all returned data from the zome call (the conductor currently nests it in many levels and is complicated and tedious to get to it all, this raw data is stored in  RawZomeReturnData &amp; ZomeReturnData (decoded version)).
+		- EntryData is now accessible as a property from the root level of ZomeFunctionCallBackEventArgs rather than using the key "Entry" on the ZomeReturnData dictionary.
 		- Documentation Updated.
 	</PackageReleaseNotes>
     <RepositoryType>git</RepositoryType>
@@ -28,7 +27,7 @@
 	  <!--<PackageLicenseExpression>GNU GPLv3</PackageLicenseExpression>-->
 	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-    <Version>1.3.0</Version>
+    <Version>1.3.1</Version>
     <!--<PackageLicenseFile>..\LICENSE</PackageLicenseFile>-->
 
 	  <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>

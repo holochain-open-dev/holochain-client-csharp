@@ -9,7 +9,7 @@ using System.Linq;
 using MessagePack;
 using NextGenSoftware.WebSocket;
 using NextGenSoftware.Logging;
-using NextGenSoftware.Holochain.HoloNET.Client.Properties;
+//using NextGenSoftware.Holochain.HoloNET.Client.Properties;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
@@ -184,22 +184,22 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                         case HolochainConductorModeEnum.UseEmbedded:
                             {
-                                //throw new InvalidOperationException("You must install the Embedded version if you wish to use HolochainConductorMode.UseEmbedded.");
+                                throw new InvalidOperationException("You must install the Embedded version if you wish to use HolochainConductorMode.UseEmbedded.");
 
                                 //_conductorProcess.StartInfo.FileName = fullPathToEmbeddedHCToolBinary;
 
-                                string hcPath = Path.Combine(Directory.GetCurrentDirectory(), "hc.exe");
+                                //string hcPath = Path.Combine(Directory.GetCurrentDirectory(), "hc.exe");
 
-                                if (!File.Exists(hcPath))
-                                {
-                                    using (FileStream fsDst = new FileStream(hcPath, FileMode.CreateNew, FileAccess.Write))
-                                    {
-                                        byte[] bytes = Resources.hc;
-                                        fsDst.Write(bytes, 0, bytes.Length);
-                                    }
-                                }
+                                //if (!File.Exists(hcPath))
+                                //{
+                                //    using (FileStream fsDst = new FileStream(hcPath, FileMode.CreateNew, FileAccess.Write))
+                                //    {
+                                //        byte[] bytes = Resources.hc;
+                                //        fsDst.Write(bytes, 0, bytes.Length);
+                                //    }
+                                //}
 
-                                _conductorProcess.StartInfo.FileName = hcPath;
+                                //_conductorProcess.StartInfo.FileName = hcPath;
                             }
                             break;
 
@@ -218,22 +218,22 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                         case HolochainConductorModeEnum.UseEmbedded:
                             {
-                                //throw new InvalidOperationException("You must install the Embedded version if you wish to use HolochainConductorMode.UseEmbedded.");
+                                throw new InvalidOperationException("You must install the Embedded version if you wish to use HolochainConductorMode.UseEmbedded.");
 
                                 //_conductorProcess.StartInfo.FileName = fullPathToEmbeddedHolochainConductorBinary;
 
-                                string holochainPath = Path.Combine(Directory.GetCurrentDirectory(), "holochain.exe");
+                                //string holochainPath = Path.Combine(Directory.GetCurrentDirectory(), "holochain.exe");
 
-                                if (!File.Exists(holochainPath))
-                                {
-                                    using (FileStream fsDst = new FileStream(holochainPath, FileMode.CreateNew, FileAccess.Write))
-                                    {
-                                        byte[] bytes = Resources.holochain;
-                                        fsDst.Write(bytes, 0, bytes.Length);
-                                    }
-                                }
+                                //if (!File.Exists(holochainPath))
+                                //{
+                                //    using (FileStream fsDst = new FileStream(holochainPath, FileMode.CreateNew, FileAccess.Write))
+                                //    {
+                                //        byte[] bytes = Resources.holochain;
+                                //        fsDst.Write(bytes, 0, bytes.Length);
+                                //    }
+                                //}
 
-                                _conductorProcess.StartInfo.FileName = holochainPath;
+                                //_conductorProcess.StartInfo.FileName = holochainPath;
                             }
                             break;
 
@@ -665,10 +665,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                         EntryData entryData = null;
 
                         (appResponseData, keyValuePair, keyValuePairAsString, entryData) = DecodeZomeReturnData(rawAppResponseData, appResponseData, keyValuePair, keyValuePairAsString);
-                        appResponseData["Entry"] = entryData;
+                        //appResponseData["Entry"] = entryData;
 
                         Logger.Log($"Decoded Data:\n{keyValuePairAsString}", LogType.Info);
-                        zomeFunctionCallBackArgs = new ZomeFunctionCallBackEventArgs(id, e.EndPoint, GetItemFromCache(id, _zomeLookup), GetItemFromCache(id, _funcLookup), true, rawData, rawAppResponseData, appResponseData, "", keyValuePair, keyValuePairAsString, e.RawBinaryData, e.RawJSONData, e.WebSocketResult);
+                        zomeFunctionCallBackArgs = new ZomeFunctionCallBackEventArgs(id, e.EndPoint, GetItemFromCache(id, _zomeLookup), GetItemFromCache(id, _funcLookup), true, rawData, rawAppResponseData, appResponseData, "", keyValuePair, keyValuePairAsString, entryData, e.RawBinaryData, e.RawJSONData, e.WebSocketResult);
                     }
                     catch (Exception ex)
                     {
@@ -676,7 +676,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                         string hash = ConvertHoloHashToString((byte[])rawAppResponseData);
 
                         Logger.Log($"Decoded Data:\nHoloHash: {hash}", LogType.Info);
-                        zomeFunctionCallBackArgs = new ZomeFunctionCallBackEventArgs(id, e.EndPoint, GetItemFromCache(id, _zomeLookup), GetItemFromCache(id, _funcLookup), true, rawData, null, null, hash, null, null, e.RawBinaryData, e.RawJSONData, e.WebSocketResult);
+                        zomeFunctionCallBackArgs = new ZomeFunctionCallBackEventArgs(id, e.EndPoint, GetItemFromCache(id, _zomeLookup), GetItemFromCache(id, _funcLookup), true, rawData, null, null, hash, null, null, null, e.RawBinaryData, e.RawJSONData, e.WebSocketResult);
                     }
 
                     Logger.Log(string.Concat("Id: ", zomeFunctionCallBackArgs.Id, ", Zome: ", zomeFunctionCallBackArgs.Zome, ", Zome Function: ", zomeFunctionCallBackArgs.ZomeFunction, ", Is Zome Call Successful: ", zomeFunctionCallBackArgs.IsCallSuccessful ? "True" : "False", ", Raw Zome Return Data: ", zomeFunctionCallBackArgs.RawZomeReturnData, ", Zome Return Data: ", zomeFunctionCallBackArgs.ZomeReturnData, ", Zome Return Hash: ", zomeFunctionCallBackArgs.ZomeReturnHash, ", Raw Binary Data: ", e.RawBinaryData, ", Raw JSON Data: ", zomeFunctionCallBackArgs.RawJSONData), LogType.Info);
