@@ -3,15 +3,15 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <!--<PackageId>NextGenSoftware.Holochain.HoloNET.Client.Embedded</PackageId>-->
-	<PackageId>NextGenSoftware.Holochain.HoloNET.Client</PackageId>
+    <PackageId>NextGenSoftware.Holochain.HoloNET.Client.Embedded</PackageId>
+	<!--<PackageId>NextGenSoftware.Holochain.HoloNET.Client</PackageId>-->
     <Company>NextGen Software Ltd</Company>
     <Product>HoloNET Holochain Client</Product>
 	<Title>HoloNET Holochain Client</Title>
-	 <Summary>The world's first .NET &amp; Unity client for Holochain.</Summary>
-	  <!--<Summary>The world's first .NET &amp; Unity client for Holochain. This version comes with the Holochain binaries built in.</Summary>-->
-	  <Description>The world's first .NET &amp; Unity client for Holochain.</Description>
-	<!--<Description>The world's first .NET &amp; Unity client for Holochain. This version comes with the Holochain binaries built in.</Description>-->
+	 <!--<Summary>The world's first .NET &amp; Unity client for Holochain.</Summary>-->
+	  <Summary>The world's first .NET &amp; Unity client for Holochain. This version comes with the Holochain binaries built in.</Summary>
+	  <!--<Description>The world's first .NET &amp; Unity client for Holochain.</Description>-->
+	<Description>The world's first .NET &amp; Unity client for Holochain. This version comes with the Holochain binaries built in.</Description>
     <PackageProjectUrl>https://github.com/NextGenSoftwareUK/holochain-client-csharp</PackageProjectUrl>
     <PackageIcon>hc logo.png</PackageIcon>
     <Authors>David Ellams (NextGen Software Ltd)</Authors>
@@ -53,16 +53,27 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="HolochainBinaries\hc.exe">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
     <None Update="HolochainBinaries\holochain.exe">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Properties\" />
   </ItemGroup>
 
 </Project>
