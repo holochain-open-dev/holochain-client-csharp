@@ -44,7 +44,7 @@ You can pass in one of these values:
 |----------|-------------------------------------------------------------------------------------------------------|
 | WhoAmI   | Will call zome function whoami on the whoami zome (part of the happ-build-tutorial above).            |
 | Numbers  | Will call zome function add_ten on the numbers zome (part of the happ-build-tutorial above).          |
-| OASIS    | Will call the zome function create_entry_avatar on the oasis zome (part of the oasis hApp above).     |
+| OASIS    | Will call the zome function create_entry_avatar on the oasis zome and once it receives the ActionHash back from the Holochain Conductor, it will load that entry using get_entry_avatar zome function (part of the oasis hApp above).     |
 | LoadTest | Will call zome function add_ten on the numbers zome 100 times (part of the happ-build-tutorial above).|
 
 You can also view the full source and run the Test Harness (and edit to suit your needs etc) here: \
