@@ -17,8 +17,8 @@
     <Authors>David Ellams (NextGen Software Ltd)</Authors>
     <PackageTags>holochain;net;unity</PackageTags>
     <PackageReleaseNotes>
-		- Added support for HoloNET to be able to send a ActionHash into a zome call and return a ActionHash.
-		- Also added support to return a previously committed entry. It also make the entry easier to get to from the zome call because the conductor for some reason buries it deep in a nested structure.
+		- Changed EntryData.Entry from object to Dictionary to save callers having to cast, manually convert etc.
+        - Added new KeyValuePair &amp; KeyValuePairAsString (useful for logging, displaying etc) properties to ZomeFunctionCallBackEventArgs so can easily and quickly access all returned data from the zome call (the conductor currently nests it in many levels and is complicated and tedious to get to it all, this raw data is stored in  RawZomeReturnData &amp; ZomeReturnData (decoded version)).
 	</PackageReleaseNotes>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/NextGenSoftwareUK/holochain-client-csharp</RepositoryUrl>
@@ -27,7 +27,7 @@
 	  <!--<PackageLicenseExpression>GNU GPLv3</PackageLicenseExpression>-->
 	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-    <Version>1.2.0</Version>
+    <Version>1.2.1</Version>
     <!--<PackageLicenseFile>..\LICENSE</PackageLicenseFile>-->
 
 	  <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
