@@ -67,13 +67,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
             Console.WriteLine("");
             Console.WriteLine("Calling Test Zome...\n");
 
-            //await _holoNETClient.CallZomeFunctionAsync("1", "our_world_core", "test", ZomeCallback, null);
             //await _holoNETClient.CallZomeFunctionAsync("1", "whoami", "whoami", ZomeCallback, null);
             //await _holoNETClient.CallZomeFunctionAsync("1", "whoami", "whoami", ZomeCallback, null);
             //await _holoNETClient.CallZomeFunctionAsync("1", "numbers", "add_ten", ZomeCallback, new { number = 10 });
-            //await _holoNETClient.CallZomeFunctionAsync("1", "oasis", "get_entry_avatar", ZomeCallback, new { id = 1 });
-
-            await _holoNETClient.CallZomeFunctionAsync("oasis", "create_entry_avatar", ZomeCallback, new { id = 1, first_name = "David", last_name = "Ellams", email = "davidellams@hotmail.com", dob = "11/04/1980" });
+            await _holoNETClient.CallZomeFunctionAsync("oasis", "create_entry_avatar", ZomeCallback, new { id = 1, first_name = "David", last_name = "Ellams", email = "davidellams@hotmail.com", dob = "11/04/0000" });
 
             // Load testing
             //   for (int i = 0; i < 100; i++)
@@ -84,14 +81,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
 
         private static void HoloNETClient_OnAppInfoCallBack(object sender, AppInfoCallBackEventArgs e)
         {
-            //Console.WriteLine(string.Concat("TEST HARNESS: APPINFO CALLBACK EVENT HANDLER: EndPoint: ", e.EndPoint, ", Id: ", e.Id, ", AgentPubKey: ", e.AgentPubKey, ", DnaHash: ", e.DnaHash, ", Installed App Id: ", e.InstalledAppId, ", Raw Binary Data: ",  e.RawBinaryData, ", Raw JSON Data: ", e.RawJSONData), LogType.Info);
-            //Console.WriteLine(string.Concat("TEST HARNESS: APPINFO CALLBACK EVENT HANDLER: EndPoint: ", e.EndPoint, ", Id: ", e.Id, ", AgentPubKey: ", e.AgentPubKey, ", DnaHash: ", e.DnaHash, ", Installed App Id: ", e.InstalledAppId, ", Raw Binary Data: ", e.RawBinaryData, $", Raw JSON Data: {e.RawJSONData}"), LogType.Info);
-            //Console.WriteLine($"TEST HARNESS: APPINFO CALLBACK EVENT HANDLER: EndPoint: { e.EndPoint}, Id: {e.Id}, AgentPubKey: {e.AgentPubKey}, DnaHash: {e.DnaHash}, Installed App Id: {e.InstalledAppId}, Raw Binary Data: {e.RawBinaryData}, Raw JSON Data: {e.RawJSONData}", LogType.Info);
             string msg = $"TEST HARNESS: APPINFO CALLBACK EVENT HANDLER: EndPoint: { e.EndPoint}, Id: {e.Id}, AgentPubKey: {e.AgentPubKey}, DnaHash: {e.DnaHash}, Installed App Id: {e.InstalledAppId}, Raw Binary Data: {e.RawBinaryData}";
-            //msg = msg + ", Raw JSON Data: " + e.RawJSONData;
-           // msg = string.Concat(msg, ", Raw JSON Data: ", e.RawJSONData);
             Console.WriteLine(string.Concat(msg, ", Raw JSON Data: ", e.RawJSONData));
-
             Console.WriteLine("");
         }
 
@@ -140,18 +131,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
         private static string ProcessZomeFunctionCallBackEventArgs(ZomeFunctionCallBackEventArgs args)
         {
             string result = "";
-            string zomeData = "";
             
-            if (args.ZomeReturnData != null)
-            {
-                foreach (string key in args.ZomeReturnData.Keys)
-                    zomeData = string.Concat(zomeData, key, "=", args.ZomeReturnData[key], "\n");
-            }
-
             result = string.Concat("\nEndPoint: ", args.EndPoint, "\nId: ", args.Id, "\nZome: ", args.Zome, "\nZomeFunction: ", args.ZomeFunction, "\n\nRaw Data: ", args.RawData, "\n\nZomeReturnData: ", args.ZomeReturnData, "\nZomeReturnHash: ", args.ZomeReturnHash, "\nRaw Zome Return Data: ", args.RawZomeReturnData, "\nRaw Binary Daya: ", args.RawBinaryData, "\nRaw JSON Data: ", args.RawJSONData, "\nIsCallSuccessful: ", args.IsCallSuccessful ? "true" : "false");
 
-            if (zomeData != "")
-                result = string.Concat(result, "\n\nProcessed Zome Return Data:\n", zomeData);
+            if (!string.IsNullOrEmpty(args.KeyValuePairAsString))
+                result = string.Concat(result, "\n\nProcessed Zome Return Data:\n", args.KeyValuePairAsString);
 
             return result;
         }

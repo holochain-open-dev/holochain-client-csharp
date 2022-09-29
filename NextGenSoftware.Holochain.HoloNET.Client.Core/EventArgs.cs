@@ -27,7 +27,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
     public class ZomeFunctionCallBackEventArgs : CallBackBaseEventArgsWithId
     {
         //public ZomeFunctionCallBackEventArgs(string id, string endPoint, string instance, string zome, string zomeFunction, bool isCallSuccessful, string rawData, Dictionary<object, object> rawZomeReturnData, Dictionary<string, object> zomeReturnData, byte[] rawBinaryData, string rawJSONData, WebSocketReceiveResult webSocketResult)
-        public ZomeFunctionCallBackEventArgs(string id, string endPoint, string zome, string zomeFunction, bool isCallSuccessful, string rawData, Dictionary<object, object> rawZomeReturnData, Dictionary<string, object> zomeReturnData, string zomeReturnHash, byte[] rawBinaryData, string rawJSONData, WebSocketReceiveResult webSocketResult)
+        public ZomeFunctionCallBackEventArgs(string id, string endPoint, string zome, string zomeFunction, bool isCallSuccessful, string rawData, Dictionary<object, object> rawZomeReturnData, Dictionary<string, object> zomeReturnData, string zomeReturnHash, Dictionary<string, string> keyValuePair, string keyValuePairAsString, byte[] rawBinaryData, string rawJSONData, WebSocketReceiveResult webSocketResult)
             : base(id, endPoint, isCallSuccessful, rawBinaryData, rawJSONData, webSocketResult)
         {
             //Instance = instance;
@@ -37,6 +37,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             RawZomeReturnData = rawZomeReturnData;
             ZomeReturnData = zomeReturnData;
             ZomeReturnHash = zomeReturnHash;
+            KeyValuePair = keyValuePair;
+            KeyValuePairAsString = keyValuePairAsString;
         }
 
         //public string Instance { get; private set; }
@@ -44,6 +46,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public string ZomeFunction { get; private set; }
         public string RawData { get; private set; }
         public Dictionary<string, object> ZomeReturnData { get; private set; }
+        public Dictionary<string, string> KeyValuePair { get; private set; }
+        public string KeyValuePairAsString { get; private set; }
         public Dictionary<object, object> RawZomeReturnData { get; private set; }
         public string ZomeReturnHash { get; private set; }
     }
