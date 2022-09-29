@@ -40,6 +40,8 @@ await HoloNETTestHarness.TestHoloNETClientAsync(TestToRun testToRun);
 
 You can pass in one of these values:
 
+| Test     | Description                                                                                           |
+|----------|-------------------------------------------------------------------------------------------------------|
 | WhoAmI   | Will call zome function whoami on the whoami zome (part of the happ-build-tutorial above).            |
 | Numbers  | Will call zome function add_ten on the numbers zome (part of the happ-build-tutorial above).          |
 | OASIS    | Will call the zome function create_entry_avatar on the oasis zome (part of the oasis hApp above).     |
