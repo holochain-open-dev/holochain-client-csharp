@@ -26,7 +26,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
     public class ZomeFunctionCallBackEventArgs : CallBackBaseEventArgsWithId
     {
-        //public ZomeFunctionCallBackEventArgs(string id, string endPoint, string instance, string zome, string zomeFunction, bool isCallSuccessful, string rawData, Dictionary<object, object> rawZomeReturnData, Dictionary<string, object> zomeReturnData, byte[] rawBinaryData, string rawJSONData, WebSocketReceiveResult webSocketResult)
         public ZomeFunctionCallBackEventArgs(string id, string endPoint, string zome, string zomeFunction, bool isCallSuccessful, string rawData, Dictionary<object, object> rawZomeReturnData, Dictionary<string, object> zomeReturnData, string zomeReturnHash, Dictionary<string, string> keyValuePair, string keyValuePairAsString, byte[] rawBinaryData, string rawJSONData, WebSocketReceiveResult webSocketResult)
             : base(id, endPoint, isCallSuccessful, rawBinaryData, rawJSONData, webSocketResult)
         {
@@ -41,7 +40,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             KeyValuePairAsString = keyValuePairAsString;
         }
 
-        //public string Instance { get; private set; }
         public string Zome { get; private set; }
         public string ZomeFunction { get; private set; }
         public string RawData { get; private set; }
