@@ -14,7 +14,7 @@
 	<PackageIcon>hc logo.png</PackageIcon>
 	<Authors>David Ellams (NextGen Software Ltd)</Authors>
 	<PackageTags>holochain;net;unity</PackageTags>
-	<PackageReleaseNotes>Updated README and made bug fixes.</PackageReleaseNotes>
+	<PackageReleaseNotes>Updated to work with latest HoloNET (v1.3.1)</PackageReleaseNotes>
 	<RepositoryType>git</RepositoryType>
 	<RepositoryUrl>https://github.com/NextGenSoftwareUK/holochain-client-csharp</RepositoryUrl>
 	<Copyright>Copyright © NextGen Software Ltd 2022</Copyright>
@@ -22,7 +22,7 @@
 	<!--<PackageLicenseExpression>GNU GPLv3</PackageLicenseExpression>-->
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-	<Version>1.0.2</Version>
+	<Version>1.1.0</Version>
 	<!--<PackageLicenseFile>..\LICENSE</PackageLicenseFile>-->
 
 	<AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>

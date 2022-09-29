@@ -8,39 +8,47 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
     public class HoloNETTestHarness
     {
         private static HoloNETClient _holoNETClient = null;
+        private static TestToRun _testToRun;
 
         static async Task Main(string[] args)
         {
-            await TestHoloNETClientAsync();
+            await TestHoloNETClientAsync(TestToRun.OASIS);
         }
 
-        public static async Task TestHoloNETClientAsync()
+        public static async Task TestHoloNETClientAsync(TestToRun testToRun)
         {
-            Console.WriteLine("NextGenSoftware.Holochain.HoloNET.Client Test Harness v1.0");
+            _testToRun = testToRun;
+            Console.WriteLine("NextGenSoftware.Holochain.HoloNET.Client Test Harness v1.1");
             Console.WriteLine("");
             _holoNETClient = new HoloNETClient("ws://localhost:8888");
             _holoNETClient.WebSocket.Config.NeverTimeOut = true;
 
-            //If no LoggingMode is set then it will default to WarningsErrorsAndInfo.
             _holoNETClient.Config.LoggingMode = LoggingMode.WarningsErrorsInfoAndDebug;
-            //_holoNETClient.Config.LoggingMode = LoggingMode.WarningsAndErrors;
-
             
             //holoNETClient.Config.ErrorHandlingBehaviour = ErrorHandlingBehaviour.OnlyThrowExceptionIfNoErrorHandlerSubscribedToOnErrorEvent
             _holoNETClient.Config.AutoStartHolochainConductor = false;
             _holoNETClient.Config.AutoShutdownHolochainConductor = false;
             _holoNETClient.Config.ShutDownALLHolochainConductors = false; //Normally default's to false, but if you want to make sure no holochain processes are left running set this to true.
             _holoNETClient.Config.ShowHolochainConductorWindow = false; //Defaults to false.
-           // _holoNETClient.Config.HolochainConductorMode = HolochainConductorModeEnum.UseSystemGlobal;
             _holoNETClient.Config.HolochainConductorMode = HolochainConductorModeEnum.UseEmbedded;
             _holoNETClient.Config.HolochainConductorToUse = HolochainConductorEnum.HcDevTool;
            
+            switch (testToRun)
+            {
+                case TestToRun.OASIS:
+                    {
+                        _holoNETClient.Config.FullPathToRootHappFolder = string.Concat(Environment.CurrentDirectory, @"\hApps\oasis");
+                        _holoNETClient.Config.FullPathToCompiledHappFolder = string.Concat(Environment.CurrentDirectory, @"\hApps\oasis\zomes\workdir\happ");
+                    }break;
 
-            //holoNETClient.Config.FullPathToHolochainAppDNA = @"D:\Dropbox\Our World\OASIS API\NextGenSoftware.Holochain.hApp.OurWorld\our_world\dist\our_world.dna.json";
-            _holoNETClient.Config.FullPathToRootHappFolder = string.Concat(Environment.CurrentDirectory, @"\hApps\happ-build-tutorial-develop");
-            _holoNETClient.Config.FullPathToCompiledHappFolder = string.Concat(Environment.CurrentDirectory, @"\hApps\happ-build-tutorial-develop\workdir\happ");
-            //_holoNETClient.Config.FullPathToHapp = string.Concat(Environment.CurrentDirectory, @"\hApps\numbers-hApp");
-           
+                case TestToRun.WhoAmI:
+                case TestToRun.Numbers:
+                    {
+                        _holoNETClient.Config.FullPathToRootHappFolder = string.Concat(Environment.CurrentDirectory, @"\hApps\happ-build-tutorial-develop");
+                        _holoNETClient.Config.FullPathToCompiledHappFolder = string.Concat(Environment.CurrentDirectory, @"\hApps\happ-build-tutorial-develop\workdir\happ");
+                    }
+                    break;
+            }
 
             _holoNETClient.OnConnected += HoloNETClient_OnConnected;
             _holoNETClient.OnDataReceived += HoloNETClient_OnDataReceived;
@@ -57,7 +65,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
             //_holoNETClient.Config.DnaHash = "YOUR HASH";
 
             //await _holoNETClient.Connect(false, false);
-
             await _holoNETClient.Connect();
         }
 
@@ -65,18 +72,39 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
         {
             Console.WriteLine(string.Concat("TEST HARNESS: READY FOR ZOME CALLS EVENT HANDLER: EndPoint: ", e.EndPoint, ", AgentPubKey: ", e.AgentPubKey, ", DnaHash: ", e.DnaHash));
             Console.WriteLine("");
-            Console.WriteLine("Calling Test Zome...\n");
 
-            //await _holoNETClient.CallZomeFunctionAsync("1", "whoami", "whoami", ZomeCallback, null);
-            //await _holoNETClient.CallZomeFunctionAsync("1", "whoami", "whoami", ZomeCallback, null);
-            //await _holoNETClient.CallZomeFunctionAsync("1", "numbers", "add_ten", ZomeCallback, new { number = 10 });
-            await _holoNETClient.CallZomeFunctionAsync("oasis", "create_entry_avatar", ZomeCallback, new { id = 1, first_name = "David", last_name = "Ellams", email = "davidellams@hotmail.com", dob = "11/04/0000" });
+            switch (_testToRun)
+            {
+                case TestToRun.WhoAmI:
+                    {
+                        Console.WriteLine("Calling WhoAmI Test Zome...\n");
+                        await _holoNETClient.CallZomeFunctionAsync("whoami", "whoami", ZomeCallback, null);
+                    }
+                    break;
 
-            // Load testing
-            //   for (int i = 0; i < 100; i++)
-            //     await _holoNETClient.CallZomeFunctionAsync("1", "numbers", "add_ten", ZomeCallback, new { number = 10 });
+                case TestToRun.Numbers:
+                    {
+                        Console.WriteLine("Calling Numbers Test Zome...\n");
+                        await _holoNETClient.CallZomeFunctionAsync("numbers", "add_ten", ZomeCallback, new { number = 10 });
+                    }
+                    break;
 
-            //  await _holoNETClient.Disconnect();
+                case TestToRun.OASIS:
+                    {
+                        Console.WriteLine("Calling OASIS Test Zome...\n");
+                        await _holoNETClient.CallZomeFunctionAsync("oasis", "create_entry_avatar", ZomeCallback, new { id = 1, first_name = "David", last_name = "Ellams", email = "davidellams@hotmail.com", dob = "11/04/0000" });
+                    }
+                    break;
+
+                case TestToRun.LoadTesting:
+                    {
+                        Console.WriteLine("Calling Numbers Test Zome (Load Testing)...\n");
+
+                        for (int i = 0; i < 100; i++)
+                            await _holoNETClient.CallZomeFunctionAsync("numbers", "add_ten", ZomeCallback, new { number = 10 });
+                    }
+                    break;
+            }
         }
 
         private static void HoloNETClient_OnAppInfoCallBack(object sender, AppInfoCallBackEventArgs e)
@@ -122,7 +150,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
             Console.WriteLine(string.Concat("TEST HARNESS: ZOME FUNCTION CALLBACK EVENT HANDLER: ", ProcessZomeFunctionCallBackEventArgs(e)));
             Console.WriteLine("");
 
-            if (!string.IsNullOrEmpty(e.ZomeReturnHash))
+            if (!string.IsNullOrEmpty(e.ZomeReturnHash) && _testToRun == TestToRun.OASIS)
                 _holoNETClient.CallZomeFunctionAsync("oasis", "get_entry_avatar", ZomeCallback, e.ZomeReturnHash);
             else
                 _holoNETClient.Disconnect();
