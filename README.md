@@ -316,16 +316,19 @@ private static string ProcessZomeFunctionCallBackEventArgs(ZomeFunctionCallBackE
         }
 ````             
 
- | Parameter          | Description                                                                                                                                                                                                 |
- |--------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
- | EndPoint           | The URI EndPoint of the Holochain conductor.                                                                                                                                                                |
- | Zome               | The zome that made the request.                                                                                                                                                                             |
- | ZomeFunction       | The zome function that made the request.                                                                                                                                                                    |
- | ZomeReturnData     | The parsed data that the zome function returned. HoloNET will parse & convert the best it can from the Rust Holochain Conductor format to a C# friendly one such as converting from base64 encoding, etc.   |
- | RawZomeReturnData  | The raw binary data that the zome function returned.                                                                                                                                                        |
- | RawBinaryData      | The raw binary data returned from the Holochain conductor.                                                                                                                                                  |
- | RawJSONData        | The raw JSON data returned from the Holochain conductor.                                                                                                                                                    |
- | WebSocketResult    | Contains more detailed technical information of the underlying websocket. This includes the number of bytes received, whether the message was fully received & whether the message is UTF-8 or binary. Please [see here](https://docs.microsoft.com/en-us/dotnet/api/system.net.websockets.websocketreceiveresult?view=netframework-4.8) for more info. |
+ | Parameter            | Description                                                                                                                                                                                                 |
+ |----------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+ | EndPoint             | The URI EndPoint of the Holochain conductor.                                                                                                                                                                |
+ | Zome                 | The zome that made the request.                                                                                                                                                                             |
+ | ZomeFunction         | The zome function that made the request.                                                                                                                                                                    |
+ | ZomeReturnData       | The parsed data that the zome function returned. HoloNET will parse & convert the best it can from the Rust Holochain Conductor format to a C# friendly one such as converting from base64 encoding, etc.   |
+ | RawZomeReturnData    | The raw binary data that the zome function returned.                                                                                                                                                        |
+ | ZomeReturnHash       | The ActionHash returned from a zome call (if it returned one, is null if not).
+ | KeyValuePair         | Contains all of the data returned from the zome call in a simple Dictionary keyvalue pair. The conductor for some reason returns a complex nested structure so is difficult and tedious to get to all the data needed or to quickly view all of it at once.
+ | KeyValuePairAsString | Contains the same data from KeyValuePair but formatted as a simple string, which can be used for logging, displaying, etc.
+ | RawBinaryData        | The raw binary data returned from the Holochain conductor.                                                                                                                                                  |
+ | RawJSONData          | The raw JSON data returned from the Holochain conductor.                                                                                                                                                    |
+ | WebSocketResult      | Contains more detailed technical information of the underlying websocket. This includes the number of bytes received, whether the message was fully received & whether the message is UTF-8 or binary. Please [see here](https://docs.microsoft.com/en-us/dotnet/api/system.net.websockets.websocketreceiveresult?view=netframework-4.8) for more info. |
 
 
  
