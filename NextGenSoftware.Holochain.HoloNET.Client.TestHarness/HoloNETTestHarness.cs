@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using NextGenSoftware.Logging;
 using NextGenSoftware.WebSocket;
@@ -9,16 +11,23 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
     {
         private static HoloNETClient _holoNETClient = null;
         private static TestToRun _testToRun;
+        private static int _numberOfZomeCallResponsesReceived = 0;
+        private static Dictionary<int, bool> _loadEntryResponseReceived = new Dictionary<int, bool>();
+        private static Dictionary<int, bool> _saveEntryResponseReceived = new Dictionary<int, bool>();
+        private static int _requestNumber = 10;
+        private static Stopwatch _timer = new Stopwatch(); // creating new instance of the stopwatch
+
 
         static async Task Main(string[] args)
         {
-            await TestHoloNETClientAsync(TestToRun.OASIS);
+            await TestHoloNETClientAsync(TestToRun.LoadTestSaveLoadOASISEntry);
         }
 
         public static async Task TestHoloNETClientAsync(TestToRun testToRun)
         {
+            _timer.Start();
             _testToRun = testToRun;
-            Console.WriteLine("NextGenSoftware.Holochain.HoloNET.Client Test Harness v1.1");
+            Console.WriteLine("NextGenSoftware.Holochain.HoloNET.Client Test Harness v1.2");
             Console.WriteLine("");
             _holoNETClient = new HoloNETClient("ws://localhost:8888");
             _holoNETClient.WebSocket.Config.NeverTimeOut = true;
@@ -26,23 +35,25 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
             _holoNETClient.Config.LoggingMode = LoggingMode.WarningsErrorsInfoAndDebug;
             
             //holoNETClient.Config.ErrorHandlingBehaviour = ErrorHandlingBehaviour.OnlyThrowExceptionIfNoErrorHandlerSubscribedToOnErrorEvent
-            _holoNETClient.Config.AutoStartHolochainConductor = false;
-            _holoNETClient.Config.AutoShutdownHolochainConductor = false;
-            _holoNETClient.Config.ShutDownALLHolochainConductors = false; //Normally default's to false, but if you want to make sure no holochain processes are left running set this to true.
+            _holoNETClient.Config.AutoStartHolochainConductor = true;
+            _holoNETClient.Config.AutoShutdownHolochainConductor = true;
+            _holoNETClient.Config.ShutDownALLHolochainConductors = true; //Normally default's to false, but if you want to make sure no holochain processes are left running set this to true.
             _holoNETClient.Config.ShowHolochainConductorWindow = false; //Defaults to false.
             _holoNETClient.Config.HolochainConductorMode = HolochainConductorModeEnum.UseEmbedded;
             _holoNETClient.Config.HolochainConductorToUse = HolochainConductorEnum.HcDevTool;
            
             switch (testToRun)
             {
-                case TestToRun.OASIS:
-                    {
-                        _holoNETClient.Config.FullPathToRootHappFolder = string.Concat(Environment.CurrentDirectory, @"\hApps\oasis");
-                        _holoNETClient.Config.FullPathToCompiledHappFolder = string.Concat(Environment.CurrentDirectory, @"\hApps\oasis\zomes\workdir\happ");
+                case TestToRun.SaveLoadOASISEntry:
+                case TestToRun.LoadTestSaveLoadOASISEntry:
+                {
+                        _holoNETClient.Config.FullPathToRootHappFolder = string.Concat(Environment.CurrentDirectory, @"\hApps\OASIS-Holochain-hApp");
+                        _holoNETClient.Config.FullPathToCompiledHappFolder = string.Concat(Environment.CurrentDirectory, @"\hApps\OASIS-Holochain-hApp\zomes\workdir\happ");
                     }break;
 
                 case TestToRun.WhoAmI:
                 case TestToRun.Numbers:
+                case TestToRun.LoadTestNumbers:
                     {
                         _holoNETClient.Config.FullPathToRootHappFolder = string.Concat(Environment.CurrentDirectory, @"\hApps\happ-build-tutorial-develop");
                         _holoNETClient.Config.FullPathToCompiledHappFolder = string.Concat(Environment.CurrentDirectory, @"\hApps\happ-build-tutorial-develop\workdir\happ");
@@ -77,31 +88,40 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
             {
                 case TestToRun.WhoAmI:
                     {
-                        Console.WriteLine("Calling WhoAmI Test Zome...\n");
+                        Console.WriteLine("Calling whoami function on WhoAmI Test Zome...\n");
                         await _holoNETClient.CallZomeFunctionAsync("whoami", "whoami", ZomeCallback, null);
                     }
                     break;
 
                 case TestToRun.Numbers:
                     {
-                        Console.WriteLine("Calling Numbers Test Zome...\n");
+                        Console.WriteLine("Calling add_ten function on Numbers Test Zome...\n");
                         await _holoNETClient.CallZomeFunctionAsync("numbers", "add_ten", ZomeCallback, new { number = 10 });
                     }
                     break;
 
-                case TestToRun.OASIS:
+                case TestToRun.SaveLoadOASISEntry:
                     {
-                        Console.WriteLine("Calling OASIS Test Zome...\n");
+                        Console.WriteLine("Calling create_entry_avatar function on OASIS Test Zome...\n");
                         await _holoNETClient.CallZomeFunctionAsync("oasis", "create_entry_avatar", ZomeCallback, new { id = 1, first_name = "David", last_name = "Ellams", email = "davidellams@hotmail.com", dob = "11/04/0000" });
                     }
                     break;
 
-                case TestToRun.LoadTesting:
+                case TestToRun.LoadTestNumbers:
                     {
-                        Console.WriteLine("Calling Numbers Test Zome (Load Testing)...\n");
+                        Console.WriteLine("Calling add_ten function on Numbers Test Zome (Load Testing)...\n");
 
                         for (int i = 0; i < 100; i++)
                             await _holoNETClient.CallZomeFunctionAsync("numbers", "add_ten", ZomeCallback, new { number = 10 });
+                    }
+                    break;
+
+                case TestToRun.LoadTestSaveLoadOASISEntry:
+                    {
+                        Console.WriteLine("Calling create_entry_avatar function on OASIS Test Zome (Load Testing)...\n");
+
+                        for (int i = 0; i < 100; i++)
+                            await _holoNETClient.CallZomeFunctionAsync("oasis", "create_entry_avatar", ZomeCallback, new { id = 1, first_name = "David", last_name = "Ellams", email = "davidellams@hotmail.com", dob = "11/04/0000" });
                     }
                     break;
             }
@@ -142,18 +162,76 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
         {
             Console.WriteLine(string.Concat("TEST HARNESS: DISCONNECTED CALL BACK: Disconnected from ", e.EndPoint, ". Resason: ", e.Reason));
             Console.WriteLine("");
+
+            //if (_testToRun == TestToRun.LoadTestNumbers || _testToRun == TestToRun.LoadTestSaveLoadOASISEntry)
+            //{
+            //    TimeSpan timeSpan = _endTime.Subtract(_startTime);
+            //    Console.WriteLine($"Test Complete: Time Took: {timeSpan}");
+            //}
+
             Console.ReadKey();
         }
 
         private static void HoloNETClient_OnZomeFunctionCallBack(object sender, ZomeFunctionCallBackEventArgs e)
         {
+            bool disconect = false;
             Console.WriteLine(string.Concat("TEST HARNESS: ZOME FUNCTION CALLBACK EVENT HANDLER: ", ProcessZomeFunctionCallBackEventArgs(e)));
             Console.WriteLine("");
 
-            if (!string.IsNullOrEmpty(e.ZomeReturnHash) && _testToRun == TestToRun.OASIS)
-                _holoNETClient.CallZomeFunctionAsync("oasis", "get_entry_avatar", ZomeCallback, e.ZomeReturnHash);
+            //if (!string.IsNullOrEmpty(e.ZomeReturnHash) && e.ZomeFunction == "create_entry_avatar" && (_testToRun == TestToRun.SaveLoadOASISEntry || _testToRun == TestToRun.LoadTestSaveLoadOASISEntry))
+            //{
+            //    _saveEntryResponseReceived[_requestNumber] = true;
+            //    _holoNETClient.CallZomeFunctionAsync(_requestNumber.ToString(), "oasis", "get_entry_avatar", ZomeCallback, e.ZomeReturnHash);
+            //}
+            //else if (e.ZomeFunction == "get_entry_avatar")
+            //{
+            //    _loadEntryResponseReceived[_requestNumber] = true;
+            //    _numberOfZomeCallResponsesReceived++;
+            //}
+
+            //if (_loadEntryResponseReceived.Count >= 100)
+            //    _holoNETClient.Disconnect();
+
+            //Console.WriteLine(String.Concat("Current Request Number = ", _requestNumber));
+            //Console.WriteLine(String.Concat("Number Of Zome Call Responses Received = ", _numberOfZomeCallResponsesReceived));
+            //Console.WriteLine(String.Concat("Save Entry Response Received = ", _saveEntryResponseReceived.Count));
+            //Console.WriteLine(String.Concat("Load Entry Response Received = ", _loadEntryResponseReceived.Count));
+
+            if (!string.IsNullOrEmpty(e.ZomeReturnHash) && e.ZomeFunction == "create_entry_avatar" && (_testToRun == TestToRun.SaveLoadOASISEntry || _testToRun == TestToRun.LoadTestSaveLoadOASISEntry))
+            {
+                _saveEntryResponseReceived[_requestNumber] = true;
+                _holoNETClient.CallZomeFunctionAsync(_requestNumber.ToString(), "oasis", "get_entry_avatar", ZomeCallback, e.ZomeReturnHash);
+            }
             else
+            {
+                //TODO: Need to make tests and results more accurate... (in future version)...
+                if (((_testToRun == TestToRun.LoadTestNumbers
+                    || _testToRun == TestToRun.LoadTestSaveLoadOASISEntry)
+                    && _numberOfZomeCallResponsesReceived >= 96)
+                    || (_testToRun != TestToRun.LoadTestNumbers
+                    && _testToRun != TestToRun.LoadTestSaveLoadOASISEntry))
+                {
+                    if (_testToRun == TestToRun.LoadTestNumbers || _testToRun == TestToRun.LoadTestSaveLoadOASISEntry)
+                    {
+                        _timer.Stop();
+                        Console.WriteLine($"Test Complete: Time Took: {_timer.Elapsed.Minutes} minute(s) and {_timer.Elapsed.Seconds} second(s).");
+                    }
+
+                    disconect = true;
+                }
+                else
+                    _numberOfZomeCallResponsesReceived++;
+            }
+
+            Console.WriteLine(String.Concat("Number Of Zome Call Responses Received = ", _numberOfZomeCallResponsesReceived));
+
+            if (disconect)
+            {
+                Console.WriteLine("");
                 _holoNETClient.Disconnect();
+            }
+
+            //_requestNumber++;
         }
 
         private static string ProcessZomeFunctionCallBackEventArgs(ZomeFunctionCallBackEventArgs args)
