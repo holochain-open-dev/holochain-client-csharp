@@ -18,6 +18,7 @@
 		- Added LoadTestSaveLoadOASISEntry test.
 		- Renamed existing tests.
 		- Fixed bugs.
+		- Added time taken to run tests.
 		- Updated documentation.
 	</PackageReleaseNotes>
 	<RepositoryType>git</RepositoryType>

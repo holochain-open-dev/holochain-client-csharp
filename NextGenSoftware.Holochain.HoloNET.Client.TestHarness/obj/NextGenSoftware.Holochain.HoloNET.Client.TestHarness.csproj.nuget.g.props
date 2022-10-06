@@ -13,7 +13,4 @@
     <SourceRoot Include="C:\Users\david\.nuget\packages\" />
     <SourceRoot Include="C:\Program Files (x86)\Microsoft Visual Studio\Shared\NuGetPackages\" />
   </ItemGroup>
-  <PropertyGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
-    <PkgNLog_Config Condition=" '$(PkgNLog_Config)' == '' ">C:\Users\david\.nuget\packages\nlog.config\4.6.3</PkgNLog_Config>
-  </PropertyGroup>
 </Project>
