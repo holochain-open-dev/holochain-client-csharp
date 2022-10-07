@@ -14,12 +14,7 @@
 	<PackageIcon>hc logo.png</PackageIcon>
 	<Authors>David Ellams (NextGen Software Ltd)</Authors>
 	<PackageTags>holochain;net;unity</PackageTags>
-	<PackageReleaseNotes>
-		- Added LoadTestSaveLoadOASISEntry test.
-		- Renamed existing tests.
-		- Fixed bugs.
-		- Added time taken to run tests.
-		- Updated documentation.
+	<PackageReleaseNotes>Updated to work with the latest HoloNET (v1.4.0).
 	</PackageReleaseNotes>
 	<RepositoryType>git</RepositoryType>
 	<RepositoryUrl>https://github.com/NextGenSoftwareUK/holochain-client-csharp</RepositoryUrl>
@@ -28,7 +23,7 @@
 	<!--<PackageLicenseExpression>GNU GPLv3</PackageLicenseExpression>-->
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-	<Version>1.2</Version>
+	<Version>1.3</Version>
 	<!--<PackageLicenseFile>..\LICENSE</PackageLicenseFile>-->
 
 	<AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>

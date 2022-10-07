@@ -27,7 +27,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
         {
             _timer.Start();
             _testToRun = testToRun;
-            Console.WriteLine("NextGenSoftware.Holochain.HoloNET.Client Test Harness v1.2");
+            Console.WriteLine("NextGenSoftware.Holochain.HoloNET.Client Test Harness v1.3");
             Console.WriteLine("");
             _holoNETClient = new HoloNETClient("ws://localhost:8888");
             _holoNETClient.WebSocket.Config.NeverTimeOut = true;
