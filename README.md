@@ -30,6 +30,12 @@
         - [Overload 2](#overload-2)
         - [Overload 3](#overload-3)
         - [Overload 4](#overload-4)
+        - [Overload 5](#overload-5)
+        - [Overload 6](#overload-6)
+        - [Overload 7](#overload-7)
+        - [Overload 8](#overload-8)
+        - [Overload 9](#overload-9)
+        - [Overload 10](#overload-10)
       - [Disconnect](#disconnect)
       - [ShutDownAllConductors](#shutdownallconductors)
       - [ClearCache](#clearcache)
@@ -326,7 +332,7 @@ private static string ProcessZomeFunctionCallBackEventArgs(ZomeFunctionCallBackE
  | ZomeReturnHash       | The ActionHash returned from a zome call (if it returned one, is null if not).
  | KeyValuePair         | Contains all of the data returned from the zome call in a simple Dictionary keyvalue pair. The conductor for some reason returns a complex nested structure so is difficult and tedious to get to all the data needed or to quickly view all of it at once.
  | KeyValuePairAsString | Contains the same data from KeyValuePair but formatted as a simple string, which can be used for logging, displaying, etc.
- | Entry                | The entry dictionary containing the actual user data (after it has been processed/decoded) retrived from the zome call. This is the property that will be most valuable to the caller.
+ | Entry                | The entry dictionary containing the actual user data (after it has been processed/decoded) retrived from the zome call. This is the property that will be most valuable to the caller. This also now includes a EntryDataObject property containing a dynamic data object that is mapped to the dictionary using the optional type passed into the [CallZomeFunctionAsync](#callzomefunctionasync) method.
  | RawBinaryData        | The raw binary data returned from the Holochain conductor.                                                                                                                                                  |
  | RawJSONData          | The raw JSON data returned from the Holochain conductor.                                                                                                                                                    |
  | WebSocketResult      | Contains more detailed technical information of the underlying websocket. This includes the number of bytes received, whether the message was fully received & whether the message is UTF-8 or binary. Please [see here](https://docs.microsoft.com/en-us/dotnet/api/system.net.websockets.websocketreceiveresult?view=netframework-4.8) for more info. |
@@ -517,7 +523,7 @@ This method raises the [OnZomeFunctionCallBack](#onzomefunctioncallback) event o
 ##### Overload 1
 
 ````c#
-public async Task CallZomeFunctionAsync(string id, string zome, string function, ZomeFunctionCallBack callback, object paramsObject, bool matchIdToInstanceZomeFuncInCallback = true, bool cachReturnData = false)
+public async Task CallZomeFunctionAsync(string id, string zome, string function, ZomeFunctionCallBack callback, object paramsObject, bool matchIdToInstanceZomeFuncInCallback = true, bool cachReturnData = false, Type entryDataObjectTypeReturnedFromZome = null)
 ````
 
 | Parameter                           | Description                                                                                    
@@ -529,12 +535,39 @@ public async Task CallZomeFunctionAsync(string id, string zome, string function,
 | paramsObject                        | A basic CLR object containing the params the zome function is expecting.                       |
 | matchIdToInstanceZomeFuncInCallback | This is an optional param, which defaults to true. Set this to true if you wish HoloNET to give the instance, zome  zome function that made the call in the callback/event. If this is false then only the id will be given in the callback. This uses a small internal cache to match up the id to the given zome/function. Set this to false if you wish to save a tiny amount of memory by not utilizing this cache. If it is false then the `Zome` and `ZomeFunction` params will be missing in the ZomeCallBack, you will need to manually match the `id` to the call yourself.  |
 | cachReturnData                      | This is an optional param, which defaults to false. Set this to true if you wish HoloNET to cache the response retrieved from holochain. Subsequent calls will return this cached data rather than calling the Holochain conductor again. Use this for static data that is not going to change for performance gains.                                                         
+| entryDataObjectTypeReturnedFromZome | This is an optional parma, where the caller can pass in the type of the dynamic data object they wish the entry data returned to be mapped to. |
 
+**NOTE** - If you pass in the entryDataObjectTypeReturnedFromZome type then you need to make sure on that type defintion (class) you specify the Holochain Property Names defined in the hApp rust code as shown in the follow example:
+
+````c#
+public class Avatar
+    {
+        [HolochainPropertyName("first_name")]
+        public string FirstName { get; set; }
+
+        [HolochainPropertyName("last_name")]
+        public string LastName { get; set; }
+
+        [HolochainPropertyName("email")]
+        public string Email { get; set; }
+
+        [HolochainPropertyName("dob")]
+        public DateTime DOB { get; set; }
+    }
+ ````
+
+ This would then be used like this:
+
+ ````c#
+ _holoNETClient.CallZomeFunctionAsync("oasis", "get_entry_avatar", ZomeCallback, e.ZomeReturnHash, true, false, typeof(Avatar));
+  ````
+
+  Where e.ZomeReturnHash is the hash of the entry to load. This is part of the example used in the [HoloNET Test Harness](https://github.com/holochain-open-dev/holochain-client-csharp/tree/main/NextGenSoftware.Holochain.HoloNET.Client.TestHarness), and the e.ZomeReturnHash is the hash returned from the previous call to CallZomeFunctionAsync where the zome function "create_oasis_entry" was called.
 
 #####  Overload 2
 
 ````c#
- public async Task CallZomeFunctionAsync(string zome, string function, ZomeFunctionCallBack callback, object paramsObject, bool cachReturnData = false)
+ public async Task CallZomeFunctionAsync(string zome, string function, ZomeFunctionCallBack callback, object paramsObject, bool cachReturnData = false, Type entryDataObjectTypeReturnedFromZome = null)
  ````
 
 This overload is similar to the one above except it omits the `id` and `matchIdToInstanceZomeFuncInCallback` param's forcing HoloNET to auto-generate and manage the id's itself. 
@@ -543,7 +576,7 @@ This overload is similar to the one above except it omits the `id` and `matchIdT
 ##### Overload 3
 
 ````c#
-public async Task CallZomeFunctionAsync(string id, string zome, string function, object paramsObject, bool matchIdToInstanceZomeFuncInCallback = true, bool cachReturnData = false)
+public async Task CallZomeFunctionAsync(string id, string zome, string function, object paramsObject, bool matchIdToInstanceZomeFuncInCallback = true, bool cachReturnData = false, Type entryDataObjectTypeReturnedFromZome = null)
  ````
 
 This overload is similar to the first one, except it is missing the `callback` param. For this overload you would subscribe to the `OnZomeFunctionCallBack` event. You can of course subscribe to this event for the other overloads too, it just means you will then get two callbacks, one for the event handler for `OnZomeFunctionalCallBack` and one for the callback delegate you pass in as a param to this method. The choice is yours on how you wish to use this method...
@@ -552,11 +585,46 @@ This overload is similar to the first one, except it is missing the `callback` p
 ##### Overload 4
 
 ````c#
-public async Task CallZomeFunctionAsync(string zome, string function, object paramsObject, bool cachReturnData = false)
+public async Task CallZomeFunctionAsync(string zome, string function, object paramsObject, bool cachReturnData = false, Type entryDataObjectTypeReturnedFromZome = null)
  ````
 
 This overload is similar to the one above except it omits the `id` and `matchIdToInstanceZomeFuncInCallback` param's forcing HoloNET to auto-generate and manage the id's itself. It is also missing the `callback` param. For this overload you would subscribe to the `OnZomeFunctionCallBack` event. You can of course subscribe to this event for the other overloads too, it just means you will then get two callbacks, one for the event handler for `OnZomeFunctionalCallBack` and one for the callback delegate you pass in as a param to this method. The choice is yours on how you wish to use this method...
 
+##### Overload 5
+
+````c#
+public async Task CallZomeFunctionAsync(string zome, string function, object paramsObject, bool cachReturnData = false)
+ ````
+
+##### Overload 6
+
+````c#
+public async Task CallZomeFunctionAsync(string zome, string function, object paramsObject, Type entryDataObjectTypeReturnedFromZome = null)
+ ````
+
+##### Overload 7
+
+````c#
+public async Task CallZomeFunctionAsync(string id, string zome, string function, object paramsObject, Type entryDataObjectTypeReturnedFromZome = null)
+ ````
+
+##### Overload 8
+
+````c#
+public async Task CallZomeFunctionAsync(string zome, string function, ZomeFunctionCallBack callback, object paramsObject)
+ ````
+
+##### Overload 9
+
+````c#
+public async Task CallZomeFunctionAsync(string zome, string function, ZomeFunctionCallBack callback, object paramsObject, bool cachReturnData = false)
+ ````
+
+##### Overload 10
+
+````c#
+public async Task CallZomeFunctionAsync(string id, string zome, string function, ZomeFunctionCallBack callback, object paramsObject, bool matchIdToInstanceZomeFuncInCallback = true, bool cachReturnData = false)
+ ````
 
 #### Disconnect
 

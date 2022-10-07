@@ -8,6 +8,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
     {
         public byte[] Bytes { get; set; }
         public string BytesString { get; set; }
-        public Dictionary<string, object> Entry { get; set; }    
+        public Dictionary<string, object> Entry { get; set; }
+        public dynamic EntryDataObject { get; set; }
     }
 }

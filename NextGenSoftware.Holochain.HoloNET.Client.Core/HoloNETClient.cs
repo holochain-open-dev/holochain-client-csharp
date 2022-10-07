@@ -10,6 +10,7 @@ using MessagePack;
 using NextGenSoftware.WebSocket;
 using NextGenSoftware.Logging;
 using NextGenSoftware.Holochain.HoloNET.Client.Properties;
+using System.Reflection;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
@@ -19,6 +20,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         private bool _updateDnaHashAndAgentPubKey = true;
         private Dictionary<string, string> _zomeLookup = new Dictionary<string, string>();
         private Dictionary<string, string> _funcLookup = new Dictionary<string, string>();
+        private Dictionary<string, Type> _entryDataObjectTypeLookup = new Dictionary<string, Type>();
         private Dictionary<string, ZomeFunctionCallBack> _callbackLookup = new Dictionary<string, ZomeFunctionCallBack>();
         private Dictionary<string, ZomeFunctionCallBackEventArgs> _zomeReturnDataLookup = new Dictionary<string, ZomeFunctionCallBackEventArgs>();
         private Dictionary<string, bool> _cacheZomeReturnDataLookup = new Dictionary<string, bool>();
@@ -397,9 +399,27 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             await CallZomeFunctionAsync(_currentId.ToString(), zome, function, null, paramsObject, true, cachReturnData);
         }
 
-        public async Task CallZomeFunctionAsync(string id, string zome, string function, object paramsObject, bool matchIdToInstanceZomeFuncInCallback = true, bool cachReturnData = false)
+        public async Task CallZomeFunctionAsync(string zome, string function, object paramsObject, Type entryDataObjectTypeReturnedFromZome = null)
         {
+            _currentId++;
+            await CallZomeFunctionAsync(_currentId.ToString(), zome, function, paramsObject, entryDataObjectTypeReturnedFromZome);
+        }
+
+        public async Task CallZomeFunctionAsync(string id, string zome, string function, object paramsObject, Type entryDataObjectTypeReturnedFromZome = null)
+        {
+            await CallZomeFunctionAsync(id, zome, function, paramsObject, true, false, entryDataObjectTypeReturnedFromZome);
+        }
+
+        public async Task CallZomeFunctionAsync(string id, string zome, string function, object paramsObject, bool matchIdToInstanceZomeFuncInCallback = true, bool cachReturnData = false, Type entryDataObjectTypeReturnedFromZome = null)
+        {
+            _entryDataObjectTypeLookup[id] = entryDataObjectTypeReturnedFromZome;
             await CallZomeFunctionAsync(id, zome, function, null, paramsObject, matchIdToInstanceZomeFuncInCallback, cachReturnData);
+        }
+
+        public async Task CallZomeFunctionAsync(string zome, string function, ZomeFunctionCallBack callback, object paramsObject)
+        {
+            _currentId++;
+            await CallZomeFunctionAsync(_currentId.ToString(), zome, function, callback, paramsObject, true, false);
         }
 
         public async Task CallZomeFunctionAsync(string zome, string function, ZomeFunctionCallBack callback, object paramsObject, bool cachReturnData = false)
@@ -408,8 +428,31 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             await CallZomeFunctionAsync(_currentId.ToString(), zome, function, callback, paramsObject, true, cachReturnData);
         }
 
+        public async Task CallZomeFunctionAsync(string zome, string function, ZomeFunctionCallBack callback, object paramsObject, Type entryDataObjectTypeReturnedFromZome = null)
+        {
+            _currentId++;
+            await CallZomeFunctionAsync(_currentId.ToString(), zome, function, callback, paramsObject, true, false, entryDataObjectTypeReturnedFromZome);
+        }
+
+        public async Task CallZomeFunctionAsync(string zome, string function, ZomeFunctionCallBack callback, object paramsObject, bool cachReturnData = false, Type entryDataObjectTypeReturnedFromZome = null)
+        {
+            _currentId++;
+            await CallZomeFunctionAsync(_currentId.ToString(), zome, function, callback, paramsObject, true, cachReturnData, entryDataObjectTypeReturnedFromZome);
+        }
+
+        //public async Task<T> CallZomeFunctionAsync<T>(string id, string zome, string function, ZomeFunctionCallBack callback, object paramsObject, bool matchIdToInstanceZomeFuncInCallback = true, bool cachReturnData = false)
+        //{
+        //    _zomeCallReturnTypeLookup[id] = T;
+        //}
+
         public async Task CallZomeFunctionAsync(string id, string zome, string function, ZomeFunctionCallBack callback, object paramsObject, bool matchIdToInstanceZomeFuncInCallback = true, bool cachReturnData = false)
         {
+            await CallZomeFunctionAsync(id, zome, function, callback, paramsObject, matchIdToInstanceZomeFuncInCallback, cachReturnData, null);
+        }
+
+        public async Task CallZomeFunctionAsync(string id, string zome, string function, ZomeFunctionCallBack callback, object paramsObject, bool matchIdToInstanceZomeFuncInCallback = true, bool cachReturnData = false, Type entryDataObjectTypeReturnedFromZome = null)
+        {
+            _entryDataObjectTypeLookup[id] = entryDataObjectTypeReturnedFromZome;
             _cacheZomeReturnDataLookup[id] = cachReturnData;
 
             try
@@ -660,15 +703,18 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     {
                         Dictionary<object, object> rawAppResponseData = MessagePackSerializer.Deserialize<Dictionary<object, object>>(appResponse.data, options);
                         Dictionary<string, object> appResponseData = new Dictionary<string, object>();
-                        Dictionary<string, string> keyValuePair = new Dictionary<string, string>();
-                        string keyValuePairAsString = "";
+                        Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
+                        string keyValuePairsAsString = "";
                         EntryData entryData = null;
 
-                        (appResponseData, keyValuePair, keyValuePairAsString, entryData) = DecodeZomeReturnData(rawAppResponseData, appResponseData, keyValuePair, keyValuePairAsString);
+                        (appResponseData, keyValuePairs, keyValuePairsAsString, entryData) = DecodeZomeReturnData(rawAppResponseData, appResponseData, keyValuePairs, keyValuePairsAsString);
                         //appResponseData["Entry"] = entryData;
 
-                        Logger.Log($"Decoded Data:\n{keyValuePairAsString}", LogType.Info);
-                        zomeFunctionCallBackArgs = new ZomeFunctionCallBackEventArgs(id, e.EndPoint, GetItemFromCache(id, _zomeLookup), GetItemFromCache(id, _funcLookup), true, rawData, rawAppResponseData, appResponseData, "", keyValuePair, keyValuePairAsString, entryData, e.RawBinaryData, e.RawJSONData, e.WebSocketResult);
+                        if (_entryDataObjectTypeLookup.ContainsKey(id) && _entryDataObjectTypeLookup[id] != null)
+                            entryData.EntryDataObject = MapEntryDataObject(_entryDataObjectTypeLookup[id], keyValuePairs);
+
+                        Logger.Log($"Decoded Data:\n{keyValuePairsAsString}", LogType.Info);
+                        zomeFunctionCallBackArgs = new ZomeFunctionCallBackEventArgs(id, e.EndPoint, GetItemFromCache(id, _zomeLookup), GetItemFromCache(id, _funcLookup), true, rawData, rawAppResponseData, appResponseData, "", keyValuePairs, keyValuePairsAsString, entryData, e.RawBinaryData, e.RawJSONData, e.WebSocketResult);
                     }
                     catch (Exception ex)
                     {
@@ -699,6 +745,155 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             {
                 HandleError("Error in HoloNETClient.WebSocket_OnDataReceived method.", ex);
             }
+        }
+
+        private dynamic MapEntryDataObject(Type entryDataObjectType, Dictionary<string, string> keyValuePairs)
+        {
+            Object entryDataObject = null;
+
+            try
+            {
+                //dynamic entryDataObject = new ExpandoObject();
+                //dynamic entryDataObject = new object();
+                entryDataObject = Activator.CreateInstance(entryDataObjectType);
+                PropertyInfo[] props = entryDataObjectType.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+
+                foreach (PropertyInfo propInfo in props)
+                {
+                    foreach (CustomAttributeData data in propInfo.CustomAttributes)
+                    {
+                        if (data.AttributeType == (typeof(HolochainPropertyName)))
+                        {
+                            try
+                            {
+                                if (data.ConstructorArguments.Count > 0 && data.ConstructorArguments[0] != null && data.ConstructorArguments[0].Value != null)
+                                {
+                                    string key = data.ConstructorArguments[0].Value.ToString();
+
+                                    if (propInfo.PropertyType == typeof(Guid))
+                                        propInfo.SetValue(entryDataObject, new Guid(keyValuePairs[key]));
+
+                                    else if (propInfo.PropertyType == typeof(bool))
+                                        propInfo.SetValue(entryDataObject, Convert.ToBoolean(keyValuePairs[key]));
+
+                                    else if (propInfo.PropertyType == typeof(DateTime))
+                                        propInfo.SetValue(entryDataObject, Convert.ToDateTime(keyValuePairs[key]));
+
+                                    else if (propInfo.PropertyType == typeof(int))
+                                        propInfo.SetValue(entryDataObject, Convert.ToInt32(keyValuePairs[key]));
+
+                                    else if (propInfo.PropertyType == typeof(long))
+                                        propInfo.SetValue(entryDataObject, Convert.ToInt64(keyValuePairs[key]));
+
+                                    else if (propInfo.PropertyType == typeof(float))
+                                        propInfo.SetValue(entryDataObject, Convert.ToDouble(keyValuePairs[key])); //TODO: Check if this is right?! :)
+
+                                    else if (propInfo.PropertyType == typeof(double))
+                                        propInfo.SetValue(entryDataObject, Convert.ToDouble(keyValuePairs[key]));
+
+                                    else if (propInfo.PropertyType == typeof(decimal))
+                                        propInfo.SetValue(entryDataObject, Convert.ToDecimal(keyValuePairs[key]));
+
+                                    else if (propInfo.PropertyType == typeof(UInt16))
+                                        propInfo.SetValue(entryDataObject, Convert.ToUInt16(keyValuePairs[key]));
+
+                                    else if (propInfo.PropertyType == typeof(UInt32))
+                                        propInfo.SetValue(entryDataObject, Convert.ToUInt32(keyValuePairs[key]));
+
+                                    else if (propInfo.PropertyType == typeof(UInt64))
+                                        propInfo.SetValue(entryDataObject, Convert.ToUInt64(keyValuePairs[key]));
+
+                                    else if (propInfo.PropertyType == typeof(Single))
+                                        propInfo.SetValue(entryDataObject, Convert.ToSingle(keyValuePairs[key]));
+
+                                    else if (propInfo.PropertyType == typeof(char))
+                                        propInfo.SetValue(entryDataObject, Convert.ToChar(keyValuePairs[key]));
+
+                                    else if (propInfo.PropertyType == typeof(byte))
+                                        propInfo.SetValue(entryDataObject, Convert.ToByte(keyValuePairs[key]));
+
+                                    else if (propInfo.PropertyType == typeof(sbyte))
+                                        propInfo.SetValue(entryDataObject, Convert.ToSByte(keyValuePairs[key]));
+
+                                    else
+                                        propInfo.SetValue(entryDataObject, keyValuePairs[key]);
+
+                                    break;
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+
+                            }
+                        }
+                    }
+                }
+
+                /*
+                foreach (string key in keyValuePairs.Keys)
+                {
+                    PropertyInfo propInfo = entryDataObjectType.GetProperty(key);
+
+                    if (propInfo != null)
+                    {
+                        if (propInfo.PropertyType == typeof(Guid))
+                            propInfo.SetValue(entryDataObject, new Guid(keyValuePairs[key]));
+
+                        else if (propInfo.PropertyType == typeof(bool))
+                            propInfo.SetValue(entryDataObject, Convert.ToBoolean(keyValuePairs[key]));
+
+                        else if (propInfo.PropertyType == typeof(DateTime))
+                            propInfo.SetValue(entryDataObject, Convert.ToDateTime(keyValuePairs[key]));
+
+                        else if (propInfo.PropertyType == typeof(int))
+                            propInfo.SetValue(entryDataObject, Convert.ToInt32(keyValuePairs[key]));
+
+                        else if (propInfo.PropertyType == typeof(long))
+                            propInfo.SetValue(entryDataObject, Convert.ToInt64(keyValuePairs[key]));
+
+                        else if (propInfo.PropertyType == typeof(float))
+                            propInfo.SetValue(entryDataObject, Convert.ToDouble(keyValuePairs[key])); //TODO: Check if this is right?! :)
+
+                        else if (propInfo.PropertyType == typeof(double))
+                            propInfo.SetValue(entryDataObject, Convert.ToDouble(keyValuePairs[key]));
+
+                        else if (propInfo.PropertyType == typeof(decimal))
+                            propInfo.SetValue(entryDataObject, Convert.ToDecimal(keyValuePairs[key]));
+
+                        else if (propInfo.PropertyType == typeof(UInt16))
+                            propInfo.SetValue(entryDataObject, Convert.ToUInt16(keyValuePairs[key]));
+
+                        else if (propInfo.PropertyType == typeof(UInt32))
+                            propInfo.SetValue(entryDataObject, Convert.ToUInt32(keyValuePairs[key]));
+
+                        else if (propInfo.PropertyType == typeof(UInt64))
+                            propInfo.SetValue(entryDataObject, Convert.ToUInt64(keyValuePairs[key]));
+
+                        else if (propInfo.PropertyType == typeof(Single))
+                            propInfo.SetValue(entryDataObject, Convert.ToSingle(keyValuePairs[key]));
+
+                        else if (propInfo.PropertyType == typeof(char))
+                            propInfo.SetValue(entryDataObject, Convert.ToChar(keyValuePairs[key]));
+
+                        else if (propInfo.PropertyType == typeof(byte))
+                            propInfo.SetValue(entryDataObject, Convert.ToByte(keyValuePairs[key]));
+
+                        else if (propInfo.PropertyType == typeof(sbyte))
+                            propInfo.SetValue(entryDataObject, Convert.ToSByte(keyValuePairs[key]));
+
+                        else
+                            propInfo.SetValue(entryDataObject, keyValuePairs[key]);
+                    }
+
+                    //TODO: Add any other missing types...
+                }*/
+            }
+            catch (Exception ex)
+            {
+
+            }
+
+            return entryDataObject;
         }
 
         private (Dictionary<string, object>, Dictionary<string, string> keyValuePair, string keyValuePairAsString, EntryData entry) DecodeZomeReturnData(Dictionary<object, object> rawAppResponseData, Dictionary<string, object> appResponseData, Dictionary<string, string> keyValuePair, string keyValuePairAsString)

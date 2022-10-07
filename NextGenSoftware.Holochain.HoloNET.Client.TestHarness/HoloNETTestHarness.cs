@@ -20,7 +20,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
 
         static async Task Main(string[] args)
         {
-            await TestHoloNETClientAsync(TestToRun.LoadTestSaveLoadOASISEntry);
+            await TestHoloNETClientAsync(TestToRun.SaveLoadOASISEntry);
         }
 
         public static async Task TestHoloNETClientAsync(TestToRun testToRun)
@@ -35,9 +35,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
             _holoNETClient.Config.LoggingMode = LoggingMode.WarningsErrorsInfoAndDebug;
             
             //holoNETClient.Config.ErrorHandlingBehaviour = ErrorHandlingBehaviour.OnlyThrowExceptionIfNoErrorHandlerSubscribedToOnErrorEvent
-            _holoNETClient.Config.AutoStartHolochainConductor = true;
-            _holoNETClient.Config.AutoShutdownHolochainConductor = true;
-            _holoNETClient.Config.ShutDownALLHolochainConductors = true; //Normally default's to false, but if you want to make sure no holochain processes are left running set this to true.
+            _holoNETClient.Config.AutoStartHolochainConductor = false;
+            _holoNETClient.Config.AutoShutdownHolochainConductor = false;
+            _holoNETClient.Config.ShutDownALLHolochainConductors = false; //Normally default's to false, but if you want to make sure no holochain processes are left running set this to true.
             _holoNETClient.Config.ShowHolochainConductorWindow = false; //Defaults to false.
             _holoNETClient.Config.HolochainConductorMode = HolochainConductorModeEnum.UseEmbedded;
             _holoNETClient.Config.HolochainConductorToUse = HolochainConductorEnum.HcDevTool;
@@ -103,7 +103,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                 case TestToRun.SaveLoadOASISEntry:
                     {
                         Console.WriteLine("Calling create_entry_avatar function on OASIS Test Zome...\n");
-                        await _holoNETClient.CallZomeFunctionAsync("oasis", "create_entry_avatar", ZomeCallback, new { id = 1, first_name = "David", last_name = "Ellams", email = "davidellams@hotmail.com", dob = "11/04/0000" });
+                        await _holoNETClient.CallZomeFunctionAsync("oasis", "create_entry_avatar", ZomeCallback, new { id = 1, first_name = "David", last_name = "Ellams", email = "davidellams@hotmail.com", dob = "11/04/1980" });
                     }
                     break;
 
@@ -121,7 +121,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                         Console.WriteLine("Calling create_entry_avatar function on OASIS Test Zome (Load Testing)...\n");
 
                         for (int i = 0; i < 100; i++)
-                            await _holoNETClient.CallZomeFunctionAsync("oasis", "create_entry_avatar", ZomeCallback, new { id = 1, first_name = "David", last_name = "Ellams", email = "davidellams@hotmail.com", dob = "11/04/0000" });
+                            await _holoNETClient.CallZomeFunctionAsync("oasis", "create_entry_avatar", ZomeCallback, new { id = 1, first_name = "David", last_name = "Ellams", email = "davidellams@hotmail.com", dob = "11/04/1980" });
                     }
                     break;
             }
@@ -200,7 +200,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
             if (!string.IsNullOrEmpty(e.ZomeReturnHash) && e.ZomeFunction == "create_entry_avatar" && (_testToRun == TestToRun.SaveLoadOASISEntry || _testToRun == TestToRun.LoadTestSaveLoadOASISEntry))
             {
                 _saveEntryResponseReceived[_requestNumber] = true;
-                _holoNETClient.CallZomeFunctionAsync(_requestNumber.ToString(), "oasis", "get_entry_avatar", ZomeCallback, e.ZomeReturnHash);
+                _holoNETClient.CallZomeFunctionAsync("oasis", "get_entry_avatar", ZomeCallback, e.ZomeReturnHash, typeof(Avatar));
             }
             else
             {
