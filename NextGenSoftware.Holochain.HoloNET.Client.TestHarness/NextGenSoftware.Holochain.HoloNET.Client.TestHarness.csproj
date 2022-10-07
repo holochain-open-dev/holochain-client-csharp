@@ -14,7 +14,10 @@
 	<PackageIcon>hc logo.png</PackageIcon>
 	<Authors>David Ellams (NextGen Software Ltd)</Authors>
 	<PackageTags>holochain;net;unity</PackageTags>
-	<PackageReleaseNotes>Updated to work with the latest HoloNET (v1.4.0).
+	<PackageReleaseNotes>
+		- Updated ProcessZomeFunctionCallBackEventArgs method in HoloNET Test Harness to map dynamic data object to Avatar object in zome return call.
+
+		- Bumped HoloNET Test Harness to v1.3.1
 	</PackageReleaseNotes>
 	<RepositoryType>git</RepositoryType>
 	<RepositoryUrl>https://github.com/NextGenSoftwareUK/holochain-client-csharp</RepositoryUrl>
@@ -23,7 +26,7 @@
 	<!--<PackageLicenseExpression>GNU GPLv3</PackageLicenseExpression>-->
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-	<Version>1.3</Version>
+	<Version>1.3.1</Version>
 	<!--<PackageLicenseFile>..\LICENSE</PackageLicenseFile>-->
 
 	<AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>

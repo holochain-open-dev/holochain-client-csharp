@@ -243,6 +243,19 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
             if (!string.IsNullOrEmpty(args.KeyValuePairAsString))
                 result = string.Concat(result, "\n\nProcessed Zome Return Data:\n", args.KeyValuePairAsString);
 
+            if (args.Entry != null && args.Entry.EntryDataObject != null)
+            {
+                Avatar avatar = args.Entry.EntryDataObject as Avatar;
+
+                if (avatar != null)
+                {
+                    result = string.Concat(result, "\n\nEntry Data Object.FirstName:\n", avatar.FirstName);
+                    result = string.Concat(result, "\nEntry Data Object.LastName:\n", avatar.LastName);
+                    result = string.Concat(result, "\nEntry Data Object.Email:\n", avatar.Email);
+                    result = string.Concat(result, "\nEntry Data Object.DOB:\n", avatar.DOB);
+                }
+            }
+
             return result;
         }
 

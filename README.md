@@ -338,7 +338,75 @@ private static string ProcessZomeFunctionCallBackEventArgs(ZomeFunctionCallBackE
  | WebSocketResult      | Contains more detailed technical information of the underlying websocket. This includes the number of bytes received, whether the message was fully received & whether the message is UTF-8 or binary. Please [see here](https://docs.microsoft.com/en-us/dotnet/api/system.net.websockets.websocketreceiveresult?view=netframework-4.8) for more info. |
 
 
+ As an example of how to access the entry data and see it mapped to your custom type check out the [HoloNET Test Harness](https://github.com/holochain-open-dev/holochain-client-csharp/tree/main/NextGenSoftware.Holochain.HoloNET.Client.TestHarness), especially this function below:
+
+ ````c#
+
+private static void HoloNETClient_OnZomeFunctionCallBack(object sender, ZomeFunctionCallBackEventArgs e)
+        {
+            bool disconect = false;
+            Console.WriteLine(string.Concat("TEST HARNESS: ZOME FUNCTION CALLBACK EVENT HANDLER: ", ProcessZomeFunctionCallBackEventArgs(e)));
+            Console.WriteLine("");
+        }
+
+
+ private static string ProcessZomeFunctionCallBackEventArgs(ZomeFunctionCallBackEventArgs args)
+        {
+            string result = "";
+            
+            result = string.Concat("\nEndPoint: ", args.EndPoint, "\nId: ", args.Id, "\nZome: ", args.Zome, "\nZomeFunction: ", args.ZomeFunction, "\n\nRaw Data: ", args.RawData, "\n\nZomeReturnData: ", args.ZomeReturnData, "\nZomeReturnHash: ", args.ZomeReturnHash, "\nRaw Zome Return Data: ", args.RawZomeReturnData, "\nRaw Binary Daya: ", args.RawBinaryData, "\nRaw JSON Data: ", args.RawJSONData, "\nIsCallSuccessful: ", args.IsCallSuccessful ? "true" : "false");
+
+            if (!string.IsNullOrEmpty(args.KeyValuePairAsString))
+                result = string.Concat(result, "\n\nProcessed Zome Return Data:\n", args.KeyValuePairAsString);
+
+            if (args.Entry != null && args.Entry.EntryDataObject != null)
+            {
+                Avatar avatar = args.Entry.EntryDataObject as Avatar;
+
+                if (avatar != null)
+                {
+                    result = string.Concat(result, "\n\nEntry Data Object.FirstName:\n", avatar.FirstName);
+                    result = string.Concat(result, "\nEntry Data Object.LastName:\n", avatar.LastName);
+                    result = string.Concat(result, "\nEntry Data Object.Email:\n", avatar.Email);
+                    result = string.Concat(result, "\nEntry Data Object.DOB:\n", avatar.DOB);
+                }
+            }
+
+            return result;
+        }
+ ````
  
+ This is how you can map your rust data to a C# object, the call to the Holochain Conductor is in another earlier place in the Test Harness:
+
+  ````c#
+ _holoNETClient.CallZomeFunctionAsync("oasis", "get_entry_avatar", ZomeCallback, e.ZomeReturnHash, typeof(Avatar));
+  ````
+
+  And the Avatar class/type looks like this:
+
+   ````c#
+  public class Avatar
+    {
+        [HolochainPropertyName("first_name")]
+        public string FirstName { get; set; }
+
+        [HolochainPropertyName("last_name")]
+        public string LastName { get; set; }
+
+        [HolochainPropertyName("email")]
+        public string Email { get; set; }
+
+        [HolochainPropertyName("dob")]
+        public DateTime DOB { get; set; }
+    }
+  ````
+
+  The e.ZomeReturnHash is the hash returned from a previous call to the conductor:
+
+````c#
+  await _holoNETClient.CallZomeFunctionAsync("oasis", "create_entry_avatar", ZomeCallback, new { id = 1, first_name = "David", last_name = "Ellams", email = "davidellams@hotmail.com", dob = "11/04/1980" });
+````
+
 #### OnSignalsCallBack
 Fired when the Holochain conductor sends signals data. NOTE: This is still waiting for Holochain to flesh out the details for how this will work. Currently this returns the raw signals data.
 
@@ -562,7 +630,9 @@ public class Avatar
  _holoNETClient.CallZomeFunctionAsync("oasis", "get_entry_avatar", ZomeCallback, e.ZomeReturnHash, true, false, typeof(Avatar));
   ````
 
-  Where e.ZomeReturnHash is the hash of the entry to load. This is part of the example used in the [HoloNET Test Harness](https://github.com/holochain-open-dev/holochain-client-csharp/tree/main/NextGenSoftware.Holochain.HoloNET.Client.TestHarness), and the e.ZomeReturnHash is the hash returned from the previous call to CallZomeFunctionAsync where the zome function "create_oasis_entry" was called.
+Where e.ZomeReturnHash is the hash of the entry to load. This is part of the example used in the [HoloNET Test Harness](https://github.com/holochain-open-dev/holochain-client-csharp/tree/main/NextGenSoftware.Holochain.HoloNET.Client.TestHarness), and the e.ZomeReturnHash is the hash returned from the previous call to CallZomeFunctionAsync where the zome function "create_oasis_entry" was called.
+
+Please see the [OnZomeFunctionCallBack](#onzomefunctioncallback) event for more info on how to then map the data returned to your custom class.
 
 #####  Overload 2
 
