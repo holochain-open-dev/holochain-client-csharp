@@ -50,3 +50,5 @@ You can pass in one of these values:
 
 You can also view the full source and run the Test Harness (and edit to suit your needs etc) here: \
 https://github.com/holochain-open-dev/holochain-client-csharp/tree/main/NextGenSoftware.Holochain.HoloNET.Client.TestHarness
+
+**NuGet Package:** https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.Client.TestHarness
