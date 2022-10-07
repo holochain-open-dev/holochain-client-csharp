@@ -11,23 +11,13 @@
 	 <!--<Summary>The world's first .NET &amp; Unity client for Holochain.</Summary>-->
 	  <Summary>The world's first .NET &amp; Unity client for Holochain. This version comes with the Holochain binaries built in.</Summary>
 	  <!--<Description>The world's first .NET &amp; Unity client for Holochain.</Description>-->
-	<Description>The world's first .NET &amp; Unity client for Holochain. This version comes with the Holochain binaries built in.</Description>
+	<Description>The world's first .NET &amp; Unity client for Holochain. This version comes with the Holochain binaries built in.</Description>+
     <PackageProjectUrl>https://github.com/NextGenSoftwareUK/holochain-client-csharp</PackageProjectUrl>
     <PackageIcon>hc logo.png</PackageIcon>
     <Authors>David Ellams (NextGen Software Ltd)</Authors>
     <PackageTags>holochain;net;unity</PackageTags>
     <PackageReleaseNotes>
-		- EntryData can now be optionally mapped from the keyvalue pair dictionary to a dyanmic object returned in the Entry.EntryDataObject property in the zome call using the type passed in (see updated documentation for more info...)
-
-		- Added new HolochainPropertyName CustomAttribute, which is used to map rust property names on an entry to C# ones.
-
-		- Added dynamic EntryDataObject property to EntryDate class.
-
-		- Added additional overloads to CallZomeFunctionAsync.
-
-		- Added new MapEntryDataObject function to map rust property names on an entry to dynamic C# object.
-
-		- Documentation Updated.
+		Documentation Updated with more detailed examples of how to use new dynamic data object mapping (rust to c# property mapping).
 	</PackageReleaseNotes>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/NextGenSoftwareUK/holochain-client-csharp</RepositoryUrl>
@@ -36,7 +26,7 @@
 	  <!--<PackageLicenseExpression>GNU GPLv3</PackageLicenseExpression>-->
 	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-    <Version>1.4.0</Version>
+    <Version>1.4.1</Version>
     <!--<PackageLicenseFile>..\LICENSE</PackageLicenseFile>-->
 
 	  <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
@@ -62,27 +52,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Properties\Resources.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Update="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
-
-  <ItemGroup>
     <None Update="HolochainBinaries\hc.exe">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
     <None Update="HolochainBinaries\holochain.exe">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Properties\" />
   </ItemGroup>
 
 </Project>
