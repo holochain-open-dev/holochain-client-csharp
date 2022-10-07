@@ -17,7 +17,16 @@
     <Authors>David Ellams (NextGen Software Ltd)</Authors>
     <PackageTags>holochain;net;unity</PackageTags>
     <PackageReleaseNotes>
-		- EntryData can now be optionally mapped from the keyvalue pair dictionary to a dyanmic object returned in the zome call using the type passed in.
+		- EntryData can now be optionally mapped from the keyvalue pair dictionary to a dyanmic object returned in the Entry.EntryDataObject property in the zome call using the type passed in (see updated documentation for more info...)
+
+		- Added new HolochainPropertyName CustomAttribute, which is used to map rust property names on an entry to C# ones.
+
+		- Added dynamic EntryDataObject property to EntryDate class.
+
+		- Added additional overloads to CallZomeFunctionAsync.
+
+		- Added new MapEntryDataObject function to map rust property names on an entry to dynamic C# object.
+
 		- Documentation Updated.
 	</PackageReleaseNotes>
     <RepositoryType>git</RepositoryType>
