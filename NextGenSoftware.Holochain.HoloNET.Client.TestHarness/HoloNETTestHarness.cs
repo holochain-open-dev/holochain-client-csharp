@@ -27,7 +27,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
         {
             _timer.Start();
             _testToRun = testToRun;
-            Console.WriteLine("NextGenSoftware.Holochain.HoloNET.Client Test Harness v1.3");
+            Console.WriteLine("NextGenSoftware.Holochain.HoloNET.Client Test Harness v1.4");
             Console.WriteLine("");
             _holoNETClient = new HoloNETClient("ws://localhost:8888");
             _holoNETClient.WebSocket.Config.NeverTimeOut = true;
@@ -71,7 +71,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                             Email = "davidellams@hotmail.com",
                         };
 
-                        ZomeFunctionCallBackEventArgs result =  await avatar.Save();
+                        ZomeFunctionCallBackEventArgs result =  await avatar.SaveAsync();
 
                         Console.WriteLine(string.Concat("TEST HARNESS: HOLONETBASECLASS.SAVE RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
                         Console.WriteLine("");
@@ -79,7 +79,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
 
                         if (result.IsCallSuccessful && !string.IsNullOrEmpty(result.ZomeReturnHash))
                         {
-                            result = await avatar.Load();
+                            result = await avatar.LoadAsync();
 
                             Console.WriteLine(string.Concat("TEST HARNESS: HOLONETBASECLASS.LOAD RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
                             Console.WriteLine("");
@@ -102,7 +102,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                             CreatedDate = DateTime.Now
                         };
 
-                        ZomeFunctionCallBackEventArgs result = await avatar.Save();
+                        ZomeFunctionCallBackEventArgs result = await avatar.SaveAsync();
 
                         Console.WriteLine(string.Concat("TEST HARNESS: AVATAR HOLONETBASECLASS.SAVE RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
                         Console.WriteLine("");
@@ -110,7 +110,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
 
                         if (result.IsCallSuccessful && !string.IsNullOrEmpty(result.ZomeReturnHash))
                         {
-                            result = await avatar.Load();
+                            result = await avatar.LoadAsync();
 
                             Console.WriteLine(string.Concat("TEST HARNESS: AVATAR HOLONETBASECLASS.LOAD RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
                             Console.WriteLine("");
@@ -128,7 +128,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                             CreatedDate = DateTime.Now
                         };
 
-                        result = await avatar.Save();
+                        result = await avatar.SaveAsync();
 
                         Console.WriteLine(string.Concat("TEST HARNESS: HOLON HOLONETBASECLASS.SAVE RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
                         Console.WriteLine("");
@@ -136,7 +136,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
 
                         if (result.IsCallSuccessful && !string.IsNullOrEmpty(result.ZomeReturnHash))
                         {
-                            result = await holon.Load();
+                            result = await holon.LoadAsync();
 
                             Console.WriteLine(string.Concat("TEST HARNESS: HOLON HOLONETBASECLASS.LOAD RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
                             Console.WriteLine("");
@@ -161,7 +161,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
             //_holoNETClient.Config.DnaHash = "YOUR HASH";
 
             //await _holoNETClient.Connect(false, false);
-            await _holoNETClient.Connect();
+            await _holoNETClient.ConnectAsync();
         }
 
         private static void ShowAvatarDetails(Avatar avatar)

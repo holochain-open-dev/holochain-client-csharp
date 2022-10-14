@@ -113,7 +113,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             Init(holochainConductorURI);
         }
 
-        public async Task Connect(bool getAgentPubKeyAndDnaHashFromConductor = true, bool getAgentPubKeyAndDnaHashFromSandbox = false)
+        public async Task ConnectAsync(bool getAgentPubKeyAndDnaHashFromConductor = true, bool getAgentPubKeyAndDnaHashFromSandbox = false)
         {
             try
             {
@@ -125,13 +125,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 if (WebSocket.State != WebSocketState.Connecting && WebSocket.State != WebSocketState.Open && WebSocket.State != WebSocketState.Aborted)
                 {
                     if (Config.AutoStartHolochainConductor)
-                        await StartConductor();
+                        await StartConductorAsync();
 
                     await WebSocket.Connect();
 
                     if (getAgentPubKeyAndDnaHashFromSandbox && !getAgentPubKeyAndDnaHashFromConductor)
                     {
-                        AgentPubKeyDnaHash agentPubKeyDnaHash = await GetAgentPubKeyAndDnaHashFromSandbox();
+                        AgentPubKeyDnaHash agentPubKeyDnaHash = await GetAgentPubKeyAndDnaHashFromSandboxAsync();
 
                         if (agentPubKeyDnaHash != null)
                         {
@@ -147,7 +147,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
         }
 
-        public async Task StartConductor()
+        public void Connect(bool getAgentPubKeyAndDnaHashFromConductor = true, bool getAgentPubKeyAndDnaHashFromSandbox = false)
+        {
+            ConnectAsync(getAgentPubKeyAndDnaHashFromConductor, getAgentPubKeyAndDnaHashFromSandbox);
+        }
+
+        public async Task StartConductorAsync()
         {
             try
             {
@@ -296,7 +301,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
         }
 
-        public async Task<AgentPubKeyDnaHash> GetAgentPubKeyAndDnaHashFromSandbox(bool updateConfig = true)
+        public void StartConductor()
+        {
+            StartConductorAsync();
+        }
+
+        public async Task<AgentPubKeyDnaHash> GetAgentPubKeyAndDnaHashFromSandboxAsync(bool updateConfig = true)
         {
             try
             {
@@ -346,7 +356,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             return null;
         }
 
-        public async Task GetAgentPubKeyAndDnaHashFromConductor(bool updateConfig = true)
+        public AgentPubKeyDnaHash GetAgentPubKeyAndDnaHashFromSandbox(bool updateConfig = true)
+        {
+            return GetAgentPubKeyAndDnaHashFromSandboxAsync(updateConfig).Result;
+        }
+
+        public async Task GetAgentPubKeyAndDnaHashFromConductorAsync(bool updateConfig = true)
         {
             try
             {
@@ -362,7 +377,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     }
                 };
 
-                await SendHoloNETRequest("1", holoNETData);
+                await SendHoloNETRequestAsync("1", holoNETData);
             }
             catch (Exception ex)
             {
@@ -370,7 +385,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
         }
 
-        public async Task SendHoloNETRequest(string id, HoloNETData holoNETData)
+        public void GetAgentPubKeyAndDnaHashFromConductor(bool updateConfig = true)
+        {
+            GetAgentPubKeyAndDnaHashFromConductorAsync(updateConfig);
+        }
+
+        public async Task SendHoloNETRequestAsync(string id, HoloNETData holoNETData)
         {
             try
             {
@@ -394,9 +414,19 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
         }
 
-        public async Task Disconnect()
+        public void SendHoloNETRequest(string id, HoloNETData holoNETData)
+        {
+            SendHoloNETRequestAsync(id, holoNETData);
+        }
+
+        public async Task DisconnectAsync()
         {
             await WebSocket.Disconnect();
+        }
+
+        public void Disconnect()
+        {
+            WebSocket.Disconnect();
         }
 
         public async Task<ZomeFunctionCallBackEventArgs> CallZomeFunctionAsync(string zome, string function, object paramsObject)
@@ -506,7 +536,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 _taskCompletionZomeCallBack[id] = new TaskCompletionSource<ZomeFunctionCallBackEventArgs>();
 
                 if (WebSocket.State == WebSocketState.Closed || WebSocket.State == WebSocketState.None)
-                    await Connect();
+                    await ConnectAsync();
 
                 Logger.Log($"Calling Zome Function {function} on Zome {zome} with Id {id} On Holochain Conductor...", LogType.Info, true);
 
@@ -558,7 +588,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     }
                 };
 
-                await SendHoloNETRequest(id, holoNETData);
+                await SendHoloNETRequestAsync(id, holoNETData);
             }
             catch (Exception ex)
             {
@@ -573,6 +603,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
             else
                 return null;
+        }
+
+        public ZomeFunctionCallBackEventArgs CallZomeFunction(string zome, string function, object paramsObject)
+        {
+            _currentId++;
+            return CallZomeFunction(_currentId.ToString(), zome, function, null, paramsObject, true, false, ZomeResultCallBackMode.WaitForHolochainConductorResponse);
         }
 
         public ZomeFunctionCallBackEventArgs CallZomeFunction(string zome, string function, object paramsObject, ZomeResultCallBackMode zomeResultCallBackMode = ZomeResultCallBackMode.WaitForHolochainConductorResponse)
@@ -619,6 +655,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         {
             _entryDataObjectLookup[id] = entryDataObjectReturnedFromZome;
             return CallZomeFunction(id, zome, function, null, paramsObject, matchIdToInstanceZomeFuncInCallback, cachReturnData, zomeResultCallBackMode);
+        }
+
+        public ZomeFunctionCallBackEventArgs CallZomeFunction(string zome, string function, ZomeFunctionCallBack callback, object paramsObject)
+        {
+            _currentId++;
+            return CallZomeFunction(_currentId.ToString(), zome, function, callback, paramsObject, true, false, ZomeResultCallBackMode.WaitForHolochainConductorResponse);
         }
 
         public ZomeFunctionCallBackEventArgs CallZomeFunction(string zome, string function, ZomeFunctionCallBack callback, object paramsObject, ZomeResultCallBackMode zomeResultCallBackMode = ZomeResultCallBackMode.WaitForHolochainConductorResponse)
@@ -684,12 +726,17 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             return string.Concat("u", Convert.ToBase64String(bytes).Replace("+", "-").Replace("/", "_"));
         }
 
-        public dynamic MapEntryDataObject(Type entryDataObjectType, Dictionary<string, string> keyValuePairs)
+        public async Task<dynamic> MapEntryDataObjectAsync(Type entryDataObjectType, Dictionary<string, string> keyValuePairs)
         {
-            return MapEntryDataObject(Activator.CreateInstance(entryDataObjectType), keyValuePairs);
+            return await MapEntryDataObjectAsync(Activator.CreateInstance(entryDataObjectType), keyValuePairs);
         }
 
-        public dynamic MapEntryDataObject(dynamic entryDataObject, Dictionary<string, string> keyValuePairs)
+        public dynamic MapEntryDataObject(Type entryDataObjectType, Dictionary<string, string> keyValuePairs)
+        {
+            return MapEntryDataObjectAsync(entryDataObjectType, keyValuePairs).Result;
+        }
+
+        public async Task<dynamic> MapEntryDataObjectAsync(dynamic entryDataObject, Dictionary<string, string> keyValuePairs)
         {
             try
             {
@@ -774,7 +821,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             return entryDataObject;
         }
 
-        public async Task ShutDownAllConductors()
+        public dynamic MapEntryDataObject(dynamic entryDataObject, Dictionary<string, string> keyValuePairs)
+        {
+            return MapEntryDataObjectAsync(entryDataObject, keyValuePairs).Result;
+        }
+
+        public async Task ShutDownAllConductorsAsync()
         {
             try
             {
@@ -827,7 +879,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
         }
 
-        private async Task ShutDownConductorsInternal()
+        public void ShutDownAllConductors()
+        {
+            ShutDownAllConductorsAsync();
+        }
+
+        private async Task ShutDownConductorsInternalAsync()
         {
             try
             {
@@ -835,7 +892,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 if (Config.AutoShutdownHolochainConductor)
                 {
                     if (Config.ShutDownALLHolochainConductors)
-                        await ShutDownAllConductors();
+                        await ShutDownAllConductorsAsync();
 
                     else if (_conductorProcess != null)
                     {
@@ -886,7 +943,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         {
             try
             {
-                ShutDownConductorsInternal();
+                ShutDownConductorsInternalAsync();
                 OnDisconnected?.Invoke(this, new DisconnectedEventArgs { EndPoint = e.EndPoint, Reason = e.Reason });
             }
             catch (Exception ex)

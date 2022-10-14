@@ -754,6 +754,18 @@ public async Task CallZomeFunctionAsync(string id, string zome, string function,
  public async Task CallZomeFunctionAsync(string zome, string function, object paramsObject, ZomeResultCallBackMode zomeResultCallBackMode = ZomeResultCallBackMode.WaitForHolochainConductorResponse)
   ````
 
+##### Overload 17
+
+ ````c#
+ public async Task<ZomeFunctionCallBackEventArgs> CallZomeFunctionAsync(string zome, string function, object paramsObject)
+  ````
+
+##### Overload 18
+
+````c#
+public async Task<ZomeFunctionCallBackEventArgs> CallZomeFunctionAsync(string zome, string function, ZomeFunctionCallBack callback, object paramsObject)
+````
+
 #### Disconnect
 
 This method disconnects the client from the Holochain conductor. It raises the [OnDisconnected](#ondisconnected) event once it is has

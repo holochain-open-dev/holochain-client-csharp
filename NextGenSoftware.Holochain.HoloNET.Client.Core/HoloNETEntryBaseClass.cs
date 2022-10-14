@@ -50,10 +50,15 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public string ZomeUpdateEntryFunction { get; set; }
         public string ZomeDeleteEntryFunction { get; set; }
 
-        public async Task<ZomeFunctionCallBackEventArgs> Load()
+        public async Task<ZomeFunctionCallBackEventArgs> LoadAsync()
         {
             return await _holoNETClient.CallZomeFunctionAsync(ZomeName, ZomeLoadEntryFunction, EntryHash);
             //return await _taskCompletionZomeCallBack.Task;
+        }
+
+        public ZomeFunctionCallBackEventArgs Load()
+        {
+            return LoadAsync().Result;
         }
 
         /// <summary>
@@ -61,7 +66,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// </summary>
         /// <param name="paramsObject"></param>
         /// <returns></returns>
-        public async Task<ZomeFunctionCallBackEventArgs> Save()
+        public async Task<ZomeFunctionCallBackEventArgs> SaveAsync()
         {
             dynamic paramsObject = new ExpandoObject();
             PropertyInfo[] props = GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
@@ -94,12 +99,17 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             return await Save(paramsObject);
         }
 
+        public ZomeFunctionCallBackEventArgs Save()
+        {
+            return SaveAsync().Result;
+        }
+
         /// <summary>
         /// Saves the object using the params object passed in containing the hApp rust properties & their values to save. 
         /// </summary>
         /// <param name="paramsObject"></param>
         /// <returns></returns>
-        public async Task<ZomeFunctionCallBackEventArgs> Save(dynamic paramsObject)
+        public async Task<ZomeFunctionCallBackEventArgs> SaveAsync(dynamic paramsObject)
         {
             if (string.IsNullOrEmpty(EntryHash))
                 return await _holoNETClient.CallZomeFunctionAsync(ZomeName, ZomeCreateEntryFunction, paramsObject);
@@ -107,6 +117,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 return await _holoNETClient.CallZomeFunctionAsync(ZomeName, ZomeUpdateEntryFunction, paramsObject);
 
             //return await _taskCompletionZomeCallBack.Task;
+        }
+
+        public ZomeFunctionCallBackEventArgs Save(dynamic paramsObject)
+        {
+            return SaveAsync(paramsObject).Result;
         }
 
         private void Init()
