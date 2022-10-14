@@ -6,6 +6,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
         WhoAmI,
         Numbers,
         SaveLoadOASISEntry,
+        SaveLoadOASISEntryUsingSingleHoloNETBaseClass,
+        SaveLoadOASISEntryUsingMultipleHoloNETBaseClasses,
         LoadTestNumbers,
         LoadTestSaveLoadOASISEntry
     }

@@ -59,6 +59,91 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                         _holoNETClient.Config.FullPathToCompiledHappFolder = string.Concat(Environment.CurrentDirectory, @"\hApps\happ-build-tutorial-develop\workdir\happ");
                     }
                     break;
+
+                case TestToRun.SaveLoadOASISEntryUsingSingleHoloNETBaseClass:
+                    {
+                        Avatar avatar = new Avatar()
+                        {
+                            Id = Guid.NewGuid(),
+                            FirstName = "David",
+                            LastName = "Ellams",
+                            DOB = Convert.ToDateTime("11/04/1980"),
+                            Email = "davidellams@hotmail.com",
+                        };
+
+                        ZomeFunctionCallBackEventArgs result =  await avatar.Save();
+
+                        Console.WriteLine(string.Concat("TEST HARNESS: HOLONETBASECLASS.SAVE RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
+                        Console.WriteLine("");
+                        ShowAvatarDetails(avatar);
+
+                        if (result.IsCallSuccessful && !string.IsNullOrEmpty(result.ZomeReturnHash))
+                        {
+                            result = await avatar.Load();
+
+                            Console.WriteLine(string.Concat("TEST HARNESS: HOLONETBASECLASS.LOAD RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
+                            Console.WriteLine("");
+                            ShowAvatarDetails(avatar);
+                        }
+                    }
+                    break;
+
+                case TestToRun.SaveLoadOASISEntryUsingMultipleHoloNETBaseClasses:
+                    {
+                        //In this example we are passing in an existing instance of the HoloNET client so it along with the connection to the holochain condutor is shared amongst the objects/classes that inherit from HoloNETEntryBaseClass.
+                        AvatarMultiple avatar = new AvatarMultiple(_holoNETClient)
+                        {
+                            Id = Guid.NewGuid(),
+                            FirstName = "David",
+                            LastName = "Ellams",
+                            DOB = Convert.ToDateTime("11/04/1980"),
+                            Email = "davidellams@hotmail.com",
+                            CreatedBy = Guid.NewGuid(),
+                            CreatedDate = DateTime.Now
+                        };
+
+                        ZomeFunctionCallBackEventArgs result = await avatar.Save();
+
+                        Console.WriteLine(string.Concat("TEST HARNESS: AVATAR HOLONETBASECLASS.SAVE RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
+                        Console.WriteLine("");
+                        ShowAvatarDetails(avatar);
+
+                        if (result.IsCallSuccessful && !string.IsNullOrEmpty(result.ZomeReturnHash))
+                        {
+                            result = await avatar.Load();
+
+                            Console.WriteLine(string.Concat("TEST HARNESS: AVATAR HOLONETBASECLASS.LOAD RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
+                            Console.WriteLine("");
+                            ShowAvatarDetails(avatar);
+                        }
+
+                        Holon holon = new Holon(_holoNETClient)
+                        {
+                            Id = Guid.NewGuid(),
+                            ParentId = Guid.NewGuid(),
+                            Name = "Test holon",
+                            Description = "Test description",
+                            Type = "Park",
+                            CreatedBy = Guid.NewGuid(),
+                            CreatedDate = DateTime.Now
+                        };
+
+                        result = await avatar.Save();
+
+                        Console.WriteLine(string.Concat("TEST HARNESS: HOLON HOLONETBASECLASS.SAVE RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
+                        Console.WriteLine("");
+                        ShowAvatarDetails(avatar);
+
+                        if (result.IsCallSuccessful && !string.IsNullOrEmpty(result.ZomeReturnHash))
+                        {
+                            result = await holon.Load();
+
+                            Console.WriteLine(string.Concat("TEST HARNESS: HOLON HOLONETBASECLASS.LOAD RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
+                            Console.WriteLine("");
+                            ShowHolonDetails(holon);
+                        }
+                    }
+                    break;
             }
 
             _holoNETClient.OnConnected += HoloNETClient_OnConnected;
@@ -77,6 +162,47 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
 
             //await _holoNETClient.Connect(false, false);
             await _holoNETClient.Connect();
+        }
+
+        private static void ShowAvatarDetails(Avatar avatar)
+        {
+            Console.WriteLine(string.Concat("Avatar.EntryHash = ", avatar.EntryHash));
+            Console.WriteLine(string.Concat("Avatar.Id = ", avatar.Id.ToString()));
+            Console.WriteLine(string.Concat("Avatar.CreatedDate = ", avatar.CreatedDate.ToString()));
+            Console.WriteLine(string.Concat("Avatar.CreatedBy = ", avatar.CreatedBy.ToString()));
+            Console.WriteLine(string.Concat("Avatar.ModifiedDate = ", avatar.ModifiedDate.ToString()));
+            Console.WriteLine(string.Concat("Avatar.ModifiedBy = ", avatar.ModifiedBy.ToString()));
+            Console.WriteLine(string.Concat("Avatar.FirstName = ", avatar.FirstName.ToString()));
+            Console.WriteLine(string.Concat("Avatar.LastName = ", avatar.LastName.ToString()));
+            Console.WriteLine(string.Concat("Avatar.Email = ", avatar.Email.ToString()));
+            Console.WriteLine(string.Concat("Avatar.DOB = ", avatar.DOB.ToString()));
+        }
+
+        private static void ShowAvatarDetails(AvatarMultiple avatar)
+        {
+            Console.WriteLine(string.Concat("Avatar.EntryHash = ", avatar.EntryHash));
+            Console.WriteLine(string.Concat("Avatar.Id = ", avatar.Id.ToString()));
+            Console.WriteLine(string.Concat("Avatar.CreatedDate = ", avatar.CreatedDate.ToString()));
+            Console.WriteLine(string.Concat("Avatar.CreatedBy = ", avatar.CreatedBy.ToString()));
+            Console.WriteLine(string.Concat("Avatar.ModifiedDate = ", avatar.ModifiedDate.ToString()));
+            Console.WriteLine(string.Concat("Avatar.ModifiedBy = ", avatar.ModifiedBy.ToString()));
+            Console.WriteLine(string.Concat("Avatar.FirstName = ", avatar.FirstName.ToString()));
+            Console.WriteLine(string.Concat("Avatar.LastName = ", avatar.LastName.ToString()));
+            Console.WriteLine(string.Concat("Avatar.Email = ", avatar.Email.ToString()));
+            Console.WriteLine(string.Concat("Avatar.DOB = ", avatar.DOB.ToString()));
+        }
+
+        private static void ShowHolonDetails(Holon holon)
+        {
+            Console.WriteLine(string.Concat("Holon.EntryHash = ", holon.EntryHash));
+            Console.WriteLine(string.Concat("Holon.Id = ", holon.Id.ToString()));
+            Console.WriteLine(string.Concat("Holon.ParentId = ", holon.ParentId.ToString()));
+            Console.WriteLine(string.Concat("Holon.Name = ", holon.Name));
+            Console.WriteLine(string.Concat("Holon.Description = ", holon.Description));
+            Console.WriteLine(string.Concat("Holon.CreatedDate = ", holon.CreatedDate.ToString()));
+            Console.WriteLine(string.Concat("Holon.CreatedBy = ", holon.CreatedBy.ToString()));
+            Console.WriteLine(string.Concat("Holon.ModifiedDate = ", holon.ModifiedDate.ToString()));
+            Console.WriteLine(string.Concat("Holon.ModifiedBy = ", holon.ModifiedBy.ToString()));
         }
 
         private async static void _holoNETClient_OnReadyForZomeCalls(object sender, ReadyForZomeCallsEventArgs e)

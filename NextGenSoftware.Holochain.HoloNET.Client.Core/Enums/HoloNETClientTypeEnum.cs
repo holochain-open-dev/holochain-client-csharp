@@ -1,9 +1,9 @@
 ﻿
-namespace NextGenSoftware.Holochain.HoloNET.Client
-{
-    public enum HoloNETClientType
-    {
-        Desktop,
-        Unity
-    }
-}
+//namespace NextGenSoftware.Holochain.HoloNET.Client
+//{
+//    public enum HoloNETClientType
+//    {
+//        Desktop,
+//        Unity
+//    }
+//}

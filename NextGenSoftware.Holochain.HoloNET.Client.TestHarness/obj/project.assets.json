@@ -644,7 +644,7 @@
           "lib/netcoreapp2.1/_._": {}
         }
       },
-      "NextGenSoftware.Holochain.HoloNET.Client.Embedded/1.3.1": {
+      "NextGenSoftware.Holochain.HoloNET.Client.Embedded/1.4.1": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v6.0",
         "dependencies": {
@@ -2968,7 +2968,7 @@
         "version.txt"
       ]
     },
-    "NextGenSoftware.Holochain.HoloNET.Client.Embedded/1.3.1": {
+    "NextGenSoftware.Holochain.HoloNET.Client.Embedded/1.4.1": {
       "type": "project",
       "path": "../NextGenSoftware.Holochain.HoloNET.Client.Core/NextGenSoftware.Holochain.HoloNET.Client.csproj",
       "msbuildProject": "../NextGenSoftware.Holochain.HoloNET.Client.Core/NextGenSoftware.Holochain.HoloNET.Client.csproj"
@@ -2976,7 +2976,7 @@
   },
   "projectFileDependencyGroups": {
     "net6.0": [
-      "NextGenSoftware.Holochain.HoloNET.Client.Embedded >= 1.3.1"
+      "NextGenSoftware.Holochain.HoloNET.Client.Embedded >= 1.4.1"
     ]
   },
   "packageFolders": {
@@ -2984,7 +2984,7 @@
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
-    "version": "1.2.0",
+    "version": "1.3.1",
     "restore": {
       "projectUniqueName": "C:\\Users\\david\\source\\repos\\holochain-client-csharp\\NextGenSoftware.Holochain.HoloNET.Client.TestHarness\\NextGenSoftware.Holochain.HoloNET.Client.TestHarness.csproj",
       "projectName": "NextGenSoftware.Holochain.HoloNET.Client.TestHarness",
