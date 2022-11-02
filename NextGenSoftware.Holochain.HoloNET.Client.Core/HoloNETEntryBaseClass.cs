@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
-    public class HoloNETEntryBaseClass 
+    public abstract class HoloNETEntryBaseClass 
     {
         //private TaskCompletionSource<ZomeFunctionCallBackEventArgs> _taskCompletionZomeCallBack = new TaskCompletionSource<ZomeFunctionCallBackEventArgs>();
         private Dictionary<string, string> _holochainProperties = new Dictionary<string, string>();
