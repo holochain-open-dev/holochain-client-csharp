@@ -26,6 +26,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
     public class ZomeFunctionCallBackEventArgs : CallBackBaseEventArgsWithId
     {
+        public ZomeFunctionCallBackEventArgs() : base()
+        {
+
+        }
+
         public ZomeFunctionCallBackEventArgs(string id, string endPoint, string zome, string zomeFunction, bool isCallSuccessful, string rawData, Dictionary<object, object> rawZomeReturnData, Dictionary<string, object> zomeReturnData, string zomeReturnHash, Dictionary<string, string> keyValuePair, string keyValuePairAsString, EntryData entry, byte[] rawBinaryData, string rawJSONData, WebSocketReceiveResult webSocketResult)
             : base(id, endPoint, isCallSuccessful, rawBinaryData, rawJSONData, webSocketResult)
         {
@@ -40,15 +45,15 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             Entry = entry;
         }
 
-        public string Zome { get; private set; }
-        public string ZomeFunction { get; private set; }
-        public string RawData { get; private set; }
-        public Dictionary<string, object> ZomeReturnData { get; private set; }
-        public Dictionary<object, object> RawZomeReturnData { get; private set; }
-        public string ZomeReturnHash { get; private set; }
-        public EntryData Entry { get; private set; }
-        public Dictionary<string, string> KeyValuePair { get; private set; }
-        public string KeyValuePairAsString { get; private set; }
+        public string Zome { get; set; }
+        public string ZomeFunction { get; set; }
+        public string RawData { get; set; }
+        public Dictionary<string, object> ZomeReturnData { get; set; }
+        public Dictionary<object, object> RawZomeReturnData { get; set; }
+        public string ZomeReturnHash { get; set; }
+        public EntryData Entry { get; set; }
+        public Dictionary<string, string> KeyValuePair { get; set; }
+        public string KeyValuePairAsString { get; set; }
     }
 
     public class AppInfoCallBackEventArgs : CallBackBaseEventArgsWithId

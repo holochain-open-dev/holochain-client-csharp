@@ -20,7 +20,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
 
         static async Task Main(string[] args)
         {
-            await TestHoloNETClientAsync(TestToRun.SaveLoadOASISEntry);
+            await TestHoloNETClientAsync(TestToRun.SaveLoadOASISEntryUsingSingleHoloNETBaseClass);
         }
 
         public static async Task TestHoloNETClientAsync(TestToRun testToRun)
@@ -29,27 +29,30 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
             _testToRun = testToRun;
             Console.WriteLine("NextGenSoftware.Holochain.HoloNET.Client Test Harness v1.4");
             Console.WriteLine("");
-            _holoNETClient = new HoloNETClient("ws://localhost:8888");
-            _holoNETClient.WebSocket.Config.NeverTimeOut = true;
 
-            _holoNETClient.Config.LoggingMode = LoggingMode.WarningsErrorsInfoAndDebug;
-            
-            //holoNETClient.Config.ErrorHandlingBehaviour = ErrorHandlingBehaviour.OnlyThrowExceptionIfNoErrorHandlerSubscribedToOnErrorEvent
-            _holoNETClient.Config.AutoStartHolochainConductor = false;
-            _holoNETClient.Config.AutoShutdownHolochainConductor = false;
-            _holoNETClient.Config.ShutDownALLHolochainConductors = false; //Normally default's to false, but if you want to make sure no holochain processes are left running set this to true.
-            _holoNETClient.Config.ShowHolochainConductorWindow = false; //Defaults to false.
-            _holoNETClient.Config.HolochainConductorMode = HolochainConductorModeEnum.UseEmbedded;
-            _holoNETClient.Config.HolochainConductorToUse = HolochainConductorEnum.HcDevTool;
-           
+            HoloNETConfig config = new HoloNETConfig()
+            {
+                LoggingMode = LoggingMode.WarningsErrorsInfoAndDebug,
+
+                //holoNETClient.Config.ErrorHandlingBehaviour = ErrorHandlingBehaviour.OnlyThrowExceptionIfNoErrorHandlerSubscribedToOnErrorEvent
+                AutoStartHolochainConductor = false,
+                AutoShutdownHolochainConductor = false,
+                ShutDownALLHolochainConductors = false, //Normally default's to false, but if you want to make sure no holochain processes are left running set this to true.
+                ShowHolochainConductorWindow = false, //Defaults to false.
+                HolochainConductorMode = HolochainConductorModeEnum.UseEmbedded,
+                HolochainConductorToUse = HolochainConductorEnum.HcDevTool
+            };
+
+
             switch (testToRun)
             {
                 case TestToRun.SaveLoadOASISEntry:
                 case TestToRun.LoadTestSaveLoadOASISEntry:
-                {
+                    {
                         _holoNETClient.Config.FullPathToRootHappFolder = string.Concat(Environment.CurrentDirectory, @"\hApps\OASIS-Holochain-hApp");
                         _holoNETClient.Config.FullPathToCompiledHappFolder = string.Concat(Environment.CurrentDirectory, @"\hApps\OASIS-Holochain-hApp\zomes\workdir\happ");
-                    }break;
+                    }
+                    break;
 
                 case TestToRun.WhoAmI:
                 case TestToRun.Numbers:
@@ -59,10 +62,51 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                         _holoNETClient.Config.FullPathToCompiledHappFolder = string.Concat(Environment.CurrentDirectory, @"\hApps\happ-build-tutorial-develop\workdir\happ");
                     }
                     break;
+            }
 
+
+            //No need to create this when the test is SaveLoadOASISEntryUsingSingleHoloNETBaseClass because it will create its own instance of HoloNETClient internally (in the base class).
+            if (_testToRun != TestToRun.SaveLoadOASISEntryUsingSingleHoloNETBaseClass)
+            {
+                _holoNETClient = new HoloNETClient("ws://localhost:8888");
+
+                //We would normally just set the Config property but in this case we need to share the Config object with multiple HoloNET instances (such as in the SaveLoadOASISEntryUsingSingleHoloNETBaseClass test) 
+                _holoNETClient.Config = config;
+
+                //_holoNETClient.Config.LoggingMode = LoggingMode.WarningsErrorsInfoAndDebug;
+
+                ////holoNETClient.Config.ErrorHandlingBehaviour = ErrorHandlingBehaviour.OnlyThrowExceptionIfNoErrorHandlerSubscribedToOnErrorEvent
+                //_holoNETClient.Config.AutoStartHolochainConductor = false;
+                //_holoNETClient.Config.AutoShutdownHolochainConductor = false;
+                //_holoNETClient.Config.ShutDownALLHolochainConductors = false; //Normally default's to false, but if you want to make sure no holochain processes are left running set this to true.
+                //_holoNETClient.Config.ShowHolochainConductorWindow = false; //Defaults to false.
+                //_holoNETClient.Config.HolochainConductorMode = HolochainConductorModeEnum.UseEmbedded;
+                //_holoNETClient.Config.HolochainConductorToUse = HolochainConductorEnum.HcDevTool;
+
+                //_holoNETClient.WebSocket.Config.NeverTimeOut = true;
+                _holoNETClient.OnConnected += HoloNETClient_OnConnected;
+                _holoNETClient.OnDataReceived += HoloNETClient_OnDataReceived;
+                _holoNETClient.OnZomeFunctionCallBack += HoloNETClient_OnZomeFunctionCallBack;
+                _holoNETClient.OnAppInfoCallBack += HoloNETClient_OnAppInfoCallBack;
+                _holoNETClient.OnReadyForZomeCalls += _holoNETClient_OnReadyForZomeCalls;
+                _holoNETClient.OnSignalsCallBack += HoloNETClient_OnSignalsCallBack;
+                _holoNETClient.OnDisconnected += HoloNETClient_OnDisconnected;
+                _holoNETClient.OnError += HoloNETClient_OnError;
+                _holoNETClient.OnConductorDebugCallBack += HoloNETClient_OnConductorDebugCallBack;
+
+                ////Use this if you to manually pass in the AgentPubKey &DnaHash(otherwise it will be automatically queried from the conductor or sandbox).
+                //_holoNETClient.Config.AgentPubKey = "YOUR KEY";
+                //_holoNETClient.Config.DnaHash = "YOUR HASH";
+
+                //await _holoNETClient.Connect(false, false);
+                await _holoNETClient.ConnectAsync();
+            }
+
+            switch (testToRun)
+            {
                 case TestToRun.SaveLoadOASISEntryUsingSingleHoloNETBaseClass:
                     {
-                        Avatar avatar = new Avatar()
+                        Avatar avatar = new Avatar(config)
                         {
                             Id = Guid.NewGuid(),
                             FirstName = "David",
@@ -73,17 +117,30 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
 
                         ZomeFunctionCallBackEventArgs result =  await avatar.SaveAsync();
 
-                        Console.WriteLine(string.Concat("TEST HARNESS: HOLONETBASECLASS.SAVE RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
-                        Console.WriteLine("");
-                        ShowAvatarDetails(avatar);
-
-                        if (result.IsCallSuccessful && !string.IsNullOrEmpty(result.ZomeReturnHash))
+                        if (result.IsCallSuccessful && !result.IsError && !string.IsNullOrEmpty(result.ZomeReturnHash))
                         {
-                            result = await avatar.LoadAsync();
-
-                            Console.WriteLine(string.Concat("TEST HARNESS: HOLONETBASECLASS.LOAD RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
+                            Console.WriteLine(string.Concat("TEST HARNESS: AVATAR SINGLE HOLONETBASECLASS.SAVE RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
                             Console.WriteLine("");
                             ShowAvatarDetails(avatar);
+
+                            result = await avatar.LoadAsync();
+
+                            if (result.IsCallSuccessful && !result.IsError && !string.IsNullOrEmpty(result.ZomeReturnHash))
+                            {
+                                Console.WriteLine(string.Concat("TEST HARNESS: AVATAR SINGLE HOLONETBASECLASS.LOAD RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
+                                Console.WriteLine("");
+                                ShowAvatarDetails(avatar);
+                            }
+                            else
+                            {
+                                Console.WriteLine(string.Concat("TEST HARNESS: AVATAR SINGLE HOLONETBASECLASS.LOAD RESPONSE: AN ERROR OCCURED: ", result.Message));
+                                Console.WriteLine("");
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine(string.Concat("TEST HARNESS: AVATAR SINGLE HOLONETBASECLASS.SAVE RESPONSE: AN ERROR OCCURED: ", result.Message));
+                            Console.WriteLine("");
                         }
                     }
                     break;
@@ -104,17 +161,30 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
 
                         ZomeFunctionCallBackEventArgs result = await avatar.SaveAsync();
 
-                        Console.WriteLine(string.Concat("TEST HARNESS: AVATAR HOLONETBASECLASS.SAVE RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
-                        Console.WriteLine("");
-                        ShowAvatarDetails(avatar);
-
-                        if (result.IsCallSuccessful && !string.IsNullOrEmpty(result.ZomeReturnHash))
+                        if (result.IsCallSuccessful && !result.IsError && !string.IsNullOrEmpty(result.ZomeReturnHash))
                         {
-                            result = await avatar.LoadAsync();
-
-                            Console.WriteLine(string.Concat("TEST HARNESS: AVATAR HOLONETBASECLASS.LOAD RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
+                            Console.WriteLine(string.Concat("TEST HARNESS: AVATAR MULTIPLE HOLONETBASECLASS.SAVE RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
                             Console.WriteLine("");
                             ShowAvatarDetails(avatar);
+
+                            result = await avatar.LoadAsync();
+
+                            if (result.IsCallSuccessful && !result.IsError && !string.IsNullOrEmpty(result.ZomeReturnHash))
+                            {
+                                Console.WriteLine(string.Concat("TEST HARNESS: AVATAR MULTIPLE HOLONETBASECLASS.LOAD RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
+                                Console.WriteLine("");
+                                ShowAvatarDetails(avatar);
+                            }
+                            else
+                            {
+                                Console.WriteLine(string.Concat("TEST HARNESS: AVATAR MULTIPLE HOLONETBASECLASS.LOAD RESPONSE: AN ERROR OCCURED: ", result.Message));
+                                Console.WriteLine("");
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine(string.Concat("TEST HARNESS: AVATAR MULTIPLE HOLONETBASECLASS.SAVE RESPONSE: AN ERROR OCCURED: ", result.Message));
+                            Console.WriteLine("");
                         }
 
                         Holon holon = new Holon(_holoNETClient)
@@ -130,38 +200,34 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
 
                         result = await avatar.SaveAsync();
 
-                        Console.WriteLine(string.Concat("TEST HARNESS: HOLON HOLONETBASECLASS.SAVE RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
-                        Console.WriteLine("");
-                        ShowAvatarDetails(avatar);
-
-                        if (result.IsCallSuccessful && !string.IsNullOrEmpty(result.ZomeReturnHash))
+                        if (result.IsCallSuccessful && !result.IsError && !string.IsNullOrEmpty(result.ZomeReturnHash))
                         {
+                            Console.WriteLine(string.Concat("TEST HARNESS: HOLON MULTIPLE HOLONETBASECLASS.SAVE RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
+                            Console.WriteLine("");
+                            ShowAvatarDetails(avatar);
+
                             result = await holon.LoadAsync();
 
-                            Console.WriteLine(string.Concat("TEST HARNESS: HOLON HOLONETBASECLASS.LOAD RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
+                            if (result.IsCallSuccessful && !result.IsError && !string.IsNullOrEmpty(result.ZomeReturnHash))
+                            {
+                                Console.WriteLine(string.Concat("TEST HARNESS: HOLON MULTIPLE HOLONETBASECLASS.LOAD RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
+                                Console.WriteLine("");
+                                ShowAvatarDetails(avatar);
+                            }
+                            else
+                            {
+                                Console.WriteLine(string.Concat("TEST HARNESS: HOLON MULTIPLE HOLONETBASECLASS.LOAD RESPONSE: AN ERROR OCCURED: ", result.Message));
+                                Console.WriteLine("");
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine(string.Concat("TEST HARNESS: HOLON MULTIPLE HOLONETBASECLASS.SAVE RESPONSE: AN ERROR OCCURED: ", result.Message));
                             Console.WriteLine("");
-                            ShowHolonDetails(holon);
                         }
                     }
                     break;
             }
-
-            _holoNETClient.OnConnected += HoloNETClient_OnConnected;
-            _holoNETClient.OnDataReceived += HoloNETClient_OnDataReceived;
-            _holoNETClient.OnZomeFunctionCallBack += HoloNETClient_OnZomeFunctionCallBack;
-            _holoNETClient.OnAppInfoCallBack += HoloNETClient_OnAppInfoCallBack;
-            _holoNETClient.OnReadyForZomeCalls += _holoNETClient_OnReadyForZomeCalls;
-            _holoNETClient.OnSignalsCallBack += HoloNETClient_OnSignalsCallBack;
-            _holoNETClient.OnDisconnected += HoloNETClient_OnDisconnected;
-            _holoNETClient.OnError += HoloNETClient_OnError;
-            _holoNETClient.OnConductorDebugCallBack += HoloNETClient_OnConductorDebugCallBack;
-
-            ////Use this if you to manually pass in the AgentPubKey &DnaHash(otherwise it will be automatically queried from the conductor or sandbox).
-            //_holoNETClient.Config.AgentPubKey = "YOUR KEY";
-            //_holoNETClient.Config.DnaHash = "YOUR HASH";
-
-            //await _holoNETClient.Connect(false, false);
-            await _holoNETClient.ConnectAsync();
         }
 
         private static void ShowAvatarDetails(Avatar avatar)

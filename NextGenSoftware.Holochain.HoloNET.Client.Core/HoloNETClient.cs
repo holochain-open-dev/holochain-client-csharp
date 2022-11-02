@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using MessagePack;
 using NextGenSoftware.WebSocket;
 using NextGenSoftware.Logging;
 using NextGenSoftware.Holochain.HoloNET.Client.Properties;
-using System.Reflection;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
@@ -26,6 +26,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         private Dictionary<string, ZomeFunctionCallBackEventArgs> _zomeReturnDataLookup = new Dictionary<string, ZomeFunctionCallBackEventArgs>();
         private Dictionary<string, bool> _cacheZomeReturnDataLookup = new Dictionary<string, bool>();
         private Dictionary<string, TaskCompletionSource<ZomeFunctionCallBackEventArgs>> _taskCompletionZomeCallBack = new Dictionary<string, TaskCompletionSource<ZomeFunctionCallBackEventArgs>>();
+        private TaskCompletionSource<ReadyForZomeCallsEventArgs> _taskCompletionReadyForZomeCalls = new TaskCompletionSource<ReadyForZomeCallsEventArgs>();
         private int _currentId = 0;
         private HoloNETConfig _config = null;
         private Process _conductorProcess = null;
@@ -344,7 +345,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 Logger.Log("AgentPubKey & DnaHash successfully retreived from hc sandbox.", LogType.Info, false);
 
                 if (WebSocket.State == WebSocketState.Open && !string.IsNullOrEmpty(Config.AgentPubKey) && !string.IsNullOrEmpty(Config.DnaHash))
-                    OnReadyForZomeCalls?.Invoke(this, new ReadyForZomeCallsEventArgs(EndPoint, dnaHash, agentPubKey));
+                {
+                    ReadyForZomeCallsEventArgs eventArgs = new ReadyForZomeCallsEventArgs(EndPoint, dnaHash, agentPubKey);
+                    OnReadyForZomeCalls?.Invoke(this, eventArgs);
+                    _taskCompletionReadyForZomeCalls.SetResult(eventArgs);
+                }
 
                 return new AgentPubKeyDnaHash() { DnaHash = dnaHash, AgentPubKey = agentPubKey };
             }
@@ -538,6 +543,16 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 if (WebSocket.State == WebSocketState.Closed || WebSocket.State == WebSocketState.None)
                     await ConnectAsync();
 
+                await _taskCompletionReadyForZomeCalls.Task;
+
+                if (string.IsNullOrEmpty(Config.DnaHash))
+                    return new ZomeFunctionCallBackEventArgs() { EndPoint = EndPoint, Id = id, Zome = zome, ZomeFunction = function, IsError = true, Message = "The DnaHash cannot be empty, please either set manually in the Config.DnaHash property or wait till the ReadyForZomeCalls event is fired before attempting to make a zome call." };
+                    //throw new InvalidOperationException("The DnaHash cannot be empty, please either set manually in the Config.DnaHash property or wait till the ReadyForZomeCalls event is fired before attempting to make a zome call.");
+
+                if (string.IsNullOrEmpty(Config.AgentPubKey))
+                    return new ZomeFunctionCallBackEventArgs() { EndPoint = EndPoint, Id = id, Zome = zome, ZomeFunction = function, IsError = true, Message = "The AgentPubKey cannot be empty, please either set manually in the Config.DnaHash property or wait till the ReadyForZomeCalls event is fired before attempting to make a zome call." };
+                    //throw new InvalidOperationException("The AgentPubKey cannot be empty, please either set manually in the Config.AgentPubKey property or wait till the ReadyForZomeCalls event is fired before attempting to make a zome call.");
+
                 Logger.Log($"Calling Zome Function {function} on Zome {zome} with Id {id} On Holochain Conductor...", LogType.Info, true);
 
                 _cacheZomeReturnDataLookup[id] = cachReturnData;
@@ -589,20 +604,21 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 };
 
                 await SendHoloNETRequestAsync(id, holoNETData);
+
+                if (zomeResultCallBackMode == ZomeResultCallBackMode.WaitForHolochainConductorResponse)
+                {
+                    Task<ZomeFunctionCallBackEventArgs> returnValue = _taskCompletionZomeCallBack[id].Task;
+                    _taskCompletionZomeCallBack.Remove(id);
+                    return await returnValue;
+                }
+                else
+                    return new ZomeFunctionCallBackEventArgs() { EndPoint = EndPoint, Id = id, Zome = zome, ZomeFunction = function, Message = "ZomeResultCallBackMode is set to UseCallBackEvents so please wait for OnZomeFunctionCallBack event for zome result." };
             }
             catch (Exception ex)
             {
                 HandleError("Error occured in HoloNETClient.CallZomeFunctionAsync method.", ex);
+                return new ZomeFunctionCallBackEventArgs() { EndPoint = EndPoint, Id = id, Zome = zome, ZomeFunction = function, IsError = true, Message = $"Error occured in HoloNETClient.CallZomeFunctionAsync method. Details: {ex}", Excception = ex };
             }
-
-            if (zomeResultCallBackMode == ZomeResultCallBackMode.WaitForHolochainConductorResponse)
-            {
-                Task<ZomeFunctionCallBackEventArgs> returnValue = _taskCompletionZomeCallBack[id].Task;
-                _taskCompletionZomeCallBack.Remove(id);
-                return await returnValue;
-            }
-            else
-                return null;
         }
 
         public ZomeFunctionCallBackEventArgs CallZomeFunction(string zome, string function, object paramsObject)
@@ -978,16 +994,16 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     Logger.Log("APP INFO RESPONSE DATA DETECTED\n", LogType.Info);
                     HolonNETAppInfoResponse appInfoResponse = MessagePackSerializer.Deserialize<HolonNETAppInfoResponse>(response.data, options);
 
-                    string dnHash = ConvertHoloHashToString(appInfoResponse.data.cell_data[0].cell_id[0]);
+                    string dnaHash = ConvertHoloHashToString(appInfoResponse.data.cell_data[0].cell_id[0]);
                     string agentPubKey = ConvertHoloHashToString(appInfoResponse.data.cell_data[0].cell_id[1]);
 
                     if (_updateDnaHashAndAgentPubKey)
                     {
                         Config.AgentPubKey = agentPubKey;
-                        Config.DnaHash = dnHash;
+                        Config.DnaHash = dnaHash;
                     }
 
-                    AppInfoCallBackEventArgs args = new AppInfoCallBackEventArgs(response.id.ToString(), EndPoint, true, e.RawBinaryData, e.RawJSONData, dnHash, agentPubKey, appInfoResponse.data.installed_app_id, appInfoResponse, e.WebSocketResult);
+                    AppInfoCallBackEventArgs args = new AppInfoCallBackEventArgs(response.id.ToString(), EndPoint, true, e.RawBinaryData, e.RawJSONData, dnaHash, agentPubKey, appInfoResponse.data.installed_app_id, appInfoResponse, e.WebSocketResult);
                     Logger.Log(string.Concat("Id: ", args.Id, ", Is Call Successful: ", args.IsCallSuccessful ? "True" : "False", ", AgentPubKey: ", args.AgentPubKey, ", DnaHash: ", args.DnaHash, ", Installed App Id: ", args.InstalledAppId, ", Raw Binary Data: ", e.RawBinaryData, ", Raw JSON Data: ", args.RawJSONData, "\n"), LogType.Info);
                     OnAppInfoCallBack?.Invoke(this, args);
 
@@ -995,7 +1011,15 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     if (string.IsNullOrEmpty(Config.AgentPubKey) || string.IsNullOrEmpty(Config.DnaHash))
                         GetAgentPubKeyAndDnaHashFromSandbox();
                     else
-                        OnReadyForZomeCalls?.Invoke(this, new ReadyForZomeCallsEventArgs(EndPoint, dnHash, agentPubKey));
+                    {
+                        ReadyForZomeCallsEventArgs eventArgs = new ReadyForZomeCallsEventArgs(EndPoint, dnaHash, agentPubKey);
+                        OnReadyForZomeCalls?.Invoke(this, eventArgs);
+                        _taskCompletionReadyForZomeCalls.SetResult(eventArgs);
+                    }
+                }
+                else if (rawData.Contains("error"))
+                {
+                    HandleError($"Error in HoloNETClient.WebSocket_OnDataReceived method. Error received from Holochain Conductor: {rawData}", null);
                 }
                 else
                 {

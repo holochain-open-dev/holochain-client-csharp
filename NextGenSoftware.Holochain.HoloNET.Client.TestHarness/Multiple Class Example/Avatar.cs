@@ -5,7 +5,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
 {
     public class AvatarMultiple : HoloNETEntryBaseClass
     {
-        public AvatarMultiple(HoloNETClient holonNETClient) : base("oasis", "get_avatar_entry", "create_avatar_entry", "update_avatar_entry", "delete_avatar_entry", holonNETClient) { }
+        public AvatarMultiple(HoloNETClient holonNETClient) : base("oasis", "get_entry_avatar", "create_entry_avatar", "update_entry_avatar", "delete_entry_avatar", holonNETClient) { }
 
         [HolochainPropertyName("id")]
         public Guid Id { get; set; }
