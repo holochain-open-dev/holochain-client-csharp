@@ -34,6 +34,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
 
         [HolochainPropertyName("modified_by")]
         public Guid ModifiedBy { get; set; }
+
+        [HolochainPropertyName("deleted_date")]
         public DateTime DeletedDate { get; set; }
 
         [HolochainPropertyName("deleted_by")]

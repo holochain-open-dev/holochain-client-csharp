@@ -86,6 +86,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public async Task<ZomeFunctionCallBackEventArgs> SaveAsync()
         {
             dynamic paramsObject = new ExpandoObject();
+            //object paramsObject = new object();
+            Dictionary<string, object> zomeCallProps = new Dictionary<string, object>();
             PropertyInfo[] props = GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
 
             foreach (PropertyInfo propInfo in props)
@@ -99,10 +101,66 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                             if (data.ConstructorArguments.Count > 0 && data.ConstructorArguments[0] != null && data.ConstructorArguments[0].Value != null)
                             {
                                 string key = data.ConstructorArguments[0].Value.ToString();
+                                object value = propInfo.GetValue(this);
 
                                 //Only include the hash if it is not null.
-                                if ((key == "entry_hash" && propInfo.GetValue(this) != null) || key != "entry_hash")
-                                    paramsObject.key = propInfo.GetValue(this).ToString();
+                                if ((key == "entry_hash" && value != null) || key != "entry_hash")
+                                {
+                                    if (propInfo.PropertyType == typeof(Guid))
+                                        propInfo.SetValue(paramsObject, value.ToString());
+
+                                    else if (propInfo.PropertyType == typeof(DateTime))
+                                        propInfo.SetValue(paramsObject, value.ToString());
+
+                                    /*
+                                    else if (propInfo.PropertyType == typeof(bool))
+                                        propInfo.SetValue(paramsObject, Convert.ToBoolean(keyValuePairs[key]));
+
+                                    else if (propInfo.PropertyType == typeof(int))
+                                        propInfo.SetValue(paramsObject, Convert.ToInt32(keyValuePairs[key]));
+
+                                    else if (propInfo.PropertyType == typeof(long))
+                                        propInfo.SetValue(paramsObject, Convert.ToInt64(keyValuePairs[key]));
+
+                                    else if (propInfo.PropertyType == typeof(float))
+                                        propInfo.SetValue(paramsObject, Convert.ToDouble(keyValuePairs[key])); //TODO: Check if this is right?! :)
+
+                                    else if (propInfo.PropertyType == typeof(double))
+                                        propInfo.SetValue(paramsObject, Convert.ToDouble(keyValuePairs[key]));
+
+                                    else if (propInfo.PropertyType == typeof(decimal))
+                                        propInfo.SetValue(paramsObject, Convert.ToDecimal(keyValuePairs[key]));
+
+                                    else if (propInfo.PropertyType == typeof(UInt16))
+                                        propInfo.SetValue(paramsObject, Convert.ToUInt16(keyValuePairs[key]));
+
+                                    else if (propInfo.PropertyType == typeof(UInt32))
+                                        propInfo.SetValue(paramsObject, Convert.ToUInt32(keyValuePairs[key]));
+
+                                    else if (propInfo.PropertyType == typeof(UInt64))
+                                        propInfo.SetValue(paramsObject, Convert.ToUInt64(keyValuePairs[key]));
+
+                                    else if (propInfo.PropertyType == typeof(Single))
+                                        propInfo.SetValue(paramsObject, Convert.ToSingle(keyValuePairs[key]));
+
+                                    else if (propInfo.PropertyType == typeof(char))
+                                        propInfo.SetValue(paramsObject, Convert.ToChar(keyValuePairs[key]));
+
+                                    else if (propInfo.PropertyType == typeof(byte))
+                                        propInfo.SetValue(paramsObject, Convert.ToByte(keyValuePairs[key]));
+
+                                    else if (propInfo.PropertyType == typeof(sbyte))
+                                        propInfo.SetValue(paramsObject, Convert.ToSByte(keyValuePairs[key]));
+                                    */
+
+                                    else
+                                        propInfo.SetValue(paramsObject, value);
+                                }
+                                    //AddProperty(paramsObject, key, value);
+                                    //paramsObject.Add(key, value);
+                                    //zomeCallProps[key] = value;
+                                    //propInfo.SetValue(paramsObject, value);
+                                    //paramsObject.key = propInfo.GetValue(this).ToString();
                             }
                         }
                         catch (Exception ex)
@@ -112,6 +170,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     }
                 }
             }
+
+            //dynamic zomeCallParams = new HoloNETEntryDynamicParams(zomeCallProps);
+            //return await SaveAsync(zomeCallParams);
 
             return await SaveAsync(paramsObject);
         }
@@ -204,6 +265,15 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         private void HoloNETClient_OnAppInfoCallBack(object sender, AppInfoCallBackEventArgs e)
         {
             
+        }
+
+        public void AddProperty(ExpandoObject expando, string propertyName, object propertyValue)
+        {
+            var exDict = expando as IDictionary<string, object>;
+            if (exDict.ContainsKey(propertyName))
+                exDict[propertyName] = propertyValue;
+            else
+                exDict.Add(propertyName, propertyValue);
         }
     }
 }
