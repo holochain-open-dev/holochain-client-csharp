@@ -69,8 +69,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         public async Task<ZomeFunctionCallBackEventArgs> LoadAsync()
         {
-            return await HoloNETClient.CallZomeFunctionAsync(ZomeName, ZomeLoadEntryFunction, EntryHash);
-            //return await _taskCompletionZomeCallBack.Task;
+            ZomeFunctionCallBackEventArgs result = await HoloNETClient.CallZomeFunctionAsync(ZomeName, ZomeLoadEntryFunction, EntryHash);
+            ProcessZomeReturnCall(result);
+            return result;
         }
 
         public ZomeFunctionCallBackEventArgs Load()
@@ -107,10 +108,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                                 if ((key == "entry_hash" && value != null) || key != "entry_hash")
                                 {
                                     if (propInfo.PropertyType == typeof(Guid))
-                                        propInfo.SetValue(paramsObject, value.ToString());
+                                        AddProperty(paramsObject, key, value.ToString());
 
                                     else if (propInfo.PropertyType == typeof(DateTime))
-                                        propInfo.SetValue(paramsObject, value.ToString());
+                                        AddProperty(paramsObject, key, value.ToString());
 
                                     /*
                                     else if (propInfo.PropertyType == typeof(bool))
@@ -154,13 +155,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                                     */
 
                                     else
-                                        propInfo.SetValue(paramsObject, value);
+                                        AddProperty(paramsObject, key, value);
                                 }
-                                    //AddProperty(paramsObject, key, value);
-                                    //paramsObject.Add(key, value);
-                                    //zomeCallProps[key] = value;
-                                    //propInfo.SetValue(paramsObject, value);
-                                    //paramsObject.key = propInfo.GetValue(this).ToString();
                             }
                         }
                         catch (Exception ex)
@@ -170,9 +166,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     }
                 }
             }
-
-            //dynamic zomeCallParams = new HoloNETEntryDynamicParams(zomeCallProps);
-            //return await SaveAsync(zomeCallParams);
 
             return await SaveAsync(paramsObject);
         }
@@ -189,12 +182,16 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public async Task<ZomeFunctionCallBackEventArgs> SaveAsync(dynamic paramsObject)
         {
-            if (string.IsNullOrEmpty(EntryHash))
-                return await HoloNETClient.CallZomeFunctionAsync(ZomeName, ZomeCreateEntryFunction, paramsObject);
-            else
-                return await HoloNETClient.CallZomeFunctionAsync(ZomeName, ZomeUpdateEntryFunction, paramsObject);
+            ZomeFunctionCallBackEventArgs result = null;
 
-            //return await _taskCompletionZomeCallBack.Task;
+            if (string.IsNullOrEmpty(EntryHash))
+                result = await HoloNETClient.CallZomeFunctionAsync(ZomeName, ZomeCreateEntryFunction, paramsObject);
+            else
+                result = await HoloNETClient.CallZomeFunctionAsync(ZomeName, ZomeUpdateEntryFunction, paramsObject);
+
+            ProcessZomeReturnCall(result);
+
+            return result;
         }
 
         public ZomeFunctionCallBackEventArgs Save(dynamic paramsObject)
@@ -220,11 +217,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         private void HoloNETClient_OnZomeFunctionCallBack(object sender, ZomeFunctionCallBackEventArgs e)
         {
-            if ((e.ZomeFunction == ZomeCreateEntryFunction || e.ZomeFunction == ZomeUpdateEntryFunction) && !string.IsNullOrEmpty(e.ZomeReturnHash))
-                this.EntryHash = e.ZomeReturnHash;
+            //if ((e.ZomeFunction == ZomeCreateEntryFunction || e.ZomeFunction == ZomeUpdateEntryFunction) && !string.IsNullOrEmpty(e.ZomeReturnHash))
+            //    this.EntryHash = e.ZomeReturnHash;
 
-            HoloNETClient.MapEntryDataObject(this, e.KeyValuePair);
-            //_taskCompletionZomeCallBack.SetResult(e);
+            //if (e.KeyValuePair != null)
+            //    HoloNETClient.MapEntryDataObject(this, e.KeyValuePair);
         }
 
         private void HoloNETClient_OnSignalsCallBack(object sender, SignalsCallBackEventArgs e)
@@ -267,13 +264,25 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             
         }
 
-        public void AddProperty(ExpandoObject expando, string propertyName, object propertyValue)
+        private void AddProperty(ExpandoObject expando, string propertyName, object propertyValue)
         {
             var exDict = expando as IDictionary<string, object>;
             if (exDict.ContainsKey(propertyName))
                 exDict[propertyName] = propertyValue;
             else
                 exDict.Add(propertyName, propertyValue);
+        }
+
+        private void ProcessZomeReturnCall(ZomeFunctionCallBackEventArgs result)
+        {
+            if (!result.IsError && result.IsCallSuccessful)
+            {
+                if (!string.IsNullOrEmpty(result.ZomeReturnHash))
+                    this.EntryHash = result.ZomeReturnHash;
+
+                if (result.KeyValuePair != null)
+                    HoloNETClient.MapEntryDataObject(this, result.KeyValuePair);
+            }
         }
     }
 }

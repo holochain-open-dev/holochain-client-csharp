@@ -113,6 +113,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                             LastName = "Ellams",
                             DOB = Convert.ToDateTime("11/04/1980"),
                             Email = "davidellams@hotmail.com",
+                            CreatedDate = DateTime.Now,
+                            CreatedBy = Guid.NewGuid(),
+                            IsActive = true
                         };
 
                         ZomeFunctionCallBackEventArgs result =  await avatar.SaveAsync();
@@ -125,7 +128,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
 
                             result = await avatar.LoadAsync();
 
-                            if (result.IsCallSuccessful && !result.IsError && !string.IsNullOrEmpty(result.ZomeReturnHash))
+                            if (result.IsCallSuccessful && !result.IsError)
                             {
                                 Console.WriteLine(string.Concat("TEST HARNESS: AVATAR SINGLE HOLONETBASECLASS.LOAD RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
                                 Console.WriteLine("");
@@ -156,7 +159,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                             DOB = Convert.ToDateTime("11/04/1980"),
                             Email = "davidellams@hotmail.com",
                             CreatedBy = Guid.NewGuid(),
-                            CreatedDate = DateTime.Now
+                            CreatedDate = DateTime.Now,
+                            IsActive = true
                         };
 
                         ZomeFunctionCallBackEventArgs result = await avatar.SaveAsync();
@@ -169,7 +173,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
 
                             result = await avatar.LoadAsync();
 
-                            if (result.IsCallSuccessful && !result.IsError && !string.IsNullOrEmpty(result.ZomeReturnHash))
+                            if (result.IsCallSuccessful && !result.IsError)
                             {
                                 Console.WriteLine(string.Concat("TEST HARNESS: AVATAR MULTIPLE HOLONETBASECLASS.LOAD RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
                                 Console.WriteLine("");
@@ -195,24 +199,25 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                             Description = "Test description",
                             Type = "Park",
                             CreatedBy = Guid.NewGuid(),
-                            CreatedDate = DateTime.Now
+                            CreatedDate = DateTime.Now,
+                            IsActive = true
                         };
 
-                        result = await avatar.SaveAsync();
+                        result = await holon.SaveAsync();
 
                         if (result.IsCallSuccessful && !result.IsError && !string.IsNullOrEmpty(result.ZomeReturnHash))
                         {
                             Console.WriteLine(string.Concat("TEST HARNESS: HOLON MULTIPLE HOLONETBASECLASS.SAVE RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
                             Console.WriteLine("");
-                            ShowAvatarDetails(avatar);
+                            ShowHolonDetails(holon);
 
                             result = await holon.LoadAsync();
 
-                            if (result.IsCallSuccessful && !result.IsError && !string.IsNullOrEmpty(result.ZomeReturnHash))
+                            if (result.IsCallSuccessful && !result.IsError)
                             {
                                 Console.WriteLine(string.Concat("TEST HARNESS: HOLON MULTIPLE HOLONETBASECLASS.LOAD RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
                                 Console.WriteLine("");
-                                ShowAvatarDetails(avatar);
+                                ShowHolonDetails(holon);
                             }
                             else
                             {
@@ -234,28 +239,34 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
         {
             Console.WriteLine(string.Concat("Avatar.EntryHash = ", avatar.EntryHash));
             Console.WriteLine(string.Concat("Avatar.Id = ", avatar.Id.ToString()));
-            Console.WriteLine(string.Concat("Avatar.CreatedDate = ", avatar.CreatedDate.ToString()));
-            Console.WriteLine(string.Concat("Avatar.CreatedBy = ", avatar.CreatedBy.ToString()));
-            Console.WriteLine(string.Concat("Avatar.ModifiedDate = ", avatar.ModifiedDate.ToString()));
-            Console.WriteLine(string.Concat("Avatar.ModifiedBy = ", avatar.ModifiedBy.ToString()));
             Console.WriteLine(string.Concat("Avatar.FirstName = ", avatar.FirstName.ToString()));
             Console.WriteLine(string.Concat("Avatar.LastName = ", avatar.LastName.ToString()));
             Console.WriteLine(string.Concat("Avatar.Email = ", avatar.Email.ToString()));
             Console.WriteLine(string.Concat("Avatar.DOB = ", avatar.DOB.ToString()));
+            Console.WriteLine(string.Concat("Avatar.CreatedDate = ", avatar.CreatedDate.ToString()));
+            Console.WriteLine(string.Concat("Avatar.CreatedBy = ", avatar.CreatedBy.ToString()));
+            Console.WriteLine(string.Concat("Avatar.ModifiedDate = ", avatar.ModifiedDate.ToString()));
+            Console.WriteLine(string.Concat("Avatar.ModifiedBy = ", avatar.ModifiedBy.ToString()));
+            Console.WriteLine(string.Concat("Avatar.DeletedDate = ", avatar.DeletedDate.ToString()));
+            Console.WriteLine(string.Concat("Avatar.DeletedBy = ", avatar.DeletedBy.ToString()));
+            Console.WriteLine(string.Concat("Avatar.IsActive = ", avatar.IsActive.ToString()));
         }
 
         private static void ShowAvatarDetails(AvatarMultiple avatar)
         {
             Console.WriteLine(string.Concat("Avatar.EntryHash = ", avatar.EntryHash));
             Console.WriteLine(string.Concat("Avatar.Id = ", avatar.Id.ToString()));
-            Console.WriteLine(string.Concat("Avatar.CreatedDate = ", avatar.CreatedDate.ToString()));
-            Console.WriteLine(string.Concat("Avatar.CreatedBy = ", avatar.CreatedBy.ToString()));
-            Console.WriteLine(string.Concat("Avatar.ModifiedDate = ", avatar.ModifiedDate.ToString()));
-            Console.WriteLine(string.Concat("Avatar.ModifiedBy = ", avatar.ModifiedBy.ToString()));
             Console.WriteLine(string.Concat("Avatar.FirstName = ", avatar.FirstName.ToString()));
             Console.WriteLine(string.Concat("Avatar.LastName = ", avatar.LastName.ToString()));
             Console.WriteLine(string.Concat("Avatar.Email = ", avatar.Email.ToString()));
             Console.WriteLine(string.Concat("Avatar.DOB = ", avatar.DOB.ToString()));
+            Console.WriteLine(string.Concat("Avatar.CreatedDate = ", avatar.CreatedDate.ToString()));
+            Console.WriteLine(string.Concat("Avatar.CreatedBy = ", avatar.CreatedBy.ToString()));
+            Console.WriteLine(string.Concat("Avatar.ModifiedDate = ", avatar.ModifiedDate.ToString()));
+            Console.WriteLine(string.Concat("Avatar.ModifiedBy = ", avatar.ModifiedBy.ToString()));
+            Console.WriteLine(string.Concat("Avatar.DeletedDate = ", avatar.DeletedDate.ToString()));
+            Console.WriteLine(string.Concat("Avatar.DeletedBy = ", avatar.DeletedBy.ToString()));
+            Console.WriteLine(string.Concat("Avatar.IsActive = ", avatar.IsActive.ToString()));
         }
 
         private static void ShowHolonDetails(Holon holon)
@@ -269,6 +280,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
             Console.WriteLine(string.Concat("Holon.CreatedBy = ", holon.CreatedBy.ToString()));
             Console.WriteLine(string.Concat("Holon.ModifiedDate = ", holon.ModifiedDate.ToString()));
             Console.WriteLine(string.Concat("Holon.ModifiedBy = ", holon.ModifiedBy.ToString()));
+            Console.WriteLine(string.Concat("Avatar.DeletedDate = ", holon.DeletedDate.ToString()));
+            Console.WriteLine(string.Concat("Avatar.DeletedBy = ", holon.DeletedBy.ToString()));
+            Console.WriteLine(string.Concat("Avatar.IsActive = ", holon.IsActive.ToString()));
         }
 
         private async static void _holoNETClient_OnReadyForZomeCalls(object sender, ReadyForZomeCallsEventArgs e)
@@ -441,6 +455,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
 
                 if (avatar != null)
                 {
+                    result = string.Concat(result, "\n\nEntry Data Object.EntryHash:\n", avatar.EntryHash);
                     result = string.Concat(result, "\n\nEntry Data Object.FirstName:\n", avatar.FirstName);
                     result = string.Concat(result, "\nEntry Data Object.LastName:\n", avatar.LastName);
                     result = string.Concat(result, "\nEntry Data Object.Email:\n", avatar.Email);
