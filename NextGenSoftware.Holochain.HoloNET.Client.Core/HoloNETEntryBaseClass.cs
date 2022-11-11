@@ -13,10 +13,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         public HoloNETClient HoloNETClient { get; set; }
 
-        public HoloNETEntryBaseClass(string zomeName, string zomeLoadEntryFunction, string zomeCreateEntryFunction, string zomeUpdateEntryFunction, string zomeDeleteEntryFunction, string holochainConductorURI = "ws://localhost:8888", HoloNETConfig holoNETConfig = null, bool logToConsole = true, bool logToFile = true, string releativePathToLogFolder = "Logs", string logFileName = "HoloNET.log", bool addAdditionalSpaceAfterEachLogEntry = false, bool showColouredLogs = true, ConsoleColor debugColour = ConsoleColor.White, ConsoleColor infoColour = ConsoleColor.Green, ConsoleColor warningColour = ConsoleColor.Yellow, ConsoleColor errorColour = ConsoleColor.Red)
+        public bool StoreEntryHashInEntry { get; set; } = true;
+
+        public HoloNETEntryBaseClass(string zomeName, string zomeLoadEntryFunction, string zomeCreateEntryFunction, string zomeUpdateEntryFunction, string zomeDeleteEntryFunction, bool storeEntryHashInEntry = true, string holochainConductorURI = "ws://localhost:8888", HoloNETConfig holoNETConfig = null, bool logToConsole = true, bool logToFile = true, string releativePathToLogFolder = "Logs", string logFileName = "HoloNET.log", bool addAdditionalSpaceAfterEachLogEntry = false, bool showColouredLogs = true, ConsoleColor debugColour = ConsoleColor.White, ConsoleColor infoColour = ConsoleColor.Green, ConsoleColor warningColour = ConsoleColor.Yellow, ConsoleColor errorColour = ConsoleColor.Red)
         {
             HoloNETClient = new HoloNETClient(holochainConductorURI, logToConsole, logToFile, releativePathToLogFolder, logFileName, addAdditionalSpaceAfterEachLogEntry, showColouredLogs, debugColour, infoColour, warningColour, errorColour);
 
+            StoreEntryHashInEntry = storeEntryHashInEntry;
             ZomeName = zomeName;
             ZomeLoadEntryFunction = zomeLoadEntryFunction;
             ZomeCreateEntryFunction = zomeCreateEntryFunction;
@@ -29,10 +32,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             Init();
         }
 
-        public HoloNETEntryBaseClass(string zomeName, string zomeLoadEntryFunction, string zomeCreateEntryFunction, string zomeUpdateEntryFunction, string zomeDeleteEntryFunction, HoloNETConfig holoNETConfig)
+        public HoloNETEntryBaseClass(string zomeName, string zomeLoadEntryFunction, string zomeCreateEntryFunction, string zomeUpdateEntryFunction, string zomeDeleteEntryFunction, HoloNETConfig holoNETConfig, bool storeEntryHashInEntry = true)
         {
             HoloNETClient = new HoloNETClient();
 
+            StoreEntryHashInEntry = storeEntryHashInEntry;
             ZomeName = zomeName;
             ZomeLoadEntryFunction = zomeLoadEntryFunction;
             ZomeCreateEntryFunction = zomeCreateEntryFunction;
@@ -45,9 +49,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             Init();
         }
 
-        public HoloNETEntryBaseClass(string zomeName, string zomeLoadEntryFunction, string zomeCreateEntryFunction, string zomeUpdateEntryFunction, string zomeDeleteEntryFunction, HoloNETClient holoNETClient)
+        public HoloNETEntryBaseClass(string zomeName, string zomeLoadEntryFunction, string zomeCreateEntryFunction, string zomeUpdateEntryFunction, string zomeDeleteEntryFunction, HoloNETClient holoNETClient, bool storeEntryHashInEntry = true)
         {
             HoloNETClient = holoNETClient;
+            StoreEntryHashInEntry = storeEntryHashInEntry;
             ZomeName = zomeName;
             ZomeLoadEntryFunction = zomeLoadEntryFunction;
             ZomeCreateEntryFunction = zomeCreateEntryFunction;
@@ -62,7 +67,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         public string ZomeName { get; set; }
         public string ZomeLoadEntryFunction { get; set; }
-        //public string ZomeEntryFunction { get; set; }
         public string ZomeCreateEntryFunction { get; set; }
         public string ZomeUpdateEntryFunction { get; set; }
         public string ZomeDeleteEntryFunction { get; set; }
@@ -105,7 +109,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                                 object value = propInfo.GetValue(this);
 
                                 //Only include the hash if it is not null.
-                                if ((key == "entry_hash" && value != null) || key != "entry_hash")
+                                if (key != "entry_hash")
                                 {
                                     if (propInfo.PropertyType == typeof(Guid))
                                         AddProperty(paramsObject, key, value.ToString());
@@ -154,6 +158,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                                         propInfo.SetValue(paramsObject, Convert.ToSByte(keyValuePairs[key]));
                                     */
 
+                                    else
+                                        AddProperty(paramsObject, key, value);
+                                }
+                                else if (StoreEntryHashInEntry && key == "entry_hash")
+                                {
+                                    if (value == null)
+                                        AddProperty(paramsObject, key, "");
                                     else
                                         AddProperty(paramsObject, key, value);
                                 }
@@ -281,7 +292,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     this.EntryHash = result.ZomeReturnHash;
 
                 if (result.KeyValuePair != null)
+                {
+                    if (result.KeyValuePair.ContainsKey("entry_hash") && string.IsNullOrEmpty(result.KeyValuePair["entry_hash"]))
+                        result.KeyValuePair.Remove("entry_hash");
+
                     HoloNETClient.MapEntryDataObject(this, result.KeyValuePair);
+                }
             }
         }
     }
