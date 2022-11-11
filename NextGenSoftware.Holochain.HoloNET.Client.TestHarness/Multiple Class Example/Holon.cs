@@ -3,12 +3,12 @@ using System;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
 {
-    public class Holon : HoloNETEntryBaseClass
+    public class Holon : HoloNETAuditEntryBaseClass
     {
         public Holon(HoloNETClient holonNETClient) : base("oasis", "get_holon_entry", "create_holon_entry", "update_holon_entry", "delete_holon_entry", holonNETClient) { }
 
-        [HolochainPropertyName("id")]
-        public Guid Id { get; set; }
+        //[HolochainPropertyName("id")]
+        //public Guid Id { get; set; }
 
 
         [HolochainPropertyName("parent_id")]
@@ -23,6 +23,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
         [HolochainPropertyName("type")]
         public string Type { get; set; }
 
+        /*
         [HolochainPropertyName("created_date")]
         public DateTime CreatedDate { get; set; }
 
@@ -42,6 +43,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
         public Guid DeletedBy { get; set; }
 
         [HolochainPropertyName("is_active")]
-        public bool IsActive { get; set; }
+        public bool IsActive { get; set; }*/
     }
 }

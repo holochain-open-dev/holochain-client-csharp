@@ -6,10 +6,11 @@ using System.Threading.Tasks;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
-    public abstract class HoloNETEntryBaseClass 
+    public abstract class HoloNETEntryBaseClass : IDisposable
     {
         //private TaskCompletionSource<ZomeFunctionCallBackEventArgs> _taskCompletionZomeCallBack = new TaskCompletionSource<ZomeFunctionCallBackEventArgs>();
         private Dictionary<string, string> _holochainProperties = new Dictionary<string, string>();
+        private bool _disposeOfHoloNETClient = false;
 
         public HoloNETClient HoloNETClient { get; set; }
 
@@ -18,6 +19,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public HoloNETEntryBaseClass(string zomeName, string zomeLoadEntryFunction, string zomeCreateEntryFunction, string zomeUpdateEntryFunction, string zomeDeleteEntryFunction, bool storeEntryHashInEntry = true, string holochainConductorURI = "ws://localhost:8888", HoloNETConfig holoNETConfig = null, bool logToConsole = true, bool logToFile = true, string releativePathToLogFolder = "Logs", string logFileName = "HoloNET.log", bool addAdditionalSpaceAfterEachLogEntry = false, bool showColouredLogs = true, ConsoleColor debugColour = ConsoleColor.White, ConsoleColor infoColour = ConsoleColor.Green, ConsoleColor warningColour = ConsoleColor.Yellow, ConsoleColor errorColour = ConsoleColor.Red)
         {
             HoloNETClient = new HoloNETClient(holochainConductorURI, logToConsole, logToFile, releativePathToLogFolder, logFileName, addAdditionalSpaceAfterEachLogEntry, showColouredLogs, debugColour, infoColour, warningColour, errorColour);
+            _disposeOfHoloNETClient = true;
 
             StoreEntryHashInEntry = storeEntryHashInEntry;
             ZomeName = zomeName;
@@ -35,6 +37,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public HoloNETEntryBaseClass(string zomeName, string zomeLoadEntryFunction, string zomeCreateEntryFunction, string zomeUpdateEntryFunction, string zomeDeleteEntryFunction, HoloNETConfig holoNETConfig, bool storeEntryHashInEntry = true)
         {
             HoloNETClient = new HoloNETClient();
+            _disposeOfHoloNETClient = true;
 
             StoreEntryHashInEntry = storeEntryHashInEntry;
             ZomeName = zomeName;
@@ -298,6 +301,17 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                     HoloNETClient.MapEntryDataObject(this, result.KeyValuePair);
                 }
+            }
+        }
+
+        public void Dispose()
+        {
+            if (HoloNETClient != null && _disposeOfHoloNETClient)
+            {
+                if (HoloNETClient.WebSocket.State != System.Net.WebSockets.WebSocketState.Closed || HoloNETClient.WebSocket.State != System.Net.WebSockets.WebSocketState.CloseReceived || HoloNETClient.WebSocket.State != System.Net.WebSockets.WebSocketState.CloseSent)
+                    HoloNETClient.Disconnect();
+
+                HoloNETClient = null;
             }
         }
     }

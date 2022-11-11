@@ -3,12 +3,12 @@ using System;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
 {
-    public class AvatarMultiple : HoloNETEntryBaseClass
+    public class AvatarMultiple : HoloNETAuditEntryBaseClass
     {
         public AvatarMultiple(HoloNETClient holonNETClient) : base("oasis", "get_entry_avatar", "create_entry_avatar", "update_entry_avatar", "delete_entry_avatar", holonNETClient) { }
 
-        [HolochainPropertyName("id")]
-        public Guid Id { get; set; }
+        //[HolochainPropertyName("id")]
+        //public Guid Id { get; set; }
 
         [HolochainPropertyName("first_name")]
         public string FirstName { get; set; }
@@ -22,6 +22,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
         [HolochainPropertyName("dob")]
         public DateTime DOB { get; set; }
 
+        /*
         [HolochainPropertyName("created_date")]
         public DateTime CreatedDate { get; set; }
 
@@ -41,6 +42,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
         public Guid DeletedBy { get; set; }
 
         [HolochainPropertyName("is_active")]
-        public bool IsActive { get; set; }
+        public bool IsActive { get; set; }*/
     }
 }

@@ -122,10 +122,14 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
 
                         if (result.IsCallSuccessful && !result.IsError && !string.IsNullOrEmpty(result.ZomeReturnHash))
                         {
-                            Console.WriteLine(string.Concat("TEST HARNESS: AVATAR SINGLE HOLONETBASECLASS.SAVE RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
+                            Console.WriteLine(string.Concat("TEST HARNESS: AVATAR SINGLE HOLONETBASECLASS.SAVE/CREATE RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
                             Console.WriteLine("");
                             ShowAvatarDetails(avatar);
+                            string entryHash = avatar.EntryHash;
+                            avatar.Dispose(); //Free any resources including disconnecting from the Holochain Conductor, shutting down any running conductors etc...
 
+                            avatar = new Avatar(config); //Normally you wouldn't need to create a new instance but we want to verify the data is fully loaded so best to use a new object.
+                            avatar.EntryHash = entryHash;
                             result = await avatar.LoadAsync();
 
                             if (result.IsCallSuccessful && !result.IsError)
@@ -133,6 +137,22 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                                 Console.WriteLine(string.Concat("TEST HARNESS: AVATAR SINGLE HOLONETBASECLASS.LOAD RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
                                 Console.WriteLine("");
                                 ShowAvatarDetails(avatar);
+
+                                // Now test the update method.
+                                avatar.FirstName = "James";
+                                result = await avatar.SaveAsync();
+
+                                if (result.IsCallSuccessful && !result.IsError && !string.IsNullOrEmpty(result.ZomeReturnHash))
+                                {
+                                    Console.WriteLine(string.Concat("TEST HARNESS: AVATAR SINGLE HOLONETBASECLASS.SAVE/UPDATE RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
+                                    Console.WriteLine("");
+                                    ShowAvatarDetails(avatar);
+                                }
+                                else
+                                {
+                                    Console.WriteLine(string.Concat("TEST HARNESS: AVATAR SINGLE HOLONETBASECLASS.SAVE/UPDATE RESPONSE: AN ERROR OCCURED: ", result.Message));
+                                    Console.WriteLine("");
+                                }
                             }
                             else
                             {
@@ -142,9 +162,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                         }
                         else
                         {
-                            Console.WriteLine(string.Concat("TEST HARNESS: AVATAR SINGLE HOLONETBASECLASS.SAVE RESPONSE: AN ERROR OCCURED: ", result.Message));
+                            Console.WriteLine(string.Concat("TEST HARNESS: AVATAR SINGLE HOLONETBASECLASS.SAVE/CREATE RESPONSE: AN ERROR OCCURED: ", result.Message));
                             Console.WriteLine("");
                         }
+
+                        if (avatar != null)
+                            avatar.Dispose(); //Free any resources including disconnecting from the Holochain Conductor, shutting down any running conductors etc...
                     }
                     break;
 
@@ -167,10 +190,15 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
 
                         if (result.IsCallSuccessful && !result.IsError && !string.IsNullOrEmpty(result.ZomeReturnHash))
                         {
-                            Console.WriteLine(string.Concat("TEST HARNESS: AVATAR MULTIPLE HOLONETBASECLASS.SAVE RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
+                            Console.WriteLine(string.Concat("TEST HARNESS: AVATAR MULTIPLE HOLONETBASECLASS.SAVE/CREATE RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
                             Console.WriteLine("");
                             ShowAvatarDetails(avatar);
+                            string entryHash = avatar.EntryHash;
 
+                            //There is no need to call Dispose on an object sharing a HoloNETClient instance (passed in) because it will only dispose of (disconnect etc) a HoloNETClient if one was NOT passed in because it was internally created and used (like the single use above).
+                            //avatar.Dispose(); //Free any resources including disconnecting from the Holochain Conductor, shutting down any running conductors etc...
+                            avatar = new AvatarMultiple(_holoNETClient); //Normally you wouldn't need to create a new instance but we want to verify the data is fully loaded so best to use a new object.
+                            avatar.EntryHash = entryHash;
                             result = await avatar.LoadAsync();
 
                             if (result.IsCallSuccessful && !result.IsError)
@@ -178,6 +206,22 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                                 Console.WriteLine(string.Concat("TEST HARNESS: AVATAR MULTIPLE HOLONETBASECLASS.LOAD RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
                                 Console.WriteLine("");
                                 ShowAvatarDetails(avatar);
+
+                                // Now test the update method.
+                                avatar.FirstName = "James";
+                                result = await avatar.SaveAsync();
+
+                                if (result.IsCallSuccessful && !result.IsError && !string.IsNullOrEmpty(result.ZomeReturnHash))
+                                {
+                                    Console.WriteLine(string.Concat("TEST HARNESS: AVATAR MULTIPLE HOLONETBASECLASS.SAVE/UPDATE RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
+                                    Console.WriteLine("");
+                                    ShowAvatarDetails(avatar);
+                                }
+                                else
+                                {
+                                    Console.WriteLine(string.Concat("TEST HARNESS: AVATAR MULTIPLE HOLONETBASECLASS.SAVE/UPDATE RESPONSE: AN ERROR OCCURED: ", result.Message));
+                                    Console.WriteLine("");
+                                }
                             }
                             else
                             {
@@ -187,7 +231,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                         }
                         else
                         {
-                            Console.WriteLine(string.Concat("TEST HARNESS: AVATAR MULTIPLE HOLONETBASECLASS.SAVE RESPONSE: AN ERROR OCCURED: ", result.Message));
+                            Console.WriteLine(string.Concat("TEST HARNESS: AVATAR MULTIPLE HOLONETBASECLASS.SAVE/CREATE RESPONSE: AN ERROR OCCURED: ", result.Message));
                             Console.WriteLine("");
                         }
 
@@ -207,10 +251,15 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
 
                         if (result.IsCallSuccessful && !result.IsError && !string.IsNullOrEmpty(result.ZomeReturnHash))
                         {
-                            Console.WriteLine(string.Concat("TEST HARNESS: HOLON MULTIPLE HOLONETBASECLASS.SAVE RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
+                            Console.WriteLine(string.Concat("TEST HARNESS: HOLON MULTIPLE HOLONETBASECLASS.SAVE/CREATE RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
                             Console.WriteLine("");
                             ShowHolonDetails(holon);
+                            string entryHash = holon.EntryHash;
 
+                            //There is no need to call Dispose on an object sharing a HoloNETClient instance (passed in) because it will only dispose of (disconnect etc) a HoloNETClient if one was NOT passed in because it was internally created and used (like the single use above).
+                            //holon.Dispose(); //Free any resources including disconnecting from the Holochain Conductor, shutting down any running conductors etc...
+                            holon = new Holon(_holoNETClient); //Normally you wouldn't need to create a new instance but we want to verify the data is fully loaded so best to use a new object.
+                            holon.EntryHash = entryHash;
                             result = await holon.LoadAsync();
 
                             if (result.IsCallSuccessful && !result.IsError)
@@ -218,6 +267,22 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                                 Console.WriteLine(string.Concat("TEST HARNESS: HOLON MULTIPLE HOLONETBASECLASS.LOAD RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
                                 Console.WriteLine("");
                                 ShowHolonDetails(holon);
+
+                                // Now test the update method.
+                                holon.Name = "another holon";
+                                result = await holon.SaveAsync();
+
+                                if (result.IsCallSuccessful && !result.IsError && !string.IsNullOrEmpty(result.ZomeReturnHash))
+                                {
+                                    Console.WriteLine(string.Concat("TEST HARNESS: AVATAR MULTIPLE HOLONETBASECLASS.SAVE/UPDATE RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
+                                    Console.WriteLine("");
+                                    ShowHolonDetails(holon);
+                                }
+                                else
+                                {
+                                    Console.WriteLine(string.Concat("TEST HARNESS: AVATAR MULTIPLE HOLONETBASECLASS.SAVE/UPDATE RESPONSE: AN ERROR OCCURED: ", result.Message));
+                                    Console.WriteLine("");
+                                }
                             }
                             else
                             {
@@ -227,9 +292,16 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                         }
                         else
                         {
-                            Console.WriteLine(string.Concat("TEST HARNESS: HOLON MULTIPLE HOLONETBASECLASS.SAVE RESPONSE: AN ERROR OCCURED: ", result.Message));
+                            Console.WriteLine(string.Concat("TEST HARNESS: HOLON MULTIPLE HOLONETBASECLASS.SAVE/CREATE RESPONSE: AN ERROR OCCURED: ", result.Message));
                             Console.WriteLine("");
                         }
+
+                        //There is no need to call Dispose on an object sharing a HoloNETClient instance (passed in) because it will only dispose of (disconnect etc) a HoloNETClient if one was NOT passed in because it was internally created and used (like the single use above).
+                        //if (avatar != null)
+                        //    avatar.Dispose(); //Free any resources including disconnecting from the Holochain Conductor, shutting down any running conductors etc...
+
+                        //if (holon != null)
+                        //    holon.Dispose(); //Free any resources including disconnecting from the Holochain Conductor, shutting down any running conductors etc...
                     }
                     break;
             }
