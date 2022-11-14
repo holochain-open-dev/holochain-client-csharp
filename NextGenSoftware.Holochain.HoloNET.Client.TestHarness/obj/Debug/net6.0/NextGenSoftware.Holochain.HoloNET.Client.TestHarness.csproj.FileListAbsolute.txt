@@ -57,3 +57,8 @@ C:\Users\david\source\repos\holochain-client-csharp\NextGenSoftware.Holochain.Ho
 C:\Users\david\source\repos\holochain-client-csharp\NextGenSoftware.Holochain.HoloNET.Client.TestHarness\obj\Debug\net6.0\NextGenSoftware.Holochain.HoloNET.Client.TestHarness.pdb
 C:\Users\david\source\repos\holochain-client-csharp\NextGenSoftware.Holochain.HoloNET.Client.TestHarness\obj\Debug\net6.0\NextGenSoftware.Holochain.HoloNET.Client.TestHarness.genruntimeconfig.cache
 C:\Users\david\source\repos\holochain-client-csharp\NextGenSoftware.Holochain.HoloNET.Client.TestHarness\bin\Debug\net6.0\NextGenSoftware.WebSocket.pdb
+C:\Users\david\source\repos\holochain-client-csharp\NextGenSoftware.Holochain.HoloNET.Client.TestHarness\bin\Debug\net6.0\Spectre.Console.deps.json
+C:\Users\david\source\repos\holochain-client-csharp\NextGenSoftware.Holochain.HoloNET.Client.TestHarness\bin\Debug\net6.0\Spectre.Console.xml
+C:\Users\david\source\repos\holochain-client-csharp\NextGenSoftware.Holochain.HoloNET.Client.TestHarness\bin\Debug\net6.0\NextGenSoftware.Logging.pdb
+C:\Users\david\source\repos\holochain-client-csharp\NextGenSoftware.Holochain.HoloNET.Client.TestHarness\bin\Debug\net6.0\NextGenSoftware.CLI.Engine.pdb
+C:\Users\david\source\repos\holochain-client-csharp\NextGenSoftware.Holochain.HoloNET.Client.TestHarness\bin\Debug\net6.0\NextGenSoftware.Utilities.pdb

@@ -14,7 +14,7 @@ using NextGenSoftware.Holochain.HoloNET.Client.Properties;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
-    public class HoloNETClient
+    public class HoloNETClient : IDisposable
     {
         private bool _getAgentPubKeyAndDnaHashFromConductor;
         private bool _updateDnaHashAndAgentPubKey = true;
@@ -27,6 +27,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         private Dictionary<string, bool> _cacheZomeReturnDataLookup = new Dictionary<string, bool>();
         private Dictionary<string, TaskCompletionSource<ZomeFunctionCallBackEventArgs>> _taskCompletionZomeCallBack = new Dictionary<string, TaskCompletionSource<ZomeFunctionCallBackEventArgs>>();
         private TaskCompletionSource<ReadyForZomeCallsEventArgs> _taskCompletionReadyForZomeCalls = new TaskCompletionSource<ReadyForZomeCallsEventArgs>();
+        private TaskCompletionSource<DisconnectedEventArgs> _taskCompletionDisconnected = new TaskCompletionSource<DisconnectedEventArgs>();
         private int _currentId = 0;
         private HoloNETConfig _config = null;
         private Process _conductorProcess = null;
@@ -424,14 +425,17 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             SendHoloNETRequestAsync(id, holoNETData);
         }
 
-        public async Task DisconnectAsync()
+        public async Task DisconnectAsync(DisconnectedCallBackMode disconnectedCallBackMode = DisconnectedCallBackMode.WaitForHolochainConductorToDisconnect)
         {
             await WebSocket.Disconnect();
+
+            if (disconnectedCallBackMode == DisconnectedCallBackMode.WaitForHolochainConductorToDisconnect)
+                await _taskCompletionDisconnected.Task;
         }
 
-        public void Disconnect()
+        public void Disconnect(DisconnectedCallBackMode disconnectedCallBackMode = DisconnectedCallBackMode.WaitForHolochainConductorToDisconnect)
         {
-            WebSocket.Disconnect();
+            DisconnectAsync(disconnectedCallBackMode);
         }
 
         public async Task<ZomeFunctionCallBackEventArgs> CallZomeFunctionAsync(string zome, string function, object paramsObject)
@@ -903,6 +907,14 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             ShutDownAllConductorsAsync();
         }
 
+        public void Dispose()
+        {
+            if (WebSocket.State != WebSocketState.Closed || WebSocket.State != WebSocketState.CloseReceived || WebSocket.State != WebSocketState.CloseSent)
+                Disconnect();
+
+            Logger.Loggers.Clear();
+        }
+
         private async Task ShutDownConductorsInternalAsync()
         {
             try
@@ -963,7 +975,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             try
             {
                 ShutDownConductorsInternalAsync();
-                OnDisconnected?.Invoke(this, new DisconnectedEventArgs { EndPoint = e.EndPoint, Reason = e.Reason });
+                OnDisconnected?.Invoke(this, e);
+                _taskCompletionDisconnected.SetResult(e);
             }
             catch (Exception ex)
             {

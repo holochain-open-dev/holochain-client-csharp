@@ -147,6 +147,19 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                                     Console.WriteLine(string.Concat("TEST HARNESS: AVATAR SINGLE HOLONETBASECLASS.SAVE/UPDATE RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
                                     Console.WriteLine("");
                                     ShowAvatarDetails(avatar);
+
+                                    result = await avatar.DeleteAsync();
+
+                                    if (result.IsCallSuccessful && !result.IsError && !string.IsNullOrEmpty(result.ZomeReturnHash))
+                                    {
+                                        Console.WriteLine(string.Concat("TEST HARNESS: AVATAR SINGLE HOLONETBASECLASS.DELETE RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
+                                        Console.WriteLine("");
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine(string.Concat("TEST HARNESS: AVATAR SINGLE HOLONETBASECLASS.DELETE RESPONSE: AN ERROR OCCURED: ", result.Message));
+                                        Console.WriteLine("");
+                                    }
                                 }
                                 else
                                 {
