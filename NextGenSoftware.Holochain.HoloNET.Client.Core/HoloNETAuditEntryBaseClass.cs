@@ -1,5 +1,6 @@
 ﻿
 using System;
+using System.Threading.Tasks;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
 {
@@ -35,5 +36,21 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
 
         [HolochainPropertyName("is_active")]
         public bool IsActive { get; set; }
+
+        public override Task<ZomeFunctionCallBackEventArgs> SaveAsync()
+        {
+            if (string.IsNullOrEmpty(EntryHash))
+            {
+                if (CreatedDate == DateTime.MinValue)
+                    CreatedDate = DateTime.Now;
+            }
+            else
+            {
+                if (ModifiedDate == DateTime.MinValue)
+                    ModifiedDate = DateTime.Now;
+            }
+
+            return base.SaveAsync();
+        }
     }
 }

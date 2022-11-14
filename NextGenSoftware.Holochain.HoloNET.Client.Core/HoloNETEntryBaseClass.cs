@@ -8,7 +8,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 {
     public abstract class HoloNETEntryBaseClass : IDisposable
     {
-        //private TaskCompletionSource<ZomeFunctionCallBackEventArgs> _taskCompletionZomeCallBack = new TaskCompletionSource<ZomeFunctionCallBackEventArgs>();
         private Dictionary<string, string> _holochainProperties = new Dictionary<string, string>();
         private bool _disposeOfHoloNETClient = false;
 
@@ -74,11 +73,21 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public string ZomeUpdateEntryFunction { get; set; }
         public string ZomeDeleteEntryFunction { get; set; }
 
-        public async Task<ZomeFunctionCallBackEventArgs> LoadAsync()
+        public async Task<ZomeFunctionCallBackEventArgs> LoadAsync(string entryHash)
         {
             ZomeFunctionCallBackEventArgs result = await HoloNETClient.CallZomeFunctionAsync(ZomeName, ZomeLoadEntryFunction, EntryHash);
             ProcessZomeReturnCall(result);
             return result;
+        }
+
+        public ZomeFunctionCallBackEventArgs Load(string entryHash)
+        {
+            return LoadAsync(entryHash).Result;
+        }
+
+        public async Task<ZomeFunctionCallBackEventArgs> LoadAsync()
+        {
+            return await LoadAsync(EntryHash);
         }
 
         public ZomeFunctionCallBackEventArgs Load()
@@ -91,7 +100,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// </summary>
         /// <param name="paramsObject"></param>
         /// <returns></returns>
-        public async Task<ZomeFunctionCallBackEventArgs> SaveAsync()
+        public virtual async Task<ZomeFunctionCallBackEventArgs> SaveAsync()
         {
             dynamic paramsObject = new ExpandoObject();
             //object paramsObject = new object();
@@ -194,7 +203,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// </summary>
         /// <param name="paramsObject"></param>
         /// <returns></returns>
-        public async Task<ZomeFunctionCallBackEventArgs> SaveAsync(dynamic paramsObject)
+        public virtual async Task<ZomeFunctionCallBackEventArgs> SaveAsync(dynamic paramsObject)
         {
             ZomeFunctionCallBackEventArgs result = null;
 
@@ -211,6 +220,52 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public ZomeFunctionCallBackEventArgs Save(dynamic paramsObject)
         {
             return SaveAsync(paramsObject).Result;
+        }
+
+        public virtual async Task<ZomeFunctionCallBackEventArgs> DeleteAsync()
+        {
+            return await DeleteAsync(this.EntryHash);
+        }
+
+        public virtual async Task<ZomeFunctionCallBackEventArgs> DeleteAsync(string entryHash)
+        {
+            ZomeFunctionCallBackEventArgs result = null;
+
+            if (!string.IsNullOrEmpty(EntryHash))
+                result = await HoloNETClient.CallZomeFunctionAsync(ZomeName, ZomeDeleteEntryFunction, entryHash);
+            else
+                result = new ZomeFunctionCallBackEventArgs() { IsError = true, Message = "EntryHash is null, please set before calling this function." };
+
+            return result;
+        }
+
+        public virtual ZomeFunctionCallBackEventArgs Delete()
+        {
+            return DeleteAsync().Result;
+        }
+
+        public virtual ZomeFunctionCallBackEventArgs Delete(string entryHash)
+        {
+            return DeleteAsync(entryHash).Result;
+        }
+
+        public void Dispose()
+        {
+            if (HoloNETClient != null && _disposeOfHoloNETClient)
+            {
+                HoloNETClient.Dispose();
+                
+                if (HoloNETClient.WebSocket.State == System.Net.WebSockets.WebSocketState.Closed)
+                {
+
+                }
+                else
+                {
+
+                }
+                
+                HoloNETClient = null;
+            }
         }
 
         private void Init()
@@ -301,17 +356,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                     HoloNETClient.MapEntryDataObject(this, result.KeyValuePair);
                 }
-            }
-        }
-
-        public void Dispose()
-        {
-            if (HoloNETClient != null && _disposeOfHoloNETClient)
-            {
-                if (HoloNETClient.WebSocket.State != System.Net.WebSockets.WebSocketState.Closed || HoloNETClient.WebSocket.State != System.Net.WebSockets.WebSocketState.CloseReceived || HoloNETClient.WebSocket.State != System.Net.WebSockets.WebSocketState.CloseSent)
-                    HoloNETClient.Disconnect();
-
-                HoloNETClient = null;
             }
         }
     }
