@@ -14,8 +14,9 @@ using NextGenSoftware.Holochain.HoloNET.Client.Properties;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
-    public class HoloNETClient : IDisposable
+    public class HoloNETClient //: IDisposable //, IAsyncDisposable
     {
+        private bool _shuttingDownHoloNET = false;
         private bool _getAgentPubKeyAndDnaHashFromConductor;
         private bool _updateDnaHashAndAgentPubKey = true;
         private Dictionary<string, string> _zomeLookup = new Dictionary<string, string>();
@@ -31,6 +32,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         private int _currentId = 0;
         private HoloNETConfig _config = null;
         private Process _conductorProcess = null;
+        private ShutdownHolochainConductorsMode _shutdownHolochainConductorsMode = ShutdownHolochainConductorsMode.UseConfigSettings;
 
         //Events
         public delegate void Connected(object sender, ConnectedEventArgs e);
@@ -38,6 +40,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         public delegate void Disconnected(object sender, DisconnectedEventArgs e);
         public event Disconnected OnDisconnected;
+
+        public delegate void HolochainConductorsShutdownComplete(object sender, HolochainConductorsShutdownEventArgs e);
+        public event HolochainConductorsShutdownComplete OnHolochainConductorsShutdownComplete;
+
+        public delegate void HoloNETShutdownComplete(object sender, HoloNETShutdownEventArgs e);
+        public event HoloNETShutdownComplete OnHoloNETShutdownComplete;
 
         public delegate void DataReceived(object sender, HoloNETDataReceivedEventArgs e);
         public event DataReceived OnDataReceived;
@@ -425,17 +433,18 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             SendHoloNETRequestAsync(id, holoNETData);
         }
 
-        public async Task DisconnectAsync(DisconnectedCallBackMode disconnectedCallBackMode = DisconnectedCallBackMode.WaitForHolochainConductorToDisconnect)
+        public async Task DisconnectAsync(DisconnectedCallBackMode disconnectedCallBackMode = DisconnectedCallBackMode.WaitForHolochainConductorToDisconnect, ShutdownHolochainConductorsMode shutdownHolochainConductorsMode = ShutdownHolochainConductorsMode.UseConfigSettings)
         {
+            _shutdownHolochainConductorsMode = shutdownHolochainConductorsMode;
             await WebSocket.Disconnect();
 
             if (disconnectedCallBackMode == DisconnectedCallBackMode.WaitForHolochainConductorToDisconnect)
                 await _taskCompletionDisconnected.Task;
         }
 
-        public void Disconnect(DisconnectedCallBackMode disconnectedCallBackMode = DisconnectedCallBackMode.WaitForHolochainConductorToDisconnect)
+        public void Disconnect(DisconnectedCallBackMode disconnectedCallBackMode = DisconnectedCallBackMode.WaitForHolochainConductorToDisconnect, ShutdownHolochainConductorsMode shutdownHolochainConductorsMode = ShutdownHolochainConductorsMode.UseConfigSettings)
         {
-            DisconnectAsync(disconnectedCallBackMode);
+            DisconnectAsync(disconnectedCallBackMode, shutdownHolochainConductorsMode);
         }
 
         public async Task<ZomeFunctionCallBackEventArgs> CallZomeFunctionAsync(string zome, string function, object paramsObject)
@@ -849,8 +858,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             return MapEntryDataObjectAsync(entryDataObject, keyValuePairs).Result;
         }
 
-        public async Task ShutDownAllConductorsAsync()
+        public async Task<HolochainConductorsShutdownEventArgs> ShutDownAllHolochainConductorsAsync()
         {
+            HolochainConductorsShutdownEventArgs result = new HolochainConductorsShutdownEventArgs();
+            result.AgentPubKey = Config.AgentPubKey;
+            result.DnaHash = Config.DnaHash;
+            result.EndPoint = EndPoint;
+
             try
             {
                 Logger.Log("Shutting Down All Holochain Conductors...", LogType.Info, true);
@@ -865,6 +879,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                     //process.WaitForExit();
                     process.Dispose();
+                    result.NumberOfHcExeInstancesShutdown++;
                 }
 
                 //conductorInfo = new FileInfo(Config.FullPathToExternalHolochainConductorBinary);
@@ -880,6 +895,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                     //process.WaitForExit();
                     process.Dispose();
+                    result.NumberOfHolochainExeInstancesShutdown++;
                 }
 
                 foreach (Process process in Process.GetProcessesByName("rustc"))
@@ -892,6 +908,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                     //process.WaitForExit();
                     process.Dispose();
+                    result.NumberOfRustcExeInstancesShutdown++;
                 }
 
                 Logger.Log("All Holochain Conductors Successfully Shutdown.", LogType.Info);
@@ -900,30 +917,78 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             {
                 HandleError("Error occured in HoloNETClient.ShutDownAllConductors method", ex);
             }
+
+            return result;
         }
 
-        public void ShutDownAllConductors()
+        /// <summary>
+        /// Shutsdown all running Holochain Conductors.
+        /// </summary>
+        public HolochainConductorsShutdownEventArgs ShutDownAllHolochainConductors()
         {
-            ShutDownAllConductorsAsync();
+            return ShutDownAllHolochainConductorsAsync().Result;
         }
 
-        public void Dispose()
+        //public void Dispose()
+        //{
+        //    Shutdown();
+        //}
+
+        //public ValueTask DisposeAsync()
+        //{
+        //    if (WebSocket.State != WebSocketState.Closed || WebSocket.State != WebSocketState.CloseReceived || WebSocket.State != WebSocketState.CloseSent)
+        //        await DisconnectAsync();
+
+        //    Logger.Loggers.Clear();
+        //}
+
+        /// <summary>
+        /// Will shutdown HoloNET and its current connetion to the Holochain Conductor.
+        /// You can specify if HoloNET should wait until it has finished disconnecting and shutting down the conductors before returning to the caller or whether it should return immediately and then use the Disconnected, HolochainConductorsShutdownComplete & HoloNETShutdownComplete events to notify the caller.
+        /// It will also shutdown the current running Holochain Conductor or all conductors depending on the config/params passed in.
+        /// </summary>
+        /// <param name="disconnectedCallBackMode"></param>
+        /// <param name="shutdownHolochainConductorsMode"></param>
+        /// <returns></returns>
+        public async Task ShutdownHoloNETAsync(DisconnectedCallBackMode disconnectedCallBackMode = DisconnectedCallBackMode.WaitForHolochainConductorToDisconnect, ShutdownHolochainConductorsMode shutdownHolochainConductorsMode = ShutdownHolochainConductorsMode.UseConfigSettings)
         {
+            _shuttingDownHoloNET = true;
+
             if (WebSocket.State != WebSocketState.Closed || WebSocket.State != WebSocketState.CloseReceived || WebSocket.State != WebSocketState.CloseSent)
-                Disconnect();
-
-            Logger.Loggers.Clear();
+                await DisconnectAsync(disconnectedCallBackMode, shutdownHolochainConductorsMode);
         }
 
-        private async Task ShutDownConductorsInternalAsync()
+        /// <summary>
+        /// Will shutdown HoloNET and its current connetion to the Holochain Conductor.
+        /// Unlike the async version, this non async version will not wait until HoloNET disconnects & shutsdown any Holochain Conductors before it returns to the caller. It will later raise the Disconnected, HolochainConductorsShutdownComplete & HoloNETShutdownComplete events. If you wish to wait for HoloNET to disconnect and shutdown the conductors(s) before returning then please use ShutdownAsync instead.
+        /// It will also shutdown the current running Holochain Conductor or all conductors depending on the config/params passed in.
+        /// </summary>
+        /// <param name="shutdownHolochainConductorsMode"></param>
+        public void ShutdownHoloNET(ShutdownHolochainConductorsMode shutdownHolochainConductorsMode = ShutdownHolochainConductorsMode.UseConfigSettings)
         {
+            _shuttingDownHoloNET = true;
+
+            if (WebSocket.State != WebSocketState.Closed || WebSocket.State != WebSocketState.CloseReceived || WebSocket.State != WebSocketState.CloseSent)
+                Disconnect(DisconnectedCallBackMode.UseCallBackEvents, shutdownHolochainConductorsMode);
+        }
+
+        private async Task<HolochainConductorsShutdownEventArgs> ShutDownHolochainConductorsInternalAsync()
+        {
+            HolochainConductorsShutdownEventArgs holochainConductorsShutdownEventArgs = new HolochainConductorsShutdownEventArgs();
+            holochainConductorsShutdownEventArgs.AgentPubKey = Config.AgentPubKey;
+            holochainConductorsShutdownEventArgs.DnaHash = Config.DnaHash;
+            holochainConductorsShutdownEventArgs.EndPoint = EndPoint;
+
             try
             {
                 // Close any conductors down if necessary.
-                if (Config.AutoShutdownHolochainConductor)
+                if ((Config.AutoShutdownHolochainConductor && _shutdownHolochainConductorsMode == ShutdownHolochainConductorsMode.UseConfigSettings)
+                    || _shutdownHolochainConductorsMode == ShutdownHolochainConductorsMode.ShutdownCurrentConductorOnly
+                    || _shutdownHolochainConductorsMode == ShutdownHolochainConductorsMode.ShutdownAllConductors)
                 {
-                    if (Config.ShutDownALLHolochainConductors)
-                        await ShutDownAllConductorsAsync();
+                    if ((Config.ShutDownALLHolochainConductors && _shutdownHolochainConductorsMode == ShutdownHolochainConductorsMode.UseConfigSettings)
+                    || _shutdownHolochainConductorsMode == ShutdownHolochainConductorsMode.ShutdownAllConductors)
+                        holochainConductorsShutdownEventArgs = await ShutDownAllHolochainConductorsAsync();
 
                     else if (_conductorProcess != null)
                     {
@@ -938,15 +1003,34 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                         // _conductorProcess.WaitForExit();
                         _conductorProcess.Dispose();
 
+                        if (_conductorProcess.StartInfo.FileName.Contains("hc.exe"))
+                            holochainConductorsShutdownEventArgs.NumberOfHcExeInstancesShutdown = 1;
+
+                        else if (_conductorProcess.StartInfo.FileName.Contains("holochain.exe"))
+                            holochainConductorsShutdownEventArgs.NumberOfHolochainExeInstancesShutdown = 1;
+                           
                         Logger.Log("Holochain Conductor Successfully Shutdown.", LogType.Info);
                     }
+                }
+
+                OnHolochainConductorsShutdownComplete?.Invoke(this, holochainConductorsShutdownEventArgs);
+
+                if (_shuttingDownHoloNET)
+                {
+                    Logger.Loggers.Clear();
+
+                    HoloNETShutdownEventArgs holoNETShutdownEventArgs = new HoloNETShutdownEventArgs(this.EndPoint, Config.DnaHash, Config.AgentPubKey, holochainConductorsShutdownEventArgs);
+                    OnHoloNETShutdownComplete?.Invoke(this, holoNETShutdownEventArgs);
                 }
             }
             catch (Exception ex)
             {
                 HandleError("Error occured in HoloNETClient.ShutDownConductorsInternal method.", ex);
             }
+
+            return holochainConductorsShutdownEventArgs;
         }
+
         private void Init(string holochainConductorURI)
         {
             try
@@ -974,9 +1058,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         {
             try
             {
-                ShutDownConductorsInternalAsync();
-                OnDisconnected?.Invoke(this, e);
                 _taskCompletionDisconnected.SetResult(e);
+                OnDisconnected?.Invoke(this, e);
+                ShutDownHolochainConductorsInternalAsync();
             }
             catch (Exception ex)
             {

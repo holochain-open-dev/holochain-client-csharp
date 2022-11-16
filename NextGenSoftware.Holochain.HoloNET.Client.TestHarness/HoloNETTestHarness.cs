@@ -125,11 +125,23 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                             Console.WriteLine(string.Concat("TEST HARNESS: AVATAR SINGLE HOLONETBASECLASS.SAVE/CREATE RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
                             Console.WriteLine("");
                             ShowAvatarDetails(avatar);
-                            string entryHash = avatar.EntryHash;
-                            avatar.Dispose(); //Free any resources including disconnecting from the Holochain Conductor, shutting down any running conductors etc...
 
-                            avatar = new Avatar(config); //Normally you wouldn't need to create a new instance but we want to verify the data is fully loaded so best to use a new object.
-                            avatar.EntryHash = entryHash;
+                            avatar.Id = Guid.Empty;
+                            avatar.FirstName = "";
+                            avatar.LastName = "";
+                            avatar.Email = "";
+                            avatar.DOB = DateTime.MinValue;
+                            avatar.CreatedBy = Guid.Empty;
+                            avatar.CreatedDate = DateTime.MinValue;
+                            avatar.ModifiedBy = Guid.Empty;
+                            avatar.ModifiedDate = DateTime.MinValue;
+
+                            //string entryHash = avatar.EntryHash;
+                            //avatar.Dispose(); //Free any resources including disconnecting from the Holochain Conductor, shutting down any running conductors etc...
+                            //await avatar.CloseAsync();
+
+                            //avatar = new Avatar(config); //Normally you wouldn't need to create a new instance but we want to verify the data is fully loaded so best to use a new object.
+                            //avatar.EntryHash = entryHash;
                             result = await avatar.LoadAsync();
 
                             if (result.IsCallSuccessful && !result.IsError)
@@ -180,7 +192,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                         }
 
                         if (avatar != null)
-                            avatar.Dispose(); //Free any resources including disconnecting from the Holochain Conductor, shutting down any running conductors etc...
+                            await avatar.CloseAsync();
+                            //avatar.Dispose(); //Free any resources including disconnecting from the Holochain Conductor, shutting down any running conductors etc...
                     }
                     break;
 

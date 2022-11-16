@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
-    public abstract class HoloNETEntryBaseClass : IDisposable
+    public abstract class HoloNETEntryBaseClass //: IDisposable
     {
         private Dictionary<string, string> _holochainProperties = new Dictionary<string, string>();
         private bool _disposeOfHoloNETClient = false;
@@ -249,12 +249,39 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             return DeleteAsync(entryHash).Result;
         }
 
-        public void Dispose()
+        //public void Dispose()
+        //{
+        //    if (HoloNETClient != null && _disposeOfHoloNETClient)
+        //    {
+        //        HoloNETClient.Dispose();
+
+        //        if (HoloNETClient.WebSocket.State == System.Net.WebSockets.WebSocketState.Closed)
+        //        {
+
+        //        }
+        //        else
+        //        {
+
+        //        }
+
+        //        HoloNETClient = null;
+        //    }
+        //}
+
+        /// <summary>
+        /// Will close this HoloNET Entry and then shutdown its internal HoloNET instance (if one was not passed in) and its current connetion to the Holochain Conductor.
+        /// You can specify if HoloNET should wait until it has finished disconnecting and shutting down the conductors before returning to the caller or whether it should return immediately and then use the Disconnected, HolochainConductorsShutdownComplete & HoloNETShutdownComplete events to notify the caller.
+        /// It will also shutdown the current running Holochain Conductor or all conductors depending on the config/params passed in.
+        /// </summary>
+        /// <param name="disconnectedCallBackMode"></param>
+        /// <param name="shutdownHolochainConductorsMode"></param>
+        /// <returns></returns>
+        public async Task CloseAsync(DisconnectedCallBackMode disconnectedCallBackMode = DisconnectedCallBackMode.WaitForHolochainConductorToDisconnect, ShutdownHolochainConductorsMode shutdownHolochainConductorsMode = ShutdownHolochainConductorsMode.UseConfigSettings)
         {
             if (HoloNETClient != null && _disposeOfHoloNETClient)
             {
-                HoloNETClient.Dispose();
-                
+                await HoloNETClient.ShutdownHoloNETAsync(disconnectedCallBackMode, shutdownHolochainConductorsMode);
+
                 if (HoloNETClient.WebSocket.State == System.Net.WebSockets.WebSocketState.Closed)
                 {
 
@@ -263,7 +290,32 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 {
 
                 }
-                
+
+                HoloNETClient = null;
+            }
+        }
+
+        /// <summary>
+        /// Will close this HoloNET Entry and then shutdown its internal HoloNET instance (if one was not passed in) and its current connetion to the Holochain Conductor.
+        /// Unlike the async version, this non async version will not wait until HoloNET disconnects & shutsdown any Holochain Conductors before it returns to the caller. It will later raise the Disconnected, HolochainConductorsShutdownComplete & HoloNETShutdownComplete events. If you wish to wait for HoloNET to disconnect and shutdown the conductors(s) before returning then please use CloseAsync instead.
+        /// It will also shutdown the current running Holochain Conductor or all conductors depending on the config/params passed in.
+        /// </summary>
+        /// <param name="shutdownHolochainConductorsMode"></param>
+        public void Close(ShutdownHolochainConductorsMode shutdownHolochainConductorsMode = ShutdownHolochainConductorsMode.UseConfigSettings)
+        {
+            if (HoloNETClient != null && _disposeOfHoloNETClient)
+            {
+                HoloNETClient.ShutdownHoloNET(shutdownHolochainConductorsMode);
+
+                if (HoloNETClient.WebSocket.State == System.Net.WebSockets.WebSocketState.Closed)
+                {
+
+                }
+                else
+                {
+
+                }
+
                 HoloNETClient = null;
             }
         }

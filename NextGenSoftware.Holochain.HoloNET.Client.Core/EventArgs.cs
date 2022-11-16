@@ -87,6 +87,32 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public string AgentPubKey { get; private set; }
     }
 
+    public class HoloNETShutdownEventArgs
+    {
+        public HoloNETShutdownEventArgs(string endPoint, string dnaHash, string agentPubKey, HolochainConductorsShutdownEventArgs holochainConductorsShutdownEventArgs)
+        {
+            EndPoint = endPoint;
+            DnaHash = dnaHash;
+            AgentPubKey = agentPubKey;
+            HolochainConductorsShutdownEventArgs = holochainConductorsShutdownEventArgs;
+        }
+
+        public HolochainConductorsShutdownEventArgs HolochainConductorsShutdownEventArgs { get; private set; }
+        public string EndPoint { get; private set; }
+        public string DnaHash { get; private set; }
+        public string AgentPubKey { get; private set; }
+    }
+
+    public class HolochainConductorsShutdownEventArgs
+    {
+        public int NumberOfHolochainExeInstancesShutdown { get; set; }
+        public int NumberOfHcExeInstancesShutdown { get; set; }
+        public int NumberOfRustcExeInstancesShutdown { get; set; }
+        public string EndPoint { get; set; }
+        public string DnaHash { get; set; }
+        public string AgentPubKey { get; set; }
+    }
+
     public class SignalsCallBackEventArgs : CallBackBaseEventArgsWithId
     {
         public SignalsCallBackEventArgs(string id, string endPoint, bool isCallSuccessful, SignalTypes signalType, string name, JToken signalData, byte[] rawBinaryData, string rawJSONData, WebSocketReceiveResult webSocketResult)
