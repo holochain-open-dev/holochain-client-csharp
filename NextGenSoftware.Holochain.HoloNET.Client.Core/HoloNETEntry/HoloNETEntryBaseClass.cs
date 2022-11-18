@@ -72,6 +72,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public string ZomeCreateEntryFunction { get; set; }
         public string ZomeUpdateEntryFunction { get; set; }
         public string ZomeDeleteEntryFunction { get; set; }
+        public List<HoloNETAuditEntry> AuditEntries { get; set; }
 
         public async Task<ZomeFunctionCallBackEventArgs> LoadAsync(string entryHash)
         {
@@ -103,9 +104,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public virtual async Task<ZomeFunctionCallBackEventArgs> SaveAsync()
         {
             dynamic paramsObject = new ExpandoObject();
+            dynamic updateParamsObject = new ExpandoObject();
             //object paramsObject = new object();
             Dictionary<string, object> zomeCallProps = new Dictionary<string, object>();
             PropertyInfo[] props = GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            bool update = false;
 
             foreach (PropertyInfo propInfo in props)
             {
@@ -120,7 +123,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                                 string key = data.ConstructorArguments[0].Value.ToString();
                                 object value = propInfo.GetValue(this);
 
-                                //Only include the hash if it is not null.
                                 if (key != "entry_hash")
                                 {
                                     if (propInfo.PropertyType == typeof(Guid))
@@ -180,6 +182,19 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                                     else
                                         AddProperty(paramsObject, key, value);
                                 }
+                                
+                                if (key == "entry_hash" && value != null)
+                                {
+                                    //Is an update so we need to include the action_hash for the rust HDK to be able to update the entry...
+                                    AddProperty(updateParamsObject, "original_action_hash", HoloNETClient.ConvertHoloHashToBytes(value.ToString()));
+                                    update = true;
+                                }
+
+                                //else if (key == "entry_hash" && value != null)
+                                //{
+                                //    //Is an update so we need to include the action_hash for the rust HDK to be able to update the entry...
+                                //    AddProperty(paramsObject, "action_hash", HoloNETClient.ConvertHoloHashToBytes(value.ToString()));
+                                //}
                             }
                         }
                         catch (Exception ex)
@@ -190,7 +205,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 }
             }
 
-            return await SaveAsync(paramsObject);
+            if (update)
+            {
+                AddProperty(updateParamsObject, "updated_entry", paramsObject);
+                return await SaveAsync(updateParamsObject);
+            }
+            else
+                return await SaveAsync(paramsObject);
         }
 
         public ZomeFunctionCallBackEventArgs Save()
