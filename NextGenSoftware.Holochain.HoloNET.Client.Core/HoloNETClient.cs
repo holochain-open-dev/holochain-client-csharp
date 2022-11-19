@@ -1218,63 +1218,126 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         {
             string value = "";
             var options = MessagePackSerializerOptions.Standard.WithSecurity(MessagePackSecurity.UntrustedData);
-            EntryData entryData = null;
+            EntryData entryData = new EntryData();
 
-            foreach (string key in rawAppResponseData.Keys)
+            try
             {
-                value = "";
-                byte[] bytes = rawAppResponseData[key] as byte[];
-
-                if (bytes != null)
+                foreach (string key in rawAppResponseData.Keys)
                 {
-                    if (key == "entry")
+                    try
                     {
-                        string byteString = "";
+                        value = "";
+                        byte[] bytes = rawAppResponseData[key] as byte[];
 
-                        for (int i = 0; i < bytes.Length; i++)
-                            byteString = string.Concat(byteString, bytes[i], ",");
-
-                        byteString = byteString.Substring(0, byteString.Length - 1);
-
-                        Dictionary<object, object> entry = MessagePackSerializer.Deserialize<Dictionary<object, object>>(bytes, options);
-                        Dictionary<string, object> decodedEntry = new Dictionary<string, object>();
-
-                        if (entry != null)
+                        if (bytes != null)
                         {
-                            foreach (object entryKey in entry.Keys)
+                            if (key == "entry")
                             {
-                                decodedEntry[entryKey.ToString()] = entry[entryKey].ToString();
-                                keyValuePair[entryKey.ToString()] = entry[entryKey].ToString();
-                                keyValuePairAsString = string.Concat(keyValuePairAsString, entryKey.ToString(), "=", entry[entryKey].ToString(), "\n");
-                            }
+                                string byteString = "";
 
-                            entryData = new EntryData() { Bytes = bytes, BytesString = byteString, Entry = decodedEntry };
-                            appResponseData[key] = entryData;
+                                for (int i = 0; i < bytes.Length; i++)
+                                    byteString = string.Concat(byteString, bytes[i], ",");
+
+                                byteString = byteString.Substring(0, byteString.Length - 1);
+
+                                Dictionary<object, object> entry = MessagePackSerializer.Deserialize<Dictionary<object, object>>(bytes, options);
+                                Dictionary<string, object> decodedEntry = new Dictionary<string, object>();
+
+                                if (entry != null)
+                                {
+                                    foreach (object entryKey in entry.Keys)
+                                    {
+                                        decodedEntry[entryKey.ToString()] = entry[entryKey].ToString();
+                                        keyValuePair[entryKey.ToString()] = entry[entryKey].ToString();
+                                        keyValuePairAsString = string.Concat(keyValuePairAsString, entryKey.ToString(), "=", entry[entryKey].ToString(), "\n");
+                                    }
+
+                                    entryData.Bytes = bytes;
+                                    entryData.BytesString = byteString;
+                                    entryData.Entry = decodedEntry;
+                                    appResponseData[key] = entryData;
+                                }
+                            }
+                            else
+                                value = ConvertHoloHashToString(bytes);
+                        }
+                        else
+                        {
+                            Dictionary<object, object> dict = rawAppResponseData[key] as Dictionary<object, object>;
+
+                            if (dict != null)
+                            {
+                                Dictionary<string, object> tempDict = new Dictionary<string, object>();
+                                (tempDict, keyValuePair, keyValuePairAsString, entryData) = DecodeZomeReturnData(dict, tempDict, keyValuePair, keyValuePairAsString);
+                                appResponseData[key] = tempDict;
+                            }
+                            else if (rawAppResponseData[key] != null)
+                            {
+                                try
+                                {
+                                    value = rawAppResponseData[key].ToString();
+
+                                    switch (key)
+                                    {
+                                        case "prev_action":
+                                            entryData.PreviousHash = value;
+                                            break;
+
+                                        case "action_seq":
+                                            entryData.ActionSequence = Convert.ToInt32(value);
+                                            break;
+
+                                        case "author":
+                                            entryData.Author = value;
+                                            break;
+
+                                        case "original_action_address":
+                                            entryData.OriginalActionAddress = value;
+                                            break;
+
+                                        case "original_entry_address":
+                                            entryData.OriginalEntryAddress = value;
+                                            break;
+
+                                        case "timestamp":
+                                            {
+                                                entryData.TimestampRust = Convert.ToInt64(value);
+                                                //entryData.Timestamp = Convert.ToDateTime(entryData.TimestampRust);
+                                                //entryData.Timestamp = DateTime.FromBinary(entryData.TimestampRust);
+
+                                                long time = entryData.TimestampRust / 1000; // Divide by 1,000 because we need milliseconds, not microseconds.
+                                                entryData.Timestamp = DateTimeOffset.FromUnixTimeMilliseconds(time).DateTime.AddHours(-5);
+                                            }
+                                            break;
+
+                                        case "type":
+                                            entryData.Type = value;
+                                            break;
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    HandleError("Error in HoloNETClient.DecodeZomeReturnData method.", ex);
+                                }
+                            }
+                        }
+
+                        if (!string.IsNullOrEmpty(value))
+                        {
+                            keyValuePairAsString = string.Concat(keyValuePairAsString, key, "=", value, "\n");
+                            keyValuePair[key] = value;
+                            appResponseData[key] = value;
                         }
                     }
-                    else
-                        value = ConvertHoloHashToString(bytes);
-                }
-                else
-                {
-                    Dictionary<object, object> dict = rawAppResponseData[key] as Dictionary<object, object>;
-
-                    if (dict != null)
+                    catch (Exception ex)
                     {
-                        Dictionary<string, object> tempDict = new Dictionary<string, object>();
-                        (tempDict, keyValuePair, keyValuePairAsString, entryData) = DecodeZomeReturnData(dict, tempDict, keyValuePair, keyValuePairAsString);
-                        appResponseData[key] = tempDict;
+                        HandleError("Error in HoloNETClient.DecodeZomeReturnData method.", ex);
                     }
-                    else if (rawAppResponseData[key] != null)
-                        value = rawAppResponseData[key].ToString();
-                }
-
-                if (!string.IsNullOrEmpty(value))
-                {
-                    keyValuePairAsString = string.Concat(keyValuePairAsString, key, "=", value, "\n");
-                    keyValuePair[key] = value;
-                    appResponseData[key] = value;
-                }
+                 }
+            }
+            catch (Exception ex)
+            {
+                HandleError("Error in HoloNETClient.DecodeZomeReturnData method.", ex);
             }
 
             return (appResponseData, keyValuePair, keyValuePairAsString, entryData);

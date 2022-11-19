@@ -130,16 +130,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                             Console.WriteLine("");
                             ShowAvatarDetails(avatar);
 
+                            avatar = ResetAvatar(avatar);
                             CLIEngine.ShowMessage("*** AVATAR SINGLE HOLONET BASE ENTRY LOAD TEST ***", _testHeadingColour);
-                            avatar.Id = Guid.Empty;
-                            avatar.FirstName = "";
-                            avatar.LastName = "";
-                            avatar.Email = "";
-                            avatar.DOB = DateTime.MinValue;
-                            avatar.CreatedBy = Guid.Empty;
-                            avatar.CreatedDate = DateTime.MinValue;
-                            avatar.ModifiedBy = Guid.Empty;
-                            avatar.ModifiedDate = DateTime.MinValue;
+                            
 
                             //string entryHash = avatar.EntryHash;
                             //avatar.Dispose(); //Free any resources including disconnecting from the Holochain Conductor, shutting down any running conductors etc...
@@ -154,12 +147,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                             if (result.IsCallSuccessful && !result.IsError)
                             {
                                 CLIEngine.ShowSuccessMessage(string.Concat("TEST HARNESS: AVATAR SINGLE HOLONET BASE ENTRY.LOAD RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
-                                //Console.WriteLine("");
                                 ShowAvatarDetails(avatar);
 
-
-                                CLIEngine.ShowMessage("*** AVATAR SINGLE HOLONET BASE ENTRY SAVE/UPDATE TEST ***", _testHeadingColour);
                                 // Now test the update method.
+                                CLIEngine.ShowMessage("*** AVATAR SINGLE HOLONET BASE ENTRY SAVE/UPDATE TEST ***", _testHeadingColour);
                                 avatar.FirstName = "James";
                                 CLIEngine.ShowWorkingMessage("Saving Avatar...");
                                 result = await avatar.SaveAsync();
@@ -167,40 +158,39 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                                 if (result.IsCallSuccessful && !result.IsError && !string.IsNullOrEmpty(result.ZomeReturnHash))
                                 {
                                     CLIEngine.ShowSuccessMessage(string.Concat("TEST HARNESS: AVATAR SINGLE HOLONET BASE ENTRY.SAVE/UPDATE RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
-                                    //Console.WriteLine("");
                                     ShowAvatarDetails(avatar);
 
-                                    CLIEngine.ShowMessage("*** AVATAR SINGLE HOLONET BASE ENTRY DELETE TEST ***", _testHeadingColour);
-                                    result = await avatar.DeleteAsync();
+                                    //Now check the update was saved correctly by re-loading it...
+                                    CLIEngine.ShowMessage("*** AVATAR SINGLE HOLONET BASE ENTRY LOAD TEST 2 (VERIFYING UPDATE WAS SUCCESSFUL) ***", _testHeadingColour);
+                                    CLIEngine.ShowWorkingMessage("Loading Avatar...");
 
-                                    if (result.IsCallSuccessful && !result.IsError && !string.IsNullOrEmpty(result.ZomeReturnHash))
+                                    avatar = ResetAvatar(avatar);
+                                    result = await avatar.LoadAsync();
+
+                                    if (result.IsCallSuccessful && !result.IsError)
                                     {
-                                        CLIEngine.ShowSuccessMessage(string.Concat("TEST HARNESS: AVATAR SINGLE HOLONET BASE ENTRY.DELETE RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
-                                        //Console.WriteLine("");
+                                        CLIEngine.ShowSuccessMessage(string.Concat("TEST HARNESS: AVATAR SINGLE HOLONET BASE ENTRY.LOAD RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
+                                        ShowAvatarDetails(avatar);
+
+                                        CLIEngine.ShowMessage("*** AVATAR SINGLE HOLONET BASE ENTRY DELETE TEST ***", _testHeadingColour);
+                                        result = await avatar.DeleteAsync();
+
+                                        if (result.IsCallSuccessful && !result.IsError && !string.IsNullOrEmpty(result.ZomeReturnHash))
+                                            CLIEngine.ShowSuccessMessage(string.Concat("TEST HARNESS: AVATAR SINGLE HOLONET BASE ENTRY.DELETE RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
+                                        else
+                                            CLIEngine.ShowErrorMessage(string.Concat("TEST HARNESS: AVATAR SINGLE HOLONET BASE ENTRY.DELETE RESPONSE: AN ERROR OCCURED: ", result.Message));
                                     }
                                     else
-                                    {
-                                        CLIEngine.ShowErrorMessage(string.Concat("TEST HARNESS: AVATAR SINGLE HOLONET BASE ENTRY.DELETE RESPONSE: AN ERROR OCCURED: ", result.Message));
-                                        //Console.WriteLine("");
-                                    }
+                                        CLIEngine.ShowErrorMessage(string.Concat("TEST HARNESS: AVATAR SINGLE HOLONET BASE ENTRY.LOAD RESPONSE: AN ERROR OCCURED: ", result.Message));
                                 }
                                 else
-                                {
                                     CLIEngine.ShowErrorMessage(string.Concat("TEST HARNESS: AVATAR SINGLE HOLONET BASE ENTRY.SAVE/UPDATE RESPONSE: AN ERROR OCCURED: ", result.Message));
-                                    //Console.WriteLine("");
-                                }
                             }
                             else
-                            {
                                 CLIEngine.ShowErrorMessage(string.Concat("TEST HARNESS: AVATAR SINGLE HOLONET BASE ENTRY.LOAD RESPONSE: AN ERROR OCCURED: ", result.Message));
-                                //Console.WriteLine("");
-                            }
                         }
                         else
-                        {
                             CLIEngine.ShowErrorMessage(string.Concat("TEST HARNESS: AVATAR SINGLE HOLONET BASE ENTRY.SAVE/CREATE RESPONSE: AN ERROR OCCURED: ", result.Message));
-                            //Console.WriteLine("");
-                        }
 
                         if (avatar != null)
                             await avatar.CloseAsync();
@@ -342,6 +332,21 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                     }
                     break;
             }
+        }
+
+        private static Avatar ResetAvatar(Avatar avatar)
+        {
+            avatar.Id = Guid.Empty;
+            avatar.FirstName = "";
+            avatar.LastName = "";
+            avatar.Email = "";
+            avatar.DOB = DateTime.MinValue;
+            avatar.CreatedBy = Guid.Empty;
+            avatar.CreatedDate = DateTime.MinValue;
+            avatar.ModifiedBy = Guid.Empty;
+            avatar.ModifiedDate = DateTime.MinValue;
+
+            return avatar;
         }
 
         private static void ShowAvatarDetails(Avatar avatar)

@@ -64,15 +64,23 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             Init();
         }
 
+        public EntryData EntryData { get; set; }
+
         [HolochainPropertyName("entry_hash")]
         public string EntryHash { get; set; }
+
+        //[HolochainPropertyName("previous_version_entry_hash")]
+        public string PreviousVersionEntryHash { get; set; }
+
+        [HolochainPropertyName("version")]
+        public int Version { get; set; } = 1;
 
         public string ZomeName { get; set; }
         public string ZomeLoadEntryFunction { get; set; }
         public string ZomeCreateEntryFunction { get; set; }
         public string ZomeUpdateEntryFunction { get; set; }
         public string ZomeDeleteEntryFunction { get; set; }
-        public List<HoloNETAuditEntry> AuditEntries { get; set; }
+        public List<HoloNETAuditEntry> AuditEntries { get; set; } = new List<HoloNETAuditEntry>();
 
         public async Task<ZomeFunctionCallBackEventArgs> LoadAsync(string entryHash)
         {
@@ -109,6 +117,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             Dictionary<string, object> zomeCallProps = new Dictionary<string, object>();
             PropertyInfo[] props = GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
             bool update = false;
+
+           // PreviousVersionEntryHash = EntryHash;
 
             foreach (PropertyInfo propInfo in props)
             {
@@ -207,11 +217,18 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             if (update)
             {
+                this.Version++;
                 AddProperty(updateParamsObject, "updated_entry", paramsObject);
+                AddProperty(updateParamsObject, "version", this.Version);
+                //AddProperty(updateParamsObject, "version", this.PreviousVersionEntryHash);
+
                 return await SaveAsync(updateParamsObject);
             }
             else
+            {
+                AddProperty(paramsObject, "version", this.Version);
                 return await SaveAsync(paramsObject);
+            }
         }
 
         public ZomeFunctionCallBackEventArgs Save()
@@ -419,8 +436,38 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         {
             if (!result.IsError && result.IsCallSuccessful)
             {
+                if (result.Entry != null)
+                {
+                    this.EntryData = result.Entry;
+
+                    if (!string.IsNullOrEmpty(result.Entry.PreviousHash))
+                        this.PreviousVersionEntryHash = result.Entry.PreviousHash;
+                }
+
                 if (!string.IsNullOrEmpty(result.ZomeReturnHash))
+                {
+                    if (!string.IsNullOrEmpty(this.EntryHash))
+                        this.PreviousVersionEntryHash = this.EntryHash;
+
                     this.EntryHash = result.ZomeReturnHash;
+
+                    HoloNETAuditEntry auditEntry = new HoloNETAuditEntry()
+                    {
+                        DateTime = DateTime.Now,
+                        EntryHash = result.ZomeReturnHash
+                    };
+
+                    if (result.ZomeFunction == ZomeCreateEntryFunction)
+                        auditEntry.Type = HoloNETAuditEntryType.Create;
+
+                    else if (result.ZomeFunction == ZomeUpdateEntryFunction)
+                        auditEntry.Type = HoloNETAuditEntryType.Modify;
+
+                    else if (result.ZomeFunction == ZomeDeleteEntryFunction)
+                        auditEntry.Type = HoloNETAuditEntryType.Delete;
+
+                    this.AuditEntries.Add(auditEntry);
+                }
 
                 if (result.KeyValuePair != null)
                 {
