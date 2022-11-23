@@ -1214,11 +1214,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
         }
 
-        private (Dictionary<string, object>, Dictionary<string, string> keyValuePair, string keyValuePairAsString, EntryData entry) DecodeZomeReturnData(Dictionary<object, object> rawAppResponseData, Dictionary<string, object> appResponseData, Dictionary<string, string> keyValuePair, string keyValuePairAsString)
+        private (Dictionary<string, object>, Dictionary<string, string> keyValuePair, string keyValuePairAsString, EntryData entry) DecodeZomeReturnData(Dictionary<object, object> rawAppResponseData, Dictionary<string, object> appResponseData, Dictionary<string, string> keyValuePair, string keyValuePairAsString, EntryData entryData = null)
         {
             string value = "";
             var options = MessagePackSerializerOptions.Standard.WithSecurity(MessagePackSecurity.UntrustedData);
-            EntryData entryData = new EntryData();
+
+            if (entryData == null)
+                entryData = new EntryData();
 
             try
             {
@@ -1268,58 +1270,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                             if (dict != null)
                             {
                                 Dictionary<string, object> tempDict = new Dictionary<string, object>();
-                                (tempDict, keyValuePair, keyValuePairAsString, entryData) = DecodeZomeReturnData(dict, tempDict, keyValuePair, keyValuePairAsString);
+                                (tempDict, keyValuePair, keyValuePairAsString, entryData) = DecodeZomeReturnData(dict, tempDict, keyValuePair, keyValuePairAsString, entryData);
                                 appResponseData[key] = tempDict;
                             }
                             else if (rawAppResponseData[key] != null)
-                            {
-                                try
-                                {
-                                    value = rawAppResponseData[key].ToString();
-
-                                    switch (key)
-                                    {
-                                        case "prev_action":
-                                            entryData.PreviousHash = value;
-                                            break;
-
-                                        case "action_seq":
-                                            entryData.ActionSequence = Convert.ToInt32(value);
-                                            break;
-
-                                        case "author":
-                                            entryData.Author = value;
-                                            break;
-
-                                        case "original_action_address":
-                                            entryData.OriginalActionAddress = value;
-                                            break;
-
-                                        case "original_entry_address":
-                                            entryData.OriginalEntryAddress = value;
-                                            break;
-
-                                        case "timestamp":
-                                            {
-                                                entryData.TimestampRust = Convert.ToInt64(value);
-                                                //entryData.Timestamp = Convert.ToDateTime(entryData.TimestampRust);
-                                                //entryData.Timestamp = DateTime.FromBinary(entryData.TimestampRust);
-
-                                                long time = entryData.TimestampRust / 1000; // Divide by 1,000 because we need milliseconds, not microseconds.
-                                                entryData.Timestamp = DateTimeOffset.FromUnixTimeMilliseconds(time).DateTime.AddHours(-5);
-                                            }
-                                            break;
-
-                                        case "type":
-                                            entryData.Type = value;
-                                            break;
-                                    }
-                                }
-                                catch (Exception ex)
-                                {
-                                    HandleError("Error in HoloNETClient.DecodeZomeReturnData method.", ex);
-                                }
-                            }
+                                value = rawAppResponseData[key].ToString();
                         }
 
                         if (!string.IsNullOrEmpty(value))
@@ -1327,6 +1282,64 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                             keyValuePairAsString = string.Concat(keyValuePairAsString, key, "=", value, "\n");
                             keyValuePair[key] = value;
                             appResponseData[key] = value;
+
+                            try
+                            {
+                                switch (key)
+                                {
+                                    case "hash":
+                                        entryData.Hash = value;
+                                        break;
+
+                                    case "entry_hash":
+                                        entryData.EntryHash = value;
+                                        break;
+
+                                    case "prev_action":
+                                        entryData.PreviousHash = value;
+                                        break;
+
+                                    case "signature":
+                                        entryData.Signature = value;
+                                        break;
+
+                                    case "action_seq":
+                                        entryData.ActionSequence = Convert.ToInt32(value);
+                                        break;
+
+                                    case "author":
+                                        entryData.Author = value;
+                                        break;
+
+                                    case "original_action_address":
+                                        entryData.OriginalActionAddress = value;
+                                        break;
+
+                                    case "original_entry_address":
+                                        entryData.OriginalEntryAddress = value;
+                                        break;
+
+                                    case "timestamp":
+                                        {
+                                            entryData.Timestamp = Convert.ToInt64(value);
+                                            long time = entryData.Timestamp / 1000; // Divide by 1,000 because we need milliseconds, not microseconds.
+                                            entryData.DateTime = DateTimeOffset.FromUnixTimeMilliseconds(time).DateTime.AddHours(-5).AddMinutes(1);
+                                        }
+                                        break;
+
+                                    case "type":
+                                        entryData.Type = value;
+                                        break;
+
+                                    case "entry_type":
+                                        entryData.EntryType = value;
+                                        break;
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                HandleError("Error in HoloNETClient.DecodeZomeReturnData method.", ex);
+                            } 
                         }
                     }
                     catch (Exception ex)

@@ -66,7 +66,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         public EntryData EntryData { get; set; }
 
-        [HolochainPropertyName("entry_hash")]
+        //[HolochainPropertyName("entry_hash")]
         public string EntryHash { get; set; }
 
         //[HolochainPropertyName("previous_version_entry_hash")]
@@ -185,13 +185,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                                     else
                                         AddProperty(paramsObject, key, value);
                                 }
-                                else if (StoreEntryHashInEntry && key == "entry_hash")
-                                {
-                                    if (value == null)
-                                        AddProperty(paramsObject, key, "");
-                                    else
-                                        AddProperty(paramsObject, key, value);
-                                }
+                                //else if (StoreEntryHashInEntry && key == "entry_hash")
+                                //{
+                                //    if (value == null)
+                                //        AddProperty(paramsObject, key, "");
+                                //    else
+                                //        AddProperty(paramsObject, key, value);
+                                //}
                                 
                                 if (key == "entry_hash" && value != null)
                                 {
@@ -199,12 +199,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                                     AddProperty(updateParamsObject, "original_action_hash", HoloNETClient.ConvertHoloHashToBytes(value.ToString()));
                                     update = true;
                                 }
-
-                                //else if (key == "entry_hash" && value != null)
-                                //{
-                                //    //Is an update so we need to include the action_hash for the rust HDK to be able to update the entry...
-                                //    AddProperty(paramsObject, "action_hash", HoloNETClient.ConvertHoloHashToBytes(value.ToString()));
-                                //}
                             }
                         }
                         catch (Exception ex)
@@ -436,14 +430,19 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         {
             if (!result.IsError && result.IsCallSuccessful)
             {
+                //Load
                 if (result.Entry != null)
                 {
                     this.EntryData = result.Entry;
+
+                    if (!string.IsNullOrEmpty(result.Entry.EntryHash))
+                        this.EntryHash = result.Entry.EntryHash;
 
                     if (!string.IsNullOrEmpty(result.Entry.PreviousHash))
                         this.PreviousVersionEntryHash = result.Entry.PreviousHash;
                 }
 
+                //Create/Updates/Delete
                 if (!string.IsNullOrEmpty(result.ZomeReturnHash))
                 {
                     if (!string.IsNullOrEmpty(this.EntryHash))
@@ -471,8 +470,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                 if (result.KeyValuePair != null)
                 {
-                    if (result.KeyValuePair.ContainsKey("entry_hash") && string.IsNullOrEmpty(result.KeyValuePair["entry_hash"]))
-                        result.KeyValuePair.Remove("entry_hash");
+                    //if (result.KeyValuePair.ContainsKey("entry_hash") && string.IsNullOrEmpty(result.KeyValuePair["entry_hash"]))
+                    //    result.KeyValuePair.Remove("entry_hash");
 
                     HoloNETClient.MapEntryDataObject(this, result.KeyValuePair);
                 }
