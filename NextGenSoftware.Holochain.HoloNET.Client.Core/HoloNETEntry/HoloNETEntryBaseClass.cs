@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Reflection;
 using System.Threading.Tasks;
+using NextGenSoftware.Logging;
+using NextGenSoftware.Utilities.ExtentionMethods;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
@@ -14,6 +16,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public HoloNETClient HoloNETClient { get; set; }
 
         public bool StoreEntryHashInEntry { get; set; } = true;
+
+        public delegate void Error(object sender, HoloNETErrorEventArgs e);
+        public event Error OnError;
 
         public HoloNETEntryBaseClass(string zomeName, string zomeLoadEntryFunction, string zomeCreateEntryFunction, string zomeUpdateEntryFunction, string zomeDeleteEntryFunction, bool storeEntryHashInEntry = true, string holochainConductorURI = "ws://localhost:8888", HoloNETConfig holoNETConfig = null, bool logToConsole = true, bool logToFile = true, string releativePathToLogFolder = "Logs", string logFileName = "HoloNET.log", bool addAdditionalSpaceAfterEachLogEntry = false, bool showColouredLogs = true, ConsoleColor debugColour = ConsoleColor.White, ConsoleColor infoColour = ConsoleColor.Green, ConsoleColor warningColour = ConsoleColor.Yellow, ConsoleColor errorColour = ConsoleColor.Red)
         {
@@ -64,41 +69,105 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             Init();
         }
 
+        /// <summary>
+        /// Metadata for the Entry.
+        /// </summary>
         public EntryData EntryData { get; set; }
 
+        /// <summary>
+        /// The Entry hash.
+        /// </summary>
         //[HolochainPropertyName("entry_hash")]
         public string EntryHash { get; set; }
 
+        //public string Author { get; set; }
+
+        /// <summary>
+        /// The previous entry hash.
+        /// </summary>
         //[HolochainPropertyName("previous_version_entry_hash")]
         public string PreviousVersionEntryHash { get; set; }
 
+        /// <summary>
+        /// The current version of the entry.
+        /// </summary>
         [HolochainPropertyName("version")]
         public int Version { get; set; } = 1;
 
+        /// <summary>
+        /// The name of the zome to call the respective ZomeLoadEntryFunction, ZomeCreateEntryFunction, ZomeUpdateEntryFunction & ZomeDeleteEntryFunction.
+        /// </summary>
         public string ZomeName { get; set; }
+
+        /// <summary>
+        /// The name of the zome function to call to load the entry.
+        /// </summary>
         public string ZomeLoadEntryFunction { get; set; }
+
+        /// <summary>
+        /// The name of the zome function to call to create the entry.
+        /// </summary>
         public string ZomeCreateEntryFunction { get; set; }
+
+        /// <summary>
+        /// The name of the zome function to call to update the entry.
+        /// </summary>
         public string ZomeUpdateEntryFunction { get; set; }
+
+        /// <summary>
+        /// The name of the zome function to call to delete the entry.
+        /// </summary>
         public string ZomeDeleteEntryFunction { get; set; }
+
+        /// <summary>
+        /// List of all previous hashes along with the type and datetime.
+        /// </summary>
         public List<HoloNETAuditEntry> AuditEntries { get; set; } = new List<HoloNETAuditEntry>();
 
+        /// <summary>
+        /// Load's the entry by calling the ZomeLoadEntryFunction.
+        /// </summary>
+        /// <param name="entryHash"></param>
+        /// <returns></returns>
         public async Task<ZomeFunctionCallBackEventArgs> LoadAsync(string entryHash)
         {
-            ZomeFunctionCallBackEventArgs result = await HoloNETClient.CallZomeFunctionAsync(ZomeName, ZomeLoadEntryFunction, EntryHash);
-            ProcessZomeReturnCall(result);
-            return result;
+            try
+            {
+                ZomeFunctionCallBackEventArgs result = await HoloNETClient.CallZomeFunctionAsync(ZomeName, ZomeLoadEntryFunction, EntryHash);
+                ProcessZomeReturnCall(result);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                string msg = "Unknown error occured in LoadAsync method.";
+                HandleError(msg, ex);
+                return new ZomeFunctionCallBackEventArgs() { IsError = true, Message = $"{msg}. Reason: {ex}" };
+            }
         }
 
+        /// <summary>
+        /// Load's the entry by calling the ZomeLoadEntryFunction.
+        /// </summary>
+        /// <param name="entryHash"></param>
+        /// <returns></returns>
         public ZomeFunctionCallBackEventArgs Load(string entryHash)
         {
             return LoadAsync(entryHash).Result;
         }
 
+        /// <summary>
+        /// Load's the entry by calling the ZomeLoadEntryFunction (it will use the EntryHash property to load from).
+        /// </summary>
+        /// <returns></returns>
         public async Task<ZomeFunctionCallBackEventArgs> LoadAsync()
         {
             return await LoadAsync(EntryHash);
         }
 
+        /// <summary>
+        /// Load's the entry by calling the ZomeLoadEntryFunction (it will use the EntryHash property to load from).
+        /// </summary>
+        /// <returns></returns>
         public ZomeFunctionCallBackEventArgs Load()
         {
             return LoadAsync().Result;
@@ -107,124 +176,83 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <summary>
         /// Saves the object and will automatically extrct the properties that need saving (contain the HolochainPropertyName attribute). This method uses reflection so has a tiny performance overhead (negligbale), but if you need the extra nanoseconds use the other Save overload passing in your own params object.
         /// </summary>
-        /// <param name="paramsObject"></param>
         /// <returns></returns>
         public virtual async Task<ZomeFunctionCallBackEventArgs> SaveAsync()
         {
-            dynamic paramsObject = new ExpandoObject();
-            dynamic updateParamsObject = new ExpandoObject();
-            //object paramsObject = new object();
-            Dictionary<string, object> zomeCallProps = new Dictionary<string, object>();
-            PropertyInfo[] props = GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
-            bool update = false;
-
-           // PreviousVersionEntryHash = EntryHash;
-
-            foreach (PropertyInfo propInfo in props)
+            try
             {
-                foreach (CustomAttributeData data in propInfo.CustomAttributes)
+                dynamic paramsObject = new ExpandoObject();
+                dynamic updateParamsObject = new ExpandoObject();
+                Dictionary<string, object> zomeCallProps = new Dictionary<string, object>();
+                PropertyInfo[] props = GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
+                bool update = false;
+
+                foreach (PropertyInfo propInfo in props)
                 {
-                    if (data.AttributeType == (typeof(HolochainPropertyName)))
+                    foreach (CustomAttributeData data in propInfo.CustomAttributes)
                     {
-                        try
+                        if (data.AttributeType == (typeof(HolochainPropertyName)))
                         {
-                            if (data.ConstructorArguments.Count > 0 && data.ConstructorArguments[0] != null && data.ConstructorArguments[0].Value != null)
+                            try
                             {
-                                string key = data.ConstructorArguments[0].Value.ToString();
-                                object value = propInfo.GetValue(this);
-
-                                if (key != "entry_hash")
+                                if (data.ConstructorArguments.Count > 0 && data.ConstructorArguments[0] != null && data.ConstructorArguments[0].Value != null)
                                 {
-                                    if (propInfo.PropertyType == typeof(Guid))
-                                        AddProperty(paramsObject, key, value.ToString());
+                                    string key = data.ConstructorArguments[0].Value.ToString();
+                                    object value = propInfo.GetValue(this);
 
-                                    else if (propInfo.PropertyType == typeof(DateTime))
-                                        AddProperty(paramsObject, key, value.ToString());
+                                    if (key != "entry_hash")
+                                    {
+                                        if (propInfo.PropertyType == typeof(Guid))
+                                            ExpandoObjectHelpers.AddProperty(paramsObject, key, value.ToString());
 
-                                    /*
-                                    else if (propInfo.PropertyType == typeof(bool))
-                                        propInfo.SetValue(paramsObject, Convert.ToBoolean(keyValuePairs[key]));
+                                        else if (propInfo.PropertyType == typeof(DateTime))
+                                            ExpandoObjectHelpers.AddProperty(paramsObject, key, value.ToString());
 
-                                    else if (propInfo.PropertyType == typeof(int))
-                                        propInfo.SetValue(paramsObject, Convert.ToInt32(keyValuePairs[key]));
-
-                                    else if (propInfo.PropertyType == typeof(long))
-                                        propInfo.SetValue(paramsObject, Convert.ToInt64(keyValuePairs[key]));
-
-                                    else if (propInfo.PropertyType == typeof(float))
-                                        propInfo.SetValue(paramsObject, Convert.ToDouble(keyValuePairs[key])); //TODO: Check if this is right?! :)
-
-                                    else if (propInfo.PropertyType == typeof(double))
-                                        propInfo.SetValue(paramsObject, Convert.ToDouble(keyValuePairs[key]));
-
-                                    else if (propInfo.PropertyType == typeof(decimal))
-                                        propInfo.SetValue(paramsObject, Convert.ToDecimal(keyValuePairs[key]));
-
-                                    else if (propInfo.PropertyType == typeof(UInt16))
-                                        propInfo.SetValue(paramsObject, Convert.ToUInt16(keyValuePairs[key]));
-
-                                    else if (propInfo.PropertyType == typeof(UInt32))
-                                        propInfo.SetValue(paramsObject, Convert.ToUInt32(keyValuePairs[key]));
-
-                                    else if (propInfo.PropertyType == typeof(UInt64))
-                                        propInfo.SetValue(paramsObject, Convert.ToUInt64(keyValuePairs[key]));
-
-                                    else if (propInfo.PropertyType == typeof(Single))
-                                        propInfo.SetValue(paramsObject, Convert.ToSingle(keyValuePairs[key]));
-
-                                    else if (propInfo.PropertyType == typeof(char))
-                                        propInfo.SetValue(paramsObject, Convert.ToChar(keyValuePairs[key]));
-
-                                    else if (propInfo.PropertyType == typeof(byte))
-                                        propInfo.SetValue(paramsObject, Convert.ToByte(keyValuePairs[key]));
-
-                                    else if (propInfo.PropertyType == typeof(sbyte))
-                                        propInfo.SetValue(paramsObject, Convert.ToSByte(keyValuePairs[key]));
-                                    */
-
-                                    else
-                                        AddProperty(paramsObject, key, value);
-                                }
-                                //else if (StoreEntryHashInEntry && key == "entry_hash")
-                                //{
-                                //    if (value == null)
-                                //        AddProperty(paramsObject, key, "");
-                                //    else
-                                //        AddProperty(paramsObject, key, value);
-                                //}
-                                
-                                if (key == "entry_hash" && value != null)
-                                {
-                                    //Is an update so we need to include the action_hash for the rust HDK to be able to update the entry...
-                                    AddProperty(updateParamsObject, "original_action_hash", HoloNETClient.ConvertHoloHashToBytes(value.ToString()));
-                                    update = true;
+                                        else
+                                            ExpandoObjectHelpers.AddProperty(paramsObject, key, value);
+                                    }
+                                    if (key == "entry_hash" && value != null)
+                                    {
+                                        //Is an update so we need to include the action_hash for the rust HDK to be able to update the entry...
+                                        ExpandoObjectHelpers.AddProperty(updateParamsObject, "original_action_hash", HoloNETClient.ConvertHoloHashToBytes(value.ToString()));
+                                        update = true;
+                                    }
                                 }
                             }
-                        }
-                        catch (Exception ex)
-                        {
+                            catch (Exception ex)
+                            {
 
+                            }
                         }
                     }
                 }
-            }
 
-            if (update)
-            {
-                this.Version++;
-                AddProperty(updateParamsObject, "updated_entry", paramsObject);
-                AddProperty(updateParamsObject, "version", this.Version);
-                //AddProperty(updateParamsObject, "version", this.PreviousVersionEntryHash);
+                if (update)
+                {
+                    this.Version++;
+                    ExpandoObjectHelpers.AddProperty(updateParamsObject, "updated_entry", paramsObject);
+                    ExpandoObjectHelpers.AddProperty(updateParamsObject, "version", this.Version);
 
-                return await SaveAsync(updateParamsObject);
+                    return await SaveAsync(updateParamsObject);
+                }
+                else
+                {
+                    ExpandoObjectHelpers.AddProperty(paramsObject, "version", this.Version);
+                    return await SaveAsync(paramsObject);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                AddProperty(paramsObject, "version", this.Version);
-                return await SaveAsync(paramsObject);
+                string msg = "Unknown error occured in SaveAsync method.";
+                HandleError(msg, ex);
+                return new ZomeFunctionCallBackEventArgs() { IsError = true, Message = $"{msg}. Reason: {ex}" };
             }
         }
 
+        /// <summary>
+        /// Saves the object and will automatically extrct the properties that need saving (contain the HolochainPropertyName attribute). This method uses reflection so has a tiny performance overhead (negligbale), but if you need the extra nanoseconds use the other Save overload passing in your own params object.
+        /// </summary>
+        /// <returns></returns>
         public ZomeFunctionCallBackEventArgs Save()
         {
             return SaveAsync().Result;
@@ -239,66 +267,82 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         {
             ZomeFunctionCallBackEventArgs result = null;
 
-            if (string.IsNullOrEmpty(EntryHash))
-                result = await HoloNETClient.CallZomeFunctionAsync(ZomeName, ZomeCreateEntryFunction, paramsObject);
-            else
-                result = await HoloNETClient.CallZomeFunctionAsync(ZomeName, ZomeUpdateEntryFunction, paramsObject);
+            try
+            {
+                if (string.IsNullOrEmpty(EntryHash))
+                    result = await HoloNETClient.CallZomeFunctionAsync(ZomeName, ZomeCreateEntryFunction, paramsObject);
+                else
+                    result = await HoloNETClient.CallZomeFunctionAsync(ZomeName, ZomeUpdateEntryFunction, paramsObject);
 
-            ProcessZomeReturnCall(result);
+                ProcessZomeReturnCall(result);
+            }
+            catch (Exception ex)
+            {
+                HandleError("Unknown error occured in SaveAsync method.", ex);
+            }
 
             return result;
         }
 
+        /// <summary>
+        /// Saves the object using the params object passed in containing the hApp rust properties & their values to save. 
+        /// </summary>
+        /// <param name="paramsObject"></param>
+        /// <returns></returns>
         public ZomeFunctionCallBackEventArgs Save(dynamic paramsObject)
         {
             return SaveAsync(paramsObject).Result;
         }
 
+        /// <summary>
+        /// Soft delete's the entry (the previous version can still be retreived). Uses the EntryHash property.
+        /// </summary>
+        /// <returns></returns>
         public virtual async Task<ZomeFunctionCallBackEventArgs> DeleteAsync()
         {
             return await DeleteAsync(this.EntryHash);
         }
 
+        /// <summary>
+        /// Soft delete's the entry (the previous version can still be retreived).
+        /// </summary>
+        /// <returns></returns>
         public virtual async Task<ZomeFunctionCallBackEventArgs> DeleteAsync(string entryHash)
         {
             ZomeFunctionCallBackEventArgs result = null;
 
-            if (!string.IsNullOrEmpty(EntryHash))
-                result = await HoloNETClient.CallZomeFunctionAsync(ZomeName, ZomeDeleteEntryFunction, entryHash);
-            else
-                result = new ZomeFunctionCallBackEventArgs() { IsError = true, Message = "EntryHash is null, please set before calling this function." };
+            try
+            {
+                if (!string.IsNullOrEmpty(EntryHash))
+                    result = await HoloNETClient.CallZomeFunctionAsync(ZomeName, ZomeDeleteEntryFunction, entryHash);
+                else
+                    result = new ZomeFunctionCallBackEventArgs() { IsError = true, Message = "EntryHash is null, please set before calling this function." };
+            }
+            catch (Exception ex)
+            {
+                HandleError("Unknown error occured in DeleteAsync method.", ex);
+            }
 
             return result;
         }
 
+        /// <summary>
+        /// Soft delete's the entry (the previous version can still be retreived).
+        /// </summary>
+        /// <returns></returns>
         public virtual ZomeFunctionCallBackEventArgs Delete()
         {
             return DeleteAsync().Result;
         }
 
+        /// <summary>
+        /// Soft delete's the entry (the previous version can still be retreived).
+        /// </summary>
+        /// <returns></returns>
         public virtual ZomeFunctionCallBackEventArgs Delete(string entryHash)
         {
             return DeleteAsync(entryHash).Result;
         }
-
-        //public void Dispose()
-        //{
-        //    if (HoloNETClient != null && _disposeOfHoloNETClient)
-        //    {
-        //        HoloNETClient.Dispose();
-
-        //        if (HoloNETClient.WebSocket.State == System.Net.WebSockets.WebSocketState.Closed)
-        //        {
-
-        //        }
-        //        else
-        //        {
-
-        //        }
-
-        //        HoloNETClient = null;
-        //    }
-        //}
 
         /// <summary>
         /// Will close this HoloNET Entry and then shutdown its internal HoloNET instance (if one was not passed in) and its current connetion to the Holochain Conductor.
@@ -310,20 +354,17 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public async Task CloseAsync(DisconnectedCallBackMode disconnectedCallBackMode = DisconnectedCallBackMode.WaitForHolochainConductorToDisconnect, ShutdownHolochainConductorsMode shutdownHolochainConductorsMode = ShutdownHolochainConductorsMode.UseConfigSettings)
         {
-            if (HoloNETClient != null && _disposeOfHoloNETClient)
+            try
             {
-                await HoloNETClient.ShutdownHoloNETAsync(disconnectedCallBackMode, shutdownHolochainConductorsMode);
-
-                if (HoloNETClient.WebSocket.State == System.Net.WebSockets.WebSocketState.Closed)
+                if (HoloNETClient != null && _disposeOfHoloNETClient)
                 {
-
+                    await HoloNETClient.ShutdownHoloNETAsync(disconnectedCallBackMode, shutdownHolochainConductorsMode);
+                    HoloNETClient = null;
                 }
-                else
-                {
-
-                }
-
-                HoloNETClient = null;
+            }
+            catch (Exception ex)
+            {
+                HandleError("Unknown error occured in CloseAsync method.", ex);
             }
         }
 
@@ -335,37 +376,41 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="shutdownHolochainConductorsMode"></param>
         public void Close(ShutdownHolochainConductorsMode shutdownHolochainConductorsMode = ShutdownHolochainConductorsMode.UseConfigSettings)
         {
-            if (HoloNETClient != null && _disposeOfHoloNETClient)
+            try
             {
-                HoloNETClient.ShutdownHoloNET(shutdownHolochainConductorsMode);
-
-                if (HoloNETClient.WebSocket.State == System.Net.WebSockets.WebSocketState.Closed)
+                if (HoloNETClient != null && _disposeOfHoloNETClient)
                 {
-
+                    HoloNETClient.ShutdownHoloNET(shutdownHolochainConductorsMode);
+                    HoloNETClient = null;
                 }
-                else
-                {
-
-                }
-
-                HoloNETClient = null;
+            }
+            catch (Exception ex)
+            {
+                HandleError("Unknown error occured in Close method.", ex);
             }
         }
 
         private void Init()
         {
-            HoloNETClient.OnAppInfoCallBack += HoloNETClient_OnAppInfoCallBack;
-            HoloNETClient.OnConductorDebugCallBack += HoloNETClient_OnConductorDebugCallBack;
-            HoloNETClient.OnConnected += HoloNETClient_OnConnected;
-            HoloNETClient.OnDataReceived += HoloNETClient_OnDataReceived;
-            HoloNETClient.OnDisconnected += HoloNETClient_OnDisconnected;
-            HoloNETClient.OnError += HoloNETClient_OnError;
-            HoloNETClient.OnReadyForZomeCalls += HoloNETClient_OnReadyForZomeCalls;
-            HoloNETClient.OnSignalsCallBack += HoloNETClient_OnSignalsCallBack;
-            HoloNETClient.OnZomeFunctionCallBack += HoloNETClient_OnZomeFunctionCallBack;
+            try
+            {
+                HoloNETClient.OnAppInfoCallBack += HoloNETClient_OnAppInfoCallBack;
+                HoloNETClient.OnConductorDebugCallBack += HoloNETClient_OnConductorDebugCallBack;
+                HoloNETClient.OnConnected += HoloNETClient_OnConnected;
+                HoloNETClient.OnDataReceived += HoloNETClient_OnDataReceived;
+                HoloNETClient.OnDisconnected += HoloNETClient_OnDisconnected;
+                HoloNETClient.OnError += HoloNETClient_OnError;
+                HoloNETClient.OnReadyForZomeCalls += HoloNETClient_OnReadyForZomeCalls;
+                HoloNETClient.OnSignalsCallBack += HoloNETClient_OnSignalsCallBack;
+                HoloNETClient.OnZomeFunctionCallBack += HoloNETClient_OnZomeFunctionCallBack;
 
-            if (HoloNETClient.WebSocket.State != System.Net.WebSockets.WebSocketState.Connecting || HoloNETClient.WebSocket.State != System.Net.WebSockets.WebSocketState.Open)
-                HoloNETClient.Connect();
+                if (HoloNETClient.WebSocket.State != System.Net.WebSockets.WebSocketState.Connecting || HoloNETClient.WebSocket.State != System.Net.WebSockets.WebSocketState.Open)
+                    HoloNETClient.Connect();
+            }
+            catch (Exception ex)
+            {
+                HandleError("Unknown error occured in Init method.", ex);
+            }
         }
 
         private void HoloNETClient_OnZomeFunctionCallBack(object sender, ZomeFunctionCallBackEventArgs e)
@@ -417,64 +462,86 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             
         }
 
-        private void AddProperty(ExpandoObject expando, string propertyName, object propertyValue)
-        {
-            var exDict = expando as IDictionary<string, object>;
-            if (exDict.ContainsKey(propertyName))
-                exDict[propertyName] = propertyValue;
-            else
-                exDict.Add(propertyName, propertyValue);
-        }
-
         private void ProcessZomeReturnCall(ZomeFunctionCallBackEventArgs result)
         {
-            if (!result.IsError && result.IsCallSuccessful)
+            try
             {
-                //Load
-                if (result.Entry != null)
+                if (!result.IsError && result.IsCallSuccessful)
                 {
-                    this.EntryData = result.Entry;
-
-                    if (!string.IsNullOrEmpty(result.Entry.EntryHash))
-                        this.EntryHash = result.Entry.EntryHash;
-
-                    if (!string.IsNullOrEmpty(result.Entry.PreviousHash))
-                        this.PreviousVersionEntryHash = result.Entry.PreviousHash;
-                }
-
-                //Create/Updates/Delete
-                if (!string.IsNullOrEmpty(result.ZomeReturnHash))
-                {
-                    if (!string.IsNullOrEmpty(this.EntryHash))
-                        this.PreviousVersionEntryHash = this.EntryHash;
-
-                    this.EntryHash = result.ZomeReturnHash;
-
-                    HoloNETAuditEntry auditEntry = new HoloNETAuditEntry()
+                    //Load
+                    if (result.Entry != null)
                     {
-                        DateTime = DateTime.Now,
-                        EntryHash = result.ZomeReturnHash
-                    };
+                        this.EntryData = result.Entry;
 
-                    if (result.ZomeFunction == ZomeCreateEntryFunction)
-                        auditEntry.Type = HoloNETAuditEntryType.Create;
+                        if (!string.IsNullOrEmpty(result.Entry.EntryHash))
+                            this.EntryHash = result.Entry.EntryHash;
 
-                    else if (result.ZomeFunction == ZomeUpdateEntryFunction)
-                        auditEntry.Type = HoloNETAuditEntryType.Modify;
+                        if (!string.IsNullOrEmpty(result.Entry.PreviousHash))
+                            this.PreviousVersionEntryHash = result.Entry.PreviousHash;
 
-                    else if (result.ZomeFunction == ZomeDeleteEntryFunction)
-                        auditEntry.Type = HoloNETAuditEntryType.Delete;
+                        //if (!string.IsNullOrEmpty(result.Entry.Author))
+                        //    this.Author = result.Entry.Author;
+                    }
 
-                    this.AuditEntries.Add(auditEntry);
+                    //Create/Updates/Delete
+                    if (!string.IsNullOrEmpty(result.ZomeReturnHash))
+                    {
+                        if (!string.IsNullOrEmpty(this.EntryHash))
+                            this.PreviousVersionEntryHash = this.EntryHash;
+
+                        this.EntryHash = result.ZomeReturnHash;
+
+                        HoloNETAuditEntry auditEntry = new HoloNETAuditEntry()
+                        {
+                            DateTime = DateTime.Now,
+                            EntryHash = result.ZomeReturnHash
+                        };
+
+                        if (result.ZomeFunction == ZomeCreateEntryFunction)
+                            auditEntry.Type = HoloNETAuditEntryType.Create;
+
+                        else if (result.ZomeFunction == ZomeUpdateEntryFunction)
+                            auditEntry.Type = HoloNETAuditEntryType.Modify;
+
+                        else if (result.ZomeFunction == ZomeDeleteEntryFunction)
+                            auditEntry.Type = HoloNETAuditEntryType.Delete;
+
+                        this.AuditEntries.Add(auditEntry);
+                    }
+
+                    if (result.KeyValuePair != null)
+                    {
+                        //if (result.KeyValuePair.ContainsKey("entry_hash") && string.IsNullOrEmpty(result.KeyValuePair["entry_hash"]))
+                        //    result.KeyValuePair.Remove("entry_hash");
+
+                        HoloNETClient.MapEntryDataObject(this, result.KeyValuePair);
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                HandleError("Unknown error occured in ProcessZomeReturnCall method.", ex);
+            }
+        }
 
-                if (result.KeyValuePair != null)
-                {
-                    //if (result.KeyValuePair.ContainsKey("entry_hash") && string.IsNullOrEmpty(result.KeyValuePair["entry_hash"]))
-                    //    result.KeyValuePair.Remove("entry_hash");
+        private void HandleError(string message, Exception exception)
+        {
+            message = string.Concat(message, exception != null ? $". Error Details: {exception}" : "");
+            Logger.Log(message, LogType.Error);
 
-                    HoloNETClient.MapEntryDataObject(this, result.KeyValuePair);
-                }
+            OnError?.Invoke(this, new HoloNETErrorEventArgs { EndPoint = HoloNETClient.WebSocket.EndPoint, Reason = message, ErrorDetails = exception });
+
+            switch (HoloNETClient.Config.ErrorHandlingBehaviour)
+            {
+                case ErrorHandlingBehaviour.AlwaysThrowExceptionOnError:
+                    throw new HoloNETException(message, exception, HoloNETClient.WebSocket.EndPoint);
+
+                case ErrorHandlingBehaviour.OnlyThrowExceptionIfNoErrorHandlerSubscribedToOnErrorEvent:
+                    {
+                        if (OnError == null)
+                            throw new HoloNETException(message, exception, HoloNETClient.WebSocket.EndPoint);
+                    }
+                    break;
             }
         }
     }

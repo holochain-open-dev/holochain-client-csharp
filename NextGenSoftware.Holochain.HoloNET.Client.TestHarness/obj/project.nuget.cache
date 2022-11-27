@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "KTSKvkCsvY7SFEWO2w2uskmI7O1TlVWbGdLZ1e/AHdDpxuKsTf1cqLK6TjdTnCeJp4BkHPaSj1vMLa/rym21DQ==",
+  "dgSpecHash": "BHzY7fALrMggu+a0wmLFjKcmdZ2hry42r4/U1vuliX7dL7L+xI4aSXGwAmitvJbdluwuWwtFy5m+7r4h6IfyZQ==",
   "success": true,
   "projectFilePath": "C:\\Users\\david\\source\\repos\\holochain-client-csharp\\NextGenSoftware.Holochain.HoloNET.Client.TestHarness\\NextGenSoftware.Holochain.HoloNET.Client.TestHarness.csproj",
   "expectedPackageFiles": [
@@ -48,10 +48,7 @@
     "C:\\Users\\david\\.nuget\\packages\\system.threading.tasks\\4.3.0\\system.threading.tasks.4.3.0.nupkg.sha512",
     "C:\\Users\\david\\.nuget\\packages\\system.threading.tasks.extensions\\4.5.4\\system.threading.tasks.extensions.4.5.4.nupkg.sha512",
     "C:\\Users\\david\\.nuget\\packages\\nextgensoftware.cli.engine\\1.1.1\\nextgensoftware.cli.engine.1.1.1.nupkg.sha512",
-    "C:\\Users\\david\\.nuget\\packages\\nextgensoftware.holochain.holonet.client.embedded\\1.4.1\\nextgensoftware.holochain.holonet.client.embedded.1.4.1.nupkg.sha512",
-    "C:\\Users\\david\\.nuget\\packages\\nextgensoftware.logging\\1.1.3\\nextgensoftware.logging.1.1.3.nupkg.sha512",
-    "C:\\Users\\david\\.nuget\\packages\\nextgensoftware.utilities\\1.0.3\\nextgensoftware.utilities.1.0.3.nupkg.sha512",
-    "C:\\Users\\david\\.nuget\\packages\\nextgensoftware.websocket\\1.1.3\\nextgensoftware.websocket.1.1.3.nupkg.sha512"
+    "C:\\Users\\david\\.nuget\\packages\\nextgensoftware.holochain.holonet.client.embedded\\1.4.1\\nextgensoftware.holochain.holonet.client.embedded.1.4.1.nupkg.sha512"
   ],
   "logs": []
 }

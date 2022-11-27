@@ -215,7 +215,7 @@
       }
     },
     "C:\\Users\\david\\source\\repos\\NextGenSoftware-Libraries\\NextGenSoftware Libraries\\NextGenSoftware.Logging\\NextGenSoftware.Logging.csproj": {
-      "version": "1.1.3",
+      "version": "1.1.4",
       "restore": {
         "projectUniqueName": "C:\\Users\\david\\source\\repos\\NextGenSoftware-Libraries\\NextGenSoftware Libraries\\NextGenSoftware.Logging\\NextGenSoftware.Logging.csproj",
         "projectName": "NextGenSoftware.Logging",
@@ -277,7 +277,7 @@
       }
     },
     "C:\\Users\\david\\source\\repos\\NextGenSoftware-Libraries\\NextGenSoftware Libraries\\NextGenSoftware.Utilities\\NextGenSoftware.Utilities.csproj": {
-      "version": "1.0.3",
+      "version": "1.0.4",
       "restore": {
         "projectUniqueName": "C:\\Users\\david\\source\\repos\\NextGenSoftware-Libraries\\NextGenSoftware Libraries\\NextGenSoftware.Utilities\\NextGenSoftware.Utilities.csproj",
         "projectName": "NextGenSoftware.Utilities",
@@ -335,7 +335,7 @@
       }
     },
     "C:\\Users\\david\\source\\repos\\NextGenSoftware-Libraries\\NextGenSoftware Libraries\\NextGenSoftware.WebSocket\\NextGenSoftware.WebSocket.csproj": {
-      "version": "1.1.3",
+      "version": "1.1.4",
       "restore": {
         "projectUniqueName": "C:\\Users\\david\\source\\repos\\NextGenSoftware-Libraries\\NextGenSoftware Libraries\\NextGenSoftware.WebSocket\\NextGenSoftware.WebSocket.csproj",
         "projectName": "NextGenSoftware.WebSocket",
