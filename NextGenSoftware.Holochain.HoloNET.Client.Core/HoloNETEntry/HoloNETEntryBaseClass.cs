@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using NextGenSoftware.Logging;
 using NextGenSoftware.Utilities.ExtentionMethods;
+using NextGenSoftware.WebSocket;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
@@ -19,6 +20,18 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         public delegate void Error(object sender, HoloNETErrorEventArgs e);
         public event Error OnError;
+
+        public delegate void Loaded(object sender, ZomeFunctionCallBackEventArgs e);
+        public event Loaded OnLoaded;
+
+        public delegate void Saved(object sender, ZomeFunctionCallBackEventArgs e);
+        public event Saved OnSaved;
+
+        public delegate void Deleted(object sender, ZomeFunctionCallBackEventArgs e);
+        public event Deleted OnDeleted;
+
+        public delegate void Closed(object sender, HoloNETShutdownEventArgs e);
+        public event Closed OnClosed;
 
         public HoloNETEntryBaseClass(string zomeName, string zomeLoadEntryFunction, string zomeCreateEntryFunction, string zomeUpdateEntryFunction, string zomeDeleteEntryFunction, bool storeEntryHashInEntry = true, string holochainConductorURI = "ws://localhost:8888", HoloNETConfig holoNETConfig = null, bool logToConsole = true, bool logToFile = true, string releativePathToLogFolder = "Logs", string logFileName = "HoloNET.log", bool addAdditionalSpaceAfterEachLogEntry = false, bool showColouredLogs = true, ConsoleColor debugColour = ConsoleColor.White, ConsoleColor infoColour = ConsoleColor.Green, ConsoleColor warningColour = ConsoleColor.Yellow, ConsoleColor errorColour = ConsoleColor.Red)
         {
@@ -352,20 +365,28 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="disconnectedCallBackMode"></param>
         /// <param name="shutdownHolochainConductorsMode"></param>
         /// <returns></returns>
-        public async Task CloseAsync(DisconnectedCallBackMode disconnectedCallBackMode = DisconnectedCallBackMode.WaitForHolochainConductorToDisconnect, ShutdownHolochainConductorsMode shutdownHolochainConductorsMode = ShutdownHolochainConductorsMode.UseConfigSettings)
+        public async Task<HoloNETShutdownEventArgs> CloseAsync(DisconnectedCallBackMode disconnectedCallBackMode = DisconnectedCallBackMode.WaitForHolochainConductorToDisconnect, ShutdownHolochainConductorsMode shutdownHolochainConductorsMode = ShutdownHolochainConductorsMode.UseConfigSettings)
         {
+            HoloNETShutdownEventArgs returnValue = null;
+
             try
             {
                 if (HoloNETClient != null && _disposeOfHoloNETClient)
                 {
-                    await HoloNETClient.ShutdownHoloNETAsync(disconnectedCallBackMode, shutdownHolochainConductorsMode);
+                    returnValue = await HoloNETClient.ShutdownHoloNETAsync(disconnectedCallBackMode, shutdownHolochainConductorsMode);
                     HoloNETClient = null;
                 }
+
+                OnClosed?.Invoke(this, returnValue);
             }
             catch (Exception ex)
             {
-                HandleError("Unknown error occured in CloseAsync method.", ex);
+                //returnValue = HandleError<HoloNETShutdownEventArgs>("Unknown error occured in CloseAsync method.", ex);
+
+               // returnValue = new HoloNETShutdownEventArgs() { IsError = true, }
             }
+
+            return returnValue;
         }
 
         /// <summary>
@@ -411,55 +432,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             {
                 HandleError("Unknown error occured in Init method.", ex);
             }
-        }
-
-        private void HoloNETClient_OnZomeFunctionCallBack(object sender, ZomeFunctionCallBackEventArgs e)
-        {
-            //if ((e.ZomeFunction == ZomeCreateEntryFunction || e.ZomeFunction == ZomeUpdateEntryFunction) && !string.IsNullOrEmpty(e.ZomeReturnHash))
-            //    this.EntryHash = e.ZomeReturnHash;
-
-            //if (e.KeyValuePair != null)
-            //    HoloNETClient.MapEntryDataObject(this, e.KeyValuePair);
-        }
-
-        private void HoloNETClient_OnSignalsCallBack(object sender, SignalsCallBackEventArgs e)
-        {
-            
-        }
-
-        private void HoloNETClient_OnReadyForZomeCalls(object sender, ReadyForZomeCallsEventArgs e)
-        {
-            
-        }
-
-        private void HoloNETClient_OnError(object sender, HoloNETErrorEventArgs e)
-        {
-            
-        }
-
-        private void HoloNETClient_OnDisconnected(object sender, WebSocket.DisconnectedEventArgs e)
-        {
-            
-        }
-
-        private void HoloNETClient_OnDataReceived(object sender, HoloNETDataReceivedEventArgs e)
-        {
-            
-        }
-
-        private void HoloNETClient_OnConnected(object sender, WebSocket.ConnectedEventArgs e)
-        {
-            
-        }
-
-        private void HoloNETClient_OnConductorDebugCallBack(object sender, ConductorDebugCallBackEventArgs e)
-        {
-            
-        }
-
-        private void HoloNETClient_OnAppInfoCallBack(object sender, AppInfoCallBackEventArgs e)
-        {
-            
         }
 
         private void ProcessZomeReturnCall(ZomeFunctionCallBackEventArgs result)
@@ -524,12 +496,62 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
         }
 
-        private void HandleError(string message, Exception exception)
+        private void HoloNETClient_OnZomeFunctionCallBack(object sender, ZomeFunctionCallBackEventArgs e)
+        {
+            //if ((e.ZomeFunction == ZomeCreateEntryFunction || e.ZomeFunction == ZomeUpdateEntryFunction) && !string.IsNullOrEmpty(e.ZomeReturnHash))
+            //    this.EntryHash = e.ZomeReturnHash;
+
+            //if (e.KeyValuePair != null)
+            //    HoloNETClient.MapEntryDataObject(this, e.KeyValuePair);
+        }
+
+        private void HoloNETClient_OnSignalsCallBack(object sender, SignalsCallBackEventArgs e)
+        {
+            
+        }
+
+        private void HoloNETClient_OnReadyForZomeCalls(object sender, ReadyForZomeCallsEventArgs e)
+        {
+            
+        }
+
+        private void HoloNETClient_OnError(object sender, HoloNETErrorEventArgs e)
+        {
+            
+        }
+
+        private void HoloNETClient_OnDisconnected(object sender, WebSocket.DisconnectedEventArgs e)
+        {
+            
+        }
+
+        private void HoloNETClient_OnDataReceived(object sender, HoloNETDataReceivedEventArgs e)
+        {
+            
+        }
+
+        private void HoloNETClient_OnConnected(object sender, WebSocket.ConnectedEventArgs e)
+        {
+            
+        }
+
+        private void HoloNETClient_OnConductorDebugCallBack(object sender, ConductorDebugCallBackEventArgs e)
+        {
+            
+        }
+
+        private void HoloNETClient_OnAppInfoCallBack(object sender, AppInfoCallBackEventArgs e)
+        {
+            
+        }
+
+        private T HandleError<T>(string message, Exception exception) where T : CallBackBaseEventArgs, new()
         {
             message = string.Concat(message, exception != null ? $". Error Details: {exception}" : "");
             Logger.Log(message, LogType.Error);
 
             OnError?.Invoke(this, new HoloNETErrorEventArgs { EndPoint = HoloNETClient.WebSocket.EndPoint, Reason = message, ErrorDetails = exception });
+            T returnValue = new T() { IsError = true, Message = message };
 
             switch (HoloNETClient.Config.ErrorHandlingBehaviour)
             {
@@ -543,6 +565,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     }
                     break;
             }
+
+            return returnValue;
         }
     }
 }

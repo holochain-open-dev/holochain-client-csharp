@@ -73,7 +73,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public string AgentPubKey { get; private set; }
     }
 
-    public class ReadyForZomeCallsEventArgs
+    public class ReadyForZomeCallsEventArgs : CallBackBaseEventArgs
     {
         public ReadyForZomeCallsEventArgs(string endPoint, string dnaHash, string agentPubKey)
         {
@@ -87,7 +87,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public string AgentPubKey { get; private set; }
     }
 
-    public class HoloNETShutdownEventArgs
+    public class HoloNETShutdownEventArgs : CallBackBaseEventArgs
     {
         public HoloNETShutdownEventArgs(string endPoint, string dnaHash, string agentPubKey, HolochainConductorsShutdownEventArgs holochainConductorsShutdownEventArgs)
         {
@@ -98,12 +98,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         }
 
         public HolochainConductorsShutdownEventArgs HolochainConductorsShutdownEventArgs { get; private set; }
-        public string EndPoint { get; private set; }
-        public string DnaHash { get; private set; }
-        public string AgentPubKey { get; private set; }
+        public string EndPoint { get; set; }
+        public string DnaHash { get; set; }
+        public string AgentPubKey { get; set; }
     }
 
-    public class HolochainConductorsShutdownEventArgs
+    public class HolochainConductorsShutdownEventArgs : CallBackBaseEventArgs
     {
         public int NumberOfHolochainExeInstancesShutdown { get; set; }
         public int NumberOfHcExeInstancesShutdown { get; set; }
@@ -135,7 +135,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
        public JToken SignalData { get; set; }
     }
 
-    public class ConductorDebugCallBackEventArgs 
+    public class ConductorDebugCallBackEventArgs : CallBackBaseEventArgs
     {
         public string Type { get; set; }
         public int NumberHeldEntries { get; set; }

@@ -53,7 +53,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
         /// The AgentId who deleted the entry.
         /// </summary>
         [HolochainPropertyName("deleted_by")]
-        public Guid DeletedBy { get; set; }
+        public string DeletedBy { get; set; }
 
         /// <summary>
         /// Flag showing the whether this entry is active or not.
@@ -70,12 +70,18 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
             if (string.IsNullOrEmpty(EntryHash))
             {
                 if (CreatedDate == DateTime.MinValue)
+                {
                     CreatedDate = DateTime.Now;
+                    CreatedBy = this.HoloNETClient.Config.AgentPubKey;
+                }
             }
             else
             {
                 if (ModifiedDate == DateTime.MinValue)
+                {
                     ModifiedDate = DateTime.Now;
+                    ModifiedBy = this.HoloNETClient.Config.AgentPubKey;
+                }
             }
 
             return base.SaveAsync();
@@ -88,9 +94,33 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
         public override Task<ZomeFunctionCallBackEventArgs> DeleteAsync(string entryHash)
         {
             if (DeletedDate == DateTime.MinValue)
+            {
                 DeletedDate = DateTime.Now;
+                DeletedBy = this.HoloNETClient.Config.AgentPubKey;
+            }
 
             return base.DeleteAsync(entryHash);
         }
+
+        //protected override void ProcessZomeReturnCall(ZomeFunctionCallBackEventArgs result)
+        //{
+        //    if (!result.IsError && result.IsCallSuccessful)
+        //    {
+        //        //Load
+        //        if (result.Entry != null)
+        //        {
+        //            if (!string.IsNullOrEmpty(result.Entry.Author))
+        //            {
+        //                if (result.ZomeFunction == this.ZomeCreateEntryFunction)
+        //                    this.CreatedBy = result.Entry.Author;
+
+        //                else if (result.ZomeFunction == this.ZomeUpdateEntryFunction)
+        //                    this.ModifiedBy = result.Entry.Author;
+        //            }
+        //        }
+        //    }
+
+        //    base.ProcessZomeReturnCall(result);
+        //}
     }
 }

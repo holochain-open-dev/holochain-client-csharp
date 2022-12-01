@@ -29,6 +29,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         private Dictionary<string, TaskCompletionSource<ZomeFunctionCallBackEventArgs>> _taskCompletionZomeCallBack = new Dictionary<string, TaskCompletionSource<ZomeFunctionCallBackEventArgs>>();
         private TaskCompletionSource<ReadyForZomeCallsEventArgs> _taskCompletionReadyForZomeCalls = new TaskCompletionSource<ReadyForZomeCallsEventArgs>();
         private TaskCompletionSource<DisconnectedEventArgs> _taskCompletionDisconnected = new TaskCompletionSource<DisconnectedEventArgs>();
+        private TaskCompletionSource<HoloNETShutdownEventArgs> _taskCompletionHoloNETShutdown = new TaskCompletionSource<HoloNETShutdownEventArgs>();
         private int _currentId = 0;
         private HoloNETConfig _config = null;
         private Process _conductorProcess = null;
@@ -950,12 +951,17 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="disconnectedCallBackMode"></param>
         /// <param name="shutdownHolochainConductorsMode"></param>
         /// <returns></returns>
-        public async Task ShutdownHoloNETAsync(DisconnectedCallBackMode disconnectedCallBackMode = DisconnectedCallBackMode.WaitForHolochainConductorToDisconnect, ShutdownHolochainConductorsMode shutdownHolochainConductorsMode = ShutdownHolochainConductorsMode.UseConfigSettings)
+        public async Task<HoloNETShutdownEventArgs> ShutdownHoloNETAsync(DisconnectedCallBackMode disconnectedCallBackMode = DisconnectedCallBackMode.WaitForHolochainConductorToDisconnect, ShutdownHolochainConductorsMode shutdownHolochainConductorsMode = ShutdownHolochainConductorsMode.UseConfigSettings)
         {
             _shuttingDownHoloNET = true;
 
             if (WebSocket.State != WebSocketState.Closed || WebSocket.State != WebSocketState.CloseReceived || WebSocket.State != WebSocketState.CloseSent)
                 await DisconnectAsync(disconnectedCallBackMode, shutdownHolochainConductorsMode);
+
+            if (disconnectedCallBackMode == DisconnectedCallBackMode.WaitForHolochainConductorToDisconnect)
+                return await _taskCompletionHoloNETShutdown.Task;
+            else
+                return new HoloNETShutdownEventArgs(EndPoint, Config.DnaHash, Config.AgentPubKey, null);
         }
 
         /// <summary>
@@ -964,12 +970,14 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// It will also shutdown the current running Holochain Conductor or all conductors depending on the config/params passed in.
         /// </summary>
         /// <param name="shutdownHolochainConductorsMode"></param>
-        public void ShutdownHoloNET(ShutdownHolochainConductorsMode shutdownHolochainConductorsMode = ShutdownHolochainConductorsMode.UseConfigSettings)
+        public HoloNETShutdownEventArgs ShutdownHoloNET(ShutdownHolochainConductorsMode shutdownHolochainConductorsMode = ShutdownHolochainConductorsMode.UseConfigSettings)
         {
             _shuttingDownHoloNET = true;
 
             if (WebSocket.State != WebSocketState.Closed || WebSocket.State != WebSocketState.CloseReceived || WebSocket.State != WebSocketState.CloseSent)
                 Disconnect(DisconnectedCallBackMode.UseCallBackEvents, shutdownHolochainConductorsMode);
+
+            return new HoloNETShutdownEventArgs(EndPoint, Config.DnaHash, Config.AgentPubKey, null);
         }
 
         private async Task<HolochainConductorsShutdownEventArgs> ShutDownHolochainConductorsInternalAsync()
@@ -1021,6 +1029,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                     HoloNETShutdownEventArgs holoNETShutdownEventArgs = new HoloNETShutdownEventArgs(this.EndPoint, Config.DnaHash, Config.AgentPubKey, holochainConductorsShutdownEventArgs);
                     OnHoloNETShutdownComplete?.Invoke(this, holoNETShutdownEventArgs);
+                    _taskCompletionHoloNETShutdown.SetResult(holoNETShutdownEventArgs);
                 }
             }
             catch (Exception ex)
