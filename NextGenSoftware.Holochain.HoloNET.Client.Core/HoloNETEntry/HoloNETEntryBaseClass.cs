@@ -148,13 +148,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             {
                 ZomeFunctionCallBackEventArgs result = await HoloNETClient.CallZomeFunctionAsync(ZomeName, ZomeLoadEntryFunction, EntryHash);
                 ProcessZomeReturnCall(result);
+                OnLoaded?.Invoke(this, result);
                 return result;
             }
             catch (Exception ex)
             {
-                string msg = "Unknown error occured in LoadAsync method.";
-                HandleError(msg, ex);
-                return new ZomeFunctionCallBackEventArgs() { IsError = true, Message = $"{msg}. Reason: {ex}" };
+                return HandleError<ZomeFunctionCallBackEventArgs>("Unknown error occured in LoadAsync method.", ex);
             }
         }
 
@@ -256,9 +255,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
             catch (Exception ex)
             {
-                string msg = "Unknown error occured in SaveAsync method.";
-                HandleError(msg, ex);
-                return new ZomeFunctionCallBackEventArgs() { IsError = true, Message = $"{msg}. Reason: {ex}" };
+                return HandleError<ZomeFunctionCallBackEventArgs>("Unknown error occured in SaveAsync method.", ex);
             }
         }
 
@@ -288,10 +285,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     result = await HoloNETClient.CallZomeFunctionAsync(ZomeName, ZomeUpdateEntryFunction, paramsObject);
 
                 ProcessZomeReturnCall(result);
+                OnSaved?.Invoke(this, result);
             }
             catch (Exception ex)
             {
-                HandleError("Unknown error occured in SaveAsync method.", ex);
+                return HandleError<ZomeFunctionCallBackEventArgs>("Unknown error occured in SaveAsync method.", ex);
             }
 
             return result;
@@ -333,7 +331,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
             catch (Exception ex)
             {
-                HandleError("Unknown error occured in DeleteAsync method.", ex);
+                return HandleError<ZomeFunctionCallBackEventArgs>("Unknown error occured in DeleteAsync method.", ex);
             }
 
             return result;
@@ -374,6 +372,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 if (HoloNETClient != null && _disposeOfHoloNETClient)
                 {
                     returnValue = await HoloNETClient.ShutdownHoloNETAsync(disconnectedCallBackMode, shutdownHolochainConductorsMode);
+                    UnsubscribeEvents();
                     HoloNETClient = null;
                 }
 
@@ -381,9 +380,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
             catch (Exception ex)
             {
-                //returnValue = HandleError<HoloNETShutdownEventArgs>("Unknown error occured in CloseAsync method.", ex);
-
-               // returnValue = new HoloNETShutdownEventArgs() { IsError = true, }
+                returnValue = HandleError<HoloNETShutdownEventArgs>("Unknown error occured in CloseAsync method.", ex);
             }
 
             return returnValue;
@@ -391,42 +388,81 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         /// <summary>
         /// Will close this HoloNET Entry and then shutdown its internal HoloNET instance (if one was not passed in) and its current connetion to the Holochain Conductor.
-        /// Unlike the async version, this non async version will not wait until HoloNET disconnects & shutsdown any Holochain Conductors before it returns to the caller. It will later raise the Disconnected, HolochainConductorsShutdownComplete & HoloNETShutdownComplete events. If you wish to wait for HoloNET to disconnect and shutdown the conductors(s) before returning then please use CloseAsync instead.
+        /// Unlike the async version, this non async version will not wait until HoloNET disconnects & shutsdown any Holochain Conductors before it returns to the caller. It will later raise the Disconnected, HolochainConductorsShutdownComplete & HoloNETShutdownComplete events. If you wish to wait for HoloNET to disconnect and shutdown the conductors(s) before returning then please use CloseAsync instead. It will also not contain any Holochain conductor shutdown stats and the HolochainConductorsShutdownEventArgs property will be null (Only the CloseAsync version contains this info).
         /// It will also shutdown the current running Holochain Conductor or all conductors depending on the config/params passed in.
         /// </summary>
         /// <param name="shutdownHolochainConductorsMode"></param>
-        public void Close(ShutdownHolochainConductorsMode shutdownHolochainConductorsMode = ShutdownHolochainConductorsMode.UseConfigSettings)
+        public HoloNETShutdownEventArgs Close(ShutdownHolochainConductorsMode shutdownHolochainConductorsMode = ShutdownHolochainConductorsMode.UseConfigSettings)
         {
+            HoloNETShutdownEventArgs returnValue = null;
+
             try
             {
                 if (HoloNETClient != null && _disposeOfHoloNETClient)
                 {
-                    HoloNETClient.ShutdownHoloNET(shutdownHolochainConductorsMode);
+                    returnValue = HoloNETClient.ShutdownHoloNET(shutdownHolochainConductorsMode);
+                    UnsubscribeEvents();
                     HoloNETClient = null;
                 }
+
+                OnClosed?.Invoke(this, returnValue);
             }
             catch (Exception ex)
             {
-                HandleError("Unknown error occured in Close method.", ex);
+                returnValue = HandleError<HoloNETShutdownEventArgs>("Unknown error occured in Close method.", ex);
             }
+
+            return returnValue;
         }
 
-        private void Init()
+        private void UnsubscribeEvents()
+        {
+            HoloNETClient.OnError -= HoloNETClient_OnError;
+        }
+
+        public void Init()
         {
             try
             {
-                HoloNETClient.OnAppInfoCallBack += HoloNETClient_OnAppInfoCallBack;
-                HoloNETClient.OnConductorDebugCallBack += HoloNETClient_OnConductorDebugCallBack;
-                HoloNETClient.OnConnected += HoloNETClient_OnConnected;
-                HoloNETClient.OnDataReceived += HoloNETClient_OnDataReceived;
-                HoloNETClient.OnDisconnected += HoloNETClient_OnDisconnected;
+                //HoloNETClient.OnAppInfoCallBack += HoloNETClient_OnAppInfoCallBack;
+                //HoloNETClient.OnConductorDebugCallBack += HoloNETClient_OnConductorDebugCallBack;
+                //HoloNETClient.OnConnected += HoloNETClient_OnConnected;
+                //HoloNETClient.OnDataReceived += HoloNETClient_OnDataReceived;
+                //HoloNETClient.OnDisconnected += HoloNETClient_OnDisconnected;
                 HoloNETClient.OnError += HoloNETClient_OnError;
-                HoloNETClient.OnReadyForZomeCalls += HoloNETClient_OnReadyForZomeCalls;
-                HoloNETClient.OnSignalsCallBack += HoloNETClient_OnSignalsCallBack;
-                HoloNETClient.OnZomeFunctionCallBack += HoloNETClient_OnZomeFunctionCallBack;
+                //HoloNETClient.OnReadyForZomeCalls += HoloNETClient_OnReadyForZomeCalls;
+                //HoloNETClient.OnSignalsCallBack += HoloNETClient_OnSignalsCallBack;
+                //HoloNETClient.OnZomeFunctionCallBack += HoloNETClient_OnZomeFunctionCallBack;
 
                 if (HoloNETClient.WebSocket.State != System.Net.WebSockets.WebSocketState.Connecting || HoloNETClient.WebSocket.State != System.Net.WebSockets.WebSocketState.Open)
                     HoloNETClient.Connect();
+            }
+            catch (Exception ex)
+            {
+                HandleError("Unknown error occured in Init method.", ex);
+            }
+        }
+
+        public async Task InitAsync()
+        {
+            try
+            {
+                //HoloNETClient.OnAppInfoCallBack += HoloNETClient_OnAppInfoCallBack;
+                //HoloNETClient.OnConductorDebugCallBack += HoloNETClient_OnConductorDebugCallBack;
+                //HoloNETClient.OnConnected += HoloNETClient_OnConnected;
+                //HoloNETClient.OnDataReceived += HoloNETClient_OnDataReceived;
+                //HoloNETClient.OnDisconnected += HoloNETClient_OnDisconnected;
+                HoloNETClient.OnError += HoloNETClient_OnError;
+                //HoloNETClient.OnReadyForZomeCalls += HoloNETClient_OnReadyForZomeCalls;
+                //HoloNETClient.OnSignalsCallBack += HoloNETClient_OnSignalsCallBack;
+                //HoloNETClient.OnZomeFunctionCallBack += HoloNETClient_OnZomeFunctionCallBack;
+
+                if (HoloNETClient.WebSocket.State != System.Net.WebSockets.WebSocketState.Connecting || HoloNETClient.WebSocket.State != System.Net.WebSockets.WebSocketState.Open)
+                { 
+                    await HoloNETClient.ConnectAsync();
+                    await HoloNETClient.
+
+                }
             }
             catch (Exception ex)
             {
@@ -496,6 +532,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
         }
 
+        private void HoloNETClient_OnError(object sender, HoloNETErrorEventArgs e)
+        {
+            OnError?.Invoke(this, e);
+        }
+
+        /*
         private void HoloNETClient_OnZomeFunctionCallBack(object sender, ZomeFunctionCallBackEventArgs e)
         {
             //if ((e.ZomeFunction == ZomeCreateEntryFunction || e.ZomeFunction == ZomeUpdateEntryFunction) && !string.IsNullOrEmpty(e.ZomeReturnHash))
@@ -511,11 +553,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         }
 
         private void HoloNETClient_OnReadyForZomeCalls(object sender, ReadyForZomeCallsEventArgs e)
-        {
-            
-        }
-
-        private void HoloNETClient_OnError(object sender, HoloNETErrorEventArgs e)
         {
             
         }
@@ -544,14 +581,14 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         {
             
         }
+        */
 
-        private T HandleError<T>(string message, Exception exception) where T : CallBackBaseEventArgs, new()
+        private void HandleError(string message, Exception exception)
         {
             message = string.Concat(message, exception != null ? $". Error Details: {exception}" : "");
             Logger.Log(message, LogType.Error);
 
             OnError?.Invoke(this, new HoloNETErrorEventArgs { EndPoint = HoloNETClient.WebSocket.EndPoint, Reason = message, ErrorDetails = exception });
-            T returnValue = new T() { IsError = true, Message = message };
 
             switch (HoloNETClient.Config.ErrorHandlingBehaviour)
             {
@@ -565,8 +602,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     }
                     break;
             }
+        }
 
-            return returnValue;
+        private T HandleError<T>(string message, Exception exception) where T : CallBackBaseEventArgs, new()
+        {
+            HandleError(message, exception);
+            return new T() { IsError = true, Message = string.Concat(message, exception != null ? $". Error Details: {exception}" : "") };
         }
     }
 }

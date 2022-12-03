@@ -17,6 +17,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
     public class HoloNETClient //: IDisposable //, IAsyncDisposable
     {
         private bool _shuttingDownHoloNET = false;
+        private bool _gettingAgentPubKeyAndDnaHash = false;
         private bool _getAgentPubKeyAndDnaHashFromConductor;
         private bool _updateDnaHashAndAgentPubKey = true;
         private Dictionary<string, string> _zomeLookup = new Dictionary<string, string>();
@@ -106,6 +107,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
         }
 
+        public bool IsReadyForZomesCalls { get; set; }
+
         public HoloNETClient(string holochainConductorURI = "ws://localhost:8888", bool logToConsole = true, bool logToFile = true, string releativePathToLogFolder = "Logs", string logFileName = "HoloNET.log", bool addAdditionalSpaceAfterEachLogEntry = false, bool showColouredLogs = true, ConsoleColor debugColour = ConsoleColor.White, ConsoleColor infoColour = ConsoleColor.Green, ConsoleColor warningColour = ConsoleColor.Yellow, ConsoleColor errorColour = ConsoleColor.Red)
         {
             Logger.Loggers.Add(new DefaultLogger(logToConsole, logToFile, releativePathToLogFolder, logFileName, addAdditionalSpaceAfterEachLogEntry, showColouredLogs, debugColour, infoColour, warningColour, errorColour));
@@ -161,6 +164,36 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public void Connect(bool getAgentPubKeyAndDnaHashFromConductor = true, bool getAgentPubKeyAndDnaHashFromSandbox = false)
         {
             ConnectAsync(getAgentPubKeyAndDnaHashFromConductor, getAgentPubKeyAndDnaHashFromSandbox);
+        }
+
+        public void GetAgentPubKeyAndDnaHash(bool getAgentPubKeyAndDnaHashFromConductor = true, bool getAgentPubKeyAndDnaHashFromSandbox = false)
+        {
+
+        }
+
+        public async Task<AgentPubKeyDnaHash> GetAgentPubKeyAndDnaHash(bool getAgentPubKeyAndDnaHashFromConductor = true, bool getAgentPubKeyAndDnaHashFromSandbox = false)
+        {
+            if (_gettingAgentPubKeyAndDnaHash)
+                return null;
+
+            _gettingAgentPubKeyAndDnaHash = true;
+
+            //if (getAgentPubKeyAndDnaHashFromSandbox && !getAgentPubKeyAndDnaHashFromConductor)
+            if (getAgentPubKeyAndDnaHashFromSandbox)
+            {
+                AgentPubKeyDnaHash agentPubKeyDnaHash = await GetAgentPubKeyAndDnaHashFromSandboxAsync();
+
+                if (agentPubKeyDnaHash != null)
+                {
+                    Config.AgentPubKey = agentPubKeyDnaHash.AgentPubKey;
+                    Config.DnaHash = agentPubKeyDnaHash.DnaHash;
+                    _gettingAgentPubKeyAndDnaHash = false;
+                    return new AgentPubKeyDnaHash() { AgentPubKey = Config.AgentPubKey, DnaHash = Config.DnaHash };
+                }
+            }
+
+            else if (getAgentPubKeyAndDnaHashFromConductor)
+                GetAgentPubKeyAndDnaHashFromConductor();
         }
 
         public async Task StartConductorAsync()
@@ -355,11 +388,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 Logger.Log("AgentPubKey & DnaHash successfully retreived from hc sandbox.", LogType.Info, false);
 
                 if (WebSocket.State == WebSocketState.Open && !string.IsNullOrEmpty(Config.AgentPubKey) && !string.IsNullOrEmpty(Config.DnaHash))
-                {
-                    ReadyForZomeCallsEventArgs eventArgs = new ReadyForZomeCallsEventArgs(EndPoint, dnaHash, agentPubKey);
-                    OnReadyForZomeCalls?.Invoke(this, eventArgs);
-                    _taskCompletionReadyForZomeCalls.SetResult(eventArgs);
-                }
+                    SetReadyForZomeCalls();
 
                 return new AgentPubKeyDnaHash() { DnaHash = dnaHash, AgentPubKey = agentPubKey };
             }
@@ -1373,7 +1402,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                 //If the AgentPubKey & DnaHash have already been retreived from the hc sandbox command then raise the OnReadyForZomeCalls event.
                 if (WebSocket.State == WebSocketState.Open && !string.IsNullOrEmpty(Config.AgentPubKey) && !string.IsNullOrEmpty(Config.DnaHash))
-                    OnReadyForZomeCalls?.Invoke(this, new ReadyForZomeCallsEventArgs(EndPoint, Config.DnaHash, Config.AgentPubKey));
+                    SetReadyForZomeCalls();
 
                 //Otherwise, if the getAgentPubKeyAndDnaHashFromConductor param was set to true when calling the Connect method, retreive them now...
                 else if (_getAgentPubKeyAndDnaHashFromConductor)
@@ -1383,6 +1412,14 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             {
                 HandleError("Error in HoloNETClient.WebSocket_OnDataReceived method.", ex);
             }
+        }
+
+        private void SetReadyForZomeCalls()
+        {
+            IsReadyForZomesCalls = true;
+            ReadyForZomeCallsEventArgs eventArgs = new ReadyForZomeCallsEventArgs(EndPoint, Config.DnaHash, Config.AgentPubKey);
+            OnReadyForZomeCalls?.Invoke(this, eventArgs);
+            _taskCompletionReadyForZomeCalls.SetResult(eventArgs);
         }
 
         private string GetItemFromCache(string id, Dictionary<string, string> cache)

@@ -89,6 +89,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
     public class HoloNETShutdownEventArgs : CallBackBaseEventArgs
     {
+        public HoloNETShutdownEventArgs()
+        {
+
+        }
+
         public HoloNETShutdownEventArgs(string endPoint, string dnaHash, string agentPubKey, HolochainConductorsShutdownEventArgs holochainConductorsShutdownEventArgs)
         {
             EndPoint = endPoint;

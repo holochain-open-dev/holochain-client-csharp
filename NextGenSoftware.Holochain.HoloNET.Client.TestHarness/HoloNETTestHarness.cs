@@ -114,12 +114,16 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                             Id = Guid.NewGuid(),
                             FirstName = "David",
                             LastName = "Ellams",
-                            DOB = Convert.ToDateTime("11/04/1980"),
+                            DOB = Convert.ToDateTime("11/07/1980"),
                             Email = "davidellams@hotmail.com",
-                            CreatedDate = DateTime.Now,
-                            CreatedBy = Guid.NewGuid(),
                             IsActive = true
                         };
+
+                        avatar.OnLoaded += Avatar_OnLoaded;
+                        avatar.OnSaved += Avatar_OnSaved;
+                        avatar.OnDeleted += Avatar_OnDeleted;
+                        avatar.OnError += Avatar_OnError;
+                        avatar.OnClosed += Avatar_OnClosed;
 
                         CLIEngine.ShowWorkingMessage("Saving Avatar...");
                         ZomeFunctionCallBackEventArgs result =  await avatar.SaveAsync();
@@ -173,6 +177,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                                         ShowAvatarDetails(avatar);
 
                                         CLIEngine.ShowMessage("*** AVATAR SINGLE HOLONET BASE ENTRY DELETE TEST ***", _testHeadingColour);
+                                        CLIEngine.ShowWorkingMessage("Deleting Avatar...");
                                         result = await avatar.DeleteAsync();
 
                                         if (result.IsCallSuccessful && !result.IsError && !string.IsNullOrEmpty(result.ZomeReturnHash))
@@ -185,6 +190,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                                 }
                                 else
                                     CLIEngine.ShowErrorMessage(string.Concat("TEST HARNESS: AVATAR SINGLE HOLONET BASE ENTRY.SAVE/UPDATE RESPONSE: AN ERROR OCCURED: ", result.Message));
+                            
+                            
                             }
                             else
                                 CLIEngine.ShowErrorMessage(string.Concat("TEST HARNESS: AVATAR SINGLE HOLONET BASE ENTRY.LOAD RESPONSE: AN ERROR OCCURED: ", result.Message));
@@ -193,8 +200,16 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                             CLIEngine.ShowErrorMessage(string.Concat("TEST HARNESS: AVATAR SINGLE HOLONET BASE ENTRY.SAVE/CREATE RESPONSE: AN ERROR OCCURED: ", result.Message));
 
                         if (avatar != null)
-                            await avatar.CloseAsync();
-                            //avatar.Dispose(); //Free any resources including disconnecting from the Holochain Conductor, shutting down any running conductors etc...
+                        {
+                            await avatar.CloseAsync(); //Free any resources including disconnecting from the Holochain Conductor, shutting down any running conductors etc...
+                            //avatar.Dispose(); //There originally use to be a Dispose method but we need it to be async so it waits for the HoloNET to disconnect etc. The AsyncDispose pattern was also not a good fit for what we needed and is overly complicated. We may look at implementing this in a later version...
+
+                            avatar.OnLoaded -= Avatar_OnLoaded;
+                            avatar.OnSaved -= Avatar_OnSaved;
+                            avatar.OnDeleted -= Avatar_OnDeleted;
+                            avatar.OnError -= Avatar_OnError;
+                            avatar.OnClosed -= Avatar_OnClosed;
+                        }
                     }
                     break;
 
@@ -206,13 +221,18 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                             Id = Guid.NewGuid(),
                             FirstName = "David",
                             LastName = "Ellams",
-                            DOB = Convert.ToDateTime("11/04/1980"),
+                            DOB = Convert.ToDateTime("11/07/1980"),
                             Email = "davidellams@hotmail.com",
-                            CreatedBy = Guid.NewGuid(),
-                            CreatedDate = DateTime.Now,
                             IsActive = true
                         };
 
+                        avatar.OnLoaded += Avatar_OnLoaded;
+                        avatar.OnSaved += Avatar_OnSaved;
+                        avatar.OnDeleted += Avatar_OnDeleted;
+                        avatar.OnError += Avatar_OnError;
+                        avatar.OnClosed += Avatar_OnClosed;
+
+                        CLIEngine.ShowWorkingMessage("Saving Avatar...");
                         ZomeFunctionCallBackEventArgs result = await avatar.SaveAsync();
 
                         if (result.IsCallSuccessful && !result.IsError && !string.IsNullOrEmpty(result.ZomeReturnHash))
@@ -226,6 +246,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                             //avatar.Dispose(); //Free any resources including disconnecting from the Holochain Conductor, shutting down any running conductors etc...
                             avatar = new AvatarMultiple(_holoNETClient); //Normally you wouldn't need to create a new instance but we want to verify the data is fully loaded so best to use a new object.
                             avatar.EntryHash = entryHash;
+                            CLIEngine.ShowWorkingMessage("Loading Avatar...");
                             result = await avatar.LoadAsync();
 
                             if (result.IsCallSuccessful && !result.IsError)
@@ -236,19 +257,40 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
 
                                 // Now test the update method.
                                 avatar.FirstName = "James";
+                                CLIEngine.ShowWorkingMessage("Saving Avatar...");
                                 result = await avatar.SaveAsync();
 
                                 if (result.IsCallSuccessful && !result.IsError && !string.IsNullOrEmpty(result.ZomeReturnHash))
                                 {
-                                    Console.WriteLine(string.Concat("TEST HARNESS: AVATAR MULTIPLE HOLONETBASECLASS.SAVE/UPDATE RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
-                                    Console.WriteLine("");
+                                    CLIEngine.ShowSuccessMessage(string.Concat("TEST HARNESS: AVATAR MULTIPLE HOLONET BASE ENTRY.SAVE/UPDATE RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
                                     ShowAvatarDetails(avatar);
+
+                                    //Now check the update was saved correctly by re-loading it...
+                                    CLIEngine.ShowMessage("*** AVATAR MULTIPLE HOLONET BASE ENTRY LOAD TEST 2 (VERIFYING UPDATE WAS SUCCESSFUL) ***", _testHeadingColour);
+                                    CLIEngine.ShowWorkingMessage("Loading Avatar...");
+
+                                    avatar = ResetAvatar(avatar);
+                                    result = await avatar.LoadAsync();
+
+                                    if (result.IsCallSuccessful && !result.IsError)
+                                    {
+                                        CLIEngine.ShowSuccessMessage(string.Concat("TEST HARNESS: AVATAR MULTIPLE HOLONET BASE ENTRY.LOAD RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
+                                        ShowAvatarDetails(avatar);
+
+                                        CLIEngine.ShowMessage("*** AVATAR MULTIPLE HOLONET BASE ENTRY DELETE TEST ***", _testHeadingColour);
+                                        CLIEngine.ShowWorkingMessage("Deleting Avatar...");
+                                        result = await avatar.DeleteAsync();
+
+                                        if (result.IsCallSuccessful && !result.IsError && !string.IsNullOrEmpty(result.ZomeReturnHash))
+                                            CLIEngine.ShowSuccessMessage(string.Concat("TEST HARNESS: AVATAR MULTIPLE HOLONET BASE ENTRY.DELETE RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
+                                        else
+                                            CLIEngine.ShowErrorMessage(string.Concat("TEST HARNESS: AVATAR MULTIPLE HOLONET BASE ENTRY.DELETE RESPONSE: AN ERROR OCCURED: ", result.Message));
+                                    }
+                                    else
+                                        CLIEngine.ShowErrorMessage(string.Concat("TEST HARNESS: AVATAR MULTIPLE HOLONET BASE ENTRY.LOAD RESPONSE: AN ERROR OCCURED: ", result.Message));
                                 }
                                 else
-                                {
-                                    Console.WriteLine(string.Concat("TEST HARNESS: AVATAR MULTIPLE HOLONETBASECLASS.SAVE/UPDATE RESPONSE: AN ERROR OCCURED: ", result.Message));
-                                    Console.WriteLine("");
-                                }
+                                    CLIEngine.ShowErrorMessage(string.Concat("TEST HARNESS: AVATAR MULTIPLE HOLONET BASE ENTRY.SAVE/UPDATE RESPONSE: AN ERROR OCCURED: ", result.Message));
                             }
                             else
                             {
@@ -269,11 +311,16 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                             Name = "Test holon",
                             Description = "Test description",
                             Type = "Park",
-                            CreatedBy = Guid.NewGuid(),
-                            CreatedDate = DateTime.Now,
                             IsActive = true
                         };
 
+                        holon.OnLoaded += Holon_OnLoaded;
+                        holon.OnSaved += Holon_OnSaved;
+                        holon.OnDeleted += Holon_OnDeleted;
+                        holon.OnError += Holon_OnError;
+                        holon.OnClosed += Holon_OnClosed;
+
+                        CLIEngine.ShowWorkingMessage("Saving Holon...");
                         result = await holon.SaveAsync();
 
                         if (result.IsCallSuccessful && !result.IsError && !string.IsNullOrEmpty(result.ZomeReturnHash))
@@ -287,6 +334,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                             //holon.Dispose(); //Free any resources including disconnecting from the Holochain Conductor, shutting down any running conductors etc...
                             holon = new Holon(_holoNETClient); //Normally you wouldn't need to create a new instance but we want to verify the data is fully loaded so best to use a new object.
                             holon.EntryHash = entryHash;
+                            CLIEngine.ShowWorkingMessage("Loading Holon...");
                             result = await holon.LoadAsync();
 
                             if (result.IsCallSuccessful && !result.IsError)
@@ -297,19 +345,40 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
 
                                 // Now test the update method.
                                 holon.Name = "another holon";
+                                CLIEngine.ShowWorkingMessage("Saving Holon...");
                                 result = await holon.SaveAsync();
 
                                 if (result.IsCallSuccessful && !result.IsError && !string.IsNullOrEmpty(result.ZomeReturnHash))
                                 {
-                                    Console.WriteLine(string.Concat("TEST HARNESS: AVATAR MULTIPLE HOLONETBASECLASS.SAVE/UPDATE RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
-                                    Console.WriteLine("");
-                                    ShowHolonDetails(holon);
+                                    CLIEngine.ShowSuccessMessage(string.Concat("TEST HARNESS: AVATAR SINGLE HOLONET BASE ENTRY.SAVE/UPDATE RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
+                                    ShowAvatarDetails(avatar);
+
+                                    //Now check the update was saved correctly by re-loading it...
+                                    CLIEngine.ShowMessage("*** HOLON MULTIPLEHOLONET BASE ENTRY LOAD TEST 2 (VERIFYING UPDATE WAS SUCCESSFUL) ***", _testHeadingColour);
+                                    CLIEngine.ShowWorkingMessage("Loading Holon...");
+
+                                    holon = ResetHolon(holon);
+                                    result = await holon.LoadAsync();
+
+                                    if (result.IsCallSuccessful && !result.IsError)
+                                    {
+                                        CLIEngine.ShowSuccessMessage(string.Concat("TEST HARNESS: HOLON MULTIPLE HOLONET BASE ENTRY.LOAD RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
+                                        ShowAvatarDetails(avatar);
+
+                                        CLIEngine.ShowMessage("*** HOLON MULTIPLE HOLONET BASE ENTRY DELETE TEST ***", _testHeadingColour);
+                                        CLIEngine.ShowWorkingMessage("Deleting Holon...");
+                                        result = await avatar.DeleteAsync();
+
+                                        if (result.IsCallSuccessful && !result.IsError && !string.IsNullOrEmpty(result.ZomeReturnHash))
+                                            CLIEngine.ShowSuccessMessage(string.Concat("TEST HARNESS: HOLON MULTIPLE HOLONET BASE ENTRY.DELETE RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
+                                        else
+                                            CLIEngine.ShowErrorMessage(string.Concat("TEST HARNESS: HOLON MULTIPLEHOLONET BASE ENTRY.DELETE RESPONSE: AN ERROR OCCURED: ", result.Message));
+                                    }
+                                    else
+                                        CLIEngine.ShowErrorMessage(string.Concat("TEST HARNESS: HOLON MULTIPLE HOLONET BASE ENTRY.LOAD RESPONSE: AN ERROR OCCURED: ", result.Message));
                                 }
                                 else
-                                {
-                                    Console.WriteLine(string.Concat("TEST HARNESS: AVATAR MULTIPLE HOLONETBASECLASS.SAVE/UPDATE RESPONSE: AN ERROR OCCURED: ", result.Message));
-                                    Console.WriteLine("");
-                                }
+                                    CLIEngine.ShowErrorMessage(string.Concat("TEST HARNESS: HOLON MULTIPLE HOLONET BASE ENTRY.SAVE/UPDATE RESPONSE: AN ERROR OCCURED: ", result.Message));
                             }
                             else
                             {
@@ -323,15 +392,84 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                             Console.WriteLine("");
                         }
 
-                        //There is no need to call Dispose on an object sharing a HoloNETClient instance (passed in) because it will only dispose of (disconnect etc) a HoloNETClient if one was NOT passed in because it was internally created and used (like the single use above).
-                        //if (avatar != null)
-                        //    avatar.Dispose(); //Free any resources including disconnecting from the Holochain Conductor, shutting down any running conductors etc...
+                        // There is no need to call Close on an object sharing a HoloNETClient instance (passed in) because it will only dispose of (disconnect etc) a HoloNETClient if one was NOT passed in because it was internally created and used (like the single use above).
+                        // UPDATE: There is now a need to still call Close so it unsubscribes the OnError event handler created for the shared HoloNETClient instance.
+                        if (avatar != null)
+                        {
+                            await avatar.CloseAsync(); //Free any resources including disconnecting from the Holochain Conductor, shutting down any running conductors etc...
+                            // avatar.Dispose(); //There originally use to be a Dispose method but we need it to be async so it waits for the HoloNET to disconnect etc. The AsyncDispose pattern was also not a good fit for what we needed and is overly complicated. We may look at implementing this in a later version...
 
-                        //if (holon != null)
-                        //    holon.Dispose(); //Free any resources including disconnecting from the Holochain Conductor, shutting down any running conductors etc...
+                            avatar.OnLoaded -= Avatar_OnLoaded;
+                            avatar.OnSaved -= Avatar_OnSaved;
+                            avatar.OnDeleted -= Avatar_OnDeleted;
+                            avatar.OnError -= Avatar_OnError;
+                            avatar.OnClosed -= Avatar_OnClosed;
+                        }
+
+                        if (holon != null)
+                        {
+                            await holon.CloseAsync(); //Free any resources including disconnecting from the Holochain Conductor, shutting down any running conductors etc...
+                            // holon.Dispose(); 
+
+                            holon.OnLoaded -= Avatar_OnLoaded;
+                            holon.OnSaved -= Avatar_OnSaved;
+                            holon.OnDeleted -= Avatar_OnDeleted;
+                            holon.OnError -= Avatar_OnError;
+                            holon.OnClosed -= Avatar_OnClosed;
+                        }
                     }
                     break;
             }
+        }
+
+        private static void Holon_OnClosed(object sender, HoloNETShutdownEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private static void Holon_OnError(object sender, HoloNETErrorEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private static void Holon_OnDeleted(object sender, ZomeFunctionCallBackEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private static void Holon_OnSaved(object sender, ZomeFunctionCallBackEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private static void Holon_OnLoaded(object sender, ZomeFunctionCallBackEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private static void Avatar_OnClosed(object sender, HoloNETShutdownEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private static void Avatar_OnError(object sender, HoloNETErrorEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private static void Avatar_OnDeleted(object sender, ZomeFunctionCallBackEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private static void Avatar_OnSaved(object sender, ZomeFunctionCallBackEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private static void Avatar_OnLoaded(object sender, ZomeFunctionCallBackEventArgs e)
+        {
+            throw new NotImplementedException();
         }
 
         private static Avatar ResetAvatar(Avatar avatar)
@@ -341,12 +479,47 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
             avatar.LastName = "";
             avatar.Email = "";
             avatar.DOB = DateTime.MinValue;
-            avatar.CreatedBy = Guid.Empty;
+            avatar.CreatedBy = "";
             avatar.CreatedDate = DateTime.MinValue;
-            avatar.ModifiedBy = Guid.Empty;
+            avatar.ModifiedBy = "";
             avatar.ModifiedDate = DateTime.MinValue;
+            avatar.DeletedBy = "";
+            avatar.DeletedDate = DateTime.MinValue;
 
             return avatar;
+        }
+
+        private static AvatarMultiple ResetAvatar(AvatarMultiple avatar)
+        {
+            avatar.Id = Guid.Empty;
+            avatar.FirstName = "";
+            avatar.LastName = "";
+            avatar.Email = "";
+            avatar.DOB = DateTime.MinValue;
+            avatar.CreatedBy = "";
+            avatar.CreatedDate = DateTime.MinValue;
+            avatar.ModifiedBy = "";
+            avatar.ModifiedDate = DateTime.MinValue;
+            avatar.DeletedBy = "";
+            avatar.DeletedDate = DateTime.MinValue;
+
+            return avatar;
+        }
+
+        private static Holon ResetHolon(Holon holon)
+        {
+            holon.Id = Guid.Empty;
+            holon.ParentId = Guid.Empty;
+            holon.Name = "";
+            holon.Description = "";
+            holon.CreatedBy = "";
+            holon.CreatedDate = DateTime.MinValue;
+            holon.ModifiedBy = "";
+            holon.ModifiedDate = DateTime.MinValue;
+            holon.DeletedBy = "";
+            holon.DeletedDate = DateTime.MinValue;
+
+            return holon;
         }
 
         private static void ShowAvatarDetails(Avatar avatar)

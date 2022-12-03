@@ -101,26 +101,5 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
 
             return base.DeleteAsync(entryHash);
         }
-
-        //protected override void ProcessZomeReturnCall(ZomeFunctionCallBackEventArgs result)
-        //{
-        //    if (!result.IsError && result.IsCallSuccessful)
-        //    {
-        //        //Load
-        //        if (result.Entry != null)
-        //        {
-        //            if (!string.IsNullOrEmpty(result.Entry.Author))
-        //            {
-        //                if (result.ZomeFunction == this.ZomeCreateEntryFunction)
-        //                    this.CreatedBy = result.Entry.Author;
-
-        //                else if (result.ZomeFunction == this.ZomeUpdateEntryFunction)
-        //                    this.ModifiedBy = result.Entry.Author;
-        //            }
-        //        }
-        //    }
-
-        //    base.ProcessZomeReturnCall(result);
-        //}
     }
 }
