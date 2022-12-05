@@ -125,6 +125,19 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                         avatar.OnError += Avatar_OnError;
                         avatar.OnClosed += Avatar_OnClosed;
 
+                        //By default the constructor's will auto call the InitializeAsync method but if you wish to call it manually so you can await it and ensure it is connected and AgentPubKey & DnaHash have been retreived you can do so as below:
+                        //We need to make sure we call this before anything else to make sure HoloNET is connected to the Conductor and so the AgentPubKey & DnaHash are set.
+                        //CLIEngine.ShowWorkingMessage("Initializing Avatar...");
+                        //await avatar.InitializeAsync();
+
+                        //Alternatively if you use the defaults and allow the constructor to auto-call InitializeAsync() then you can await the WaitTillHoloNETInitializedAsync method to make sure it is connected and the AgentPubKey & DnaHash have been retreived.
+                        //Note that all the CRUD methods LoadAsync, SaveAsync & DeleteAsync will automatically await internally until HoloNET is ready. 
+                        //So you only need to use the WaitTillHoloNETInitializedAsync method if you have not used the InitializeAsync method above and if you wish to access the HoloNETClient.Config.AgentPubKey or HoloNETClient.Config.DnaHash properties BEFORE calling any of the CRUD methods.
+                        await avatar.WaitTillHoloNETInitializedAsync();
+                        CLIEngine.ShowMessage($"AgentPubKey:{avatar.HoloNETClient.Config.AgentPubKey}");
+                        CLIEngine.ShowMessage($"DnaHash:{avatar.HoloNETClient.Config.DnaHash}");
+
+
                         CLIEngine.ShowWorkingMessage("Saving Avatar...");
                         ZomeFunctionCallBackEventArgs result =  await avatar.SaveAsync();
 

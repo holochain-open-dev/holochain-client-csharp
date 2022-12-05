@@ -17,7 +17,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
     public class HoloNETClient //: IDisposable //, IAsyncDisposable
     {
         private bool _shuttingDownHoloNET = false;
-        private bool _gettingAgentPubKeyAndDnaHash = false;
         private bool _getAgentPubKeyAndDnaHashFromConductor;
         private bool _updateDnaHashAndAgentPubKey = true;
         private Dictionary<string, string> _zomeLookup = new Dictionary<string, string>();
@@ -28,6 +27,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         private Dictionary<string, ZomeFunctionCallBackEventArgs> _zomeReturnDataLookup = new Dictionary<string, ZomeFunctionCallBackEventArgs>();
         private Dictionary<string, bool> _cacheZomeReturnDataLookup = new Dictionary<string, bool>();
         private Dictionary<string, TaskCompletionSource<ZomeFunctionCallBackEventArgs>> _taskCompletionZomeCallBack = new Dictionary<string, TaskCompletionSource<ZomeFunctionCallBackEventArgs>>();
+        private TaskCompletionSource<AgentPubKeyDnaHash> _taskCompletionAgentPubKeyAndDnaHashRetreived = new TaskCompletionSource<AgentPubKeyDnaHash>();
+        //private TaskCompletionSource<AgentPubKeyDnaHash> _taskCompletionAgentPubKeyAndDnaHashRetreivedFromConductor = new TaskCompletionSource<AgentPubKeyDnaHash>();
         private TaskCompletionSource<ReadyForZomeCallsEventArgs> _taskCompletionReadyForZomeCalls = new TaskCompletionSource<ReadyForZomeCallsEventArgs>();
         private TaskCompletionSource<DisconnectedEventArgs> _taskCompletionDisconnected = new TaskCompletionSource<DisconnectedEventArgs>();
         private TaskCompletionSource<HoloNETShutdownEventArgs> _taskCompletionHoloNETShutdown = new TaskCompletionSource<HoloNETShutdownEventArgs>();
@@ -108,6 +109,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         }
 
         public bool IsReadyForZomesCalls { get; set; }
+        public bool RetreivingAgentPubKeyAndDnaHash { get; private set; }
+
+        public async Task<ReadyForZomeCallsEventArgs> WaitTillReadyForZomeCallsAsync()
+        {
+            return await _taskCompletionReadyForZomeCalls.Task;
+        }
 
         public HoloNETClient(string holochainConductorURI = "ws://localhost:8888", bool logToConsole = true, bool logToFile = true, string releativePathToLogFolder = "Logs", string logFileName = "HoloNET.log", bool addAdditionalSpaceAfterEachLogEntry = false, bool showColouredLogs = true, ConsoleColor debugColour = ConsoleColor.White, ConsoleColor infoColour = ConsoleColor.Green, ConsoleColor warningColour = ConsoleColor.Yellow, ConsoleColor errorColour = ConsoleColor.Red)
         {
@@ -127,7 +134,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             Init(holochainConductorURI);
         }
 
-        public async Task ConnectAsync(bool getAgentPubKeyAndDnaHashFromConductor = true, bool getAgentPubKeyAndDnaHashFromSandbox = false)
+        public async Task ConnectAsync(ConnectedCallBackMode connectedCallBackMode = ConnectedCallBackMode.WaitForHolochainConductorToConnect, RetreiveAgentPubKeyAndDnaHashMode retreiveAgentPubKeyAndDnaHashMode = RetreiveAgentPubKeyAndDnaHashMode.Wait, bool getAgentPubKeyAndDnaHashFromConductor = true, bool getAgentPubKeyAndDnaHashFromSandbox = true)
         {
             try
             {
@@ -141,17 +148,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     if (Config.AutoStartHolochainConductor)
                         await StartConductorAsync();
 
-                    await WebSocket.Connect();
-
-                    if (getAgentPubKeyAndDnaHashFromSandbox && !getAgentPubKeyAndDnaHashFromConductor)
+                    if (connectedCallBackMode == ConnectedCallBackMode.WaitForHolochainConductorToConnect)
+                        await WebSocket.Connect();
+                    else
                     {
-                        AgentPubKeyDnaHash agentPubKeyDnaHash = await GetAgentPubKeyAndDnaHashFromSandboxAsync();
-
-                        if (agentPubKeyDnaHash != null)
-                        {
-                            Config.AgentPubKey = agentPubKeyDnaHash.AgentPubKey;
-                            Config.DnaHash = agentPubKeyDnaHash.DnaHash;
-                        }
+                        WebSocket.Connect();
+                        await RetreiveAgentPubKeyAndDnaHashAsync(retreiveAgentPubKeyAndDnaHashMode, getAgentPubKeyAndDnaHashFromConductor, getAgentPubKeyAndDnaHashFromSandbox);
                     }
                 }
             }
@@ -163,37 +165,34 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         public void Connect(bool getAgentPubKeyAndDnaHashFromConductor = true, bool getAgentPubKeyAndDnaHashFromSandbox = false)
         {
-            ConnectAsync(getAgentPubKeyAndDnaHashFromConductor, getAgentPubKeyAndDnaHashFromSandbox);
+            ConnectAsync(ConnectedCallBackMode.UseCallBackEvents, RetreiveAgentPubKeyAndDnaHashMode.UseCallBackEvents, getAgentPubKeyAndDnaHashFromConductor, getAgentPubKeyAndDnaHashFromSandbox);
         }
 
-        public void GetAgentPubKeyAndDnaHash(bool getAgentPubKeyAndDnaHashFromConductor = true, bool getAgentPubKeyAndDnaHashFromSandbox = false)
+        public AgentPubKeyDnaHash RetreiveAgentPubKeyAndDnaHash(bool getAgentPubKeyAndDnaHashFromConductor = true, bool getAgentPubKeyAndDnaHashFromSandbox = false)
         {
-
+            return RetreiveAgentPubKeyAndDnaHashAsync(RetreiveAgentPubKeyAndDnaHashMode.UseCallBackEvents, getAgentPubKeyAndDnaHashFromConductor, getAgentPubKeyAndDnaHashFromSandbox).Result;
         }
 
-        public async Task<AgentPubKeyDnaHash> GetAgentPubKeyAndDnaHash(bool getAgentPubKeyAndDnaHashFromConductor = true, bool getAgentPubKeyAndDnaHashFromSandbox = false)
+        public async Task<AgentPubKeyDnaHash> RetreiveAgentPubKeyAndDnaHashAsync(RetreiveAgentPubKeyAndDnaHashMode retreiveAgentPubKeyAndDnaHashMode = RetreiveAgentPubKeyAndDnaHashMode.Wait, bool getAgentPubKeyAndDnaHashFromConductor = true, bool getAgentPubKeyAndDnaHashFromSandbox = true)
         {
-            if (_gettingAgentPubKeyAndDnaHash)
+            if (RetreivingAgentPubKeyAndDnaHash)
                 return null;
 
-            _gettingAgentPubKeyAndDnaHash = true;
+            RetreivingAgentPubKeyAndDnaHash = true;
 
-            //if (getAgentPubKeyAndDnaHashFromSandbox && !getAgentPubKeyAndDnaHashFromConductor)
-            if (getAgentPubKeyAndDnaHashFromSandbox)
+            //Try to first get from the conductor.
+            if (getAgentPubKeyAndDnaHashFromConductor)
+                return await RetreiveAgentPubKeyAndDnaHashFromConductorAsync(retreiveAgentPubKeyAndDnaHashMode);
+            
+            else if (getAgentPubKeyAndDnaHashFromSandbox)
             {
-                AgentPubKeyDnaHash agentPubKeyDnaHash = await GetAgentPubKeyAndDnaHashFromSandboxAsync();
+                AgentPubKeyDnaHash agentPubKeyDnaHash = await RetreiveAgentPubKeyAndDnaHashFromSandboxAsync();
 
                 if (agentPubKeyDnaHash != null)
-                {
-                    Config.AgentPubKey = agentPubKeyDnaHash.AgentPubKey;
-                    Config.DnaHash = agentPubKeyDnaHash.DnaHash;
-                    _gettingAgentPubKeyAndDnaHash = false;
-                    return new AgentPubKeyDnaHash() { AgentPubKey = Config.AgentPubKey, DnaHash = Config.DnaHash };
-                }
+                    RetreivingAgentPubKeyAndDnaHash = false;
             }
 
-            else if (getAgentPubKeyAndDnaHashFromConductor)
-                GetAgentPubKeyAndDnaHashFromConductor();
+            return new AgentPubKeyDnaHash() { AgentPubKey = Config.AgentPubKey, DnaHash = Config.DnaHash };
         }
 
         public async Task StartConductorAsync()
@@ -350,10 +349,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             StartConductorAsync();
         }
 
-        public async Task<AgentPubKeyDnaHash> GetAgentPubKeyAndDnaHashFromSandboxAsync(bool updateConfig = true)
+        public async Task<AgentPubKeyDnaHash> RetreiveAgentPubKeyAndDnaHashFromSandboxAsync(bool updateConfig = true)
         {
             try
             {
+                RetreivingAgentPubKeyAndDnaHash = true;
                 Logger.Log("Attempting To Retreive AgentPubKey & DnaHash From hc sandbox...", LogType.Info, true);
 
                 if (string.IsNullOrEmpty(Config.FullPathToExternalHCToolBinary))
@@ -400,15 +400,16 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             return null;
         }
 
-        public AgentPubKeyDnaHash GetAgentPubKeyAndDnaHashFromSandbox(bool updateConfig = true)
+        public AgentPubKeyDnaHash RetreiveAgentPubKeyAndDnaHashFromSandbox(bool updateConfig = true)
         {
-            return GetAgentPubKeyAndDnaHashFromSandboxAsync(updateConfig).Result;
+            return RetreiveAgentPubKeyAndDnaHashFromSandboxAsync(updateConfig).Result;
         }
 
-        public async Task GetAgentPubKeyAndDnaHashFromConductorAsync(bool updateConfig = true)
+        public async Task<AgentPubKeyDnaHash> RetreiveAgentPubKeyAndDnaHashFromConductorAsync(RetreiveAgentPubKeyAndDnaHashMode retreiveAgentPubKeyAndDnaHashMode = RetreiveAgentPubKeyAndDnaHashMode.Wait, bool updateConfig = true)
         {
             try
             {
+                RetreivingAgentPubKeyAndDnaHash = true;
                 _updateDnaHashAndAgentPubKey = updateConfig;
                 Logger.Log("Attempting To Retreive AgentPubKey & DnaHash from Holochain Conductor...", LogType.Info, true);
 
@@ -421,17 +422,23 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     }
                 };
 
-                await SendHoloNETRequestAsync("1", holoNETData);
+                await SendHoloNETRequestAsync(_currentId.ToString(), holoNETData);
+                _currentId++;
+
+                if (retreiveAgentPubKeyAndDnaHashMode == RetreiveAgentPubKeyAndDnaHashMode.Wait)
+                    return await _taskCompletionAgentPubKeyAndDnaHashRetreived.Task;
             }
             catch (Exception ex)
             {
                 HandleError("Error occured in HoloNETClient.GetAgentPubKeyAndDnaHashFromConductor method getting DnaHash & AgentPubKey from hApp.", ex);
             }
+
+            return null;
         }
 
-        public void GetAgentPubKeyAndDnaHashFromConductor(bool updateConfig = true)
+        public AgentPubKeyDnaHash RetreiveAgentPubKeyAndDnaHashFromConductor(bool updateConfig = true)
         {
-            GetAgentPubKeyAndDnaHashFromConductorAsync(updateConfig);
+            return RetreiveAgentPubKeyAndDnaHashFromConductorAsync(RetreiveAgentPubKeyAndDnaHashMode.UseCallBackEvents, updateConfig).Result;
         }
 
         public async Task SendHoloNETRequestAsync(string id, HoloNETData holoNETData)
@@ -1173,13 +1180,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                         //If either the AgentPubKey or DnaHash is empty then attempt to get from the sandbox cmd.
                         if (string.IsNullOrEmpty(Config.AgentPubKey) || string.IsNullOrEmpty(Config.DnaHash))
-                            GetAgentPubKeyAndDnaHashFromSandbox();
+                            RetreiveAgentPubKeyAndDnaHashFromSandbox();
                         else
-                        {
-                            ReadyForZomeCallsEventArgs eventArgs = new ReadyForZomeCallsEventArgs(EndPoint, dnaHash, agentPubKey);
-                            OnReadyForZomeCalls?.Invoke(this, eventArgs);
-                            _taskCompletionReadyForZomeCalls.SetResult(eventArgs);
-                        }
+                            SetReadyForZomeCalls();
                     }
                     else
                     {
@@ -1405,21 +1408,24 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     SetReadyForZomeCalls();
 
                 //Otherwise, if the getAgentPubKeyAndDnaHashFromConductor param was set to true when calling the Connect method, retreive them now...
-                else if (_getAgentPubKeyAndDnaHashFromConductor)
-                    GetAgentPubKeyAndDnaHashFromConductor();
+                else if (_getAgentPubKeyAndDnaHashFromConductor) //TODO: Might not need to do this now because it is called in the Connect method (need to test this).
+                    RetreiveAgentPubKeyAndDnaHashFromConductorAsync();
             }
             catch (Exception ex)
             {
-                HandleError("Error in HoloNETClient.WebSocket_OnDataReceived method.", ex);
+                HandleError("Error in HoloNETClient.WebSocket_OnConnected method.", ex);
             }
         }
 
         private void SetReadyForZomeCalls()
         {
+            RetreivingAgentPubKeyAndDnaHash = false;
+            _taskCompletionAgentPubKeyAndDnaHashRetreived.SetResult(new AgentPubKeyDnaHash() { AgentPubKey = Config.AgentPubKey, DnaHash = Config.DnaHash });
+            
             IsReadyForZomesCalls = true;
             ReadyForZomeCallsEventArgs eventArgs = new ReadyForZomeCallsEventArgs(EndPoint, Config.DnaHash, Config.AgentPubKey);
             OnReadyForZomeCalls?.Invoke(this, eventArgs);
-            _taskCompletionReadyForZomeCalls.SetResult(eventArgs);
+            _taskCompletionReadyForZomeCalls.SetResult(eventArgs);            
         }
 
         private string GetItemFromCache(string id, Dictionary<string, string> cache)

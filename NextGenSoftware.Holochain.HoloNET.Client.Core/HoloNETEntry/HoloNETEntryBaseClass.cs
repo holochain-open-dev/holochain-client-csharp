@@ -33,12 +33,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public delegate void Closed(object sender, HoloNETShutdownEventArgs e);
         public event Closed OnClosed;
 
-        public HoloNETEntryBaseClass(string zomeName, string zomeLoadEntryFunction, string zomeCreateEntryFunction, string zomeUpdateEntryFunction, string zomeDeleteEntryFunction, bool storeEntryHashInEntry = true, string holochainConductorURI = "ws://localhost:8888", HoloNETConfig holoNETConfig = null, bool logToConsole = true, bool logToFile = true, string releativePathToLogFolder = "Logs", string logFileName = "HoloNET.log", bool addAdditionalSpaceAfterEachLogEntry = false, bool showColouredLogs = true, ConsoleColor debugColour = ConsoleColor.White, ConsoleColor infoColour = ConsoleColor.Green, ConsoleColor warningColour = ConsoleColor.Yellow, ConsoleColor errorColour = ConsoleColor.Red)
+        public HoloNETEntryBaseClass(string zomeName, string zomeLoadEntryFunction, string zomeCreateEntryFunction, string zomeUpdateEntryFunction, string zomeDeleteEntryFunction, bool autoCallInitialize = true, string holochainConductorURI = "ws://localhost:8888", HoloNETConfig holoNETConfig = null, ConnectedCallBackMode connectedCallBackMode = ConnectedCallBackMode.WaitForHolochainConductorToConnect, RetreiveAgentPubKeyAndDnaHashMode retreiveAgentPubKeyAndDnaHashMode = RetreiveAgentPubKeyAndDnaHashMode.Wait, bool getAgentPubKeyAndDnaHashFromConductor = true, bool getAgentPubKeyAndDnaHashFromSandbox = true, bool logToConsole = true, bool logToFile = true, string releativePathToLogFolder = "Logs", string logFileName = "HoloNET.log", bool addAdditionalSpaceAfterEachLogEntry = false, bool showColouredLogs = true, ConsoleColor debugColour = ConsoleColor.White, ConsoleColor infoColour = ConsoleColor.Green, ConsoleColor warningColour = ConsoleColor.Yellow, ConsoleColor errorColour = ConsoleColor.Red)
         {
             HoloNETClient = new HoloNETClient(holochainConductorURI, logToConsole, logToFile, releativePathToLogFolder, logFileName, addAdditionalSpaceAfterEachLogEntry, showColouredLogs, debugColour, infoColour, warningColour, errorColour);
             _disposeOfHoloNETClient = true;
 
-            StoreEntryHashInEntry = storeEntryHashInEntry;
             ZomeName = zomeName;
             ZomeLoadEntryFunction = zomeLoadEntryFunction;
             ZomeCreateEntryFunction = zomeCreateEntryFunction;
@@ -48,15 +47,16 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             if (holoNETConfig != null)
                 HoloNETClient.Config = holoNETConfig;
 
-            Init();
+            if (autoCallInitialize)
+                InitializeAsync(connectedCallBackMode, retreiveAgentPubKeyAndDnaHashMode, getAgentPubKeyAndDnaHashFromConductor, getAgentPubKeyAndDnaHashFromSandbox);
         }
 
-        public HoloNETEntryBaseClass(string zomeName, string zomeLoadEntryFunction, string zomeCreateEntryFunction, string zomeUpdateEntryFunction, string zomeDeleteEntryFunction, HoloNETConfig holoNETConfig, bool storeEntryHashInEntry = true)
+        public HoloNETEntryBaseClass(string zomeName, string zomeLoadEntryFunction, string zomeCreateEntryFunction, string zomeUpdateEntryFunction, string zomeDeleteEntryFunction, HoloNETConfig holoNETConfig, bool autoCallInitialize = true, ConnectedCallBackMode connectedCallBackMode = ConnectedCallBackMode.WaitForHolochainConductorToConnect, RetreiveAgentPubKeyAndDnaHashMode retreiveAgentPubKeyAndDnaHashMode = RetreiveAgentPubKeyAndDnaHashMode.Wait, bool getAgentPubKeyAndDnaHashFromConductor = true, bool getAgentPubKeyAndDnaHashFromSandbox = true)
         {
             HoloNETClient = new HoloNETClient();
             _disposeOfHoloNETClient = true;
 
-            StoreEntryHashInEntry = storeEntryHashInEntry;
+            //StoreEntryHashInEntry = storeEntryHashInEntry;
             ZomeName = zomeName;
             ZomeLoadEntryFunction = zomeLoadEntryFunction;
             ZomeCreateEntryFunction = zomeCreateEntryFunction;
@@ -66,20 +66,32 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             if (holoNETConfig != null)
                 HoloNETClient.Config = holoNETConfig;
 
-            Init();
+            if (autoCallInitialize)
+                InitializeAsync(connectedCallBackMode, retreiveAgentPubKeyAndDnaHashMode, getAgentPubKeyAndDnaHashFromConductor, getAgentPubKeyAndDnaHashFromSandbox);
         }
 
-        public HoloNETEntryBaseClass(string zomeName, string zomeLoadEntryFunction, string zomeCreateEntryFunction, string zomeUpdateEntryFunction, string zomeDeleteEntryFunction, HoloNETClient holoNETClient, bool storeEntryHashInEntry = true)
+        public HoloNETEntryBaseClass(string zomeName, string zomeLoadEntryFunction, string zomeCreateEntryFunction, string zomeUpdateEntryFunction, string zomeDeleteEntryFunction, HoloNETClient holoNETClient, bool autoCallInitialize = true, ConnectedCallBackMode connectedCallBackMode = ConnectedCallBackMode.WaitForHolochainConductorToConnect, RetreiveAgentPubKeyAndDnaHashMode retreiveAgentPubKeyAndDnaHashMode = RetreiveAgentPubKeyAndDnaHashMode.Wait, bool getAgentPubKeyAndDnaHashFromConductor = true, bool getAgentPubKeyAndDnaHashFromSandbox = true)
         {
             HoloNETClient = holoNETClient;
-            StoreEntryHashInEntry = storeEntryHashInEntry;
+            //StoreEntryHashInEntry = storeEntryHashInEntry;
             ZomeName = zomeName;
             ZomeLoadEntryFunction = zomeLoadEntryFunction;
             ZomeCreateEntryFunction = zomeCreateEntryFunction;
             ZomeUpdateEntryFunction = zomeUpdateEntryFunction;
             ZomeDeleteEntryFunction = zomeDeleteEntryFunction;
 
-            Init();
+            if (autoCallInitialize)
+                InitializeAsync(connectedCallBackMode, retreiveAgentPubKeyAndDnaHashMode, getAgentPubKeyAndDnaHashFromConductor, getAgentPubKeyAndDnaHashFromSandbox);
+        }
+
+        public bool IsInitializing { get; private set; }
+
+        public bool IsInitialized
+        {
+            get
+            {
+                return HoloNETClient != null ? HoloNETClient.IsReadyForZomesCalls : false;
+            }
         }
 
         /// <summary>
@@ -146,6 +158,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         {
             try
             {
+                if (!IsInitialized && !IsInitializing)
+                    await InitializeAsync();
+
                 ZomeFunctionCallBackEventArgs result = await HoloNETClient.CallZomeFunctionAsync(ZomeName, ZomeLoadEntryFunction, EntryHash);
                 ProcessZomeReturnCall(result);
                 OnLoaded?.Invoke(this, result);
@@ -193,6 +208,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         {
             try
             {
+                if (!IsInitialized && !IsInitializing)
+                    await InitializeAsync();
+
                 dynamic paramsObject = new ExpandoObject();
                 dynamic updateParamsObject = new ExpandoObject();
                 Dictionary<string, object> zomeCallProps = new Dictionary<string, object>();
@@ -279,6 +297,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             try
             {
+                if (!IsInitialized && !IsInitializing)
+                    await InitializeAsync();
+
                 if (string.IsNullOrEmpty(EntryHash))
                     result = await HoloNETClient.CallZomeFunctionAsync(ZomeName, ZomeCreateEntryFunction, paramsObject);
                 else
@@ -324,6 +345,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             try
             {
+                if (!IsInitialized && !IsInitializing)
+                    await InitializeAsync();
+
                 if (!string.IsNullOrEmpty(EntryHash))
                     result = await HoloNETClient.CallZomeFunctionAsync(ZomeName, ZomeDeleteEntryFunction, entryHash);
                 else
@@ -415,59 +439,54 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             return returnValue;
         }
 
+        public void Initialize(bool getAgentPubKeyAndDnaHashFromConductor = true, bool getAgentPubKeyAndDnaHashFromSandbox = true)
+        {
+            InitializeAsync(ConnectedCallBackMode.UseCallBackEvents, RetreiveAgentPubKeyAndDnaHashMode.UseCallBackEvents, getAgentPubKeyAndDnaHashFromConductor, getAgentPubKeyAndDnaHashFromSandbox);
+        }
+
+        public async Task InitializeAsync(ConnectedCallBackMode connectedCallBackMode = ConnectedCallBackMode.WaitForHolochainConductorToConnect, RetreiveAgentPubKeyAndDnaHashMode retreiveAgentPubKeyAndDnaHashMode = RetreiveAgentPubKeyAndDnaHashMode.Wait, bool getAgentPubKeyAndDnaHashFromConductor = true, bool getAgentPubKeyAndDnaHashFromSandbox = true)
+        {
+            try
+            {
+                if (IsInitialized)
+                    throw new InvalidOperationException("The HoloNET Client has already been initialized.");
+
+                if (IsInitializing)
+                    return;
+
+                IsInitializing = true;
+
+                //HoloNETClient.OnAppInfoCallBack += HoloNETClient_OnAppInfoCallBack;
+                //HoloNETClient.OnConductorDebugCallBack += HoloNETClient_OnConductorDebugCallBack;
+                //HoloNETClient.OnConnected += HoloNETClient_OnConnected;
+                //HoloNETClient.OnDataReceived += HoloNETClient_OnDataReceived;
+                //HoloNETClient.OnDisconnected += HoloNETClient_OnDisconnected;
+                HoloNETClient.OnError += HoloNETClient_OnError;
+                HoloNETClient.OnReadyForZomeCalls += HoloNETClient_OnReadyForZomeCalls;
+                //HoloNETClient.OnSignalsCallBack += HoloNETClient_OnSignalsCallBack;
+                //HoloNETClient.OnZomeFunctionCallBack += HoloNETClient_OnZomeFunctionCallBack;
+
+                if (HoloNETClient.WebSocket.State != System.Net.WebSockets.WebSocketState.Connecting || HoloNETClient.WebSocket.State != System.Net.WebSockets.WebSocketState.Open)
+                    await HoloNETClient.ConnectAsync(connectedCallBackMode, retreiveAgentPubKeyAndDnaHashMode, getAgentPubKeyAndDnaHashFromConductor, getAgentPubKeyAndDnaHashFromSandbox);
+            }
+            catch (Exception ex)
+            {
+                HandleError("Unknown error occured in InitializeAsync method.", ex);
+            }
+        }
+
+        public async Task<ReadyForZomeCallsEventArgs> WaitTillHoloNETInitializedAsync()
+        {
+            if (!IsInitialized && !IsInitializing)
+                await InitializeAsync();
+
+            return await HoloNETClient.WaitTillReadyForZomeCallsAsync();
+        }
+
         private void UnsubscribeEvents()
         {
             HoloNETClient.OnError -= HoloNETClient_OnError;
-        }
-
-        public void Init()
-        {
-            try
-            {
-                //HoloNETClient.OnAppInfoCallBack += HoloNETClient_OnAppInfoCallBack;
-                //HoloNETClient.OnConductorDebugCallBack += HoloNETClient_OnConductorDebugCallBack;
-                //HoloNETClient.OnConnected += HoloNETClient_OnConnected;
-                //HoloNETClient.OnDataReceived += HoloNETClient_OnDataReceived;
-                //HoloNETClient.OnDisconnected += HoloNETClient_OnDisconnected;
-                HoloNETClient.OnError += HoloNETClient_OnError;
-                //HoloNETClient.OnReadyForZomeCalls += HoloNETClient_OnReadyForZomeCalls;
-                //HoloNETClient.OnSignalsCallBack += HoloNETClient_OnSignalsCallBack;
-                //HoloNETClient.OnZomeFunctionCallBack += HoloNETClient_OnZomeFunctionCallBack;
-
-                if (HoloNETClient.WebSocket.State != System.Net.WebSockets.WebSocketState.Connecting || HoloNETClient.WebSocket.State != System.Net.WebSockets.WebSocketState.Open)
-                    HoloNETClient.Connect();
-            }
-            catch (Exception ex)
-            {
-                HandleError("Unknown error occured in Init method.", ex);
-            }
-        }
-
-        public async Task InitAsync()
-        {
-            try
-            {
-                //HoloNETClient.OnAppInfoCallBack += HoloNETClient_OnAppInfoCallBack;
-                //HoloNETClient.OnConductorDebugCallBack += HoloNETClient_OnConductorDebugCallBack;
-                //HoloNETClient.OnConnected += HoloNETClient_OnConnected;
-                //HoloNETClient.OnDataReceived += HoloNETClient_OnDataReceived;
-                //HoloNETClient.OnDisconnected += HoloNETClient_OnDisconnected;
-                HoloNETClient.OnError += HoloNETClient_OnError;
-                //HoloNETClient.OnReadyForZomeCalls += HoloNETClient_OnReadyForZomeCalls;
-                //HoloNETClient.OnSignalsCallBack += HoloNETClient_OnSignalsCallBack;
-                //HoloNETClient.OnZomeFunctionCallBack += HoloNETClient_OnZomeFunctionCallBack;
-
-                if (HoloNETClient.WebSocket.State != System.Net.WebSockets.WebSocketState.Connecting || HoloNETClient.WebSocket.State != System.Net.WebSockets.WebSocketState.Open)
-                { 
-                    await HoloNETClient.ConnectAsync();
-                    await HoloNETClient.
-
-                }
-            }
-            catch (Exception ex)
-            {
-                HandleError("Unknown error occured in Init method.", ex);
-            }
+            HoloNETClient.OnReadyForZomeCalls -= HoloNETClient_OnReadyForZomeCalls;
         }
 
         private void ProcessZomeReturnCall(ZomeFunctionCallBackEventArgs result)
@@ -537,6 +556,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             OnError?.Invoke(this, e);
         }
 
+        private void HoloNETClient_OnReadyForZomeCalls(object sender, ReadyForZomeCallsEventArgs e)
+        {
+            IsInitializing = false;
+        }
+
         /*
         private void HoloNETClient_OnZomeFunctionCallBack(object sender, ZomeFunctionCallBackEventArgs e)
         {
@@ -548,11 +572,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         }
 
         private void HoloNETClient_OnSignalsCallBack(object sender, SignalsCallBackEventArgs e)
-        {
-            
-        }
-
-        private void HoloNETClient_OnReadyForZomeCalls(object sender, ReadyForZomeCallsEventArgs e)
         {
             
         }

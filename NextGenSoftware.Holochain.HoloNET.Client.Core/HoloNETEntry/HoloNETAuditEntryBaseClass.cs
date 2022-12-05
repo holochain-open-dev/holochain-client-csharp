@@ -65,13 +65,15 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
         /// Saves the object and will automatically extrct the properties that need saving (contain the HolochainPropertyName attribute). This method uses reflection so has a tiny performance overhead (negligbale), but if you need the extra nanoseconds use the other Save overload passing in your own params object.
         /// </summary>
         /// <returns></returns>
-        public override Task<ZomeFunctionCallBackEventArgs> SaveAsync()
+        public override async Task<ZomeFunctionCallBackEventArgs> SaveAsync()
         {
             if (string.IsNullOrEmpty(EntryHash))
             {
                 if (CreatedDate == DateTime.MinValue)
                 {
                     CreatedDate = DateTime.Now;
+
+                    await this.HoloNETClient.WaitTillReadyForZomeCallsAsync();
                     CreatedBy = this.HoloNETClient.Config.AgentPubKey;
                 }
             }
@@ -80,26 +82,30 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                 if (ModifiedDate == DateTime.MinValue)
                 {
                     ModifiedDate = DateTime.Now;
+
+                    await this.HoloNETClient.WaitTillReadyForZomeCallsAsync();
                     ModifiedBy = this.HoloNETClient.Config.AgentPubKey;
                 }
             }
 
-            return base.SaveAsync();
+            return await base.SaveAsync();
         }
 
         /// <summary>
         /// Soft delete's the entry (the previous version can still be retreived).
         /// </summary>
         /// <returns></returns>
-        public override Task<ZomeFunctionCallBackEventArgs> DeleteAsync(string entryHash)
+        public override async Task<ZomeFunctionCallBackEventArgs> DeleteAsync(string entryHash)
         {
             if (DeletedDate == DateTime.MinValue)
             {
                 DeletedDate = DateTime.Now;
+
+                await this.HoloNETClient.WaitTillReadyForZomeCallsAsync();
                 DeletedBy = this.HoloNETClient.Config.AgentPubKey;
             }
 
-            return base.DeleteAsync(entryHash);
+            return await base.DeleteAsync(entryHash);
         }
     }
 }
