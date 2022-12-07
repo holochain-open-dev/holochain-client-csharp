@@ -21,6 +21,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public delegate void Error(object sender, HoloNETErrorEventArgs e);
         public event Error OnError;
 
+        public delegate void Initialized(object sender, ReadyForZomeCallsEventArgs e);
+        public event Initialized OnInitialized;
+
         public delegate void Loaded(object sender, ZomeFunctionCallBackEventArgs e);
         public event Loaded OnLoaded;
 
@@ -239,14 +242,20 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                                             ExpandoObjectHelpers.AddProperty(paramsObject, key, value.ToString());
 
                                         else
+                                        {
+                                            //For some reason ExpandoObject doesn't set null properties so for strings we will set it as a empty string.
+                                            if (propInfo.PropertyType == typeof(string) && value == null)
+                                                value = "";
+
                                             ExpandoObjectHelpers.AddProperty(paramsObject, key, value);
+                                        }
                                     }
-                                    if (key == "entry_hash" && value != null)
-                                    {
-                                        //Is an update so we need to include the action_hash for the rust HDK to be able to update the entry...
-                                        ExpandoObjectHelpers.AddProperty(updateParamsObject, "original_action_hash", HoloNETClient.ConvertHoloHashToBytes(value.ToString()));
-                                        update = true;
-                                    }
+                                    //if (key == "entry_hash" && value != null)
+                                    //{
+                                    //    //Is an update so we need to include the action_hash for the rust HDK to be able to update the entry...
+                                    //    ExpandoObjectHelpers.AddProperty(updateParamsObject, "original_action_hash", HoloNETClient.ConvertHoloHashToBytes(value.ToString()));
+                                    //    update = true;
+                                    //}
                                 }
                             }
                             catch (Exception ex)
@@ -257,19 +266,20 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     }
                 }
 
-                if (update)
-                {
-                    this.Version++;
-                    ExpandoObjectHelpers.AddProperty(updateParamsObject, "updated_entry", paramsObject);
-                    ExpandoObjectHelpers.AddProperty(updateParamsObject, "version", this.Version);
+                ExpandoObjectHelpers.AddProperty(paramsObject, "version", this.Version);
+                this.Version++;
 
+                //Update
+                if (!string.IsNullOrEmpty(EntryHash))
+                {
+                    ExpandoObjectHelpers.AddProperty(updateParamsObject, "original_action_hash", HoloNETClient.ConvertHoloHashToBytes(EntryHash));
+                    //ExpandoObjectHelpers.AddProperty(updateParamsObject, "original_action_hash", EntryHash);
+                    ExpandoObjectHelpers.AddProperty(updateParamsObject, "updated_entry", paramsObject);
                     return await SaveAsync(updateParamsObject);
                 }
                 else
-                {
-                    ExpandoObjectHelpers.AddProperty(paramsObject, "version", this.Version);
+                    //Create
                     return await SaveAsync(paramsObject);
-                }
             }
             catch (Exception ex)
             {
@@ -559,6 +569,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         private void HoloNETClient_OnReadyForZomeCalls(object sender, ReadyForZomeCallsEventArgs e)
         {
             IsInitializing = false;
+            OnInitialized?.Invoke(this, e);
         }
 
         /*

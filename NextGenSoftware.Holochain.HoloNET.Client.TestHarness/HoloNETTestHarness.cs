@@ -124,6 +124,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                         avatar.OnDeleted += Avatar_OnDeleted;
                         avatar.OnError += Avatar_OnError;
                         avatar.OnClosed += Avatar_OnClosed;
+                        avatar.OnInitialized += Avatar_OnInitialized;
 
                         //By default the constructor's will auto call the InitializeAsync method but if you wish to call it manually so you can await it and ensure it is connected and AgentPubKey & DnaHash have been retreived you can do so as below:
                         //We need to make sure we call this before anything else to make sure HoloNET is connected to the Conductor and so the AgentPubKey & DnaHash are set.
@@ -222,6 +223,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                             avatar.OnDeleted -= Avatar_OnDeleted;
                             avatar.OnError -= Avatar_OnError;
                             avatar.OnClosed -= Avatar_OnClosed;
+                            avatar.OnInitialized -= Avatar_OnInitialized;
                         }
                     }
                     break;
@@ -244,6 +246,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                         avatar.OnDeleted += Avatar_OnDeleted;
                         avatar.OnError += Avatar_OnError;
                         avatar.OnClosed += Avatar_OnClosed;
+                        avatar.OnInitialized += Avatar_OnInitialized;
 
                         CLIEngine.ShowWorkingMessage("Saving Avatar...");
                         ZomeFunctionCallBackEventArgs result = await avatar.SaveAsync();
@@ -332,6 +335,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                         holon.OnDeleted += Holon_OnDeleted;
                         holon.OnError += Holon_OnError;
                         holon.OnClosed += Holon_OnClosed;
+                        holon.OnInitialized += Holon_OnInitialized;
 
                         CLIEngine.ShowWorkingMessage("Saving Holon...");
                         result = await holon.SaveAsync();
@@ -417,6 +421,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                             avatar.OnDeleted -= Avatar_OnDeleted;
                             avatar.OnError -= Avatar_OnError;
                             avatar.OnClosed -= Avatar_OnClosed;
+                            avatar.OnInitialized -= Avatar_OnInitialized;
                         }
 
                         if (holon != null)
@@ -424,65 +429,76 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                             await holon.CloseAsync(); //Free any resources including disconnecting from the Holochain Conductor, shutting down any running conductors etc...
                             // holon.Dispose(); 
 
-                            holon.OnLoaded -= Avatar_OnLoaded;
-                            holon.OnSaved -= Avatar_OnSaved;
-                            holon.OnDeleted -= Avatar_OnDeleted;
-                            holon.OnError -= Avatar_OnError;
-                            holon.OnClosed -= Avatar_OnClosed;
+                            holon.OnLoaded -= Holon_OnLoaded;
+                            holon.OnSaved -= Holon_OnSaved;
+                            holon.OnDeleted -= Holon_OnDeleted;
+                            holon.OnError -= Holon_OnError;
+                            holon.OnClosed -= Holon_OnClosed;
+                            holon.OnInitialized -= Holon_OnInitialized;
                         }
                     }
                     break;
             }
         }
 
+        private static void Holon_OnInitialized(object sender, ReadyForZomeCallsEventArgs e)
+        {
+            CLIEngine.ShowMessage($"TEST HARNESS: Holon_OnInitialized, EndPoint: {e.EndPoint}, AgentPubKey: {e.AgentPubKey}, DnaHash: {e.DnaHash}, IsError: {e.IsError}, Message: {e.Message}");
+        }
+
+        private static void Avatar_OnInitialized(object sender, ReadyForZomeCallsEventArgs e)
+        {
+            CLIEngine.ShowMessage($"TEST HARNESS: Avatar_OnInitialized, EndPoint: {e.EndPoint}, AgentPubKey: {e.AgentPubKey}, DnaHash: {e.DnaHash}, IsError: {e.IsError}, Message: {e.Message}");
+        }
+
         private static void Holon_OnClosed(object sender, HoloNETShutdownEventArgs e)
         {
-            throw new NotImplementedException();
+            CLIEngine.ShowMessage($"TEST HARNESS: Holon_OnClosed, EndPoint: {e.EndPoint}, AgentPubKey: {e.AgentPubKey}, DnaHash: {e.DnaHash}, NumberOfHcExeInstancesShutdown: {e.HolochainConductorsShutdownEventArgs.NumberOfHcExeInstancesShutdown}, NumberOfHolochainExeInstancesShutdown: {e.HolochainConductorsShutdownEventArgs.NumberOfHolochainExeInstancesShutdown}, NumberOfRustcExeInstancesShutdown: {e.HolochainConductorsShutdownEventArgs.NumberOfRustcExeInstancesShutdown}, IsError: {e.IsError}, Message: {e.Message}");
         }
 
         private static void Holon_OnError(object sender, HoloNETErrorEventArgs e)
         {
-            throw new NotImplementedException();
+            CLIEngine.ShowErrorMessage($"TEST HARNESS: Holon_OnError, EndPoint: {e.EndPoint}, Reason: {e.Reason}");
         }
 
         private static void Holon_OnDeleted(object sender, ZomeFunctionCallBackEventArgs e)
         {
-            throw new NotImplementedException();
+            CLIEngine.ShowMessage($"TEST HARNESS: Holon_OnDeleted: {ProcessZomeFunctionCallBackEventArgs(e)}");
         }
 
         private static void Holon_OnSaved(object sender, ZomeFunctionCallBackEventArgs e)
         {
-            throw new NotImplementedException();
+            CLIEngine.ShowMessage($"TEST HARNESS: Holon_OnSaved: {ProcessZomeFunctionCallBackEventArgs(e)}");
         }
 
         private static void Holon_OnLoaded(object sender, ZomeFunctionCallBackEventArgs e)
         {
-            throw new NotImplementedException();
+            CLIEngine.ShowMessage($"TEST HARNESS: Holon_OnLoaded: {ProcessZomeFunctionCallBackEventArgs(e)}");
         }
 
         private static void Avatar_OnClosed(object sender, HoloNETShutdownEventArgs e)
         {
-            throw new NotImplementedException();
+            CLIEngine.ShowMessage($"TEST HARNESS: Avatar_OnClosed, EndPoint: {e.EndPoint}, AgentPubKey: {e.AgentPubKey}, DnaHash: {e.DnaHash}, NumberOfHcExeInstancesShutdown: {e.HolochainConductorsShutdownEventArgs.NumberOfHcExeInstancesShutdown}, NumberOfHolochainExeInstancesShutdown: {e.HolochainConductorsShutdownEventArgs.NumberOfHolochainExeInstancesShutdown}, NumberOfRustcExeInstancesShutdown: {e.HolochainConductorsShutdownEventArgs.NumberOfRustcExeInstancesShutdown}, IsError: {e.IsError}, Message: {e.Message}");
         }
 
         private static void Avatar_OnError(object sender, HoloNETErrorEventArgs e)
         {
-            throw new NotImplementedException();
+            CLIEngine.ShowErrorMessage($"TEST HARNESS: Avatar_OnError, EndPoint: {e.EndPoint}, Reason: {e.Reason}");
         }
 
         private static void Avatar_OnDeleted(object sender, ZomeFunctionCallBackEventArgs e)
         {
-            throw new NotImplementedException();
+            CLIEngine.ShowMessage($"TEST HARNESS: Avatar_OnDeleted: {ProcessZomeFunctionCallBackEventArgs(e)}");
         }
 
         private static void Avatar_OnSaved(object sender, ZomeFunctionCallBackEventArgs e)
         {
-            throw new NotImplementedException();
+            CLIEngine.ShowMessage($"TEST HARNESS: Avatar_OnSaved: {ProcessZomeFunctionCallBackEventArgs(e)}");
         }
 
         private static void Avatar_OnLoaded(object sender, ZomeFunctionCallBackEventArgs e)
         {
-            throw new NotImplementedException();
+            CLIEngine.ShowMessage($"TEST HARNESS: Avatar_OnLoaded: {ProcessZomeFunctionCallBackEventArgs(e)}");
         }
 
         private static Avatar ResetAvatar(Avatar avatar)
@@ -544,11 +560,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
             Console.WriteLine(string.Concat("Avatar.Email = ", avatar.Email.ToString()));
             Console.WriteLine(string.Concat("Avatar.DOB = ", avatar.DOB.ToString()));
             Console.WriteLine(string.Concat("Avatar.CreatedDate = ", avatar.CreatedDate.ToString()));
-            Console.WriteLine(string.Concat("Avatar.CreatedBy = ", avatar.CreatedBy.ToString()));
+            Console.WriteLine(string.Concat("Avatar.CreatedBy = ", avatar.CreatedBy));
             Console.WriteLine(string.Concat("Avatar.ModifiedDate = ", avatar.ModifiedDate.ToString()));
-            Console.WriteLine(string.Concat("Avatar.ModifiedBy = ", avatar.ModifiedBy.ToString()));
+            Console.WriteLine(string.Concat("Avatar.ModifiedBy = ", avatar.ModifiedBy));
             Console.WriteLine(string.Concat("Avatar.DeletedDate = ", avatar.DeletedDate.ToString()));
-            Console.WriteLine(string.Concat("Avatar.DeletedBy = ", avatar.DeletedBy.ToString()));
+            Console.WriteLine(string.Concat("Avatar.DeletedBy = ", avatar.DeletedBy));
             Console.WriteLine(string.Concat("Avatar.IsActive = ", avatar.IsActive.ToString()));
         }
 
@@ -561,11 +577,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
             Console.WriteLine(string.Concat("Avatar.Email = ", avatar.Email.ToString()));
             Console.WriteLine(string.Concat("Avatar.DOB = ", avatar.DOB.ToString()));
             Console.WriteLine(string.Concat("Avatar.CreatedDate = ", avatar.CreatedDate.ToString()));
-            Console.WriteLine(string.Concat("Avatar.CreatedBy = ", avatar.CreatedBy.ToString()));
+            Console.WriteLine(string.Concat("Avatar.CreatedBy = ", avatar.CreatedBy));
             Console.WriteLine(string.Concat("Avatar.ModifiedDate = ", avatar.ModifiedDate.ToString()));
-            Console.WriteLine(string.Concat("Avatar.ModifiedBy = ", avatar.ModifiedBy.ToString()));
+            Console.WriteLine(string.Concat("Avatar.ModifiedBy = ", avatar.ModifiedBy));
             Console.WriteLine(string.Concat("Avatar.DeletedDate = ", avatar.DeletedDate.ToString()));
-            Console.WriteLine(string.Concat("Avatar.DeletedBy = ", avatar.DeletedBy.ToString()));
+            Console.WriteLine(string.Concat("Avatar.DeletedBy = ", avatar.DeletedBy));
             Console.WriteLine(string.Concat("Avatar.IsActive = ", avatar.IsActive.ToString()));
         }
 
@@ -577,12 +593,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
             Console.WriteLine(string.Concat("Holon.Name = ", holon.Name));
             Console.WriteLine(string.Concat("Holon.Description = ", holon.Description));
             Console.WriteLine(string.Concat("Holon.CreatedDate = ", holon.CreatedDate.ToString()));
-            Console.WriteLine(string.Concat("Holon.CreatedBy = ", holon.CreatedBy.ToString()));
+            Console.WriteLine(string.Concat("Holon.CreatedBy = ", holon.CreatedBy));
             Console.WriteLine(string.Concat("Holon.ModifiedDate = ", holon.ModifiedDate.ToString()));
-            Console.WriteLine(string.Concat("Holon.ModifiedBy = ", holon.ModifiedBy.ToString()));
-            Console.WriteLine(string.Concat("Avatar.DeletedDate = ", holon.DeletedDate.ToString()));
-            Console.WriteLine(string.Concat("Avatar.DeletedBy = ", holon.DeletedBy.ToString()));
-            Console.WriteLine(string.Concat("Avatar.IsActive = ", holon.IsActive.ToString()));
+            Console.WriteLine(string.Concat("Holon.ModifiedBy = ", holon.ModifiedBy));
+            Console.WriteLine(string.Concat("Holon.DeletedDate = ", holon.DeletedDate.ToString()));
+            Console.WriteLine(string.Concat("Holon.DeletedBy = ", holon.DeletedBy));
+            Console.WriteLine(string.Concat("Holon.IsActive = ", holon.IsActive.ToString()));
         }
 
         private async static void _holoNETClient_OnReadyForZomeCalls(object sender, ReadyForZomeCallsEventArgs e)
@@ -744,7 +760,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
         {
             string result = "";
             
-            result = string.Concat("\nEndPoint: ", args.EndPoint, "\nId: ", args.Id, "\nZome: ", args.Zome, "\nZomeFunction: ", args.ZomeFunction, "\n\nRaw Data: ", args.RawData, "\n\nZomeReturnData: ", args.ZomeReturnData, "\nZomeReturnHash: ", args.ZomeReturnHash, "\nRaw Zome Return Data: ", args.RawZomeReturnData, "\nRaw Binary Daya: ", args.RawBinaryData, "\nRaw JSON Data: ", args.RawJSONData, "\nIsCallSuccessful: ", args.IsCallSuccessful ? "true" : "false");
+            result = string.Concat("\nEndPoint: ", args.EndPoint, "\nId: ", args.Id, "\nZome: ", args.Zome, "\nZomeFunction: ", args.ZomeFunction, "\n\nRaw Data: ", args.RawData, "\n\nZomeReturnData: ", args.ZomeReturnData, "\nZomeReturnHash: ", args.ZomeReturnHash, "\nRaw Zome Return Data: ", args.RawZomeReturnData, "\nRaw Binary Daya: ", args.RawBinaryData, "\nRaw JSON Data: ", args.RawJSONData, "\nIsCallSuccessful: ", args.IsCallSuccessful ? "true" : "false", "\nIsError: ", args.IsError ? "true" : "false", "\nMessage: ", args.Message);
 
             if (!string.IsNullOrEmpty(args.KeyValuePairAsString))
                 result = string.Concat(result, "\n\nProcessed Zome Return Data:\n", args.KeyValuePairAsString);
