@@ -636,8 +636,21 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 if (callback != null)
                     _callbackLookup[id] = callback;
 
-                if (paramsObject != null && paramsObject.GetType() == typeof(string))
-                    paramsObject = ConvertHoloHashToBytes(paramsObject.ToString());
+                try
+                {
+                    if (paramsObject != null && paramsObject.GetType() == typeof(string))
+                    {
+                        byte[] holoHash = null;
+                        holoHash = ConvertHoloHashToBytes(paramsObject.ToString());
+
+                        if (holoHash != null)
+                            paramsObject = holoHash;
+                    }
+                }
+                catch (Exception ex)
+                {
+
+                }
 
                 HoloNETData holoNETData = new HoloNETData()
                 {
@@ -784,7 +797,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         public byte[] ConvertHoloHashToBytes(string hash)
         {
-            return Convert.FromBase64String(hash.Replace('-', '+').Replace('_', '/').Substring(1, hash.Length - 1)); //also remove the u prefix.
+            Span<byte> output = null;
+            int bytesWritten = 0;
+
+            if (Convert.TryFromBase64String(hash.Replace('-', '+').Replace('_', '/').Substring(1, hash.Length - 1), output, out bytesWritten)) //also remove the u prefix.
+                return output.ToArray();
+            else
+                return null;
         }
 
         public string ConvertHoloHashToString(byte[] bytes)
@@ -1103,7 +1122,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         {
             try
             {
-                _taskCompletionDisconnected.SetResult(e);
+                if (!_taskCompletionDisconnected.Task.IsCompleted)
+                    _taskCompletionDisconnected.SetResult(e);
+
                 OnDisconnected?.Invoke(this, e);
                 ShutDownHolochainConductorsInternalAsync();
             }
@@ -1118,6 +1139,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             ZomeFunctionCallBackEventArgs zomeFunctionCallBackArgs = new ZomeFunctionCallBackEventArgs();
             string id = "";
             string rawData = "";
+            string rawBytes = "";
 
             try
             {
@@ -1133,18 +1155,42 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 {
                     string msg = $"Error in HoloNETClient.WebSocket_OnDataReceived method. Error received from Holochain Conductor: {rawData}";
                     HandleError(msg, null);
+                    HoloNETResponse response = null;
 
                     try
                     {
-                        HoloNETResponse response = MessagePackSerializer.Deserialize<HoloNETResponse>(e.RawBinaryData, options);
+                        response = MessagePackSerializer.Deserialize<HoloNETResponse>(e.RawBinaryData, options);
                         id = response.id.ToString();
+
+                        foreach (byte b in response.data)
+                            rawBytes = string.Concat(rawBytes, ", ", b.ToString());
+
+                        rawBytes = rawBytes.Substring(1, rawBytes.Length - 1);
                     }
                     catch (Exception ex)
                     {
 
                     }
 
-                    zomeFunctionCallBackArgs = new ZomeFunctionCallBackEventArgs(id, e.EndPoint, GetItemFromCache(id, _zomeLookup), GetItemFromCache(id, _funcLookup), false, rawData, null, null, null, null, null, null, e.RawBinaryData, e.RawJSONData, e.WebSocketResult);
+
+
+                    //zomeFunctionCallBackArgs = new ZomeFunctionCallBackEventArgs(id, e.EndPoint, GetItemFromCache(id, _zomeLookup), GetItemFromCache(id, _funcLookup), false, rawData, null, null, null, null, null, null, e.RawBinaryData, e.RawJSONData, e.WebSocketResult);
+
+                    zomeFunctionCallBackArgs = new ZomeFunctionCallBackEventArgs
+                    {
+                        Id = id,
+                        EndPoint = e.EndPoint,
+                        Zome = GetItemFromCache(id, _zomeLookup),
+                        ZomeFunction = GetItemFromCache(id, _funcLookup),
+                        IsCallSuccessful = false,
+                        RawData = rawData,
+                        RawBinaryData = e.RawBinaryData,
+                        RawBinaryDataAfterMessagePackDecode = response != null ? response.data : null,
+                        RawBinaryDataAfterMessagePackDecodeAsString = rawBytes,
+                        RawJSONData = e.RawJSONData,
+                        WebSocketResult = e.WebSocketResult
+                    };
+
                     zomeFunctionCallBackArgs.IsError = true;
                     zomeFunctionCallBackArgs.Message = msg;
                 }
@@ -1157,9 +1203,27 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     Logger.Log($"Type: {response.type}", LogType.Info);
                     id = response.id.ToString();
 
-                    OnDataReceived?.Invoke(this, new HoloNETDataReceivedEventArgs(response.id.ToString(), EndPoint, true, e.RawBinaryData, e.RawJSONData, e.WebSocketResult, false));
+                    foreach (byte b in response.data)
+                        rawBytes = string.Concat(rawBytes, ", ", b.ToString());
 
-                    //if (rawData.Substring(32, 8) == "app_info")
+                    rawBytes = rawBytes.Substring(1, rawBytes.Length - 1);
+                    Logger.Log(String.Concat("Raw Data Bytes Received After MessagePack Decode: ", rawBytes), LogType.Debug);
+
+                    //OnDataReceived?.Invoke(this, new HoloNETDataReceivedEventArgs(response.id.ToString(), EndPoint, true, e.RawBinaryData, e.RawJSONData, e.WebSocketResult, false, response.data, rawBytes));
+
+                    OnDataReceived?.Invoke(this, new HoloNETDataReceivedEventArgs()
+                    {
+                        Id = id,
+                        EndPoint = e.EndPoint,
+                        IsCallSuccessful = true,
+                        RawData = rawData,
+                        RawBinaryData = e.RawBinaryData,
+                        RawBinaryDataAfterMessagePackDecode = response.data,
+                        RawBinaryDataAfterMessagePackDecodeAsString = rawBytes,
+                        RawJSONData = e.RawJSONData,
+                        WebSocketResult = e.WebSocketResult
+                    });
+
                     if (rawData.Contains("app_info"))
                     {
                         Logger.Log("APP INFO RESPONSE DATA DETECTED\n", LogType.Info);
@@ -1184,6 +1248,17 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                         else
                             SetReadyForZomeCalls();
                     }
+                    else if (response.type == "Signal")
+                    {
+                        Logger.Log("SIGNAL DATA DETECTED\n", LogType.Info);
+
+                        HolonNETAppInfoResponse appResponse2 = MessagePackSerializer.Deserialize<HolonNETAppInfoResponse>(response.data, options);
+
+                        HoloNETSignalResponse appResponse = MessagePackSerializer.Deserialize<HoloNETSignalResponse>(response.data, options);
+
+                        
+                        //Dictionary<object, object> rawAppResponseData = MessagePackSerializer.Deserialize<Dictionary<object, object>>(appResponse.data, options);
+                    }
                     else
                     {
                         Logger.Log("ZOME RESPONSE DATA DETECTED\n", LogType.Info);
@@ -1207,7 +1282,27 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
 
                             Logger.Log($"Decoded Data:\n{keyValuePairsAsString}", LogType.Info);
-                            zomeFunctionCallBackArgs = new ZomeFunctionCallBackEventArgs(id, e.EndPoint, GetItemFromCache(id, _zomeLookup), GetItemFromCache(id, _funcLookup), true, rawData, rawAppResponseData, appResponseData, "", keyValuePairs, keyValuePairsAsString, entryData, e.RawBinaryData, e.RawJSONData, e.WebSocketResult);
+                            //zomeFunctionCallBackArgs = new ZomeFunctionCallBackEventArgs(id, e.EndPoint, GetItemFromCache(id, _zomeLookup), GetItemFromCache(id, _funcLookup), true, rawData, rawAppResponseData, appResponseData, "", keyValuePairs, keyValuePairsAsString, entryData, e.RawBinaryData, e.RawJSONData, e.WebSocketResult);
+
+                            zomeFunctionCallBackArgs = new ZomeFunctionCallBackEventArgs
+                            {
+                                Id = id,
+                                EndPoint = e.EndPoint,
+                                Zome = GetItemFromCache(id, _zomeLookup),
+                                ZomeFunction = GetItemFromCache(id, _funcLookup),
+                                IsCallSuccessful = true,
+                                RawZomeReturnData = rawAppResponseData,
+                                ZomeReturnData = appResponseData,
+                                KeyValuePair = keyValuePairs,
+                                KeyValuePairAsString = keyValuePairsAsString,
+                                Entry = entryData,
+                                RawData = rawData,
+                                RawBinaryData = e.RawBinaryData,
+                                RawBinaryDataAfterMessagePackDecode = response.data,
+                                RawBinaryDataAfterMessagePackDecodeAsString = rawBytes,
+                                RawJSONData = e.RawJSONData,
+                                WebSocketResult = e.WebSocketResult
+                            };
                         }
                         catch (Exception ex)
                         {
@@ -1215,7 +1310,23 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                             string hash = ConvertHoloHashToString((byte[])rawAppResponseData);
 
                             Logger.Log($"Decoded Data:\nHoloHash: {hash}", LogType.Info);
-                            zomeFunctionCallBackArgs = new ZomeFunctionCallBackEventArgs(id, e.EndPoint, GetItemFromCache(id, _zomeLookup), GetItemFromCache(id, _funcLookup), true, rawData, null, null, hash, null, null, null, e.RawBinaryData, e.RawJSONData, e.WebSocketResult);
+                            //zomeFunctionCallBackArgs = new ZomeFunctionCallBackEventArgs(id, e.EndPoint, GetItemFromCache(id, _zomeLookup), GetItemFromCache(id, _funcLookup), true, rawData, null, null, hash, null, null, null, e.RawBinaryData, e.RawJSONData, e.WebSocketResult);
+
+                            zomeFunctionCallBackArgs = new ZomeFunctionCallBackEventArgs
+                            {
+                                Id = id,
+                                EndPoint = e.EndPoint,
+                                Zome = GetItemFromCache(id, _zomeLookup),
+                                ZomeFunction = GetItemFromCache(id, _funcLookup),
+                                IsCallSuccessful = true,
+                                ZomeReturnHash = hash,
+                                RawData = rawData,
+                                RawBinaryData = e.RawBinaryData,
+                                RawBinaryDataAfterMessagePackDecode = response.data,
+                                RawBinaryDataAfterMessagePackDecodeAsString = rawBytes,
+                                RawJSONData = e.RawJSONData,
+                                WebSocketResult = e.WebSocketResult
+                            };
                         }
                     }
                 }

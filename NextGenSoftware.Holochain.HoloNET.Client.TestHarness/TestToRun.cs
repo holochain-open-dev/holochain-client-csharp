@@ -5,6 +5,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
     {
         WhoAmI,
         Numbers,
+        Signal,
         SaveLoadOASISEntry,
         SaveLoadOASISEntryUsingSingleHoloNETBaseClass,
         SaveLoadOASISEntryUsingMultipleHoloNETBaseClasses,
