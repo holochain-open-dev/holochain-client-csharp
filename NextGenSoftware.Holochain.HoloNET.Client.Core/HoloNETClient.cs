@@ -11,6 +11,7 @@ using MessagePack;
 using NextGenSoftware.WebSocket;
 using NextGenSoftware.Logging;
 using NextGenSoftware.Holochain.HoloNET.Client.Properties;
+using NextGenSoftware.Utilities;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
@@ -797,13 +798,15 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         public byte[] ConvertHoloHashToBytes(string hash)
         {
-            Span<byte> output = null;
-            int bytesWritten = 0;
+            return Convert.FromBase64String(hash.Replace('-', '+').Replace('_', '/').Substring(1, hash.Length - 1)); //also remove the u prefix.
 
-            if (Convert.TryFromBase64String(hash.Replace('-', '+').Replace('_', '/').Substring(1, hash.Length - 1), output, out bytesWritten)) //also remove the u prefix.
-                return output.ToArray();
-            else
-                return null;
+            //Span<byte> output = null;
+            //int bytesWritten = 0;
+
+            //if (Convert.TryFromBase64String(hash.Replace('-', '+').Replace('_', '/').Substring(1, hash.Length - 1), output, out bytesWritten)) //also remove the u prefix.
+            //    return output.ToArray();
+            //else
+            //    return null;
         }
 
         public string ConvertHoloHashToString(byte[] bytes)
@@ -1138,22 +1141,24 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         {
             ZomeFunctionCallBackEventArgs zomeFunctionCallBackArgs = new ZomeFunctionCallBackEventArgs();
             string id = "";
-            string rawData = "";
-            string rawBytes = "";
+            string rawBinaryDataAsString = "";
+            string rawBinaryDataDecoded = "";
+            string rawBinaryDataAfterMessagePackDecodeAsString = "";
+            string rawBinaryDataAfterMessagePackDecodeDecoded = "";
 
             try
             {
                 var options = MessagePackSerializerOptions.Standard.WithSecurity(MessagePackSecurity.UntrustedData);
-                
-                Logger.Log("DATA RECEIVED", LogType.Info);
-                StringBuilder sb = new StringBuilder();
-                sb.Append(Encoding.UTF8.GetString(e.RawBinaryData, 0, e.RawBinaryData.Length));
-                rawData = sb.ToString();
-                Logger.Log("Raw Data Received: " + rawData, LogType.Debug);
+                rawBinaryDataAsString = DataHelper.ConvertBinaryDataToString(e.RawBinaryData);
+                rawBinaryDataDecoded = DataHelper.DecodeBinaryData(e.RawBinaryData);
 
-                if (rawData.Contains("error"))
+                Logger.Log("DATA RECEIVED", LogType.Info);
+                Logger.Log("Raw Data Received: " + rawBinaryDataAsString, LogType.Debug);
+                Logger.Log("Raw Data Decoded: " + rawBinaryDataDecoded, LogType.Debug);
+
+                if (rawBinaryDataDecoded.Contains("error"))
                 {
-                    string msg = $"Error in HoloNETClient.WebSocket_OnDataReceived method. Error received from Holochain Conductor: {rawData}";
+                    string msg = $"Error in HoloNETClient.WebSocket_OnDataReceived method. Error received from Holochain Conductor: {rawBinaryDataDecoded}";
                     HandleError(msg, null);
                     HoloNETResponse response = null;
 
@@ -1161,20 +1166,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     {
                         response = MessagePackSerializer.Deserialize<HoloNETResponse>(e.RawBinaryData, options);
                         id = response.id.ToString();
-
-                        foreach (byte b in response.data)
-                            rawBytes = string.Concat(rawBytes, ", ", b.ToString());
-
-                        rawBytes = rawBytes.Substring(1, rawBytes.Length - 1);
+                        rawBinaryDataAfterMessagePackDecodeAsString = DataHelper.ConvertBinaryDataToString(response.data);
+                        rawBinaryDataAfterMessagePackDecodeDecoded = DataHelper.DecodeBinaryData(response.data);
                     }
                     catch (Exception ex)
                     {
 
                     }
-
-
-
-                    //zomeFunctionCallBackArgs = new ZomeFunctionCallBackEventArgs(id, e.EndPoint, GetItemFromCache(id, _zomeLookup), GetItemFromCache(id, _funcLookup), false, rawData, null, null, null, null, null, null, e.RawBinaryData, e.RawJSONData, e.WebSocketResult);
 
                     zomeFunctionCallBackArgs = new ZomeFunctionCallBackEventArgs
                     {
@@ -1183,10 +1181,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                         Zome = GetItemFromCache(id, _zomeLookup),
                         ZomeFunction = GetItemFromCache(id, _funcLookup),
                         IsCallSuccessful = false,
-                        RawData = rawData,
                         RawBinaryData = e.RawBinaryData,
+                        RawBinaryDataAsString = rawBinaryDataAsString,
+                        RawBinaryDataDecoded = rawBinaryDataDecoded,
                         RawBinaryDataAfterMessagePackDecode = response != null ? response.data : null,
-                        RawBinaryDataAfterMessagePackDecodeAsString = rawBytes,
+                        RawBinaryDataAfterMessagePackDecodeAsString = rawBinaryDataAfterMessagePackDecodeAsString,
+                        RawBinaryDataAfterMessagePackDecodeDecoded = rawBinaryDataAfterMessagePackDecodeDecoded,
                         RawJSONData = e.RawJSONData,
                         WebSocketResult = e.WebSocketResult
                     };
@@ -1198,33 +1198,32 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 {
                     HoloNETResponse response = MessagePackSerializer.Deserialize<HoloNETResponse>(e.RawBinaryData, options);
 
-                    Logger.Log("RSM Response", LogType.Info);
+                    id = response.id.ToString();
+                    rawBinaryDataAfterMessagePackDecodeAsString = DataHelper.ConvertBinaryDataToString(response.data);
+                    rawBinaryDataAfterMessagePackDecodeDecoded = DataHelper.DecodeBinaryData(response.data);
+
+                    Logger.Log("Response", LogType.Info);
                     Logger.Log($"Id: {response.id}", LogType.Info);
                     Logger.Log($"Type: {response.type}", LogType.Info);
-                    id = response.id.ToString();
-
-                    foreach (byte b in response.data)
-                        rawBytes = string.Concat(rawBytes, ", ", b.ToString());
-
-                    rawBytes = rawBytes.Substring(1, rawBytes.Length - 1);
-                    Logger.Log(String.Concat("Raw Data Bytes Received After MessagePack Decode: ", rawBytes), LogType.Debug);
-
-                    //OnDataReceived?.Invoke(this, new HoloNETDataReceivedEventArgs(response.id.ToString(), EndPoint, true, e.RawBinaryData, e.RawJSONData, e.WebSocketResult, false, response.data, rawBytes));
+                    Logger.Log(String.Concat("Raw Data Bytes Received After MessagePack Decode: ", rawBinaryDataAfterMessagePackDecodeAsString), LogType.Debug);
+                    Logger.Log(String.Concat("Raw Data Bytes Decoded After MessagePack Decode: ", rawBinaryDataAfterMessagePackDecodeDecoded), LogType.Debug);
 
                     OnDataReceived?.Invoke(this, new HoloNETDataReceivedEventArgs()
                     {
                         Id = id,
                         EndPoint = e.EndPoint,
                         IsCallSuccessful = true,
-                        RawData = rawData,
                         RawBinaryData = e.RawBinaryData,
-                        RawBinaryDataAfterMessagePackDecode = response.data,
-                        RawBinaryDataAfterMessagePackDecodeAsString = rawBytes,
+                        RawBinaryDataAsString = rawBinaryDataAsString,
+                        RawBinaryDataDecoded = rawBinaryDataDecoded,
+                        RawBinaryDataAfterMessagePackDecode = response != null ? response.data : null,
+                        RawBinaryDataAfterMessagePackDecodeAsString = rawBinaryDataAfterMessagePackDecodeAsString,
+                        RawBinaryDataAfterMessagePackDecodeDecoded = rawBinaryDataAfterMessagePackDecodeDecoded,
                         RawJSONData = e.RawJSONData,
                         WebSocketResult = e.WebSocketResult
                     });
 
-                    if (rawData.Contains("app_info"))
+                    if (rawBinaryDataDecoded.Contains("app_info"))
                     {
                         Logger.Log("APP INFO RESPONSE DATA DETECTED\n", LogType.Info);
                         HolonNETAppInfoResponse appInfoResponse = MessagePackSerializer.Deserialize<HolonNETAppInfoResponse>(response.data, options);
@@ -1238,7 +1237,25 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                             Config.DnaHash = dnaHash;
                         }
 
-                        AppInfoCallBackEventArgs args = new AppInfoCallBackEventArgs(response.id.ToString(), EndPoint, true, e.RawBinaryData, e.RawJSONData, dnaHash, agentPubKey, appInfoResponse.data.installed_app_id, appInfoResponse, e.WebSocketResult);
+                        AppInfoCallBackEventArgs args = new AppInfoCallBackEventArgs()
+                        {
+                            AgentPubKey = agentPubKey,
+                            DnaHash = dnaHash,
+                            AppInfo = appInfoResponse,
+                            EndPoint = e.EndPoint,
+                            Id = response.id.ToString(),
+                            InstalledAppId = appInfoResponse.data.installed_app_id,
+                            IsCallSuccessful = true,
+                            RawBinaryData = e.RawBinaryData,
+                            RawBinaryDataAsString = rawBinaryDataAsString,
+                            RawBinaryDataDecoded = rawBinaryDataDecoded,
+                            RawBinaryDataAfterMessagePackDecode = response != null ? response.data : null,
+                            RawBinaryDataAfterMessagePackDecodeAsString = rawBinaryDataAfterMessagePackDecodeAsString,
+                            RawBinaryDataAfterMessagePackDecodeDecoded = rawBinaryDataAfterMessagePackDecodeDecoded,
+                            RawJSONData = e.RawJSONData,
+                            WebSocketResult = e.WebSocketResult
+                        };
+
                         Logger.Log(string.Concat("Id: ", args.Id, ", Is Call Successful: ", args.IsCallSuccessful ? "True" : "False", ", AgentPubKey: ", args.AgentPubKey, ", DnaHash: ", args.DnaHash, ", Installed App Id: ", args.InstalledAppId, ", Raw Binary Data: ", e.RawBinaryData, ", Raw JSON Data: ", args.RawJSONData, "\n"), LogType.Info);
                         OnAppInfoCallBack?.Invoke(this, args);
 
@@ -1254,9 +1271,31 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                         HolonNETAppInfoResponse appResponse2 = MessagePackSerializer.Deserialize<HolonNETAppInfoResponse>(response.data, options);
 
-                        HoloNETSignalResponse appResponse = MessagePackSerializer.Deserialize<HoloNETSignalResponse>(response.data, options);
+                        int index = rawBinaryDataAfterMessagePackDecodeDecoded.LastIndexOf("�");
+                        string signalData = rawBinaryDataAfterMessagePackDecodeDecoded.Substring(rawBinaryDataAfterMessagePackDecodeDecoded.LastIndexOf("�") + 1);
 
+                        OnSignalsCallBack?.Invoke(this, new SignalsCallBackEventArgs()
+                        {
+                            Id = id,
+                            EndPoint = e.EndPoint,
+                            IsCallSuccessful = true,
+                            SignalData = signalData,
+                            SignalType = SignalType.App, //TODO: Need to test for System SignalType when we can properly decode it or parse the raw data like we have above...
+                            RawBinaryData = e.RawBinaryData,
+                            RawBinaryDataAsString = rawBinaryDataAsString,
+                            RawBinaryDataDecoded = rawBinaryDataDecoded,
+                            RawBinaryDataAfterMessagePackDecode = response != null ? response.data : null,
+                            RawBinaryDataAfterMessagePackDecodeAsString = rawBinaryDataAfterMessagePackDecodeAsString,
+                            RawBinaryDataAfterMessagePackDecodeDecoded = rawBinaryDataAfterMessagePackDecodeDecoded,
+                            RawJSONData = e.RawJSONData,
+                            WebSocketResult = e.WebSocketResult
+                        });
                         
+                        //HoloNETSignalResponse appResponse = MessagePackSerializer.Deserialize<HoloNETSignalResponse>(response.data, options);
+                        //byte[][] appResponse = MessagePackSerializer.Deserialize<byte[][]>(response.data, options);
+                        //byte[,,] appResponse = MessagePackSerializer.Deserialize<byte[,,]>(response.data, options);
+
+
                         //Dictionary<object, object> rawAppResponseData = MessagePackSerializer.Deserialize<Dictionary<object, object>>(appResponse.data, options);
                     }
                     else
@@ -1282,7 +1321,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
 
                             Logger.Log($"Decoded Data:\n{keyValuePairsAsString}", LogType.Info);
-                            //zomeFunctionCallBackArgs = new ZomeFunctionCallBackEventArgs(id, e.EndPoint, GetItemFromCache(id, _zomeLookup), GetItemFromCache(id, _funcLookup), true, rawData, rawAppResponseData, appResponseData, "", keyValuePairs, keyValuePairsAsString, entryData, e.RawBinaryData, e.RawJSONData, e.WebSocketResult);
+                            Logger.Log($"appResponse.data as string: {DataHelper.ConvertBinaryDataToString(appResponse.data)}", LogType.Debug);
+                            Logger.Log($"appResponse.data decoded: {DataHelper.DecodeBinaryData(appResponse.data)}", LogType.Debug);
 
                             zomeFunctionCallBackArgs = new ZomeFunctionCallBackEventArgs
                             {
@@ -1296,10 +1336,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                                 KeyValuePair = keyValuePairs,
                                 KeyValuePairAsString = keyValuePairsAsString,
                                 Entry = entryData,
-                                RawData = rawData,
                                 RawBinaryData = e.RawBinaryData,
-                                RawBinaryDataAfterMessagePackDecode = response.data,
-                                RawBinaryDataAfterMessagePackDecodeAsString = rawBytes,
+                                RawBinaryDataAsString = rawBinaryDataAsString,
+                                RawBinaryDataDecoded = rawBinaryDataDecoded,
+                                RawBinaryDataAfterMessagePackDecode = response != null ? response.data : null,
+                                RawBinaryDataAfterMessagePackDecodeAsString = rawBinaryDataAfterMessagePackDecodeAsString,
+                                RawBinaryDataAfterMessagePackDecodeDecoded = rawBinaryDataAfterMessagePackDecodeDecoded,
                                 RawJSONData = e.RawJSONData,
                                 WebSocketResult = e.WebSocketResult
                             };
@@ -1308,9 +1350,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                         {
                             object rawAppResponseData = MessagePackSerializer.Deserialize<object>(appResponse.data, options);
                             string hash = ConvertHoloHashToString((byte[])rawAppResponseData);
-
                             Logger.Log($"Decoded Data:\nHoloHash: {hash}", LogType.Info);
-                            //zomeFunctionCallBackArgs = new ZomeFunctionCallBackEventArgs(id, e.EndPoint, GetItemFromCache(id, _zomeLookup), GetItemFromCache(id, _funcLookup), true, rawData, null, null, hash, null, null, null, e.RawBinaryData, e.RawJSONData, e.WebSocketResult);
 
                             zomeFunctionCallBackArgs = new ZomeFunctionCallBackEventArgs
                             {
@@ -1320,10 +1360,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                                 ZomeFunction = GetItemFromCache(id, _funcLookup),
                                 IsCallSuccessful = true,
                                 ZomeReturnHash = hash,
-                                RawData = rawData,
                                 RawBinaryData = e.RawBinaryData,
-                                RawBinaryDataAfterMessagePackDecode = response.data,
-                                RawBinaryDataAfterMessagePackDecodeAsString = rawBytes,
+                                RawBinaryDataAsString = rawBinaryDataAsString,
+                                RawBinaryDataDecoded = rawBinaryDataDecoded,
+                                RawBinaryDataAfterMessagePackDecode = response != null ? response.data : null,
+                                RawBinaryDataAfterMessagePackDecodeAsString = rawBinaryDataAfterMessagePackDecodeAsString,
+                                RawBinaryDataAfterMessagePackDecodeDecoded = rawBinaryDataAfterMessagePackDecodeDecoded,
                                 RawJSONData = e.RawJSONData,
                                 WebSocketResult = e.WebSocketResult
                             };
@@ -1339,10 +1381,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 zomeFunctionCallBackArgs.Message = $"{msg}. Reason: {ex}";
             }
 
-            //if (rawData.Substring(32, 8) != "app_info")
-            if (!rawData.Contains("app_info"))
+            if (!rawBinaryDataDecoded.Contains("app_info"))
             {
-                Logger.Log(string.Concat("Id: ", zomeFunctionCallBackArgs.Id, ", Zome: ", zomeFunctionCallBackArgs.Zome, ", Zome Function: ", zomeFunctionCallBackArgs.ZomeFunction, ", Is Zome Call Successful: ", zomeFunctionCallBackArgs.IsCallSuccessful ? "True" : "False", ", Raw Zome Return Data: ", zomeFunctionCallBackArgs.RawZomeReturnData, ", Zome Return Data: ", zomeFunctionCallBackArgs.ZomeReturnData, ", Zome Return Hash: ", zomeFunctionCallBackArgs.ZomeReturnHash, ", Raw Binary Data: ", e.RawBinaryData, ", Raw JSON Data: ", zomeFunctionCallBackArgs.RawJSONData), LogType.Info);
+                Logger.Log(string.Concat("Id: ", zomeFunctionCallBackArgs.Id, ", Zome: ", zomeFunctionCallBackArgs.Zome, ", Zome Function: ", zomeFunctionCallBackArgs.ZomeFunction, ", Is Zome Call Successful: ", zomeFunctionCallBackArgs.IsCallSuccessful ? "True" : "False", ", Raw Zome Return Data: ", zomeFunctionCallBackArgs.RawZomeReturnData, ", Zome Return Data: ", zomeFunctionCallBackArgs.ZomeReturnData, ", Zome Return Hash: ", zomeFunctionCallBackArgs.ZomeReturnHash, ", Raw Binary Data: ", zomeFunctionCallBackArgs.RawBinaryData, ", Raw Binary Data As String: ", zomeFunctionCallBackArgs.RawBinaryDataAsString, "Raw Binary Data Decoded: ", zomeFunctionCallBackArgs.RawBinaryDataDecoded, ", Raw Binary Data After MessagePack Decode: ", zomeFunctionCallBackArgs.RawBinaryDataAfterMessagePackDecode, ",  Raw Binary Data After MessagePack Decode As String: ", zomeFunctionCallBackArgs.RawBinaryDataAfterMessagePackDecodeAsString, ", Raw Binary Data Decoded After MessagePack Decode: ", zomeFunctionCallBackArgs.RawBinaryDataAfterMessagePackDecodeDecoded, ", Raw JSON Data: ", zomeFunctionCallBackArgs.RawJSONData), LogType.Info);
 
                 if (_callbackLookup.ContainsKey(id) && _callbackLookup[id] != null)
                     _callbackLookup[id].DynamicInvoke(this, zomeFunctionCallBackArgs);
@@ -1353,7 +1394,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 OnZomeFunctionCallBack?.Invoke(this, zomeFunctionCallBackArgs);
 
                 // If the zome call requested for this to be cached then stick it in the cache.
-                if (_cacheZomeReturnDataLookup[id])
+                if (_cacheZomeReturnDataLookup.ContainsKey(id) && _cacheZomeReturnDataLookup[id])
                     _zomeReturnDataLookup[id] = zomeFunctionCallBackArgs;
 
                 _zomeLookup.Remove(id);

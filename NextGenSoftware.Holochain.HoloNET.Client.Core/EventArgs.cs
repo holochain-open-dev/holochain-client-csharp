@@ -8,8 +8,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 {
     public class HoloNETDataReceivedBaseEventArgs : CallBackBaseEventArgsWithId
     {
+        //public string RawBinaryDataAsString { get; set; }
+        //public string RawBinaryDataDecoded { get; set; }
         public byte[] RawBinaryDataAfterMessagePackDecode { get; set; }
         public string RawBinaryDataAfterMessagePackDecodeAsString { get; set; }
+        public string RawBinaryDataAfterMessagePackDecodeDecoded { get; set; }
     }
 
     public class HoloNETErrorEventArgs : EventArgs
@@ -42,23 +45,23 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         }
 
-        public ZomeFunctionCallBackEventArgs(string id, string endPoint, string zome, string zomeFunction, bool isCallSuccessful, string rawData, Dictionary<object, object> rawZomeReturnData, Dictionary<string, object> zomeReturnData, string zomeReturnHash, Dictionary<string, string> keyValuePair, string keyValuePairAsString, EntryData entry, byte[] rawBinaryData, string rawJSONData, byte[] rawBinaryDataAfterMessagePackDecode, string rawBinaryDataAfterMessagePackDecodeAsString, WebSocketReceiveResult webSocketResult)
-            : base(id, endPoint, isCallSuccessful, rawBinaryData, rawBinaryDataAfterMessagePackDecode, rawBinaryDataAfterMessagePackDecodeAsString, rawJSONData, webSocketResult)
-        {
-            Zome = zome;
-            ZomeFunction = zomeFunction;
-            RawData = rawData;
-            RawZomeReturnData = rawZomeReturnData;
-            ZomeReturnData = zomeReturnData;
-            ZomeReturnHash = zomeReturnHash;
-            KeyValuePair = keyValuePair;
-            KeyValuePairAsString = keyValuePairAsString;
-            Entry = entry;
-        }
+        //public ZomeFunctionCallBackEventArgs(string id, string endPoint, string zome, string zomeFunction, bool isCallSuccessful, string rawData, Dictionary<object, object> rawZomeReturnData, Dictionary<string, object> zomeReturnData, string zomeReturnHash, Dictionary<string, string> keyValuePair, string keyValuePairAsString, EntryData entry, byte[] rawBinaryData, string rawJSONData, byte[] rawBinaryDataAfterMessagePackDecode, string rawBinaryDataAfterMessagePackDecodeAsString, WebSocketReceiveResult webSocketResult)
+        //    : base(id, endPoint, isCallSuccessful, rawBinaryData, rawBinaryDataAfterMessagePackDecode, rawBinaryDataAfterMessagePackDecodeAsString, rawJSONData, webSocketResult)
+        //{
+        //    Zome = zome;
+        //    ZomeFunction = zomeFunction;
+        //    RawData = rawData;
+        //    RawZomeReturnData = rawZomeReturnData;
+        //    ZomeReturnData = zomeReturnData;
+        //    ZomeReturnHash = zomeReturnHash;
+        //    KeyValuePair = keyValuePair;
+        //    KeyValuePairAsString = keyValuePairAsString;
+        //    Entry = entry;
+        //}
 
         public string Zome { get; set; }
         public string ZomeFunction { get; set; }
-        public string RawData { get; set; }
+        //public string RawData { get; set; }
         public Dictionary<string, object> ZomeReturnData { get; set; }
         public Dictionary<object, object> RawZomeReturnData { get; set; }
         public string ZomeReturnHash { get; set; }
@@ -78,10 +81,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         //    InstalledAppId = installedAppId;
         //}
 
-        public HolonNETAppInfoResponse AppInfo { get; private set; }
-        public string InstalledAppId { get; private set; }
-        public string DnaHash { get; private set; }
-        public string AgentPubKey { get; private set; }
+        public HolonNETAppInfoResponse AppInfo { get; set; }
+        public string InstalledAppId { get; set; }
+        public string DnaHash { get; set; }
+        public string AgentPubKey { get; set; }
     }
 
     public class ReadyForZomeCallsEventArgs : CallBackBaseEventArgs
@@ -93,9 +96,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             AgentPubKey = agentPubKey;
         }
 
-        public string EndPoint { get; private set; }
-        public string DnaHash { get; private set; }
-        public string AgentPubKey { get; private set; }
+        public string EndPoint { get; set; }
+        public string DnaHash { get; set; }
+        public string AgentPubKey { get; set; }
     }
 
     public class HoloNETShutdownEventArgs : CallBackBaseEventArgs
@@ -129,27 +132,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public string AgentPubKey { get; set; }
     }
 
-    //Old Redux Code.
     public class SignalsCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
-        //public SignalsCallBackEventArgs(string id, string endPoint, bool isCallSuccessful, SignalTypes signalType, string name, JToken signalData, byte[] rawBinaryData, string rawJSONData, WebSocketReceiveResult webSocketResult)
-        //    : base(id, endPoint, isCallSuccessful, rawBinaryData, rawJSONData, webSocketResult)
-        //{
-        //    this.SignalType = signalType;
-        //    this.Name = name;
-        //    this.SignalData = signalData;
-        //}
-
-        //public enum SignalTypes
-        //{
-        //    User,
-        //    Admin
-        //}
-
-        //TODO: Check Signals Return Data And Add Properties Here
-        //public SignalTypes SignalType { get; set; }
-        //public string Name { get; set; }
-        //public JToken SignalData { get; set; }
+        public SignalType SignalType { get; set; }
+        public object SignalData { get; set; } 
     }
 
     public class ConductorDebugCallBackEventArgs : CallBackBaseEventArgs
