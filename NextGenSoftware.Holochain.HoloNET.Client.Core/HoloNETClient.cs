@@ -1269,34 +1269,32 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     {
                         Logger.Log("SIGNAL DATA DETECTED\n", LogType.Info);
 
-                        HolonNETAppInfoResponse appResponse2 = MessagePackSerializer.Deserialize<HolonNETAppInfoResponse>(response.data, options);
+                        HoloNETSignalResponse appResponse = MessagePackSerializer.Deserialize<HoloNETSignalResponse>(response.data, options);
 
-                        int index = rawBinaryDataAfterMessagePackDecodeDecoded.LastIndexOf("�");
-                        string signalData = rawBinaryDataAfterMessagePackDecodeDecoded.Substring(rawBinaryDataAfterMessagePackDecodeDecoded.LastIndexOf("�") + 1);
-
-                        OnSignalsCallBack?.Invoke(this, new SignalsCallBackEventArgs()
+                        if (appResponse != null)
                         {
-                            Id = id,
-                            EndPoint = e.EndPoint,
-                            IsCallSuccessful = true,
-                            SignalData = signalData,
-                            SignalType = SignalType.App, //TODO: Need to test for System SignalType when we can properly decode it or parse the raw data like we have above...
-                            RawBinaryData = e.RawBinaryData,
-                            RawBinaryDataAsString = rawBinaryDataAsString,
-                            RawBinaryDataDecoded = rawBinaryDataDecoded,
-                            RawBinaryDataAfterMessagePackDecode = response != null ? response.data : null,
-                            RawBinaryDataAfterMessagePackDecodeAsString = rawBinaryDataAfterMessagePackDecodeAsString,
-                            RawBinaryDataAfterMessagePackDecodeDecoded = rawBinaryDataAfterMessagePackDecodeDecoded,
-                            RawJSONData = e.RawJSONData,
-                            WebSocketResult = e.WebSocketResult
-                        });
-                        
-                        //HoloNETSignalResponse appResponse = MessagePackSerializer.Deserialize<HoloNETSignalResponse>(response.data, options);
-                        //byte[][] appResponse = MessagePackSerializer.Deserialize<byte[][]>(response.data, options);
-                        //byte[,,] appResponse = MessagePackSerializer.Deserialize<byte[,,]>(response.data, options);
+                            object signalData = null;
 
+                            //int index = rawBinaryDataAfterMessagePackDecodeDecoded.LastIndexOf("�");
+                            //string signalData = rawBinaryDataAfterMessagePackDecodeDecoded.Substring(rawBinaryDataAfterMessagePackDecodeDecoded.LastIndexOf("�") + 1);
 
-                        //Dictionary<object, object> rawAppResponseData = MessagePackSerializer.Deserialize<Dictionary<object, object>>(appResponse.data, options);
+                            OnSignalsCallBack?.Invoke(this, new SignalsCallBackEventArgs()
+                            {
+                                Id = id,
+                                EndPoint = e.EndPoint,
+                                IsCallSuccessful = true,
+                                SignalData = signalData,
+                                SignalType = SignalType.App, //TODO: Need to test for System SignalType when we can properly decode it or parse the raw data like we have above...
+                                RawBinaryData = e.RawBinaryData,
+                                RawBinaryDataAsString = rawBinaryDataAsString,
+                                RawBinaryDataDecoded = rawBinaryDataDecoded,
+                                RawBinaryDataAfterMessagePackDecode = response != null ? response.data : null,
+                                RawBinaryDataAfterMessagePackDecodeAsString = rawBinaryDataAfterMessagePackDecodeAsString,
+                                RawBinaryDataAfterMessagePackDecodeDecoded = rawBinaryDataAfterMessagePackDecodeDecoded,
+                                RawJSONData = e.RawJSONData,
+                                WebSocketResult = e.WebSocketResult
+                            });
+                        }
                     }
                     else
                     {
