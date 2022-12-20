@@ -633,6 +633,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                     {
                         Console.WriteLine("Calling test_signal function on OASIS Test Zome...\n");
                         await _holoNETClient.CallZomeFunctionAsync("oasis", "test_signal", ZomeCallback, "test signal data");
+                        //await _holoNETClient.CallZomeFunctionAsync("oasis", "test_signal", ZomeCallback, 7);
                     }
                     break;
 
@@ -671,7 +672,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
 
         private static void HoloNETClient_OnSignalsCallBack(object sender, SignalsCallBackEventArgs e)
         {
-            Console.WriteLine(string.Concat("TEST HARNESS: SIGINALS CALLBACK EVENT HANDLER: EndPoint: ", e.EndPoint, ", Id: ", e.Id, ", Data: ", e.RawJSONData, ", Signal Type: ", Enum.GetName(typeof(SignalType), e.SignalType), "Signal Data: ", e.SignalData));
+            Console.WriteLine(string.Concat("TEST HARNESS: SIGINALS CALLBACK EVENT HANDLER: EndPoint: ", e.EndPoint, ", Id: ", e.Id, ", Data: ", e.RawJSONData, ", AgentPubKey =  ", e.AgentPubKey, ", DnaHash = ", e.DnaHash, ", Signal Type: ", Enum.GetName(typeof(SignalType), e.SignalType)));
+            Console.WriteLine("\nSignal Data:");
+
+            foreach (string key in e.SignalData.Keys)
+                Console.WriteLine(string.Concat(key, "=", e.SignalData[key]), "\n");
+            
             Console.WriteLine("");
         }
 

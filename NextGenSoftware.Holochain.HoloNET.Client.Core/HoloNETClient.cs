@@ -1270,31 +1270,47 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                         Logger.Log("SIGNAL DATA DETECTED\n", LogType.Info);
 
                         HoloNETSignalResponse appResponse = MessagePackSerializer.Deserialize<HoloNETSignalResponse>(response.data, options);
+                        Dictionary<string, object> signalDataDecoded = new Dictionary<string, object>();
+                        SignalType signalType = SignalType.App;
+                        string agentPublicKey = "";
+                        string dnaHash = "";
 
                         if (appResponse != null)
                         {
-                            object signalData = null;
+                            agentPublicKey = ConvertHoloHashToString(appResponse.App.CellData[0]);
+                            dnaHash = ConvertHoloHashToString(appResponse.App.CellData[1]);
+                            Dictionary<object, byte[]> signalData = MessagePackSerializer.Deserialize<Dictionary<object, byte[]>>(appResponse.App.SignalData, options);
 
-                            //int index = rawBinaryDataAfterMessagePackDecodeDecoded.LastIndexOf("�");
-                            //string signalData = rawBinaryDataAfterMessagePackDecodeDecoded.Substring(rawBinaryDataAfterMessagePackDecodeDecoded.LastIndexOf("�") + 1);
-
-                            OnSignalsCallBack?.Invoke(this, new SignalsCallBackEventArgs()
-                            {
-                                Id = id,
-                                EndPoint = e.EndPoint,
-                                IsCallSuccessful = true,
-                                SignalData = signalData,
-                                SignalType = SignalType.App, //TODO: Need to test for System SignalType when we can properly decode it or parse the raw data like we have above...
-                                RawBinaryData = e.RawBinaryData,
-                                RawBinaryDataAsString = rawBinaryDataAsString,
-                                RawBinaryDataDecoded = rawBinaryDataDecoded,
-                                RawBinaryDataAfterMessagePackDecode = response != null ? response.data : null,
-                                RawBinaryDataAfterMessagePackDecodeAsString = rawBinaryDataAfterMessagePackDecodeAsString,
-                                RawBinaryDataAfterMessagePackDecodeDecoded = rawBinaryDataAfterMessagePackDecodeDecoded,
-                                RawJSONData = e.RawJSONData,
-                                WebSocketResult = e.WebSocketResult
-                            });
+                            foreach (object key in signalData.Keys)
+                                signalDataDecoded[key.ToString()] = MessagePackSerializer.Deserialize<object>(signalData[key]);
                         }
+                        else
+                            signalType = SignalType.System;
+
+                        SignalsCallBackEventArgs signalsCallBackEventArgs = new SignalsCallBackEventArgs()
+                        {
+                            Id = id,
+                            EndPoint = e.EndPoint,
+                            IsCallSuccessful = true,
+                            AgentPubKey = agentPublicKey,
+                            DnaHash = dnaHash,
+                            RawSignalData = appResponse.App,
+                            SignalData = signalDataDecoded,
+                            SignalType = signalType, //TODO: Need to test for System SignalType... Not even sure if we want to raise this event for System signals? (the js client ignores them currently).
+                            RawBinaryData = e.RawBinaryData,
+                            RawBinaryDataAsString = rawBinaryDataAsString,
+                            RawBinaryDataDecoded = rawBinaryDataDecoded,
+                            RawBinaryDataAfterMessagePackDecode = response != null ? response.data : null,
+                            RawBinaryDataAfterMessagePackDecodeAsString = rawBinaryDataAfterMessagePackDecodeAsString,
+                            RawBinaryDataAfterMessagePackDecodeDecoded = rawBinaryDataAfterMessagePackDecodeDecoded,
+                            RawJSONData = e.RawJSONData,
+                            WebSocketResult = e.WebSocketResult
+                        };
+
+                        //TODO: Finish updating Log... Also log decoded data like Test Harness does... 
+                        //TODO: Copy Test Harness logging into appropriate logs in this method for log/debug logtypes... (espcially decoded data)
+                        Logger.Log(string.Concat("Id: ", signalsCallBackEventArgs.Id, ", Is Call Successful: ", signalsCallBackEventArgs.IsCallSuccessful ? "True" : "False", ", AgentPubKey: ", signalsCallBackEventArgs.AgentPubKey, ", DnaHash: ", signalsCallBackEventArgs.DnaHash, " Raw Binary Data: ", signalsCallBackEventArgs.RawBinaryData, ", Raw JSON Data: ", signalsCallBackEventArgs.RawJSONData, "\n"), LogType.Info);
+                        OnSignalsCallBack?.Invoke(this, signalsCallBackEventArgs);
                     }
                     else
                     {
