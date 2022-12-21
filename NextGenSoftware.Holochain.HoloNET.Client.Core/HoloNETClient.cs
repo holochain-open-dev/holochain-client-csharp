@@ -37,6 +37,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         private HoloNETConfig _config = null;
         private Process _conductorProcess = null;
         private ShutdownHolochainConductorsMode _shutdownHolochainConductorsMode = ShutdownHolochainConductorsMode.UseConfigSettings;
+        private MessagePackSerializerOptions messagePackSerializerOptions = MessagePackSerializerOptions.Standard.WithSecurity(MessagePackSecurity.UntrustedData);
 
         //Events
         public delegate void Connected(object sender, ConnectedEventArgs e);
@@ -1137,9 +1138,320 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
         }
 
+        //private void WebSocket_OnDataReceived(object sender, WebSocket.DataReceivedEventArgs e)
+        //{
+        //    ZomeFunctionCallBackEventArgs zomeFunctionCallBackArgs = null;
+        //    string id = "";
+        //    string rawBinaryDataAsString = "";
+        //    string rawBinaryDataDecoded = "";
+        //    string rawBinaryDataAfterMessagePackDecodeAsString = "";
+        //    string rawBinaryDataAfterMessagePackDecodeDecoded = "";
+
+        //    try
+        //    {
+        //        var options = MessagePackSerializerOptions.Standard.WithSecurity(MessagePackSecurity.UntrustedData);
+        //        rawBinaryDataAsString = DataHelper.ConvertBinaryDataToString(e.RawBinaryData);
+        //        rawBinaryDataDecoded = DataHelper.DecodeBinaryData(e.RawBinaryData);
+
+        //        Logger.Log("DATA RECEIVED", LogType.Info);
+        //        Logger.Log("Raw Data Received: " + rawBinaryDataAsString, LogType.Debug);
+        //        Logger.Log("Raw Data Decoded: " + rawBinaryDataDecoded, LogType.Debug);
+
+        //        if (rawBinaryDataDecoded.Contains("error"))
+        //        {
+        //            string msg = $"Error in HoloNETClient.WebSocket_OnDataReceived method. Error received from Holochain Conductor: {rawBinaryDataDecoded}";
+        //            HandleError(msg, null);
+        //            HoloNETResponse response = null;
+
+        //            try
+        //            {
+        //                response = MessagePackSerializer.Deserialize<HoloNETResponse>(e.RawBinaryData, options);
+        //                id = response.id.ToString();
+        //                rawBinaryDataAfterMessagePackDecodeAsString = DataHelper.ConvertBinaryDataToString(response.data);
+        //                rawBinaryDataAfterMessagePackDecodeDecoded = DataHelper.DecodeBinaryData(response.data);
+        //            }
+        //            catch (Exception ex)
+        //            {
+
+        //            }
+
+        //            if (response != null)
+        //            {
+        //                switch (response.type.ToUpper())
+        //                {
+        //                    case "SIGNAL":
+        //                    {
+
+        //                    }break;
+        //                }
+        //            }
+
+        //            zomeFunctionCallBackArgs = new ZomeFunctionCallBackEventArgs
+        //            {
+        //                Id = id,
+        //                EndPoint = e.EndPoint,
+        //                Zome = GetItemFromCache(id, _zomeLookup),
+        //                ZomeFunction = GetItemFromCache(id, _funcLookup),
+        //                IsCallSuccessful = false,
+        //                RawBinaryData = e.RawBinaryData,
+        //                RawBinaryDataAsString = rawBinaryDataAsString,
+        //                RawBinaryDataDecoded = rawBinaryDataDecoded,
+        //                RawBinaryDataAfterMessagePackDecode = response != null ? response.data : null,
+        //                RawBinaryDataAfterMessagePackDecodeAsString = rawBinaryDataAfterMessagePackDecodeAsString,
+        //                RawBinaryDataAfterMessagePackDecodeDecoded = rawBinaryDataAfterMessagePackDecodeDecoded,
+        //                RawJSONData = e.RawJSONData,
+        //                WebSocketResult = e.WebSocketResult
+        //            };
+
+        //            zomeFunctionCallBackArgs.IsError = true;
+        //            zomeFunctionCallBackArgs.Message = msg;
+        //        }
+        //        else
+        //        {
+        //            HoloNETResponse response = MessagePackSerializer.Deserialize<HoloNETResponse>(e.RawBinaryData, options);
+
+        //            id = response.id.ToString();
+        //            rawBinaryDataAfterMessagePackDecodeAsString = DataHelper.ConvertBinaryDataToString(response.data);
+        //            rawBinaryDataAfterMessagePackDecodeDecoded = DataHelper.DecodeBinaryData(response.data);
+
+        //            Logger.Log("Response", LogType.Info);
+        //            Logger.Log($"Id: {response.id}", LogType.Info);
+        //            Logger.Log($"Type: {response.type}", LogType.Info);
+        //            Logger.Log(String.Concat("Raw Data Bytes Received After MessagePack Decode: ", rawBinaryDataAfterMessagePackDecodeAsString), LogType.Debug);
+        //            Logger.Log(String.Concat("Raw Data Bytes Decoded After MessagePack Decode: ", rawBinaryDataAfterMessagePackDecodeDecoded), LogType.Debug);
+
+        //            OnDataReceived?.Invoke(this, new HoloNETDataReceivedEventArgs()
+        //            {
+        //                Id = id,
+        //                EndPoint = e.EndPoint,
+        //                IsCallSuccessful = true,
+        //                RawBinaryData = e.RawBinaryData,
+        //                RawBinaryDataAsString = rawBinaryDataAsString,
+        //                RawBinaryDataDecoded = rawBinaryDataDecoded,
+        //                RawBinaryDataAfterMessagePackDecode = response != null ? response.data : null,
+        //                RawBinaryDataAfterMessagePackDecodeAsString = rawBinaryDataAfterMessagePackDecodeAsString,
+        //                RawBinaryDataAfterMessagePackDecodeDecoded = rawBinaryDataAfterMessagePackDecodeDecoded,
+        //                RawJSONData = e.RawJSONData,
+        //                WebSocketResult = e.WebSocketResult
+        //            });
+
+        //            if (rawBinaryDataDecoded.Contains("app_info"))
+        //            {
+        //                Logger.Log("APP INFO RESPONSE DATA DETECTED\n", LogType.Info);
+        //                HolonNETAppInfoResponse appInfoResponse = MessagePackSerializer.Deserialize<HolonNETAppInfoResponse>(response.data, options);
+
+        //                string dnaHash = ConvertHoloHashToString(appInfoResponse.data.cell_data[0].cell_id[0]);
+        //                string agentPubKey = ConvertHoloHashToString(appInfoResponse.data.cell_data[0].cell_id[1]);
+
+        //                if (_updateDnaHashAndAgentPubKey)
+        //                {
+        //                    Config.AgentPubKey = agentPubKey;
+        //                    Config.DnaHash = dnaHash;
+        //                }
+
+        //                AppInfoCallBackEventArgs args = new AppInfoCallBackEventArgs()
+        //                {
+        //                    AgentPubKey = agentPubKey,
+        //                    DnaHash = dnaHash,
+        //                    AppInfo = appInfoResponse,
+        //                    EndPoint = e.EndPoint,
+        //                    Id = response.id.ToString(),
+        //                    InstalledAppId = appInfoResponse.data.installed_app_id,
+        //                    IsCallSuccessful = true,
+        //                    RawBinaryData = e.RawBinaryData,
+        //                    RawBinaryDataAsString = rawBinaryDataAsString,
+        //                    RawBinaryDataDecoded = rawBinaryDataDecoded,
+        //                    RawBinaryDataAfterMessagePackDecode = response != null ? response.data : null,
+        //                    RawBinaryDataAfterMessagePackDecodeAsString = rawBinaryDataAfterMessagePackDecodeAsString,
+        //                    RawBinaryDataAfterMessagePackDecodeDecoded = rawBinaryDataAfterMessagePackDecodeDecoded,
+        //                    RawJSONData = e.RawJSONData,
+        //                    WebSocketResult = e.WebSocketResult
+        //                };
+
+        //                Logger.Log(string.Concat("Id: ", args.Id, ", Is Call Successful: ", args.IsCallSuccessful ? "True" : "False", ", AgentPubKey: ", args.AgentPubKey, ", DnaHash: ", args.DnaHash, ", Installed App Id: ", args.InstalledAppId, ", Raw Binary Data: ", e.RawBinaryData, ", Raw JSON Data: ", args.RawJSONData, "\n"), LogType.Info);
+        //                OnAppInfoCallBack?.Invoke(this, args);
+
+        //                //If either the AgentPubKey or DnaHash is empty then attempt to get from the sandbox cmd.
+        //                if (string.IsNullOrEmpty(Config.AgentPubKey) || string.IsNullOrEmpty(Config.DnaHash))
+        //                    RetreiveAgentPubKeyAndDnaHashFromSandbox();
+        //                else
+        //                    SetReadyForZomeCalls();
+        //            }
+        //            else if (response.type == "Signal")
+        //            {
+        //                Logger.Log("SIGNAL DATA DETECTED\n", LogType.Info);
+
+        //                HoloNETSignalResponse appResponse = MessagePackSerializer.Deserialize<HoloNETSignalResponse>(response.data, options);
+        //                Dictionary<string, object> signalDataDecoded = new Dictionary<string, object>();
+        //                SignalType signalType = SignalType.App;
+        //                string agentPublicKey = "";
+        //                string dnaHash = "";
+        //                string signalDataAsString = "";
+
+        //                if (appResponse != null)
+        //                {
+        //                    agentPublicKey = ConvertHoloHashToString(appResponse.App.CellData[0]);
+        //                    dnaHash = ConvertHoloHashToString(appResponse.App.CellData[1]);
+        //                    Dictionary<object, byte[]> signalData = MessagePackSerializer.Deserialize<Dictionary<object, byte[]>>(appResponse.App.SignalData, options);
+
+        //                    foreach (object key in signalData.Keys)
+        //                    {
+        //                        signalDataDecoded[key.ToString()] = MessagePackSerializer.Deserialize<object>(signalData[key]);
+        //                        signalDataAsString = string.Concat(signalDataAsString, key.ToString(), "=", signalDataDecoded[key.ToString()], ",");
+        //                    }
+
+        //                    signalDataAsString = signalDataAsString.Substring(0, signalDataAsString.Length - 1);
+        //                }
+        //                else
+        //                    signalType = SignalType.System;
+
+        //                SignalsCallBackEventArgs signalsCallBackEventArgs = new SignalsCallBackEventArgs()
+        //                {
+        //                    Id = id,
+        //                    EndPoint = e.EndPoint,
+        //                    IsCallSuccessful = true,
+        //                    AgentPubKey = agentPublicKey,
+        //                    DnaHash = dnaHash,
+        //                    RawSignalData = appResponse.App,
+        //                    SignalData = signalDataDecoded,
+        //                    SignalDataAsString = signalDataAsString,
+        //                    SignalType = signalType, //TODO: Need to test for System SignalType... Not even sure if we want to raise this event for System signals? (the js client ignores them currently).
+        //                    RawBinaryData = e.RawBinaryData,
+        //                    RawBinaryDataAsString = rawBinaryDataAsString,
+        //                    RawBinaryDataDecoded = rawBinaryDataDecoded,
+        //                    RawBinaryDataAfterMessagePackDecode = response != null ? response.data : null,
+        //                    RawBinaryDataAfterMessagePackDecodeAsString = rawBinaryDataAfterMessagePackDecodeAsString,
+        //                    RawBinaryDataAfterMessagePackDecodeDecoded = rawBinaryDataAfterMessagePackDecodeDecoded,
+        //                    RawJSONData = e.RawJSONData,
+        //                    WebSocketResult = e.WebSocketResult
+        //                };
+
+        //                //TODO: Copy Test Harness logging into appropriate logs in this method for log/debug logtypes... (espcially decoded data)
+        //                Logger.Log(string.Concat("Id: ", signalsCallBackEventArgs.Id, ", Is Call Successful: ", signalsCallBackEventArgs.IsCallSuccessful ? "True" : "False", ", AgentPubKey: ", signalsCallBackEventArgs.AgentPubKey, ", DnaHash: ", signalsCallBackEventArgs.DnaHash, " Raw Binary Data: ", signalsCallBackEventArgs.RawBinaryData, ", Raw JSON Data: ", signalsCallBackEventArgs.RawJSONData, ", Signal Type: ", Enum.GetName(typeof(SignalType), signalsCallBackEventArgs.SignalType), ", Signal Data: ", signalsCallBackEventArgs.SignalDataAsString, "\n"), LogType.Info);
+        //                OnSignalsCallBack?.Invoke(this, signalsCallBackEventArgs);
+        //            }
+        //            else
+        //            {
+        //                Logger.Log("ZOME RESPONSE DATA DETECTED\n", LogType.Info);
+        //                HolonNETAppResponse appResponse = MessagePackSerializer.Deserialize<HolonNETAppResponse>(response.data, options);
+
+        //                try
+        //                {
+        //                    Dictionary<object, object> rawAppResponseData = MessagePackSerializer.Deserialize<Dictionary<object, object>>(appResponse.data, options);
+        //                    Dictionary<string, object> appResponseData = new Dictionary<string, object>();
+        //                    Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
+        //                    string keyValuePairsAsString = "";
+        //                    EntryData entryData = null;
+
+        //                    (appResponseData, keyValuePairs, keyValuePairsAsString, entryData) = DecodeZomeReturnData(rawAppResponseData, appResponseData, keyValuePairs, keyValuePairsAsString);
+
+        //                    if (_entryDataObjectTypeLookup.ContainsKey(id) && _entryDataObjectTypeLookup[id] != null)
+        //                        entryData.EntryDataObject = MapEntryDataObject(_entryDataObjectTypeLookup[id], keyValuePairs);
+
+        //                    else if (_entryDataObjectLookup.ContainsKey(id) && _entryDataObjectLookup[id] != null)
+        //                        entryData.EntryDataObject = MapEntryDataObject(_entryDataObjectLookup[id], keyValuePairs);
+
+
+        //                    Logger.Log($"Decoded Data:\n{keyValuePairsAsString}", LogType.Info);
+        //                    //Logger.Log($"appResponse.data as string: {DataHelper.ConvertBinaryDataToString(appResponse.data)}", LogType.Debug);
+        //                    //Logger.Log($"appResponse.data decoded: {DataHelper.DecodeBinaryData(appResponse.data)}", LogType.Debug);
+
+        //                    zomeFunctionCallBackArgs = new ZomeFunctionCallBackEventArgs
+        //                    {
+        //                        Id = id,
+        //                        EndPoint = e.EndPoint,
+        //                        Zome = GetItemFromCache(id, _zomeLookup),
+        //                        ZomeFunction = GetItemFromCache(id, _funcLookup),
+        //                        IsCallSuccessful = true,
+        //                        RawZomeReturnData = rawAppResponseData,
+        //                        ZomeReturnData = appResponseData,
+        //                        KeyValuePair = keyValuePairs,
+        //                        KeyValuePairAsString = keyValuePairsAsString,
+        //                        Entry = entryData,
+        //                        RawBinaryData = e.RawBinaryData,
+        //                        RawBinaryDataAsString = rawBinaryDataAsString,
+        //                        RawBinaryDataDecoded = rawBinaryDataDecoded,
+        //                        RawBinaryDataAfterMessagePackDecode = response != null ? response.data : null,
+        //                        RawBinaryDataAfterMessagePackDecodeAsString = rawBinaryDataAfterMessagePackDecodeAsString,
+        //                        RawBinaryDataAfterMessagePackDecodeDecoded = rawBinaryDataAfterMessagePackDecodeDecoded,
+        //                        RawJSONData = e.RawJSONData,
+        //                        WebSocketResult = e.WebSocketResult
+        //                    };
+        //                }
+        //                catch (Exception ex)
+        //                {
+        //                    object rawAppResponseData = MessagePackSerializer.Deserialize<object>(appResponse.data, options);
+        //                    string hash = ConvertHoloHashToString((byte[])rawAppResponseData);
+        //                    Logger.Log($"Decoded Data:\nHoloHash: {hash}", LogType.Info);
+
+        //                    zomeFunctionCallBackArgs = new ZomeFunctionCallBackEventArgs
+        //                    {
+        //                        Id = id,
+        //                        EndPoint = e.EndPoint,
+        //                        Zome = GetItemFromCache(id, _zomeLookup),
+        //                        ZomeFunction = GetItemFromCache(id, _funcLookup),
+        //                        IsCallSuccessful = true,
+        //                        ZomeReturnHash = hash,
+        //                        RawBinaryData = e.RawBinaryData,
+        //                        RawBinaryDataAsString = rawBinaryDataAsString,
+        //                        RawBinaryDataDecoded = rawBinaryDataDecoded,
+        //                        RawBinaryDataAfterMessagePackDecode = response != null ? response.data : null,
+        //                        RawBinaryDataAfterMessagePackDecodeAsString = rawBinaryDataAfterMessagePackDecodeAsString,
+        //                        RawBinaryDataAfterMessagePackDecodeDecoded = rawBinaryDataAfterMessagePackDecodeDecoded,
+        //                        RawJSONData = e.RawJSONData,
+        //                        WebSocketResult = e.WebSocketResult
+        //                    };
+        //                }
+        //            }
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        string msg = "Error in HoloNETClient.WebSocket_OnDataReceived method.";
+        //        HandleError(msg, ex);
+
+        //        if (zomeFunctionCallBackArgs == null)
+        //            zomeFunctionCallBackArgs = new ZomeFunctionCallBackEventArgs();
+
+        //        zomeFunctionCallBackArgs.IsError = true;
+        //        zomeFunctionCallBackArgs.Message = $"{msg}. Reason: {ex}";
+        //    }
+
+        //    //if (!rawBinaryDataDecoded.Contains("app_info") && response.type != "Signal")
+        //    if (zomeFunctionCallBackArgs != null)
+        //    {
+        //        Logger.Log(string.Concat("Id: ", zomeFunctionCallBackArgs.Id, ", Zome: ", zomeFunctionCallBackArgs.Zome, ", Zome Function: ", zomeFunctionCallBackArgs.ZomeFunction, ", Is Zome Call Successful: ", zomeFunctionCallBackArgs.IsCallSuccessful ? "True" : "False", ", Raw Zome Return Data: ", zomeFunctionCallBackArgs.RawZomeReturnData, ", Zome Return Data: ", zomeFunctionCallBackArgs.ZomeReturnData, ", Zome Return Hash: ", zomeFunctionCallBackArgs.ZomeReturnHash, ", Raw Binary Data: ", zomeFunctionCallBackArgs.RawBinaryData, ", Raw Binary Data As String: ", zomeFunctionCallBackArgs.RawBinaryDataAsString, "Raw Binary Data Decoded: ", zomeFunctionCallBackArgs.RawBinaryDataDecoded, ", Raw Binary Data After MessagePack Decode: ", zomeFunctionCallBackArgs.RawBinaryDataAfterMessagePackDecode, ",  Raw Binary Data After MessagePack Decode As String: ", zomeFunctionCallBackArgs.RawBinaryDataAfterMessagePackDecodeAsString, ", Raw Binary Data Decoded After MessagePack Decode: ", zomeFunctionCallBackArgs.RawBinaryDataAfterMessagePackDecodeDecoded, ", Raw JSON Data: ", zomeFunctionCallBackArgs.RawJSONData), LogType.Info);
+
+        //        if (_callbackLookup.ContainsKey(id) && _callbackLookup[id] != null)
+        //            _callbackLookup[id].DynamicInvoke(this, zomeFunctionCallBackArgs);
+
+        //        if (_taskCompletionZomeCallBack.ContainsKey(id) && _taskCompletionZomeCallBack[id] != null)
+        //            _taskCompletionZomeCallBack[id].SetResult(zomeFunctionCallBackArgs);
+
+        //        OnZomeFunctionCallBack?.Invoke(this, zomeFunctionCallBackArgs);
+
+        //        // If the zome call requested for this to be cached then stick it in the cache.
+        //        if (_cacheZomeReturnDataLookup.ContainsKey(id) && _cacheZomeReturnDataLookup[id])
+        //            _zomeReturnDataLookup[id] = zomeFunctionCallBackArgs;
+
+        //        _zomeLookup.Remove(id);
+        //        _funcLookup.Remove(id);
+        //        _callbackLookup.Remove(id);
+        //        _entryDataObjectTypeLookup.Remove(id);
+        //        _entryDataObjectLookup.Remove(id);
+        //        _cacheZomeReturnDataLookup.Remove(id);
+        //        _taskCompletionZomeCallBack.Remove(id);
+        //    }
+        //}
+
         private void WebSocket_OnDataReceived(object sender, WebSocket.DataReceivedEventArgs e)
         {
-            ZomeFunctionCallBackEventArgs zomeFunctionCallBackArgs = new ZomeFunctionCallBackEventArgs();
+            ProcessDataReceived(e);
+        }
+
+        private void ProcessDataReceived(WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
+        {
+            ZomeFunctionCallBackEventArgs zomeFunctionCallBackArgs = null;
             string id = "";
             string rawBinaryDataAsString = "";
             string rawBinaryDataDecoded = "";
@@ -1148,9 +1460,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             try
             {
-                var options = MessagePackSerializerOptions.Standard.WithSecurity(MessagePackSecurity.UntrustedData);
-                rawBinaryDataAsString = DataHelper.ConvertBinaryDataToString(e.RawBinaryData);
-                rawBinaryDataDecoded = DataHelper.DecodeBinaryData(e.RawBinaryData);
+                rawBinaryDataAsString = DataHelper.ConvertBinaryDataToString(dataReceivedEventArgs.RawBinaryData);
+                rawBinaryDataDecoded = DataHelper.DecodeBinaryData(dataReceivedEventArgs.RawBinaryData);
 
                 Logger.Log("DATA RECEIVED", LogType.Info);
                 Logger.Log("Raw Data Received: " + rawBinaryDataAsString, LogType.Debug);
@@ -1160,268 +1471,360 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 {
                     string msg = $"Error in HoloNETClient.WebSocket_OnDataReceived method. Error received from Holochain Conductor: {rawBinaryDataDecoded}";
                     HandleError(msg, null);
-                    HoloNETResponse response = null;
 
-                    try
-                    {
-                        response = MessagePackSerializer.Deserialize<HoloNETResponse>(e.RawBinaryData, options);
-                        id = response.id.ToString();
-                        rawBinaryDataAfterMessagePackDecodeAsString = DataHelper.ConvertBinaryDataToString(response.data);
-                        rawBinaryDataAfterMessagePackDecodeDecoded = DataHelper.DecodeBinaryData(response.data);
-                    }
-                    catch (Exception ex)
-                    {
-
-                    }
-
-                    zomeFunctionCallBackArgs = new ZomeFunctionCallBackEventArgs
-                    {
-                        Id = id,
-                        EndPoint = e.EndPoint,
-                        Zome = GetItemFromCache(id, _zomeLookup),
-                        ZomeFunction = GetItemFromCache(id, _funcLookup),
-                        IsCallSuccessful = false,
-                        RawBinaryData = e.RawBinaryData,
-                        RawBinaryDataAsString = rawBinaryDataAsString,
-                        RawBinaryDataDecoded = rawBinaryDataDecoded,
-                        RawBinaryDataAfterMessagePackDecode = response != null ? response.data : null,
-                        RawBinaryDataAfterMessagePackDecodeAsString = rawBinaryDataAfterMessagePackDecodeAsString,
-                        RawBinaryDataAfterMessagePackDecodeDecoded = rawBinaryDataAfterMessagePackDecodeDecoded,
-                        RawJSONData = e.RawJSONData,
-                        WebSocketResult = e.WebSocketResult
-                    };
-
-                    zomeFunctionCallBackArgs.IsError = true;
-                    zomeFunctionCallBackArgs.Message = msg;
-                }
-                else
-                {
-                    HoloNETResponse response = MessagePackSerializer.Deserialize<HoloNETResponse>(e.RawBinaryData, options);
-
-                    id = response.id.ToString();
-                    rawBinaryDataAfterMessagePackDecodeAsString = DataHelper.ConvertBinaryDataToString(response.data);
-                    rawBinaryDataAfterMessagePackDecodeDecoded = DataHelper.DecodeBinaryData(response.data);
-
-                    Logger.Log("Response", LogType.Info);
-                    Logger.Log($"Id: {response.id}", LogType.Info);
-                    Logger.Log($"Type: {response.type}", LogType.Info);
-                    Logger.Log(String.Concat("Raw Data Bytes Received After MessagePack Decode: ", rawBinaryDataAfterMessagePackDecodeAsString), LogType.Debug);
-                    Logger.Log(String.Concat("Raw Data Bytes Decoded After MessagePack Decode: ", rawBinaryDataAfterMessagePackDecodeDecoded), LogType.Debug);
-
-                    OnDataReceived?.Invoke(this, new HoloNETDataReceivedEventArgs()
-                    {
-                        Id = id,
-                        EndPoint = e.EndPoint,
-                        IsCallSuccessful = true,
-                        RawBinaryData = e.RawBinaryData,
-                        RawBinaryDataAsString = rawBinaryDataAsString,
-                        RawBinaryDataDecoded = rawBinaryDataDecoded,
-                        RawBinaryDataAfterMessagePackDecode = response != null ? response.data : null,
-                        RawBinaryDataAfterMessagePackDecodeAsString = rawBinaryDataAfterMessagePackDecodeAsString,
-                        RawBinaryDataAfterMessagePackDecodeDecoded = rawBinaryDataAfterMessagePackDecodeDecoded,
-                        RawJSONData = e.RawJSONData,
-                        WebSocketResult = e.WebSocketResult
-                    });
+                    HoloNETResponse response = DecodeDataReceived(dataReceivedEventArgs.RawBinaryData, dataReceivedEventArgs, rawBinaryDataAsString, rawBinaryDataDecoded);
 
                     if (rawBinaryDataDecoded.Contains("app_info"))
                     {
-                        Logger.Log("APP INFO RESPONSE DATA DETECTED\n", LogType.Info);
-                        HolonNETAppInfoResponse appInfoResponse = MessagePackSerializer.Deserialize<HolonNETAppInfoResponse>(response.data, options);
-
-                        string dnaHash = ConvertHoloHashToString(appInfoResponse.data.cell_data[0].cell_id[0]);
-                        string agentPubKey = ConvertHoloHashToString(appInfoResponse.data.cell_data[0].cell_id[1]);
-
-                        if (_updateDnaHashAndAgentPubKey)
-                        {
-                            Config.AgentPubKey = agentPubKey;
-                            Config.DnaHash = dnaHash;
-                        }
-
                         AppInfoCallBackEventArgs args = new AppInfoCallBackEventArgs()
                         {
-                            AgentPubKey = agentPubKey,
-                            DnaHash = dnaHash,
-                            AppInfo = appInfoResponse,
-                            EndPoint = e.EndPoint,
-                            Id = response.id.ToString(),
-                            InstalledAppId = appInfoResponse.data.installed_app_id,
+                            EndPoint = dataReceivedEventArgs.EndPoint,
+                            Id = response != null ? response.id.ToString() : null,
                             IsCallSuccessful = true,
-                            RawBinaryData = e.RawBinaryData,
+                            RawBinaryData = dataReceivedEventArgs.RawBinaryData,
                             RawBinaryDataAsString = rawBinaryDataAsString,
                             RawBinaryDataDecoded = rawBinaryDataDecoded,
                             RawBinaryDataAfterMessagePackDecode = response != null ? response.data : null,
                             RawBinaryDataAfterMessagePackDecodeAsString = rawBinaryDataAfterMessagePackDecodeAsString,
                             RawBinaryDataAfterMessagePackDecodeDecoded = rawBinaryDataAfterMessagePackDecodeDecoded,
-                            RawJSONData = e.RawJSONData,
-                            WebSocketResult = e.WebSocketResult
+                            RawJSONData = dataReceivedEventArgs.RawJSONData,
+                            WebSocketResult = dataReceivedEventArgs.WebSocketResult
                         };
 
-                        Logger.Log(string.Concat("Id: ", args.Id, ", Is Call Successful: ", args.IsCallSuccessful ? "True" : "False", ", AgentPubKey: ", args.AgentPubKey, ", DnaHash: ", args.DnaHash, ", Installed App Id: ", args.InstalledAppId, ", Raw Binary Data: ", e.RawBinaryData, ", Raw JSON Data: ", args.RawJSONData, "\n"), LogType.Info);
-                        OnAppInfoCallBack?.Invoke(this, args);
-
-                        //If either the AgentPubKey or DnaHash is empty then attempt to get from the sandbox cmd.
-                        if (string.IsNullOrEmpty(Config.AgentPubKey) || string.IsNullOrEmpty(Config.DnaHash))
-                            RetreiveAgentPubKeyAndDnaHashFromSandbox();
-                        else
-                            SetReadyForZomeCalls();
+                        RaiseAppInfoReceivedEvent(args);
                     }
-                    else if (response.type == "Signal")
+                    else if (response != null)
                     {
-                        Logger.Log("SIGNAL DATA DETECTED\n", LogType.Info);
-
-                        HoloNETSignalResponse appResponse = MessagePackSerializer.Deserialize<HoloNETSignalResponse>(response.data, options);
-                        Dictionary<string, object> signalDataDecoded = new Dictionary<string, object>();
-                        SignalType signalType = SignalType.App;
-                        string agentPublicKey = "";
-                        string dnaHash = "";
-
-                        if (appResponse != null)
+                        if (response.type.ToUpper() == "SIGNAL")
                         {
-                            agentPublicKey = ConvertHoloHashToString(appResponse.App.CellData[0]);
-                            dnaHash = ConvertHoloHashToString(appResponse.App.CellData[1]);
-                            Dictionary<object, byte[]> signalData = MessagePackSerializer.Deserialize<Dictionary<object, byte[]>>(appResponse.App.SignalData, options);
+                            SignalsCallBackEventArgs signalsCallBackEventArgs = new SignalsCallBackEventArgs()
+                            {
+                                Id = response != null ? response.id.ToString() : null,
+                                EndPoint = dataReceivedEventArgs.EndPoint,
+                                IsCallSuccessful = false,
+                                IsError = true,
+                                Message = msg,
+                                RawBinaryData = dataReceivedEventArgs.RawBinaryData,
+                                RawBinaryDataAsString = rawBinaryDataAsString,
+                                RawBinaryDataDecoded = rawBinaryDataDecoded,
+                                RawBinaryDataAfterMessagePackDecode = response != null ? response.data : null,
+                                RawBinaryDataAfterMessagePackDecodeAsString = rawBinaryDataAfterMessagePackDecodeAsString,
+                                RawBinaryDataAfterMessagePackDecodeDecoded = rawBinaryDataAfterMessagePackDecodeDecoded,
+                                RawJSONData = dataReceivedEventArgs.RawJSONData,
+                                WebSocketResult = dataReceivedEventArgs.WebSocketResult
+                            };
 
-                            foreach (object key in signalData.Keys)
-                                signalDataDecoded[key.ToString()] = MessagePackSerializer.Deserialize<object>(signalData[key]);
+                            RaiseSignalReceivedEvent(signalsCallBackEventArgs);
                         }
-                        else
-                            signalType = SignalType.System;
-
-                        SignalsCallBackEventArgs signalsCallBackEventArgs = new SignalsCallBackEventArgs()
-                        {
-                            Id = id,
-                            EndPoint = e.EndPoint,
-                            IsCallSuccessful = true,
-                            AgentPubKey = agentPublicKey,
-                            DnaHash = dnaHash,
-                            RawSignalData = appResponse.App,
-                            SignalData = signalDataDecoded,
-                            SignalType = signalType, //TODO: Need to test for System SignalType... Not even sure if we want to raise this event for System signals? (the js client ignores them currently).
-                            RawBinaryData = e.RawBinaryData,
-                            RawBinaryDataAsString = rawBinaryDataAsString,
-                            RawBinaryDataDecoded = rawBinaryDataDecoded,
-                            RawBinaryDataAfterMessagePackDecode = response != null ? response.data : null,
-                            RawBinaryDataAfterMessagePackDecodeAsString = rawBinaryDataAfterMessagePackDecodeAsString,
-                            RawBinaryDataAfterMessagePackDecodeDecoded = rawBinaryDataAfterMessagePackDecodeDecoded,
-                            RawJSONData = e.RawJSONData,
-                            WebSocketResult = e.WebSocketResult
-                        };
-
-                        //TODO: Finish updating Log... Also log decoded data like Test Harness does... 
-                        //TODO: Copy Test Harness logging into appropriate logs in this method for log/debug logtypes... (espcially decoded data)
-                        Logger.Log(string.Concat("Id: ", signalsCallBackEventArgs.Id, ", Is Call Successful: ", signalsCallBackEventArgs.IsCallSuccessful ? "True" : "False", ", AgentPubKey: ", signalsCallBackEventArgs.AgentPubKey, ", DnaHash: ", signalsCallBackEventArgs.DnaHash, " Raw Binary Data: ", signalsCallBackEventArgs.RawBinaryData, ", Raw JSON Data: ", signalsCallBackEventArgs.RawJSONData, "\n"), LogType.Info);
-                        OnSignalsCallBack?.Invoke(this, signalsCallBackEventArgs);
                     }
                     else
                     {
-                        Logger.Log("ZOME RESPONSE DATA DETECTED\n", LogType.Info);
-                        HolonNETAppResponse appResponse = MessagePackSerializer.Deserialize<HolonNETAppResponse>(response.data, options);
-
-                        try
+                        zomeFunctionCallBackArgs = new ZomeFunctionCallBackEventArgs
                         {
-                            Dictionary<object, object> rawAppResponseData = MessagePackSerializer.Deserialize<Dictionary<object, object>>(appResponse.data, options);
-                            Dictionary<string, object> appResponseData = new Dictionary<string, object>();
-                            Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
-                            string keyValuePairsAsString = "";
-                            EntryData entryData = null;
-
-                            (appResponseData, keyValuePairs, keyValuePairsAsString, entryData) = DecodeZomeReturnData(rawAppResponseData, appResponseData, keyValuePairs, keyValuePairsAsString);
-
-                            if (_entryDataObjectTypeLookup.ContainsKey(id) && _entryDataObjectTypeLookup[id] != null)
-                                entryData.EntryDataObject = MapEntryDataObject(_entryDataObjectTypeLookup[id], keyValuePairs);
-
-                            else if (_entryDataObjectLookup.ContainsKey(id) && _entryDataObjectLookup[id] != null)
-                                entryData.EntryDataObject = MapEntryDataObject(_entryDataObjectLookup[id], keyValuePairs);
-
-
-                            Logger.Log($"Decoded Data:\n{keyValuePairsAsString}", LogType.Info);
-                            Logger.Log($"appResponse.data as string: {DataHelper.ConvertBinaryDataToString(appResponse.data)}", LogType.Debug);
-                            Logger.Log($"appResponse.data decoded: {DataHelper.DecodeBinaryData(appResponse.data)}", LogType.Debug);
-
-                            zomeFunctionCallBackArgs = new ZomeFunctionCallBackEventArgs
-                            {
-                                Id = id,
-                                EndPoint = e.EndPoint,
-                                Zome = GetItemFromCache(id, _zomeLookup),
-                                ZomeFunction = GetItemFromCache(id, _funcLookup),
-                                IsCallSuccessful = true,
-                                RawZomeReturnData = rawAppResponseData,
-                                ZomeReturnData = appResponseData,
-                                KeyValuePair = keyValuePairs,
-                                KeyValuePairAsString = keyValuePairsAsString,
-                                Entry = entryData,
-                                RawBinaryData = e.RawBinaryData,
-                                RawBinaryDataAsString = rawBinaryDataAsString,
-                                RawBinaryDataDecoded = rawBinaryDataDecoded,
-                                RawBinaryDataAfterMessagePackDecode = response != null ? response.data : null,
-                                RawBinaryDataAfterMessagePackDecodeAsString = rawBinaryDataAfterMessagePackDecodeAsString,
-                                RawBinaryDataAfterMessagePackDecodeDecoded = rawBinaryDataAfterMessagePackDecodeDecoded,
-                                RawJSONData = e.RawJSONData,
-                                WebSocketResult = e.WebSocketResult
-                            };
-                        }
-                        catch (Exception ex)
-                        {
-                            object rawAppResponseData = MessagePackSerializer.Deserialize<object>(appResponse.data, options);
-                            string hash = ConvertHoloHashToString((byte[])rawAppResponseData);
-                            Logger.Log($"Decoded Data:\nHoloHash: {hash}", LogType.Info);
-
-                            zomeFunctionCallBackArgs = new ZomeFunctionCallBackEventArgs
-                            {
-                                Id = id,
-                                EndPoint = e.EndPoint,
-                                Zome = GetItemFromCache(id, _zomeLookup),
-                                ZomeFunction = GetItemFromCache(id, _funcLookup),
-                                IsCallSuccessful = true,
-                                ZomeReturnHash = hash,
-                                RawBinaryData = e.RawBinaryData,
-                                RawBinaryDataAsString = rawBinaryDataAsString,
-                                RawBinaryDataDecoded = rawBinaryDataDecoded,
-                                RawBinaryDataAfterMessagePackDecode = response != null ? response.data : null,
-                                RawBinaryDataAfterMessagePackDecodeAsString = rawBinaryDataAfterMessagePackDecodeAsString,
-                                RawBinaryDataAfterMessagePackDecodeDecoded = rawBinaryDataAfterMessagePackDecodeDecoded,
-                                RawJSONData = e.RawJSONData,
-                                WebSocketResult = e.WebSocketResult
-                            };
-                        }
+                            Id = id,
+                            EndPoint = dataReceivedEventArgs.EndPoint,
+                            IsError = true,
+                            Message = msg,
+                            Zome = GetItemFromCache(id, _zomeLookup),
+                            ZomeFunction = GetItemFromCache(id, _funcLookup),
+                            IsCallSuccessful = false,
+                            RawBinaryData = dataReceivedEventArgs.RawBinaryData,
+                            RawBinaryDataAsString = rawBinaryDataAsString,
+                            RawBinaryDataDecoded = rawBinaryDataDecoded,
+                            RawBinaryDataAfterMessagePackDecode = response != null ? response.data : null,
+                            RawBinaryDataAfterMessagePackDecodeAsString = rawBinaryDataAfterMessagePackDecodeAsString,
+                            RawBinaryDataAfterMessagePackDecodeDecoded = rawBinaryDataAfterMessagePackDecodeDecoded,
+                            RawJSONData = dataReceivedEventArgs.RawJSONData,
+                            WebSocketResult = dataReceivedEventArgs.WebSocketResult
+                        };
                     }
+                }
+                else
+                {
+                    HoloNETResponse response = DecodeDataReceived(dataReceivedEventArgs.RawBinaryData, dataReceivedEventArgs, rawBinaryDataAsString, rawBinaryDataDecoded);
+
+                    if (rawBinaryDataDecoded.Contains("app_info"))
+                        DecodeAppInfoDataReceived(response, dataReceivedEventArgs, rawBinaryDataAsString, rawBinaryDataDecoded, rawBinaryDataAfterMessagePackDecodeAsString, rawBinaryDataAfterMessagePackDecodeDecoded);
+
+                    else if (response.type.ToUpper() == "SIGNAL")
+                        DecodeSignalDataReceived(response, dataReceivedEventArgs, rawBinaryDataAsString, rawBinaryDataDecoded, rawBinaryDataAfterMessagePackDecodeAsString, rawBinaryDataAfterMessagePackDecodeDecoded);
+                    else
+                        DecodeZomeDataReceived(response, dataReceivedEventArgs, rawBinaryDataAsString, rawBinaryDataDecoded, rawBinaryDataAfterMessagePackDecodeAsString, rawBinaryDataAfterMessagePackDecodeDecoded);
                 }
             }
             catch (Exception ex)
             {
-                string msg = "Error in HoloNETClient.WebSocket_OnDataReceived method.";
+                string msg = "Error in HoloNETClient.ProcessDataReceived method.";
                 HandleError(msg, ex);
-                zomeFunctionCallBackArgs.IsError = true;
-                zomeFunctionCallBackArgs.Message = $"{msg}. Reason: {ex}";
-            }
 
-            if (!rawBinaryDataDecoded.Contains("app_info"))
-            {
-                Logger.Log(string.Concat("Id: ", zomeFunctionCallBackArgs.Id, ", Zome: ", zomeFunctionCallBackArgs.Zome, ", Zome Function: ", zomeFunctionCallBackArgs.ZomeFunction, ", Is Zome Call Successful: ", zomeFunctionCallBackArgs.IsCallSuccessful ? "True" : "False", ", Raw Zome Return Data: ", zomeFunctionCallBackArgs.RawZomeReturnData, ", Zome Return Data: ", zomeFunctionCallBackArgs.ZomeReturnData, ", Zome Return Hash: ", zomeFunctionCallBackArgs.ZomeReturnHash, ", Raw Binary Data: ", zomeFunctionCallBackArgs.RawBinaryData, ", Raw Binary Data As String: ", zomeFunctionCallBackArgs.RawBinaryDataAsString, "Raw Binary Data Decoded: ", zomeFunctionCallBackArgs.RawBinaryDataDecoded, ", Raw Binary Data After MessagePack Decode: ", zomeFunctionCallBackArgs.RawBinaryDataAfterMessagePackDecode, ",  Raw Binary Data After MessagePack Decode As String: ", zomeFunctionCallBackArgs.RawBinaryDataAfterMessagePackDecodeAsString, ", Raw Binary Data Decoded After MessagePack Decode: ", zomeFunctionCallBackArgs.RawBinaryDataAfterMessagePackDecodeDecoded, ", Raw JSON Data: ", zomeFunctionCallBackArgs.RawJSONData), LogType.Info);
+                //if (zomeFunctionCallBackArgs == null)
+                //    zomeFunctionCallBackArgs = new ZomeFunctionCallBackEventArgs();
 
-                if (_callbackLookup.ContainsKey(id) && _callbackLookup[id] != null)
-                    _callbackLookup[id].DynamicInvoke(this, zomeFunctionCallBackArgs);
-
-                if (_taskCompletionZomeCallBack.ContainsKey(id) && _taskCompletionZomeCallBack[id] != null)
-                    _taskCompletionZomeCallBack[id].SetResult(zomeFunctionCallBackArgs);
-
-                OnZomeFunctionCallBack?.Invoke(this, zomeFunctionCallBackArgs);
-
-                // If the zome call requested for this to be cached then stick it in the cache.
-                if (_cacheZomeReturnDataLookup.ContainsKey(id) && _cacheZomeReturnDataLookup[id])
-                    _zomeReturnDataLookup[id] = zomeFunctionCallBackArgs;
-
-                _zomeLookup.Remove(id);
-                _funcLookup.Remove(id);
-                _callbackLookup.Remove(id);
-                _entryDataObjectTypeLookup.Remove(id);
-                _entryDataObjectLookup.Remove(id);
-                _cacheZomeReturnDataLookup.Remove(id);
-                _taskCompletionZomeCallBack.Remove(id);
+                //zomeFunctionCallBackArgs.IsError = true;
+                //zomeFunctionCallBackArgs.Message = $"{msg}. Reason: {ex}";
             }
         }
 
-        private (Dictionary<string, object>, Dictionary<string, string> keyValuePair, string keyValuePairAsString, EntryData entry) DecodeZomeReturnData(Dictionary<object, object> rawAppResponseData, Dictionary<string, object> appResponseData, Dictionary<string, string> keyValuePair, string keyValuePairAsString, EntryData entryData = null)
+        private HoloNETResponse DecodeDataReceived(byte[] rawBinaryData, WebSocket.DataReceivedEventArgs dataReceivedEventArgs, string rawBinaryDataAsString, string rawBinaryDataDecoded)
+        {
+            HoloNETResponse response = null;
+            HoloNETDataReceivedEventArgs holoNETDataReceivedEventArgs = new HoloNETDataReceivedEventArgs();
+
+            try
+            {
+                string id = "";
+                string rawBinaryDataAfterMessagePackDecodeAsString = "";
+                string rawBinaryDataAfterMessagePackDecodeDecoded = "";
+
+                response = MessagePackSerializer.Deserialize<HoloNETResponse>(rawBinaryData, messagePackSerializerOptions);
+
+                id = response.id.ToString();
+                rawBinaryDataAfterMessagePackDecodeAsString = DataHelper.ConvertBinaryDataToString(response.data);
+                rawBinaryDataAfterMessagePackDecodeDecoded = DataHelper.DecodeBinaryData(response.data);
+
+                Logger.Log("Response", LogType.Info);
+                Logger.Log($"Id: {response.id}", LogType.Info);
+                Logger.Log($"Type: {response.type}", LogType.Info);
+                Logger.Log(String.Concat("Raw Data Bytes Received After MessagePack Decode: ", rawBinaryDataAfterMessagePackDecodeAsString), LogType.Debug);
+                Logger.Log(String.Concat("Raw Data Bytes Decoded After MessagePack Decode: ", rawBinaryDataAfterMessagePackDecodeDecoded), LogType.Debug);
+
+                holoNETDataReceivedEventArgs = new HoloNETDataReceivedEventArgs()
+                {
+                    Id = id,
+                    EndPoint = dataReceivedEventArgs.EndPoint,
+                    IsCallSuccessful = true,
+                    RawBinaryData = rawBinaryData,
+                    RawBinaryDataAsString = rawBinaryDataAsString,
+                    RawBinaryDataDecoded = rawBinaryDataDecoded,
+                    RawBinaryDataAfterMessagePackDecode = response != null ? response.data : null,
+                    RawBinaryDataAfterMessagePackDecodeAsString = rawBinaryDataAfterMessagePackDecodeAsString,
+                    RawBinaryDataAfterMessagePackDecodeDecoded = rawBinaryDataAfterMessagePackDecodeDecoded,
+                    RawJSONData = dataReceivedEventArgs.RawJSONData,
+                    WebSocketResult = dataReceivedEventArgs.WebSocketResult
+                };
+            }
+            catch (Exception ex)
+            {
+                string msg = $"An unknown error occured in HoloNETClient.DecodeDataReceived. Reason: {ex}";
+                holoNETDataReceivedEventArgs.IsError = true;
+                holoNETDataReceivedEventArgs.Message = msg;
+                HandleError(msg, ex);
+            }
+
+            OnDataReceived?.Invoke(this, holoNETDataReceivedEventArgs);
+            return response;
+        }
+
+        private void DecodeAppInfoDataReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs, string rawBinaryDataAsString, string rawBinaryDataDecoded, string rawBinaryDataAfterMessagePackDecodeAsString, string rawBinaryDataAfterMessagePackDecodeDecoded)
+        {
+            AppInfoCallBackEventArgs args = new AppInfoCallBackEventArgs();
+
+            try
+            {
+                Logger.Log("APP INFO RESPONSE DATA DETECTED\n", LogType.Info);
+                HolonNETAppInfoResponse appInfoResponse = MessagePackSerializer.Deserialize<HolonNETAppInfoResponse>(response.data, messagePackSerializerOptions);
+
+                string dnaHash = ConvertHoloHashToString(appInfoResponse.data.cell_data[0].cell_id[0]);
+                string agentPubKey = ConvertHoloHashToString(appInfoResponse.data.cell_data[0].cell_id[1]);
+
+                if (_updateDnaHashAndAgentPubKey)
+                {
+                    Config.AgentPubKey = agentPubKey;
+                    Config.DnaHash = dnaHash;
+                }
+
+                args = new AppInfoCallBackEventArgs()
+                {
+                    AgentPubKey = agentPubKey,
+                    DnaHash = dnaHash,
+                    AppInfo = appInfoResponse,
+                    EndPoint = dataReceivedEventArgs.EndPoint,
+                    Id = response.id.ToString(),
+                    InstalledAppId = appInfoResponse.data.installed_app_id,
+                    IsCallSuccessful = true,
+                    RawBinaryData = dataReceivedEventArgs.RawBinaryData,
+                    RawBinaryDataAsString = rawBinaryDataAsString,
+                    RawBinaryDataDecoded = rawBinaryDataDecoded,
+                    RawBinaryDataAfterMessagePackDecode = response != null ? response.data : null,
+                    RawBinaryDataAfterMessagePackDecodeAsString = rawBinaryDataAfterMessagePackDecodeAsString,
+                    RawBinaryDataAfterMessagePackDecodeDecoded = rawBinaryDataAfterMessagePackDecodeDecoded,
+                    RawJSONData = dataReceivedEventArgs.RawJSONData,
+                    WebSocketResult = dataReceivedEventArgs.WebSocketResult
+                };
+            }
+            catch (Exception ex)
+            {
+                string msg = $"An unknown error occured in HoloNETClient.DecodeAppInfoDataReceived. Reason: {ex}";
+                args.IsError = true;
+                args.Message = msg;
+                HandleError(msg, ex);
+            }
+
+            //If either the AgentPubKey or DnaHash is empty then attempt to get from the sandbox cmd.
+            if (!args.IsError)
+            {
+                if (string.IsNullOrEmpty(Config.AgentPubKey) || string.IsNullOrEmpty(Config.DnaHash))
+                    RetreiveAgentPubKeyAndDnaHashFromSandbox();
+                else
+                    SetReadyForZomeCalls();
+            }
+
+            RaiseAppInfoReceivedEvent(args);
+        }
+
+        private void DecodeSignalDataReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs, string rawBinaryDataAsString, string rawBinaryDataDecoded, string rawBinaryDataAfterMessagePackDecodeAsString, string rawBinaryDataAfterMessagePackDecodeDecoded)
+        {
+            SignalsCallBackEventArgs signalsCallBackEventArgs = new SignalsCallBackEventArgs();
+
+            try
+            {
+                Logger.Log("SIGNAL DATA DETECTED\n", LogType.Info);
+
+                HoloNETSignalResponse appResponse = MessagePackSerializer.Deserialize<HoloNETSignalResponse>(response.data, messagePackSerializerOptions);
+                Dictionary<string, object> signalDataDecoded = new Dictionary<string, object>();
+                SignalType signalType = SignalType.App;
+                string agentPublicKey = "";
+                string dnaHash = "";
+                string signalDataAsString = "";
+
+                if (appResponse != null)
+                {
+                    agentPublicKey = ConvertHoloHashToString(appResponse.App.CellData[0]);
+                    dnaHash = ConvertHoloHashToString(appResponse.App.CellData[1]);
+                    Dictionary<object, byte[]> signalData = MessagePackSerializer.Deserialize<Dictionary<object, byte[]>>(appResponse.App.SignalData, messagePackSerializerOptions);
+
+                    foreach (object key in signalData.Keys)
+                    {
+                        signalDataDecoded[key.ToString()] = MessagePackSerializer.Deserialize<object>(signalData[key]);
+                        signalDataAsString = string.Concat(signalDataAsString, key.ToString(), "=", signalDataDecoded[key.ToString()], ",");
+                    }
+
+                    signalDataAsString = signalDataAsString.Substring(0, signalDataAsString.Length - 1);
+                }
+                else
+                    signalType = SignalType.System;
+
+                signalsCallBackEventArgs = new SignalsCallBackEventArgs()
+                {
+                    Id = response != null ? response.id.ToString() : null,
+                    EndPoint = dataReceivedEventArgs.EndPoint,
+                    IsCallSuccessful = true,
+                    AgentPubKey = agentPublicKey,
+                    DnaHash = dnaHash,
+                    RawSignalData = appResponse.App,
+                    SignalData = signalDataDecoded,
+                    SignalDataAsString = signalDataAsString,
+                    SignalType = signalType, //TODO: Need to test for System SignalType... Not even sure if we want to raise this event for System signals? (the js client ignores them currently).
+                    RawBinaryData = dataReceivedEventArgs.RawBinaryData,
+                    RawBinaryDataAsString = rawBinaryDataAsString,
+                    RawBinaryDataDecoded = rawBinaryDataDecoded,
+                    RawBinaryDataAfterMessagePackDecode = response != null ? response.data : null,
+                    RawBinaryDataAfterMessagePackDecodeAsString = rawBinaryDataAfterMessagePackDecodeAsString,
+                    RawBinaryDataAfterMessagePackDecodeDecoded = rawBinaryDataAfterMessagePackDecodeDecoded,
+                    RawJSONData = dataReceivedEventArgs.RawJSONData,
+                    WebSocketResult = dataReceivedEventArgs.WebSocketResult
+                };
+            }
+            catch (Exception ex)
+            {
+                string msg = $"An unknown error occured in HoloNETClient.DecodeSignalDataReceived. Reason: {ex}";
+                signalsCallBackEventArgs.IsError = true;
+                signalsCallBackEventArgs.Message = msg;
+                HandleError(msg, ex);
+            }
+
+            RaiseSignalReceivedEvent(signalsCallBackEventArgs);
+        }
+
+        private void DecodeZomeDataReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs, string rawBinaryDataAsString, string rawBinaryDataDecoded, string rawBinaryDataAfterMessagePackDecodeAsString, string rawBinaryDataAfterMessagePackDecodeDecoded)
+        {
+            Logger.Log("ZOME RESPONSE DATA DETECTED\n", LogType.Info);
+            HolonNETAppResponse appResponse = MessagePackSerializer.Deserialize<HolonNETAppResponse>(response.data, messagePackSerializerOptions);
+            string id = response.id.ToString();
+            ZomeFunctionCallBackEventArgs zomeFunctionCallBackArgs = new ZomeFunctionCallBackEventArgs();
+
+            try
+            {
+                Dictionary<object, object> rawAppResponseData = MessagePackSerializer.Deserialize<Dictionary<object, object>>(appResponse.data, messagePackSerializerOptions);
+                Dictionary<string, object> appResponseData = new Dictionary<string, object>();
+                Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
+                string keyValuePairsAsString = "";
+                EntryData entryData = null;
+                
+                (appResponseData, keyValuePairs, keyValuePairsAsString, entryData) = DecodeRawZomeData(rawAppResponseData, appResponseData, keyValuePairs, keyValuePairsAsString);
+
+                if (_entryDataObjectTypeLookup.ContainsKey(id) && _entryDataObjectTypeLookup[id] != null)
+                    entryData.EntryDataObject = MapEntryDataObject(_entryDataObjectTypeLookup[id], keyValuePairs);
+
+                else if (_entryDataObjectLookup.ContainsKey(id) && _entryDataObjectLookup[id] != null)
+                    entryData.EntryDataObject = MapEntryDataObject(_entryDataObjectLookup[id], keyValuePairs);
+
+
+                Logger.Log($"Decoded Data:\n{keyValuePairsAsString}", LogType.Info);
+                //Logger.Log($"appResponse.data as string: {DataHelper.ConvertBinaryDataToString(appResponse.data)}", LogType.Debug);
+                //Logger.Log($"appResponse.data decoded: {DataHelper.DecodeBinaryData(appResponse.data)}", LogType.Debug);
+
+                zomeFunctionCallBackArgs = new ZomeFunctionCallBackEventArgs
+                {
+                    Id = id,
+                    EndPoint = dataReceivedEventArgs.EndPoint,
+                    Zome = GetItemFromCache(id, _zomeLookup),
+                    ZomeFunction = GetItemFromCache(id, _funcLookup),
+                    IsCallSuccessful = true,
+                    RawZomeReturnData = rawAppResponseData,
+                    ZomeReturnData = appResponseData,
+                    KeyValuePair = keyValuePairs,
+                    KeyValuePairAsString = keyValuePairsAsString,
+                    Entry = entryData,
+                    RawBinaryData = dataReceivedEventArgs.RawBinaryData,
+                    RawBinaryDataAsString = rawBinaryDataAsString,
+                    RawBinaryDataDecoded = rawBinaryDataDecoded,
+                    RawBinaryDataAfterMessagePackDecode = response != null ? response.data : null,
+                    RawBinaryDataAfterMessagePackDecodeAsString = rawBinaryDataAfterMessagePackDecodeAsString,
+                    RawBinaryDataAfterMessagePackDecodeDecoded = rawBinaryDataAfterMessagePackDecodeDecoded,
+                    RawJSONData = dataReceivedEventArgs.RawJSONData,
+                    WebSocketResult = dataReceivedEventArgs.WebSocketResult
+                };
+            }
+            catch (Exception ex)
+            {
+                try
+                {
+                    object rawAppResponseData = MessagePackSerializer.Deserialize<object>(appResponse.data, messagePackSerializerOptions);
+                    string hash = ConvertHoloHashToString((byte[])rawAppResponseData);
+                    Logger.Log($"Decoded Data:\nHoloHash: {hash}", LogType.Info);
+
+                    zomeFunctionCallBackArgs = new ZomeFunctionCallBackEventArgs
+                    {
+                        Id = id,
+                        EndPoint = dataReceivedEventArgs.EndPoint,
+                        Zome = GetItemFromCache(id, _zomeLookup),
+                        ZomeFunction = GetItemFromCache(id, _funcLookup),
+                        IsCallSuccessful = true,
+                        ZomeReturnHash = hash,
+                        RawBinaryData = dataReceivedEventArgs.RawBinaryData,
+                        RawBinaryDataAsString = rawBinaryDataAsString,
+                        RawBinaryDataDecoded = rawBinaryDataDecoded,
+                        RawBinaryDataAfterMessagePackDecode = response != null ? response.data : null,
+                        RawBinaryDataAfterMessagePackDecodeAsString = rawBinaryDataAfterMessagePackDecodeAsString,
+                        RawBinaryDataAfterMessagePackDecodeDecoded = rawBinaryDataAfterMessagePackDecodeDecoded,
+                        RawJSONData = dataReceivedEventArgs.RawJSONData,
+                        WebSocketResult = dataReceivedEventArgs.WebSocketResult
+                    };
+                }
+                catch (Exception ex2)
+                {
+                    string msg = $"An unknown error occured in HoloNETClient.DecodeZomeDataReceived. Reason: {ex2}";
+                    zomeFunctionCallBackArgs.IsError = true;
+                    zomeFunctionCallBackArgs.Message = msg;
+                    HandleError(msg, ex2);
+                }
+            }
+
+            RaiseZomeDataReceivedEvent(zomeFunctionCallBackArgs);
+        }
+
+        private (Dictionary<string, object>, Dictionary<string, string> keyValuePair, string keyValuePairAsString, EntryData entry) DecodeRawZomeData(Dictionary<object, object> rawAppResponseData, Dictionary<string, object> appResponseData, Dictionary<string, string> keyValuePair, string keyValuePairAsString, EntryData entryData = null)
         {
             string value = "";
             var options = MessagePackSerializerOptions.Standard.WithSecurity(MessagePackSecurity.UntrustedData);
@@ -1477,7 +1880,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                             if (dict != null)
                             {
                                 Dictionary<string, object> tempDict = new Dictionary<string, object>();
-                                (tempDict, keyValuePair, keyValuePairAsString, entryData) = DecodeZomeReturnData(dict, tempDict, keyValuePair, keyValuePairAsString, entryData);
+                                (tempDict, keyValuePair, keyValuePairAsString, entryData) = DecodeRawZomeData(dict, tempDict, keyValuePair, keyValuePairAsString, entryData);
                                 appResponseData[key] = tempDict;
                             }
                             else if (rawAppResponseData[key] != null)
@@ -1561,6 +1964,44 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
 
             return (appResponseData, keyValuePair, keyValuePairAsString, entryData);
+        }
+
+        private void RaiseSignalReceivedEvent(SignalsCallBackEventArgs signalsCallBackEventArgs)
+        {
+            //TODO: Copy Test Harness logging into appropriate logs in this method for log/debug logtypes... (espcially decoded data)
+            Logger.Log(string.Concat("Id: ", signalsCallBackEventArgs.Id, ", Is Call Successful: ", signalsCallBackEventArgs.IsCallSuccessful ? "True" : "False", ", AgentPubKey: ", signalsCallBackEventArgs.AgentPubKey, ", DnaHash: ", signalsCallBackEventArgs.DnaHash, " Raw Binary Data: ", signalsCallBackEventArgs.RawBinaryData, ", Raw JSON Data: ", signalsCallBackEventArgs.RawJSONData, ", Signal Type: ", Enum.GetName(typeof(SignalType), signalsCallBackEventArgs.SignalType), ", Signal Data: ", signalsCallBackEventArgs.SignalDataAsString, "\n"), LogType.Info);
+            OnSignalsCallBack?.Invoke(this, signalsCallBackEventArgs);
+        }
+
+        private void RaiseAppInfoReceivedEvent(AppInfoCallBackEventArgs appInfoCallBackEventArgs)
+        {
+            Logger.Log(string.Concat("Id: ", appInfoCallBackEventArgs.Id, ", Is Call Successful: ", appInfoCallBackEventArgs.IsCallSuccessful ? "True" : "False", ", AgentPubKey: ", appInfoCallBackEventArgs.AgentPubKey, ", DnaHash: ", appInfoCallBackEventArgs.DnaHash, ", Installed App Id: ", appInfoCallBackEventArgs.InstalledAppId, ", Raw Binary Data: ", appInfoCallBackEventArgs.RawBinaryData, ", Raw JSON Data: ", appInfoCallBackEventArgs.RawJSONData, "\n"), LogType.Info);
+            OnAppInfoCallBack?.Invoke(this, appInfoCallBackEventArgs);
+        }
+
+        private void RaiseZomeDataReceivedEvent(ZomeFunctionCallBackEventArgs zomeFunctionCallBackArgs)
+        {
+            Logger.Log(string.Concat("Id: ", zomeFunctionCallBackArgs.Id, ", Zome: ", zomeFunctionCallBackArgs.Zome, ", Zome Function: ", zomeFunctionCallBackArgs.ZomeFunction, ", Is Zome Call Successful: ", zomeFunctionCallBackArgs.IsCallSuccessful ? "True" : "False", ", Raw Zome Return Data: ", zomeFunctionCallBackArgs.RawZomeReturnData, ", Zome Return Data: ", zomeFunctionCallBackArgs.ZomeReturnData, ", Zome Return Hash: ", zomeFunctionCallBackArgs.ZomeReturnHash, ", Raw Binary Data: ", zomeFunctionCallBackArgs.RawBinaryData, ", Raw Binary Data As String: ", zomeFunctionCallBackArgs.RawBinaryDataAsString, "Raw Binary Data Decoded: ", zomeFunctionCallBackArgs.RawBinaryDataDecoded, ", Raw Binary Data After MessagePack Decode: ", zomeFunctionCallBackArgs.RawBinaryDataAfterMessagePackDecode, ",  Raw Binary Data After MessagePack Decode As String: ", zomeFunctionCallBackArgs.RawBinaryDataAfterMessagePackDecodeAsString, ", Raw Binary Data Decoded After MessagePack Decode: ", zomeFunctionCallBackArgs.RawBinaryDataAfterMessagePackDecodeDecoded, ", Raw JSON Data: ", zomeFunctionCallBackArgs.RawJSONData), LogType.Info);
+
+            if (_callbackLookup.ContainsKey(zomeFunctionCallBackArgs.Id) && _callbackLookup[zomeFunctionCallBackArgs.Id] != null)
+                _callbackLookup[zomeFunctionCallBackArgs.Id].DynamicInvoke(this, zomeFunctionCallBackArgs);
+
+            if (_taskCompletionZomeCallBack.ContainsKey(zomeFunctionCallBackArgs.Id) && _taskCompletionZomeCallBack[zomeFunctionCallBackArgs.Id] != null)
+                _taskCompletionZomeCallBack[zomeFunctionCallBackArgs.Id].SetResult(zomeFunctionCallBackArgs);
+
+            OnZomeFunctionCallBack?.Invoke(this, zomeFunctionCallBackArgs);
+
+            // If the zome call requested for this to be cached then stick it in the cache.
+            if (_cacheZomeReturnDataLookup.ContainsKey(zomeFunctionCallBackArgs.Id) && _cacheZomeReturnDataLookup[zomeFunctionCallBackArgs.Id])
+                _zomeReturnDataLookup[zomeFunctionCallBackArgs.Id] = zomeFunctionCallBackArgs;
+
+            _zomeLookup.Remove(zomeFunctionCallBackArgs.Id);
+            _funcLookup.Remove(zomeFunctionCallBackArgs.Id);
+            _callbackLookup.Remove(zomeFunctionCallBackArgs.Id);
+            _entryDataObjectTypeLookup.Remove(zomeFunctionCallBackArgs.Id);
+            _entryDataObjectLookup.Remove(zomeFunctionCallBackArgs.Id);
+            _cacheZomeReturnDataLookup.Remove(zomeFunctionCallBackArgs.Id);
+            _taskCompletionZomeCallBack.Remove(zomeFunctionCallBackArgs.Id);
         }
 
         private void WebSocket_OnConnected(object sender, ConnectedEventArgs e)

@@ -138,7 +138,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public string DnaHash { get; set; }
         public SignalType SignalType { get; set; }
         public HoloNETSignalData RawSignalData { get;set;}
-        public Dictionary<string, object> SignalData { get; set; } 
+        public Dictionary<string, object> SignalData { get; set; }
+        public string SignalDataAsString { get; set; }
     }
 
     public class ConductorDebugCallBackEventArgs : CallBackBaseEventArgs
