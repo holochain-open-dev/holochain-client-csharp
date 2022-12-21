@@ -633,8 +633,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                     {
                         Console.WriteLine("Calling test_signal function on OASIS Test Zome...\n");
                         await _holoNETClient.CallZomeFunctionAsync("oasis", "test_signal_as_string", ZomeCallback, "test signal data");
-                        await _holoNETClient.CallZomeFunctionAsync("oasis", "test_signal_as_int", ZomeCallback, 7);
-                        await _holoNETClient.CallZomeFunctionAsync("oasis", "test_signal_as_int_2", ZomeCallback, 8);
+                        //await _holoNETClient.CallZomeFunctionAsync("oasis", "test_signal_as_int", ZomeCallback, 7);
+                        //await _holoNETClient.CallZomeFunctionAsync("oasis", "test_signal_as_int_2", ZomeCallback, 8);
                     }
                     break;
 
