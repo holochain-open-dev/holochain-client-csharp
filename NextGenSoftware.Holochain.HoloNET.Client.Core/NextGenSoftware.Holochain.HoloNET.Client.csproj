@@ -17,7 +17,7 @@
 	  <Authors>David Ellams (NextGen Software Ltd)</Authors>
 	  <PackageTags>holochain;net;unity</PackageTags>
 	  <PackageReleaseNotes>
-		  - Many big improvements for v2.0.0! :) HoloNET Evolved.
+		  - Many big improvements for v2.0.0! :) HoloNET Evolved. Many months of hard work have gone into this release (hence why there have been no releases for a while).
 		  - Multiple bug fixes.
 		  - Massive refacoring/rebuild.
 		  - Multiple improvements.
@@ -32,11 +32,12 @@
 		  - Now every method has a non async and async version.
 		  - Dependencies such as MessagePack &amp; Newtonsoft.Json upgraded to latest version.
 		  - Plus much more! ;-)
-		  - View full commit history here:
+		  - 27 commits with 48 changed files, 3,296 additions and 677 deletions.
+		  - View full commit history here: https://github.com/holochain-open-dev/holochain-client-csharp/compare/v1.4.1...v2.0.0
 
 	  </PackageReleaseNotes>
 	  <RepositoryType>git</RepositoryType>
-	  <RepositoryUrl>https://github.com/NextGenSoftwareUK/holochain-client-csharp</RepositoryUrl>
+	  <RepositoryUrl>https://github.com/holochain-open-dev/holochain-client-csharp</RepositoryUrl>
 	  <Copyright>Copyright © NextGen Software Ltd 2022</Copyright>
 	  <PackageReadmeFile>README.md</PackageReadmeFile>
 	  <!--<PackageLicenseExpression>GNU GPLv3</PackageLicenseExpression>-->
