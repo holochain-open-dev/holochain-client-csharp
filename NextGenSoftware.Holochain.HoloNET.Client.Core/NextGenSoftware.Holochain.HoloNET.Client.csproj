@@ -17,24 +17,8 @@
 	  <Authors>David Ellams (NextGen Software Ltd)</Authors>
 	  <PackageTags>holochain;net;unity</PackageTags>
 	  <PackageReleaseNotes>
-		  - Many big improvements for v2.0.0! :) HoloNET Evolved. Many months of hard work have gone into this release (hence why there have been no releases for a while).
-		  - Multiple bug fixes.
-		  - Massive refacoring/rebuild.
-		  - Multiple improvements.
-		  - New async/subscription hybrid method call model (gives greater flexibility on how you wish HoloNET to await for conductor responses (use async await or events or both).
-		  - Now automaps properties/fields returned from the conductor onto your custom class/object.
-		  - Many overloads added to CallZomeFunction enabling more control and power of how to call your zome functions...
-		  - New HoloNETEntryBaseClass that you can extend to add your Holochain Entry properties/fields. It will then manage all of your CRUD (Create, Read, Update, Delete) for you. You simple call Load(), Save() or Delete(). It wraps around the HoloNETClient internally.
-		  - New HoloNETAutditEntryBaseClass that extends HoloNETEntryBaseClass and adds additional audit properties/fields and capabilities such as CreatedBy, CreatedDate, ModifiedBy, ModifiedData, DeletedBy, DeletedDate, etc.
-		  - The above is a preview of some of the capabilities that the upcoming .NET HDK Low Code Generator will feature...
-		  - Signal Support Added.
-		  - Addional metadata now decoded &amp; mapped from the Holochain Conductor.
-		  - Now every method has a non async and async version.
-		  - Dependencies such as MessagePack &amp; Newtonsoft.Json upgraded to latest version.
-		  - Plus much more! ;-)
-		  - 27 commits with 48 changed files, 3,296 additions and 677 deletions.
-		  - View full commit history here: https://github.com/holochain-open-dev/holochain-client-csharp/compare/v1.4.1...v2.0.0
-
+		  - Updated dependencies for NextGenSoftware.WebSocket 1.1.4 -&gt; 1.1.5.
+		  - Updated dependencies for NextGenSoftware.Utilities 1.0.4 -&gt; 1.0.5.
 	  </PackageReleaseNotes>
 	  <RepositoryType>git</RepositoryType>
 	  <RepositoryUrl>https://github.com/holochain-open-dev/holochain-client-csharp</RepositoryUrl>
@@ -43,7 +27,7 @@
 	  <!--<PackageLicenseExpression>GNU GPLv3</PackageLicenseExpression>-->
 	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
 	  <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-	  <Version>2.0.0</Version>
+	  <Version>2.0.1</Version>
 	  <!--<PackageLicenseFile>..\LICENSE</PackageLicenseFile>-->
 
 	  <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
