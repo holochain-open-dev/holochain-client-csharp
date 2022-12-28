@@ -44,7 +44,10 @@ You can pass in one of these values:
 |----------------------------|-------------------------------------------------------------------------------------------------------|
 | WhoAmI					 | Will call zome function whoami on the whoami zome (part of the happ-build-tutorial above).            |
 | Numbers					 | Will call zome function add_ten on the numbers zome (part of the happ-build-tutorial above).          |
+| Signal					 | Will call zome function test_signal_as_string on the oasis zome.										 |
 | SaveLoadOASISEntry		 | Will call the zome function create_entry_avatar on the oasis zome and once it receives the ActionHash back from the Holochain Conductor, it will load that entry using get_entry_avatar zome function (part of the OASIS hApp above).     |
+| SaveLoadOASISEntryUsingSingleHoloNETAuditEntryBaseClass | Will test the new HoloNETAuditEntryBaseClass by extending it with the Avatar class. It will call create_entry_avatar, get_entry_avatar, update_entry_avatar & delete_entry_avatar on the oasis zome and verify the results are as expected. This version will instantiate its own internal HoloNET Client to make calls to the Holochain Conductor. |
+| SaveLoadOASISEntryUsingMultipleHoloNETAuditEntryBaseClasses | Will test the new HoloNETAuditEntryBaseClass by extending it with the AvatarMultiple & Holon class. It will call create_entry_avatar, get_entry_avatar, update_entry_avatar & delete_entry_avatar on the oasis zome and verify the results are as expected. This version passes in a HoloNETClient instance that is shared between the AvatarMultiple & Holon classes. |
 | LoadTestNumbers			 | Will call zome function add_ten on the numbers zome 100 times (part of the happ-build-tutorial above).|
 | LoadTestSaveLoadOASISEntry | Will call SaveLoadOASISEntry test 100 times (part of the OASIS happ above).|
 

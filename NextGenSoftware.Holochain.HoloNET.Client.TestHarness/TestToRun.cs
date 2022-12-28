@@ -7,8 +7,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
         Numbers,
         Signal,
         SaveLoadOASISEntry,
-        SaveLoadOASISEntryUsingSingleHoloNETBaseClass,
-        SaveLoadOASISEntryUsingMultipleHoloNETBaseClasses,
+        SaveLoadOASISEntryUsingSingleHoloNETAuditEntryBaseClass,
+        SaveLoadOASISEntryUsingMultipleHoloNETAuditEntryBaseClasses,
         LoadTestNumbers,
         LoadTestSaveLoadOASISEntry
     }

@@ -29,7 +29,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
         {
             _timer.Start();
             _testToRun = testToRun;
-            Console.WriteLine("NextGenSoftware.Holochain.HoloNET.Client Test Harness v1.4");
+            Console.WriteLine("NextGenSoftware.Holochain.HoloNET.Client Test Harness v2.0.0");
             Console.WriteLine("");
 
             HoloNETConfig config = new HoloNETConfig()
@@ -46,7 +46,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
             };
 
             //No need to create this when the test is SaveLoadOASISEntryUsingSingleHoloNETBaseClass because it will create its own instance of HoloNETClient internally (in the base class).
-            if (_testToRun != TestToRun.SaveLoadOASISEntryUsingSingleHoloNETBaseClass)
+            if (_testToRun != TestToRun.SaveLoadOASISEntryUsingSingleHoloNETAuditEntryBaseClass)
             {
                 _holoNETClient = new HoloNETClient("ws://localhost:8888");
 
@@ -105,7 +105,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
 
             switch (testToRun)
             {
-                case TestToRun.SaveLoadOASISEntryUsingSingleHoloNETBaseClass:
+                case TestToRun.SaveLoadOASISEntryUsingSingleHoloNETAuditEntryBaseClass:
                     {
                         CLIEngine.ShowMessage("*** AVATAR SINGLE HOLONET BASE ENTRY SAVE/CREATE TEST ***", _testHeadingColour);
 
@@ -228,7 +228,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                     }
                     break;
 
-                case TestToRun.SaveLoadOASISEntryUsingMultipleHoloNETBaseClasses:
+                case TestToRun.SaveLoadOASISEntryUsingMultipleHoloNETAuditEntryBaseClasses:
                     {
                         //In this example we are passing in an existing instance of the HoloNET client so it along with the connection to the holochain condutor is shared amongst the objects/classes that inherit from HoloNETEntryBaseClass.
                         AvatarMultiple avatar = new AvatarMultiple(_holoNETClient)
