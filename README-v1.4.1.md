@@ -9,7 +9,6 @@
   - [How To Use HoloNET](#how-to-use-holonet)
     - [Quick Start](#quick-start)
     - [The Power of .NET Async Methods](#the-power-of-net-async-methods)
-      - [New Hybrid Async/Event Model](#new-hybrid-async/event-model)
     - [Events](#events)
       - [OnConnected](#onconnected)
       - [OnAppInfoCallBack](#onappinfocallback)
@@ -142,8 +141,6 @@ holoNETClient.OnSignalsCallBack += HoloNETClient_OnSignalsCallBack;
 holoNETClient.OnDisconnected += HoloNETClient_OnDisconnected;
 holoNETClient.OnError += HoloNETClient_OnError;
 holoNETClient.OnConductorDebugCallBack += HoloNETClient_OnConductorDebugCallBack;
-holoNETClient.OnHolochainConductorsShutdownComplete += _holoNETClient_OnHolochainConductorsShutdownComplete;
-holoNETClient.OnHoloNETShutdownComplete += _holoNETClient_OnHoloNETShutdownComplete;
 ````
 
 Now you can call the [Connect](#connect) method to connect to Holochain.
@@ -186,28 +183,23 @@ You will notice that the above calls have the `await` keyword prefixing them. Th
 Read more here:
 https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/concepts/async/
 
-#### New Hybrid Async/Event Model
-
-Saying this, there may be scenarious where you need to use the older non async style methods and use callbacks instead so starting from HoloNET 2.0.0, it also provides non async versions of each method. On top of this each method now has optional params where you can choose to ask HoloNET to wait for the Holochain Conductor to return a response or to return to the calling method immediately and use a callback event instead.
 
 ### Events
 <a name="events"></a>
 
 You can subscribe to a number of different events:
 
-| Event                                                                           | Description                                                                                                                                                                                                                                 |
-| --------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [OnConnected](#onconnected)                                                     | Fired when the client has successfully connected to the Holochain conductor.                                                                                                                                                                |
-| [OnAppInfoCallBack](#onappinfocallback)                                         | Fired when the client receives AppInfo from the conductor containing the cell id for the running hApp (which in itself contains the AgentPubKey & DnaHash). It also contains the AppId and other info.                                      |
-| [OnReadyForZomeCalls](#onreadyforzomecalls)                                     | Fired when the client has successfully connected and reteived the AgentPubKey & DnaHash, meaning it is ready to make zome calls to the Holochain conductor.                                                                                 |
-| [OnDataReceived](#ondatareceived)                                               | Fired when any data is received from the Holochain conductor. This returns the raw data.                                                                                                                                                    |
-| [OnZomeFunctionCallBack](#onzomefunctioncallback)                               | Fired when the Holochain conductor returns the response from a zome function call. This returns the raw data as well as the parsed data returned from the zome function. It also returns the id, zome and zome function that made the call. |
-| [OnSignalsCallBack](#onsignalscallback)                                         | Fired when the Holochain conductor sends signals data. NOTE: This is still waiting for hc to flresh out the details for how this will work. Currently this returns the raw signals data.                                                    | 
-| [OnConductorDebugCallBack](#onconductordebugcallback)                           | Fired when the Holochain conductor sends debug info.                                                                                                                                                                                        |
-| [OnDisconnected](#ondisconnected)                                               | Fired when the client disconnected from the Holochain conductor.                                                                                                                                                                            |
-| [OnError](#onerror)                                                             | Fired when an error occurs, check the params for the cause of the error.                                                                                                                                                                    |
-| [OnHolochainConductorsShutdownComplete](#OnHolochainConductorsShutdownComplete) | Fired when all Holochain Conductors have been shutdown.                                                                                                                                                                                     |
-| [OnHoloNETShutdownComplete](#OnHoloNETShutdownComplete)                         | Fired when HoloNET has completed shutting down (this includes closing all connections and shutting down all Holochain Conductor).                                                                                                           |
+| Event                                                 | Description                                                                                                                                                                                                                                 |
+| ------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [OnConnected](#onconnected)                           | Fired when the client has successfully connected to the Holochain conductor.                                                                                                                                                                |
+| [OnAppInfoCallBack](#onappinfocallback)               | Fired when the client receives AppInfo from the conductor containing the cell id for the running hApp (which in itself contains the AgentPubKey & DnaHash). It also contains the AppId and other info.                                      |
+| [OnReadyForZomeCalls](#onreadyforzomecalls)           | Fired when the client has successfully connected and reteived the AgentPubKey & DnaHash, meaning it is ready to make zome calls to the Holochain conductor.                                                                                 |
+| [OnDataReceived](#ondatareceived)                     | Fired when any data is received from the Holochain conductor. This returns the raw data.                                                                                                                                                    |
+| [OnZomeFunctionCallBack](#onzomefunctioncallback)     | Fired when the Holochain conductor returns the response from a zome function call. This returns the raw data as well as the parsed data returned from the zome function. It also returns the id, zome and zome function that made the call. |
+| [OnSignalsCallBack](#onsignalscallback)               | Fired when the Holochain conductor sends signals data. NOTE: This is still waiting for hc to flresh out the details for how this will work. Currently this returns the raw signals data.                                                    | 
+| [OnConductorDebugCallBack](#onconductordebugcallback) | Fired when the Holochain conductor sends debug info.                                                                                                                                                                                        |
+| [OnDisconnected](#ondisconnected)                     | Fired when the client disconnected from the Holochain conductor.                                                                                                                                                                            |
+| [OnError](#onerror)                                   | Fired when an error occurs, check the params for the cause of the error.                                                                                                                                                                    |
 
 #### OnConnected
 Fired when the client has successfully connected to the Holochain conductor. 
@@ -378,7 +370,7 @@ private static void HoloNETClient_OnZomeFunctionCallBack(object sender, ZomeFunc
 
             if (args.Entry != null && args.Entry.EntryDataObject != null)
             {
-                AvatarEntryDataObject avatar = args.Entry.EntryDataObject as AvatarEntryDataObject;
+                Avatar avatar = args.Entry.EntryDataObject as Avatar;
 
                 if (avatar != null)
                 {
@@ -396,13 +388,13 @@ private static void HoloNETClient_OnZomeFunctionCallBack(object sender, ZomeFunc
  This is how you can map your rust data to a C# object, the call to the Holochain Conductor is in another earlier place in the Test Harness:
 
   ````c#
- _holoNETClient.CallZomeFunctionAsync("oasis", "get_entry_avatar", ZomeCallback, e.ZomeReturnHash, typeof(AvatarEntryDataObject));
+ _holoNETClient.CallZomeFunctionAsync("oasis", "get_entry_avatar", ZomeCallback, e.ZomeReturnHash, typeof(Avatar));
   ````
 
-  And the AvatarEntryDataObject class/type looks like this:
+  And the Avatar class/type looks like this:
 
    ````c#
-  public class AvatarEntryDataObject
+  public class Avatar
     {
         [HolochainPropertyName("first_name")]
         public string FirstName { get; set; }
@@ -421,7 +413,7 @@ private static void HoloNETClient_OnZomeFunctionCallBack(object sender, ZomeFunc
   The e.ZomeReturnHash is the hash returned from a previous call to the conductor:
 
 ````c#
-  await _holoNETClient.CallZomeFunctionAsync("oasis", "create_entry_avatar", ZomeCallback, new { id = 1, first_name = "David", last_name = "Ellams", email = "davidellams@hotmail.com", dob = "11/07/1980" });
+  await _holoNETClient.CallZomeFunctionAsync("oasis", "create_entry_avatar", ZomeCallback, new { id = 1, first_name = "David", last_name = "Ellams", email = "davidellams@hotmail.com", dob = "11/04/1980" });
 ````
 
 #### OnSignalsCallBack
@@ -437,18 +429,16 @@ private static void HoloNETClient_OnSignalsCallBack(object sender, SignalsCallBa
         }
 ````   
 
- | Parameter          | Description                                                                                                                                                                                                   |
- |--------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
- | EndPoint           | The URI EndPoint of the Holochain conductor.                                                                                                                                                                  |                                                                                                                                                      
- | AgentPubKey        | The Agent Public Key of the hApp that is running in the Holochain Conductor.                                                                                                                                  |
- | DnaHash            | The DNA Hash of the hApp that is running in the Holochain Conductor.                                                                                                                                          |
- | SignalType         | An enum containing the SignalType, can be either App or System.                                                                                                                                               |
- | SignalData         | The Signal Data decoded into a dictionary with keyvalue pairs.                                                                                                                                                |
- | SignalDataAsString | The Signal Data decoded into a string with keyvalue pairs.                                                                                                                                                    |
- | RawSignalData      | The Raw Signal Data returned from the conductor decoded into a HoloNETSignalData object containing a CellData (contains a 2 dimensonal array containing the AgentPubKey & DnaHash) & SignalData binary array. |
- | RawBinaryData      | The raw binary data returned from the Holochain conductor.                                                                                                                                                    |
- | RawJSONData        | The raw JSON data returned from the Holochain conductor.                                                                                                                                                      |
+ | Parameter          | Description                                                                                                                                                                                                 |
+ |--------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+ | EndPoint           | The URI EndPoint of the Holochain conductor.                                                                                                                                                                |                                                                                                                                                      
+ | SignalType         | An enum containing the SignalType, can be either User or Admin.                                                                                                                                             |
+ | SignalData         | The Signal Data.                                                                                                                                                                                            |
+ | RawBinaryData      | The raw binary data returned from the Holochain conductor.                                                                                                                                                  |
+ | RawJSONData        | The raw JSON data returned from the Holochain conductor.                                                                                                                                                    |
  | WebSocketResult    | Contains more detailed technical information of the underlying websocket. This includes the number of bytes received, whether the message was fully received & whether the message is UTF-8 or binary. Please [see here](https://docs.microsoft.com/en-us/dotnet/api/system.net.websockets.websocketreceiveresult?view=netframework-4.8) for more info. |
+
+ **NOTE: This is from the previous version of HoloNET running against the previous version of Holochain (Redux) & needs to be updated for the new RSM version, coming soon...**
 
  #### OnConductorDebugCallBack
 
@@ -517,60 +507,6 @@ private static void HoloNETClient_OnError(object sender, HoloNETErrorEventArgs e
 | EndPoint           | The URI EndPoint of the Holochain conductor.                                                                    |
 | Reason             | The reason for the error.                                                                                       |
 | ErrorDetails       | A more detailed description of the error, this normally includes a stacktrace to help you track down the cause. |
-
-#### OnHolochainConductorsShutdownComplete
-
-Fired when all of the Holochain Conductors have shutdown.
-
-````c#
-_holoNETClient.OnHolochainConductorsShutdownComplete += _holoNETClient_OnHolochainConductorsShutdownComplete;
-
-private static void _holoNETClient_OnHolochainConductorsShutdownComplete(object sender, HolochainConductorsShutdownEventArgs e)
-        {
-            CLIEngine.ShowMessage($"TEST HARNESS: OnHolochainConductorsShutdownComplete, EndPoint: {e.EndPoint}, AgentPubKey: {e.AgentPubKey}, DnaHash: {e.DnaHash}, IsError: {e.IsError}, Message: {e.Message}, NumberOfHcExeInstancesShutdown: { e.NumberOfHcExeInstancesShutdown}, NumberOfHolochainExeInstancesShutdown: {e.NumberOfHolochainExeInstancesShutdown}, NumberOfRustcExeInstancesShutdown: {e.NumberOfRustcExeInstancesShutdown}.");
-        }
-````
-
-| Parameter                             | Description                                                                                                     |
-|---------------------------------------|-----------------------------------------------------------------------------------------------------------------|
-| EndPoint                              | The URI EndPoint of the Holochain conductor.                                                                    |
-| AgentPubKey                           | The Agent Public Key of the hApp that was running in the Holochain Conductor.                                   |
-| DnaHash                               | The DNA Hash of the hApp that was running in the Holochain Conductor.                                           |
-| NumberOfHcExeInstancesShutdown        | The number of hc.exe instances that were shutdown.                                                              |
-| NumberOfHolochainExeInstancesShutdown | The number of holochain.exe instances that were shutdown.                                                       |
-| NumberOfRustcExeInstancesShutdown     | The number of rustc.exe instances that were shutdown.                                                           |
-| IsError                               | The reason for the error.                                                                                       |
-| Message                               | A more detailed description of the error, this normally includes a stacktrace to help you track down the cause. |
-
-
-#### OnHoloNETShutdownComplete
-
-Fired when all of the Holochain Conductors have shutdown.
-
-````c#
-_holoNETClient.OnHoloNETShutdownComplete += _holoNETClient_OnHoloNETShutdownComplete;
-
-private static void _holoNETClient_OnHoloNETShutdownComplete(object sender, HoloNETShutdownEventArgs e)
-        {
-            string msg = $"TEST HARNESS: OnHoloNETShutdownComplete, EndPoint: {e.EndPoint}, AgentPubKey: {e.AgentPubKey}, DnaHash: {e.DnaHash}, IsError: {e.IsError}, Message: {e.Message}";
-            
-            if (e.HolochainConductorsShutdownEventArgs != null)
-                msg = string.Concat(msg, $", NumberOfHcExeInstancesShutdown: {e.HolochainConductorsShutdownEventArgs.NumberOfHcExeInstancesShutdown}, NumberOfHolochainExeInstancesShutdown: { e.HolochainConductorsShutdownEventArgs.NumberOfHolochainExeInstancesShutdown}, NumberOfRustcExeInstancesShutdown: { e.HolochainConductorsShutdownEventArgs.NumberOfRustcExeInstancesShutdown}");
-
-            CLIEngine.ShowMessage(msg);
-        }
-````
-
-| Parameter                                                                  | Description                                                                                                     |
-|----------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------|
-| EndPoint                                                                   | The URI EndPoint of the Holochain conductor.                                                                    |
-| AgentPubKey                                                                | The Agent Public Key of the hApp that was running in the Holochain Conductor.                                   |
-| DnaHash                                                                    | The DNA Hash of the hApp that was running in the Holochain Conductor.                                           |
-| HolochainConductorsShutdownEventArgs.NumberOfHcExeInstancesShutdown        | The number of hc.exe instances that were shutdown.                                                              |
-| HolochainConductorsShutdownEventArgs.NumberOfHolochainExeInstancesShutdown | The number of holochain.exe instances that were shutdown.                                                       |
-| HolochainConductorsShutdownEventArgs.NumberOfRustcExeInstancesShutdown     | The number of rustc.exe instances that were shutdown.                                                           |
-| IsError                                                                    | The reason for the error.                                                                                       |
-| Message                                                                    | A more detailed description of the error, this normally includes a stacktrace to help you track down the cause. |
 
 
 ### Methods

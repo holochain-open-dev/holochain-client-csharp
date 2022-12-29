@@ -1174,7 +1174,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             try
             {
                 rawBinaryDataAsString = DataHelper.ConvertBinaryDataToString(dataReceivedEventArgs.RawBinaryData);
-                rawBinaryDataDecoded = DataHelper.DecodeBinaryData(dataReceivedEventArgs.RawBinaryData);
+                rawBinaryDataDecoded = DataHelper.DecodeBinaryDataAsUTF8(dataReceivedEventArgs.RawBinaryData);
 
                 Logger.Log("DATA RECEIVED", LogType.Info);
                 Logger.Log("Raw Data Received: " + rawBinaryDataAsString, LogType.Debug);
@@ -1204,7 +1204,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         private void ProcessErrorReceivedFromConductor(WebSocket.DataReceivedEventArgs dataReceivedEventArgs, string rawBinaryDataDecoded, string rawBinaryDataAsString, string rawBinaryDataAfterMessagePackDecodeAsString, string rawBinaryDataAfterMessagePackDecodeDecoded)
         {
-            string msg = $"Error in HoloNETClient.WebSocket_OnDataReceived method. Error received from Holochain Conductor: {rawBinaryDataDecoded}";
+            string msg = $"Error in HoloNETClient.ProcessErrorReceivedFromConductor method. Error received from Holochain Conductor: {rawBinaryDataDecoded}";
             HandleError(msg, null);
 
             HoloNETResponse response = DecodeDataReceived(dataReceivedEventArgs.RawBinaryData, dataReceivedEventArgs, rawBinaryDataAsString, rawBinaryDataDecoded);
@@ -1297,7 +1297,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                 id = response.id.ToString();
                 rawBinaryDataAfterMessagePackDecodeAsString = DataHelper.ConvertBinaryDataToString(response.data);
-                rawBinaryDataAfterMessagePackDecodeDecoded = DataHelper.DecodeBinaryData(response.data);
+                rawBinaryDataAfterMessagePackDecodeDecoded = DataHelper.DecodeBinaryDataAsUTF8(response.data);
 
                 Logger.Log("Response", LogType.Info);
                 Logger.Log($"Id: {response.id}", LogType.Info);
@@ -1349,6 +1349,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     Config.AgentPubKey = agentPubKey;
                     Config.DnaHash = dnaHash;
                 }
+
+                Logger.Log($"AGENT PUB KEY RETURNED FROM CONDUCTOR: {Config.AgentPubKey}", LogType.Info);
+                Logger.Log($"DNA HASH RETURNED FROM CONDUCTOR:: {Config.DnaHash}", LogType.Info);
 
                 args = new AppInfoCallBackEventArgs()
                 {

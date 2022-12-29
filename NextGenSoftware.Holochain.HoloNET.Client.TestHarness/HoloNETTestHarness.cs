@@ -18,18 +18,22 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
         private static int _requestNumber = 10;
         private static Stopwatch _timer = new Stopwatch(); // creating new instance of the stopwatch
         private static ConsoleColor _testHeadingColour = ConsoleColor.Yellow;
+        private static AvatarEntryDataObject _avatarEntryDataObject = null;
 
         static async Task Main(string[] args)
         {
             //await TestHoloNETClientAsync(TestToRun.SaveLoadOASISEntryUsingSingleHoloNETBaseClass);
-            await TestHoloNETClientAsync(TestToRun.Signal);
+            //await TestHoloNETClientAsync(TestToRun.Signal);
+            //await TestHoloNETClientAsync(TestToRun.SaveLoadOASISEntry);
+            //await TestHoloNETClientAsync(TestToRun.LoadTestSaveLoadOASISEntry);
+            await TestHoloNETClientAsync(TestToRun.WhoAmI);
         }
 
         public static async Task TestHoloNETClientAsync(TestToRun testToRun)
         {
             _timer.Start();
             _testToRun = testToRun;
-            Console.WriteLine("NextGenSoftware.Holochain.HoloNET.Client Test Harness v2.0.0");
+            Console.WriteLine("NextGenSoftware.Holochain.HoloNET.Client Test Harness v2.0.1");
             Console.WriteLine("");
 
             HoloNETConfig config = new HoloNETConfig()
@@ -37,10 +41,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                 LoggingMode = LoggingMode.WarningsErrorsInfoAndDebug,
 
                 //holoNETClient.Config.ErrorHandlingBehaviour = ErrorHandlingBehaviour.OnlyThrowExceptionIfNoErrorHandlerSubscribedToOnErrorEvent
-                AutoStartHolochainConductor = false,
-                AutoShutdownHolochainConductor = false,
-                ShutDownALLHolochainConductors = false, //Normally default's to false, but if you want to make sure no holochain processes are left running set this to true.
-                ShowHolochainConductorWindow = false, //Defaults to false.
+                AutoStartHolochainConductor = true,
+                AutoShutdownHolochainConductor = true,
+                ShutDownALLHolochainConductors = true, //Normally default's to false, but if you want to make sure no holochain processes are left running set this to true.
+                ShowHolochainConductorWindow = true, //Defaults to false.
                 HolochainConductorMode = HolochainConductorModeEnum.UseEmbedded,
                 HolochainConductorToUse = HolochainConductorEnum.HcDevTool
             };
@@ -73,6 +77,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                 _holoNETClient.OnDisconnected += HoloNETClient_OnDisconnected;
                 _holoNETClient.OnError += HoloNETClient_OnError;
                 _holoNETClient.OnConductorDebugCallBack += HoloNETClient_OnConductorDebugCallBack;
+                _holoNETClient.OnHolochainConductorsShutdownComplete += _holoNETClient_OnHolochainConductorsShutdownComplete;
+                _holoNETClient.OnHoloNETShutdownComplete += _holoNETClient_OnHoloNETShutdownComplete;
 
                 switch (testToRun)
                 {
@@ -441,6 +447,21 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
             }
         }
 
+        private static void _holoNETClient_OnHoloNETShutdownComplete(object sender, HoloNETShutdownEventArgs e)
+        {
+            string msg = $"TEST HARNESS: OnHoloNETShutdownComplete, EndPoint: {e.EndPoint}, AgentPubKey: {e.AgentPubKey}, DnaHash: {e.DnaHash}, IsError: {e.IsError}, Message: {e.Message}";
+            
+            if (e.HolochainConductorsShutdownEventArgs != null)
+                msg = string.Concat(msg, $", NumberOfHcExeInstancesShutdown: {e.HolochainConductorsShutdownEventArgs.NumberOfHcExeInstancesShutdown}, NumberOfHolochainExeInstancesShutdown: { e.HolochainConductorsShutdownEventArgs.NumberOfHolochainExeInstancesShutdown}, NumberOfRustcExeInstancesShutdown: { e.HolochainConductorsShutdownEventArgs.NumberOfRustcExeInstancesShutdown}");
+
+            CLIEngine.ShowMessage(msg);
+        }
+
+        private static void _holoNETClient_OnHolochainConductorsShutdownComplete(object sender, HolochainConductorsShutdownEventArgs e)
+        {
+            CLIEngine.ShowMessage($"TEST HARNESS: OnHolochainConductorsShutdownComplete, EndPoint: {e.EndPoint}, AgentPubKey: {e.AgentPubKey}, DnaHash: {e.DnaHash}, IsError: {e.IsError}, Message: {e.Message}, NumberOfHcExeInstancesShutdown: { e.NumberOfHcExeInstancesShutdown}, NumberOfHolochainExeInstancesShutdown: {e.NumberOfHolochainExeInstancesShutdown}, NumberOfRustcExeInstancesShutdown: {e.NumberOfRustcExeInstancesShutdown}.");
+        }
+
         private static void Holon_OnInitialized(object sender, ReadyForZomeCallsEventArgs e)
         {
             CLIEngine.ShowMessage($"TEST HARNESS: Holon_OnInitialized, EndPoint: {e.EndPoint}, AgentPubKey: {e.AgentPubKey}, DnaHash: {e.DnaHash}, IsError: {e.IsError}, Message: {e.Message}");
@@ -625,7 +646,22 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                 case TestToRun.SaveLoadOASISEntry:
                     {
                         Console.WriteLine("Calling create_entry_avatar function on OASIS Test Zome...\n");
-                        await _holoNETClient.CallZomeFunctionAsync("oasis", "create_entry_avatar", ZomeCallback, new { id = 1, first_name = "David", last_name = "Ellams", email = "davidellams@hotmail.com", dob = "11/04/1980" });
+                        await _holoNETClient.CallZomeFunctionAsync("oasis", "create_entry_avatar", ZomeCallback, new 
+                        { 
+                            id = Guid.NewGuid(), 
+                            first_name = "David", 
+                            last_name = "Ellams", 
+                            email = "davidellams@hotmail.com", 
+                            dob = "11/07/1980",
+                            created_date = DateTime.Now.ToString(),
+                            created_by = _holoNETClient.Config.AgentPubKey,
+                            modified_date = "",
+                            modified_by = "",
+                            deleted_date = "",
+                            deleted_by = "",
+                            is_active = true,
+                            version = 1
+                        });
                     }
                     break;
 
@@ -652,7 +688,24 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                         Console.WriteLine("Calling create_entry_avatar function on OASIS Test Zome (Load Testing)...\n");
 
                         for (int i = 0; i < 100; i++)
-                            await _holoNETClient.CallZomeFunctionAsync("oasis", "create_entry_avatar", ZomeCallback, new { id = 1, first_name = "David", last_name = "Ellams", email = "davidellams@hotmail.com", dob = "11/04/1980" });
+                        {
+                            await _holoNETClient.CallZomeFunctionAsync("oasis", "create_entry_avatar", ZomeCallback, new
+                            {
+                                id = Guid.NewGuid(),
+                                first_name = "David",
+                                last_name = "Ellams",
+                                email = "davidellams@hotmail.com",
+                                dob = "11/07/1980",
+                                created_date = DateTime.Now.ToString(),
+                                created_by = _holoNETClient.Config.AgentPubKey,
+                                modified_date = "",
+                                modified_by = "",
+                                deleted_date = "",
+                                deleted_by = "",
+                                is_active = true,
+                                version = 1
+                            });
+                        }
                     }
                     break;
             }
@@ -736,7 +789,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
             if (!string.IsNullOrEmpty(e.ZomeReturnHash) && e.ZomeFunction == "create_entry_avatar" && (_testToRun == TestToRun.SaveLoadOASISEntry || _testToRun == TestToRun.LoadTestSaveLoadOASISEntry))
             {
                 _saveEntryResponseReceived[_requestNumber] = true;
-                _holoNETClient.CallZomeFunctionAsync("oasis", "get_entry_avatar", ZomeCallback, e.ZomeReturnHash, typeof(Avatar));
+                _holoNETClient.CallZomeFunctionAsync("oasis", "get_entry_avatar", ZomeCallback, e.ZomeReturnHash, typeof(AvatarEntryDataObject));
+                //_holoNETClient.CallZomeFunctionAsync("oasis", "get_entry_avatar", ZomeCallback, e.ZomeReturnHash, _avatarEntryDataObject);
             }
             else
             {
@@ -781,17 +835,25 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
 
             if (args.Entry != null && args.Entry.EntryDataObject != null)
             {
-                Avatar avatar = args.Entry.EntryDataObject as Avatar;
+                AvatarEntryDataObject avatar = args.Entry.EntryDataObject as AvatarEntryDataObject;
 
                 if (avatar != null)
                 {
-                    result = string.Concat(result, "\n\nEntry Data Object.EntryHash:\n", avatar.EntryHash);
-                    result = string.Concat(result, "\n\nEntry Data Object.FirstName:\n", avatar.FirstName);
-                    result = string.Concat(result, "\nEntry Data Object.LastName:\n", avatar.LastName);
-                    result = string.Concat(result, "\nEntry Data Object.Email:\n", avatar.Email);
-                    result = string.Concat(result, "\nEntry Data Object.DOB:\n", avatar.DOB);
+                    //result = string.Concat(result, "\n\nEntry Data Object.EntryHash:\n", avatar.EntryHash);
+                    result = string.Concat(result, "\n\nEntry Data Object.FirstName: ", avatar.FirstName);
+                    result = string.Concat(result, "\nEntry Data Object.LastName: ", avatar.LastName);
+                    result = string.Concat(result, "\nEntry Data Object.Email: ", avatar.Email);
+                    result = string.Concat(result, "\nEntry Data Object.DOB: ", avatar.DOB);
                 }
             }
+
+            //if (_avatarEntryDataObject != null)
+            //{
+            //    result = string.Concat(result, "\n\nEntry Data Object.FirstName:\n", _avatarEntryDataObject.FirstName);
+            //    result = string.Concat(result, "\nEntry Data Object.LastName:\n", _avatarEntryDataObject.LastName);
+            //    result = string.Concat(result, "\nEntry Data Object.Email:\n", _avatarEntryDataObject.Email);
+            //    result = string.Concat(result, "\nEntry Data Object.DOB:\n", _avatarEntryDataObject.DOB);
+            //}
 
             return result;
         }
