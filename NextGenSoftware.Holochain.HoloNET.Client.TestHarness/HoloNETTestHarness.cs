@@ -24,16 +24,17 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
         {
             //await TestHoloNETClientAsync(TestToRun.SaveLoadOASISEntryUsingSingleHoloNETBaseClass);
             //await TestHoloNETClientAsync(TestToRun.Signal);
-            //await TestHoloNETClientAsync(TestToRun.SaveLoadOASISEntry);
+            //await TestHoloNETClientAsync(TestToRun.SaveLoadOASISEntryWithTypeOfEntryDataObject);
+            await TestHoloNETClientAsync(TestToRun.SaveLoadOASISEntryWithEntryDataObject);
             //await TestHoloNETClientAsync(TestToRun.LoadTestSaveLoadOASISEntry);
-            await TestHoloNETClientAsync(TestToRun.WhoAmI);
+            //await TestHoloNETClientAsync(TestToRun.WhoAmI);
         }
 
         public static async Task TestHoloNETClientAsync(TestToRun testToRun)
         {
             _timer.Start();
             _testToRun = testToRun;
-            Console.WriteLine("NextGenSoftware.Holochain.HoloNET.Client Test Harness v2.0.1");
+            Console.WriteLine("NextGenSoftware.Holochain.HoloNET.Client Test Harness v2.0.2");
             Console.WriteLine("");
 
             HoloNETConfig config = new HoloNETConfig()
@@ -82,7 +83,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
 
                 switch (testToRun)
                 {
-                    case TestToRun.SaveLoadOASISEntry:
+                    case TestToRun.SaveLoadOASISEntryWithEntryDataObject:
+                    case TestToRun.SaveLoadOASISEntryWithTypeOfEntryDataObject:
                     case TestToRun.LoadTestSaveLoadOASISEntry:
                     case TestToRun.Signal:
                         {
@@ -643,8 +645,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                     }
                     break;
 
-                case TestToRun.SaveLoadOASISEntry:
-                    {
+                case TestToRun.SaveLoadOASISEntryWithEntryDataObject:
+                case TestToRun.SaveLoadOASISEntryWithTypeOfEntryDataObject:
+                {
                         Console.WriteLine("Calling create_entry_avatar function on OASIS Test Zome...\n");
                         await _holoNETClient.CallZomeFunctionAsync("oasis", "create_entry_avatar", ZomeCallback, new 
                         { 
@@ -786,11 +789,18 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
             //Console.WriteLine(String.Concat("Save Entry Response Received = ", _saveEntryResponseReceived.Count));
             //Console.WriteLine(String.Concat("Load Entry Response Received = ", _loadEntryResponseReceived.Count));
 
-            if (!string.IsNullOrEmpty(e.ZomeReturnHash) && e.ZomeFunction == "create_entry_avatar" && (_testToRun == TestToRun.SaveLoadOASISEntry || _testToRun == TestToRun.LoadTestSaveLoadOASISEntry))
+            if (!string.IsNullOrEmpty(e.ZomeReturnHash) && e.ZomeFunction == "create_entry_avatar" && (_testToRun == TestToRun.SaveLoadOASISEntryWithTypeOfEntryDataObject || _testToRun == TestToRun.SaveLoadOASISEntryWithEntryDataObject || _testToRun == TestToRun.LoadTestSaveLoadOASISEntry))
             {
                 _saveEntryResponseReceived[_requestNumber] = true;
-                _holoNETClient.CallZomeFunctionAsync("oasis", "get_entry_avatar", ZomeCallback, e.ZomeReturnHash, typeof(AvatarEntryDataObject));
-                //_holoNETClient.CallZomeFunctionAsync("oasis", "get_entry_avatar", ZomeCallback, e.ZomeReturnHash, _avatarEntryDataObject);
+
+                if (_testToRun == TestToRun.SaveLoadOASISEntryWithTypeOfEntryDataObject)
+                    _holoNETClient.CallZomeFunctionAsync("oasis", "get_entry_avatar", ZomeCallback, e.ZomeReturnHash, typeof(AvatarEntryDataObject));
+
+                else if (_testToRun == TestToRun.SaveLoadOASISEntryWithEntryDataObject)
+                {
+                    _avatarEntryDataObject = new AvatarEntryDataObject();
+                    _holoNETClient.CallZomeFunctionAsync("oasis", "get_entry_avatar", ZomeCallback, e.ZomeReturnHash, _avatarEntryDataObject);
+                }
             }
             else
             {
@@ -818,7 +828,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
             if (disconect)
             {
                 Console.WriteLine("");
+                //_holoNETClient.ShutdownHoloNETAsync(DisconnectedCallBackMode.WaitForHolochainConductorToDisconnect, ShutdownHolochainConductorsMode.ShutdownAllConductors);
+
                 _holoNETClient.Disconnect();
+                _holoNETClient.ShutDownAllHolochainConductors();
+               
             }
 
             //_requestNumber++;
@@ -838,24 +852,23 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                 AvatarEntryDataObject avatar = args.Entry.EntryDataObject as AvatarEntryDataObject;
 
                 if (avatar != null)
-                {
-                    //result = string.Concat(result, "\n\nEntry Data Object.EntryHash:\n", avatar.EntryHash);
-                    result = string.Concat(result, "\n\nEntry Data Object.FirstName: ", avatar.FirstName);
-                    result = string.Concat(result, "\nEntry Data Object.LastName: ", avatar.LastName);
-                    result = string.Concat(result, "\nEntry Data Object.Email: ", avatar.Email);
-                    result = string.Concat(result, "\nEntry Data Object.DOB: ", avatar.DOB);
-                }
+                    result = BuildEntryDataObjectMessage(avatar, "Entry.EntryDataObject", result);
             }
-
-            //if (_avatarEntryDataObject != null)
-            //{
-            //    result = string.Concat(result, "\n\nEntry Data Object.FirstName:\n", _avatarEntryDataObject.FirstName);
-            //    result = string.Concat(result, "\nEntry Data Object.LastName:\n", _avatarEntryDataObject.LastName);
-            //    result = string.Concat(result, "\nEntry Data Object.Email:\n", _avatarEntryDataObject.Email);
-            //    result = string.Concat(result, "\nEntry Data Object.DOB:\n", _avatarEntryDataObject.DOB);
-            //}
+            
+            if (_avatarEntryDataObject != null)
+                result = BuildEntryDataObjectMessage(_avatarEntryDataObject, "Global.EntryDataObject", result);
 
             return result;
+        }
+
+        private static string BuildEntryDataObjectMessage(AvatarEntryDataObject avatar, string header, string message)
+        {
+            message = string.Concat(message, "\n\n", header, ".FirstName: ", avatar.FirstName);
+            message = string.Concat(message, "\n", header, ".LastName: ", avatar.LastName);
+            message = string.Concat(message, "\n", header, ".Email: ", avatar.Email);
+            message = string.Concat(message, "\n", header, ".DOB: ", avatar.DOB);
+
+            return message;
         }
 
         private static void HoloNETClient_OnDataReceived(object sender, HoloNETDataReceivedEventArgs e)
