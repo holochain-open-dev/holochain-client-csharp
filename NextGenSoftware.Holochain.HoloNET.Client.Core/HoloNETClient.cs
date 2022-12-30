@@ -927,7 +927,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             try
             {
-                Logger.Log("Shutting Down All Holochain Conductors...", LogType.Info, true);
+                Logger.Log("Shutting Down All Holochain Conductors...", LogType.Info, false);
 
                 foreach (Process process in Process.GetProcessesByName("hc"))
                 {
