@@ -240,16 +240,21 @@ private static void HoloNETClient_OnAppInfoCallBack(object sender, AppInfoCallBa
         }
 ````
 
-| Parameter          | Description                                                |
-|--------------------|------------------------------------------------------------|
-| EndPoint           | The URI EndPoint of the Holochain conductor.               |
-| Id                 | The id that made the request.                              |
-| AgentPubKey        | The AgentPubKey for the hApp.                              |
-| DnaHash            | The DnaHash for the hApp.                                  |
-| InstalledAppId     | The InstalledAppId for the hApp.                           |
-| RawBinaryData      | The raw binary data returned from the Holochain conductor. |
-| RawJSONData        | The raw JSON data returned from the Holochain conductor.   |
-| WebSocketResult    | Contains more detailed technical information of the underlying websocket. This includes the number of bytes received, whether the message was fully received & whether the message is UTF-8 or binary. Please [see here](https://docs.microsoft.com/en-us/dotnet/api/system.net.websockets.websocketreceiveresult?view=netframework-4.8) for more info.
+| Parameter                                     | Description                                                                                                                                                                                                                                                                                                                                             |
+|-----------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| EndPoint                                      | The URI EndPoint of the Holochain conductor.                                                                                                                                                                                                                                                                                                            |
+| Id                                            | The id that made the request.                                                                                                                                                                                                                                                                                                                           |
+| AgentPubKey                                   | The AgentPubKey for the hApp.                                                                                                                                                                                                                                                                                                                           |
+| DnaHash                                       | The DnaHash for the hApp.                                                                                                                                                                                                                                                                                                                               |
+| InstalledAppId                                | The InstalledAppId for the hApp.                                                                                                                                                                                                                                                                                                                        |
+| RawBinaryData                                 | The raw binary data returned from the Holochain conductor.                                                                                                                                                                                                                                                                                              |
+| RawBinaryDataAsString                         | The raw binary data returned from the Holochain conductor formatted as a string (useful for debugging/logging etc).                                                                                                                                                                                                                                     |
+| RawBinaryDataDecoded                          | The raw binary data returned from the Holochain conductor decoded into a string using UTF8 encoding.                                                                                                                                                                                                                                                    |
+| RawBinaryDataAfterMessagePackDecode           | The raw binary data after it has been decoded by MessagePack.                                                                                                                                                                                                                                                                                           |
+| RawBinaryDataAfterMessagePackDecodeAsString   | The raw binary data after it has been decoded by MessagePack formatted as a string (useful for debugging/logging etc).                                                                                                                                                                                                                                  |
+| RawBinaryDataAfterMessagePackDecodeDecoded    | The raw binary data after it has been decoded by MessagePack decoded into a string using UTF8 encoding.                                                                                                                                                                                                                                                 |
+| RawJSONData                                   | The raw JSON data returned from the Holochain conductor.                                                                                                                                                                                                                                                                                                |
+| WebSocketResult                               | Contains more detailed technical information of the underlying websocket. This includes the number of bytes received, whether the message was fully received & whether the message is UTF-8 or binary. Please [see here](https://docs.microsoft.com/en-us/dotnet/api/system.net.websockets.websocketreceiveresult?view=netframework-4.8) for more info. |
 
 
 #### OnReadyForZomeCalls
@@ -299,12 +304,19 @@ private static void HoloNETClient_OnDataReceived(object sender, HoloNETDataRecei
         }
 ````
 
-| Parameter          | Description                                                |
-|--------------------|------------------------------------------------------------|
-| EndPoint           | The URI EndPoint of the Holochain conductor.               |
-| RawBinaryData      | The raw binary data returned from the Holochain conductor. |
-| RawJSONData        | The raw JSON data returned from the Holochain conductor.   |
-| WebSocketResult    | Contains more detailed technical information of the underlying websocket. This includes the number of bytes received, whether the message was fully received & whether the message is UTF-8 or binary. Please [see here](https://docs.microsoft.com/en-us/dotnet/api/system.net.websockets.websocketreceiveresult?view=netframework-4.8) for more info.
+| Parameter                                     | Description                                                                                                                                                                                                                                                                                                                                             |
+|-----------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| EndPoint                                      | The URI EndPoint of the Holochain conductor.                                                                                                                                                                                                                                                                                                            |
+| Id                                            | The id that made the request.                                                                                                                                                                                                                                                                                                                           |                                                                                                                                                                                                                                                                                                                              |
+| InstalledAppId                                | The InstalledAppId for the hApp.                                                                                                                                                                                                                                                                                                                        |
+| RawBinaryData                                 | The raw binary data returned from the Holochain conductor.                                                                                                                                                                                                                                                                                              |
+| RawBinaryDataAsString                         | The raw binary data returned from the Holochain conductor formatted as a string (useful for debugging/logging etc).                                                                                                                                                                                                                                     |
+| RawBinaryDataDecoded                          | The raw binary data returned from the Holochain conductor decoded into a string using UTF8 encoding.                                                                                                                                                                                                                                                    |
+| RawBinaryDataAfterMessagePackDecode           | The raw binary data after it has been decoded by MessagePack.                                                                                                                                                                                                                                                                                           |
+| RawBinaryDataAfterMessagePackDecodeAsString   | The raw binary data after it has been decoded by MessagePack formatted as a string (useful for debugging/logging etc).                                                                                                                                                                                                                                  |
+| RawBinaryDataAfterMessagePackDecodeDecoded    | The raw binary data after it has been decoded by MessagePack decoded into a string using UTF8 encoding.                                                                                                                                                                                                                                                 |
+| RawJSONData                                   | The raw JSON data returned from the Holochain conductor.                                                                                                                                                                                                                                                                                                |
+| WebSocketResult                               | Contains more detailed technical information of the underlying websocket. This includes the number of bytes received, whether the message was fully received & whether the message is UTF-8 or binary. Please [see here](https://docs.microsoft.com/en-us/dotnet/api/system.net.websockets.websocketreceiveresult?view=netframework-4.8) for more info. |
 
 #### OnZomeFunctionCallBack
 
@@ -321,41 +333,61 @@ holoNETClient.OnZomeFunctionCallBack += HoloNETClient_OnZomeFunctionCallBack;
 
 private static string ProcessZomeFunctionCallBackEventArgs(ZomeFunctionCallBackEventArgs args)
         {
-            string zomeData = "";
+            string result = "";
+            
+            result = string.Concat("\nEndPoint: ", args.EndPoint, "\nId: ", args.Id, "\nZome: ", args.Zome, "\nZomeFunction: ", args.ZomeFunction, "\n\nZomeReturnData: ", args.ZomeReturnData, "\nZomeReturnHash: ", args.ZomeReturnHash, "\nRaw Zome Return Data: ", args.RawZomeReturnData, "\nRaw Binary Data: ", args.RawBinaryData, "\nRaw Binary Data As String: ", args.RawBinaryDataAsString, "\nRaw Binary Data Decoded: ", args.RawBinaryDataDecoded, "\nRaw Binary Data After MessagePack Decode: ", args.RawBinaryDataAfterMessagePackDecode, "\nRaw Binary Data After MessagePack Decode As String: ", args.RawBinaryDataAfterMessagePackDecodeAsString, "\nRaw Binary Data Decoded After MessagePack Decode: ", args.RawBinaryDataAfterMessagePackDecodeDecoded, "\nRaw JSON Data: ", args.RawJSONData, "\nIsCallSuccessful: ", args.IsCallSuccessful ? "true" : "false", "\nIsError: ", args.IsError ? "true" : "false", "\nMessage: ", args.Message);
 
-            foreach (string key in args.ZomeReturnData.Keys)
-                zomeData = string.Concat(zomeData, key, "=", args.ZomeReturnData[key], "\n");
+            if (!string.IsNullOrEmpty(args.KeyValuePairAsString))
+                result = string.Concat(result, "\n\nProcessed Zome Return Data:\n", args.KeyValuePairAsString);
 
-            return string.Concat("\nEndPoint: ", args.EndPoint, "\nId: ", args.Id, "\nZome: ", args.Zome, "\nZomeFunction: ", args.ZomeFunction, "\n\nRaw Data: ", args.RawData, "\n\nZomeReturnData: ", args.ZomeReturnData, "\nRaw Zome Return Data: ", args.RawZomeReturnData, "\nRaw Binary Daya: ", args.RawBinaryData, "\nRaw JSON Data: ", args.RawJSONData, "\nIsCallSuccessful: ", args.IsCallSuccessful ? "true" : "false", "\n\nProcessed Zome Return Data:\n", zomeData);
+            if (args.Entry != null && args.Entry.EntryDataObject != null)
+            {
+                AvatarEntryDataObject avatar = args.Entry.EntryDataObject as AvatarEntryDataObject;
+
+                if (avatar != null)
+                    result = BuildEntryDataObjectMessage(avatar, "Entry.EntryDataObject", result);
+            }
+            
+            if (_avatarEntryDataObject != null)
+                result = BuildEntryDataObjectMessage(_avatarEntryDataObject, "Global.EntryDataObject", result);
+
+            return result;
         }
 ````             
 
- | Parameter            | Description                                                                                                                                                                                                 |
- |----------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
- | EndPoint             | The URI EndPoint of the Holochain conductor.                                                                                                                                                                |
- | Zome                 | The zome that made the request.                                                                                                                                                                             |
- | ZomeFunction         | The zome function that made the request.                                                                                                                                                                    |
- | ZomeReturnData       | The parsed data that the zome function returned. HoloNET will parse & convert the best it can from the Rust Holochain Conductor format to a C# friendly one such as converting from base64 encoding, etc.   |
- | RawZomeReturnData    | The raw binary data that the zome function returned.                                                                                                                                                        |
- | ZomeReturnHash       | The ActionHash returned from a zome call (if it returned one, is null if not).
- | KeyValuePair         | Contains all of the data returned from the zome call in a simple Dictionary keyvalue pair. The conductor for some reason returns a complex nested structure so is difficult and tedious to get to all the data needed or to quickly view all of it at once.
- | KeyValuePairAsString | Contains the same data from KeyValuePair but formatted as a simple string, which can be used for logging, displaying, etc.
- | Entry                | The entry dictionary containing the actual user data (after it has been processed/decoded) retrived from the zome call. This is the property that will be most valuable to the caller. This also now includes a EntryDataObject property containing a dynamic data object that is mapped to the dictionary using the optional type passed into the [CallZomeFunctionAsync](#callzomefunctionasync) method. This effectively maps the rust data struct properties contained in the hApp to your C# data object/class.
- | RawBinaryData        | The raw binary data returned from the Holochain conductor.                                                                                                                                                  |
- | RawJSONData          | The raw JSON data returned from the Holochain conductor.                                                                                                                                                    |
- | WebSocketResult      | Contains more detailed technical information of the underlying websocket. This includes the number of bytes received, whether the message was fully received & whether the message is UTF-8 or binary. Please [see here](https://docs.microsoft.com/en-us/dotnet/api/system.net.websockets.websocketreceiveresult?view=netframework-4.8) for more info. |
+| Parameter                                     | Description                                                                                                                                                                                                                                                                                                                                             |
+|-----------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| EndPoint                                      | The URI EndPoint of the Holochain conductor.                                                                                                                                                                                                                                                                                                            |
+| Id                                            | The id that made the request.                                                                                                                                                                                                                                                                                                                           |                                                                                                                                                                                                                                                                                                                              |
+| Zome                                          | The zome that made the request.                                                                                                                                                                                                                                                                                                                         |
+| ZomeFunction                                  | The zome function that made the request.                                                                                                                                                                                                                                                                                                                |
+| ZomeReturnData                                | The parsed data that the zome function returned. HoloNET will parse & convert the best it can from the Rust Holochain Conductor format to a C# friendly one such as converting from base64 encoding, etc.                                                                                                                                               |
+| RawZomeReturnData                             | The raw binary data that the zome function returned.                                                                                                                                                                                                                                                                                                    |
+| ZomeReturnHash                                | The ActionHash returned from a zome call (if it returned one, is null if not).                                                                                                                                                                                                                                                                          |
+| KeyValuePair                                  | Contains all of the data returned from the zome call in a simple Dictionary keyvalue pair. The conductor for some reason returns a complex nested structure so is difficult and tedious to get to all the data needed or to quickly view all of it at once.                                                                                             |
+| KeyValuePairAsString                          | Contains the same data from KeyValuePair but formatted as a simple string, which can be used for logging, displaying, etc.                                                                                                                                                                                                                              |
+| Entry                                         | The entry dictionary containing the actual user data (after it has been processed/decoded) retrived from the zome call. This is the property that will be most valuable to the caller. This also now includes a EntryDataObject property containing a dynamic data object that is mapped to the dictionary using the optional type                      |
+|                                               | (or actual data object) passed into the [CallZomeFunctionAsync](#callzomefunctionasync) method. This effectively maps the rust data struct properties contained in the hApp to your C# data object/class.                                                                                                                                               |
+| RawBinaryData                                 | The raw binary data returned from the Holochain conductor.                                                                                                                                                                                                                                                                                              |
+| RawBinaryDataAsString                         | The raw binary data returned from the Holochain conductor formatted as a string (useful for debugging/logging etc).                                                                                                                                                                                                                                     |
+| RawBinaryDataDecoded                          | The raw binary data returned from the Holochain conductor decoded into a string using UTF8 encoding.                                                                                                                                                                                                                                                    |
+| RawBinaryDataAfterMessagePackDecode           | The raw binary data after it has been decoded by MessagePack.                                                                                                                                                                                                                                                                                           |
+| RawBinaryDataAfterMessagePackDecodeAsString   | The raw binary data after it has been decoded by MessagePack formatted as a string (useful for debugging/logging etc).                                                                                                                                                                                                                                  |
+| RawBinaryDataAfterMessagePackDecodeDecoded    | The raw binary data after it has been decoded by MessagePack decoded into a string using UTF8 encoding.                                                                                                                                                                                                                                                 |
+| RawJSONData                                   | The raw JSON data returned from the Holochain conductor.                                                                                                                                                                                                                                                                                                |
+| WebSocketResult                               | Contains more detailed technical information of the underlying websocket. This includes the number of bytes received, whether the message was fully received & whether the message is UTF-8 or binary. Please [see here](https://docs.microsoft.com/en-us/dotnet/api/system.net.websockets.websocketreceiveresult?view=netframework-4.8) for more info. |
 
  The Entry property contains the following sub-properties:
 
- | Parameter            | Description                                                                                                                                                                                                 |
- |----------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
- | Bytes                | Contains the raw bytes returned from the Holochain Conductor for the data entry.                                                                                                                                                              |
- | BytesString          | Contains the raw bytes returned from the Holochain Conductor for the data entry as a comma delimited string, which can be used for logging/debugging etc.                                                                                                                                                                            |
- | Entry                | Contains the keyvalue pair dictionary for the entry data returned from the conductor.
- | EntryDataObject      | If the entryDataObjectTypeReturnedFromZome type is passed into one of the [CallZomeFunctionAsync](#callzomefunctionasync) overloads then HoloNET will attempt to map the hApp rust properties (contained in the struct) to the C# type/class passed in and then pass the newly created dynamic object back to the caller via this property.
+ | Parameter            | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+ |----------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+ | Bytes                | Contains the raw bytes returned from the Holochain Conductor for the data entry.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+ | BytesString          | Contains the raw bytes returned from the Holochain Conductor for the data entry as a comma delimited string, which can be used for logging/debugging etc.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+ | Entry                | Contains the keyvalue pair dictionary for the entry data returned from the conductor.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+ | EntryDataObject      | If the type of the entry data object (entryDataObjectTypeReturnedFromZome param) or the actual data object (entryDataObjectReturnedFromZome param) is passed into one of the [CallZomeFunctionAsync](#callzomefunctionasync) overloads then HoloNET will attempt to map the hApp rust properties (contained in the struct) to the C# type/class/object passed in and then pass the newly created dynamic object (will update the existing data object if entryDataObjectReturnedFromZome param is used) back to the caller via this property. It will also update the actual data object (by ref) if entryDataObjectReturnedFromZome param is used. |
 
 
- As an example of how to access the entry data and see it mapped to your custom type check out the [HoloNET Test Harness](https://github.com/holochain-open-dev/holochain-client-csharp/tree/main/NextGenSoftware.Holochain.HoloNET.Client.TestHarness), especially this function below:
+ As an example of how to access the entry data and see it mapped to your custom type/object check out the [HoloNET Test Harness](https://github.com/holochain-open-dev/holochain-client-csharp/tree/main/NextGenSoftware.Holochain.HoloNET.Client.TestHarness), especially this function below:
 
  ````c#
 
@@ -367,11 +399,11 @@ private static void HoloNETClient_OnZomeFunctionCallBack(object sender, ZomeFunc
         }
 
 
- private static string ProcessZomeFunctionCallBackEventArgs(ZomeFunctionCallBackEventArgs args)
+private static string ProcessZomeFunctionCallBackEventArgs(ZomeFunctionCallBackEventArgs args)
         {
             string result = "";
             
-            result = string.Concat("\nEndPoint: ", args.EndPoint, "\nId: ", args.Id, "\nZome: ", args.Zome, "\nZomeFunction: ", args.ZomeFunction, "\n\nRaw Data: ", args.RawData, "\n\nZomeReturnData: ", args.ZomeReturnData, "\nZomeReturnHash: ", args.ZomeReturnHash, "\nRaw Zome Return Data: ", args.RawZomeReturnData, "\nRaw Binary Daya: ", args.RawBinaryData, "\nRaw JSON Data: ", args.RawJSONData, "\nIsCallSuccessful: ", args.IsCallSuccessful ? "true" : "false");
+            result = string.Concat("\nEndPoint: ", args.EndPoint, "\nId: ", args.Id, "\nZome: ", args.Zome, "\nZomeFunction: ", args.ZomeFunction, "\n\nZomeReturnData: ", args.ZomeReturnData, "\nZomeReturnHash: ", args.ZomeReturnHash, "\nRaw Zome Return Data: ", args.RawZomeReturnData, "\nRaw Binary Data: ", args.RawBinaryData, "\nRaw Binary Data As String: ", args.RawBinaryDataAsString, "\nRaw Binary Data Decoded: ", args.RawBinaryDataDecoded, "\nRaw Binary Data After MessagePack Decode: ", args.RawBinaryDataAfterMessagePackDecode, "\nRaw Binary Data After MessagePack Decode As String: ", args.RawBinaryDataAfterMessagePackDecodeAsString, "\nRaw Binary Data Decoded After MessagePack Decode: ", args.RawBinaryDataAfterMessagePackDecodeDecoded, "\nRaw JSON Data: ", args.RawJSONData, "\nIsCallSuccessful: ", args.IsCallSuccessful ? "true" : "false", "\nIsError: ", args.IsError ? "true" : "false", "\nMessage: ", args.Message);
 
             if (!string.IsNullOrEmpty(args.KeyValuePairAsString))
                 result = string.Concat(result, "\n\nProcessed Zome Return Data:\n", args.KeyValuePairAsString);
@@ -381,15 +413,23 @@ private static void HoloNETClient_OnZomeFunctionCallBack(object sender, ZomeFunc
                 AvatarEntryDataObject avatar = args.Entry.EntryDataObject as AvatarEntryDataObject;
 
                 if (avatar != null)
-                {
-                    result = string.Concat(result, "\n\nEntry Data Object.FirstName:\n", avatar.FirstName);
-                    result = string.Concat(result, "\nEntry Data Object.LastName:\n", avatar.LastName);
-                    result = string.Concat(result, "\nEntry Data Object.Email:\n", avatar.Email);
-                    result = string.Concat(result, "\nEntry Data Object.DOB:\n", avatar.DOB);
-                }
+                    result = BuildEntryDataObjectMessage(avatar, "Entry.EntryDataObject", result);
             }
+            
+            if (_avatarEntryDataObject != null)
+                result = BuildEntryDataObjectMessage(_avatarEntryDataObject, "Global.EntryDataObject", result);
 
             return result;
+        }
+
+        private static string BuildEntryDataObjectMessage(AvatarEntryDataObject avatar, string header, string message)
+        {
+            message = string.Concat(message, "\n\n", header, ".FirstName: ", avatar.FirstName);
+            message = string.Concat(message, "\n", header, ".LastName: ", avatar.LastName);
+            message = string.Concat(message, "\n", header, ".Email: ", avatar.Email);
+            message = string.Concat(message, "\n", header, ".DOB: ", avatar.DOB);
+
+            return message;
         }
  ````
  
@@ -402,8 +442,17 @@ private static void HoloNETClient_OnZomeFunctionCallBack(object sender, ZomeFunc
   And the AvatarEntryDataObject class/type looks like this:
 
    ````c#
-  public class AvatarEntryDataObject
+/// <summary>
+    /// This example is to be used with the CallZomeFunction overloads on HoloNETClient that take either a type of the EntryDataObject (Type entryDataObjectTypeReturnedFromZome) to map the zome function returned data onto or the actual instance of a dynamic object (dynamic entryDataObjectReturnedFromZome) to map onto.
+    /// </summary>
+    public class AvatarEntryDataObject
     {
+        /// <summary>
+        /// GUID Id that is consistent across multiple versions of the entry (each version has a different hash).
+        /// </summary>
+        [HolochainPropertyName("id")]
+        public Guid Id { get; set; }
+
         [HolochainPropertyName("first_name")]
         public string FirstName { get; set; }
 
@@ -415,6 +464,54 @@ private static void HoloNETClient_OnZomeFunctionCallBack(object sender, ZomeFunc
 
         [HolochainPropertyName("dob")]
         public DateTime DOB { get; set; }
+
+        /// <summary>
+        /// The date the entry was created.
+        /// </summary>
+        [HolochainPropertyName("created_date")]
+        public DateTime CreatedDate { get; set; }
+
+        /// <summary>
+        /// The AgentId who created the entry.
+        /// </summary>
+        [HolochainPropertyName("created_by")]
+        public string CreatedBy { get; set; }
+
+        /// <summary>
+        /// The date the entry was last modified.
+        /// </summary>
+        [HolochainPropertyName("modified_date")]
+        public DateTime ModifiedDate { get; set; }
+
+        /// <summary>
+        /// The AgentId who modifed the entry.
+        /// </summary>
+        [HolochainPropertyName("modified_by")]
+        public string ModifiedBy { get; set; }
+
+        /// <summary>
+        /// The date the entry was soft deleted.
+        /// </summary>
+        [HolochainPropertyName("deleted_date")]
+        public DateTime DeletedDate { get; set; }
+
+        /// <summary>
+        /// The AgentId who deleted the entry.
+        /// </summary>
+        [HolochainPropertyName("deleted_by")]
+        public string DeletedBy { get; set; }
+
+        /// <summary>
+        /// Flag showing the whether this entry is active or not.
+        /// </summary>
+        [HolochainPropertyName("is_active")]
+        public bool IsActive { get; set; }
+
+        /// <summary>
+        /// The current version of the entry.
+        /// </summary>
+        [HolochainPropertyName("version")]
+        public int Version { get; set; } = 1;
     }
   ````
 
@@ -425,30 +522,38 @@ private static void HoloNETClient_OnZomeFunctionCallBack(object sender, ZomeFunc
 ````
 
 #### OnSignalsCallBack
-Fired when the Holochain conductor sends signals data. NOTE: This is still waiting for Holochain to flesh out the details for how this will work. Currently this returns the raw signals data.
+
+Fired when the Holochain conductor sends signals data.
 
 ````c#
 holoNETClient.OnSignalsCallBack += HoloNETClient_OnSignalsCallBack;
 
 private static void HoloNETClient_OnSignalsCallBack(object sender, SignalsCallBackEventArgs e)
         {
-            Console.WriteLine(string.Concat("TEST HARNESS: SIGINALS CALLBACK EVENT HANDLER: EndPoint: ", e.EndPoint, ", Id: ", e.Id , ", Data: ", e.RawJSONData, "Name: ", e.Name, "SignalType: ", Enum.GetName(typeof(SignalsCallBackEventArgs.SignalTypes), e.SignalType), "Arguments: ", e.SignalData));
+            Console.WriteLine(string.Concat("TEST HARNESS: SIGINALS CALLBACK EVENT HANDLER: EndPoint: ", e.EndPoint, ", Id: ", e.Id, ", Data: ", e.RawJSONData, ", AgentPubKey =  ", e.AgentPubKey, ", DnaHash = ", e.DnaHash, ", Signal Type: ", Enum.GetName(typeof(SignalType), e.SignalType), ", Signal Data: ", e.SignalDataAsString));
             Console.WriteLine("");
         }
 ````   
 
- | Parameter          | Description                                                                                                                                                                                                   |
- |--------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
- | EndPoint           | The URI EndPoint of the Holochain conductor.                                                                                                                                                                  |                                                                                                                                                      
- | AgentPubKey        | The Agent Public Key of the hApp that is running in the Holochain Conductor.                                                                                                                                  |
- | DnaHash            | The DNA Hash of the hApp that is running in the Holochain Conductor.                                                                                                                                          |
- | SignalType         | An enum containing the SignalType, can be either App or System.                                                                                                                                               |
- | SignalData         | The Signal Data decoded into a dictionary with keyvalue pairs.                                                                                                                                                |
- | SignalDataAsString | The Signal Data decoded into a string with keyvalue pairs.                                                                                                                                                    |
- | RawSignalData      | The Raw Signal Data returned from the conductor decoded into a HoloNETSignalData object containing a CellData (contains a 2 dimensonal array containing the AgentPubKey & DnaHash) & SignalData binary array. |
- | RawBinaryData      | The raw binary data returned from the Holochain conductor.                                                                                                                                                    |
- | RawJSONData        | The raw JSON data returned from the Holochain conductor.                                                                                                                                                      |
- | WebSocketResult    | Contains more detailed technical information of the underlying websocket. This includes the number of bytes received, whether the message was fully received & whether the message is UTF-8 or binary. Please [see here](https://docs.microsoft.com/en-us/dotnet/api/system.net.websockets.websocketreceiveresult?view=netframework-4.8) for more info. |
+ | Parameter                                     | Description                                                                                                                                                                                                                                                                                                                                             |
+ |-----------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+ | EndPoint                                      | The URI EndPoint of the Holochain conductor.                                                                                                                                                                                                                                                                                                            |
+ | Id                                            | The id that made the request.                                                                                                                                                                                                                                                                                                                           |                                                                                                                                                                                                                                                                                                                              |
+ | AgentPubKey                                   | The Agent Public Key of the hApp that is running in the Holochain Conductor.                                                                                                                                                                                                                                                                            |
+ | DnaHash                                       | The DNA Hash of the hApp that is running in the Holochain Conductor.                                                                                                                                                                                                                                                                                    |
+ | SignalType                                    | An enum containing the SignalType, can be either App or System.                                                                                                                                                                                                                                                                                         |
+ | SignalData                                    | The Signal Data decoded into a dictionary with keyvalue pairs.                                                                                                                                                                                                                                                                                          |
+ | SignalDataAsString                            | The Signal Data decoded into a string with keyvalue pairs.                                                                                                                                                                                                                                                                                              |
+ | RawSignalData                                 | The Raw Signal Data returned from the conductor decoded into a HoloNETSignalData object containing a CellData (contains a 2 dimensonal array containing the AgentPubKey & DnaHash) & SignalData binary array.                                                                                                                                           |
+ | RawBinaryData                                 | The raw binary data returned from the Holochain conductor.                                                                                                                                                                                                                                                                                              |
+ | RawBinaryDataAsString                         | The raw binary data returned from the Holochain conductor formatted as a string (useful for debugging/logging etc).                                                                                                                                                                                                                                     |
+ | RawBinaryDataDecoded                          | The raw binary data returned from the Holochain conductor decoded into a string using UTF8 encoding.                                                                                                                                                                                                                                                    |
+ | RawBinaryDataAfterMessagePackDecode           | The raw binary data after it has been decoded by MessagePack.                                                                                                                                                                                                                                                                                           |
+ | RawBinaryDataAfterMessagePackDecodeAsString   | The raw binary data after it has been decoded by MessagePack formatted as a string (useful for debugging/logging etc).                                                                                                                                                                                                                                  |
+ | RawBinaryDataAfterMessagePackDecodeDecoded    | The raw binary data after it has been decoded by MessagePack decoded into a string using UTF8 encoding.                                                                                                                                                                                                                                                 |
+ | RawJSONData                                   | The raw JSON data returned from the Holochain conductor.                                                                                                                                                                                                                                                                                                |
+ | WebSocketResult                               | Contains more detailed technical information of the underlying websocket. This includes the number of bytes received, whether the message was fully received & whether the message is UTF-8 or binary. Please [see here](https://docs.microsoft.com/en-us/dotnet/api/system.net.websockets.websocketreceiveresult?view=netframework-4.8) for more info. |
+
 
  #### OnConductorDebugCallBack
 
@@ -581,16 +686,20 @@ HoloNETClient contains the following methods:
 |--|--|
 |[Connect](#connect)  | This method simply connects to the Holochain conductor. It raises the [OnConnected](#onconnected) event once it is has successfully established a connection. Please see the [Events](#events) section above for more info on how to use this event.
 |[StartConductor](#startconductor)  | This method will start the Holochain Conducutor using the approprtiate settings defined in the [HoloNETConfig](#holonetconfig).
-|[GetAgentPubKeyAndDnaHashFromSandbox](#getagentpubkeyanddnahashfromsandbox) | This method gets the AgentPubKey & DnaHash from the HC Sandbox command. It will raise the [OnReadyForZomeCalls](onreadyforzomecalls) event once it successfully retreives them and the WebSocket has connected to the Holochain Conductor. Otherwise it will call the |[GetAgentPubKeyAndDnaHashFromConductor](#getagentpubkeyanddnahashfromconductor) method to attempt to retreive them directly from the conductor (default). 
-|[GetAgentPubKeyAndDnaHashFromConductor](#getagentpubkeyanddnahashfromconductor) | This method gets the AgentPubKey & DnaHash from the Holochain Conductor (the |[Connect](#connect) method will automatically call this by default). Once it has retreived them and the WebSocket has connceted to the Holochain Conductor it will raise the [OnReadyForZomeCalls](onreadyforzomecalls) event, otherwise it will call the |[GetAgentPubKeyAndDnaHashFromSandbox](#getagentpubkeyanddnahashfromsandbox) method.
+|[RetreiveAgentPubKeyAndDnaHash]
+|[RetreiveAgentPubKeyAndDnaHashFromSandbox](#retreiveagentpubkeyanddnahashfromsandbox) | This method gets the AgentPubKey & DnaHash from the HC Sandbox command. It will raise the [OnReadyForZomeCalls](onreadyforzomecalls) event once it successfully retreives them and the WebSocket has connected to the Holochain Conductor. Otherwise it will call the |[GetAgentPubKeyAndDnaHashFromConductor](#getagentpubkeyanddnahashfromconductor) method to attempt to retreive them directly from the conductor (default). 
+|[RetreiveAgentPubKeyAndDnaHashFromConductor](#retreiveagentpubkeyanddnahashfromconductor) | This method gets the AgentPubKey & DnaHash from the Holochain Conductor (the |[Connect](#connect) method will automatically call this by default). Once it has retreived them and the WebSocket has connceted to the Holochain Conductor it will raise the [OnReadyForZomeCalls](onreadyforzomecalls) event, otherwise it will call the |[GetAgentPubKeyAndDnaHashFromSandbox](#getagentpubkeyanddnahashfromsandbox) method.
 |[SendHoloNETRequest](#sendholonetrequest) |This method allows you to send your own raw request to holochain. This method raises the [OnDataReceived](#ondatareceived) event once it has received a response from the Holochain conductor. Please see the [Events](#events) section above for more info on how to use this event. You would rarely need to use this and we highly recommend you use the [CallZomeFunctionAsync](#callzomefunctionasync) method instead.
 |[CallZomeFunctionAsync](#callzomefunctionasync)| This is the main method you will be using to invoke zome functions on your given zome. It has a number of handy overloads making it easier and more powerful to call your zome functions and manage the returned data. This method raises the [OnZomeFunctionCallBack](#onzomefunctioncallback) event once it has received a response from the Holochain conductor. Please see the [Events](#events) section above for more info on how to use this event.
 |[Disconnect](#disconnect) | This method disconnects the client from Holochain conductor. It raises the [OnDisconnected](#ondisconnected) event once it is has successfully disconnected. Please see the [Events](#events) section above for more info on how to use this event. |
-|[ShutDownAllConductors](#ShutDownAllConductors) | Will automatically shutdown all active Holochain Conductors. The [Disconnect](#disconnect) will automatically call this. |
+|[ShutDownAllHolochainConductors](#ShutDownAllHolochainConductors) | Will automatically shutdown all active Holochain Conductors. The [Disconnect](#disconnect) will automatically call this. |
+|[ShutdownHoloNET](#ShutdownHoloNET) |
 |[ClearCache](#clearcache) | Call this method to clear all of HoloNETClient's internal cache. This includes the JSON responses that have been cached using the [GetHolochainInstancesAsync](#getholochaininstancesasync) & [CallZomeFunctionAsync](#callzomefunctionasync) methods if the `cacheData` parm was set to true for any of the calls. |
 |[ConvertHoloHashToBytes](#ConvertHoloHashToBytes) | Utiltity method to convert a string to base64 encoded bytes (Holochain Conductor format). This is used to convert the AgentPubKey & DnaHash when making a zome call.|
 |[ConvertHoloHashToString](#ConvertHoloHashToString) | Utiltity method to convert from base64 bytes (Holochain Conductor format) to a friendly C# format. This is used to convert the AgentPubKey & DnaHash retreived from the Conductor.|
-
+|[WaitTillReadyForZomeCallsAsync]
+|[MapEntryDataObject](#MapEntryDataObject) | |
+|
 
 #### Connect
 

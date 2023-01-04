@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Text;
 using System.Net.WebSockets;
 using System.Collections.Generic;
 using System.Threading.Tasks;
