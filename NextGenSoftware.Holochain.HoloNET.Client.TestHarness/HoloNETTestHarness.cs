@@ -831,7 +831,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                 //_holoNETClient.ShutdownHoloNETAsync(DisconnectedCallBackMode.WaitForHolochainConductorToDisconnect, ShutdownHolochainConductorsMode.ShutdownAllConductors);
 
                 _holoNETClient.Disconnect();
-                _holoNETClient.ShutDownAllHolochainConductors();
+                _holoNETClient.ShutDownHolochainConductors();
                
             }
 
