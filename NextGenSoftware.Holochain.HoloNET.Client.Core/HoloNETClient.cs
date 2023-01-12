@@ -1190,7 +1190,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             return holochainConductorsShutdownEventArgs;
         }
 
-        public HolochainConductorsShutdownEventArgs ShutDownHolochainConductors(ShutdownHolochainConductorsMode shutdownHolochainConductorsMode)
+        public HolochainConductorsShutdownEventArgs ShutDownHolochainConductors(ShutdownHolochainConductorsMode shutdownHolochainConductorsMode = ShutdownHolochainConductorsMode.UseConfigSettings)
         {
             return ShutDownHolochainConductorsAsync(shutdownHolochainConductorsMode).Result;
         }
