@@ -1245,10 +1245,63 @@ Here is a simple example of how to use it:
 **NOTE:** This is a preview of some of the advanced functionality that will be present in the upcoming [.NET HDK Low Code Generator](#net-hdk-low-code-generator), which generates dynamic rust and c# code from your metadata freeing you to focus on your amazing business idea and creativity rather than worrying about learning Holochain, Rust and then getting it to all work in Windows and with C#.
 
 #### Events
+<a name="HoloNETEntryBaseClassEvents"></a>
+
+The HoloNETEntryBaseClass has the following events you can subscribe to:
+
+| Event                           | Description                                                                                                                                                                                                                                 |
+| --------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [OnError](#OnError)             | Fired when there is an error either in HoloNETEntryBaseClass or the HoloNET client itself.     
+| [OnInitialized](#OnInitialized) | Fired when the HoloNET client has successfully connected to the Holochain Conductor, retreived the AgentPubKey & DnaHash & then fired the [OnReadyForZomeCalls](#OnReadyForZomeCalls) event.                                                                                                                                                               |
+| [OnLoaded](#OnLoaded)           | Fired when the the HoloNET client has finished loading the Holochain entry from the Holochain Conductor. This calls the [CallZomeFunction](#CallZomeFunction) on the HoloNET client passing in the zome function name specefied in the constructor param `zomeLoadEntryFunction` or property `ZomeLoadEntryFunction` and then maps the data returned from the zome call onto your data object.
+| [OnSaved](#OnSaved)             | Fired when the the HoloNET client has finished saving the Holochain entry to the Holochain Conductor. This calls the [CallZomeFunction](#CallZomeFunction) on the HoloNET client passing in the zome function name specefied in the constructor param `zomeCreateEntryFunction` or property [ZomeCreateEntryFunction](#ZomeCreateEntryFunction) if it is a new entry (empty object) or the `zomeUpdateEntryFunction` param and [ZomeUpdateEntryFunction](#ZomeUpdateEntryFunction) property if it's an existing entry (previously saved object containing a valid value for the [EntryHash](#EntryHash) property). Once it has saved the entry it will then update the [EntryHash](#entryHash) property with the entry hash returned from the zome call/conductor. The [PreviousVersionEntryHash](#PreviousVersionEntryHash) property is also set to the previous EntryHash (if there is one).
+| [OnDeleted](#OnDeleted)         | Fired when any data is received from the Holochain conductor. This returns the raw data.                                                                                                                                                    |
+| [OnClosed](#OnClosed)           | Fired when the Holochain conductor returns the response from a zome function call. This returns the raw data as well as the parsed data returned from the zome function. It also returns the id, zome and zome function that made the call. |
+
+#### OnConnected
+Fired when the client has successfully connected to the Holochain conductor. 
+
+````c#
+holoNETClient.OnConnected += HoloNETClient_OnConnected;
+
+private static void HoloNETClient_OnConnected(object sender, ConnectedEventArgs e)
+        {
+            Console.WriteLine(string.Concat("TEST HARNESS: CONNECTED CALLBACK: Connected to ", e.EndPoint));
+            Console.WriteLine("");
+        }
+````
+
+| Parameter          | Description                                         |
+|--------------------|-----------------------------------------------------|
+| EndPoint           | The URI EndPoint of the Holochain conductor.        |
+
+
 
 #### Methods
 
+The HoloNETEntryBaseClass has the following methods:
+
+| Method                                                              | Description                                                                                                                                                                                                                                 |
+| --------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Initialize](#Initialize)                                           | Fired when the HoloNET client has successfully connected to the Holochain Conductor, retreived the AgentPubKey & DnaHash & then fired the [OnReadyForZomeCalls](#OnReadyForZomeCalls) event.                                                                                                                                                               |
+| [Load](#Load)                                                       | Fired when the the HoloNET client has finished loading the Holochain entry from the Holochain Conductor. This calls the [CallZomeFunction](#CallZomeFunction) on the HoloNET client passing in the zome function name specefied in the constructor param `zomeLoadEntryFunction` or property `ZomeLoadEntryFunction` and then maps the data returned from the zome call onto your data object.
+| [Save](#Save)                                                       | Fired when the the HoloNET client has finished saving the Holochain entry to the Holochain Conductor. This calls the [CallZomeFunction](#CallZomeFunction) on the HoloNET client passing in the zome function name specefied in the constructor param `zomeCreateEntryFunction` or property [ZomeCreateEntryFunction](#ZomeCreateEntryFunction) if it is a new entry (empty object) or the `zomeUpdateEntryFunction` param and [ZomeUpdateEntryFunction](#ZomeUpdateEntryFunction) property if it's an existing entry (previously saved object containing a valid value for the [EntryHash](#EntryHash) property). Once it has saved the entry it will then update the [EntryHash](#entryHash) property with the entry hash returned from the zome call/conductor. The [PreviousVersionEntryHash](#PreviousVersionEntryHash) property is also set to the previous EntryHash (if there is one).
+| [Delete](#Delete)                                                   | Fired when any data is received from the Holochain conductor. This returns the raw data.                                                                                                                                                    |
+| [Close](#Close)                                                     | Fired when the Holochain conductor returns the response from a zome function call. This returns the raw data as well as the parsed data returned from the zome function. It also returns the id, zome and zome function that made the call. |
+| [WaitTillHoloNETInitializedAsync](#WaitTillHoloNETInitializedAsync) |
+
 #### Properties
+
+The HoloNETEntryBaseClass has the following properties:
+
+| Property                                                            | Description                                                                                                                                                                                                                                 |
+| --------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Initialize](#Initialize)                                           | Fired when the HoloNET client has successfully connected to the Holochain Conductor, retreived the AgentPubKey & DnaHash & then fired the [OnReadyForZomeCalls](#OnReadyForZomeCalls) event.                                                                                                                                                               |
+| [Load](#Load)                                                       | Fired when the the HoloNET client has finished loading the Holochain entry from the Holochain Conductor. This calls the [CallZomeFunction](#CallZomeFunction) on the HoloNET client passing in the zome function name specefied in the constructor param `zomeLoadEntryFunction` or property `ZomeLoadEntryFunction` and then maps the data returned from the zome call onto your data object.
+| [Save](#Save)                                                       | Fired when the the HoloNET client has finished saving the Holochain entry to the Holochain Conductor. This calls the [CallZomeFunction](#CallZomeFunction) on the HoloNET client passing in the zome function name specefied in the constructor param `zomeCreateEntryFunction` or property [ZomeCreateEntryFunction](#ZomeCreateEntryFunction) if it is a new entry (empty object) or the `zomeUpdateEntryFunction` param and [ZomeUpdateEntryFunction](#ZomeUpdateEntryFunction) property if it's an existing entry (previously saved object containing a valid value for the [EntryHash](#EntryHash) property). Once it has saved the entry it will then update the [EntryHash](#entryHash) property with the entry hash returned from the zome call/conductor. The [PreviousVersionEntryHash](#PreviousVersionEntryHash) property is also set to the previous EntryHash (if there is one).
+| [Delete](#Delete)                                                   | Fired when any data is received from the Holochain conductor. This returns the raw data.                                                                                                                                                    |
+| [Close](#Close)                                                     | Fired when the Holochain conductor returns the response from a zome function call. This returns the raw data as well as the parsed data returned from the zome function. It also returns the id, zome and zome function that made the call. |
+| [WaitTillHoloNETInitializedAsync](#WaitTillHoloNETInitializedAsync) |
 
 
 
