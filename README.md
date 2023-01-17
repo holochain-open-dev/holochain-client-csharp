@@ -574,12 +574,15 @@ private static void HoloNETClient_OnConductorDebugCallBack(object sender, Conduc
  | NumberHeldAspects        | The number of held aspects.                                                                                                                                                                                 |
  | NumberHeldEntries        | The number of held entries.                                                                                                                                                                                 |
  | NumberPendingValidations | The number of pending validations.                                                                                                                                                                          |
- | NumberRunningZomeCalls   | The number of running zome calls.                                                                                                                                                                           |
- | Offline                  | Whether offline or not.                                                                                                                                                                                     |
- | Type                     | Type of conductor running.                                                                                                                                                                                  |
- | RawBinaryData            | The raw binary data returned from the Holochain conductor.                                                                                                                                                  |
- | RawJSONData              | The raw JSON data returned from the Holochain conductor.                                                                                                                                                    |
+ | NumberRunningZomeCalls   | The number of running zome calls.                                                                                                                                                                                                                                                                                                                     |
+ | Offline                  | Whether offline or not.                                                                                                                                                                                                                                                                                                                                 |
+ | Type                     | Type of conductor running.                                                                                                                                                                                                                                                                                                                              |
+ | RawBinaryData            | The raw binary data returned from the Holochain conductor.                                                                                                                                                                                                                                                                                              |
+ | RawJSONData              | The raw JSON data returned from the Holochain conductor.                                                                                                                                                                                                                                                                                                |
  | WebSocketResult          | Contains more detailed technical information of the underlying websocket. This includes the number of bytes received, whether the message was fully received & whether the message is UTF-8 or binary. Please [see here](https://docs.microsoft.com/en-us/dotnet/api/system.net.websockets.websocketreceiveresult?view=netframework-4.8) for more info. |
+ | IsError                  | True if there was an error during the initialization, false if not.                                                                                                                                                                                                                                                                                     |
+ | Message                  | If there was an error this will contain the error message, this normally includes a stacktrace to help you track down the cause. If there was no error it can contain any other message such as status etc or will be blank.                                                                                                                            |
+
 
  **NOTE: This is from the previous version of HoloNET running against the previous version of Holochain (Redux) & needs to be updated for the new RSM version, coming soon...**
 
@@ -636,16 +639,16 @@ private static void _holoNETClient_OnHolochainConductorsShutdownComplete(object 
         }
 ````
 
-| Parameter                             | Description                                                                                                     |
-|---------------------------------------|-----------------------------------------------------------------------------------------------------------------|
-| EndPoint                              | The URI EndPoint of the Holochain conductor.                                                                    |
-| AgentPubKey                           | The Agent Public Key of the hApp that was running in the Holochain Conductor.                                   |
-| DnaHash                               | The DNA Hash of the hApp that was running in the Holochain Conductor.                                           |
-| NumberOfHcExeInstancesShutdown        | The number of hc.exe instances that were shutdown.                                                              |
-| NumberOfHolochainExeInstancesShutdown | The number of holochain.exe instances that were shutdown.                                                       |
-| NumberOfRustcExeInstancesShutdown     | The number of rustc.exe instances that were shutdown.                                                           |
-| IsError                               | The reason for the error.                                                                                       |
-| Message                               | A more detailed description of the error, this normally includes a stacktrace to help you track down the cause. |
+| Parameter                             | Description                                                                                                                                                                                                                  |
+|---------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| EndPoint                              | The URI EndPoint of the Holochain conductor.                                                                                                                                                                                 |
+| AgentPubKey                           | The Agent Public Key of the hApp that was running in the Holochain Conductor.                                                                                                                                                |
+| DnaHash                               | The DNA Hash of the hApp that was running in the Holochain Conductor.                                                                                                                                                        |
+| NumberOfHcExeInstancesShutdown        | The number of hc.exe instances that were shutdown.                                                                                                                                                                           |
+| NumberOfHolochainExeInstancesShutdown | The number of holochain.exe instances that were shutdown.                                                                                                                                                                    |
+| NumberOfRustcExeInstancesShutdown     | The number of rustc.exe instances that were shutdown.                                                                                                                                                                        |
+| IsError                               | True if there was an error during the initialization, false if not.                                                                                                                                                          |
+| Message                               | If there was an error this will contain the error message, this normally includes a stacktrace to help you track down the cause. If there was no error it can contain any other message such as status etc or will be blank. |
 
 
 #### OnHoloNETShutdownComplete
@@ -666,16 +669,16 @@ private static void _holoNETClient_OnHoloNETShutdownComplete(object sender, Holo
         }
 ````
 
-| Parameter                                                                  | Description                                                                                                     |
-|----------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------|
-| EndPoint                                                                   | The URI EndPoint of the Holochain conductor.                                                                    |
-| AgentPubKey                                                                | The Agent Public Key of the hApp that was running in the Holochain Conductor.                                   |
-| DnaHash                                                                    | The DNA Hash of the hApp that was running in the Holochain Conductor.                                           |
-| HolochainConductorsShutdownEventArgs.NumberOfHcExeInstancesShutdown        | The number of hc.exe instances that were shutdown.                                                              |
-| HolochainConductorsShutdownEventArgs.NumberOfHolochainExeInstancesShutdown | The number of holochain.exe instances that were shutdown.                                                       |
-| HolochainConductorsShutdownEventArgs.NumberOfRustcExeInstancesShutdown     | The number of rustc.exe instances that were shutdown.                                                           |
-| IsError                                                                    | The reason for the error.                                                                                       |
-| Message                                                                    | A more detailed description of the error, this normally includes a stacktrace to help you track down the cause. |
+| Parameter                                                                  | Description                                                                                                                                                                                                                  |
+|----------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| EndPoint                                                                   | The URI EndPoint of the Holochain conductor.                                                                                                                                                                                 |
+| AgentPubKey                                                                | The Agent Public Key of the hApp that was running in the Holochain Conductor.                                                                                                                                                |
+| DnaHash                                                                    | The DNA Hash of the hApp that was running in the Holochain Conductor.                                                                                                                                                        |
+| HolochainConductorsShutdownEventArgs.NumberOfHcExeInstancesShutdown        | The number of hc.exe instances that were shutdown.                                                                                                                                                                           |
+| HolochainConductorsShutdownEventArgs.NumberOfHolochainExeInstancesShutdown | The number of holochain.exe instances that were shutdown.                                                                                                                                                                    |
+| HolochainConductorsShutdownEventArgs.NumberOfRustcExeInstancesShutdown     | The number of rustc.exe instances that were shutdown.                                                                                                                                                                        |
+| IsError                                                                    | True if there was an error during the initialization, false if not.                                                                                                                                                          |
+| Message                                                                    | If there was an error this will contain the error message, this normally includes a stacktrace to help you track down the cause. If there was no error it can contain any other message such as status etc or will be blank. |
 
 
 ### Methods
@@ -1249,32 +1252,232 @@ Here is a simple example of how to use it:
 
 The HoloNETEntryBaseClass has the following events you can subscribe to:
 
-| Event                           | Description                                                                                                                                                                                                                                 |
-| --------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [OnError](#OnError)             | Fired when there is an error either in HoloNETEntryBaseClass or the HoloNET client itself.     
-| [OnInitialized](#OnInitialized) | Fired when the HoloNET client has successfully connected to the Holochain Conductor, retreived the AgentPubKey & DnaHash & then fired the [OnReadyForZomeCalls](#OnReadyForZomeCalls) event.                                                                                                                                                               |
-| [OnLoaded](#OnLoaded)           | Fired when the the HoloNET client has finished loading the Holochain entry from the Holochain Conductor. This calls the [CallZomeFunction](#CallZomeFunction) on the HoloNET client passing in the zome function name specefied in the constructor param `zomeLoadEntryFunction` or property `ZomeLoadEntryFunction` and then maps the data returned from the zome call onto your data object.
-| [OnSaved](#OnSaved)             | Fired when the the HoloNET client has finished saving the Holochain entry to the Holochain Conductor. This calls the [CallZomeFunction](#CallZomeFunction) on the HoloNET client passing in the zome function name specefied in the constructor param `zomeCreateEntryFunction` or property [ZomeCreateEntryFunction](#ZomeCreateEntryFunction) if it is a new entry (empty object) or the `zomeUpdateEntryFunction` param and [ZomeUpdateEntryFunction](#ZomeUpdateEntryFunction) property if it's an existing entry (previously saved object containing a valid value for the [EntryHash](#EntryHash) property). Once it has saved the entry it will then update the [EntryHash](#entryHash) property with the entry hash returned from the zome call/conductor. The [PreviousVersionEntryHash](#PreviousVersionEntryHash) property is also set to the previous EntryHash (if there is one).
-| [OnDeleted](#OnDeleted)         | Fired when any data is received from the Holochain conductor. This returns the raw data.                                                                                                                                                    |
-| [OnClosed](#OnClosed)           | Fired when the Holochain conductor returns the response from a zome function call. This returns the raw data as well as the parsed data returned from the zome function. It also returns the id, zome and zome function that made the call. |
+| Event                           | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| --------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [OnError](#OnError)             | Fired when there is an error either in HoloNETEntryBaseClass or the HoloNET client itself.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| [OnInitialized](#OnInitialized) | Fired after the [Initialize](#Initialize) method has finished initializing the HoloNET client. This will also call the [Connect](#Connect) and [RetreiveAgentPubKeyAndDnaHash](#RetreiveAgentPubKeyAndDnaHash) methods on the HoloNET client. This event is then fired when the HoloNET client has successfully connected to the Holochain Conductor, retreived the AgentPubKey & DnaHash & then fired the [OnReadyForZomeCalls](#OnReadyForZomeCalls) event.                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| [OnLoaded](#OnLoaded)           | Fired after the [Load](#Load) method has finished loading the Holochain entry from the Holochain Conductor. This calls the [CallZomeFunction](#CallZomeFunction) on the HoloNET client passing in the zome function name specefied in the constructor param `zomeLoadEntryFunction` or property `ZomeLoadEntryFunction` and then maps the data returned from the zome call onto your data object.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| [OnSaved](#OnSaved)             | Fired after the [Save](#Save) method has finished saving the Holochain entry to the Holochain Conductor. This calls the [CallZomeFunction](#CallZomeFunction) on the HoloNET client passing in the zome function name specefied in the constructor param `zomeCreateEntryFunction` or property [ZomeCreateEntryFunction](#ZomeCreateEntryFunction) if it is a new entry (empty object) or the `zomeUpdateEntryFunction` param and [ZomeUpdateEntryFunction](#ZomeUpdateEntryFunction) property if it's an existing entry (previously saved object containing a valid value for the [EntryHash](#EntryHash) property). Once it has saved the entry it will then update the [EntryHash](#entryHash) property with the entry hash returned from the zome call/conductor. The [PreviousVersionEntryHash](#PreviousVersionEntryHash) property is also set to the previous EntryHash (if there is one). |
+| [OnDeleted](#OnDeleted)         | Fired after the [Delete](#Delete) method has finished deleting the Holochain entry and has received a response from the Holochain Conductor. This calls the [CallZomeFunction](#CallZomeFunction) on the HoloNET client passing in the zome function name specefied in the constructor param `zomeDeleteEntryFunction` or property `ZomeDeleteEntryFunction`. It then updates the HoloNET Entry Data Object with the response received from the Holochain Conductor.                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| [OnClosed](#OnClosed)           | Fired after the [Close](#Close) method has finished closing the connection to the Holochain Conductor and has shutdown all running Holochain Conductors (if configured to do so). This method calls the [ShutdownHoloNET](#ShutdownHoloNET) internally.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 
-#### OnConnected
-Fired when the client has successfully connected to the Holochain conductor. 
+#### OnError
+
+Fired when there is an error either in HoloNETEntryBaseClass or the HoloNET client itself.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
 
 ````c#
-holoNETClient.OnConnected += HoloNETClient_OnConnected;
+holoNETEntryBaseClass.OnError += holoNETEntryBaseClass_OnError;
 
-private static void HoloNETClient_OnConnected(object sender, ConnectedEventArgs e)
+ private static void holoNETEntryBaseClass_OnError(object sender, HoloNETErrorEventArgs e)
         {
-            Console.WriteLine(string.Concat("TEST HARNESS: CONNECTED CALLBACK: Connected to ", e.EndPoint));
-            Console.WriteLine("");
+            CLIEngine.ShowErrorMessage($"TEST HARNESS: holoNETEntryBaseClass_OnError, EndPoint: {e.EndPoint}, Reason: {e.Reason}");
         }
 ````
 
 | Parameter          | Description                                         |
 |--------------------|-----------------------------------------------------|
 | EndPoint           | The URI EndPoint of the Holochain conductor.        |
+| Reason             | The reason for the error.                           |
 
+
+#### OnInitialized
+
+Fired when there is an error either in HoloNETEntryBaseClass or the HoloNET client itself.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
+
+````c#
+holoNETEntryBaseClass.OnInitialized += holoNETEntryBaseClass_OnInitialized;
+
+ private static void holoNETEntryBaseClass_OnInitialized(object sender, ReadyForZomeCallsEventArgs e)
+        {
+            CLIEngine.ShowMessage($"TEST HARNESS: holoNETEntryBaseClass_OnInitialized, EndPoint: {e.EndPoint}, AgentPubKey: {e.AgentPubKey}, DnaHash: {e.DnaHash}, IsError: {e.IsError}, Message: {e.Message}");
+        }
+````
+
+| Parameter          | Description                                                                                                                                 |
+|--------------------|---------------------------------------------------------------------------------------------------------------------------------------------|
+| EndPoint           | The URI EndPoint of the Holochain conductor.                                                                                                |
+| AgentPubKey        | The Agent Public Key returned from the Holochain Conductor.                                                                                 |
+| IsError            | True if there was an error during the initialization, false if not.                                                                         |
+| Message            | If there was an error, this will contain the error message, otherwise it can contain any other message such as status etc or will be blank. |
+
+
+#### OnLoaded
+
+Fired after the [Load](#Load) method has finished loading the Holochain entry from the Holochain Conductor. This calls the [CallZomeFunction](#CallZomeFunction) on the HoloNET client passing in the zome function name specefied in the constructor param `zomeLoadEntryFunction` or property `ZomeLoadEntryFunction` and then maps the data returned from the zome call onto your data object.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
+
+````c#
+holoNETEntryBaseClass.OnLoaded += holoNETEntryBaseClass_OnLoaded;
+
+ private static void holoNETEntryBaseClass_OnLoaded(object sender, ZomeFunctionCallBackEventArgs e)
+        {
+            CLIEngine.ShowMessage($"TEST HARNESS: holoNETEntryBaseClass_OnLoaded: {ProcessZomeFunctionCallBackEventArgs(e)}");
+        }
+
+        private static string ProcessZomeFunctionCallBackEventArgs(ZomeFunctionCallBackEventArgs args)
+        {
+            string result = "";
+            
+            result = string.Concat("\nEndPoint: ", args.EndPoint, "\nId: ", args.Id, "\nZome: ", args.Zome, "\nZomeFunction: ", args.ZomeFunction, "\n\nZomeReturnData: ", args.ZomeReturnData, "\nZomeReturnHash: ", args.ZomeReturnHash, "\nRaw Zome Return Data: ", args.RawZomeReturnData, "\nRaw Binary Data: ", args.RawBinaryData, "\nRaw Binary Data As String: ", args.RawBinaryDataAsString, "\nRaw Binary Data Decoded: ", args.RawBinaryDataDecoded, "\nRaw Binary Data After MessagePack Decode: ", args.RawBinaryDataAfterMessagePackDecode, "\nRaw Binary Data After MessagePack Decode As String: ", args.RawBinaryDataAfterMessagePackDecodeAsString, "\nRaw Binary Data Decoded After MessagePack Decode: ", args.RawBinaryDataAfterMessagePackDecodeDecoded, "\nRaw JSON Data: ", args.RawJSONData, "\nIsCallSuccessful: ", args.IsCallSuccessful ? "true" : "false", "\nIsError: ", args.IsError ? "true" : "false", "\nMessage: ", args.Message);
+
+            if (!string.IsNullOrEmpty(args.KeyValuePairAsString))
+                result = string.Concat(result, "\n\nProcessed Zome Return Data:\n", args.KeyValuePairAsString);
+
+            if (args.Entry != null && args.Entry.EntryDataObject != null)
+            {
+                AvatarEntryDataObject avatar = args.Entry.EntryDataObject as AvatarEntryDataObject;
+
+                if (avatar != null)
+                    result = BuildEntryDataObjectMessage(avatar, "Entry.EntryDataObject", result);
+            }
+            
+            if (_avatarEntryDataObject != null)
+                result = BuildEntryDataObjectMessage(_avatarEntryDataObject, "Global.EntryDataObject", result);
+
+            return result;
+        }
+
+        private static string BuildEntryDataObjectMessage(AvatarEntryDataObject avatar, string header, string message)
+        {
+            message = string.Concat(message, "\n\n", header, ".FirstName: ", avatar.FirstName);
+            message = string.Concat(message, "\n", header, ".LastName: ", avatar.LastName);
+            message = string.Concat(message, "\n", header, ".Email: ", avatar.Email);
+            message = string.Concat(message, "\n", header, ".DOB: ", avatar.DOB);
+
+            return message;
+        }
+````
+
+| Parameter          | Description                                                                                                                                 |
+|--------------------|---------------------------------------------------------------------------------------------------------------------------------------------|
+| EndPoint           | The URI EndPoint of the Holochain conductor.                                                                                                |
+| AgentPubKey        | The Agent Public Key returned from the Holochain Conductor.                                                                                 |
+| IsError            | True if there was an error during the initialization, false if not.                                                                         |
+| Message            | If there was an error, this will contain the error message, otherwise it can contain any other message such as status etc or will be blank. |
+
+
+#### OnSaved
+
+Fired after the [Save](#Save) method has finished saving the Holochain entry to the Holochain Conductor. This calls the [CallZomeFunction](#CallZomeFunction) on the HoloNET client passing in the zome function name specefied in the constructor param `zomeCreateEntryFunction` or property [ZomeCreateEntryFunction](#ZomeCreateEntryFunction) if it is a new entry (empty object) or the `zomeUpdateEntryFunction` param and [ZomeUpdateEntryFunction](#ZomeUpdateEntryFunction) property if it's an existing entry (previously saved object containing a valid value for the [EntryHash](#EntryHash) property). Once it has saved the entry it will then update the [EntryHash](#entryHash) property with the entry hash returned from the zome call/conductor. The [PreviousVersionEntryHash](#PreviousVersionEntryHash) property is also set to the previous EntryHash (if there is one).
+
+````c#
+holoNETEntryBaseClass.OnSaved += holoNETEntryBaseClass_OnSaved;
+
+ private static void holoNETEntryBaseClass_OnSaved(object sender, ZomeFunctionCallBackEventArgs e)
+        {
+            CLIEngine.ShowMessage($"TEST HARNESS: holoNETEntryBaseClass_OnSaved: {ProcessZomeFunctionCallBackEventArgs(e)}");
+        }
+
+        private static string ProcessZomeFunctionCallBackEventArgs(ZomeFunctionCallBackEventArgs args)
+        {
+            string result = "";
+            
+            result = string.Concat("\nEndPoint: ", args.EndPoint, "\nId: ", args.Id, "\nZome: ", args.Zome, "\nZomeFunction: ", args.ZomeFunction, "\n\nZomeReturnData: ", args.ZomeReturnData, "\nZomeReturnHash: ", args.ZomeReturnHash, "\nRaw Zome Return Data: ", args.RawZomeReturnData, "\nRaw Binary Data: ", args.RawBinaryData, "\nRaw Binary Data As String: ", args.RawBinaryDataAsString, "\nRaw Binary Data Decoded: ", args.RawBinaryDataDecoded, "\nRaw Binary Data After MessagePack Decode: ", args.RawBinaryDataAfterMessagePackDecode, "\nRaw Binary Data After MessagePack Decode As String: ", args.RawBinaryDataAfterMessagePackDecodeAsString, "\nRaw Binary Data Decoded After MessagePack Decode: ", args.RawBinaryDataAfterMessagePackDecodeDecoded, "\nRaw JSON Data: ", args.RawJSONData, "\nIsCallSuccessful: ", args.IsCallSuccessful ? "true" : "false", "\nIsError: ", args.IsError ? "true" : "false", "\nMessage: ", args.Message);
+
+            if (!string.IsNullOrEmpty(args.KeyValuePairAsString))
+                result = string.Concat(result, "\n\nProcessed Zome Return Data:\n", args.KeyValuePairAsString);
+
+            if (args.Entry != null && args.Entry.EntryDataObject != null)
+            {
+                AvatarEntryDataObject avatar = args.Entry.EntryDataObject as AvatarEntryDataObject;
+
+                if (avatar != null)
+                    result = BuildEntryDataObjectMessage(avatar, "Entry.EntryDataObject", result);
+            }
+            
+            if (_avatarEntryDataObject != null)
+                result = BuildEntryDataObjectMessage(_avatarEntryDataObject, "Global.EntryDataObject", result);
+
+            return result;
+        }
+
+        private static string BuildEntryDataObjectMessage(AvatarEntryDataObject avatar, string header, string message)
+        {
+            message = string.Concat(message, "\n\n", header, ".FirstName: ", avatar.FirstName);
+            message = string.Concat(message, "\n", header, ".LastName: ", avatar.LastName);
+            message = string.Concat(message, "\n", header, ".Email: ", avatar.Email);
+            message = string.Concat(message, "\n", header, ".DOB: ", avatar.DOB);
+
+            return message;
+        }
+````
+
+#### OnDeleted
+
+Fired after the [Delete](#Delete) method has finished deleting the Holochain entry and has received a response from the Holochain Conductor. This calls the [CallZomeFunction](#CallZomeFunction) on the HoloNET client passing in the zome function name specefied in the constructor param `zomeDeleteEntryFunction` or property `ZomeDeleteEntryFunction`. It then updates the HoloNET Entry Data Object with the response received from the Holochain Conductor.                                                                                                                                                                                                                                                                                                                                                                                                                            
+
+````c#
+holoNETEntryBaseClass.OnDeleted += holoNETEntryBaseClass_OnDeleted;
+
+private static void holoNETEntryBaseClass_OnDeleted(object sender, ZomeFunctionCallBackEventArgs e)
+        {
+            CLIEngine.ShowMessage($"TEST HARNESS: holoNETEntryBaseClass_OnDeleted: {ProcessZomeFunctionCallBackEventArgs(e)}");
+        }
+
+        private static string ProcessZomeFunctionCallBackEventArgs(ZomeFunctionCallBackEventArgs args)
+        {
+            string result = "";
+            
+            result = string.Concat("\nEndPoint: ", args.EndPoint, "\nId: ", args.Id, "\nZome: ", args.Zome, "\nZomeFunction: ", args.ZomeFunction, "\n\nZomeReturnData: ", args.ZomeReturnData, "\nZomeReturnHash: ", args.ZomeReturnHash, "\nRaw Zome Return Data: ", args.RawZomeReturnData, "\nRaw Binary Data: ", args.RawBinaryData, "\nRaw Binary Data As String: ", args.RawBinaryDataAsString, "\nRaw Binary Data Decoded: ", args.RawBinaryDataDecoded, "\nRaw Binary Data After MessagePack Decode: ", args.RawBinaryDataAfterMessagePackDecode, "\nRaw Binary Data After MessagePack Decode As String: ", args.RawBinaryDataAfterMessagePackDecodeAsString, "\nRaw Binary Data Decoded After MessagePack Decode: ", args.RawBinaryDataAfterMessagePackDecodeDecoded, "\nRaw JSON Data: ", args.RawJSONData, "\nIsCallSuccessful: ", args.IsCallSuccessful ? "true" : "false", "\nIsError: ", args.IsError ? "true" : "false", "\nMessage: ", args.Message);
+
+            if (!string.IsNullOrEmpty(args.KeyValuePairAsString))
+                result = string.Concat(result, "\n\nProcessed Zome Return Data:\n", args.KeyValuePairAsString);
+
+            if (args.Entry != null && args.Entry.EntryDataObject != null)
+            {
+                AvatarEntryDataObject avatar = args.Entry.EntryDataObject as AvatarEntryDataObject;
+
+                if (avatar != null)
+                    result = BuildEntryDataObjectMessage(avatar, "Entry.EntryDataObject", result);
+            }
+            
+            if (_avatarEntryDataObject != null)
+                result = BuildEntryDataObjectMessage(_avatarEntryDataObject, "Global.EntryDataObject", result);
+
+            return result;
+        }
+
+        private static string BuildEntryDataObjectMessage(AvatarEntryDataObject avatar, string header, string message)
+        {
+            message = string.Concat(message, "\n\n", header, ".FirstName: ", avatar.FirstName);
+            message = string.Concat(message, "\n", header, ".LastName: ", avatar.LastName);
+            message = string.Concat(message, "\n", header, ".Email: ", avatar.Email);
+            message = string.Concat(message, "\n", header, ".DOB: ", avatar.DOB);
+
+            return message;
+        }
+````
+
+| Parameter          | Description                                                                                                                                 |
+|--------------------|---------------------------------------------------------------------------------------------------------------------------------------------|
+| EndPoint           | The URI EndPoint of the Holochain conductor.                                                                                                |
+| AgentPubKey        | The Agent Public Key returned from the Holochain Conductor.                                                                                 |
+| IsError            | True if there was an error during the initialization, false if not.                                                                         |
+| Message            | If there was an error, this will contain the error message, otherwise it can contain any other message such as status etc or will be blank. |
+
+
+#### OnClosed
+
+Fired after the [Close](#Close) method has finished closing the connection to the Holochain Conductor and has shutdown all running Holochain Conductors (if configured to do so). This method calls the [ShutdownHoloNET](#ShutdownHoloNET) internally.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
+
+````c#
+holoNETEntryBaseClass.OnClosed += holoNETEntryBaseClass_OnClosed;
+
+private static void holoNETEntryBaseClass_OnClosed(object sender, HoloNETShutdownEventArgs e)
+        {
+            CLIEngine.ShowMessage($"TEST HARNESS: holoNETEntryBaseClass_OnClosed, EndPoint: {e.EndPoint}, AgentPubKey: {e.AgentPubKey}, DnaHash: {e.DnaHash}, NumberOfHcExeInstancesShutdown: {e.HolochainConductorsShutdownEventArgs.NumberOfHcExeInstancesShutdown}, NumberOfHolochainExeInstancesShutdown: {e.HolochainConductorsShutdownEventArgs.NumberOfHolochainExeInstancesShutdown}, NumberOfRustcExeInstancesShutdown: {e.HolochainConductorsShutdownEventArgs.NumberOfRustcExeInstancesShutdown}, IsError: {e.IsError}, Message: {e.Message}");
+        }
+````
+
+| Parameter                             | Description                                                                                                                                                                                                                  |
+|---------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| EndPoint                              | The URI EndPoint of the Holochain conductor.                                                                                                                                                                                 |
+| AgentPubKey                           | The Agent Public Key of the hApp that was running in the Holochain Conductor.                                                                                                                                                |
+| DnaHash                               | The DNA Hash of the hApp that was running in the Holochain Conductor.                                                                                                                                                        |
+| NumberOfHcExeInstancesShutdown        | The number of hc.exe instances that were shutdown.                                                                                                                                                                           |
+| NumberOfHolochainExeInstancesShutdown | The number of holochain.exe instances that were shutdown.                                                                                                                                                                    |
+| NumberOfRustcExeInstancesShutdown     | The number of rustc.exe instances that were shutdown.                                                                                                                                                                        |
+| IsError                               | True if there was an error during the initialization, false if not.                                                                                                                                                          |
+| Message                               | If there was an error this will contain the error message, this normally includes a stacktrace to help you track down the cause. If there was no error it can contain any other message such as status etc or will be blank. |
 
 
 #### Methods

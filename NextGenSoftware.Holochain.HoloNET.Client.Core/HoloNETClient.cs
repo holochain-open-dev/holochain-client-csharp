@@ -61,8 +61,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public delegate void SignalsCallBack(object sender, SignalsCallBackEventArgs e);
         public event SignalsCallBack OnSignalsCallBack;
 
-        public delegate void ConductorDebugCallBack(object sender, ConductorDebugCallBackEventArgs e);
-        public event ConductorDebugCallBack OnConductorDebugCallBack;
+        //public delegate void ConductorDebugCallBack(object sender, ConductorDebugCallBackEventArgs e);
+        //public event ConductorDebugCallBack OnConductorDebugCallBack;
 
         public delegate void AppInfoCallBack(object sender, AppInfoCallBackEventArgs e);
         public event AppInfoCallBack OnAppInfoCallBack;

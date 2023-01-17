@@ -77,7 +77,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                 _holoNETClient.OnSignalsCallBack += HoloNETClient_OnSignalsCallBack;
                 _holoNETClient.OnDisconnected += HoloNETClient_OnDisconnected;
                 _holoNETClient.OnError += HoloNETClient_OnError;
-                _holoNETClient.OnConductorDebugCallBack += HoloNETClient_OnConductorDebugCallBack;
+                //_holoNETClient.OnConductorDebugCallBack += HoloNETClient_OnConductorDebugCallBack;
                 _holoNETClient.OnHolochainConductorsShutdownComplete += _holoNETClient_OnHolochainConductorsShutdownComplete;
                 _holoNETClient.OnHoloNETShutdownComplete += _holoNETClient_OnHoloNETShutdownComplete;
 
@@ -626,7 +626,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
 
         private async static void _holoNETClient_OnReadyForZomeCalls(object sender, ReadyForZomeCallsEventArgs e)
         {
-            Console.WriteLine(string.Concat("TEST HARNESS: READY FOR ZOME CALLS EVENT HANDLER: EndPoint: ", e.EndPoint, ", AgentPubKey: ", e.AgentPubKey, ", DnaHash: ", e.DnaHash));
+            Console.WriteLine(string.Concat("TEST HARNESS: READY FOR ZOME CALLS EVENT HANDLER: EndPoint: ", e.EndPoint, ", AgentPubKey: ", e.AgentPubKey, ", DnaHash: ", e.DnaHash, ", IsError: ", e.IsError, ", Message: ", e.Message));
             Console.WriteLine("");
 
             switch (_testToRun)
@@ -716,7 +716,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
 
         private static void HoloNETClient_OnAppInfoCallBack(object sender, AppInfoCallBackEventArgs e)
         {
-            string msg = $"TEST HARNESS: APPINFO CALLBACK EVENT HANDLER: EndPoint: { e.EndPoint}, Id: {e.Id}, AgentPubKey: {e.AgentPubKey}, DnaHash: {e.DnaHash}, Installed App Id: {e.InstalledAppId}, Raw Binary Data: {e.RawBinaryData}";
+            string msg = $"TEST HARNESS: APPINFO CALLBACK EVENT HANDLER: EndPoint: { e.EndPoint}, Id: {e.Id}, AgentPubKey: {e.AgentPubKey}, DnaHash: {e.DnaHash}, Installed App Id: {e.InstalledAppId}, Raw Binary Data: {e.RawBinaryData}, IsError: {e.IsError}, Message: {e.Message}";
             Console.WriteLine(string.Concat(msg, ", Raw JSON Data: ", e.RawJSONData));
             Console.WriteLine("");
         }
@@ -729,7 +729,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
 
         private static void HoloNETClient_OnSignalsCallBack(object sender, SignalsCallBackEventArgs e)
         {
-            Console.WriteLine(string.Concat("TEST HARNESS: SIGINALS CALLBACK EVENT HANDLER: EndPoint: ", e.EndPoint, ", Id: ", e.Id, ", Data: ", e.RawJSONData, ", AgentPubKey =  ", e.AgentPubKey, ", DnaHash = ", e.DnaHash, ", Signal Type: ", Enum.GetName(typeof(SignalType), e.SignalType), ", Signal Data: ", e.SignalDataAsString));
+            Console.WriteLine(string.Concat("TEST HARNESS: SIGINALS CALLBACK EVENT HANDLER: EndPoint: ", e.EndPoint, ", Id: ", e.Id, ", Data: ", e.RawJSONData, ", AgentPubKey =  ", e.AgentPubKey, ", DnaHash = ", e.DnaHash, ", Signal Type: ", Enum.GetName(typeof(SignalType), e.SignalType), ", Signal Data: ", e.SignalDataAsString, ", IsError: ", e.IsError, ", Message: ", e.Message));
             //Console.WriteLine("\nSignal Data:");
 
             //foreach (string key in e.SignalData.Keys)
@@ -875,7 +875,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
         {
             if (!e.IsConductorDebugInfo)
             {
-                Console.WriteLine(string.Concat("\nTEST HARNESS: DATA RECEIVED EVENT HANDLER: EndPoint: ", e.EndPoint, ", Raw JSON Data: ", e.RawJSONData, ", Raw Binary Data: ", e.RawBinaryData, ", Raw Binary Data After MessagePack Decode: ", e.RawBinaryDataAfterMessagePackDecode, ", Raw Binary Data After MessagePack Decode As String: ", e.RawBinaryDataAfterMessagePackDecodeAsString));
+                Console.WriteLine(string.Concat("\nTEST HARNESS: DATA RECEIVED EVENT HANDLER: EndPoint: ", e.EndPoint, ", Raw JSON Data: ", e.RawJSONData, ", Raw Binary Data: ", e.RawBinaryData, ", Raw Binary Data After MessagePack Decode: ", e.RawBinaryDataAfterMessagePackDecode, ", Raw Binary Data After MessagePack Decode As String: ", e.RawBinaryDataAfterMessagePackDecodeAsString, ", IsError: ", e.IsError, ", Message:", e.Message));
                 Console.WriteLine("");
             }
         }
