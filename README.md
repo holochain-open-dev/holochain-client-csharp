@@ -17,7 +17,6 @@
       - [OnDataReceived](#ondatareceived)
       - [OnZomeFunctionCallBack](#onzomefunctioncallback)
       - [OnSignalsCallBack](#onsignalscallback)
-      - [OnConductorDebugCallBack](#onconductordebugcallback)
       - [OnDisconnected](#ondisconnected)
       - [OnError](#onerror)
     - [Methods](#methods)
@@ -255,6 +254,8 @@ private static void HoloNETClient_OnAppInfoCallBack(object sender, AppInfoCallBa
 | RawBinaryDataAfterMessagePackDecodeDecoded    | The raw binary data after it has been decoded by MessagePack decoded into a string using UTF8 encoding.                                                                                                                                                                                                                                                 |
 | RawJSONData                                   | The raw JSON data returned from the Holochain conductor.                                                                                                                                                                                                                                                                                                |
 | WebSocketResult                               | Contains more detailed technical information of the underlying websocket. This includes the number of bytes received, whether the message was fully received & whether the message is UTF-8 or binary. Please [see here](https://docs.microsoft.com/en-us/dotnet/api/system.net.websockets.websocketreceiveresult?view=netframework-4.8) for more info. |
+| IsError                                       | True if there was an error during the initialization, false if not.                                                                                                                                                                                                                                                                                     |
+| Message                                       | If there was an error this will contain the error message, this normally includes a stacktrace to help you track down the cause. If there was no error it can contain any other message such as status etc or will be blank.                                                                                                                            |
 
 
 #### OnReadyForZomeCalls
@@ -317,6 +318,9 @@ private static void HoloNETClient_OnDataReceived(object sender, HoloNETDataRecei
 | RawBinaryDataAfterMessagePackDecodeDecoded    | The raw binary data after it has been decoded by MessagePack decoded into a string using UTF8 encoding.                                                                                                                                                                                                                                                 |
 | RawJSONData                                   | The raw JSON data returned from the Holochain conductor.                                                                                                                                                                                                                                                                                                |
 | WebSocketResult                               | Contains more detailed technical information of the underlying websocket. This includes the number of bytes received, whether the message was fully received & whether the message is UTF-8 or binary. Please [see here](https://docs.microsoft.com/en-us/dotnet/api/system.net.websockets.websocketreceiveresult?view=netframework-4.8) for more info. |
+| IsError                                       | True if there was an error during the initialization, false if not.                                                                                                                                                                                                                                                                                     |
+| Message                                       | If there was an error this will contain the error message, this normally includes a stacktrace to help you track down the cause. If there was no error it can contain any other message such as status etc or will be blank.                                                                                                                            |
+
 
 #### OnZomeFunctionCallBack
 
@@ -376,6 +380,9 @@ private static string ProcessZomeFunctionCallBackEventArgs(ZomeFunctionCallBackE
 | RawBinaryDataAfterMessagePackDecodeDecoded    | The raw binary data after it has been decoded by MessagePack decoded into a string using UTF8 encoding.                                                                                                                                                                                                                                                 |
 | RawJSONData                                   | The raw JSON data returned from the Holochain conductor.                                                                                                                                                                                                                                                                                                |
 | WebSocketResult                               | Contains more detailed technical information of the underlying websocket. This includes the number of bytes received, whether the message was fully received & whether the message is UTF-8 or binary. Please [see here](https://docs.microsoft.com/en-us/dotnet/api/system.net.websockets.websocketreceiveresult?view=netframework-4.8) for more info. |
+| IsError                                       | True if there was an error during the initialization, false if not.                                                                                                                                                                                                                                                                                     |
+| Message                                       | If there was an error this will contain the error message, this normally includes a stacktrace to help you track down the cause. If there was no error it can contain any other message such as status etc or will be blank.                                                                                                                            |
+
 
  The Entry property contains the following sub-properties:
 
@@ -553,8 +560,11 @@ private static void HoloNETClient_OnSignalsCallBack(object sender, SignalsCallBa
  | RawBinaryDataAfterMessagePackDecodeDecoded    | The raw binary data after it has been decoded by MessagePack decoded into a string using UTF8 encoding.                                                                                                                                                                                                                                                 |
  | RawJSONData                                   | The raw JSON data returned from the Holochain conductor.                                                                                                                                                                                                                                                                                                |
  | WebSocketResult                               | Contains more detailed technical information of the underlying websocket. This includes the number of bytes received, whether the message was fully received & whether the message is UTF-8 or binary. Please [see here](https://docs.microsoft.com/en-us/dotnet/api/system.net.websockets.websocketreceiveresult?view=netframework-4.8) for more info. |
+ | IsError                                       | True if there was an error during the initialization, false if not.                                                                                                                                                                                                                                                                                     |
+ | Message                                       | If there was an error this will contain the error message, this normally includes a stacktrace to help you track down the cause. If there was no error it can contain any other message such as status etc or will be blank.                                                                                                                            |
 
 
+ <!--
  #### OnConductorDebugCallBack
 
 Fired when the Holochain conductor sends debug info.
@@ -585,7 +595,7 @@ private static void HoloNETClient_OnConductorDebugCallBack(object sender, Conduc
 
 
  **NOTE: This is from the previous version of HoloNET running against the previous version of Holochain (Redux) & needs to be updated for the new RSM version, coming soon...**
-
+ -->
 
 #### OnDisconnected
 Fired when the client has successfully disconnected from the Holochain conductor. 
@@ -1293,12 +1303,13 @@ holoNETEntryBaseClass.OnInitialized += holoNETEntryBaseClass_OnInitialized;
         }
 ````
 
-| Parameter          | Description                                                                                                                                 |
-|--------------------|---------------------------------------------------------------------------------------------------------------------------------------------|
-| EndPoint           | The URI EndPoint of the Holochain conductor.                                                                                                |
-| AgentPubKey        | The Agent Public Key returned from the Holochain Conductor.                                                                                 |
-| IsError            | True if there was an error during the initialization, false if not.                                                                         |
-| Message            | If there was an error, this will contain the error message, otherwise it can contain any other message such as status etc or will be blank. |
+| Parameter   | Description                                                                                                                                                                                                                  |
+|-------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| EndPoint    | The URI EndPoint of the Holochain conductor.                                                                                                                                                                                 |
+| AgentPubKey | The Agent Public Key of the hApp that was running in the Holochain Conductor.                                                                                                                                                |
+| DnaHash     | The DNA Hash of the hApp that was running in the Holochain Conductor.                                                                                                                                                        |
+| IsError     | True if there was an error during the initialization, false if not.                                                                                                                                                          |
+| Message     | If there was an error this will contain the error message, this normally includes a stacktrace to help you track down the cause. If there was no error it can contain any other message such as status etc or will be blank. |
 
 
 #### OnLoaded
@@ -1347,13 +1358,7 @@ holoNETEntryBaseClass.OnLoaded += holoNETEntryBaseClass_OnLoaded;
         }
 ````
 
-| Parameter          | Description                                                                                                                                 |
-|--------------------|---------------------------------------------------------------------------------------------------------------------------------------------|
-| EndPoint           | The URI EndPoint of the Holochain conductor.                                                                                                |
-| AgentPubKey        | The Agent Public Key returned from the Holochain Conductor.                                                                                 |
-| IsError            | True if there was an error during the initialization, false if not.                                                                         |
-| Message            | If there was an error, this will contain the error message, otherwise it can contain any other message such as status etc or will be blank. |
-
+**NOTE:** This uses the same `ZomeFunctionCallBackEventArgs` as the [OnZomeFunctionCallBack](#OnZomeFunctionCallBack) event so please check there for the list of parameters returned by this event.
 
 #### OnSaved
 
@@ -1401,6 +1406,8 @@ holoNETEntryBaseClass.OnSaved += holoNETEntryBaseClass_OnSaved;
         }
 ````
 
+**NOTE:** This uses the same `ZomeFunctionCallBackEventArgs` as the [OnZomeFunctionCallBack](#OnZomeFunctionCallBack) event so please check there for the list of parameters returned by this event.
+
 #### OnDeleted
 
 Fired after the [Delete](#Delete) method has finished deleting the Holochain entry and has received a response from the Holochain Conductor. This calls the [CallZomeFunction](#CallZomeFunction) on the HoloNET client passing in the zome function name specefied in the constructor param `zomeDeleteEntryFunction` or property `ZomeDeleteEntryFunction`. It then updates the HoloNET Entry Data Object with the response received from the Holochain Conductor.                                                                                                                                                                                                                                                                                                                                                                                                                            
@@ -1447,13 +1454,7 @@ private static void holoNETEntryBaseClass_OnDeleted(object sender, ZomeFunctionC
         }
 ````
 
-| Parameter          | Description                                                                                                                                 |
-|--------------------|---------------------------------------------------------------------------------------------------------------------------------------------|
-| EndPoint           | The URI EndPoint of the Holochain conductor.                                                                                                |
-| AgentPubKey        | The Agent Public Key returned from the Holochain Conductor.                                                                                 |
-| IsError            | True if there was an error during the initialization, false if not.                                                                         |
-| Message            | If there was an error, this will contain the error message, otherwise it can contain any other message such as status etc or will be blank. |
-
+**NOTE:** This uses the same `ZomeFunctionCallBackEventArgs` as the [OnZomeFunctionCallBack](#OnZomeFunctionCallBack) event so please check there for the list of parameters returned by this event.
 
 #### OnClosed
 
@@ -1486,12 +1487,12 @@ The HoloNETEntryBaseClass has the following methods:
 
 | Method                                                              | Description                                                                                                                                                                                                                                 |
 | --------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Initialize](#Initialize)                                           | Fired when the HoloNET client has successfully connected to the Holochain Conductor, retreived the AgentPubKey & DnaHash & then fired the [OnReadyForZomeCalls](#OnReadyForZomeCalls) event.                                                                                                                                                               |
-| [Load](#Load)                                                       | Fired when the the HoloNET client has finished loading the Holochain entry from the Holochain Conductor. This calls the [CallZomeFunction](#CallZomeFunction) on the HoloNET client passing in the zome function name specefied in the constructor param `zomeLoadEntryFunction` or property `ZomeLoadEntryFunction` and then maps the data returned from the zome call onto your data object.
-| [Save](#Save)                                                       | Fired when the the HoloNET client has finished saving the Holochain entry to the Holochain Conductor. This calls the [CallZomeFunction](#CallZomeFunction) on the HoloNET client passing in the zome function name specefied in the constructor param `zomeCreateEntryFunction` or property [ZomeCreateEntryFunction](#ZomeCreateEntryFunction) if it is a new entry (empty object) or the `zomeUpdateEntryFunction` param and [ZomeUpdateEntryFunction](#ZomeUpdateEntryFunction) property if it's an existing entry (previously saved object containing a valid value for the [EntryHash](#EntryHash) property). Once it has saved the entry it will then update the [EntryHash](#entryHash) property with the entry hash returned from the zome call/conductor. The [PreviousVersionEntryHash](#PreviousVersionEntryHash) property is also set to the previous EntryHash (if there is one).
-| [Delete](#Delete)                                                   | Fired when any data is received from the Holochain conductor. This returns the raw data.                                                                                                                                                    |
-| [Close](#Close)                                                     | Fired when the Holochain conductor returns the response from a zome function call. This returns the raw data as well as the parsed data returned from the zome function. It also returns the id, zome and zome function that made the call. |
-| [WaitTillHoloNETInitializedAsync](#WaitTillHoloNETInitializedAsync) |
+| [Initialize](#Initialize)                                           | This method will Initialize the HoloNETEntryBaseClass along with the internal HoloNET Client and will raise the [OnInitialized](#OnInitialized) event once it has finished initializing. This will also call the [Connect](#Connect) and [RetreiveAgentPubKeyAndDnaHash](#RetreiveAgentPubKeyAndDnaHash) methods on the HoloNET client. Once the HoloNET client has successfully connected to the Holochain Conductor, retreived the AgentPubKey & DnaHash & then raised the [OnReadyForZomeCalls](#OnReadyForZomeCalls) event it will raise the [OnInitialized](#OnInitialized) event.                                                                                                                                                                                                                                                                                                                                                                                                                                     | |
+| [Load](#Load)                                                       | This method will load the Holochain entry from the Holochain Conductor using either the [EntryHash](#entryHash) property on `entryHash` param passed into one of the overloads for this method. This calls the [CallZomeFunction](#CallZomeFunction) on the HoloNET client passing in the zome function name specefied in the constructor param `zomeLoadEntryFunction` or property `ZomeLoadEntryFunction` and then maps the data returned from the zome call onto your data object. It will then raise the [OnLoaded](#OnLoaded) event.
+| [Save](#Save)                                                       | This method will save the Holochain entry to the Holochain Conductor. This calls the [CallZomeFunction](#CallZomeFunction) on the HoloNET client passing in the zome function name specefied in the constructor param `zomeCreateEntryFunction` or property [ZomeCreateEntryFunction](#ZomeCreateEntryFunction) if it is a new entry (empty object) or the `zomeUpdateEntryFunction` param and [ZomeUpdateEntryFunction](#ZomeUpdateEntryFunction) property if it's an existing entry (previously saved object containing a valid value for the [EntryHash](#EntryHash) property). Once it has saved the entry it will then update the [EntryHash](#entryHash) property with the entry hash returned from the zome call/conductor. The [PreviousVersionEntryHash](#PreviousVersionEntryHash) property is also set to the previous EntryHash (if there is one). Once it has finished saving and got a response from the Holochain Conductor it will raise the [OnSaved](#OnSaved) event.
+| [Delete](#Delete)                                                   | This method will delete the Holochain entry. This calls the [CallZomeFunction](#CallZomeFunction) on the HoloNET client passing in the zome function name specefied in the constructor param `zomeDeleteEntryFunction` or property [ZomeDeleteEntryFunction](#ZomeDeleteEntryFunction). It then updates the HoloNET Entry Data Object with the response received from the Holochain Conductor and then finally raises the [OnDeleted](#OnDeleted) event.  
+| [Close](#Close)                                                     | This method will close the connection to the Holochain Conductor and then shutdown all running Holochain Conductors (if configured to do so) as well as any other tasks to shut HoloNET down cleanly. This method calls the [ShutdownHoloNET](#ShutdownHoloNET) method internally. Once it has finished shutting down HoloNET it will raise the [OnClosed](#OnClosed) event.      
+| [WaitTillHoloNETInitializedAsync](#WaitTillHoloNETInitializedAsync) | This mehod will call the [WaitTillReadyForZomeCallsAsync](#WaitTillReadyForZomeCallsAsync) method on the HoloNET Client.                                                                                                                          |
 
 #### Properties
 
