@@ -7,7 +7,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
     public class EntryData
     {
         /// <summary>
-        /// The author of the entry.
+        /// The author of the entry (AgentPubKey on their device).
         /// </summary>
         public string Author { get; set; }
 
@@ -37,7 +37,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public long Timestamp { get; set; }
 
         /// <summary>
-        /// Converted from the Unix timestamp above (returned from the Holochain Conductor).
+        /// Standard .NET DateTime converted from the Unix timestamp (returned from the Holochain Conductor).
         /// </summary>
         public DateTime DateTime { get; set; }
 
