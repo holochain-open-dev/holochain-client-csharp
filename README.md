@@ -722,7 +722,7 @@ public async Task Connect(ConnectedCallBackMode connectedCallBackMode = Connecte
 | getAgentPubKeyAndDnaHashFromSandbox                  | Set this to true if you wish HoloNET to automatically retreive the AgentPubKey & DnaHash from the hc sandbox after it has connected. This defaults to true.                                                                                                                              |
 | automaticallyAttemptToGetFromConductorIfSandBoxFails | If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the Holochain Conductor if it fails to get them from the HC Sandbox command. This defaults to true.                                                                                           |   
 | automaticallyAttemptToGetFromSandBoxIfConductorFails | If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the HC Sandbox command if it fails to get them from the Holochain Conductor. This defaults to true.                                                                                           |
-| updateConfig                                         | Set this to true (default) to automatically update the [HoloNETConfig](#holonetconfig) once it has retreived the DnaHash & AgentPubKey.                                                                                                                                                  |
+| updateConfigWithAgentPubKeyAndDnaHashOnceRetreived   | Set this to true (default) to automatically update the [HoloNETConfig](#holonetconfig) once it has retreived the DnaHash & AgentPubKey.                                                                                                                                                  |
 
 **NOTE: If both params are set to true it will first attempt to retreive the AgentPubKey & DnaHash from the Conductor, if that fails it will then attempt to retreive them from the hc sandbox command (it will still do this even if getAgentPubKeyAndDnaHashFromSandbox is set to false).**
 
@@ -740,7 +740,7 @@ public async Task StartConductor()
 This method will retrive the AgentPubKey & DnaHash from either the Holochain Conductor or HC Sandbox depending on what params are passed in. It will default to retreiving from the Conductor first. It will call [RetreiveAgentPubKeyAndDnaHashFromConductor](#retreiveagentpubkeyanddnahashfromconductor) and [RetreiveAgentPubKeyAndDnaHashFromConductor](#retreiveagentpubkeyanddnahashfromconductor) internally.                                                                                                                                                                                                                                                            
 
 ```c#
-public async Task<AgentPubKeyDnaHash> RetreiveAgentPubKeyAndDnaHashAsync(RetreiveAgentPubKeyAndDnaHashMode retreiveAgentPubKeyAndDnaHashMode = RetreiveAgentPubKeyAndDnaHashMode.Wait, bool getAgentPubKeyAndDnaHashFromConductor = true, bool getAgentPubKeyAndDnaHashFromSandbox = true, bool automaticallyAttemptToGetFromConductorIfSandBoxFails = true, bool automaticallyAttemptToGetFromSandBoxIfConductorFails = true, bool updateConfig = true)
+public async Task<AgentPubKeyDnaHash> RetreiveAgentPubKeyAndDnaHashAsync(RetreiveAgentPubKeyAndDnaHashMode retreiveAgentPubKeyAndDnaHashMode = RetreiveAgentPubKeyAndDnaHashMode.Wait, bool getAgentPubKeyAndDnaHashFromConductor = true, bool getAgentPubKeyAndDnaHashFromSandbox = true, bool automaticallyAttemptToGetFromConductorIfSandBoxFails = true, bool automaticallyAttemptToGetFromSandBoxIfConductorFails = true, bool updateConfigWithAgentPubKeyAndDnaHashOnceRetreived = true)
 ```
 | Parameter                                            | Description                                                                                           
 | ---------------------------------------------------- | -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -749,7 +749,7 @@ public async Task<AgentPubKeyDnaHash> RetreiveAgentPubKeyAndDnaHashAsync(Retreiv
 | getAgentPubKeyAndDnaHashFromSandbox                  | Set this to true if you wish HoloNET to automatically retreive the AgentPubKey & DnaHash from the hc sandbox after it has connected. This defaults to true.                                                                                                                              |
 | automaticallyAttemptToGetFromConductorIfSandBoxFails | If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the Holochain Conductor if it fails to get them from the HC Sandbox command. This defaults to true.                                                                                           |   
 | automaticallyAttemptToGetFromSandBoxIfConductorFails | If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the HC Sandbox command if it fails to get them from the Holochain Conductor. This defaults to true.                                                                                           |
-| updateConfig                                         | Set this to true (default) to automatically update the [HoloNETConfig](#holonetconfig) once it has retreived the DnaHash & AgentPubKey.                                                                                                                                                  |
+| updateConfigWithAgentPubKeyAndDnaHashOnceRetreived   | Set this to true (default) to automatically update the [HoloNETConfig](#holonetconfig) once it has retreived the DnaHash & AgentPubKey.                                                                                                                                                  |
 
 **NOTE: If both params are set to true it will first attempt to retreive the AgentPubKey & DnaHash from the Conductor, if that fails it will then attempt to retreive them from the hc sandbox command (it will still do this even if getAgentPubKeyAndDnaHashFromSandbox is set to false).**
 
@@ -760,13 +760,13 @@ public async Task<AgentPubKeyDnaHash> RetreiveAgentPubKeyAndDnaHashAsync(Retreiv
 This method gets the AgentPubKey & DnaHash from the HC Sandbox command. It will raise the [OnReadyForZomeCalls](#onreadyforzomecalls) event once it successfully retreives them and the WebSocket has connected to the Holochain Conductor. If it fails to retreive the AgentPubKey and DnaHash from the HC Sandbox and the optional `automaticallyAttemptToGetFromConductorIfSandBoxFails` flag is true (defaults to true), it will call the |[GetAgentPubKeyAndDnaHashFromConductor](#getagentpubkeyanddnahashfromconductor) method to attempt to retreive them directly from the conductor (default).
 
 ```c#
-public async Task<AgentPubKeyDnaHash> RetreiveAgentPubKeyAndDnaHashFromSandboxAsync(bool updateConfig = true, bool automaticallyAttemptToGetFromConductorIfSandBoxFails = true)
+public async Task<AgentPubKeyDnaHash> RetreiveAgentPubKeyAndDnaHashFromSandboxAsync(bool updateConfigWithAgentPubKeyAndDnaHashOnceRetreived = true, bool automaticallyAttemptToGetFromConductorIfSandBoxFails = true)
 ```
 
 | Parameter                                            | Description                                                                                           
 | ---------------------------------------------------- | -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | automaticallyAttemptToGetFromConductorIfSandBoxFails | If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the Holochain Conductor if it fails to get them from the HC Sandbox command. This defaults to true.                                                                                           |   
-| updateConfig                                         | Set this to true (default) to automatically update the [HoloNETConfig](#holonetconfig) once it has retreived the DnaHash & AgentPubKey.                                                                                                                                                  |
+| updateConfigWithAgentPubKeyAndDnaHashOnceRetreived   | Set this to true (default) to automatically update the [HoloNETConfig](#holonetconfig) once it has retreived the DnaHash & AgentPubKey.                                                                                                                                                  |
 
 
 #### RetreiveAgentPubKeyAndDnaHashFromConductor
@@ -774,13 +774,13 @@ public async Task<AgentPubKeyDnaHash> RetreiveAgentPubKeyAndDnaHashFromSandboxAs
 This method gets the AgentPubKey & DnaHash from the Holochain Conductor (the [Connect](#connect) method will automatically call this by default). Once it has retreived them and the WebSocket has connceted to the Holochain Conductor it will raise the [OnReadyForZomeCalls](#onreadyforzomecalls) event. If it fails to retreive the AgentPubKey and DnaHash from the Conductor and the optional `automaticallyAttemptToGetFromSandboxIfConductorFails` flag is true (defaults to true), it will call the |[GetAgentPubKeyAndDnaHashFromSandbox](#getagentpubkeyanddnahashfromsandbox) method. 
 
 ```c#
- public async Task GetAgentPubKeyAndDnaHashFromConductor(bool updateConfig = true)
+ public async Task GetAgentPubKeyAndDnaHashFromConductor(bool updateConfigWithAgentPubKeyAndDnaHashOnceRetreived = true)
 ```
 
 | Parameter                                            | Description                                                                                           
 | ---------------------------------------------------- | -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | automaticallyAttemptToGetFromSandBoxIfConductorFails | If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the HC Sandbox command if it fails to get them from the Holochain Conductor. This defaults to true.                                                                                           |
-| updateConfig                                         | Set this to true (default) to automatically update the [HoloNETConfig](#holonetconfig) once it has retreived the DnaHash & AgentPubKey.                                                                                                                                                  |
+| updateConfigWithAgentPubKeyAndDnaHashOnceRetreived   | Set this to true (default) to automatically update the [HoloNETConfig](#holonetconfig) once it has retreived the DnaHash & AgentPubKey.                                                                                                                                                  |
 
 
 #### SendHoloNETRequest
@@ -1507,7 +1507,38 @@ public async Task InitializeAsync(ConnectedCallBackMode connectedCallBackMode = 
 | getAgentPubKeyAndDnaHashFromSandbox                  | Set this to true if you wish HoloNET to automatically retreive the AgentPubKey & DnaHash from the hc sandbox after it has connected. This defaults to true.                                                                                                                              |
 | automaticallyAttemptToGetFromConductorIfSandBoxFails | If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the Holochain Conductor if it fails to get them from the HC Sandbox command. This defaults to true.                                                                                           |   
 | automaticallyAttemptToGetFromSandBoxIfConductorFails | If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the HC Sandbox command if it fails to get them from the Holochain Conductor. This defaults to true.                                                                                           |
-| updateConfig                                         | Set this to true (default) to automatically update the [HoloNETConfig](#holonetconfig) once it has retreived the DnaHash & AgentPubKey.                                                                                                                                                  |
+| updateConfigWithAgentPubKeyAndDnaHashOnceRetreived   | Set this to true (default) to automatically update the [HoloNETConfig](#holonetconfig) once it has retreived the DnaHash & AgentPubKey.                                                                                                                                                  |
+
+##### Load
+
+This method will load the Holochain entry from the Holochain Conductor using either the [EntryHash](#entryHash) property on `entryHash` param passed into one of the overloads for this method. This calls the [CallZomeFunction](#CallZomeFunction) on the HoloNET client passing in the zome function name specefied in the constructor param `zomeLoadEntryFunction` or property `ZomeLoadEntryFunction` and then maps the data returned from the zome call onto your data object. It will then raise the [OnLoaded](#OnLoaded) event.                                                                                                                                                                                                                                                                                                                                                                                                                           
+
+````c#
+public async Task<ZomeFunctionCallBackEventArgs> LoadAsync(string entryHash)
+public ZomeFunctionCallBackEventArgs Load(string entryHash)
+public async Task<ZomeFunctionCallBackEventArgs> LoadAsync()
+public ZomeFunctionCallBackEventArgs Load()
+````
+
+| Parameter                                            | Description                                                                                           
+| ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| entryHash                                            | The hash of the Holochain Entry you wish to load. For the overloads that do not take the entryHash as a paramater it will use the [EntryHash](#EntryHash) property. **NOTE:** The corresponding rust Holochain Entry in your hApp will need to have the same properties contained in your class and have the correct mappings using the [HolochainPropertyName](#HolochainPropertyName) attribute. |                                                
+
+
+##### Save
+
+This method will save the Holochain entry to the Holochain Conductor. This calls the [CallZomeFunction](#CallZomeFunction) on the HoloNET client passing in the zome function name specefied in the constructor param `zomeCreateEntryFunction` or property [ZomeCreateEntryFunction](#ZomeCreateEntryFunction) if it is a new entry (empty object) or the `zomeUpdateEntryFunction` param and [ZomeUpdateEntryFunction](#ZomeUpdateEntryFunction) property if it's an existing entry (previously saved object containing a valid value for the [EntryHash](#EntryHash) property). Once it has saved the entry it will then update the [EntryHash](#entryHash) property with the entry hash returned from the zome call/conductor. The [PreviousVersionEntryHash](#PreviousVersionEntryHash) property is also set to the previous EntryHash (if there is one). Once it has finished saving and got a response from the Holochain Conductor it will raise the [OnSaved](#OnSaved) event.
+
+````c#
+public virtual async Task<ZomeFunctionCallBackEventArgs> SaveAsync()
+public virtual ZomeFunctionCallBackEventArgs Save()
+public virtual async Task<ZomeFunctionCallBackEventArgs> SaveAsync(dynamic paramsObject)
+public virtual ZomeFunctionCallBackEventArgs Save(dynamic paramsObject)
+````
+
+| Parameter                                            | Description                                                                                           
+| ---------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| paramsObject                                         | The dynamic data object containing the params you wish to pass to the Create/Update zome function via the [CallZomeFunction](#CallZomeFunction) method. **NOTE:** You do not need to pass this in unless you have a need, if you call one of the overloads that do not have this parameter [HoloNETEntryBaseClass](#HoloNETEntryBaseClass) will automatically generate this object from any properties in your class that contain the [HolochainPropertyName](#HolochainPropertyName) attribute. |
 
 
 #### Properties
