@@ -1251,6 +1251,24 @@ Here is a simple example of how to use it:
 
 #### Constructors
 
+The HoloNETEntryBaseClass has the following constructors:
+
+````c#
+public HoloNETEntryBaseClass(string zomeName, string zomeLoadEntryFunction, string zomeCreateEntryFunction, string zomeUpdateEntryFunction, string zomeDeleteEntryFunction, bool autoCallInitialize = true, string holochainConductorURI = "ws://localhost:8888", HoloNETConfig holoNETConfig = null, ConnectedCallBackMode connectedCallBackMode = ConnectedCallBackMode.WaitForHolochainConductorToConnect, RetreiveAgentPubKeyAndDnaHashMode retreiveAgentPubKeyAndDnaHashMode = RetreiveAgentPubKeyAndDnaHashMode.Wait, bool getAgentPubKeyAndDnaHashFromConductor = true, bool getAgentPubKeyAndDnaHashFromSandbox = true, bool automaticallyAttemptToGetFromConductorIfSandBoxFails = true, bool automaticallyAttemptToGetFromSandBoxIfConductorFails = true, bool updateConfigWithAgentPubKeyAndDnaHashOnceRetreived = true, bool logToConsole = true, bool logToFile = true, string releativePathToLogFolder = "Logs", string logFileName = "HoloNET.log", bool addAdditionalSpaceAfterEachLogEntry = false, bool showColouredLogs = true, ConsoleColor debugColour = ConsoleColor.White, ConsoleColor infoColour = ConsoleColor.Green, ConsoleColor warningColour = ConsoleColor.Yellow, ConsoleColor errorColour = ConsoleColor.Red)
+public HoloNETEntryBaseClass(string zomeName, string zomeLoadEntryFunction, string zomeCreateEntryFunction, string zomeUpdateEntryFunction, string zomeDeleteEntryFunction, HoloNETConfig holoNETConfig, bool autoCallInitialize = true, ConnectedCallBackMode connectedCallBackMode = ConnectedCallBackMode.WaitForHolochainConductorToConnect, RetreiveAgentPubKeyAndDnaHashMode retreiveAgentPubKeyAndDnaHashMode = RetreiveAgentPubKeyAndDnaHashMode.Wait, bool getAgentPubKeyAndDnaHashFromConductor = true, bool getAgentPubKeyAndDnaHashFromSandbox = true, bool automaticallyAttemptToGetFromConductorIfSandBoxFails = true, bool automaticallyAttemptToGetFromSandBoxIfConductorFails = true, bool updateConfigWithAgentPubKeyAndDnaHashOnceRetreived = true)
+public HoloNETEntryBaseClass(string zomeName, string zomeLoadEntryFunction, string zomeCreateEntryFunction, string zomeUpdateEntryFunction, string zomeDeleteEntryFunction, HoloNETClient holoNETClient, bool autoCallInitialize = true, ConnectedCallBackMode connectedCallBackMode = ConnectedCallBackMode.WaitForHolochainConductorToConnect, RetreiveAgentPubKeyAndDnaHashMode retreiveAgentPubKeyAndDnaHashMode = RetreiveAgentPubKeyAndDnaHashMode.Wait, bool getAgentPubKeyAndDnaHashFromConductor = true, bool getAgentPubKeyAndDnaHashFromSandbox = true, bool automaticallyAttemptToGetFromConductorIfSandBoxFails = true, bool automaticallyAttemptToGetFromSandBoxIfConductorFails = true, bool updateConfigWithAgentPubKeyAndDnaHashOnceRetreived = true)
+````
+
+| Parameter                             | Description                                                                                                                                                                                                                  |
+|---------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| zomeName                              | The URI EndPoint of the Holochain conductor.                                                                                                                                                                                 |
+| zomeLoadEntryFunction                 | The Agent Public Key of the hApp that was running in the Holochain Conductor.                                                                                                                                                |
+| zomeCreateEntryFunction               | The DNA Hash of the hApp that was running in the Holochain Conductor.                                                                                                                                                        |
+| zomeUpdateEntryFunction               | The number of hc.exe instances that were shutdown.                                                                                                                                                                           |
+| zomeDeleteEntryFunction | The number of holochain.exe instances that were shutdown.                                                                                                                                                                    |
+| NumberOfRustcExeInstancesShutdown     | The number of rustc.exe instances that were shutdown.                                                                                                                                                                        |
+| IsError                               | True if there was an error during the initialization, false if not.                                                                                                                                                          |
+| Message                               | If there was an error this will contain the error message, this normally includes a stacktrace to help you track down the cause. If there was no error it can contain any other message such as status etc or will be blank. |
 
 
 #### Events
@@ -1496,7 +1514,8 @@ The HoloNETEntryBaseClass has the following methods:
 This method will Initialize the HoloNETEntryBaseClass along with the internal HoloNET Client and will raise the [OnInitialized](#OnInitialized) event once it has finished initializing. This will also call the [Connect](#Connect) and [RetreiveAgentPubKeyAndDnaHash](#RetreiveAgentPubKeyAndDnaHash) methods on the HoloNET client. Once the HoloNET client has successfully connected to the Holochain Conductor, retreived the AgentPubKey & DnaHash & then raised the [OnReadyForZomeCalls](#OnReadyForZomeCalls) event it will raise the [OnInitialized](#OnInitialized) event. See also the [IsInitializing](#IsInitializing) and the [IsInitialized](#IsInitialized) properties.                                                                                                                                                                                                                   
 
 ````c#
-public async Task InitializeAsync(ConnectedCallBackMode connectedCallBackMode = ConnectedCallBackMode.WaitForHolochainConductorToConnect, RetreiveAgentPubKeyAndDnaHashMode retreiveAgentPubKeyAndDnaHashMode = RetreiveAgentPubKeyAndDnaHashMode.Wait, bool getAgentPubKeyAndDnaHashFromConductor = true, bool getAgentPubKeyAndDnaHashFromSandbox = true)
+public async Task InitializeAsync(ConnectedCallBackMode connectedCallBackMode = ConnectedCallBackMode.WaitForHolochainConductorToConnect, RetreiveAgentPubKeyAndDnaHashMode retreiveAgentPubKeyAndDnaHashMode = RetreiveAgentPubKeyAndDnaHashMode.Wait, bool getAgentPubKeyAndDnaHashFromConductor = true, bool getAgentPubKeyAndDnaHashFromSandbox = true, bool automaticallyAttemptToGetFromConductorIfSandBoxFails = true, bool automaticallyAttemptToGetFromSandBoxIfConductorFails = true, bool updateConfigWithAgentPubKeyAndDnaHashOnceRetreived = true)
+public void Initialize(bool getAgentPubKeyAndDnaHashFromConductor = true, bool getAgentPubKeyAndDnaHashFromSandbox = true, bool automaticallyAttemptToGetFromConductorIfSandBoxFails = true, bool automaticallyAttemptToGetFromSandBoxIfConductorFails = true, bool updateConfigWithAgentPubKeyAndDnaHashOnceRetreived = true)
 ````
 
 | Parameter                                            | Description                                                                                           
@@ -1520,9 +1539,9 @@ public async Task<ZomeFunctionCallBackEventArgs> LoadAsync()
 public ZomeFunctionCallBackEventArgs Load()
 ````
 
-| Parameter                                            | Description                                                                                           
-| ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| entryHash                                            | The hash of the Holochain Entry you wish to load. For the overloads that do not take the entryHash as a paramater it will use the [EntryHash](#EntryHash) property. **NOTE:** The corresponding rust Holochain Entry in your hApp will need to have the same properties contained in your class and have the correct mappings using the [HolochainPropertyName](#HolochainPropertyName) attribute. |                                                
+| Parameter | Description                                                                                           
+| --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| entryHash | The hash of the Holochain Entry you wish to load. For the overloads that do not take the entryHash as a paramater it will use the [EntryHash](#EntryHash) property. **NOTE:** The corresponding rust Holochain Entry in your hApp will need to have the same properties contained in your class and have the correct mappings using the [HolochainPropertyName](#HolochainPropertyName) attribute. |                                                
 
 
 ##### Save
@@ -1536,9 +1555,49 @@ public virtual async Task<ZomeFunctionCallBackEventArgs> SaveAsync(dynamic param
 public virtual ZomeFunctionCallBackEventArgs Save(dynamic paramsObject)
 ````
 
-| Parameter                                            | Description                                                                                           
-| ---------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| paramsObject                                         | The dynamic data object containing the params you wish to pass to the Create/Update zome function via the [CallZomeFunction](#CallZomeFunction) method. **NOTE:** You do not need to pass this in unless you have a need, if you call one of the overloads that do not have this parameter [HoloNETEntryBaseClass](#HoloNETEntryBaseClass) will automatically generate this object from any properties in your class that contain the [HolochainPropertyName](#HolochainPropertyName) attribute. |
+| Parameter    | Description                                                                                           
+| ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| paramsObject | The dynamic data object containing the params you wish to pass to the Create/Update zome function via the [CallZomeFunction](#CallZomeFunction) method. **NOTE:** You do not need to pass this in unless you have a need, if you call one of the overloads that do not have this parameter [HoloNETEntryBaseClass](#HoloNETEntryBaseClass) will automatically generate this object from any properties in your class that contain the [HolochainPropertyName](#HolochainPropertyName) attribute. |
+
+
+##### Delete
+
+This method will delete the Holochain entry. This calls the [CallZomeFunction](#CallZomeFunction) on the HoloNET client passing in the zome function name specefied in the constructor param `zomeDeleteEntryFunction` or property [ZomeDeleteEntryFunction](#ZomeDeleteEntryFunction). It then updates the HoloNET Entry Data Object with the response received from the Holochain Conductor and then finally raises the [OnDeleted](#OnDeleted) event.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
+
+````c#
+public virtual async Task<ZomeFunctionCallBackEventArgs> DeleteAsync()
+public virtual ZomeFunctionCallBackEventArgs DeleteAsync()
+public virtual async Task<ZomeFunctionCallBackEventArgs> DeleteAsync(string entryHash)
+public virtual ZomeFunctionCallBackEventArgs DeleteAsync(string entryHash)
+````
+
+| Parameter | Description                                                                                           
+| --------- | -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| entryHash | The hash of the Holochain Entry you wish to delete. For the overloads that do not take the entryHash as a paramater it will use the [EntryHash](#EntryHash) property. **NOTE:** The corresponding rust Holochain Entry in your hApp will need to have the same properties contained in your class and have the correct mappings using the [HolochainPropertyName](#HolochainPropertyName) attribute. | 
+
+
+##### Close
+
+This method will close the connection to the Holochain Conductor and then shutdown all running Holochain Conductors (if configured to do so) as well as any other tasks to shut HoloNET down cleanly. This method calls the [ShutdownHoloNET](#ShutdownHoloNET) method internally. Once it has finished shutting down HoloNET it will raise the [OnClosed](#OnClosed) event.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
+
+````c#
+public async Task<HoloNETShutdownEventArgs> CloseAsync(DisconnectedCallBackMode disconnectedCallBackMode = DisconnectedCallBackMode.WaitForHolochainConductorToDisconnect, ShutdownHolochainConductorsMode shutdownHolochainConductorsMode = ShutdownHolochainConductorsMode.UseConfigSettings)
+public HoloNETShutdownEventArgs Close(ShutdownHolochainConductorsMode shutdownHolochainConductorsMode = ShutdownHolochainConductorsMode.UseConfigSettings)
+````
+
+| Parameter                           | Description                                                                                    
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| disconnectedCallBackMode            | If this is set to `WaitForHolochainConductorToDisconnect` (default) then it will await until it has disconnected before returning to the caller, otherwise (it is set to `UseCallBackEvents`) it will return immediately and then raise the [OnDisconnected](#ondisconnected) once it is disconnected.                                                                                                                                                                                                                                                                                |
+| shutdownHolochainConductorsMode     | Once it has successfully disconneced it will automatically call the [ShutDownAllHolochainConductors](#ShutDownAllHolochainConductors) method if the `shutdownHolochainConductorsMode` flag (defaults to `UseConfigSettings`) is not set to `DoNotShutdownAnyConductors`. Other values it can be are 'ShutdownCurrentConductorOnly' or 'ShutdownAllConductors'. Please see the [ShutDownConductors](#ShutDownConductors) method below for more detail.                                                                                                                                 |                                                                                                                                                                                                                                                                                                                                                            
+
+
+##### WaitTillHoloNETInitializedAsync
+
+This mehod will call the [WaitTillReadyForZomeCallsAsync](#WaitTillReadyForZomeCallsAsync) method on the HoloNET Client.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
+
+````c#
+public async Task<ReadyForZomeCallsEventArgs> WaitTillHoloNETInitializedAsync()
+````
 
 
 #### Properties
@@ -1560,6 +1619,14 @@ The HoloNETEntryBaseClass has the following properties:
 | [ZomeDeleteEntryFunction](#ZomeDeleteEntryFunction)   | This is the name of the rust zome function in your hApp that will be used to delete existing Holochain enties that this instance of the [HoloNETEntryBaseClass](#HoloNETEntryBaseClass) maps onto. You can set this either through this property or through one of the constructors.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | [AuditEntries](#AuditEntries)                         | This contains a collection of audit enties that allow you to track every action that was taken on the Holochain Entry that this instance of the [HoloNETEntryBaseClass](#HoloNETEntryBaseClass) maps onto. Each audit entry contains the [EntryHash](#EntryHash), DateTime & the Type (Create, Modify or Delete).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 
+
+##### IsInitializing
+
+This will return true whilst HoloNETEntryBaseClass and it's internal HoloNET client is initializing. The [Initialize](#Initialize) method will begin the initialaztion process. This will also call the [Connect](#Connect) and [RetreiveAgentPubKeyAndDnaHash](#RetreiveAgentPubKeyAndDnaHash) methods on the HoloNET client. Once the HoloNET client has successfully connected to the Holochain Conductor, retreived the AgentPubKey & DnaHash & then raised the [OnReadyForZomeCalls](#OnReadyForZomeCalls) event it will raise the [OnInitialized](#OnInitialized) event. See also the [IsInitialized](#IsInitialized) property.                                                                                                                                                                                                                                                                                 |                                                                                                                                                                                                                                                                                                                                                     | 
+
+##### IsInitialized
+
+This will return true once HoloNETEntryBaseClass and it's internal HoloNET client have finished initializing and the [OnInitialized](#OnInitialized) event has been raised. See also the [IsInitializing](#IsInitializing) property and the [Initialize](#Initialize) method.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
 
 ##### EntryData
 
@@ -1586,7 +1653,48 @@ The EntryData property contains the following sub-properties:
 
  **NOTE**: Please see the [OnZomeFunctionCallBack](#OnZomeFunctionCallBack) event handler to see examples of how to use and access this property along with how to map your custom c# data object to the rust properties in your hApp when using the [CallZomeFunction](#CallZomeFunction) method. When using any class that extends the [HoloNETEntryBaseClass](#HoloNETEntryBaseClass) this mapping is automatic and built in.
 
+
+##### EntryHash
+
+ This is the hash generated by the Holochain Conductor for the Holochain Entry that the [HoloNETEntryBaseClass](#HoloNETEntryBaseClass) maps onto. This will be empty until after the first call to the [Save](#Save) method.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
+
+##### PreviousVersionEntryHash
+
+ This is the previous [EntryHash](#EntryHash) before the last call of the [Save](#Save) method.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
+
+##### Version
+
+  This is the current version of the HolochainEntry. Each time it is saved with the [Save](#Save) method it will be incremented. **NOTE:** You will need to ensure you add a corresponding property in the rust entry struct for your hApp (pub version: i32), which will then map to this property.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
+
+##### ZomeName
+
+This is the name of the rust zome in your hApp that this instance of the [HoloNETEntryBaseClass](#HoloNETEntryBaseClass) maps onto. You can set this either through this property or through one of the constructors.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+
+##### ZomeCreateEntryFunction
+
+This is the name of the rust zome function in your hApp that will be used to create new Holochain enties that this instance of the [HoloNETEntryBaseClass](#HoloNETEntryBaseClass) maps onto. You can set this either through this property or through one of the constructors.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+
+##### ZomeLoadEntryFunction
+
+This is the name of the rust zome function in your hApp that will be used to load existing Holochain enties that this instance of the [HoloNETEntryBaseClass](#HoloNETEntryBaseClass) maps onto. You can set this either through this property or through one of the constructors.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
+
+##### ZomeUpdateEntryFunction
+
+This is the name of the rust zome function in your hApp that will be used to update existing Holochain enties that this instance of the [HoloNETEntryBaseClass](#HoloNETEntryBaseClass) maps onto. You can set this either through this property or through one of the constructors.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+
+##### ZomeDeleteEntryFunction
+
+This is the name of the rust zome function in your hApp that will be used to delete existing Holochain enties that this instance of the [HoloNETEntryBaseClass](#HoloNETEntryBaseClass) maps onto. You can set this either through this property or through one of the constructors.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
+
+##### AuditEntries
+
+This contains a collection of audit enties that allow you to track every action that was taken on the Holochain Entry that this instance of the [HoloNETEntryBaseClass](#HoloNETEntryBaseClass) maps onto. Each audit entry contains the [EntryHash](#EntryHash), DateTime & the Type (Create, Modify or Delete).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
+
+
+
 ### HoloNETAuditEntryBaseClass
+
+#### Constructors
 
 #### Events
 
