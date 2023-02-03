@@ -1,5 +1,6 @@
 ﻿
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
@@ -62,6 +63,16 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
         public bool IsActive { get; set; }
 
         /// <summary>
+        /// The current version of the entry.
+        /// </summary>
+        [HolochainPropertyName("version")]
+        public int Version { get; set; } = 1;
+
+        /// List of all previous hashes along with the type and datetime.
+        /// </summary>
+        public List<HoloNETAuditEntry> AuditEntries { get; set; } = new List<HoloNETAuditEntry>();
+
+        /// <summary>
         /// Saves the object and will automatically extrct the properties that need saving (contain the HolochainPropertyName attribute). This method uses reflection so has a tiny performance overhead (negligbale), but if you need the extra nanoseconds use the other Save overload passing in your own params object.
         /// </summary>
         /// <returns></returns>
@@ -91,6 +102,29 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
             return await base.SaveAsync();
         }
 
+        ///// <summary>
+        ///// Load's the entry by calling the ZomeLoadEntryFunction.
+        ///// </summary>
+        ///// <param name="entryHash"></param>
+        ///// <returns></returns>
+        //public override async Task<ZomeFunctionCallBackEventArgs> LoadAsync(string entryHash)
+        //{
+        //    try
+        //    {
+        //        if (!IsInitialized && !IsInitializing)
+        //            await InitializeAsync();
+
+        //        ZomeFunctionCallBackEventArgs result = await HoloNETClient.CallZomeFunctionAsync(ZomeName, ZomeLoadEntryFunction, EntryHash);
+        //        ProcessZomeReturnCall(result);
+        //        OnLoaded?.Invoke(this, result);
+        //        return result;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return HandleError<ZomeFunctionCallBackEventArgs>("Unknown error occured in LoadAsync method.", ex);
+        //    }
+        //}
+
         /// <summary>
         /// Soft delete's the entry (the previous version can still be retreived).
         /// </summary>
@@ -106,6 +140,42 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
             }
 
             return await base.DeleteAsync(entryHash);
+        }
+
+        protected override void ProcessZomeReturnCall(ZomeFunctionCallBackEventArgs result)
+        {
+            try
+            {
+                if (!result.IsError && result.IsCallSuccessful)
+                {
+                    //Create/Updates/Delete
+                    if (!string.IsNullOrEmpty(result.ZomeReturnHash))
+                    {
+                        HoloNETAuditEntry auditEntry = new HoloNETAuditEntry()
+                        {
+                            DateTime = DateTime.Now,
+                            EntryHash = result.ZomeReturnHash
+                        };
+
+                        if (result.ZomeFunction == ZomeCreateEntryFunction)
+                            auditEntry.Type = HoloNETAuditEntryType.Create;
+
+                        else if (result.ZomeFunction == ZomeUpdateEntryFunction)
+                            auditEntry.Type = HoloNETAuditEntryType.Modify;
+
+                        else if (result.ZomeFunction == ZomeDeleteEntryFunction)
+                            auditEntry.Type = HoloNETAuditEntryType.Delete;
+
+                        this.AuditEntries.Add(auditEntry);
+                    }
+                }
+
+                base.ProcessZomeReturnCall(result);
+            }
+            catch (Exception ex)
+            {
+                HandleError("Unknown error occured in ProcessZomeReturnCall method.", ex);
+            }
         }
     }
 }

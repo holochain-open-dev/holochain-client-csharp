@@ -14,10 +14,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         private Dictionary<string, string> _holochainProperties = new Dictionary<string, string>();
         private bool _disposeOfHoloNETClient = false;
 
-        public HoloNETClient HoloNETClient { get; set; }
-
-        public bool StoreEntryHashInEntry { get; set; } = true;
-
         public delegate void Error(object sender, HoloNETErrorEventArgs e);
         public event Error OnError;
 
@@ -87,6 +83,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 InitializeAsync(connectedCallBackMode, retreiveAgentPubKeyAndDnaHashMode, getAgentPubKeyAndDnaHashFromConductor, getAgentPubKeyAndDnaHashFromSandbox, automaticallyAttemptToGetFromConductorIfSandBoxFails, automaticallyAttemptToGetFromSandBoxIfConductorFails, updateConfigWithAgentPubKeyAndDnaHashOnceRetreived);
         }
 
+        public HoloNETClient HoloNETClient { get; set; }
+
+        //public bool StoreEntryHashInEntry { get; set; } = true;
+
         public bool IsInitializing { get; private set; }
 
         public bool IsInitialized
@@ -148,16 +148,16 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public string ZomeDeleteEntryFunction { get; set; }
 
         /// <summary>
-        /// List of all previous hashes along with the type and datetime.
-        /// </summary>
-        public List<HoloNETAuditEntry> AuditEntries { get; set; } = new List<HoloNETAuditEntry>();
+        ///// List of all previous hashes along with the type and datetime.
+        ///// </summary>
+        //public List<HoloNETAuditEntry> AuditEntries { get; set; } = new List<HoloNETAuditEntry>();
 
         /// <summary>
         /// Load's the entry by calling the ZomeLoadEntryFunction.
         /// </summary>
         /// <param name="entryHash"></param>
         /// <returns></returns>
-        public async Task<ZomeFunctionCallBackEventArgs> LoadAsync(string entryHash)
+        public virtual async Task<ZomeFunctionCallBackEventArgs> LoadAsync(string entryHash)
         {
             try
             {
@@ -180,7 +180,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// </summary>
         /// <param name="entryHash"></param>
         /// <returns></returns>
-        public ZomeFunctionCallBackEventArgs Load(string entryHash)
+        public virtual ZomeFunctionCallBackEventArgs Load(string entryHash)
         {
             return LoadAsync(entryHash).Result;
         }
@@ -189,7 +189,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// Load's the entry by calling the ZomeLoadEntryFunction (it will use the EntryHash property to load from).
         /// </summary>
         /// <returns></returns>
-        public async Task<ZomeFunctionCallBackEventArgs> LoadAsync()
+        public virtual async Task<ZomeFunctionCallBackEventArgs> LoadAsync()
         {
             return await LoadAsync(EntryHash);
         }
@@ -198,7 +198,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// Load's the entry by calling the ZomeLoadEntryFunction (it will use the EntryHash property to load from).
         /// </summary>
         /// <returns></returns>
-        public ZomeFunctionCallBackEventArgs Load()
+        public virtual ZomeFunctionCallBackEventArgs Load()
         {
             return LoadAsync().Result;
         }
@@ -499,7 +499,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             HoloNETClient.OnReadyForZomeCalls -= HoloNETClient_OnReadyForZomeCalls;
         }
 
-        private void ProcessZomeReturnCall(ZomeFunctionCallBackEventArgs result)
+        protected virtual void ProcessZomeReturnCall(ZomeFunctionCallBackEventArgs result)
         {
             try
             {
@@ -528,22 +528,24 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                         this.EntryHash = result.ZomeReturnHash;
 
-                        HoloNETAuditEntry auditEntry = new HoloNETAuditEntry()
-                        {
-                            DateTime = DateTime.Now,
-                            EntryHash = result.ZomeReturnHash
-                        };
+                        //Moved into HoloNETAutditEntryBaseClass.
 
-                        if (result.ZomeFunction == ZomeCreateEntryFunction)
-                            auditEntry.Type = HoloNETAuditEntryType.Create;
+                        //HoloNETAuditEntry auditEntry = new HoloNETAuditEntry()
+                        //{
+                        //    DateTime = DateTime.Now,
+                        //    EntryHash = result.ZomeReturnHash
+                        //};
 
-                        else if (result.ZomeFunction == ZomeUpdateEntryFunction)
-                            auditEntry.Type = HoloNETAuditEntryType.Modify;
+                        //if (result.ZomeFunction == ZomeCreateEntryFunction)
+                        //    auditEntry.Type = HoloNETAuditEntryType.Create;
 
-                        else if (result.ZomeFunction == ZomeDeleteEntryFunction)
-                            auditEntry.Type = HoloNETAuditEntryType.Delete;
+                        //else if (result.ZomeFunction == ZomeUpdateEntryFunction)
+                        //    auditEntry.Type = HoloNETAuditEntryType.Modify;
 
-                        this.AuditEntries.Add(auditEntry);
+                        //else if (result.ZomeFunction == ZomeDeleteEntryFunction)
+                        //    auditEntry.Type = HoloNETAuditEntryType.Delete;
+
+                        //this.AuditEntries.Add(auditEntry);
                     }
 
                     if (result.KeyValuePair != null)
@@ -613,7 +615,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         }
         */
 
-        private void HandleError(string message, Exception exception)
+        protected void HandleError(string message, Exception exception)
         {
             message = string.Concat(message, exception != null ? $". Error Details: {exception}" : "");
             Logger.Log(message, LogType.Error);

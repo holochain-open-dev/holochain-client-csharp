@@ -22,10 +22,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
 
         static async Task Main(string[] args)
         {
-            //await TestHoloNETClientAsync(TestToRun.SaveLoadOASISEntryUsingSingleHoloNETBaseClass);
+            await TestHoloNETClientAsync(TestToRun.SaveLoadOASISEntryUsingSingleHoloNETAuditEntryBaseClass);
             //await TestHoloNETClientAsync(TestToRun.Signal);
             //await TestHoloNETClientAsync(TestToRun.SaveLoadOASISEntryWithTypeOfEntryDataObject);
-            await TestHoloNETClientAsync(TestToRun.SaveLoadOASISEntryWithEntryDataObject);
+            //await TestHoloNETClientAsync(TestToRun.SaveLoadOASISEntryWithEntryDataObject);
             //await TestHoloNETClientAsync(TestToRun.LoadTestSaveLoadOASISEntry);
             //await TestHoloNETClientAsync(TestToRun.WhoAmI);
         }
@@ -50,6 +50,30 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                 HolochainConductorToUse = HolochainConductorEnum.HcDevTool
             };
 
+            switch (testToRun)
+            {
+                case TestToRun.SaveLoadOASISEntryWithEntryDataObject:
+                case TestToRun.SaveLoadOASISEntryWithTypeOfEntryDataObject:
+                case TestToRun.SaveLoadOASISEntryUsingMultipleHoloNETAuditEntryBaseClasses:
+                case TestToRun.SaveLoadOASISEntryUsingSingleHoloNETAuditEntryBaseClass:
+                case TestToRun.LoadTestSaveLoadOASISEntry:
+                case TestToRun.Signal:
+                    {
+                        config.FullPathToRootHappFolder = string.Concat(Environment.CurrentDirectory, @"\hApps\OASIS-Holochain-hApp");
+                        config.FullPathToCompiledHappFolder = string.Concat(Environment.CurrentDirectory, @"\hApps\OASIS-Holochain-hApp\zomes\workdir\happ");
+                    }
+                    break;
+
+                case TestToRun.WhoAmI:
+                case TestToRun.Numbers:
+                case TestToRun.LoadTestNumbers:
+                    {
+                        config.FullPathToRootHappFolder = string.Concat(Environment.CurrentDirectory, @"\hApps\happ-build-tutorial-develop");
+                        config.FullPathToCompiledHappFolder = string.Concat(Environment.CurrentDirectory, @"\hApps\happ-build-tutorial-develop\workdir\happ");
+                    }
+                    break;
+            }
+
             //No need to create this when the test is SaveLoadOASISEntryUsingSingleHoloNETBaseClass because it will create its own instance of HoloNETClient internally (in the base class).
             if (_testToRun != TestToRun.SaveLoadOASISEntryUsingSingleHoloNETAuditEntryBaseClass)
             {
@@ -58,17 +82,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                 //We would normally just set the Config property but in this case we need to share the Config object with multiple HoloNET instances (such as in the SaveLoadOASISEntryUsingSingleHoloNETBaseClass test) 
                 _holoNETClient.Config = config;
 
-                //_holoNETClient.Config.LoggingMode = LoggingMode.WarningsErrorsInfoAndDebug;
-
-                ////holoNETClient.Config.ErrorHandlingBehaviour = ErrorHandlingBehaviour.OnlyThrowExceptionIfNoErrorHandlerSubscribedToOnErrorEvent
-                //_holoNETClient.Config.AutoStartHolochainConductor = false;
-                //_holoNETClient.Config.AutoShutdownHolochainConductor = false;
-                //_holoNETClient.Config.ShutDownALLHolochainConductors = false; //Normally default's to false, but if you want to make sure no holochain processes are left running set this to true.
-                //_holoNETClient.Config.ShowHolochainConductorWindow = false; //Defaults to false.
-                //_holoNETClient.Config.HolochainConductorMode = HolochainConductorModeEnum.UseEmbedded;
-                //_holoNETClient.Config.HolochainConductorToUse = HolochainConductorEnum.HcDevTool;
-
-                //_holoNETClient.WebSocket.Config.NeverTimeOut = true;
                 _holoNETClient.OnConnected += HoloNETClient_OnConnected;
                 _holoNETClient.OnDataReceived += HoloNETClient_OnDataReceived;
                 _holoNETClient.OnZomeFunctionCallBack += HoloNETClient_OnZomeFunctionCallBack;
@@ -77,31 +90,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                 _holoNETClient.OnSignalsCallBack += HoloNETClient_OnSignalsCallBack;
                 _holoNETClient.OnDisconnected += HoloNETClient_OnDisconnected;
                 _holoNETClient.OnError += HoloNETClient_OnError;
-                //_holoNETClient.OnConductorDebugCallBack += HoloNETClient_OnConductorDebugCallBack;
                 _holoNETClient.OnHolochainConductorsShutdownComplete += _holoNETClient_OnHolochainConductorsShutdownComplete;
                 _holoNETClient.OnHoloNETShutdownComplete += _holoNETClient_OnHoloNETShutdownComplete;
-
-                switch (testToRun)
-                {
-                    case TestToRun.SaveLoadOASISEntryWithEntryDataObject:
-                    case TestToRun.SaveLoadOASISEntryWithTypeOfEntryDataObject:
-                    case TestToRun.LoadTestSaveLoadOASISEntry:
-                    case TestToRun.Signal:
-                        {
-                            _holoNETClient.Config.FullPathToRootHappFolder = string.Concat(Environment.CurrentDirectory, @"\hApps\OASIS-Holochain-hApp");
-                            _holoNETClient.Config.FullPathToCompiledHappFolder = string.Concat(Environment.CurrentDirectory, @"\hApps\OASIS-Holochain-hApp\zomes\workdir\happ");
-                        }
-                        break;
-
-                    case TestToRun.WhoAmI:
-                    case TestToRun.Numbers:
-                    case TestToRun.LoadTestNumbers:
-                        {
-                            _holoNETClient.Config.FullPathToRootHappFolder = string.Concat(Environment.CurrentDirectory, @"\hApps\happ-build-tutorial-develop");
-                            _holoNETClient.Config.FullPathToCompiledHappFolder = string.Concat(Environment.CurrentDirectory, @"\hApps\happ-build-tutorial-develop\workdir\happ");
-                        }
-                        break;
-                }
 
                 ////Use this if you to manually pass in the AgentPubKey &DnaHash(otherwise it will be automatically queried from the conductor or sandbox).
                 //_holoNETClient.Config.AgentPubKey = "YOUR KEY";
