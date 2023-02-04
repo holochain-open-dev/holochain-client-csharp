@@ -9,7 +9,8 @@
   - [How To Use HoloNET](#how-to-use-holonet)
     - [Quick Start](#quick-start)
     - [The Power of .NET Async Methods](#the-power-of-net-async-methods)
-      - [New Hybrid Async/Event Model](#new-hybrid-async/event-model)
+      - [New Hybrid Async/Event Model](#new-hybrid-asyncevent-model)
+    - [Constructors](#constructors)
     - [Events](#events)
       - [OnConnected](#onconnected)
       - [OnAppInfoCallBack](#onappinfocallback)
@@ -17,13 +18,17 @@
       - [OnDataReceived](#ondatareceived)
       - [OnZomeFunctionCallBack](#onzomefunctioncallback)
       - [OnSignalsCallBack](#onsignalscallback)
+      - [OnConductorDebugCallBack](#onconductordebugcallback)
       - [OnDisconnected](#ondisconnected)
       - [OnError](#onerror)
+      - [OnHolochainConductorsShutdownComplete](#onholochainconductorsshutdowncomplete)
+      - [OnHoloNETShutdownComplete](#onholonetshutdowncomplete)
     - [Methods](#methods)
       - [Connect](#connect)
       - [StartConductor](#startconductor)
-      - [GetAgentPubKeyAndDnaHashFromSandbox](#getagentpubkeyanddnahashfromsandbox)
-      - [GetAgentPubKeyAndDnaHashFromConductor](#getagentpubkeyanddnahashfromconductor)
+      - [RetreiveAgentPubKeyAndDnaHash](#retreiveagentpubkeyanddnahash)
+      - [RetreiveAgentPubKeyAndDnaHashFromSandbox](#retreiveagentpubkeyanddnahashfromsandbox)
+      - [RetreiveAgentPubKeyAndDnaHashFromConductor](#retreiveagentpubkeyanddnahashfromconductor)
       - [SendHoloNETRequest](#sendholonetrequest)
       - [CallZomeFunctionAsync](#callzomefunctionasync)
         - [Overload 1](#overload-1)
@@ -36,19 +41,66 @@
         - [Overload 8](#overload-8)
         - [Overload 9](#overload-9)
         - [Overload 10](#overload-10)
+        - [Overload 11](#overload-11)
+        - [Overload 12](#overload-12)
+        - [Overload 13](#overload-13)
+        - [Overload 14](#overload-14)
+        - [Overload 15](#overload-15)
+        - [Overload 16](#overload-16)
+        - [Overload 17](#overload-17)
+        - [Overload 18](#overload-18)
       - [Disconnect](#disconnect)
-      - [ShutDownAllConductors](#shutdownallconductors)
+      - [ShutDownHolochainConductors](#shutdownholochainconductors)
+      - [ShutdownHoloNET](#shutdownholonet)
       - [ClearCache](#clearcache)
       - [ConvertHoloHashToBytes](#convertholohashtobytes)
       - [ConvertHoloHashToString](#convertholohashtostring)
+      - [WaitTillReadyForZomeCallsAsync](#waittillreadyforzomecallsasync)
+      - [MapEntryDataObject](#mapentrydataobject)
     - [Properties](#properties)
-      - [Config](#holonetconfig)
+      - [Config](#config)
       - [WebSocket](#websocket)
         - [Config](#config)
         - [State](#state)
       - [State](#state)
       - [EndPoint](#endpoint)
     - [Logging](#logging)
+      - [DefaultLogger](#defaultlogger)
+    - [HoloNETEntryBaseClass](#holonetentrybaseclass)
+      - [Constructors](#constructors)
+      - [Events](#events)
+        - [OnError](#onerror)
+        - [OnInitialized](#oninitialized)
+        - [OnLoaded](#onloaded)
+        - [OnSaved](#onsaved)
+        - [OnDeleted](#ondeleted)
+        - [OnClosed](#onclosed)
+      - [Methods](#methods)
+        - [Initialize](#initialize)
+        - [Load](#load)
+        - [Save](#save)
+        - [Delete](#delete)
+        - [Close](#close)
+        - [WaitTillHoloNETInitializedAsync](#waittillholonetinitializedasync)
+      - [Properties](#properties)
+        - [HoloNETClient](#holonetclient)
+        - [IsInitializing](#isinitializing)
+        - [IsInitialized](#isinitialized)
+        - [EntryData](#entrydata)
+        - [EntryHash](#entryhash)
+        - [PreviousVersionEntryHash](#previousversionentryhash)
+        - [Version](#version)
+        - [ZomeName](#zomename)
+        - [ZomeCreateEntryFunction](#zomecreateentryfunction)
+        - [ZomeLoadEntryFunction](#zomeloadentryfunction)
+        - [ZomeUpdateEntryFunction](#zomeupdateentryfunction)
+        - [ZomeDeleteEntryFunction](#zomedeleteentryfunction)
+        - [AuditEntries](#auditentries)
+    - [HoloNETAuditEntryBaseClass](#holonetauditentrybaseclass)
+      - [Constructors](#constructors)
+      - [Events](#events)
+      - [Methods](#methods)
+      - [Properties](#properties)
     - [Test Harness](#test-harness)
       - [NetworkServiceProvider](#networkserviceprovider)
       - [NetworkServiceProviderMode](#networkserviceprovidermode)
@@ -65,7 +117,7 @@
     - [Restore Holochain Support For The OASIS API](#restore-holochain-support-for-the-oasis-api)
     - [WEB5 STAR Omniverse Interoperable Metaverse Low Code Generator](#web5-star-omniverse-interoperable-metaverse-low-code-generator)
   - [Donations Welcome! Thank you!](#donations-welcome-thank-you)
-  - [Do You Want To Get Involved?](#get-involved)
+  - [Do You Want To Get Involved?](#do-you-want-to-get-involved)
 
 ## Overview
 
@@ -713,23 +765,23 @@ private static void _holoNETClient_OnHoloNETShutdownComplete(object sender, Holo
 
 HoloNETClient contains the following methods:
 
-|Method                                                                                    |Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-|------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-|[Connect](#connect)                                                                       | This method simply connects to the Holochain conductor. It raises the [OnConnected](#onconnected) event once it is has successfully established a connection. It then calls the [RetreiveAgentPubKeyAndDnaHash](#RetreiveAgentPubKeyAndDnaHash) method to retrive the AgentPubKey & DnaHash. If the `connectedCallBackMode` flag is set to `WaitForHolochainConductorToConnect` (default) it will await until it is connected before returning, otherwise it will return immediatley and then call the [OnConnected](#onconnected) event once it has finished connecting.                                                                                                                                      |
-|[StartConductor](#startconductor)                                                         | This method will start the Holochain Conducutor using the approprtiate settings defined in the [HoloNETConfig](#holonetconfig).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
-|[RetreiveAgentPubKeyAndDnaHash](#RetreiveAgentPubKeyAndDnaHash)                           | This method will retrive the AgentPubKey & DnaHash from either the Holochain Conductor or HC Sandbox depending on what params are passed in. It will default to retreiving from the Conductor first. It will call [RetreiveAgentPubKeyAndDnaHashFromConductor](#retreiveagentpubkeyanddnahashfromconductor) and [RetreiveAgentPubKeyAndDnaHashFromConductor](#retreiveagentpubkeyanddnahashfromconductor) internally.                                                                                                                                                                                                                                                                                          |
-|[RetreiveAgentPubKeyAndDnaHashFromSandbox](#retreiveagentpubkeyanddnahashfromsandbox)     | This method gets the AgentPubKey & DnaHash from the HC Sandbox command. It will raise the [OnReadyForZomeCalls](#onreadyforzomecalls) event once it successfully retreives them and the WebSocket has connected to the Holochain Conductor. If it fails to retreive the AgentPubKey and DnaHash from the HC Sandbox and the optional `automaticallyAttemptToGetFromConductorIfSandBoxFails` flag is true (defaults to true), it will call the |[GetAgentPubKeyAndDnaHashFromConductor](#getagentpubkeyanddnahashfromconductor) method to attempt to retreive them directly from the conductor (default).                                                                                                       |
-|[RetreiveAgentPubKeyAndDnaHashFromConductor](#retreiveagentpubkeyanddnahashfromconductor) | This method gets the AgentPubKey & DnaHash from the Holochain Conductor (the [Connect](#connect) method will automatically call this by default). Once it has retreived them and the WebSocket has connceted to the Holochain Conductor it will raise the [OnReadyForZomeCalls](#onreadyforzomecalls) event. If it fails to retreive the AgentPubKey and DnaHash from the Conductor and the optional `automaticallyAttemptToGetFromSandboxIfConductorFails` flag is true (defaults to true), it will call the |[GetAgentPubKeyAndDnaHashFromSandbox](#getagentpubkeyanddnahashfromsandbox) method.                                                                                                             |
-|[SendHoloNETRequest](#sendholonetrequest)                                                 | This method allows you to send your own raw request to holochain. This method raises the [OnDataReceived](#ondatareceived) event once it has received a response from the Holochain conductor. Please see the [Events](#events) section above for more info on how to use this event. You would rarely need to use this and we highly recommend you use the [CallZomeFunctionAsync](#callzomefunctionasync) method instead.                                                                                                                                                                                                                                                                                    |
-|[CallZomeFunction](#callzomefunction)                                                     | This is the main method you will be using to invoke zome functions on your given zome. It has a number of handy overloads making it easier and more powerful to call your zome functions and manage the returned data. This method raises the [OnZomeFunctionCallBack](#onzomefunctioncallback) event once it has received a response from the Holochain conductor.                                                                                                                                                                                                                                                                                                                                            |
-|[Disconnect](#disconnect)                                                                 | This method disconnects the client from the Holochain conductor. It raises the [OnDisconnected](#ondisconnected) event once it is has successfully disconnected. It will then automatically call the [ShutDownHolochainConductors](#ShutDownHolochainConductors) method (if the `shutdownHolochainConductorsMode` flag (defaults to `UseConfigSettings`) is not set to `DoNotShutdownAnyConductors`). If the `disconnectedCallBackMode` flag is set to `WaitForHolochainConductorToDisconnect` (default) then it will await until it has disconnected before returning to the caller, otherwise it will return immediately and then raise the [OnDisconnected](#ondisconnected) once it is disconnected.       |
-|[ShutDownHolochainConductors](#ShutDownHolochainConductors)                               | Will automatically shutdown the current Holochain Conductor (if the `shutdownHolochainConductorsMode` param is set to `ShutdownCurrentConductorOnly`) or active Holochain Conductors (if the `shutdownHolochainConductorsMode` param is set to `ShutdownAllConductors`). If the `shutdownHolochainConductorsMode` param is set to `UseConfigSettings` then it will use the `HoloNETClient.Config.AutoShutdownHolochainConductor` and `HoloNETClient.Config.ShutDownALLHolochainConductors` flags to determine which mode to use. The [Disconnect](#disconnect) method will automatically call this once it has finished disconnecting from the Holochain Conductor.                                            |     
-|[ShutdownHoloNET](#ShutdownHoloNET)                                                       | This method will shutdown HoloNET by first calling the [Disconnect](#disconnect) method to disconnect from the Holochain Conductor and then calling the [ShutDownHolochainConductors](#ShutDownHolochainConductors) method to shutdown any running Holochain Conductors. This method will then raise the [OnHoloNETShutdown](OnHoloNETShutdownComplete) event.                                                                                                                                                                                                                                                                                                                                                 |
-|[ClearCache](#clearcache)                                                                 | Call this method to clear all of HoloNETClient's internal cache. This includes the responses that have been cached using the [CallZomeFunction](#callzomefunction) methods if the `cacheData` parm was set to true for any of the calls.                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-|[ConvertHoloHashToBytes](#ConvertHoloHashToBytes)                                         | Utiltity method to convert a string to base64 encoded bytes (Holochain Conductor format). This is used to convert the AgentPubKey & DnaHash when making a zome call.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
-|[ConvertHoloHashToString](#ConvertHoloHashToString)                                       | Utiltity method to convert from base64 bytes (Holochain Conductor format) to a friendly C# format. This is used to convert the AgentPubKey & DnaHash retreived from the Conductor.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
-|[WaitTillReadyForZomeCallsAsync](WaitTillReadyForZomeCallsAsync)                          | This method will wait (non blocking) until HoloNET is ready to make zome calls after it has connected to the Holochain Conductor and retrived the AgentPubKey & DnaHash. It will then return to the caller with the AgentPubKey & DnaHash. This method will return the same time the [OnReadyForZomeCalls](#OnReadyForZomeCalls) event is raised. Unlike all the other methods, this one only contains an async version because the non async version would block all other threads including any UI ones etc.                                                                                                                                                                                                 |
-|[MapEntryDataObject](#MapEntryDataObject)                                                 | This method maps the data returned from the Conductor zome call onto a dynamic data object passed into the [CallZomeFunction](#callzomefunction) method. Alternatively the type of the data object can be passed in. Either way the now mapped and populated data object is then returned in the EntryDataObject property during the [OnZomeFunctionCallBack](OnZomeFunctionCallBack) event. Please see [OnZomeFunctionCallBack](OnZomeFunctionCallBack) for more info. This method is called internally but can also be called manually and is used by the [HoloNETEntryBaseClass](#HoloNETEntryBaseClass).                                                                                                   |
+| Method                                                                                    | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+|-------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [Connect](#connect)                                                                       | This method simply connects to the Holochain conductor. It raises the [OnConnected](#onconnected) event once it is has successfully established a connection. It then calls the [RetreiveAgentPubKeyAndDnaHash](#RetreiveAgentPubKeyAndDnaHash) method to retrive the AgentPubKey & DnaHash. If the `connectedCallBackMode` flag is set to `WaitForHolochainConductorToConnect` (default) it will await until it is connected before returning, otherwise it will return immediatley and then call the [OnConnected](#onconnected) event once it has finished connecting.                                                                                                                                      |
+| [StartConductor](#startconductor)                                                         | This method will start the Holochain Conducutor using the approprtiate settings defined in the [HoloNETConfig](#holonetconfig).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| [RetreiveAgentPubKeyAndDnaHash](#RetreiveAgentPubKeyAndDnaHash)                           | This method will retrive the AgentPubKey & DnaHash from either the Holochain Conductor or HC Sandbox depending on what params are passed in. It will default to retreiving from the Conductor first. It will call [RetreiveAgentPubKeyAndDnaHashFromConductor](#retreiveagentpubkeyanddnahashfromconductor) and [RetreiveAgentPubKeyAndDnaHashFromConductor](#retreiveagentpubkeyanddnahashfromconductor) internally.                                                                                                                                                                                                                                                                                          |
+| [RetreiveAgentPubKeyAndDnaHashFromSandbox](#retreiveagentpubkeyanddnahashfromsandbox)     | This method gets the AgentPubKey & DnaHash from the HC Sandbox command. It will raise the [OnReadyForZomeCalls](#onreadyforzomecalls) event once it successfully retreives them and the WebSocket has connected to the Holochain Conductor. If it fails to retreive the AgentPubKey and DnaHash from the HC Sandbox and the optional `automaticallyAttemptToGetFromConductorIfSandBoxFails` flag is true (defaults to true), it will call the |[GetAgentPubKeyAndDnaHashFromConductor](#getagentpubkeyanddnahashfromconductor) method to attempt to retreive them directly from the conductor (default).                                                                                                       |
+| [RetreiveAgentPubKeyAndDnaHashFromConductor](#retreiveagentpubkeyanddnahashfromconductor) | This method gets the AgentPubKey & DnaHash from the Holochain Conductor (the [Connect](#connect) method will automatically call this by default). Once it has retreived them and the WebSocket has connceted to the Holochain Conductor it will raise the [OnReadyForZomeCalls](#onreadyforzomecalls) event. If it fails to retreive the AgentPubKey and DnaHash from the Conductor and the optional `automaticallyAttemptToGetFromSandboxIfConductorFails` flag is true (defaults to true), it will call the |[GetAgentPubKeyAndDnaHashFromSandbox](#getagentpubkeyanddnahashfromsandbox) method.                                                                                                             |
+| [SendHoloNETRequest](#sendholonetrequest)                                                 | This method allows you to send your own raw request to holochain. This method raises the [OnDataReceived](#ondatareceived) event once it has received a response from the Holochain conductor. Please see the [Events](#events) section above for more info on how to use this event. You would rarely need to use this and we highly recommend you use the [CallZomeFunctionAsync](#callzomefunctionasync) method instead.                                                                                                                                                                                                                                                                                    |
+| [CallZomeFunction](#callzomefunction)                                                     | This is the main method you will be using to invoke zome functions on your given zome. It has a number of handy overloads making it easier and more powerful to call your zome functions and manage the returned data. This method raises the [OnZomeFunctionCallBack](#onzomefunctioncallback) event once it has received a response from the Holochain conductor.                                                                                                                                                                                                                                                                                                                                            |
+| [Disconnect](#disconnect)                                                                 | This method disconnects the client from the Holochain conductor. It raises the [OnDisconnected](#ondisconnected) event once it is has successfully disconnected. It will then automatically call the [ShutDownHolochainConductors](#ShutDownHolochainConductors) method (if the `shutdownHolochainConductorsMode` flag (defaults to `UseConfigSettings`) is not set to `DoNotShutdownAnyConductors`). If the `disconnectedCallBackMode` flag is set to `WaitForHolochainConductorToDisconnect` (default) then it will await until it has disconnected before returning to the caller, otherwise it will return immediately and then raise the [OnDisconnected](#ondisconnected) once it is disconnected.       |
+| [ShutDownHolochainConductors](#ShutDownHolochainConductors)                               | Will automatically shutdown the current Holochain Conductor (if the `shutdownHolochainConductorsMode` param is set to `ShutdownCurrentConductorOnly`) or active Holochain Conductors (if the `shutdownHolochainConductorsMode` param is set to `ShutdownAllConductors`). If the `shutdownHolochainConductorsMode` param is set to `UseConfigSettings` then it will use the `HoloNETClient.Config.AutoShutdownHolochainConductor` and `HoloNETClient.Config.ShutDownALLHolochainConductors` flags to determine which mode to use. The [Disconnect](#disconnect) method will automatically call this once it has finished disconnecting from the Holochain Conductor.                                            |     
+| [ShutdownHoloNET](#ShutdownHoloNET)                                                       | This method will shutdown HoloNET by first calling the [Disconnect](#disconnect) method to disconnect from the Holochain Conductor and then calling the [ShutDownHolochainConductors](#ShutDownHolochainConductors) method to shutdown any running Holochain Conductors. This method will then raise the [OnHoloNETShutdown](OnHoloNETShutdownComplete) event.                                                                                                                                                                                                                                                                                                                                                 |
+| [ClearCache](#clearcache)                                                                 | Call this method to clear all of HoloNETClient's internal cache. This includes the responses that have been cached using the [CallZomeFunction](#callzomefunction) methods if the `cacheData` parm was set to true for any of the calls.                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| [ConvertHoloHashToBytes](#ConvertHoloHashToBytes)                                         | Utiltity method to convert a string to base64 encoded bytes (Holochain Conductor format). This is used to convert the AgentPubKey & DnaHash when making a zome call.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| [ConvertHoloHashToString](#ConvertHoloHashToString)                                       | Utiltity method to convert from base64 bytes (Holochain Conductor format) to a friendly C# format. This is used to convert the AgentPubKey & DnaHash retreived from the Conductor.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| [WaitTillReadyForZomeCallsAsync](WaitTillReadyForZomeCallsAsync)                          | This method will wait (non blocking) until HoloNET is ready to make zome calls after it has connected to the Holochain Conductor and retrived the AgentPubKey & DnaHash. It will then return to the caller with the AgentPubKey & DnaHash. This method will return the same time the [OnReadyForZomeCalls](#OnReadyForZomeCalls) event is raised. Unlike all the other methods, this one only contains an async version because the non async version would block all other threads including any UI ones etc.                                                                                                                                                                                                 |
+| [MapEntryDataObject](#MapEntryDataObject)                                                 | This method maps the data returned from the Conductor zome call onto a dynamic data object passed into the [CallZomeFunction](#callzomefunction) method. Alternatively the type of the data object can be passed in. Either way the now mapped and populated data object is then returned in the EntryDataObject property during the [OnZomeFunctionCallBack](OnZomeFunctionCallBack) event. Please see [OnZomeFunctionCallBack](OnZomeFunctionCallBack) for more info. This method is called internally but can also be called manually and is used by the [HoloNETEntryBaseClass](#HoloNETEntryBaseClass).                                                                                                   |
 
 **NOTE:** All methods contain both a non async version and async version to cater for all use case scenarios.
 
@@ -1116,7 +1168,7 @@ HoloNETClient contains the following properties:
 
 This property contains a struct called `HoloNETConfig` containing the following sub-properties:
 
-|Property                                    |Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| Property                                   | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 |--------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | AgentPubKey                                | The AgentPubKey to use for Zome calls. If this is not set then HoloNET will automatically retreive this along with the DnaHash after it connects (if the [Connect](#connect) method defaults are not overriden).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | DnaHash                                    | The DnaHash to use for Zome calls. If this is not set then HoloNET will automatically retreive this along with the AgentPubKey after it connects (if the [Connect](#connect) method defaults are not overriden).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
@@ -1143,16 +1195,16 @@ This property contains a refrence to the internal [NextGenSoftware WebSocket](ht
 
 It has a sub-property called Config that contains the following options:
 
-|Property|Description  |
-|--|--|
-|TimeOutSeconds  | The time in seconds before the connection times out when calling either method `SendHoloNETRequest` or `CalLZomeFunction`. This defaults to 30 seconds.|
-|NeverTimeOut|Set this to true if you wish the connection to never time out when making a call from methods `SendHoloNETRequest` and `CallZomeFunction`. This defaults to false.
-|KeepAliveSeconds| This is the time to keep the connection alive in seconds. This defaults to 30 seconds.
-|ReconnectionAttempts| The number of times HoloNETClient will attempt to re-connect if the connection is dropped. The default is 5.|
-|ReconnectionIntervalSeconds|The time to wait between each re-connection attempt. The default is 5 seconds.|
-|SendChunkSize| The size of the buffer to use when sending data to the Holochain Conductor. The default is 1024 bytes.
-|ReceiveChunkSizeDefault| The size of the buffer to use when receiving data from the Holochain Conductor. The default is 1024 bytes. |
-|ErrorHandlingBehaviour | An enum that specifies what to do when anm error occurs. The options are: `AlwaysThrowExceptionOnError`, `OnlyThrowExceptionIfNoErrorHandlerSubscribedToOnErrorEvent` & `NeverThrowExceptions`). The default is `OnlyThrowExceptionIfNoErrorHandlerSubscribedToOnErrorEvent` meaning it will only throw an error if the `OnError` event has not been subscribed to. This delegates error handling to the caller. If no event has been subscribed then HoloNETClient will throw an error. `AlwaysThrowExceptionOnError` will always throw an error even if the `OnError` event has been subscribed to. The `NeverThrowException` enum option will never throw an error even if the `OnError` event has not been subscribed to. Regardless of what enum is selected, the error will always be logged using whatever `ILogger`s have been injected into the constructor or set on the static Logging.Loggers property.
+| Property                    | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+|-----------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| TimeOutSeconds              | The time in seconds before the connection times out when calling either method `SendHoloNETRequest` or `CalLZomeFunction`. This defaults to 30 seconds.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| NeverTimeOut                | Set this to true if you wish the connection to never time out when making a call from methods `SendHoloNETRequest` and `CallZomeFunction`. This defaults to false.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| KeepAliveSeconds            | This is the time to keep the connection alive in seconds. This defaults to 30 seconds.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| ReconnectionAttempts        | The number of times HoloNETClient will attempt to re-connect if the connection is dropped. The default is 5.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| ReconnectionIntervalSeconds | The time to wait between each re-connection attempt. The default is 5 seconds.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| SendChunkSize               | The size of the buffer to use when sending data to the Holochain Conductor. The default is 1024 bytes.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| ReceiveChunkSizeDefault     | The size of the buffer to use when receiving data from the Holochain Conductor. The default is 1024 bytes.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | 
+| ErrorHandlingBehaviour      | An enum that specifies what to do when anm error occurs. The options are: `AlwaysThrowExceptionOnError`, `OnlyThrowExceptionIfNoErrorHandlerSubscribedToOnErrorEvent` & `NeverThrowExceptions`). The default is `OnlyThrowExceptionIfNoErrorHandlerSubscribedToOnErrorEvent` meaning it will only throw an error if the `OnError` event has not been subscribed to. This delegates error handling to the caller. If no event has been subscribed then HoloNETClient will throw an error. `AlwaysThrowExceptionOnError` will always throw an error even if the `OnError` event has been subscribed to. The `NeverThrowException` enum option will never throw an error even if the `OnError` event has not been subscribed to. Regardless of what enum is selected, the error will always be logged using whatever `ILogger`s have been injected into the constructor or set on the static Logging.Loggers property. |
 
 ##### State
 
@@ -1227,18 +1279,18 @@ All NextGen Software libraries such as HoloNET, WebSocket etc use [NextGenSoftwa
 
 The DefaultLogger has the following options that can also be configured:
 
-|Property|Description  |
-|--|--|
-|LogDirectory  | The directory where logs will be created.|
-|LogFileName| The name of the log file to create. |
-|LogToConsole| Set this to true to log to the console. The default is true. |
-|LogToFile| Set this to true to log to the file. The default is true. |
-|AddAdditionalSpaceAfterEachLogEntry| Set this to true to add additional space after each log entry. The default is false. |
-|ShowColouredLogs| Set this to true to enable coloured logs in the console. This default to true. |
-|DebugColour| The colour to use for `Debug` log enries to the console. |
-|InfoColour| The colour to use for `Info` log enries to the console. |
-|WarningColour| The colour to use for `Warning` log enries to the console. |
-|ErrorColour| The colour to use for `Error` log enries to the console. |
+| Property                            | Description                                                                          |
+|-------------------------------------|--------------------------------------------------------------------------------------|
+| LogDirectory                        | The directory where logs will be created.                                            |
+| LogFileName                         | The name of the log file to create.                                                  |
+| LogToConsole                        | Set this to true to log to the console. The default is true.                         |
+| LogToFile                           | Set this to true to log to the file. The default is true.                            |
+| AddAdditionalSpaceAfterEachLogEntry | Set this to true to add additional space after each log entry. The default is false. |
+| ShowColouredLogs                    | Set this to true to enable coloured logs in the console. This default to true.       |
+| DebugColour                         | The colour to use for `Debug` log enries to the console.                             |
+| InfoColour                          | The colour to use for `Info` log enries to the console.                              |
+| WarningColour                       | The colour to use for `Warning` log enries to the console.                           |
+| ErrorColour                         | The colour to use for `Error` log enries to the console.                             |
 
 You are welcome to create your own loggers to inject in, you simply need to implement the simple ILogger interface:
 
@@ -1258,7 +1310,7 @@ The Shutdown method is not used by the `DefaultLogger`, and so far is only used 
 
 This is a new abstract class introduced in HoloNET 2 that wraps around the HoloNETClient so you do not need to interact with the client directly. Instead it allows very simple CRUD operations ([Load](#loadHoloNETEntryBaseClass), [Save](#saveHoloNETEntryBaseClass) & [Delete](#deleteHoloNETEntryBaseClass)) to be performed on your custom data object that extends this class. Your custom data object represents the data (Holochain Entry) returned from a zome call and HoloNET will handle the mapping onto your data object automatically.
 
-It has two constructors as can be seen below, one that allows you to pass in a HoloNETClient instance (which can be shared with other classes that extend the HoloNETEntryBaseClass or [HoloNETAuditEntryBaseClass](#HoloNETAuditEntryBaseClass)) or if you do not pass a HoloNETClient instance in using the other constructor it will create its own internal instance to use just for this class.
+It has two main types of constructors as can be seen below, one that allows you to pass in a HoloNETClient instance (which can be shared with other classes that extend the HoloNETEntryBaseClass or [HoloNETAuditEntryBaseClass](#HoloNETAuditEntryBaseClass)) or if you do not pass a HoloNETClient instance in using the other constructor it will create its own internal instance to use just for this class.
 
 Here is a simple example of how to use it:
 
@@ -1285,9 +1337,57 @@ Here is a simple example of how to use it:
     }
 ````
 
+And here is the rust code in the hApp that this maps onto:
+
+```rust
+#[hdk_entry_helper]
+#[derive(Clone)] 
+pub struct Avatar {
+    pub id: String,
+    pub first_name: String,
+    pub last_name: String,
+    pub email: String,
+    pub dob: String
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct UpdateEntryAvatarInput {
+  original_action_hash: ActionHash,
+  updated_entry: Avatar
+}
+
+#[hdk_entry_defs]
+#[unit_enum(UnitEntryTypes)]
+pub enum EntryTypes {
+#[entry_def()]
+Avatar(Avatar),
+}
+
+#[hdk_extern]
+pub fn create_entry_avatar(avatar: Avatar) -> ExternResult<ActionHash> {
+  create_entry(&EntryTypes::Avatar(avatar.clone()))
+}
+
+#[hdk_extern]
+pub fn get_entry_avatar(action_hash: ActionHash) -> ExternResult<Option<Record>> {
+  get(action_hash, GetOptions::default())
+}
+
+#[hdk_extern]
+pub fn update_entry_avatar(input: UpdateEntryAvatarInput) -> ExternResult<ActionHash> 
+{
+  update_entry(input.original_action_hash, &input.updated_entry)
+}
+
+#[hdk_extern]
+pub fn delete_entry_avatar(action_hash: ActionHash) -> ExternResult<ActionHash> {
+  delete_entry(action_hash)
+}
+````
+
 **NOTE:** Each property that you wish to have mapped to a property/field in your rust code needs to have the HolochainPropertyName attribute applied to it specifying the name of the field in your rust struct that is to be mapped to this c# property.
 
-**NOTE:** This is a preview of some of the advanced functionality that will be present in the upcoming [.NET HDK Low Code Generator](#net-hdk-low-code-generator), which generates dynamic rust and c# code from your metadata freeing you to focus on your amazing business idea and creativity rather than worrying about learning Holochain, Rust and then getting it to all work in Windows and with C#.
+**NOTE:** This is a preview of some of the advanced functionality that will be present in the upcoming [.NET HDK Low Code Generator](#net-hdk-low-code-generator), which generates dynamic rust and c# code from your metadata freeing you to focus on your amazing business idea and creativity rather than worrying about learning Holochain, Rust and then getting it to all work in Windows and with C#. HAppy Days! ;-)
 
 #### Constructors
 
@@ -1346,7 +1446,7 @@ The HoloNETEntryBaseClass has the following events you can subscribe to:
 | [OnDeleted](#OnDeleted)         | Fired after the [Delete](#Delete) method has finished deleting the Holochain entry and has received a response from the Holochain Conductor. This calls the [CallZomeFunction](#CallZomeFunction) on the HoloNET client passing in the zome function name specefied in the constructor param `zomeDeleteEntryFunction` or property `ZomeDeleteEntryFunction`. It then updates the HoloNET Entry Data Object with the response received from the Holochain Conductor.                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | [OnClosed](#OnClosed)           | Fired after the [Close](#Close) method has finished closing the connection to the Holochain Conductor and has shutdown all running Holochain Conductors (if configured to do so). This method calls the [ShutdownHoloNET](#ShutdownHoloNET) internally.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 
-#### OnError
+##### OnError
 
 Fired when there is an error either in HoloNETEntryBaseClass or the HoloNET client itself.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
 
@@ -1365,7 +1465,7 @@ holoNETEntryBaseClass.OnError += holoNETEntryBaseClass_OnError;
 | Reason             | The reason for the error.                           |
 
 
-#### OnInitialized
+##### OnInitialized
 
 Fired after the [Initialize](#Initialize) method has finished initializing the HoloNET client. This will also call the [Connect](#Connect) and [RetreiveAgentPubKeyAndDnaHash](#RetreiveAgentPubKeyAndDnaHash) methods on the HoloNET client. This event is then fired when the HoloNET client has successfully connected to the Holochain Conductor, retreived the AgentPubKey & DnaHash & then fired the [OnReadyForZomeCalls](#OnReadyForZomeCalls) event. See also the [IsInitializing](#IsInitializing) and the [IsInitialized](#IsInitialized) properties.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
 
@@ -1387,7 +1487,7 @@ holoNETEntryBaseClass.OnInitialized += holoNETEntryBaseClass_OnInitialized;
 | Message     | If there was an error this will contain the error message, this normally includes a stacktrace to help you track down the cause. If there was no error it can contain any other message such as status etc or will be blank. |
 
 
-#### OnLoaded
+##### OnLoaded
 
 Fired after the [Load](#Load) method has finished loading the Holochain entry from the Holochain Conductor. This calls the [CallZomeFunction](#CallZomeFunction) on the HoloNET client passing in the zome function name specefied in the constructor param `zomeLoadEntryFunction` or property `ZomeLoadEntryFunction` and then maps the data returned from the zome call onto your data object.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
 
@@ -1435,7 +1535,7 @@ holoNETEntryBaseClass.OnLoaded += holoNETEntryBaseClass_OnLoaded;
 
 **NOTE:** This uses the same `ZomeFunctionCallBackEventArgs` as the [OnZomeFunctionCallBack](#OnZomeFunctionCallBack) event so please check there for the list of parameters returned by this event.
 
-#### OnSaved
+##### OnSaved
 
 Fired after the [Save](#Save) method has finished saving the Holochain entry to the Holochain Conductor. This calls the [CallZomeFunction](#CallZomeFunction) on the HoloNET client passing in the zome function name specefied in the constructor param `zomeCreateEntryFunction` or property [ZomeCreateEntryFunction](#ZomeCreateEntryFunction) if it is a new entry (empty object) or the `zomeUpdateEntryFunction` param and [ZomeUpdateEntryFunction](#ZomeUpdateEntryFunction) property if it's an existing entry (previously saved object containing a valid value for the [EntryHash](#EntryHash) property). Once it has saved the entry it will then update the [EntryHash](#entryHash) property with the entry hash returned from the zome call/conductor. The [PreviousVersionEntryHash](#PreviousVersionEntryHash) property is also set to the previous EntryHash (if there is one).
 
@@ -1483,7 +1583,7 @@ holoNETEntryBaseClass.OnSaved += holoNETEntryBaseClass_OnSaved;
 
 **NOTE:** This uses the same `ZomeFunctionCallBackEventArgs` as the [OnZomeFunctionCallBack](#OnZomeFunctionCallBack) event so please check there for the list of parameters returned by this event.
 
-#### OnDeleted
+##### OnDeleted
 
 Fired after the [Delete](#Delete) method has finished deleting the Holochain entry and has received a response from the Holochain Conductor. This calls the [CallZomeFunction](#CallZomeFunction) on the HoloNET client passing in the zome function name specefied in the constructor param `zomeDeleteEntryFunction` or property `ZomeDeleteEntryFunction`. It then updates the HoloNET Entry Data Object with the response received from the Holochain Conductor.                                                                                                                                                                                                                                                                                                                                                                                                                            
 
@@ -1531,7 +1631,7 @@ private static void holoNETEntryBaseClass_OnDeleted(object sender, ZomeFunctionC
 
 **NOTE:** This uses the same `ZomeFunctionCallBackEventArgs` as the [OnZomeFunctionCallBack](#OnZomeFunctionCallBack) event so please check there for the list of parameters returned by this event.
 
-#### OnClosed
+##### OnClosed
 
 Fired after the [Close](#Close) method has finished closing the connection to the Holochain Conductor and has shutdown all running Holochain Conductors (if configured to do so). This method calls the [ShutdownHoloNET](#ShutdownHoloNET) internally.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
 
@@ -1761,6 +1861,94 @@ This contains a collection of audit enties that allow you to track every action 
 ### HoloNETAuditEntryBaseClass
 
 This is very similar to [HoloNETEntryBaseClass](#HoloNETEntryBaseClass) because it extends it by adding auditing capabilities.
+
+Here is a simple example of how to use it:
+
+````c#
+    /// <summary>
+    /// This example creates its own internal instance of the HoloNETClient, you should only use this if you will be extending only one HoloNETAuditEntryBaseClass/HoloNETEntryBaseClass otherwise use the Multiple Class Example.
+    /// </summary>
+    public class Avatar : HoloNETAuditEntryBaseClass
+    {
+        public Avatar() : base("oasis", "get_entry_avatar", "create_entry_avatar", "update_entry_avatar", "delete_entry_avatar") { }
+        public Avatar(HoloNETConfig holoNETConfig) : base("oasis", "get_entry_avatar", "create_entry_avatar", "update_entry_avatar", "delete_entry_avatar", holoNETConfig) { }
+
+        [HolochainPropertyName("first_name")]
+        public string FirstName { get; set; }
+
+        [HolochainPropertyName("last_name")]
+        public string LastName { get; set; }
+
+        [HolochainPropertyName("email")]
+        public string Email { get; set; }
+
+        [HolochainPropertyName("dob")]
+        public DateTime DOB { get; set; }
+    }
+````
+
+And here is the rust code in the hApp that this maps onto:
+
+```rust
+#[hdk_entry_helper]
+#[derive(Clone)] 
+pub struct Avatar {
+    pub id: String,
+    pub first_name: String,
+    pub last_name: String,
+    pub email: String,
+    pub dob: String,
+    pub created_date: String,
+    pub created_by: String,
+    pub modified_date: String,
+    pub modified_by: String,
+    pub deleted_date: String,
+    pub deleted_by: String,
+    pub is_active: bool,
+    pub version: i32
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct UpdateEntryAvatarInput {
+  original_action_hash: ActionHash,
+  updated_entry: Avatar
+}
+
+#[hdk_entry_defs]
+#[unit_enum(UnitEntryTypes)]
+pub enum EntryTypes {
+#[entry_def()]
+Avatar(Avatar),
+}
+
+#[hdk_extern]
+pub fn create_entry_avatar(avatar: Avatar) -> ExternResult<ActionHash> {
+  create_entry(&EntryTypes::Avatar(avatar.clone()))
+}
+
+#[hdk_extern]
+pub fn get_entry_avatar(action_hash: ActionHash) -> ExternResult<Option<Record>> {
+  get(action_hash, GetOptions::default())
+}
+
+#[hdk_extern]
+pub fn update_entry_avatar(input: UpdateEntryAvatarInput) -> ExternResult<ActionHash> 
+{
+  update_entry(input.original_action_hash, &input.updated_entry)
+}
+
+#[hdk_extern]
+pub fn delete_entry_avatar(action_hash: ActionHash) -> ExternResult<ActionHash> {
+  delete_entry(action_hash)
+}
+````
+
+**NOTE:** Each property that you wish to have mapped to a property/field in your rust code needs to have the HolochainPropertyName attribute applied to it specifying the name of the field in your rust struct that is to be mapped to this c# property.
+
+**NOTE:** You will note that the rust code for using the [HoloNETAuditEntryBaseClass](#HoloNETAuditEntryBaseClass) is the same as [HoloNETEntryBaseClass](#HoloNETEntryBaseClass) except it adds the audit fields to the Avatar struct.
+
+**NOTE:** This is a preview of some of the advanced functionality that will be present in the upcoming [.NET HDK Low Code Generator](#net-hdk-low-code-generator), which generates dynamic rust and c# code from your metadata freeing you to focus on your amazing business idea and creativity rather than worrying about learning Holochain, Rust and then getting it to all work in Windows and with C#. HAppy Days! ;-)
+
 
 #### Constructors
 
