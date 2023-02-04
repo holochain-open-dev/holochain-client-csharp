@@ -102,8 +102,6 @@
       - [Methods](#methods)
       - [Properties](#properties)
     - [Test Harness](#test-harness)
-      - [NetworkServiceProvider](#networkserviceprovider)
-      - [NetworkServiceProviderMode](#networkserviceprovidermode)
   - [HoloOASIS](#holooasis)
   - [HoloUnity](#holounity)
     - [Using HoloUnity](#using-holounity)
