@@ -15,10 +15,8 @@
 	<Authors>David Ellams (NextGen Software Ltd)</Authors>
 	<PackageTags>holochain;net;unity</PackageTags>
 	<PackageReleaseNotes>
-		- Renamed SaveLoadOASISEntry test to SaveLoadOASISEntryWithEntryDataObject in HoloNET Test Harness.
-		- Added new SaveLoadOASISEntryWithTypeOfEntryDataObject test to HoloNET Test Harness.
-		- Added call to ShutDownAllHolochainConductors on HoloNETClient after HoloNET Test Harness calls the Disconect method on HoloNETClient.
-		- Added new BuildEntryDataObjectMessage method to HoloNET Test Harness.
+		- Various bug fixes.
+		- Various improvements.
 	</PackageReleaseNotes>
 	<RepositoryType>git</RepositoryType>
 	<RepositoryUrl>https://github.com/NextGenSoftwareUK/holochain-client-csharp</RepositoryUrl>
@@ -27,7 +25,7 @@
 	<!--<PackageLicenseExpression>GNU GPLv3</PackageLicenseExpression>-->
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-	<Version>2.0.2</Version>
+	<Version>2.1.0</Version>
 	<!--<PackageLicenseFile>..\LICENSE</PackageLicenseFile>-->
 
 	<AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
