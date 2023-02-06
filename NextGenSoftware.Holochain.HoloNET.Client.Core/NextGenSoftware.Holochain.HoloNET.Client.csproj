@@ -17,8 +17,9 @@
 	  <Authors>David Ellams (NextGen Software Ltd)</Authors>
 	  <PackageTags>holochain;net;unity</PackageTags>
 	  <PackageReleaseNotes>
-		  - Updated dependencies for NextGenSoftware.WebSocket 1.1.4 -&gt; 1.1.5.
-		  - Updated dependencies for NextGenSoftware.Utilities 1.0.4 -&gt; 1.0.5.
+		  - Updated HoloNET 2 Documentation (now complete).
+		  - Various bug fixses.
+		  - Various improvements.
 	  </PackageReleaseNotes>
 	  <RepositoryType>git</RepositoryType>
 	  <RepositoryUrl>https://github.com/holochain-open-dev/holochain-client-csharp</RepositoryUrl>
@@ -27,7 +28,7 @@
 	  <!--<PackageLicenseExpression>GNU GPLv3</PackageLicenseExpression>-->
 	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
 	  <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-	  <Version>2.0.1</Version>
+	  <Version>2.1.0</Version>
 	  <!--<PackageLicenseFile>..\LICENSE</PackageLicenseFile>-->
 
 	  <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
