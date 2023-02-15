@@ -74,8 +74,15 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public event Error OnError;
 
         // Properties
+
+        /// <summary>
+        /// This property contains the internal NextGenSoftware.WebSocket (https://www.nuget.org/packages/NextGenSoftware.WebSocket) that HoloNET uses. You can use this property to access the current state of the WebSocket as well as configure more options.
+        /// </summary>
         public WebSocket.WebSocket WebSocket { get; set; }
 
+        /// <summary>
+        /// This property contains a struct called HoloNETConfig containing the sub-properties: AgentPubKey, DnaHash, FullPathToRootHappFolder, FullPathToCompiledHappFolder, HolochainConductorMode, FullPathToExternalHolochainConductorBinary, FullPathToExternalHCToolBinary, SecondsToWaitForHolochainConductorToStart, AutoStartHolochainConductor, ShowHolochainConductorWindow, AutoShutdownHolochainConductor, ShutDownALLHolochainConductors, HolochainConductorToUse, OnlyAllowOneHolochainConductorToRunAtATime, LoggingMode & ErrorHandlingBehaviour.
+        /// </summary>
         public HoloNETConfig Config
         {
             get
@@ -91,6 +98,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
         }
 
+        /// <summary>
+        /// This property is a shortcut to the State property on the WebSocket property.
+        /// </summary>
         public WebSocketState State
         {
             get
@@ -99,6 +109,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
         }
 
+        /// <summary>
+        /// This property is a shortcut to the EndPoint property on the WebSocket property.
+        /// </summary>
         public string EndPoint
         {
             get
@@ -110,48 +123,145 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
         }
 
+        /// <summary>
+        /// This property is a boolean and will return true when HoloNET is ready for zome calls after the OnReadyForZomeCalls event is raised.
+        /// </summary>
         public bool IsReadyForZomesCalls { get; set; }
+
+        /// <summary>
+        /// This property is a boolean and will return true when HoloNET is retreiving the AgentPubKey & DnaHash using one of the RetreiveAgentPubKeyAndDnaHash, RetreiveAgentPubKeyAndDnaHashFromSandbox or RetreiveAgentPubKeyAndDnaHashFromConductor methods (by default this will occur automativally after it has connected to the Holochain Conductor).
+        /// </summary>
         public bool RetreivingAgentPubKeyAndDnaHash { get; private set; }
 
-        public async Task<ReadyForZomeCallsEventArgs> WaitTillReadyForZomeCallsAsync()
-        {
-            return await _taskCompletionReadyForZomeCalls.Task;
-        }
-
+        /// <summary>
+        /// This constructor uses the built-in DefaultLogger and allows various options to be configured for it.
+        /// </summary>
+        /// <param name="holochainConductorURI">The URI of the Holochain Conductor to connect to. Will default to 'ws://localhost:8888'.</param>
+        /// <param name="logToConsole">Set this to true (default) if you wish HoloNET to log to the console. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
+        /// <param name="logToFile">Set this to true (default) if you wish HoloNET to log a log file. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
+        /// <param name="releativePathToLogFolder">The relative path to the log folder to log to. Will default to a sub-directory called `Logs` within the current working directory. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
+        /// <param name="logFileName">The name of the file to log to. Will default to `HoloNET.log`. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
+        /// <param name="addAdditionalSpaceAfterEachLogEntry">Set this to true to add additional space after each log entry. The default is false. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
+        /// <param name="showColouredLogs">Set this to true to enable coloured logs in the console. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
+        /// <param name="debugColour">The colour to use for `Debug` log enries to the console NOTE: This is only relevant if the built-in DefaultLogger is used..</param>
+        /// <param name="infoColour">The colour to use for `Info` log enries to the console. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
+        /// <param name="warningColour">The colour to use for `Warning` log enries to the console. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
+        /// <param name="errorColour">The colour to use for `Error` log enries to the console. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
         public HoloNETClient(string holochainConductorURI = "ws://localhost:8888", bool logToConsole = true, bool logToFile = true, string releativePathToLogFolder = "Logs", string logFileName = "HoloNET.log", bool addAdditionalSpaceAfterEachLogEntry = false, bool showColouredLogs = true, ConsoleColor debugColour = ConsoleColor.White, ConsoleColor infoColour = ConsoleColor.Green, ConsoleColor warningColour = ConsoleColor.Yellow, ConsoleColor errorColour = ConsoleColor.Red)
         {
             Logger.Loggers.Add(new DefaultLogger(logToConsole, logToFile, releativePathToLogFolder, logFileName, addAdditionalSpaceAfterEachLogEntry, showColouredLogs, debugColour, infoColour, warningColour, errorColour));
             Init(holochainConductorURI);
         }
 
-        public HoloNETClient(ILogger logger, string holochainConductorURI = "ws://localhost:8888")
+        /// <summary>
+        /// This constructor allows you to inject in (DI) your own implementation (logger) of the ILogger interface.
+        /// </summary>
+        /// <param name="logger">The implementation of the ILogger interface (custom logger).</param>
+        /// <param name="alsoUseDefaultLogger">Set this to true if you wish HoloNET to also log to the DefaultLogger as well as any custom logger injected in.</param>
+        /// <param name="holochainConductorURI">The URI of the Holochain Conductor to connect to. Will default to 'ws://localhost:8888'.</param>
+        public HoloNETClient(ILogger logger, bool alsoUseDefaultLogger = false, string holochainConductorURI = "ws://localhost:8888")
         {
             Logger.Loggers.Add(logger);
-            Init(holochainConductorURI);
-        }
 
-        public HoloNETClient(IEnumerable<ILogger> loggers, string holochainConductorURI = "ws://localhost:8888")
-        {
-            Logger.Loggers = new List<ILogger>(loggers);
+            if (alsoUseDefaultLogger)
+                Logger.Loggers.Add(new DefaultLogger());
+
             Init(holochainConductorURI);
         }
 
         /// <summary>
-        /// 
+        /// This constructor allows you to inject in (DI) your own implementation (logger) of the ILogger interface.
         /// </summary>
-        /// <param name="connectedCallBackMode"></param>
-        /// <param name="retreiveAgentPubKeyAndDnaHashMode"></param>
-        /// <param name="getAgentPubKeyAndDnaHashFromConductor"></param>
-        /// <param name="getAgentPubKeyAndDnaHashFromSandbox"></param>
-        /// <param name="automaticallyAttemptToGetFromConductorIfSandBoxFails"></param>
-        /// <param name="automaticallyAttemptToGetFromSandBoxIfConductorFails"></param>
-        /// <param name="updateConfigWithAgentPubKeyAndDnaHashOnceRetreived"></param>
+        /// <param name="logger">The implementation of the ILogger interface (custom logger).</param>
+        /// <param name="alsoUseDefaultLogger">Set this to true if you wish HoloNET to also log to the DefaultLogger as well as any custom logger injected in.</param>
+        /// <param name="holochainConductorURI">The URI of the Holochain Conductor to connect to. Will default to 'ws://localhost:8888'.</param>
+        /// <param name="logToConsole">Set this to true (default) if you wish HoloNET to log to the console. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
+        /// <param name="logToFile">Set this to true (default) if you wish HoloNET to log a log file. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
+        /// <param name="releativePathToLogFolder">The relative path to the log folder to log to. Will default to a sub-directory called `Logs` within the current working directory. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
+        /// <param name="logFileName">The name of the file to log to. Will default to `HoloNET.log`. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
+        /// <param name="addAdditionalSpaceAfterEachLogEntry">Set this to true to add additional space after each log entry. The default is false. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
+        /// <param name="showColouredLogs">Set this to true to enable coloured logs in the console. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
+        /// <param name="debugColour">The colour to use for `Debug` log enries to the console NOTE: This is only relevant if the built-in DefaultLogger is used..</param>
+        /// <param name="infoColour">The colour to use for `Info` log enries to the console. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
+        /// <param name="warningColour">The colour to use for `Warning` log enries to the console. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
+        /// <param name="errorColour">The colour to use for `Error` log enries to the console. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
+        public HoloNETClient(ILogger logger, bool alsoUseDefaultLogger = false, string holochainConductorURI = "ws://localhost:8888", bool logToConsole = true, bool logToFile = true, string releativePathToLogFolder = "Logs", string logFileName = "HoloNET.log", bool addAdditionalSpaceAfterEachLogEntry = false, bool showColouredLogs = true, ConsoleColor debugColour = ConsoleColor.White, ConsoleColor infoColour = ConsoleColor.Green, ConsoleColor warningColour = ConsoleColor.Yellow, ConsoleColor errorColour = ConsoleColor.Red)
+        {
+            Logger.Loggers.Add(logger);
+
+            if (alsoUseDefaultLogger)
+                Logger.Loggers.Add(new DefaultLogger(logToConsole, logToFile, releativePathToLogFolder, logFileName, addAdditionalSpaceAfterEachLogEntry, showColouredLogs, debugColour, infoColour, warningColour, errorColour));
+
+            Init(holochainConductorURI);
+        }
+
+        /// <summary>
+        /// This constructor allows you to inject in (DI) multiple implementations (logger) of the ILogger interface. HoloNET will then log to each of these loggers.
+        /// </summary>
+        /// <param name="loggers">The implementations of the ILogger interface (custom loggers).</param>
+        /// <param name="alsoUseDefaultLogger">Set this to true if you wish HoloNET to also log to the DefaultLogger as well as any custom loggers injected in.</param>
+        /// <param name="holochainConductorURI">The URI of the Holochain Conductor to connect to. Will default to 'ws://localhost:8888'.</param>
+        public HoloNETClient(IEnumerable<ILogger> loggers, bool alsoUseDefaultLogger = false, string holochainConductorURI = "ws://localhost:8888")
+        {
+            Logger.Loggers = new List<ILogger>(loggers);
+
+            if (alsoUseDefaultLogger)
+                Logger.Loggers.Add(new DefaultLogger());
+
+            Init(holochainConductorURI);
+        }
+
+        /// <summary>
+        /// This constructor allows you to inject in (DI) multiple implementations (logger) of the ILogger interface. HoloNET will then log to each of these loggers.
+        /// </summary>
+        /// <param name="loggers">The implementations of the ILogger interface (custom loggers).</param>
+        /// <param name="alsoUseDefaultLogger">Set this to true if you wish HoloNET to also log to the DefaultLogger as well as any custom loggers injected in.</param>
+        /// <param name="holochainConductorURI">The URI of the Holochain Conductor to connect to. Will default to 'ws://localhost:8888'.</param>
+        /// <param name="logToConsole">Set this to true (default) if you wish HoloNET to log to the console. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
+        /// <param name="logToFile">Set this to true (default) if you wish HoloNET to log a log file. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
+        /// <param name="releativePathToLogFolder">The relative path to the log folder to log to. Will default to a sub-directory called `Logs` within the current working directory. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
+        /// <param name="logFileName">The name of the file to log to. Will default to `HoloNET.log`. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
+        /// <param name="addAdditionalSpaceAfterEachLogEntry">Set this to true to add additional space after each log entry. The default is false. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
+        /// <param name="showColouredLogs">Set this to true to enable coloured logs in the console. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
+        /// <param name="debugColour">The colour to use for `Debug` log enries to the console NOTE: This is only relevant if the built-in DefaultLogger is used..</param>
+        /// <param name="infoColour">The colour to use for `Info` log enries to the console. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
+        /// <param name="warningColour">The colour to use for `Warning` log enries to the console. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
+        /// <param name="errorColour">The colour to use for `Error` log enries to the console. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
+        public HoloNETClient(IEnumerable<ILogger> loggers, bool alsoUseDefaultLogger = false, string holochainConductorURI = "ws://localhost:8888", bool logToConsole = true, bool logToFile = true, string releativePathToLogFolder = "Logs", string logFileName = "HoloNET.log", bool addAdditionalSpaceAfterEachLogEntry = false, bool showColouredLogs = true, ConsoleColor debugColour = ConsoleColor.White, ConsoleColor infoColour = ConsoleColor.Green, ConsoleColor warningColour = ConsoleColor.Yellow, ConsoleColor errorColour = ConsoleColor.Red)
+        {
+            Logger.Loggers = new List<ILogger>(loggers);
+
+            if (alsoUseDefaultLogger)
+                Logger.Loggers.Add(new DefaultLogger(logToConsole, logToFile, releativePathToLogFolder, logFileName, addAdditionalSpaceAfterEachLogEntry, showColouredLogs, debugColour, infoColour, warningColour, errorColour));
+
+            Init(holochainConductorURI);
+        }
+
+        /// <summary>
+        /// This method will wait (non blocking) until HoloNET is ready to make zome calls after it has connected to the Holochain Conductor and retrived the AgentPubKey & DnaHash. It will then return to the caller with the AgentPubKey & DnaHash. This method will return the same time the OnReadyForZomeCalls event is raised. Unlike all the other methods, this one only contains an async version because the non async version would block all other threads including any UI ones etc.
+        /// </summary>
         /// <returns></returns>
-        public async Task ConnectAsync(ConnectedCallBackMode connectedCallBackMode = ConnectedCallBackMode.WaitForHolochainConductorToConnect, RetreiveAgentPubKeyAndDnaHashMode retreiveAgentPubKeyAndDnaHashMode = RetreiveAgentPubKeyAndDnaHashMode.Wait, bool getAgentPubKeyAndDnaHashFromConductor = true, bool getAgentPubKeyAndDnaHashFromSandbox = true, bool automaticallyAttemptToGetFromConductorIfSandBoxFails = true, bool automaticallyAttemptToGetFromSandBoxIfConductorFails = true, bool updateConfigWithAgentPubKeyAndDnaHashOnceRetreived = true)
+        public async Task<ReadyForZomeCallsEventArgs> WaitTillReadyForZomeCallsAsync()
+        {
+            return await _taskCompletionReadyForZomeCalls.Task;
+        }
+
+        /// <summary>
+        /// This method simply connects to the Holochain conductor. It raises the OnConnected event once it is has successfully established a connection. It then calls the RetreiveAgentPubKeyAndDnaHash method to retrive the AgentPubKey & DnaHash. If the `connectedCallBackMode` flag is set to `WaitForHolochainConductorToConnect` (default) it will await until it is connected before returning, otherwise it will return immediatley and then call the OnConnected event once it has finished connecting.
+        /// </summary>
+        /// <param name="connectedCallBackMode">If set to `WaitForHolochainConductorToConnect` (default) it will await until it is connected before returning, otherwise it will return immediatley and then call the OnConnected event once it has finished connecting.</param>
+        /// <param name="retreiveAgentPubKeyAndDnaHashMode">If set to `Wait` (default) it will await until it has finished retreiving the AgentPubKey & DnaHash before returning, otherwise it will return immediatley and then call the OnReadyForZomeCalls event once it has finished retreiving the DnaHash & AgentPubKey.</param>
+        /// <param name="retreiveAgentPubKeyAndDnaHashFromConductor">Set this to true for HoloNET to automatically retreive the AgentPubKey & DnaHash from the Holochain Conductor after it has connected. This defaults to true.</param>
+        /// <param name="retreiveAgentPubKeyAndDnaHashFromSandbox">Set this to true if you wish HoloNET to automatically retreive the AgentPubKey & DnaHash from the hc sandbox after it has connected. This defaults to true.</param>
+        /// <param name="automaticallyAttemptToRetreiveFromConductorIfSandBoxFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the Holochain Conductor if it fails to get them from the HC Sandbox command. This defaults to true.</param>
+        /// <param name="automaticallyAttemptToRetreiveFromSandBoxIfConductorFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the HC Sandbox command if it fails to get them from the Holochain Conductor. This defaults to true.</param>
+        /// <param name="updateConfigWithAgentPubKeyAndDnaHashOnceRetreived">Set this to true (default) to automatically update the [HoloNETConfig](#holonetconfig) once it has retreived the DnaHash & AgentPubKey.</param>
+        /// <returns></returns>
+        public async Task ConnectAsync(ConnectedCallBackMode connectedCallBackMode = ConnectedCallBackMode.WaitForHolochainConductorToConnect, RetreiveAgentPubKeyAndDnaHashMode retreiveAgentPubKeyAndDnaHashMode = RetreiveAgentPubKeyAndDnaHashMode.Wait, bool retreiveAgentPubKeyAndDnaHashFromConductor = true, bool retreiveAgentPubKeyAndDnaHashFromSandbox = true, bool automaticallyAttemptToRetreiveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetreiveFromSandBoxIfConductorFails = true, bool updateConfigWithAgentPubKeyAndDnaHashOnceRetreived = true)
         {
             try
             {
-                _getAgentPubKeyAndDnaHashFromConductor = getAgentPubKeyAndDnaHashFromConductor;
+                _getAgentPubKeyAndDnaHashFromConductor = retreiveAgentPubKeyAndDnaHashFromConductor;
 
                 if (Logger.Loggers.Count == 0)
                     throw new HoloNETException("ERROR: No Logger Has Been Specified! Please set a Logger with the Logger.Loggers Property.");
@@ -159,14 +269,14 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 if (WebSocket.State != WebSocketState.Connecting && WebSocket.State != WebSocketState.Open && WebSocket.State != WebSocketState.Aborted)
                 {
                     if (Config.AutoStartHolochainConductor)
-                        await StartConductorAsync();
+                        await StartHolochainConductorAsync();
 
                     if (connectedCallBackMode == ConnectedCallBackMode.WaitForHolochainConductorToConnect)
                         await WebSocket.Connect();
                     else
                     {
                         WebSocket.Connect();
-                        await RetreiveAgentPubKeyAndDnaHashAsync(retreiveAgentPubKeyAndDnaHashMode, getAgentPubKeyAndDnaHashFromConductor, getAgentPubKeyAndDnaHashFromSandbox, automaticallyAttemptToGetFromConductorIfSandBoxFails, automaticallyAttemptToGetFromSandBoxIfConductorFails, updateConfigWithAgentPubKeyAndDnaHashOnceRetreived);
+                        await RetreiveAgentPubKeyAndDnaHashAsync(retreiveAgentPubKeyAndDnaHashMode, retreiveAgentPubKeyAndDnaHashFromConductor, retreiveAgentPubKeyAndDnaHashFromSandbox, automaticallyAttemptToRetreiveFromConductorIfSandBoxFails, automaticallyAttemptToRetreiveFromSandBoxIfConductorFails, updateConfigWithAgentPubKeyAndDnaHashOnceRetreived);
                     }
                 }
             }
@@ -177,19 +287,23 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         }
 
         /// <summary>
-        /// 
+        /// This method simply connects to the Holochain conductor. It raises the OnConnected event once it is has successfully established a connection. It then calls the RetreiveAgentPubKeyAndDnaHash method to retrive the AgentPubKey & DnaHash.
         /// </summary>
-        /// <param name="getAgentPubKeyAndDnaHashFromConductor"></param>
-        /// <param name="getAgentPubKeyAndDnaHashFromSandbox"></param>
-        /// <param name="automaticallyAttemptToGetFromConductorIfSandBoxFails"></param>
-        /// <param name="automaticallyAttemptToGetFromSandBoxIfConductorFails"></param>
-        /// <param name="updateConfigWithAgentPubKeyAndDnaHashOnceRetreived"></param>
-        public void Connect(bool getAgentPubKeyAndDnaHashFromConductor = true, bool getAgentPubKeyAndDnaHashFromSandbox = false, bool automaticallyAttemptToGetFromConductorIfSandBoxFails = true, bool automaticallyAttemptToGetFromSandBoxIfConductorFails = true, bool updateConfigWithAgentPubKeyAndDnaHashOnceRetreived = true)
+        /// <param name="retreiveAgentPubKeyAndDnaHashFromConductor">Set this to true for HoloNET to automatically retreive the AgentPubKey & DnaHash from the Holochain Conductor after it has connected. This defaults to true.</param>
+        /// <param name="retreiveAgentPubKeyAndDnaHashFromSandbox">Set this to true if you wish HoloNET to automatically retreive the AgentPubKey & DnaHash from the hc sandbox after it has connected. This defaults to true.</param>
+        /// <param name="automaticallyAttemptToRetreiveFromConductorIfSandBoxFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the Holochain Conductor if it fails to get them from the HC Sandbox command. This defaults to true.</param>
+        /// <param name="automaticallyAttemptToRetreiveFromSandBoxIfConductorFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the HC Sandbox command if it fails to get them from the Holochain Conductor. This defaults to true.</param>
+        /// <param name="updateConfigWithAgentPubKeyAndDnaHashOnceRetreived">Set this to true (default) to automatically update the [HoloNETConfig](#holonetconfig) once it has retreived the DnaHash & AgentPubKey.</param>
+        public void Connect(bool retreiveAgentPubKeyAndDnaHashFromConductor = true, bool retreiveAgentPubKeyAndDnaHashFromSandbox = false, bool automaticallyAttemptToRetreiveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetreiveFromSandBoxIfConductorFails = true, bool updateConfigWithAgentPubKeyAndDnaHashOnceRetreived = true)
         {
-            ConnectAsync(ConnectedCallBackMode.UseCallBackEvents, RetreiveAgentPubKeyAndDnaHashMode.UseCallBackEvents, getAgentPubKeyAndDnaHashFromConductor, getAgentPubKeyAndDnaHashFromSandbox, automaticallyAttemptToGetFromConductorIfSandBoxFails, automaticallyAttemptToGetFromSandBoxIfConductorFails, updateConfigWithAgentPubKeyAndDnaHashOnceRetreived);
+            ConnectAsync(ConnectedCallBackMode.UseCallBackEvents, RetreiveAgentPubKeyAndDnaHashMode.UseCallBackEvents, retreiveAgentPubKeyAndDnaHashFromConductor, retreiveAgentPubKeyAndDnaHashFromSandbox, automaticallyAttemptToRetreiveFromConductorIfSandBoxFails, automaticallyAttemptToRetreiveFromSandBoxIfConductorFails, updateConfigWithAgentPubKeyAndDnaHashOnceRetreived);
         }
 
-        public async Task StartConductorAsync()
+        /// <summary>
+        /// This method will start the Holochain Conducutor using the approprtiate settings defined in the Config property.
+        /// </summary>
+        /// <returns></returns>
+        public async Task StartHolochainConductorAsync()
         {
             try
             {
@@ -338,17 +452,40 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
         }
 
-        public void StartConductor()
+        /// <summary>
+        /// This method will start the Holochain Conducutor using the approprtiate settings defined in the Config property.
+        /// </summary>
+        /// <returns></returns>
+        public void StartHolochainConductor()
         {
-            StartConductorAsync();
+            StartHolochainConductorAsync();
         }
 
-        public AgentPubKeyDnaHash RetreiveAgentPubKeyAndDnaHash(bool getAgentPubKeyAndDnaHashFromConductor = true, bool getAgentPubKeyAndDnaHashFromSandbox = false, bool automaticallyAttemptToGetFromConductorIfSandBoxFails = true, bool automaticallyAttemptToGetFromSandBoxIfConductorFails = true, bool updateConfigWithAgentPubKeyAndDnaHashOnceRetreived = true)
+        /// <summary>
+        /// This method will retrive the AgentPubKey & DnaHash from either the Holochain Conductor or HC Sandbox depending on what params are passed in. It will default to retreiving from the Conductor first. It will call RetreiveAgentPubKeyAndDnaHashFromConductor and RetreiveAgentPubKeyAndDnaHashFromSandboxAsync internally.
+        /// </summary>
+        /// <param name="retreiveAgentPubKeyAndDnaHashFromConductor">Set this to true for HoloNET to automatically retreive the AgentPubKey & DnaHash from the Holochain Conductor after it has connected. This defaults to true.</param>
+        /// <param name="retreiveAgentPubKeyAndDnaHashFromSandbox">Set this to true if you wish HoloNET to automatically retreive the AgentPubKey & DnaHash from the hc sandbox after it has connected. This defaults to true.</param>
+        /// <param name="automaticallyAttemptToRetreiveFromConductorIfSandBoxFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the Holochain Conductor if it fails to get them from the HC Sandbox command. This defaults to true.</param>
+        /// <param name="automaticallyAttemptToRetreiveFromSandBoxIfConductorFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the HC Sandbox command if it fails to get them from the Holochain Conductor. This defaults to true.</param>
+        /// <param name="updateConfigWithAgentPubKeyAndDnaHashOnceRetreived">Set this to true (default) to automatically update the Config property once it has retreived the DnaHash & AgentPubKey.</param>
+        /// <returns>The AgentPubKey and DnaHash</returns>
+        public AgentPubKeyDnaHash RetreiveAgentPubKeyAndDnaHash(bool retreiveAgentPubKeyAndDnaHashFromConductor = true, bool retreiveAgentPubKeyAndDnaHashFromSandbox = false, bool automaticallyAttemptToRetreiveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetreiveFromSandBoxIfConductorFails = true, bool updateConfigWithAgentPubKeyAndDnaHashOnceRetreived = true)
         {
-            return RetreiveAgentPubKeyAndDnaHashAsync(RetreiveAgentPubKeyAndDnaHashMode.UseCallBackEvents, getAgentPubKeyAndDnaHashFromConductor, getAgentPubKeyAndDnaHashFromSandbox, automaticallyAttemptToGetFromConductorIfSandBoxFails, automaticallyAttemptToGetFromSandBoxIfConductorFails, updateConfigWithAgentPubKeyAndDnaHashOnceRetreived).Result;
+            return RetreiveAgentPubKeyAndDnaHashAsync(RetreiveAgentPubKeyAndDnaHashMode.UseCallBackEvents, retreiveAgentPubKeyAndDnaHashFromConductor, retreiveAgentPubKeyAndDnaHashFromSandbox, automaticallyAttemptToRetreiveFromConductorIfSandBoxFails, automaticallyAttemptToRetreiveFromSandBoxIfConductorFails, updateConfigWithAgentPubKeyAndDnaHashOnceRetreived).Result;
         }
 
-        public async Task<AgentPubKeyDnaHash> RetreiveAgentPubKeyAndDnaHashAsync(RetreiveAgentPubKeyAndDnaHashMode retreiveAgentPubKeyAndDnaHashMode = RetreiveAgentPubKeyAndDnaHashMode.Wait, bool getAgentPubKeyAndDnaHashFromConductor = true, bool getAgentPubKeyAndDnaHashFromSandbox = true, bool automaticallyAttemptToGetFromConductorIfSandBoxFails = true, bool automaticallyAttemptToGetFromSandBoxIfConductorFails = true, bool updateConfigWithAgentPubKeyAndDnaHashOnceRetreived = true)
+        /// <summary>
+        /// This method will retrive the AgentPubKey & DnaHash from either the Holochain Conductor or HC Sandbox depending on what params are passed in. It will default to retreiving from the Conductor first. It will call RetreiveAgentPubKeyAndDnaHashFromConductor and RetreiveAgentPubKeyAndDnaHashFromSandboxAsync internally.
+        /// </summary>
+        /// <param name="retreiveAgentPubKeyAndDnaHashMode">If set to `Wait` (default) it will await until it has finished retreiving the AgentPubKey & DnaHash before returning, otherwise it will return immediatley and then raise the OnReadyForZomeCalls event once it has finished retreiving the DnaHash & AgentPubKey.</param>
+        /// <param name="retreiveAgentPubKeyAndDnaHashFromConductor">Set this to true for HoloNET to automatically retreive the AgentPubKey & DnaHash from the Holochain Conductor after it has connected. This defaults to true.</param>
+        /// <param name="retreiveAgentPubKeyAndDnaHashFromSandbox">Set this to true if you wish HoloNET to automatically retreive the AgentPubKey & DnaHash from the hc sandbox after it has connected. This defaults to true.</param>
+        /// <param name="automaticallyAttemptToRetreiveFromConductorIfSandBoxFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the Holochain Conductor if it fails to get them from the HC Sandbox command. This defaults to true.</param>
+        /// <param name="automaticallyAttemptToRetreiveFromSandBoxIfConductorFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the HC Sandbox command if it fails to get them from the Holochain Conductor. This defaults to true.</param>
+        /// <param name="updateConfigWithAgentPubKeyAndDnaHashOnceRetreived">Set this to true (default) to automatically update the Config property once it has retreived the DnaHash & AgentPubKey.</param>
+        /// <returns>The AgentPubKey and DnaHash</returns>
+        public async Task<AgentPubKeyDnaHash> RetreiveAgentPubKeyAndDnaHashAsync(RetreiveAgentPubKeyAndDnaHashMode retreiveAgentPubKeyAndDnaHashMode = RetreiveAgentPubKeyAndDnaHashMode.Wait, bool retreiveAgentPubKeyAndDnaHashFromConductor = true, bool retreiveAgentPubKeyAndDnaHashFromSandbox = true, bool automaticallyAttemptToRetreiveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetreiveFromSandBoxIfConductorFails = true, bool updateConfigWithAgentPubKeyAndDnaHashOnceRetreived = true)
         {
             if (RetreivingAgentPubKeyAndDnaHash)
                 return null;
@@ -356,12 +493,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             RetreivingAgentPubKeyAndDnaHash = true;
 
             //Try to first get from the conductor.
-            if (getAgentPubKeyAndDnaHashFromConductor)
-                return await RetreiveAgentPubKeyAndDnaHashFromConductorAsync(retreiveAgentPubKeyAndDnaHashMode, updateConfigWithAgentPubKeyAndDnaHashOnceRetreived, automaticallyAttemptToGetFromSandBoxIfConductorFails);
+            if (retreiveAgentPubKeyAndDnaHashFromConductor)
+                return await RetreiveAgentPubKeyAndDnaHashFromConductorAsync(retreiveAgentPubKeyAndDnaHashMode, updateConfigWithAgentPubKeyAndDnaHashOnceRetreived, automaticallyAttemptToRetreiveFromSandBoxIfConductorFails);
 
-            else if (getAgentPubKeyAndDnaHashFromSandbox)
+            else if (retreiveAgentPubKeyAndDnaHashFromSandbox)
             {
-                AgentPubKeyDnaHash agentPubKeyDnaHash = await RetreiveAgentPubKeyAndDnaHashFromSandboxAsync(updateConfigWithAgentPubKeyAndDnaHashOnceRetreived, automaticallyAttemptToGetFromConductorIfSandBoxFails);
+                AgentPubKeyDnaHash agentPubKeyDnaHash = await RetreiveAgentPubKeyAndDnaHashFromSandboxAsync(updateConfigWithAgentPubKeyAndDnaHashOnceRetreived, automaticallyAttemptToRetreiveFromConductorIfSandBoxFails);
 
                 if (agentPubKeyDnaHash != null)
                     RetreivingAgentPubKeyAndDnaHash = false;
@@ -370,7 +507,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             return new AgentPubKeyDnaHash() { AgentPubKey = Config.AgentPubKey, DnaHash = Config.DnaHash };
         }
 
-        public async Task<AgentPubKeyDnaHash> RetreiveAgentPubKeyAndDnaHashFromSandboxAsync(bool updateConfigWithAgentPubKeyAndDnaHashOnceRetreived = true, bool automaticallyAttemptToGetFromConductorIfSandBoxFails = true)
+        /// <summary>
+        /// This method gets the AgentPubKey & DnaHash from the HC Sandbox command. It will raise the [OnReadyForZomeCalls](#onreadyforzomecalls) event once it successfully retreives them and the WebSocket has connected to the Holochain Conductor. If it fails to retreive the AgentPubKey and DnaHash from the HC Sandbox and the optional `automaticallyAttemptToRetreiveFromConductorIfSandBoxFails` flag is true (defaults to true), it will call the RetreiveAgentPubKeyAndDnaHashFromConductor method to attempt to retreive them directly from the conductor (default).
+        /// </summary>
+        /// <param name="updateConfigWithAgentPubKeyAndDnaHashOnceRetreived">Set this to true (default) to automatically update the Config property once it has retreived the DnaHash & AgentPubKey.</param>
+        /// <param name="automaticallyAttemptToRetreiveFromConductorIfSandBoxFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the HC Sandbox command if it fails to get them from the Holochain Conductor. This defaults to true.</param>
+        /// <returns>The AgentPubKey and DnaHash</returns>
+        public async Task<AgentPubKeyDnaHash> RetreiveAgentPubKeyAndDnaHashFromSandboxAsync(bool updateConfigWithAgentPubKeyAndDnaHashOnceRetreived = true, bool automaticallyAttemptToRetreiveFromConductorIfSandBoxFails = true)
         {
             try
             {
@@ -418,30 +561,43 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                     return new AgentPubKeyDnaHash() { DnaHash = dnaHash, AgentPubKey = agentPubKey };
                 }
-                else if (automaticallyAttemptToGetFromConductorIfSandBoxFails)
+                else if (automaticallyAttemptToRetreiveFromConductorIfSandBoxFails)
                     await RetreiveAgentPubKeyAndDnaHashFromConductorAsync();
             }
             catch (Exception ex)
             {
-                HandleError("Error in HoloNETClient.GetAgentPubKeyAndDnaHashFromSandbox method getting DnaHash & AgentPubKey from hApp.", ex);
+                HandleError("Error in HoloNETClient.retreiveAgentPubKeyAndDnaHashFromSandbox method getting DnaHash & AgentPubKey from hApp.", ex);
             }
 
             return null;
         }
 
-        public AgentPubKeyDnaHash RetreiveAgentPubKeyAndDnaHashFromSandbox(bool updateConfigWithAgentPubKeyAndDnaHashOnceRetreived = true, bool automaticallyAttemptToGetFromConductorIfSandBoxFails = true)
+        /// <summary>
+        /// This method gets the AgentPubKey & DnaHash from the HC Sandbox command. It will raise the [OnReadyForZomeCalls](#onreadyforzomecalls) event once it successfully retreives them and the WebSocket has connected to the Holochain Conductor. If it fails to retreive the AgentPubKey and DnaHash from the HC Sandbox and the optional `automaticallyAttemptToRetreiveFromConductorIfSandBoxFails` flag is true (defaults to true), it will call the RetreiveAgentPubKeyAndDnaHashFromConductor method to attempt to retreive them directly from the conductor (default).
+        /// </summary>
+        /// <param name="updateConfigWithAgentPubKeyAndDnaHashOnceRetreived">Set this to true (default) to automatically update the Config property once it has retreived the DnaHash & AgentPubKey.</param>
+        /// <param name="automaticallyAttemptToRetreiveFromConductorIfSandBoxFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the HC Sandbox command if it fails to get them from the Holochain Conductor. This defaults to true.</param>
+        /// <returns>The AgentPubKey and DnaHash</returns>
+        public AgentPubKeyDnaHash RetreiveAgentPubKeyAndDnaHashFromSandbox(bool updateConfigWithAgentPubKeyAndDnaHashOnceRetreived = true, bool automaticallyAttemptToRetreiveFromConductorIfSandBoxFails = true)
         {
-            return RetreiveAgentPubKeyAndDnaHashFromSandboxAsync(updateConfigWithAgentPubKeyAndDnaHashOnceRetreived, automaticallyAttemptToGetFromConductorIfSandBoxFails).Result;
+            return RetreiveAgentPubKeyAndDnaHashFromSandboxAsync(updateConfigWithAgentPubKeyAndDnaHashOnceRetreived, automaticallyAttemptToRetreiveFromConductorIfSandBoxFails).Result;
         }
 
-        public async Task<AgentPubKeyDnaHash> RetreiveAgentPubKeyAndDnaHashFromConductorAsync(RetreiveAgentPubKeyAndDnaHashMode retreiveAgentPubKeyAndDnaHashMode = RetreiveAgentPubKeyAndDnaHashMode.Wait, bool updateConfigWithAgentPubKeyAndDnaHashOnceRetreived = true, bool automaticallyAttemptToGetFromSandboxIfConductorFails = true)
+        /// <summary>
+        /// This method gets the AgentPubKey & DnaHash from the Holochain Conductor (the Connect method will automatically call this by default). Once it has retreived them and the WebSocket has connceted to the Holochain Conductor it will raise the OnReadyForZomeCalls event. If it fails to retreive the AgentPubKey and DnaHash from the Conductor and the optional `automaticallyAttemptToRetreiveFromSandBoxIfConductorFails` flag is true (defaults to true), it will call the RetreiveAgentPubKeyAndDnaHashFromSandbox method. 
+        /// </summary>
+        /// <param name="retreiveAgentPubKeyAndDnaHashMode">If set to `Wait` (default) it will await until it has finished retreiving the AgentPubKey & DnaHash before returning, otherwise it will return immediatley and then raise the OnReadyForZomeCalls event once it has finished retreiving the DnaHash & AgentPubKey.</param>
+        /// <param name="updateConfigWithAgentPubKeyAndDnaHashOnceRetreived">Set this to true (default) to automatically update the Config property once it has retreived the DnaHash & AgentPubKey.</param>
+        /// <param name="automaticallyAttemptToRetreiveFromSandBoxIfConductorFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the HC Sandbox command if it fails to get them from the Holochain Conductor. This defaults to true.</param>
+        /// <returns>The AgentPubKey and DnaHash</returns>
+        public async Task<AgentPubKeyDnaHash> RetreiveAgentPubKeyAndDnaHashFromConductorAsync(RetreiveAgentPubKeyAndDnaHashMode retreiveAgentPubKeyAndDnaHashMode = RetreiveAgentPubKeyAndDnaHashMode.Wait, bool updateConfigWithAgentPubKeyAndDnaHashOnceRetreived = true, bool automaticallyAttemptToRetreiveFromSandBoxIfConductorFails = true)
         {
             try
             {
                 if (RetreivingAgentPubKeyAndDnaHash)
                     return null;
 
-                _automaticallyAttemptToGetFromSandboxIfConductorFails = automaticallyAttemptToGetFromSandboxIfConductorFails;
+                _automaticallyAttemptToGetFromSandboxIfConductorFails = automaticallyAttemptToRetreiveFromSandBoxIfConductorFails;
                 RetreivingAgentPubKeyAndDnaHash = true;
                 _updateDnaHashAndAgentPubKey = updateConfigWithAgentPubKeyAndDnaHashOnceRetreived;
                 Logger.Log("Attempting To Retreive AgentPubKey & DnaHash from Holochain Conductor...", LogType.Info, true);
@@ -463,17 +619,29 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
             catch (Exception ex)
             {
-                HandleError("Error occured in HoloNETClient.GetAgentPubKeyAndDnaHashFromConductor method getting DnaHash & AgentPubKey from hApp.", ex);
+                HandleError("Error occured in HoloNETClient.retreiveAgentPubKeyAndDnaHashFromConductor method getting DnaHash & AgentPubKey from hApp.", ex);
             }
 
             return null;
         }
 
-        public AgentPubKeyDnaHash RetreiveAgentPubKeyAndDnaHashFromConductor(bool updateConfigWithAgentPubKeyAndDnaHashOnceRetreived = true, bool automaticallyAttemptToGetFromSandboxIfConductorFails = true)
+        /// <summary>
+        /// This method gets the AgentPubKey & DnaHash from the Holochain Conductor (the Connect method will automatically call this by default). Once it has retreived them and the WebSocket has connceted to the Holochain Conductor it will raise the OnReadyForZomeCalls event. If it fails to retreive the AgentPubKey and DnaHash from the Conductor and the optional `automaticallyAttemptToRetreiveFromSandBoxIfConductorFails` flag is true (defaults to true), it will call the RetreiveAgentPubKeyAndDnaHashFromSandbox method. 
+        /// </summary>
+        /// <param name="updateConfigWithAgentPubKeyAndDnaHashOnceRetreived">Set this to true (default) to automatically update the Config property once it has retreived the DnaHash & AgentPubKey.</param>
+        /// <param name="automaticallyAttemptToRetreiveFromSandBoxIfConductorFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the HC Sandbox command if it fails to get them from the Holochain Conductor. This defaults to true.</param>
+        /// <returns>The AgentPubKey and DnaHash</returns>
+        public AgentPubKeyDnaHash RetreiveAgentPubKeyAndDnaHashFromConductor(bool updateConfigWithAgentPubKeyAndDnaHashOnceRetreived = true, bool automaticallyAttemptToRetreiveFromSandBoxIfConductorFails = true)
         {
-            return RetreiveAgentPubKeyAndDnaHashFromConductorAsync(RetreiveAgentPubKeyAndDnaHashMode.UseCallBackEvents, updateConfigWithAgentPubKeyAndDnaHashOnceRetreived, automaticallyAttemptToGetFromSandboxIfConductorFails).Result;
+            return RetreiveAgentPubKeyAndDnaHashFromConductorAsync(RetreiveAgentPubKeyAndDnaHashMode.UseCallBackEvents, updateConfigWithAgentPubKeyAndDnaHashOnceRetreived, automaticallyAttemptToRetreiveFromSandBoxIfConductorFails).Result;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="holoNETData"></param>
+        /// <returns></returns>
         public async Task SendHoloNETRequestAsync(string id, HoloNETData holoNETData)
         {
             try
@@ -1163,7 +1331,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 if (WebSocket.State == WebSocketState.Open && !string.IsNullOrEmpty(Config.AgentPubKey) && !string.IsNullOrEmpty(Config.DnaHash))
                     SetReadyForZomeCalls();
 
-                //Otherwise, if the getAgentPubKeyAndDnaHashFromConductor param was set to true when calling the Connect method, retreive them now...
+                //Otherwise, if the retreiveAgentPubKeyAndDnaHashFromConductor param was set to true when calling the Connect method, retreive them now...
                 else if (_getAgentPubKeyAndDnaHashFromConductor) //TODO: Might not need to do this now because it is called in the Connect method (need to test this).
                     RetreiveAgentPubKeyAndDnaHashFromConductorAsync();
             }
