@@ -132,7 +132,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public string AgentPubKey { get; set; }
     }
 
-    public class SignalsCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
+    public class SignalCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
         public string AgentPubKey { get; set; }
         public string DnaHash { get; set; }

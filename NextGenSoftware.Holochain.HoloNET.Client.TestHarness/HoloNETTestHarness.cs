@@ -87,7 +87,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                 _holoNETClient.OnZomeFunctionCallBack += HoloNETClient_OnZomeFunctionCallBack;
                 _holoNETClient.OnAppInfoCallBack += HoloNETClient_OnAppInfoCallBack;
                 _holoNETClient.OnReadyForZomeCalls += _holoNETClient_OnReadyForZomeCalls;
-                _holoNETClient.OnSignalsCallBack += HoloNETClient_OnSignalsCallBack;
+                _holoNETClient.OnSignalCallBack += HoloNETClient_OnSignalCallBack;
                 _holoNETClient.OnDisconnected += HoloNETClient_OnDisconnected;
                 _holoNETClient.OnError += HoloNETClient_OnError;
                 _holoNETClient.OnHolochainConductorsShutdownComplete += _holoNETClient_OnHolochainConductorsShutdownComplete;
@@ -717,7 +717,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
             Console.WriteLine("");
         }
 
-        private static void HoloNETClient_OnSignalsCallBack(object sender, SignalsCallBackEventArgs e)
+        private static void HoloNETClient_OnSignalCallBack(object sender, SignalCallBackEventArgs e)
         {
             Console.WriteLine(string.Concat("TEST HARNESS: SIGINALS CALLBACK EVENT HANDLER: EndPoint: ", e.EndPoint, ", Id: ", e.Id, ", Data: ", e.RawJSONData, ", AgentPubKey =  ", e.AgentPubKey, ", DnaHash = ", e.DnaHash, ", Signal Type: ", Enum.GetName(typeof(SignalType), e.SignalType), ", Signal Data: ", e.SignalDataAsString, ", IsError: ", e.IsError, ", Message: ", e.Message));
             //Console.WriteLine("\nSignal Data:");
