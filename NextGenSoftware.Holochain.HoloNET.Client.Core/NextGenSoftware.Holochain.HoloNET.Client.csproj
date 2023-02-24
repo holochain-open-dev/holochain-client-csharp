@@ -33,9 +33,9 @@
 		  - Re-set HoloNETClient defaults so it will auto-start and auto-shutdown the Holochain Condutor as it use to in previous versions in HoloNET Test Harness.
 		  - Added new OnHolochainConductorsShutdownComplete &amp; OnHoloNETShutdownComplete event handlers to HoloNET Test Harness.
 		  - Removed animation from log message in ShutDownAllHolochainConductorsAsync method in HoloNET Client.
-		  - Added automaticallyAttemptToGetFromConductorIfSandBoxFails and automaticallyAttemptToGetFromSandBoxIfConductorFails and updateConfig optional params to methods RetreiveAgentPubKeyAndDnaHashAsync, RetreiveAgentPubKeyAndDnaHash, Connect &amp; ConnectAsync in HoloNETClient.
-		  - Added optional params updateConfig &amp; automaticallyAttemptToGetFromConductorIfSandBoxFails to RetreiveAgentPubKeyAndDnaHashFromSandboxAsync and RetreiveAgentPubKeyAndDnaHashFromSandboxmethods in HoloNETClient.
-		  - Added optional params updateConfig &amp; automaticallyAttemptToGetFromSandboxIfConductorFails to methods RetreiveAgentPubKeyAndDnaHashFromConductor &amp; RetreiveAgentPubKeyAndDnaHashFromConductorAsync in HoloNETClient.
+		  - Added automaticallyAttemptToGetFromConductorIfSandBoxFails and automaticallyAttemptToGetFromSandBoxIfConductorFails and updateConfig optional params to methods RetrieveAgentPubKeyAndDnaHashAsync, RetrieveAgentPubKeyAndDnaHash, Connect &amp; ConnectAsync in HoloNETClient.
+		  - Added optional params updateConfig &amp; automaticallyAttemptToGetFromConductorIfSandBoxFails to RetrieveAgentPubKeyAndDnaHashFromSandboxAsync and RetrieveAgentPubKeyAndDnaHashFromSandboxmethods in HoloNETClient.
+		  - Added optional params updateConfig &amp; automaticallyAttemptToGetFromSandboxIfConductorFails to methods RetrieveAgentPubKeyAndDnaHashFromConductor &amp; RetrieveAgentPubKeyAndDnaHashFromConductorAsync in HoloNETClient.
 		  - Made ShutDownAllHolochainConductorsAsync method private.
 		  - Removed ShutDownAllHolochainConductors method.
 		  - ShutDownHolochainConductorsAsync method now takes a ShutdownHolochainConductorsMode optional param which defaults to UseConfigSettings.
@@ -44,10 +44,10 @@
 		  - Removed ConductorDebugCallBack event from HoloNET Client (obsolete from previous Redux version).
 		  - Related to above removed ConductorDebugCallBack event from HoloNET Test Harness.
 		  - Added IsError &amp; Message to the HoloNETClient_OnAppInfoCallBack, HoloNETClient_OnSignalsCallBack &amp; HoloNETClient_OnDataReceived event handlers in HoloNET Test Harness.
-		  - Added automaticallyAttemptToGetFromConductorIfSandBoxFails, automaticallyAttemptToGetFromSandBoxIfConductorFails &amp; updateConfigWithAgentPubKeyAndDnaHashOnceRetreived to all 3 of the HoloNETEntryBaseClass contructors.
-		  - Added automaticallyAttemptToGetFromConductorIfSandBoxFails, automaticallyAttemptToGetFromSandBoxIfConductorFails &amp; updateConfigWithAgentPubKeyAndDnaHashOnceRetreived to all 3 of the HoloNETAuditEntryBaseClass contructors.
-		  - Added automaticallyAttemptToGetFromConductorIfSandBoxFails, automaticallyAttemptToGetFromSandBoxIfConductorFails &amp; updateConfigWithAgentPubKeyAndDnaHashOnceRetreived to InitializeAsync and Initialize methods on HoloNETEntryBaseClass.
-		  - Renamed updateConfig to updateConfigWithAgentPubKeyAndDnaHashOnceRetreived on HoloNET Client.
+		  - Added automaticallyAttemptToGetFromConductorIfSandBoxFails, automaticallyAttemptToGetFromSandBoxIfConductorFails &amp; updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved to all 3 of the HoloNETEntryBaseClass contructors.
+		  - Added automaticallyAttemptToGetFromConductorIfSandBoxFails, automaticallyAttemptToGetFromSandBoxIfConductorFails &amp; updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved to all 3 of the HoloNETAuditEntryBaseClass contructors.
+		  - Added automaticallyAttemptToGetFromConductorIfSandBoxFails, automaticallyAttemptToGetFromSandBoxIfConductorFails &amp; updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved to InitializeAsync and Initialize methods on HoloNETEntryBaseClass.
+		  - Renamed updateConfig to updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved on HoloNET Client.
 		  - Moved Version &amp; AuditEntries properties from HoloNETEntryBaseClass to HoloNETAuditEntryBaseClass.
 		  - Added new ProcessZomeReturnCall method to HoloNETAuditEntryBaseClass which overrides the base class version in HoloNETEntryBaseClass .
 		  - Removed StoreEntryHashInEntry property from HoloNETEntryBaseClass.
