@@ -36,12 +36,24 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public event Loaded OnLoaded;
 
         public delegate void Saved(object sender, ZomeFunctionCallBackEventArgs e);
+
+        /// <summary>
+        /// Fired after the Save method has finished saving the Holochain entry to the Holochain Conductor. This calls the CallZomeFunction on the HoloNET client passing in the zome function name specified in the constructor param `zomeCreateEntryFunction` or property ZomeCreateEntryFunction if it is a new entry (empty object) or the `zomeUpdateEntryFunction` param and ZomeUpdateEntryFunction property if it's an existing entry (previously saved object containing a valid value for the EntryHash property). Once it has saved the entry it will then update the EntryHash property with the entry hash returned from the zome call/conductor. The PreviousVersionEntryHash property is also set to the previous EntryHash (if there is one).
+        /// </summary>
         public event Saved OnSaved;
 
         public delegate void Deleted(object sender, ZomeFunctionCallBackEventArgs e);
+
+        /// <summary>
+        /// Fired after the Delete method has finished deleting the Holochain entry and has received a response from the Holochain Conductor. This calls the CallZomeFunction on the HoloNET client passing in the zome function name specified in the constructor param `zomeDeleteEntryFunction` or property `ZomeDeleteEntryFunction`. It then updates the HoloNET Entry Data Object with the response received from the Holochain Conductor.
+        /// </summary>
         public event Deleted OnDeleted;
 
         public delegate void Closed(object sender, HoloNETShutdownEventArgs e);
+
+        /// <summary>
+        /// Fired after the Close method has finished closing the connection to the Holochain Conductor and has shutdown all running Holochain Conductors (if configured to do so). This method calls the ShutdownHoloNET internally.
+        /// </summary>
         public event Closed OnClosed;
 
         /// <summary>
@@ -365,14 +377,20 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         }
 
         /// <summary>
-        /// 
+        /// This is a reference to the internal instance of the HoloNET Client (either the one passed in through a constructor or one created internally.)
         /// </summary>
         public HoloNETClient HoloNETClient { get; set; }
 
         //public bool StoreEntryHashInEntry { get; set; } = true;
 
+        /// <summary>
+        /// This will return true whilst HoloNETEntryBaseClass and it's internal HoloNET client is initializing. The Initialize method will begin the initialization process. This will also call the Connect and RetrieveAgentPubKeyAndDnaHash methods on the HoloNET client. Once the HoloNET client has successfully connected to the Holochain Conductor, retrieved the AgentPubKey & DnaHash & then raised the OnReadyForZomeCalls event it will raise the OnInitialized event. See also the IsInitialized property.
+        /// </summary>
         public bool IsInitializing { get; private set; }
 
+        /// <summary>
+        /// This will return true once HoloNETEntryBaseClass and it's internal HoloNET client have finished initializing and the OnInitialized event has been raised. See also the IsInitializing property and the Initialize method.
+        /// </summary>
         public bool IsInitialized
         {
             get
@@ -733,11 +751,30 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             return returnValue;
         }
 
+        /// <summary>
+        /// This method will Initialize the HoloNETEntryBaseClass along with the internal HoloNET Client and will raise the OnInitialized event once it has finished initializing. This will also call the Connect and RetrieveAgentPubKeyAndDnaHash methods on the HoloNET client. Once the HoloNET client has successfully connected to the Holochain Conductor, retrieved the AgentPubKey & DnaHash & then raised the OnReadyForZomeCalls event it will raise the OnInitialized event. See also the IsInitializing and the IsInitialized properties.
+        /// </summary>
+        /// <param name="retrieveAgentPubKeyAndDnaHashFromConductor"></param>
+        /// <param name="retrieveAgentPubKeyAndDnaHashFromSandbox"></param>
+        /// <param name="automaticallyAttemptToRetrieveFromConductorIfSandBoxFails"></param>
+        /// <param name="automaticallyAttemptToRetrieveFromSandBoxIfConductorFails"></param>
+        /// <param name="updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved"></param>
         public void Initialize(bool retrieveAgentPubKeyAndDnaHashFromConductor = true, bool retrieveAgentPubKeyAndDnaHashFromSandbox = true, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true, bool updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved = true)
         {
             InitializeAsync(ConnectedCallBackMode.UseCallBackEvents, RetrieveAgentPubKeyAndDnaHashMode.UseCallBackEvents, retrieveAgentPubKeyAndDnaHashFromConductor, retrieveAgentPubKeyAndDnaHashFromSandbox, automaticallyAttemptToRetrieveFromConductorIfSandBoxFails, automaticallyAttemptToRetrieveFromSandBoxIfConductorFails, updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved);
         }
 
+        /// <summary>
+        /// This method will Initialize the HoloNETEntryBaseClass along with the internal HoloNET Client and will raise the OnInitialized event once it has finished initializing. This will also call the Connect and RetrieveAgentPubKeyAndDnaHash methods on the HoloNET client. Once the HoloNET client has successfully connected to the Holochain Conductor, retrieved the AgentPubKey & DnaHash & then raised the OnReadyForZomeCalls event it will raise the OnInitialized event. See also the IsInitializing and the IsInitialized properties.
+        /// </summary>
+        /// <param name="connectedCallBackMode"></param>
+        /// <param name="retrieveAgentPubKeyAndDnaHashMode"></param>
+        /// <param name="retrieveAgentPubKeyAndDnaHashFromConductor"></param>
+        /// <param name="retrieveAgentPubKeyAndDnaHashFromSandbox"></param>
+        /// <param name="automaticallyAttemptToRetrieveFromConductorIfSandBoxFails"></param>
+        /// <param name="automaticallyAttemptToRetrieveFromSandBoxIfConductorFails"></param>
+        /// <param name="updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved"></param>
+        /// <returns></returns>
         public async Task InitializeAsync(ConnectedCallBackMode connectedCallBackMode = ConnectedCallBackMode.WaitForHolochainConductorToConnect, RetrieveAgentPubKeyAndDnaHashMode retrieveAgentPubKeyAndDnaHashMode = RetrieveAgentPubKeyAndDnaHashMode.Wait, bool retrieveAgentPubKeyAndDnaHashFromConductor = true, bool retrieveAgentPubKeyAndDnaHashFromSandbox = true, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true, bool updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved = true)
         {
             try
@@ -769,18 +806,16 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public async Task<ReadyForZomeCallsEventArgs> WaitTillHoloNETInitializedAsync()
         {
             if (!IsInitialized && !IsInitializing)
                 await InitializeAsync();
 
             return await HoloNETClient.WaitTillReadyForZomeCallsAsync();
-        }
-
-        private void UnsubscribeEvents()
-        {
-            HoloNETClient.OnError -= HoloNETClient_OnError;
-            HoloNETClient.OnReadyForZomeCalls -= HoloNETClient_OnReadyForZomeCalls;
         }
 
         protected virtual void ProcessZomeReturnCall(ZomeFunctionCallBackEventArgs result)
@@ -845,6 +880,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             {
                 HandleError("Unknown error occurred in ProcessZomeReturnCall method.", ex);
             }
+        }
+
+        private void UnsubscribeEvents()
+        {
+            HoloNETClient.OnError -= HoloNETClient_OnError;
+            HoloNETClient.OnReadyForZomeCalls -= HoloNETClient_OnReadyForZomeCalls;
         }
 
         private void HoloNETClient_OnError(object sender, HoloNETErrorEventArgs e)
