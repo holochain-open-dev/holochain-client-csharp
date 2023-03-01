@@ -15,18 +15,11 @@
 	<Authors>David Ellams (NextGen Software Ltd)</Authors>
 	<PackageTags>holochain;net;unity</PackageTags>
 	<PackageReleaseNotes>
+		- Updated HoloNET 2 Documentation (now complete).
+		- Added intellisense documentation making it even easier to use HoloNET! :)
 		- Various bug fixes.
 		- Various improvements.
-		- Added new SaveLoadOASISEntryWithTypeOfEntryDataObject test to HoloNET Test Harness.
-		- Added call to ShutDownAllHolochainConductors on HoloNETClient after HoloNET Test Harness calls the Disconect method on HoloNETClient.
-		- Added new BuildEntryDataObjectMessage method to HoloNET Test Harness.
-		- Added new AvatarEntryDataObject to HoloNET Test Harness to use as example of how to use the CallZomeFunction overloads that either pass in the type of a EntryDataObject to map to or the actual object itself.
-		- Added additional commenting/documentation on how to use the new HoloNETAuditEntryBaseClass so is easier to understand in in HoloNET Test Harness.
-		- Organised examples into new Examples folder in HoloNET Test Harness so is easier to find and understand.
-		- Added new global _avatarEntryDataObject to HoloNET Test Harness as part of the new tests described above.
-		- Re-set HoloNETClient defaults so it will auto-start and auto-shutdown the Holochain Condutor as it use to in previous versions in HoloNET Test Harness.
-		- Added new OnHolochainConductorsShutdownComplete &amp; OnHoloNETShutdownComplete event handlers to HoloNET Test Harness.
-		- View full change log here: https://github.com/holochain-open-dev/holochain-client-csharp/releases/tag/v2.1.0
+		- View full change log here: https://github.com/holochain-open-dev/holochain-client-csharp/releases/tag/v2.1.1
 	</PackageReleaseNotes>
 	<RepositoryType>git</RepositoryType>
 	<RepositoryUrl>https://github.com/NextGenSoftwareUK/holochain-client-csharp</RepositoryUrl>
@@ -35,7 +28,7 @@
 	<!--<PackageLicenseExpression>GNU GPLv3</PackageLicenseExpression>-->
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-	<Version>2.1.0</Version>
+	<Version>2.1.1</Version>
 	<!--<PackageLicenseFile>..\LICENSE</PackageLicenseFile>-->
 
 	<AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
