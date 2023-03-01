@@ -41,36 +41,76 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         //Events
         public delegate void Connected(object sender, ConnectedEventArgs e);
+
+        /// <summary>
+        /// Fired when the client has successfully connected to the Holochain conductor.
+        /// </summary>
         public event Connected OnConnected;
 
         public delegate void Disconnected(object sender, DisconnectedEventArgs e);
+
+        /// <summary>
+        /// Fired when the client disconnected from the Holochain conductor.
+        /// </summary>
         public event Disconnected OnDisconnected;
 
         public delegate void HolochainConductorsShutdownComplete(object sender, HolochainConductorsShutdownEventArgs e);
+
+        /// <summary>
+        /// Fired when all Holochain Conductors have been shutdown.
+        /// </summary>
         public event HolochainConductorsShutdownComplete OnHolochainConductorsShutdownComplete;
 
         public delegate void HoloNETShutdownComplete(object sender, HoloNETShutdownEventArgs e);
+
+        /// <summary>
+        /// Fired when HoloNET has completed shutting down (this includes closing all connections and shutting down all Holochain Conductor).
+        /// </summary>
         public event HoloNETShutdownComplete OnHoloNETShutdownComplete;
 
         public delegate void DataReceived(object sender, HoloNETDataReceivedEventArgs e);
+
+        /// <summary>
+        /// Fired when any data is received from the Holochain conductor. This returns the raw data.                                     
+        /// </summary>
         public event DataReceived OnDataReceived;
 
         public delegate void ZomeFunctionCallBack(object sender, ZomeFunctionCallBackEventArgs e);
+
+        /// <summary>
+        /// Fired when the Holochain conductor returns the response from a zome function call. This returns the raw data as well as the parsed data returned from the zome function. It also returns the id, zome and zome function that made the call.
+        /// </summary>
         public event ZomeFunctionCallBack OnZomeFunctionCallBack;
 
         public delegate void SignalCallBack(object sender, SignalCallBackEventArgs e);
+
+        /// <summary>
+        /// Fired when the Holochain conductor sends signals data. 
+        /// </summary>
         public event SignalCallBack OnSignalCallBack;
 
         //public delegate void ConductorDebugCallBack(object sender, ConductorDebugCallBackEventArgs e);
         //public event ConductorDebugCallBack OnConductorDebugCallBack;
 
         public delegate void AppInfoCallBack(object sender, AppInfoCallBackEventArgs e);
+
+        /// <summary>
+        /// Fired when the client receives AppInfo from the conductor containing the cell id for the running hApp (which in itself contains the AgentPubKey & DnaHash). It also contains the AppId and other info.
+        /// </summary>
         public event AppInfoCallBack OnAppInfoCallBack;
 
         public delegate void ReadyForZomeCalls(object sender, ReadyForZomeCallsEventArgs e);
+
+        /// <summary>
+        /// Fired when the client has successfully connected and reteived the AgentPubKey & DnaHash, meaning it is ready to make zome calls to the Holochain conductor.
+        /// </summary>
         public event ReadyForZomeCalls OnReadyForZomeCalls;
 
         public delegate void Error(object sender, HoloNETErrorEventArgs e);
+
+        /// <summary>
+        /// Fired when an error occurs, check the params for the cause of the error.
+        /// </summary>
         public event Error OnError;
 
         // Properties
