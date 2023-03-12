@@ -6,10 +6,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
     public class HolochainPropertyName : Attribute
     {
         private string _propertyName;
+        private bool _isEnabled;
 
-        public HolochainPropertyName(string propertyName)
+        public HolochainPropertyName(string propertyName, bool isEnabled = true)
         {
             _propertyName = propertyName;
+            _isEnabled = isEnabled;
         }
     }
 }

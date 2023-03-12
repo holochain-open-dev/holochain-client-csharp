@@ -418,11 +418,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         //[HolochainPropertyName("previous_version_entry_hash")]
         public string PreviousVersionEntryHash { get; set; }
 
-        /// <summary>
-        /// The current version of the entry.
-        /// </summary>
-        [HolochainPropertyName("version")]
-        public int Version { get; set; } = 1;
+        ///// <summary>
+        ///// The current version of the entry.
+        ///// </summary>
+        //[HolochainPropertyName("version")]
+        //public int Version { get; set; } = 1;
 
         /// <summary>
         /// The name of the zome to call the respective ZomeLoadEntryFunction, ZomeCreateEntryFunction, ZomeUpdateEntryFunction & ZomeDeleteEntryFunction.
@@ -514,17 +514,20 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// NOTE: This will automatically extrct the properties that need saving (contain the HolochainPropertyName attribute). This method uses reflection so has a tiny performance overhead (negligbale), but if you need the extra nanoseconds use the other Save overload passing in your own params object.
         /// NOTE: The corresponding rust Holochain Entry in your hApp will need to have the same properties contained in your class and have the correct mappings using the HolochainPropertyName attribute. Please see HoloNETEntryBaseClass in the documentation/README on the GitHub repo https://github.com/NextGenSoftwareUK/holochain-client-csharp for more info...
         /// </summary>
+        /// <param name="customDataKeyValuePair">This is a optional dictionary containing keyvalue pairs of custom data you wish to inject into the params that are sent to the zome function.</param>
+        /// <param name="holochainPropertiesIsEnabledKeyValuePair">This is a optional dictionary containing keyvalue pairs to allow properties that contain the HolochainProperty to be omitted from the data sent to the zome function. The key (case senstive) needs to match a property that has the HolochainProperty attribute.</param>
         /// <returns></returns>
-        public virtual async Task<ZomeFunctionCallBackEventArgs> SaveAsync()
+        public virtual async Task<ZomeFunctionCallBackEventArgs> SaveAsync(Dictionary<string, string> customDataKeyValuePair = null, Dictionary<string, bool> holochainPropertiesIsEnabledKeyValuePair = null)
         {
             try
             {
-                if (!IsInitialized && !IsInitializing)
-                    await InitializeAsync();
-
                 dynamic paramsObject = new ExpandoObject();
                 dynamic updateParamsObject = new ExpandoObject();
                 Dictionary<string, object> zomeCallProps = new Dictionary<string, object>();
+
+                if (!IsInitialized && !IsInitializing)
+                    await InitializeAsync();
+
                 PropertyInfo[] props = GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
                 bool update = false;
 
@@ -536,10 +539,14 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                         {
                             try
                             {
-                                if (data.ConstructorArguments.Count > 0 && data.ConstructorArguments[0] != null && data.ConstructorArguments[0].Value != null)
+                                if (data.ConstructorArguments.Count > 0 && data.ConstructorArguments[0].Value != null)
                                 {
                                     string key = data.ConstructorArguments[0].Value.ToString();
+                                    bool? isEnabled = data.ConstructorArguments[1].Value as bool?;
                                     object value = propInfo.GetValue(this);
+
+                                    if ((isEnabled.HasValue && !isEnabled.Value) || (holochainPropertiesIsEnabledKeyValuePair != null && holochainPropertiesIsEnabledKeyValuePair.ContainsKey(key) && !holochainPropertiesIsEnabledKeyValuePair[key]))
+                                        break;
 
                                     if (key != "entry_hash")
                                     {
@@ -574,8 +581,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     }
                 }
 
-                ExpandoObjectHelpers.AddProperty(paramsObject, "version", this.Version);
-                this.Version++;
+                if (customDataKeyValuePair != null)
+                {
+                    foreach (string key in customDataKeyValuePair.Keys)
+                        ExpandoObjectHelpers.AddProperty(paramsObject, key, customDataKeyValuePair[key]);
+                }
 
                 //Update
                 if (!string.IsNullOrEmpty(EntryHash))
