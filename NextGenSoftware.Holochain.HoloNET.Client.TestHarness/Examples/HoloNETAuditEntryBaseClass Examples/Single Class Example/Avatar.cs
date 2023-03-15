@@ -1,5 +1,7 @@
 ﻿
 using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
 {
@@ -8,19 +10,30 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
     /// </summary>
     public class Avatar : HoloNETAuditEntryBaseClass
     {
-        public Avatar() : base("oasis", "get_entry_avatar", "create_entry_avatar", "update_entry_avatar", "delete_entry_avatar") { }
-        public Avatar(HoloNETConfig holoNETConfig) : base("oasis", "get_entry_avatar", "create_entry_avatar", "update_entry_avatar", "delete_entry_avatar", holoNETConfig) { }
+        public Avatar() : base("oasis", "get_entry_avatar", "create_entry_avatar", "update_entry_avatar", "delete_entry_avatar", false, false, false) { }
+        public Avatar(HoloNETConfig holoNETConfig) : base("oasis", "get_entry_avatar", "create_entry_avatar", "update_entry_avatar", "delete_entry_avatar", holoNETConfig, false, false, false) { }
 
-        [HolochainPropertyName("first_name")]
+        [HolochainFieldName("first_name")]
         public string FirstName { get; set; }
 
-        [HolochainPropertyName("last_name")]
+        [HolochainFieldName("last_name")]
         public string LastName { get; set; }
 
-        [HolochainPropertyName("email")]
+        [HolochainFieldName("email")]
         public string Email { get; set; }
 
-        [HolochainPropertyName("dob")]
+        [HolochainFieldName("dob")]
         public DateTime DOB { get; set; }
+
+        public override Task<ZomeFunctionCallBackEventArgs> SaveAsync(Dictionary<string, string> customDataKeyValuePair = null, Dictionary<string, bool> holochainPropertiesIsEnabledKeyValuePair = null)
+        {
+            if (holochainPropertiesIsEnabledKeyValuePair == null)
+                holochainPropertiesIsEnabledKeyValuePair = new Dictionary<string, bool>();
+
+            holochainPropertiesIsEnabledKeyValuePair["DOB"] = false;
+            holochainPropertiesIsEnabledKeyValuePair["Email"] = false;
+
+            return base.SaveAsync(customDataKeyValuePair, holochainPropertiesIsEnabledKeyValuePair);
+        }
     }
 }

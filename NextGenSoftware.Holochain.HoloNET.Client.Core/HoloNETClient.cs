@@ -1488,7 +1488,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     {
                         foreach (CustomAttributeData data in propInfo.CustomAttributes)
                         {
-                            if (data.AttributeType == (typeof(HolochainPropertyName)))
+                            if (data.AttributeType == (typeof(HolochainFieldName)))
                             {
                                 try
                                 {

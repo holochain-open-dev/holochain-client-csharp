@@ -512,67 +512,67 @@ private static string ProcessZomeFunctionCallBackEventArgs(ZomeFunctionCallBackE
         /// <summary>
         /// GUID Id that is consistent across multiple versions of the entry (each version has a different hash).
         /// </summary>
-        [HolochainPropertyName("id")]
+        [HolochainFieldName("id")]
         public Guid Id { get; set; }
 
-        [HolochainPropertyName("first_name")]
+        [HolochainFieldName("first_name")]
         public string FirstName { get; set; }
 
-        [HolochainPropertyName("last_name")]
+        [HolochainFieldName("last_name")]
         public string LastName { get; set; }
 
-        [HolochainPropertyName("email")]
+        [HolochainFieldName("email")]
         public string Email { get; set; }
 
-        [HolochainPropertyName("dob")]
+        [HolochainFieldName("dob")]
         public DateTime DOB { get; set; }
 
         /// <summary>
         /// The date the entry was created.
         /// </summary>
-        [HolochainPropertyName("created_date")]
+        [HolochainFieldName("created_date")]
         public DateTime CreatedDate { get; set; }
 
         /// <summary>
         /// The AgentId who created the entry.
         /// </summary>
-        [HolochainPropertyName("created_by")]
+        [HolochainFieldName("created_by")]
         public string CreatedBy { get; set; }
 
         /// <summary>
         /// The date the entry was last modified.
         /// </summary>
-        [HolochainPropertyName("modified_date")]
+        [HolochainFieldName("modified_date")]
         public DateTime ModifiedDate { get; set; }
 
         /// <summary>
         /// The AgentId who modifed the entry.
         /// </summary>
-        [HolochainPropertyName("modified_by")]
+        [HolochainFieldName("modified_by")]
         public string ModifiedBy { get; set; }
 
         /// <summary>
         /// The date the entry was soft deleted.
         /// </summary>
-        [HolochainPropertyName("deleted_date")]
+        [HolochainFieldName("deleted_date")]
         public DateTime DeletedDate { get; set; }
 
         /// <summary>
         /// The AgentId who deleted the entry.
         /// </summary>
-        [HolochainPropertyName("deleted_by")]
+        [HolochainFieldName("deleted_by")]
         public string DeletedBy { get; set; }
 
         /// <summary>
         /// Flag showing the whether this entry is active or not.
         /// </summary>
-        [HolochainPropertyName("is_active")]
+        [HolochainFieldName("is_active")]
         public bool IsActive { get; set; }
 
         /// <summary>
         /// The current version of the entry.
         /// </summary>
-        [HolochainPropertyName("version")]
+        [HolochainFieldName("version")]
         public int Version { get; set; } = 1;
     }
   ````
@@ -898,16 +898,16 @@ This method raises the [OnDataReceived](#OnDataReceived) event and then either t
 ````c#
 public class Avatar
     {
-        [HolochainPropertyName("first_name")]
+        [HolochainFieldName("first_name")]
         public string FirstName { get; set; }
 
-        [HolochainPropertyName("last_name")]
+        [HolochainFieldName("last_name")]
         public string LastName { get; set; }
 
-        [HolochainPropertyName("email")]
+        [HolochainFieldName("email")]
         public string Email { get; set; }
 
-        [HolochainPropertyName("dob")]
+        [HolochainFieldName("dob")]
         public DateTime DOB { get; set; }
     }
  ````
@@ -1337,16 +1337,16 @@ Here is a simple example of how to use it:
         public Avatar() : base("oasis", "get_entry_avatar", "create_entry_avatar", "update_entry_avatar", "delete_entry_avatar") { }
         public Avatar(HoloNETConfig holoNETConfig) : base("oasis", "get_entry_avatar", "create_entry_avatar", "update_entry_avatar", "delete_entry_avatar", holoNETConfig) { }
 
-        [HolochainPropertyName("first_name")]
+        [HolochainFieldName("first_name")]
         public string FirstName { get; set; }
 
-        [HolochainPropertyName("last_name")]
+        [HolochainFieldName("last_name")]
         public string LastName { get; set; }
 
-        [HolochainPropertyName("email")]
+        [HolochainFieldName("email")]
         public string Email { get; set; }
 
-        [HolochainPropertyName("dob")]
+        [HolochainFieldName("dob")]
         public DateTime DOB { get; set; }
     }
 ````
@@ -1399,7 +1399,7 @@ pub fn delete_entry_avatar(action_hash: ActionHash) -> ExternResult<ActionHash> 
 }
 ````
 
-**NOTE:** Each property that you wish to have mapped to a property/field in your rust code needs to have the HolochainPropertyName attribute applied to it specifying the name of the field in your rust struct that is to be mapped to this c# property.
+**NOTE:** Each property that you wish to have mapped to a property/field in your rust code needs to have the HolochainFieldName attribute applied to it specifying the name of the field in your rust struct that is to be mapped to this c# property.
 
 **NOTE:** This is a preview of some of the advanced functionality that will be present in the upcoming [.NET HDK Low Code Generator](#net-hdk-low-code-generator), which generates dynamic rust and c# code from your metadata freeing you to focus on your amazing business idea and creativity rather than worrying about learning Holochain, Rust and then getting it to all work in Windows and with C#. HAppy Days! ;-)
 
@@ -1680,9 +1680,9 @@ The HoloNETEntryBaseClass has the following methods:
 | Method                                                              | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | --------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | [Initialize](#Initialize)                                           | This method will Initialize the HoloNETEntryBaseClass along with the internal HoloNET Client and will raise the [OnInitialized](#OnInitialized) event once it has finished initializing. This will also call the [Connect](#Connect) and [RetrieveAgentPubKeyAndDnaHash](#RetrieveAgentPubKeyAndDnaHash) methods on the HoloNET client. Once the HoloNET client has successfully connected to the Holochain Conductor, retrieved the AgentPubKey & DnaHash & then raised the [OnReadyForZomeCalls](#OnReadyForZomeCalls) event it will raise the [OnInitialized](#OnInitialized) event. See also the [IsInitializing](#IsInitializing) and the [IsInitialized](#IsInitialized) properties.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | 
-| [Load](#Load)                                                       | This method will load the Holochain entry from the Holochain Conductor using either the [EntryHash](#entryHash) property or `entryHash` param passed into one of the overloads for this method. This calls the [CallZomeFunction](#CallZomeFunction) on the HoloNET client passing in the zome function name specified in the constructor param `zomeLoadEntryFunction` or property `ZomeLoadEntryFunction` and then maps the data returned from the zome call onto your data object. It will then raise the [OnLoaded](#OnLoaded) event. **NOTE:** The corresponding rust Holochain Entry in your hApp will need to have the same properties contained in your class and have the correct mappings using the [HolochainPropertyName](#HolochainPropertyName) attribute. Please see [HoloNETEntryBaseClass](#HoloNETEntryBaseClass) for more info...                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| [Save](#Save)                                                       | This method will save the Holochain entry to the Holochain Conductor. This calls the [CallZomeFunction](#CallZomeFunction) on the HoloNET client passing in the zome function name specified in the constructor param `zomeCreateEntryFunction` or property [ZomeCreateEntryFunction](#ZomeCreateEntryFunction) if it is a new entry (empty object) or the `zomeUpdateEntryFunction` param and [ZomeUpdateEntryFunction](#ZomeUpdateEntryFunction) property if it's an existing entry (previously saved object containing a valid value for the [EntryHash](#EntryHash) property). Once it has saved the entry it will then update the [EntryHash](#entryHash) property with the entry hash returned from the zome call/conductor. The [PreviousVersionEntryHash](#PreviousVersionEntryHash) property is also set to the previous EntryHash (if there is one). Once it has finished saving and got a response from the Holochain Conductor it will raise the [OnSaved](#OnSaved) event. **NOTE:** The corresponding rust Holochain Entry in your hApp will need to have the same properties contained in your class and have the correct mappings using the [HolochainPropertyName](#HolochainPropertyName) attribute. Please see [HoloNETEntryBaseClass](#HoloNETEntryBaseClass) for more info... **NOTE:** The parmeterless overload will automatically extrct the properties that need saving (contain the HolochainPropertyName attribute). This method uses reflection so has a tiny performance overhead (negligbale), but if you need the extra nanoseconds use the other Save overload passing in your own params object. |
-| [Delete](#Delete)                                                   | This method will soft delete the Holochain entry (the previous version can still be retrieved). This calls the [CallZomeFunction](#CallZomeFunction) on the HoloNET client passing in the zome function name specified in the constructor param `zomeDeleteEntryFunction` or property [ZomeDeleteEntryFunction](#ZomeDeleteEntryFunction). It then updates the HoloNET Entry Data Object with the response received from the Holochain Conductor and then finally raises the [OnDeleted](#OnDeleted) event. **NOTE:** The parmeterless overload will automatically extrct the properties that need saving (contain the HolochainPropertyName attribute). This method uses reflection so has a tiny performance overhead (negligbale), but if you need the extra nanoseconds use the other Save overload passing in your own params object.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | 
+| [Load](#Load)                                                       | This method will load the Holochain entry from the Holochain Conductor using either the [EntryHash](#entryHash) property or `entryHash` param passed into one of the overloads for this method. This calls the [CallZomeFunction](#CallZomeFunction) on the HoloNET client passing in the zome function name specified in the constructor param `zomeLoadEntryFunction` or property `ZomeLoadEntryFunction` and then maps the data returned from the zome call onto your data object. It will then raise the [OnLoaded](#OnLoaded) event. **NOTE:** The corresponding rust Holochain Entry in your hApp will need to have the same properties contained in your class and have the correct mappings using the [HolochainFieldName](#HolochainFieldName) attribute. Please see [HoloNETEntryBaseClass](#HoloNETEntryBaseClass) for more info...                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| [Save](#Save)                                                       | This method will save the Holochain entry to the Holochain Conductor. This calls the [CallZomeFunction](#CallZomeFunction) on the HoloNET client passing in the zome function name specified in the constructor param `zomeCreateEntryFunction` or property [ZomeCreateEntryFunction](#ZomeCreateEntryFunction) if it is a new entry (empty object) or the `zomeUpdateEntryFunction` param and [ZomeUpdateEntryFunction](#ZomeUpdateEntryFunction) property if it's an existing entry (previously saved object containing a valid value for the [EntryHash](#EntryHash) property). Once it has saved the entry it will then update the [EntryHash](#entryHash) property with the entry hash returned from the zome call/conductor. The [PreviousVersionEntryHash](#PreviousVersionEntryHash) property is also set to the previous EntryHash (if there is one). Once it has finished saving and got a response from the Holochain Conductor it will raise the [OnSaved](#OnSaved) event. **NOTE:** The corresponding rust Holochain Entry in your hApp will need to have the same properties contained in your class and have the correct mappings using the [HolochainFieldName](#HolochainFieldName) attribute. Please see [HoloNETEntryBaseClass](#HoloNETEntryBaseClass) for more info... **NOTE:** The parmeterless overload will automatically extrct the properties that need saving (contain the HolochainFieldName attribute). This method uses reflection so has a tiny performance overhead (negligbale), but if you need the extra nanoseconds use the other Save overload passing in your own params object. |
+| [Delete](#Delete)                                                   | This method will soft delete the Holochain entry (the previous version can still be retrieved). This calls the [CallZomeFunction](#CallZomeFunction) on the HoloNET client passing in the zome function name specified in the constructor param `zomeDeleteEntryFunction` or property [ZomeDeleteEntryFunction](#ZomeDeleteEntryFunction). It then updates the HoloNET Entry Data Object with the response received from the Holochain Conductor and then finally raises the [OnDeleted](#OnDeleted) event. **NOTE:** The parmeterless overload will automatically extrct the properties that need saving (contain the HolochainFieldName attribute). This method uses reflection so has a tiny performance overhead (negligbale), but if you need the extra nanoseconds use the other Save overload passing in your own params object.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | 
 | [Close](#Close)                                                     | Will close this HoloNET Entry and then shutdown its internal HoloNET instance (if one was not passed in) and its current connetion to the Holochain Conductor and then shutdown all running Holochain Conductors (if configured to do so) as well as any other tasks to shut HoloNET down cleanly. This method calls the [ShutdownHoloNET](#ShutdownHoloNET) method internally. Once it has finished shutting down HoloNET it will raise the [OnClosed](#OnClosed) event. You can specify if HoloNET should wait until it has finished disconnecting and shutting down the conductors before returning to the caller or whether it should return immediately and then use the [OnDisconnected](#OnDisconnected), [OnHolochainConductorsShutdownComplete](#OnHolochainConductorsShutdownComplete) & [OnHoloNETShutdownComplete](#OnHoloNETShutdownComplete) events to notify the caller.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 | [WaitTillHoloNETInitializedAsync](#WaitTillHoloNETInitializedAsync) | This mehod will call the [WaitTillReadyForZomeCallsAsync](#WaitTillReadyForZomeCallsAsync) method on the HoloNET Client.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 
@@ -1710,7 +1710,7 @@ public void Initialize(bool retrieveAgentPubKeyAndDnaHashFromConductor = true, b
 
 This method will load the Holochain entry from the Holochain Conductor using either the [EntryHash](#entryHash) property or `entryHash` param passed into one of the overloads for this method. This calls the [CallZomeFunction](#CallZomeFunction) on the HoloNET client passing in the zome function name specified in the constructor param `zomeLoadEntryFunction` or property `ZomeLoadEntryFunction` and then maps the data returned from the zome call onto your data object. It will then raise the [OnLoaded](#OnLoaded) event.                                                                                                                                                                                                                                                                                                                                                                                                                           
 
-**NOTE:** The corresponding rust Holochain Entry in your hApp will need to have the same properties contained in your class and have the correct mappings using the [HolochainPropertyName](#HolochainPropertyName) attribute. Please see [HoloNETEntryBaseClass](#HoloNETEntryBaseClass) for more info...
+**NOTE:** The corresponding rust Holochain Entry in your hApp will need to have the same properties contained in your class and have the correct mappings using the [HolochainFieldName](#HolochainFieldName) attribute. Please see [HoloNETEntryBaseClass](#HoloNETEntryBaseClass) for more info...
 
 ````c#
 public async Task<ZomeFunctionCallBackEventArgs> LoadAsync(string entryHash)
@@ -1728,9 +1728,9 @@ public ZomeFunctionCallBackEventArgs Load()
 
 This method will save the Holochain entry to the Holochain Conductor. This calls the [CallZomeFunction](#CallZomeFunction) on the HoloNET client passing in the zome function name specified in the constructor param `zomeCreateEntryFunction` or property [ZomeCreateEntryFunction](#ZomeCreateEntryFunction) if it is a new entry (empty object) or the `zomeUpdateEntryFunction` param and [ZomeUpdateEntryFunction](#ZomeUpdateEntryFunction) property if it's an existing entry (previously saved object containing a valid value for the [EntryHash](#EntryHash) property). Once it has saved the entry it will then update the [EntryHash](#entryHash) property with the entry hash returned from the zome call/conductor. The [PreviousVersionEntryHash](#PreviousVersionEntryHash) property is also set to the previous EntryHash (if there is one). Once it has finished saving and got a response from the Holochain Conductor it will raise the [OnSaved](#OnSaved) event.
 
-**NOTE:** The parmeterless overload will automatically extrct the properties that need saving (contain the HolochainPropertyName attribute). This method uses reflection so has a tiny performance overhead (negligbale), but if you need the extra nanoseconds use the other Save overload passing in your own params object.
+**NOTE:** The parmeterless overload will automatically extrct the properties that need saving (contain the HolochainFieldName attribute). This method uses reflection so has a tiny performance overhead (negligbale), but if you need the extra nanoseconds use the other Save overload passing in your own params object.
 
-**NOTE:** The corresponding rust Holochain Entry in your hApp will need to have the same properties contained in your class and have the correct mappings using the [HolochainPropertyName](#HolochainPropertyName) attribute. Please see [HoloNETEntryBaseClass](#HoloNETEntryBaseClass) for more info...
+**NOTE:** The corresponding rust Holochain Entry in your hApp will need to have the same properties contained in your class and have the correct mappings using the [HolochainFieldName](#HolochainFieldName) attribute. Please see [HoloNETEntryBaseClass](#HoloNETEntryBaseClass) for more info...
 
 ````c#
 public virtual async Task<ZomeFunctionCallBackEventArgs> SaveAsync()
@@ -1741,14 +1741,14 @@ public virtual ZomeFunctionCallBackEventArgs Save(dynamic paramsObject)
 
 | Parameter    | Description                                                                                           
 | ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| paramsObject | The dynamic data object containing the params you wish to pass to the Create/Update zome function via the [CallZomeFunction](#CallZomeFunction) method. **NOTE:** You do not need to pass this in unless you have a need, if you call one of the overloads that do not have this parameter [HoloNETEntryBaseClass](#HoloNETEntryBaseClass) will automatically generate this object from any properties in your class that contain the [HolochainPropertyName](#HolochainPropertyName) attribute. |
+| paramsObject | The dynamic data object containing the params you wish to pass to the Create/Update zome function via the [CallZomeFunction](#CallZomeFunction) method. **NOTE:** You do not need to pass this in unless you have a need, if you call one of the overloads that do not have this parameter [HoloNETEntryBaseClass](#HoloNETEntryBaseClass) will automatically generate this object from any properties in your class that contain the [HolochainFieldName](#HolochainFieldName) attribute. |
 
 
 ##### Delete
 
 This method will soft delete the Holochain entry (the previous version can still be retrieved). This calls the [CallZomeFunction](#CallZomeFunction) on the HoloNET client passing in the zome function name specified in the constructor param `zomeDeleteEntryFunction` or property [ZomeDeleteEntryFunction](#ZomeDeleteEntryFunction). It then updates the HoloNET Entry Data Object with the response received from the Holochain Conductor and then finally raises the [OnDeleted](#OnDeleted) event.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
 
-**NOTE:** The corresponding rust Holochain Entry in your hApp will need to have the same properties contained in your class and have the correct mappings using the [HolochainPropertyName](#HolochainPropertyName) attribute. Please see [HoloNETEntryBaseClass](#HoloNETEntryBaseClass) for more info...
+**NOTE:** The corresponding rust Holochain Entry in your hApp will need to have the same properties contained in your class and have the correct mappings using the [HolochainFieldName](#HolochainFieldName) attribute. Please see [HoloNETEntryBaseClass](#HoloNETEntryBaseClass) for more info...
 
 ````c#
 public virtual async Task<ZomeFunctionCallBackEventArgs> DeleteAsync()
@@ -1900,16 +1900,16 @@ Here is a simple example of how to use it:
         public Avatar() : base("oasis", "get_entry_avatar", "create_entry_avatar", "update_entry_avatar", "delete_entry_avatar") { }
         public Avatar(HoloNETConfig holoNETConfig) : base("oasis", "get_entry_avatar", "create_entry_avatar", "update_entry_avatar", "delete_entry_avatar", holoNETConfig) { }
 
-        [HolochainPropertyName("first_name")]
+        [HolochainFieldName("first_name")]
         public string FirstName { get; set; }
 
-        [HolochainPropertyName("last_name")]
+        [HolochainFieldName("last_name")]
         public string LastName { get; set; }
 
-        [HolochainPropertyName("email")]
+        [HolochainFieldName("email")]
         public string Email { get; set; }
 
-        [HolochainPropertyName("dob")]
+        [HolochainFieldName("dob")]
         public DateTime DOB { get; set; }
     }
 ````
@@ -1970,7 +1970,7 @@ pub fn delete_entry_avatar(action_hash: ActionHash) -> ExternResult<ActionHash> 
 }
 ````
 
-**NOTE:** Each property that you wish to have mapped to a property/field in your rust code needs to have the HolochainPropertyName attribute applied to it specifying the name of the field in your rust struct that is to be mapped to this c# property.
+**NOTE:** Each property that you wish to have mapped to a property/field in your rust code needs to have the HolochainFieldName attribute applied to it specifying the name of the field in your rust struct that is to be mapped to this c# property.
 
 **NOTE:** You will note that the rust code for using the [HoloNETAuditEntryBaseClass](#HoloNETAuditEntryBaseClass) is the same as [HoloNETEntryBaseClass](#HoloNETEntryBaseClass) except it adds the audit fields to the Avatar struct.
 

@@ -10,16 +10,16 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
     {
         public Holon(HoloNETClient holonNETClient) : base("oasis", "get_holon_entry", "create_holon_entry", "update_holon_entry", "delete_holon_entry", holonNETClient) { }
 
-        [HolochainPropertyName("parent_id")]
+        [HolochainFieldName("parent_id")]
         public Guid ParentId { get; set; }
 
-        [HolochainPropertyName("name")]
+        [HolochainFieldName("name")]
         public string Name { get; set; }
 
-        [HolochainPropertyName("description")]
+        [HolochainFieldName("description")]
         public string Description { get; set; }
 
-        [HolochainPropertyName("type")]
+        [HolochainFieldName("type")]
         public string Type { get; set; }
     }
 }

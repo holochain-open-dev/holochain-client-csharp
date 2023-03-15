@@ -13,7 +13,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
         /// This is a new abstract class introduced in HoloNET 2 that wraps around the HoloNETClient so you do not need to interact with the client directly. Instead it allows very simple CRUD operations (Load, Save & Delete) to be performed on your custom data object that extends this class. Your custom data object represents the data (Holochain Entry) returned from a zome call and HoloNET will handle the mapping onto your data object automatically.
         /// It has two main types of constructors, one that allows you to pass in a HoloNETClient instance (which can be shared with other classes that extend the HoloNETEntryBaseClass or HoloNETAuditEntryBaseClass) or if you do not pass a HoloNETClient instance in using the other constructor it will create its own internal instance to use just for this class. 
         /// NOTE: This is very similar to HoloNETEntryBaseClass because it extends it by adding auditing capabilities.
-        /// NOTE: Each property that you wish to have mapped to a property/field in your rust code needs to have the HolochainPropertyName attribute applied to it specifying the name of the field in your rust struct that is to be mapped to this c# property. See the documentation on GitHub for more info...
+        /// NOTE: Each property that you wish to have mapped to a property/field in your rust code needs to have the HolochainFieldName attribute applied to it specifying the name of the field in your rust struct that is to be mapped to this c# property. See the documentation on GitHub for more info...
         /// NOTE: To use this class you will need to make sure your corresponding rust hApp zome functions/structs have the corresponding properties(such as created_date etc) defined. See the documentation on GitHub for more info...
         /// NOTE: This is a preview of some of the advanced functionality that will be present in the upcoming .NET HDK Low Code Generator, which generates dynamic rust and c# code from your metadata freeing you to focus on your amazing business idea and creativity rather than worrying about learning Holochain, Rust and then getting it to all work in Windows and with C#. HAppy Days! ;-)
         /// </summary>
@@ -56,7 +56,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
         /// This is a new abstract class introduced in HoloNET 2 that wraps around the HoloNETClient so you do not need to interact with the client directly. Instead it allows very simple CRUD operations (Load, Save & Delete) to be performed on your custom data object that extends this class. Your custom data object represents the data (Holochain Entry) returned from a zome call and HoloNET will handle the mapping onto your data object automatically.
         /// It has two main types of constructors, one that allows you to pass in a HoloNETClient instance (which can be shared with other classes that extend the HoloNETEntryBaseClass or HoloNETAuditEntryBaseClass) or if you do not pass a HoloNETClient instance in using the other constructor it will create its own internal instance to use just for this class. 
         /// NOTE: This is very similar to HoloNETEntryBaseClass because it extends it by adding auditing capabilities.
-        /// NOTE: Each property that you wish to have mapped to a property/field in your rust code needs to have the HolochainPropertyName attribute applied to it specifying the name of the field in your rust struct that is to be mapped to this c# property. See the documentation on GitHub for more info...
+        /// NOTE: Each property that you wish to have mapped to a property/field in your rust code needs to have the HolochainFieldName attribute applied to it specifying the name of the field in your rust struct that is to be mapped to this c# property. See the documentation on GitHub for more info...
         /// NOTE: To use this class you will need to make sure your corresponding rust hApp zome functions/structs have the corresponding properties(such as created_date etc) defined. See the documentation on GitHub for more info...
         /// NOTE: This is a preview of some of the advanced functionality that will be present in the upcoming .NET HDK Low Code Generator, which generates dynamic rust and c# code from your metadata freeing you to focus on your amazing business idea and creativity rather than worrying about learning Holochain, Rust and then getting it to all work in Windows and with C#. HAppy Days! ;-)
         /// </summary>
@@ -91,7 +91,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
         /// This is a new abstract class introduced in HoloNET 2 that wraps around the HoloNETClient so you do not need to interact with the client directly. Instead it allows very simple CRUD operations (Load, Save & Delete) to be performed on your custom data object that extends this class. Your custom data object represents the data (Holochain Entry) returned from a zome call and HoloNET will handle the mapping onto your data object automatically.
         /// It has two main types of constructors, one that allows you to pass in a HoloNETClient instance (which can be shared with other classes that extend the HoloNETEntryBaseClass or HoloNETAuditEntryBaseClass) or if you do not pass a HoloNETClient instance in using the other constructor it will create its own internal instance to use just for this class. 
         /// NOTE: This is very similar to HoloNETEntryBaseClass because it extends it by adding auditing capabilities.
-        /// NOTE: Each property that you wish to have mapped to a property/field in your rust code needs to have the HolochainPropertyName attribute applied to it specifying the name of the field in your rust struct that is to be mapped to this c# property. See the documentation on GitHub for more info...
+        /// NOTE: Each property that you wish to have mapped to a property/field in your rust code needs to have the HolochainFieldName attribute applied to it specifying the name of the field in your rust struct that is to be mapped to this c# property. See the documentation on GitHub for more info...
         /// NOTE: To use this class you will need to make sure your corresponding rust hApp zome functions/structs have the corresponding properties(such as created_date etc) defined. See the documentation on GitHub for more info...
         /// NOTE: This is a preview of some of the advanced functionality that will be present in the upcoming .NET HDK Low Code Generator, which generates dynamic rust and c# code from your metadata freeing you to focus on your amazing business idea and creativity rather than worrying about learning Holochain, Rust and then getting it to all work in Windows and with C#. HAppy Days! ;-) 
         /// </summary>
@@ -136,7 +136,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
         /// This is a new abstract class introduced in HoloNET 2 that wraps around the HoloNETClient so you do not need to interact with the client directly. Instead it allows very simple CRUD operations (Load, Save & Delete) to be performed on your custom data object that extends this class. Your custom data object represents the data (Holochain Entry) returned from a zome call and HoloNET will handle the mapping onto your data object automatically.
         /// It has two main types of constructors, one that allows you to pass in a HoloNETClient instance (which can be shared with other classes that extend the HoloNETEntryBaseClass or HoloNETAuditEntryBaseClass) or if you do not pass a HoloNETClient instance in using the other constructor it will create its own internal instance to use just for this class. 
         /// NOTE: This is very similar to HoloNETEntryBaseClass because it extends it by adding auditing capabilities.
-        /// NOTE: Each property that you wish to have mapped to a property/field in your rust code needs to have the HolochainPropertyName attribute applied to it specifying the name of the field in your rust struct that is to be mapped to this c# property. See the documentation on GitHub for more info...
+        /// NOTE: Each property that you wish to have mapped to a property/field in your rust code needs to have the HolochainFieldName attribute applied to it specifying the name of the field in your rust struct that is to be mapped to this c# property. See the documentation on GitHub for more info...
         /// NOTE: To use this class you will need to make sure your corresponding rust hApp zome functions/structs have the corresponding properties(such as created_date etc) defined. See the documentation on GitHub for more info...
         /// NOTE: This is a preview of some of the advanced functionality that will be present in the upcoming .NET HDK Low Code Generator, which generates dynamic rust and c# code from your metadata freeing you to focus on your amazing business idea and creativity rather than worrying about learning Holochain, Rust and then getting it to all work in Windows and with C#. HAppy Days! ;-)
         /// </summary>
@@ -171,7 +171,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
         /// This is a new abstract class introduced in HoloNET 2 that wraps around the HoloNETClient so you do not need to interact with the client directly. Instead it allows very simple CRUD operations (Load, Save & Delete) to be performed on your custom data object that extends this class. Your custom data object represents the data (Holochain Entry) returned from a zome call and HoloNET will handle the mapping onto your data object automatically.
         /// It has two main types of constructors, one that allows you to pass in a HoloNETClient instance (which can be shared with other classes that extend the HoloNETEntryBaseClass or HoloNETAuditEntryBaseClass) or if you do not pass a HoloNETClient instance in using the other constructor it will create its own internal instance to use just for this class. 
         /// NOTE: This is very similar to HoloNETEntryBaseClass because it extends it by adding auditing capabilities.
-        /// NOTE: Each property that you wish to have mapped to a property/field in your rust code needs to have the HolochainPropertyName attribute applied to it specifying the name of the field in your rust struct that is to be mapped to this c# property. See the documentation on GitHub for more info...
+        /// NOTE: Each property that you wish to have mapped to a property/field in your rust code needs to have the HolochainFieldName attribute applied to it specifying the name of the field in your rust struct that is to be mapped to this c# property. See the documentation on GitHub for more info...
         /// NOTE: To use this class you will need to make sure your corresponding rust hApp zome functions/structs have the corresponding properties(such as created_date etc) defined. See the documentation on GitHub for more info...
         /// NOTE: This is a preview of some of the advanced functionality that will be present in the upcoming .NET HDK Low Code Generator, which generates dynamic rust and c# code from your metadata freeing you to focus on your amazing business idea and creativity rather than worrying about learning Holochain, Rust and then getting it to all work in Windows and with C#. HAppy Days! ;-) 
         /// </summary>
@@ -216,7 +216,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
         /// This is a new abstract class introduced in HoloNET 2 that wraps around the HoloNETClient so you do not need to interact with the client directly. Instead it allows very simple CRUD operations (Load, Save & Delete) to be performed on your custom data object that extends this class. Your custom data object represents the data (Holochain Entry) returned from a zome call and HoloNET will handle the mapping onto your data object automatically.
         /// It has two main types of constructors, one that allows you to pass in a HoloNETClient instance (which can be shared with other classes that extend the HoloNETEntryBaseClass or HoloNETAuditEntryBaseClass) or if you do not pass a HoloNETClient instance in using the other constructor it will create its own internal instance to use just for this class. 
         /// NOTE: This is very similar to HoloNETEntryBaseClass because it extends it by adding auditing capabilities.
-        /// NOTE: Each property that you wish to have mapped to a property/field in your rust code needs to have the HolochainPropertyName attribute applied to it specifying the name of the field in your rust struct that is to be mapped to this c# property. See the documentation on GitHub for more info...
+        /// NOTE: Each property that you wish to have mapped to a property/field in your rust code needs to have the HolochainFieldName attribute applied to it specifying the name of the field in your rust struct that is to be mapped to this c# property. See the documentation on GitHub for more info...
         /// NOTE: To use this class you will need to make sure your corresponding rust hApp zome functions/structs have the corresponding properties(such as created_date etc) defined. See the documentation on GitHub for more info...
         /// NOTE: This is a preview of some of the advanced functionality that will be present in the upcoming .NET HDK Low Code Generator, which generates dynamic rust and c# code from your metadata freeing you to focus on your amazing business idea and creativity rather than worrying about learning Holochain, Rust and then getting it to all work in Windows and with C#. HAppy Days! ;-) 
         /// </summary>
@@ -248,7 +248,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
         /// This is a new abstract class introduced in HoloNET 2 that wraps around the HoloNETClient so you do not need to interact with the client directly. Instead it allows very simple CRUD operations (Load, Save & Delete) to be performed on your custom data object that extends this class. Your custom data object represents the data (Holochain Entry) returned from a zome call and HoloNET will handle the mapping onto your data object automatically.
         /// It has two main types of constructors, one that allows you to pass in a HoloNETClient instance (which can be shared with other classes that extend the HoloNETEntryBaseClass or HoloNETAuditEntryBaseClass) or if you do not pass a HoloNETClient instance in using the other constructor it will create its own internal instance to use just for this class. 
         /// NOTE: This is very similar to HoloNETEntryBaseClass because it extends it by adding auditing capabilities.
-        /// NOTE: Each property that you wish to have mapped to a property/field in your rust code needs to have the HolochainPropertyName attribute applied to it specifying the name of the field in your rust struct that is to be mapped to this c# property. See the documentation on GitHub for more info...
+        /// NOTE: Each property that you wish to have mapped to a property/field in your rust code needs to have the HolochainFieldName attribute applied to it specifying the name of the field in your rust struct that is to be mapped to this c# property. See the documentation on GitHub for more info...
         /// NOTE: To use this class you will need to make sure your corresponding rust hApp zome functions/structs have the corresponding properties(such as created_date etc) defined. See the documentation on GitHub for more info...
         /// NOTE: This is a preview of some of the advanced functionality that will be present in the upcoming .NET HDK Low Code Generator, which generates dynamic rust and c# code from your metadata freeing you to focus on your amazing business idea and creativity rather than worrying about learning Holochain, Rust and then getting it to all work in Windows and with C#. HAppy Days! ;-) 
         /// </summary>
@@ -292,55 +292,55 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
         /// <summary>
         /// GUID Id that is consistent across multiple versions of the entry (each version has a different hash).
         /// </summary>
-        [HolochainPropertyName("id")]
+        [HolochainFieldName("id")]
         public Guid Id { get; set; }
 
         /// <summary>
         /// The date the entry was created.
         /// </summary>
-        [HolochainPropertyName("created_date")]
+        [HolochainFieldName("created_date")]
         public DateTime CreatedDate { get; set; }
 
         /// <summary>
         /// The AgentId who created the entry.
         /// </summary>
-        [HolochainPropertyName("created_by")]
+        [HolochainFieldName("created_by")]
         public string CreatedBy { get; set; }
 
         /// <summary>
         /// The date the entry was last modified.
         /// </summary>
-        [HolochainPropertyName("modified_date")]
+        [HolochainFieldName("modified_date")]
         public DateTime ModifiedDate { get; set; }
 
         /// <summary>
         /// The AgentId who modifed the entry.
         /// </summary>
-        [HolochainPropertyName("modified_by")]
+        [HolochainFieldName("modified_by")]
         public string ModifiedBy { get; set; }
 
         /// <summary>
         /// The date the entry was soft deleted.
         /// </summary>
-        [HolochainPropertyName("deleted_date")]
+        [HolochainFieldName("deleted_date")]
         public DateTime DeletedDate { get; set; }
 
         /// <summary>
         /// The AgentId who deleted the entry.
         /// </summary>
-        [HolochainPropertyName("deleted_by")]
+        [HolochainFieldName("deleted_by")]
         public string DeletedBy { get; set; }
 
         /// <summary>
         /// Flag showing the whether this entry is active or not.
         /// </summary>
-        [HolochainPropertyName("is_active")]
+        [HolochainFieldName("is_active")]
         public bool IsActive { get; set; }
 
         /// <summary>
         /// The current version of the entry.
         /// </summary>
-        [HolochainPropertyName("version")]
+        [HolochainFieldName("version")]
         public int Version { get; set; } 
 
         /// List of all previous hashes along with the type and datetime.
@@ -348,8 +348,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
         public List<HoloNETAuditEntry> AuditEntries { get; set; } = new List<HoloNETAuditEntry>();
 
         /// <summary>
-        /// Saves the object and will automatically extrct the properties that need saving (contain the HolochainPropertyName attribute). This method uses reflection so has a tiny performance overhead (negligbale), but if you need the extra nanoseconds use the other Save overload passing in your own params object. 
-        /// NOTE: This overload now also allows you to pass in your own params object but it will still dynamically add any properties that have the HolochainPropertyName attribute.
+        /// Saves the object and will automatically extrct the properties that need saving (contain the HolochainFieldName attribute). This method uses reflection so has a tiny performance overhead (negligbale), but if you need the extra nanoseconds use the other Save overload passing in your own params object. 
+        /// NOTE: This overload now also allows you to pass in your own params object but it will still dynamically add any properties that have the HolochainFieldName attribute.
         /// </summary>
         /// <param name="customDataKeyValuePair">This is a optional dictionary containing keyvalue pairs of custom data you wish to inject into the params that are sent to the zome function.</param>
         /// <param name="holochainPropertiesIsEnabledKeyValuePair">This is a optional dictionary containing keyvalue pairs to allow properties that contain the HolochainProperty to be omitted from the data sent to the zome function. The key (case senstive) needs to match a property that has the HolochainProperty attribute.</param>
@@ -392,7 +392,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                 holochainPropertiesIsEnabledKeyValuePair["DeletedDate"] = false;
             }
 
-            return await base.SaveAsync(customDataKeyValuePair);
+            return await base.SaveAsync(customDataKeyValuePair, holochainPropertiesIsEnabledKeyValuePair);
         }
 
         /// <summary>
@@ -464,7 +464,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
 
                 if (members[0].MemberType == MemberTypes.Property)
                 {
-                    CustomAttributeData data = members[0].CustomAttributes.FirstOrDefault(x => x.AttributeType == (typeof(HolochainPropertyName)));
+                    CustomAttributeData data = members[0].CustomAttributes.FirstOrDefault(x => x.AttributeType == (typeof(HolochainFieldName)));
 
                     //if (data != null)
                     //    data.NamedArguments[0].TypedValue.Value = false;
@@ -478,7 +478,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                 //{
                 //    foreach (CustomAttributeData data in propInfo.CustomAttributes)
                 //    {
-                //        if (data.AttributeType == (typeof(HolochainPropertyName)))
+                //        if (data.AttributeType == (typeof(HolochainFieldName)))
                 //        {
                 //            try
                 //            {

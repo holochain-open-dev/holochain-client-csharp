@@ -11,67 +11,67 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
         /// <summary>
         /// GUID Id that is consistent across multiple versions of the entry (each version has a different hash).
         /// </summary>
-        [HolochainPropertyName("id")]
+        [HolochainFieldName("id")]
         public Guid Id { get; set; }
 
-        [HolochainPropertyName("first_name")]
+        [HolochainFieldName("first_name")]
         public string FirstName { get; set; }
 
-        [HolochainPropertyName("last_name")]
+        [HolochainFieldName("last_name")]
         public string LastName { get; set; }
 
-        [HolochainPropertyName("email")]
+        [HolochainFieldName("email")]
         public string Email { get; set; }
 
-        [HolochainPropertyName("dob")]
+        [HolochainFieldName("dob")]
         public DateTime DOB { get; set; }
 
         /// <summary>
         /// The date the entry was created.
         /// </summary>
-        [HolochainPropertyName("created_date")]
+        [HolochainFieldName("created_date")]
         public DateTime CreatedDate { get; set; }
 
         /// <summary>
         /// The AgentId who created the entry.
         /// </summary>
-        [HolochainPropertyName("created_by")]
+        [HolochainFieldName("created_by")]
         public string CreatedBy { get; set; }
 
         /// <summary>
         /// The date the entry was last modified.
         /// </summary>
-        [HolochainPropertyName("modified_date")]
+        [HolochainFieldName("modified_date")]
         public DateTime ModifiedDate { get; set; }
 
         /// <summary>
         /// The AgentId who modifed the entry.
         /// </summary>
-        [HolochainPropertyName("modified_by")]
+        [HolochainFieldName("modified_by")]
         public string ModifiedBy { get; set; }
 
         /// <summary>
         /// The date the entry was soft deleted.
         /// </summary>
-        [HolochainPropertyName("deleted_date")]
+        [HolochainFieldName("deleted_date")]
         public DateTime DeletedDate { get; set; }
 
         /// <summary>
         /// The AgentId who deleted the entry.
         /// </summary>
-        [HolochainPropertyName("deleted_by")]
+        [HolochainFieldName("deleted_by")]
         public string DeletedBy { get; set; }
 
         /// <summary>
         /// Flag showing the whether this entry is active or not.
         /// </summary>
-        [HolochainPropertyName("is_active")]
+        [HolochainFieldName("is_active")]
         public bool IsActive { get; set; }
 
         /// <summary>
         /// The current version of the entry.
         /// </summary>
-        [HolochainPropertyName("version")]
+        [HolochainFieldName("version")]
         public int Version { get; set; } = 1;
     }
 }
