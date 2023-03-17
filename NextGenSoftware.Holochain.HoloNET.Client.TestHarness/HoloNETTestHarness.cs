@@ -34,7 +34,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
         {
             _timer.Start();
             _testToRun = testToRun;
-            Console.WriteLine("NextGenSoftware.Holochain.HoloNET.Client Test Harness v2.1.1");
+            Console.WriteLine("NextGenSoftware.Holochain.HoloNET.Client Test Harness v2.1.2");
             Console.WriteLine("");
 
             HoloNETConfig config = new HoloNETConfig()

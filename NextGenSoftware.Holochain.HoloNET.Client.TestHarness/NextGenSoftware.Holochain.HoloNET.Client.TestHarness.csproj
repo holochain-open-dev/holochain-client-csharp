@@ -15,9 +15,7 @@
 	<Authors>David Ellams (NextGen Software Ltd)</Authors>
 	<PackageTags>holochain;net;unity</PackageTags>
 	<PackageReleaseNotes>
-		- Updated HoloNET 2 Documentation (now complete).
-		- Added intellisense documentation making it even easier to use HoloNET! :)
-		- View full change log here: https://github.com/holochain-open-dev/holochain-client-csharp/releases/tag/v2.1.1
+		- View full change log here: https://github.com/holochain-open-dev/holochain-client-csharp/releases/tag/v2.1.2
 	</PackageReleaseNotes>
 	<RepositoryType>git</RepositoryType>
 	<RepositoryUrl>https://github.com/NextGenSoftwareUK/holochain-client-csharp</RepositoryUrl>
@@ -26,7 +24,7 @@
 	<!--<PackageLicenseExpression>GNU GPLv3</PackageLicenseExpression>-->
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-	<Version>2.1.1</Version>
+	<Version>2.1.2</Version>
 	<!--<PackageLicenseFile>..\LICENSE</PackageLicenseFile>-->
 
 	<AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
