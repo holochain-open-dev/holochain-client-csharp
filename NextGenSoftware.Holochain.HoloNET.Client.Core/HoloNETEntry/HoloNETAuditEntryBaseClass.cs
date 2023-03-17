@@ -352,9 +352,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
         /// NOTE: This overload now also allows you to pass in your own params object but it will still dynamically add any properties that have the HolochainFieldName attribute.
         /// </summary>
         /// <param name="customDataKeyValuePair">This is a optional dictionary containing keyvalue pairs of custom data you wish to inject into the params that are sent to the zome function.</param>
-        /// <param name="holochainPropertiesIsEnabledKeyValuePair">This is a optional dictionary containing keyvalue pairs to allow properties that contain the HolochainProperty to be omitted from the data sent to the zome function. The key (case senstive) needs to match a property that has the HolochainProperty attribute.</param>
+        /// <param name="holochainFieldsIsEnabledKeyValuePair">This is a optional dictionary containing keyvalue pairs to allow properties that contain the HolochainFieldName to be omitted from the data sent to the zome function. The key (case senstive) needs to match a property that has the HolochainFieldName attribute.</param>
         /// <returns></returns>
-        public override async Task<ZomeFunctionCallBackEventArgs> SaveAsync(Dictionary<string, string> customDataKeyValuePair = null, Dictionary<string, bool> holochainPropertiesIsEnabledKeyValuePair = null)
+        public override async Task<ZomeFunctionCallBackEventArgs> SaveAsync(Dictionary<string, string> customDataKeyValuePair = null, Dictionary<string, bool> holochainFieldsIsEnabledKeyValuePair = null)
         {
             if (string.IsNullOrEmpty(EntryHash))
             {
@@ -380,19 +380,24 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
             if (IsVersionTrackingEnabled)
                 this.Version++;
             else
-                holochainPropertiesIsEnabledKeyValuePair["Version"] = false;
+                holochainFieldsIsEnabledKeyValuePair["Version"] = false;
 
             if (!IsAuditAgentCreateModifyDeleteFieldsEnabled)
             {
-                holochainPropertiesIsEnabledKeyValuePair["CreatedBy"] = false;
-                holochainPropertiesIsEnabledKeyValuePair["CreatedDate"] = false;
-                holochainPropertiesIsEnabledKeyValuePair["ModifiedBy"] = false;
-                holochainPropertiesIsEnabledKeyValuePair["ModifiedDate"] = false;
-                holochainPropertiesIsEnabledKeyValuePair["DeletedBy"] = false;
-                holochainPropertiesIsEnabledKeyValuePair["DeletedDate"] = false;
+                holochainFieldsIsEnabledKeyValuePair["CreatedBy"] = false;
+                holochainFieldsIsEnabledKeyValuePair["CreatedDate"] = false;
+                holochainFieldsIsEnabledKeyValuePair["ModifiedBy"] = false;
+                holochainFieldsIsEnabledKeyValuePair["ModifiedDate"] = false;
+                holochainFieldsIsEnabledKeyValuePair["DeletedBy"] = false;
+                holochainFieldsIsEnabledKeyValuePair["DeletedDate"] = false;
             }
 
-            return await base.SaveAsync(customDataKeyValuePair, holochainPropertiesIsEnabledKeyValuePair);
+            return await base.SaveAsync(customDataKeyValuePair, holochainFieldsIsEnabledKeyValuePair);
+        }
+
+        public override ZomeFunctionCallBackEventArgs Save(Dictionary<string, string> customDataKeyValuePair = null, Dictionary<string, bool> holochainFieldsIsEnabledKeyValuePair = null)
+        {
+            return SaveAsync(customDataKeyValuePair, holochainFieldsIsEnabledKeyValuePair).Result;
         }
 
         /// <summary>
@@ -411,6 +416,21 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
             }
 
             return await base.DeleteAsync(entryHash);
+        }
+
+        public override ZomeFunctionCallBackEventArgs Delete(string entryHash)
+        {
+            return DeleteAsync(entryHash).Result;
+        }
+
+        public override Task<ZomeFunctionCallBackEventArgs> DeleteAsync()
+        {
+            return DeleteAsync(this.EntryHash);
+        }
+
+        public override ZomeFunctionCallBackEventArgs Delete()
+        {
+            return DeleteAsync().Result;
         }
 
         /// <summary>
@@ -454,40 +474,5 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                 HandleError("Unknown error occurred in ProcessZomeReturnCall method.", ex);
             }
         }
-
-        /*
-        private void setAuditPropertyStatus()
-        {
-            if (!IsVersionTrackingEnabled)
-            {
-                MemberInfo[] members = GetType().GetMember("Version");
-
-                if (members[0].MemberType == MemberTypes.Property)
-                {
-                    CustomAttributeData data = members[0].CustomAttributes.FirstOrDefault(x => x.AttributeType == (typeof(HolochainFieldName)));
-
-                    //if (data != null)
-                    //    data.NamedArguments[0].TypedValue.Value = false;
-                        //data.ConstructorArguments[1].Value = false;
-                }
-
-                //PropertyInfo[] props = GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
-                //bool update = false;
-
-                //foreach (PropertyInfo propInfo in props)
-                //{
-                //    foreach (CustomAttributeData data in propInfo.CustomAttributes)
-                //    {
-                //        if (data.AttributeType == (typeof(HolochainFieldName)))
-                //        {
-                //            try
-                //            {
-                //                if (data.ConstructorArguments.Count > 0 && data.ConstructorArguments[0] != null && data.ConstructorArguments[0].Value != null)
-                //                {
-                //                    string key = data.ConstructorArguments[0].Value.ToString();
-                //                    object value = propInfo.GetValue(this);
-                //                }
-            }
-        }*/
     }
 }

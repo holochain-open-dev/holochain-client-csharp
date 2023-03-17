@@ -515,9 +515,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// NOTE: The corresponding rust Holochain Entry in your hApp will need to have the same properties contained in your class and have the correct mappings using the HolochainFieldName attribute. Please see HoloNETEntryBaseClass in the documentation/README on the GitHub repo https://github.com/NextGenSoftwareUK/holochain-client-csharp for more info...
         /// </summary>
         /// <param name="customDataKeyValuePair">This is a optional dictionary containing keyvalue pairs of custom data you wish to inject into the params that are sent to the zome function.</param>
-        /// <param name="holochainPropertiesIsEnabledKeyValuePair">This is a optional dictionary containing keyvalue pairs to allow properties that contain the HolochainProperty to be omitted from the data sent to the zome function. The key (case senstive) needs to match a property that has the HolochainProperty attribute.</param>
+        /// <param name="holochainFieldsIsEnabledKeyValuePair">This is a optional dictionary containing keyvalue pairs to allow properties that contain the HolochainFieldName to be omitted from the data sent to the zome function. The key (case senstive) needs to match a property that has the HolochainFieldName attribute.</param>
         /// <returns></returns>
-        public virtual async Task<ZomeFunctionCallBackEventArgs> SaveAsync(Dictionary<string, string> customDataKeyValuePair = null, Dictionary<string, bool> holochainPropertiesIsEnabledKeyValuePair = null)
+        public virtual async Task<ZomeFunctionCallBackEventArgs> SaveAsync(Dictionary<string, string> customDataKeyValuePair = null, Dictionary<string, bool> holochainFieldsIsEnabledKeyValuePair = null)
         {
             try
             {
@@ -545,7 +545,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                                     bool? isEnabled = data.ConstructorArguments[1].Value as bool?;
                                     object value = propInfo.GetValue(this);
 
-                                    if ((isEnabled.HasValue && !isEnabled.Value) || (holochainPropertiesIsEnabledKeyValuePair != null && holochainPropertiesIsEnabledKeyValuePair.ContainsKey(propInfo.Name) && !holochainPropertiesIsEnabledKeyValuePair[propInfo.Name]))
+                                    if ((isEnabled.HasValue && !isEnabled.Value) || (holochainFieldsIsEnabledKeyValuePair != null && holochainFieldsIsEnabledKeyValuePair.ContainsKey(propInfo.Name) && !holochainFieldsIsEnabledKeyValuePair[propInfo.Name]))
                                         break;
 
                                     if (key != "entry_hash")
@@ -611,9 +611,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// NOTE: The corresponding rust Holochain Entry in your hApp will need to have the same properties contained in your class and have the correct mappings using the HolochainFieldName attribute. Please see HoloNETEntryBaseClass in the documentation/README on the GitHub repo https://github.com/NextGenSoftwareUK/holochain-client-csharp for more info...
         /// </summary>
         /// <returns></returns>
-        public ZomeFunctionCallBackEventArgs Save()
+        public virtual ZomeFunctionCallBackEventArgs Save(Dictionary<string, string> customDataKeyValuePair = null, Dictionary<string, bool> holochainFieldsIsEnabledKeyValuePair = null)
         {
-            return SaveAsync().Result;
+
+
+
+            return SaveAsync(customDataKeyValuePair, holochainFieldsIsEnabledKeyValuePair).Result;
         }
 
         /// <summary>
@@ -652,7 +655,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// </summary>
         /// <param name="paramsObject">The dynamic data object containing the params you wish to pass to the Create/Update zome function via the CallZomeFunction method. **NOTE:** You do not need to pass this in unless you have a need, if you call one of the overloads that do not have this parameter HoloNETEntryBaseClass will automatically generate this object from any properties in your class that contain the HolochainFieldName attribute.</param>
         /// <returns></returns>
-        public ZomeFunctionCallBackEventArgs Save(dynamic paramsObject)
+        public virtual ZomeFunctionCallBackEventArgs Save(dynamic paramsObject)
         {
             return SaveAsync(paramsObject).Result;
         }
@@ -725,7 +728,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="disconnectedCallBackMode">If this is set to `WaitForHolochainConductorToDisconnect` (default) then it will await until it has disconnected before returning to the caller, otherwise (it is set to `UseCallBackEvents`) it will return immediately and then raise the [OnDisconnected](#ondisconnected) once it is disconnected.</param>
         /// <param name="shutdownHolochainConductorsMode">Once it has successfully disconnected it will automatically call the ShutDownAllHolochainConductors method if the `shutdownHolochainConductorsMode` flag (defaults to `UseConfigSettings`) is not set to `DoNotShutdownAnyConductors`. Other values it can be are 'ShutdownCurrentConductorOnly' or 'ShutdownAllConductors'. Please see the ShutDownConductors method below for more detail.</param>
         /// <returns></returns>
-        public async Task<HoloNETShutdownEventArgs> CloseAsync(DisconnectedCallBackMode disconnectedCallBackMode = DisconnectedCallBackMode.WaitForHolochainConductorToDisconnect, ShutdownHolochainConductorsMode shutdownHolochainConductorsMode = ShutdownHolochainConductorsMode.UseConfigSettings)
+        public virtual async Task<HoloNETShutdownEventArgs> CloseAsync(DisconnectedCallBackMode disconnectedCallBackMode = DisconnectedCallBackMode.WaitForHolochainConductorToDisconnect, ShutdownHolochainConductorsMode shutdownHolochainConductorsMode = ShutdownHolochainConductorsMode.UseConfigSettings)
         {
             HoloNETShutdownEventArgs returnValue = null;
 
@@ -753,7 +756,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// Unlike the async version, this non async version will not wait until HoloNET disconnects & shutsdown any Holochain Conductors before it returns to the caller. It will later raise the Disconnected, HolochainConductorsShutdownComplete & HoloNETShutdownComplete events. If you wish to wait for HoloNET to disconnect and shutdown the conductors(s) before returning then please use CloseAsync instead. It will also not contain any Holochain conductor shutdown stats and the HolochainConductorsShutdownEventArgs property will be null (Only the CloseAsync version contains this info).
         /// </summary>
         /// <param name="shutdownHolochainConductorsMode">Once it has successfully disconnected it will automatically call the ShutDownAllHolochainConductors method if the `shutdownHolochainConductorsMode` flag (defaults to `UseConfigSettings`) is not set to `DoNotShutdownAnyConductors`. Other values it can be are 'ShutdownCurrentConductorOnly' or 'ShutdownAllConductors'. Please see the ShutDownConductors method below for more detail.</param>
-        public HoloNETShutdownEventArgs Close(ShutdownHolochainConductorsMode shutdownHolochainConductorsMode = ShutdownHolochainConductorsMode.UseConfigSettings)
+        public virtual HoloNETShutdownEventArgs Close(ShutdownHolochainConductorsMode shutdownHolochainConductorsMode = ShutdownHolochainConductorsMode.UseConfigSettings)
         {
             HoloNETShutdownEventArgs returnValue = null;
 
@@ -784,7 +787,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="automaticallyAttemptToRetrieveFromConductorIfSandBoxFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the Holochain Conductor if it fails to get them from the HC Sandbox command. This defaults to true.</param>
         /// <param name="automaticallyAttemptToRetrieveFromSandBoxIfConductorFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the HC Sandbox command if it fails to get them from the Holochain Conductor. This defaults to true.</param>
         /// <param name="updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved">Set this to true (default) to automatically update the HoloNETConfig once it has retrieved the DnaHash & AgentPubKey.</param>
-        public void Initialize(bool retrieveAgentPubKeyAndDnaHashFromConductor = true, bool retrieveAgentPubKeyAndDnaHashFromSandbox = true, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true, bool updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved = true)
+        public virtual void Initialize(bool retrieveAgentPubKeyAndDnaHashFromConductor = true, bool retrieveAgentPubKeyAndDnaHashFromSandbox = true, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true, bool updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved = true)
         {
             InitializeAsync(ConnectedCallBackMode.UseCallBackEvents, RetrieveAgentPubKeyAndDnaHashMode.UseCallBackEvents, retrieveAgentPubKeyAndDnaHashFromConductor, retrieveAgentPubKeyAndDnaHashFromSandbox, automaticallyAttemptToRetrieveFromConductorIfSandBoxFails, automaticallyAttemptToRetrieveFromSandBoxIfConductorFails, updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved);
         }
@@ -800,7 +803,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="automaticallyAttemptToRetrieveFromSandBoxIfConductorFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the HC Sandbox command if it fails to get them from the Holochain Conductor. This defaults to true.</param>
         /// <param name="updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved">Set this to true (default) to automatically update the HoloNETConfig once it has retrieved the DnaHash & AgentPubKey.</param>
         /// <returns></returns>
-        public async Task InitializeAsync(ConnectedCallBackMode connectedCallBackMode = ConnectedCallBackMode.WaitForHolochainConductorToConnect, RetrieveAgentPubKeyAndDnaHashMode retrieveAgentPubKeyAndDnaHashMode = RetrieveAgentPubKeyAndDnaHashMode.Wait, bool retrieveAgentPubKeyAndDnaHashFromConductor = true, bool retrieveAgentPubKeyAndDnaHashFromSandbox = true, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true, bool updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved = true)
+        public virtual async Task InitializeAsync(ConnectedCallBackMode connectedCallBackMode = ConnectedCallBackMode.WaitForHolochainConductorToConnect, RetrieveAgentPubKeyAndDnaHashMode retrieveAgentPubKeyAndDnaHashMode = RetrieveAgentPubKeyAndDnaHashMode.Wait, bool retrieveAgentPubKeyAndDnaHashFromConductor = true, bool retrieveAgentPubKeyAndDnaHashFromSandbox = true, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true, bool updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved = true)
         {
             try
             {
@@ -812,15 +815,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                 IsInitializing = true;
 
-                //HoloNETClient.OnAppInfoCallBack += HoloNETClient_OnAppInfoCallBack;
-                //HoloNETClient.OnConductorDebugCallBack += HoloNETClient_OnConductorDebugCallBack;
-                //HoloNETClient.OnConnected += HoloNETClient_OnConnected;
-                //HoloNETClient.OnDataReceived += HoloNETClient_OnDataReceived;
-                //HoloNETClient.OnDisconnected += HoloNETClient_OnDisconnected;
                 HoloNETClient.OnError += HoloNETClient_OnError;
                 HoloNETClient.OnReadyForZomeCalls += HoloNETClient_OnReadyForZomeCalls;
-                //HoloNETClient.OnSignalsCallBack += HoloNETClient_OnSignalsCallBack;
-                //HoloNETClient.OnZomeFunctionCallBack += HoloNETClient_OnZomeFunctionCallBack;
 
                 if (HoloNETClient.WebSocket.State != System.Net.WebSockets.WebSocketState.Connecting || HoloNETClient.WebSocket.State != System.Net.WebSockets.WebSocketState.Open)
                     await HoloNETClient.ConnectAsync(connectedCallBackMode, retrieveAgentPubKeyAndDnaHashMode, retrieveAgentPubKeyAndDnaHashFromConductor, retrieveAgentPubKeyAndDnaHashFromSandbox, automaticallyAttemptToRetrieveFromConductorIfSandBoxFails, automaticallyAttemptToRetrieveFromSandBoxIfConductorFails, updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved);
@@ -835,7 +831,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// This mehod will call the WaitTillReadyForZomeCallsAsync method on the HoloNET Client. 
         /// </summary>
         /// <returns></returns>
-        public async Task<ReadyForZomeCallsEventArgs> WaitTillHoloNETInitializedAsync()
+        public virtual async Task<ReadyForZomeCallsEventArgs> WaitTillHoloNETInitializedAsync()
         {
             if (!IsInitialized && !IsInitializing)
                 await InitializeAsync();
@@ -875,25 +871,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                             this.PreviousVersionEntryHash = this.EntryHash;
 
                         this.EntryHash = result.ZomeReturnHash;
-
-                        //Moved into HoloNETAutditEntryBaseClass.
-
-                        //HoloNETAuditEntry auditEntry = new HoloNETAuditEntry()
-                        //{
-                        //    DateTime = DateTime.Now,
-                        //    EntryHash = result.ZomeReturnHash
-                        //};
-
-                        //if (result.ZomeFunction == ZomeCreateEntryFunction)
-                        //    auditEntry.Type = HoloNETAuditEntryType.Create;
-
-                        //else if (result.ZomeFunction == ZomeUpdateEntryFunction)
-                        //    auditEntry.Type = HoloNETAuditEntryType.Modify;
-
-                        //else if (result.ZomeFunction == ZomeDeleteEntryFunction)
-                        //    auditEntry.Type = HoloNETAuditEntryType.Delete;
-
-                        //this.AuditEntries.Add(auditEntry);
                     }
 
                     if (result.KeyValuePair != null)
@@ -927,47 +904,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             IsInitializing = false;
             OnInitialized?.Invoke(this, e);
         }
-
-        /*
-        private void HoloNETClient_OnZomeFunctionCallBack(object sender, ZomeFunctionCallBackEventArgs e)
-        {
-            //if ((e.ZomeFunction == ZomeCreateEntryFunction || e.ZomeFunction == ZomeUpdateEntryFunction) && !string.IsNullOrEmpty(e.ZomeReturnHash))
-            //    this.EntryHash = e.ZomeReturnHash;
-
-            //if (e.KeyValuePair != null)
-            //    HoloNETClient.MapEntryDataObject(this, e.KeyValuePair);
-        }
-
-        private void HoloNETClient_OnSignalsCallBack(object sender, SignalsCallBackEventArgs e)
-        {
-            
-        }
-
-        private void HoloNETClient_OnDisconnected(object sender, WebSocket.DisconnectedEventArgs e)
-        {
-            
-        }
-
-        private void HoloNETClient_OnDataReceived(object sender, HoloNETDataReceivedEventArgs e)
-        {
-            
-        }
-
-        private void HoloNETClient_OnConnected(object sender, WebSocket.ConnectedEventArgs e)
-        {
-            
-        }
-
-        private void HoloNETClient_OnConductorDebugCallBack(object sender, ConductorDebugCallBackEventArgs e)
-        {
-            
-        }
-
-        private void HoloNETClient_OnAppInfoCallBack(object sender, AppInfoCallBackEventArgs e)
-        {
-            
-        }
-        */
 
         protected void HandleError(string message, Exception exception)
         {
