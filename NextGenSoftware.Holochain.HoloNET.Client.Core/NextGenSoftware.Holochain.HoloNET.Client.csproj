@@ -3,20 +3,60 @@
   <PropertyGroup>
 	  <TargetFramework>net6.0</TargetFramework>
 	  <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-	  <PackageId>NextGenSoftware.Holochain.HoloNET.Client.Embedded</PackageId>
-	  <!--<PackageId>NextGenSoftware.Holochain.HoloNET.Client</PackageId>-->
+	  <!--<PackageId>NextGenSoftware.Holochain.HoloNET.Client.Embedded</PackageId>-->
+	  <PackageId>NextGenSoftware.Holochain.HoloNET.Client</PackageId>
 	  <Company>NextGen Software Ltd</Company>
 	  <Product>HoloNET Holochain Client</Product>
 	  <Title>HoloNET Holochain Client</Title>
-	  <!--<Summary>The world's first .NET &amp; Unity client for Holochain.</Summary>-->
-	  <Summary>The world's first .NET &amp; Unity client for Holochain. This version comes with the Holochain binaries built in.</Summary>
-	  <!--<Description>The world's first .NET &amp; Unity client for Holochain.</Description>-->
-	  <Description>The world's first .NET &amp; Unity client for Holochain. This version comes with the Holochain binaries built in.</Description>
+	  <Summary>The world's first .NET &amp; Unity client for Holochain.</Summary>
+	  <!--<Summary>The world's first .NET &amp; Unity client for Holochain. This version comes with the Holochain binaries built in.</Summary>-->
+	  <Description>The world's first .NET &amp; Unity client for Holochain.</Description>
+	  <!--<Description>The world's first .NET &amp; Unity client for Holochain. This version comes with the Holochain binaries built in.</Description>-->
 	  <PackageProjectUrl>https://github.com/NextGenSoftwareUK/holochain-client-csharp</PackageProjectUrl>
 	  <PackageIcon>hc logo.png</PackageIcon>
 	  <Authors>David Ellams (NextGen Software Ltd)</Authors>
 	  <PackageTags>holochain;net;unity</PackageTags>
 	  <PackageReleaseNotes>
+		  https://github.com/holochain-open-dev/holochain-client-csharp/commit/c26a822f4fd6a2aff0da6b01bf4ab4796c663034:
+		  - Added IsEnabled parameter to the constructor for the HolochainProperty attribute.
+
+		  - Added isVersionTrackingEnabled, isAuditTrackingEnabled &amp; isAuditAgentCreateModifyDeleteFieldsEnabled params to all constructors in HoloNETAuditEntryBaseClass.
+
+		  - Added IsVersionTrackingEnabled, IsAuditTrackingEnabled &amp; IsAuditAgentCreateModifyDeleteFieldsEnabled properties to HoloNETAuditEntryBaseClass.
+
+		  - Added customDataKeyValuePair &amp; holochainPropertiesIsEnabledKeyValuePair params to SaveAsync method in HoloNETAuditEntryBaseClass.
+
+		  - Added entryHash to summary info for DeleteAsync method in HoloNETAuditEntryBaseClass.
+
+		  - Moved Version property from HoloNETEntryBaseClass to HoloNETAuditEntryBaseClass.
+
+		  - Added customDataKeyValuePair &amp; holochainPropertiesIsEnabledKeyValuePair params to SaveAsync method in HoloNETEntryBaseClass.
+
+		  https://github.com/holochain-open-dev/holochain-client-csharp/commit/37e87dc46aab518febb8f1ac17a30f50b2197ed2:
+		  - Renamed HolochainPropertyName to HolochainFieldName throughout the full HoloNET codebase and documentation.
+
+		  - Renamed propertyName to fieldName in HolochainFieldName attribute.
+
+		  - Added holochainPropertiesIsEnabledKeyValuePair to call to base.SaveAsync in SaveAsync method in HoloNETAuditEntryBaseClass.
+
+		  - Added summary documentation to HoloNETConfig properties.
+
+		  - Added test/sample use case for overriding the SaveAsync method in Avatar example object where various properties are disabled.
+
+		  https://github.com/holochain-open-dev/holochain-client-csharp/commit/a4d78bae4154a3939b53f0171a4609b326ce6bce:
+		  - Renamed holochainPropertiesIsEnabledKeyValuePair to holochainFieldsIsEnabledKeyValuePair param in SaveAsync &amp; Save methods in HoloNETAuditEntryBaseClass &amp; HoloNETEntryBaseClass.
+
+		  - Added Save method to HoloNETAuditEntryBaseClass.
+
+		  - Added 2 Delete overloads &amp; DeleteAsync methods to HoloNETAuditEntryBaseClass.
+
+		  - Save methods in HoloNETEntryBaseClass are now all virtual methods meaning they can be overriden in classes that extend it.
+
+		  - Avatar class in HoloNET Test Harness now has additional examples of how to override the Save and SaveAsync methods.
+
+		  - Avatar class in HoloNET Test Harness now has example of how to use constructors that enable/disable the various auditing functionality of HoloNETAuditEntryBaseClass.
+
+		  - Updated HoloNET README.md/documentation to reflect the latest changes to HoloNET such as the additional auditing capabilitites and increased flexability and extendability of the Save/SaveAsync methods.
 		  
 		  - View full change log here: https://github.com/holochain-open-dev/holochain-client-csharp/releases/tag/v2.1.2
 	  </PackageReleaseNotes>
