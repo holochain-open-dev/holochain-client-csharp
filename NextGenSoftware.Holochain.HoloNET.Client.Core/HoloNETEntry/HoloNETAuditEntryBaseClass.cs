@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
+namespace NextGenSoftware.Holochain.HoloNET.Client
 {
     //NOTE: To use this class you will need to make sure your corresponding rust hApp zome functions/structs have the corresponding properties (such as created_date etc) below defined.
     public abstract class HoloNETAuditEntryBaseClass : HoloNETEntryBaseClass
