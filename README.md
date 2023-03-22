@@ -1745,6 +1745,31 @@ public virtual ZomeFunctionCallBackEventArgs Save(dynamic paramsObject)
 | customDataKeyValuePair                | This is a optional dictionary containing keyvalue pairs of custom data you wish to inject into the params that are sent to the zome function.                                                                                                                                                                                                                                                                                                                                                    |
 | holochainFieldsIsEnabledKeyValuePair  | This is a optional dictionary containing keyvalue pairs to allow properties that contain the HolochainFieldName to be omitted from the data sent to the zome function. The key (case senstive) needs to match a property that has the HolochainFieldName attribute.                                                                                                                                                                                                                              |                                                         
 
+Below is an example of how to override the SaveAsync in a class that extends the [HoloNETEntryBaseClass](#HoloNETEntryBaseClass) or [HoloNETAuditEntryBaseClass](#HoloNETAuditEntryBaseClass):
+
+````c#
+public override Task<ZomeFunctionCallBackEventArgs> SaveAsync(Dictionary<string, string> customDataKeyValuePair = null, Dictionary<string, bool> holochainFieldsIsEnabledKeyValuePair = null)
+        {
+            //Example of how to disable various holochain fields/properties so the data is omitted from the data sent to the zome function.
+            if (holochainFieldsIsEnabledKeyValuePair == null)
+                holochainFieldsIsEnabledKeyValuePair = new Dictionary<string, bool>();
+
+            holochainFieldsIsEnabledKeyValuePair["DOB"] = false;
+            holochainFieldsIsEnabledKeyValuePair["Email"] = false;
+
+            //Below is an example of how you can send custom data to the zome function:
+            if (customDataKeyValuePair == null)
+                customDataKeyValuePair = new Dictionary<string, string>();
+
+            customDataKeyValuePair["dynamic data"] = "dynamic";
+            customDataKeyValuePair["some other data"] = "data";
+
+            return base.SaveAsync(customDataKeyValuePair, holochainFieldsIsEnabledKeyValuePair);
+        }
+````
+
+This example is taken from the Avatar class in the Single Class Example folder in the HoloNET Test Harness.
+
 ##### Delete
 
 This method will soft delete the Holochain entry (the previous version can still be retrieved). This calls the [CallZomeFunction](#CallZomeFunction) on the HoloNET client passing in the zome function name specified in the constructor param `zomeDeleteEntryFunction` or property [ZomeDeleteEntryFunction](#ZomeDeleteEntryFunction). It then updates the HoloNET Entry Data Object with the response received from the Holochain Conductor and then finally raises the [OnDeleted](#OnDeleted) event.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               

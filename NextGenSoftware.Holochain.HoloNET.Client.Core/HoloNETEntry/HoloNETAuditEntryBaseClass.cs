@@ -362,7 +362,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 {
                     CreatedDate = DateTime.Now;
 
-                    await this.HoloNETClient.WaitTillReadyForZomeCallsAsync();
+                    //await this.HoloNETClient.WaitTillReadyForZomeCallsAsync();
+                    await WaitTillHoloNETInitializedAsync();
                     CreatedBy = this.HoloNETClient.Config.AgentPubKey;
                 }
             }
@@ -372,7 +373,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 {
                     ModifiedDate = DateTime.Now;
 
-                    await this.HoloNETClient.WaitTillReadyForZomeCallsAsync();
+                    //await this.HoloNETClient.WaitTillReadyForZomeCallsAsync();
+                    await WaitTillHoloNETInitializedAsync();
                     ModifiedBy = this.HoloNETClient.Config.AgentPubKey;
                 }
             }
@@ -411,7 +413,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             {
                 DeletedDate = DateTime.Now;
 
-                await this.HoloNETClient.WaitTillReadyForZomeCallsAsync();
+                //await this.HoloNETClient.WaitTillReadyForZomeCallsAsync();
+                await WaitTillHoloNETInitializedAsync();
                 DeletedBy = this.HoloNETClient.Config.AgentPubKey;
             }
 

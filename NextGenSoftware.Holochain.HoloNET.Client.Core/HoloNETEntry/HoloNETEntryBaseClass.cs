@@ -528,8 +528,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 if (!IsInitialized && !IsInitializing)
                     await InitializeAsync();
 
+                //TODO: Add caching for the properties (key: full assembly and type, value: array of propertyInfo).
                 PropertyInfo[] props = GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
-                bool update = false;
+                //bool update = false;
 
                 foreach (PropertyInfo propInfo in props)
                 {
@@ -808,7 +809,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             try
             {
                 if (IsInitialized)
-                    throw new InvalidOperationException("The HoloNET Client has already been initialized.");
+                    return;
+                    //throw new InvalidOperationException("The HoloNET Client has already been initialized.");
 
                 if (IsInitializing)
                     return;
