@@ -457,7 +457,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     if (Config.HolochainConductorToUse == HolochainConductorEnum.HcDevTool)
                     {
                         //_conductorProcess.StartInfo.Arguments = "sandbox run 0";
-                        _conductorProcess.StartInfo.Arguments = $"hc sandbox generate {Config.FullPathToCompiledHappFolder}";
+                        _conductorProcess.StartInfo.Arguments = $"sandbox generate {Config.FullPathToCompiledHappFolder}";
                     }
 
                     _conductorProcess.StartInfo.UseShellExecute = true;
