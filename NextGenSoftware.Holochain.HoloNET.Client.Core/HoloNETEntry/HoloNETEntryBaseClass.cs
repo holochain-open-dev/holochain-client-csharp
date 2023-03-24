@@ -13,6 +13,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
     {
         private Dictionary<string, string> _holochainProperties = new Dictionary<string, string>();
         private bool _disposeOfHoloNETClient = false;
+        private PropertyInfo[] _propInfoCache = null;
 
         public delegate void Error(object sender, HoloNETErrorEventArgs e);
 
@@ -516,21 +517,31 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// </summary>
         /// <param name="customDataKeyValuePair">This is a optional dictionary containing keyvalue pairs of custom data you wish to inject into the params that are sent to the zome function.</param>
         /// <param name="holochainFieldsIsEnabledKeyValuePair">This is a optional dictionary containing keyvalue pairs to allow properties that contain the HolochainFieldName to be omitted from the data sent to the zome function. The key (case senstive) needs to match a property that has the HolochainFieldName attribute.</param>
+        /// <param name="cachePropertyInfos">Set this to true if you want HoloNET to cache the property info's for the Entry Data Object (this can reduce the slight overhead used by reflection).</param>
         /// <returns></returns>
-        public virtual async Task<ZomeFunctionCallBackEventArgs> SaveAsync(Dictionary<string, string> customDataKeyValuePair = null, Dictionary<string, bool> holochainFieldsIsEnabledKeyValuePair = null)
+        public virtual async Task<ZomeFunctionCallBackEventArgs> SaveAsync(Dictionary<string, string> customDataKeyValuePair = null, Dictionary<string, bool> holochainFieldsIsEnabledKeyValuePair = null, bool cachePropertyInfos = true)
         {
             try
             {
-                dynamic paramsObject = new ExpandoObject();
-                dynamic updateParamsObject = new ExpandoObject();
-                Dictionary<string, object> zomeCallProps = new Dictionary<string, object>();
-
                 if (!IsInitialized && !IsInitializing)
                     await InitializeAsync();
 
-                //TODO: Add caching for the properties (key: full assembly and type, value: array of propertyInfo).
-                PropertyInfo[] props = GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
-                //bool update = false;
+                dynamic paramsObject = new ExpandoObject();
+                dynamic updateParamsObject = new ExpandoObject();
+                PropertyInfo[] props = null;
+                Dictionary<string, object> zomeCallProps = new Dictionary<string, object>();
+                Type type = GetType();
+
+                if (cachePropertyInfos && _propInfoCache != null)
+                    props = _propInfoCache;
+                else
+                {
+                    //Cache the props to reduce overhead of reflection.
+                    props = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+                    
+                    if (cachePropertyInfos)
+                        _propInfoCache = props;
+                }
 
                 foreach (PropertyInfo propInfo in props)
                 {
@@ -611,13 +622,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// NOTE: This will automatically extrct the properties that need saving (contain the HolochainFieldName attribute). This method uses reflection so has a tiny performance overhead (negligbale), but if you need the extra nanoseconds use the other Save overload passing in your own params object.
         /// NOTE: The corresponding rust Holochain Entry in your hApp will need to have the same properties contained in your class and have the correct mappings using the HolochainFieldName attribute. Please see HoloNETEntryBaseClass in the documentation/README on the GitHub repo https://github.com/NextGenSoftwareUK/holochain-client-csharp for more info...
         /// </summary>
+        /// <param name="customDataKeyValuePair">This is a optional dictionary containing keyvalue pairs of custom data you wish to inject into the params that are sent to the zome function.</param>
+        /// <param name="holochainFieldsIsEnabledKeyValuePair">This is a optional dictionary containing keyvalue pairs to allow properties that contain the HolochainFieldName to be omitted from the data sent to the zome function. The key (case senstive) needs to match a property that has the HolochainFieldName attribute.</param>
+        /// <param name="cachePropertyInfos">Set this to true if you want HoloNET to cache the property info's for the Entry Data Object (this can reduce the slight overhead used by reflection).</param>
         /// <returns></returns>
-        public virtual ZomeFunctionCallBackEventArgs Save(Dictionary<string, string> customDataKeyValuePair = null, Dictionary<string, bool> holochainFieldsIsEnabledKeyValuePair = null)
+        public virtual ZomeFunctionCallBackEventArgs Save(Dictionary<string, string> customDataKeyValuePair = null, Dictionary<string, bool> holochainFieldsIsEnabledKeyValuePair = null, bool cachePropertyInfos = true)
         {
-
-
-
-            return SaveAsync(customDataKeyValuePair, holochainFieldsIsEnabledKeyValuePair).Result;
+            return SaveAsync(customDataKeyValuePair, holochainFieldsIsEnabledKeyValuePair, cachePropertyInfos).Result;
         }
 
         /// <summary>

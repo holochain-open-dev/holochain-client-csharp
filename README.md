@@ -1728,13 +1728,13 @@ public virtual ZomeFunctionCallBackEventArgs Load()
 
 This method will save the Holochain entry to the Holochain Conductor. This calls the [CallZomeFunction](#CallZomeFunction) on the HoloNET client passing in the zome function name specified in the constructor param `zomeCreateEntryFunction` or property [ZomeCreateEntryFunction](#ZomeCreateEntryFunction) if it is a new entry (empty object) or the `zomeUpdateEntryFunction` param and [ZomeUpdateEntryFunction](#ZomeUpdateEntryFunction) property if it's an existing entry (previously saved object containing a valid value for the [EntryHash](#EntryHash) property). Once it has saved the entry it will then update the [EntryHash](#entryHash) property with the entry hash returned from the zome call/conductor. The [PreviousVersionEntryHash](#PreviousVersionEntryHash) property is also set to the previous EntryHash (if there is one). Once it has finished saving and got a response from the Holochain Conductor it will raise the [OnSaved](#OnSaved) event.
 
-**NOTE:** The parmeterless overload will automatically extrct the properties that need saving (contain the HolochainFieldName attribute). This method uses reflection so has a tiny performance overhead (negligbale), but if you need the extra nanoseconds use the other Save overload passing in your own params object.
+**NOTE:** The overloads that do not have the paramsObject param will automatically extrct the properties that need saving (contain the HolochainFieldName attribute). This method uses reflection so has a tiny performance overhead (negligbale), but if you need the extra nanoseconds use the other Save overload passing in your own params object.
 
 **NOTE:** The corresponding rust Holochain Entry in your hApp will need to have the same properties contained in your class and have the correct mappings using the [HolochainFieldName](#HolochainFieldName) attribute. Please see [HoloNETEntryBaseClass](#HoloNETEntryBaseClass) for more info...
 
 ````c#
-public virtual async Task<ZomeFunctionCallBackEventArgs> SaveAsync(Dictionary<string, string> customDataKeyValuePair = null, Dictionary<string, bool> holochainFieldsIsEnabledKeyValuePair = null)
-public virtual ZomeFunctionCallBackEventArgs Save(Dictionary<string, string> customDataKeyValuePair = null, Dictionary<string, bool> holochainFieldsIsEnabledKeyValuePair = null)
+public virtual async Task<ZomeFunctionCallBackEventArgs> SaveAsync(Dictionary<string, string> customDataKeyValuePair = null, Dictionary<string, bool> holochainFieldsIsEnabledKeyValuePair = null, bool cachePropertyInfos = true)
+public virtual ZomeFunctionCallBackEventArgs Save(Dictionary<string, string> customDataKeyValuePair = null, Dictionary<string, bool> holochainFieldsIsEnabledKeyValuePair = null, bool cachePropertyInfos = true)
 public virtual async Task<ZomeFunctionCallBackEventArgs> SaveAsync(dynamic paramsObject)
 public virtual ZomeFunctionCallBackEventArgs Save(dynamic paramsObject)
 ````
@@ -1744,28 +1744,29 @@ public virtual ZomeFunctionCallBackEventArgs Save(dynamic paramsObject)
 | paramsObject                          | The dynamic data object containing the params you wish to pass to the Create/Update zome function via the [CallZomeFunction](#CallZomeFunction) method. **NOTE:** You do not need to pass this in unless you have a need, if you call one of the overloads that do not have this parameter [HoloNETEntryBaseClass](#HoloNETEntryBaseClass) will automatically generate this object from any properties in your class that contain the [HolochainFieldName](#HolochainFieldName) attribute.       |
 | customDataKeyValuePair                | This is a optional dictionary containing keyvalue pairs of custom data you wish to inject into the params that are sent to the zome function.                                                                                                                                                                                                                                                                                                                                                    |
 | holochainFieldsIsEnabledKeyValuePair  | This is a optional dictionary containing keyvalue pairs to allow properties that contain the HolochainFieldName to be omitted from the data sent to the zome function. The key (case senstive) needs to match a property that has the HolochainFieldName attribute.                                                                                                                                                                                                                              |                                                         
+| cachePropertyInfos                    | Set this to true (default) if you want HoloNET to cache the property info's for the Entry Data Object (this can reduce the slight overhead used by reflection).                                                                                                                                                                                                                                                                                                                                  |
 
 Below is an example of how to override the SaveAsync in a class that extends the [HoloNETEntryBaseClass](#HoloNETEntryBaseClass) or [HoloNETAuditEntryBaseClass](#HoloNETAuditEntryBaseClass):
 
 ````c#
-public override Task<ZomeFunctionCallBackEventArgs> SaveAsync(Dictionary<string, string> customDataKeyValuePair = null, Dictionary<string, bool> holochainFieldsIsEnabledKeyValuePair = null)
-        {
-            //Example of how to disable various holochain fields/properties so the data is omitted from the data sent to the zome function.
-            if (holochainFieldsIsEnabledKeyValuePair == null)
-                holochainFieldsIsEnabledKeyValuePair = new Dictionary<string, bool>();
+public override Task<ZomeFunctionCallBackEventArgs> SaveAsync(Dictionary<string, string> customDataKeyValuePair = null, Dictionary<string, bool> holochainFieldsIsEnabledKeyValuePair = null, bool cachePropertyInfos = true)
+{
+    //Example of how to disable various holochain fields/ properties so the data is omitted from the data sent to the zome function.
+    if (holochainFieldsIsEnabledKeyValuePair == null)
+        holochainFieldsIsEnabledKeyValuePair = new Dictionary<string, bool>();
 
-            holochainFieldsIsEnabledKeyValuePair["DOB"] = false;
-            holochainFieldsIsEnabledKeyValuePair["Email"] = false;
+    holochainFieldsIsEnabledKeyValuePair["DOB"] = false;
+    holochainFieldsIsEnabledKeyValuePair["Email"] = false;
 
-            //Below is an example of how you can send custom data to the zome function:
-            if (customDataKeyValuePair == null)
-                customDataKeyValuePair = new Dictionary<string, string>();
+    //Below is an example of how you can send custom data to the zome function:
+    if (customDataKeyValuePair == null)
+        customDataKeyValuePair = new Dictionary<string, string>();
 
-            customDataKeyValuePair["dynamic data"] = "dynamic";
-            customDataKeyValuePair["some other data"] = "data";
+    customDataKeyValuePair["dynamic data"] = "dynamic";
+    customDataKeyValuePair["some other data"] = "data";
 
-            return base.SaveAsync(customDataKeyValuePair, holochainFieldsIsEnabledKeyValuePair);
-        }
+    return base.SaveAsync(customDataKeyValuePair, holochainFieldsIsEnabledKeyValuePair, cachePropertyInfos);
+}
 ````
 
 This example is taken from the Avatar class in the Single Class Example folder in the HoloNET Test Harness.
