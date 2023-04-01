@@ -13,7 +13,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
     {
         private Dictionary<string, string> _holochainProperties = new Dictionary<string, string>();
         private bool _disposeOfHoloNETClient = false;
-        private PropertyInfo[] _propInfoCache = null;
+        //private PropertyInfo[] _propInfoCache = null;
+        private static Dictionary<string, PropertyInfo[]> _dictPropertyInfos = new Dictionary<string, PropertyInfo[]>();
 
         public delegate void Error(object sender, HoloNETErrorEventArgs e);
 
@@ -531,16 +532,17 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 PropertyInfo[] props = null;
                 Dictionary<string, object> zomeCallProps = new Dictionary<string, object>();
                 Type type = GetType();
+                string typeKey = $"{type.AssemblyQualifiedName}.{type.FullName}";
 
-                if (cachePropertyInfos && _propInfoCache != null)
-                    props = _propInfoCache;
+                if (cachePropertyInfos && _dictPropertyInfos.ContainsKey(typeKey))
+                    props = _dictPropertyInfos[typeKey];
                 else
                 {
                     //Cache the props to reduce overhead of reflection.
                     props = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
                     
                     if (cachePropertyInfos)
-                        _propInfoCache = props;
+                        _dictPropertyInfos[typeKey] = props;
                 }
 
                 foreach (PropertyInfo propInfo in props)
@@ -850,6 +852,14 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 await InitializeAsync();
 
             return await HoloNETClient.WaitTillReadyForZomeCallsAsync();
+        }
+
+        /// <summary>
+        /// Clears the PropertyInfo cache used during the Save methods that use reflection to dynamically build the params for the zome function (save/update).
+        /// </summary>
+        public static void ClearCache()
+        {
+            _dictPropertyInfos.Clear();
         }
 
         /// <summary>

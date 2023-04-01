@@ -1419,6 +1419,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         {
             _zomeReturnDataLookup.Clear();
             _cacheZomeReturnDataLookup.Clear();
+            _dictPropertyInfos.Clear();
         }
 
         /// <summary>
