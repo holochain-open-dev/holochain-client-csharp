@@ -512,6 +512,30 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         }
 
         /// <summary>
+        /// This method will load the Holochain entry from the Holochain Conductor. This calls the CallZomeFunction on the HoloNET client passing in the zome function name specified in the constructor param `zomeLoadEntryFunction` or property `ZomeLoadEntryFunction` and then maps the data returned from the zome call onto your data object. It will then raise the OnLoaded event.
+        /// NOTE: The corresponding rust Holochain Entry in your hApp will need to have the same properties contained in your class and have the correct mappings using the HolochainFieldName attribute. Please see HoloNETEntryBaseClass in the documentation/README on the GitHub repo https://github.com/NextGenSoftwareUK/holochain-client-csharp for more info...
+        /// </summary>
+        /// <param name="customFieldToLoadByValue">The custom field value to load by (if you do not wish to load by the EntryHash).</param>
+        /// <returns></returns>
+        public virtual async Task<ZomeFunctionCallBackEventArgs> LoadAsync(object customFieldToLoadByValue)
+        {
+            try
+            {
+                if (!IsInitialized && !IsInitializing)
+                    await InitializeAsync();
+
+                ZomeFunctionCallBackEventArgs result = await HoloNETClient.CallZomeFunctionAsync(ZomeName, ZomeLoadEntryFunction, customFieldToLoadByValue);
+                ProcessZomeReturnCall(result);
+                OnLoaded?.Invoke(this, result);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                return HandleError<ZomeFunctionCallBackEventArgs>("Unknown error occurred in LoadAsync method.", ex);
+            }
+        }
+
+        /// <summary>
         /// This method will save the Holochain entry to the Holochain Conductor. This calls the CallZomeFunction on the HoloNET client passing in the zome function name specified in the constructor param `zomeCreateEntryFunction` or property ZomeCreateEntryFunction if it is a new entry (empty object) or the `zomeUpdateEntryFunction` param and ZomeUpdateEntryFunction property if it's an existing entry (previously saved object containing a valid value for the EntryHash property). Once it has saved the entry it will then update the EntryHash property with the entry hash returned from the zome call/conductor. The PreviousVersionEntryHash property is also set to the previous EntryHash (if there is one). Once it has finished saving and got a response from the Holochain Conductor it will raise the OnSaved event.
         /// NOTE: This will automatically extrct the properties that need saving (contain the HolochainFieldName attribute). This method uses reflection so has a tiny performance overhead (negligbale), but if you need the extra nanoseconds use the other Save overload passing in your own params object.
         /// NOTE: The corresponding rust Holochain Entry in your hApp will need to have the same properties contained in your class and have the correct mappings using the HolochainFieldName attribute. Please see HoloNETEntryBaseClass in the documentation/README on the GitHub repo https://github.com/NextGenSoftwareUK/holochain-client-csharp for more info...
@@ -733,6 +757,45 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public virtual ZomeFunctionCallBackEventArgs Delete(string entryHash)
         {
             return DeleteAsync(entryHash).Result;
+        }
+
+        /// <summary>
+        /// This method will soft delete the Holochain entry (the previous version can still be retrieved). This calls the CallZomeFunction on the HoloNET client passing in the zome function name specified in the constructor param `zomeDeleteEntryFunction` or property ZomeDeleteEntryFunction. It then updates the HoloNET Entry Data Object with the response received from the Holochain Conductor and then finally raises the OnDeleted event.
+        /// NOTE: The corresponding rust Holochain Entry in your hApp will need to have the same properties contained in your class and have the correct mappings using the HolochainFieldName attribute. Please see HoloNETEntryBaseClass in the documentation/README on the GitHub repo https://github.com/NextGenSoftwareUK/holochain-client-csharp for more info...
+        /// </summary>
+        /// <param name="customFieldToLoadByValue">The custom field value to delete by (if you do not wish to delete by the EntryHash).</param>
+        /// <returns></returns>
+        public virtual async Task<ZomeFunctionCallBackEventArgs> DeleteAsync(object customFieldToLoadByValue)
+        {
+            ZomeFunctionCallBackEventArgs result = null;
+
+            try
+            {
+                if (!IsInitialized && !IsInitializing)
+                    await InitializeAsync();
+
+                if (!string.IsNullOrEmpty(EntryHash))
+                    result = await HoloNETClient.CallZomeFunctionAsync(ZomeName, ZomeDeleteEntryFunction, customFieldToLoadByValue);
+                else
+                    result = new ZomeFunctionCallBackEventArgs() { IsError = true, Message = "EntryHash is null, please set before calling this function." };
+            }
+            catch (Exception ex)
+            {
+                return HandleError<ZomeFunctionCallBackEventArgs>("Unknown error occurred in DeleteAsync method.", ex);
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// This method will soft delete the Holochain entry (the previous version can still be retrieved). This calls the CallZomeFunction on the HoloNET client passing in the zome function name specified in the constructor param `zomeDeleteEntryFunction` or property ZomeDeleteEntryFunction. It then updates the HoloNET Entry Data Object with the response received from the Holochain Conductor and then finally raises the OnDeleted event.
+        /// NOTE: The corresponding rust Holochain Entry in your hApp will need to have the same properties contained in your class and have the correct mappings using the HolochainFieldName attribute. Please see HoloNETEntryBaseClass in the documentation/README on the GitHub repo https://github.com/NextGenSoftwareUK/holochain-client-csharp for more info...
+        /// </summary>
+        /// <param name="customFieldToLoadByValue">The custom field value to delete by (if you do not wish to delete by the EntryHash).</param>
+        /// <returns></returns>
+        public virtual ZomeFunctionCallBackEventArgs Delete(object customFieldToLoadByValue)
+        {
+            return DeleteAsync(customFieldToLoadByValue).Result;
         }
 
         /// <summary>
