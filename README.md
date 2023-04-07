@@ -6,6 +6,7 @@
   - [HoloNET Code Has Migrated](#holonet-code-has-migrated)
   - [Background](#background)
   - [Initial RSM Version](#initial-rsm-version)
+  - [Donations Welcome! Thank you!](#donations-welcome-thank-you)
   - [How To Use HoloNET](#how-to-use-holonet)
     - [Quick Start](#quick-start)
     - [The Power of .NET Async Methods](#the-power-of-net-async-methods)
@@ -148,6 +149,14 @@ Please check out the above link, there you will find more details on what has ch
 
 We will also add it here soon...
 
+## Donations Welcome! Thank you!
+
+**HoloNET is totally free and Open Sourced to be used anyway you wish as long as we are credited. If you find it helpful, we would REALLY appreciate a donation to our crowd funding page, because this is our full-time job and so have no other income and will help keep us alive so we can continue to improve it for you all (as well as the WEB4 OASIS API, .NET HDK Low Code Generator & WEB5 STAR ODK Ominverse Interoperable Metaverse Low Code Generator), thank you! :)**
+
+**https://www.gofundme.com/ourworldthegame**
+
+You can alternatively buy some virtual land NFT's (OLAND's) for Our World from our NFT store here:
+https://opensea.io/collection/theoasisandourworld
 
 ## How To Use HoloNET 
 
@@ -2410,6 +2419,9 @@ https://github.com/NextGenSoftwareUK/Our-World-OASIS-API-HoloNET-HoloUnity-And-.
 **HoloNET is totally free and Open Sourced to be used anyway you wish as long as we are credited. If you find it helpful, we would REALLY appreciate a donation to our crowd funding page, because this is our full-time job and so have no other income and will help keep us alive so we can continue to improve it for you all (as well as the WEB4 OASIS API, .NET HDK Low Code Generator & WEB5 STAR ODK Ominverse Interoperable Metaverse Low Code Generator), thank you! :)**
 
 **https://www.gofundme.com/ourworldthegame**
+
+You can alternatively buy some virtual land NFT's (OLAND's) for Our World from our NFT store here:
+https://opensea.io/collection/theoasisandourworld
 
 <a name="get-involved"></a>
 ## Do You Want To Get Involved?
