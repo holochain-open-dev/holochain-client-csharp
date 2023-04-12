@@ -146,6 +146,18 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                             Console.WriteLine("");
                             ShowAvatarDetails(avatar);
 
+                            Avatar avatar2 = new Avatar(config)
+                            {
+                                Id = Guid.NewGuid(),
+                                FirstName = "David",
+                                LastName = "Ellams",
+                                DOB = Convert.ToDateTime("11/07/1980"),
+                                Email = "davidellams@hotmail.com",
+                                IsActive = true
+                            };
+
+                            await avatar2.SaveAsync();
+
                             avatar = ResetAvatar(avatar);
                             CLIEngine.ShowMessage("*** AVATAR SINGLE HOLONET BASE ENTRY LOAD TEST ***", _testHeadingColour);
                             

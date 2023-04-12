@@ -32,18 +32,18 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
         public override Task<ZomeFunctionCallBackEventArgs> SaveAsync(Dictionary<string, string> customDataKeyValuePair = null, Dictionary<string, bool> holochainFieldsIsEnabledKeyValuePair = null, bool cachePropertyInfos = true)
         {
             //Example of how to disable various holochain fields/ properties so the data is omitted from the data sent to the zome function.
-            if (holochainFieldsIsEnabledKeyValuePair == null)
-                holochainFieldsIsEnabledKeyValuePair = new Dictionary<string, bool>();
+            //if (holochainFieldsIsEnabledKeyValuePair == null)
+            //    holochainFieldsIsEnabledKeyValuePair = new Dictionary<string, bool>();
 
-            holochainFieldsIsEnabledKeyValuePair["DOB"] = false;
-            holochainFieldsIsEnabledKeyValuePair["Email"] = false;
+            //holochainFieldsIsEnabledKeyValuePair["DOB"] = false;
+            //holochainFieldsIsEnabledKeyValuePair["Email"] = false;
 
-            //Below is an example of how you can send custom data to the zome function:
-            if (customDataKeyValuePair == null)
-                customDataKeyValuePair = new Dictionary<string, string>();
+            ////Below is an example of how you can send custom data to the zome function:
+            //if (customDataKeyValuePair == null)
+            //    customDataKeyValuePair = new Dictionary<string, string>();
 
-            customDataKeyValuePair["dynamic data"] = "dynamic";
-            customDataKeyValuePair["some other data"] = "data";
+            //customDataKeyValuePair["dynamic data"] = "dynamic";
+            //customDataKeyValuePair["some other data"] = "data";
 
             return base.SaveAsync(customDataKeyValuePair, holochainFieldsIsEnabledKeyValuePair, cachePropertyInfos);
         }
