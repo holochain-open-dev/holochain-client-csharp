@@ -509,8 +509,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// NOTE: The corresponding rust Holochain Entry in your hApp will need to have the same properties contained in your class and have the correct mappings using the HolochainFieldName attribute. Please see HoloNETEntryBaseClass in the documentation/README on the GitHub repo https://github.com/NextGenSoftwareUK/holochain-client-csharp for more info...
         /// </summary>
         /// <param name="entryHash">The hash of the Holochain Entry you wish to load.</param>
+        /// <param name="useReflectionToMapOntoEntryDataObject">Set this to true to map the data returned from the Holochain Conductor onto</param>
         /// <returns></returns>
-        public virtual async Task<ZomeFunctionCallBackEventArgs> LoadAsync(string entryHash)
+        public virtual async Task<ZomeFunctionCallBackEventArgs> LoadAsync(string entryHash, bool useReflectionToMapOntoEntryDataObject = true)
         {
             try
             {
@@ -518,7 +519,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     await InitializeAsync();
 
                 ZomeFunctionCallBackEventArgs result = await HoloNETClient.CallZomeFunctionAsync(ZomeName, ZomeLoadEntryFunction, EntryHash);
-                ProcessZomeReturnCall(result);
+                ProcessZomeReturnCall(result, useReflectionToMapOntoEntryDataObject);
                 OnLoaded?.Invoke(this, result);
                 return result;
             }
@@ -534,9 +535,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// </summary>
         /// <param name="entryHash">The hash of the Holochain Entry you wish to load.</param>
         /// <returns></returns>
-        public virtual ZomeFunctionCallBackEventArgs Load(string entryHash)
+        public virtual ZomeFunctionCallBackEventArgs Load(string entryHash, bool useReflectionToMapOntoEntryDataObject = true)
         {
-            return LoadAsync(entryHash).Result;
+            return LoadAsync(entryHash, useReflectionToMapOntoEntryDataObject).Result;
         }
 
         /// <summary>
@@ -544,9 +545,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// NOTE: The corresponding rust Holochain Entry in your hApp will need to have the same properties contained in your class and have the correct mappings using the HolochainFieldName attribute. Please see HoloNETEntryBaseClass in the documentation/README on the GitHub repo https://github.com/NextGenSoftwareUK/holochain-client-csharp for more info...
         /// </summary>
         /// <returns></returns>
-        public virtual async Task<ZomeFunctionCallBackEventArgs> LoadAsync()
+        public virtual async Task<ZomeFunctionCallBackEventArgs> LoadAsync(bool useReflectionToMapOntoEntryDataObject = true)
         {
-            return await LoadAsync(EntryHash);
+            return await LoadAsync(EntryHash, useReflectionToMapOntoEntryDataObject);
         }
 
         /// <summary>
@@ -554,9 +555,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// NOTE: The corresponding rust Holochain Entry in your hApp will need to have the same properties contained in your class and have the correct mappings using the HolochainFieldName attribute. Please see HoloNETEntryBaseClass in the documentation/README on the GitHub repo https://github.com/NextGenSoftwareUK/holochain-client-csharp for more info...
         /// </summary>
         /// <returns></returns>
-        public virtual ZomeFunctionCallBackEventArgs Load()
+        public virtual ZomeFunctionCallBackEventArgs Load(bool useReflectionToMapOntoEntryDataObject = true)
         {
-            return LoadAsync().Result;
+            return LoadAsync(useReflectionToMapOntoEntryDataObject).Result;
         }
 
         /// <summary>
@@ -565,7 +566,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// </summary>
         /// <param name="customFieldToLoadByValue">The custom field value to load by (if you do not wish to load by the EntryHash).</param>
         /// <returns></returns>
-        public virtual async Task<ZomeFunctionCallBackEventArgs> LoadAsync(object customFieldToLoadByValue)
+        public virtual async Task<ZomeFunctionCallBackEventArgs> LoadAsync(object customFieldToLoadByValue, bool useReflectionToMapOntoEntryDataObject = true)
         {
             try
             {
@@ -573,7 +574,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     await InitializeAsync();
 
                 ZomeFunctionCallBackEventArgs result = await HoloNETClient.CallZomeFunctionAsync(ZomeName, ZomeLoadEntryFunction, customFieldToLoadByValue);
-                ProcessZomeReturnCall(result);
+                ProcessZomeReturnCall(result, useReflectionToMapOntoEntryDataObject);
                 OnLoaded?.Invoke(this, result);
                 return result;
             }
@@ -589,9 +590,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// </summary>
         /// <param name="customFieldToLoadByValue">The custom field value to load by (if you do not wish to load by the EntryHash).</param>
         /// <returns></returns>
-        public virtual ZomeFunctionCallBackEventArgs Load(object customFieldToLoadByValue)
+        public virtual ZomeFunctionCallBackEventArgs Load(object customFieldToLoadByValue, bool useReflectionToMapOntoEntryDataObject = true)
         {
-            return LoadAsync(customFieldToLoadByValue).Result;
+            return LoadAsync(customFieldToLoadByValue, useReflectionToMapOntoEntryDataObject).Result;
         }
 
         /// <summary>
@@ -615,6 +616,16 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             {
                 return HandleError<ZomeFunctionCallBackEventArgs>("Unknown error occurred in LoadCollectionAsync method in HoloNETEntryBaseClass", ex);
             }
+        }
+
+        /// <summary>
+        /// This method will load the Holochain Collection from the Holochain Conductor. This calls the CallZomeFunction on the HoloNET client passing in the zome function name specified in the constructor param `zomeLoadCollectionFunction` or property `ZomeLoadCollectionFunction` and then maps the data returned from the zome call onto your collection of data objects. It will then raise the OnLoaded event.
+        /// </summary>
+        /// <param name="collectionAnchor">The anchor of the Holochain Collection you wish to load.</param>
+        /// <returns></returns>
+        public virtual ZomeFunctionCallBackEventArgs LoadCollection(string collectionAnchor)
+        {
+            return LoadCollectionAsync(collectionAnchor).Result;
         }
 
         /// <summary>
@@ -1011,7 +1022,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// Processes the data returned from the Holochain Conductor/CallZomeFunction method.
         /// </summary>
         /// <param name="result">The data returned from the Holochain Conductor/CallZomeFunction.</param>
-        protected virtual void ProcessZomeReturnCall(ZomeFunctionCallBackEventArgs result)
+        protected virtual void ProcessZomeReturnCall(ZomeFunctionCallBackEventArgs result, bool useReflectionToMapOntoEntryDataObject = true)
         {
             try
             {
@@ -1041,7 +1052,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                         this.EntryHash = result.ZomeReturnHash;
                     }
 
-                    if (result.KeyValuePair != null)
+                    if (result.KeyValuePair != null && useReflectionToMapOntoEntryDataObject)
                     {
                         //if (result.KeyValuePair.ContainsKey("entry_hash") && string.IsNullOrEmpty(result.KeyValuePair["entry_hash"]))
                         //    result.KeyValuePair.Remove("entry_hash");
