@@ -5,7 +5,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
     /// <summary>
     /// Contains audit information for a Holochain Entry.
     /// </summary>
-    public class HoloNETAuditEntry
+    public class HoloNETAuditEntry : IHoloNETAuditEntry
     {
         /// <summary>
         /// The entry hash.
@@ -20,6 +20,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <summary>
         /// The audit action (created, updated or deleted).
         /// </summary>
-        public HoloNETAuditEntryType Type { get; set; } 
+        public HoloNETAuditEntryType Type { get; set; }
     }
 }

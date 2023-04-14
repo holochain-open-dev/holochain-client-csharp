@@ -9,7 +9,8 @@ using NextGenSoftware.WebSocket;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
-    public abstract class HoloNETEntryBaseClass //: IDisposable
+    public abstract class HoloNETEntryBaseClass : IHoloNETEntryBaseClass
+    //: IDisposable
     {
         private Dictionary<string, string> _holochainProperties = new Dictionary<string, string>();
         private bool _disposeOfHoloNETClient = false;
@@ -657,7 +658,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 {
                     //Cache the props to reduce overhead of reflection.
                     props = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
-                    
+
                     if (cachePropertyInfos)
                         _dictPropertyInfos[typeKey] = props;
                 }
@@ -979,7 +980,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             {
                 if (IsInitialized)
                     return;
-                    //throw new InvalidOperationException("The HoloNET Client has already been initialized.");
+                //throw new InvalidOperationException("The HoloNET Client has already been initialized.");
 
                 if (IsInitializing)
                     return;

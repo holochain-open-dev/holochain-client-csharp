@@ -14,7 +14,8 @@ using NextGenSoftware.Utilities;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
-    public class HoloNETClient //: IDisposable //, IAsyncDisposable
+    public class HoloNETClient : IHoloNETClient
+    //: IDisposable //, IAsyncDisposable
     {
         private bool _shuttingDownHoloNET = false;
         private bool _getAgentPubKeyAndDnaHashFromConductor;
@@ -1038,11 +1039,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                 if (string.IsNullOrEmpty(Config.DnaHash))
                     return new ZomeFunctionCallBackEventArgs() { EndPoint = EndPoint, Id = id, Zome = zome, ZomeFunction = function, IsError = true, Message = "The DnaHash cannot be empty, please either set manually in the Config.DnaHash property or wait till the ReadyForZomeCalls event is fired before attempting to make a zome call." };
-                    //throw new InvalidOperationException("The DnaHash cannot be empty, please either set manually in the Config.DnaHash property or wait till the ReadyForZomeCalls event is fired before attempting to make a zome call.");
+                //throw new InvalidOperationException("The DnaHash cannot be empty, please either set manually in the Config.DnaHash property or wait till the ReadyForZomeCalls event is fired before attempting to make a zome call.");
 
                 if (string.IsNullOrEmpty(Config.AgentPubKey))
                     return new ZomeFunctionCallBackEventArgs() { EndPoint = EndPoint, Id = id, Zome = zome, ZomeFunction = function, IsError = true, Message = "The AgentPubKey cannot be empty, please either set manually in the Config.DnaHash property or wait till the ReadyForZomeCalls event is fired before attempting to make a zome call." };
-                    //throw new InvalidOperationException("The AgentPubKey cannot be empty, please either set manually in the Config.AgentPubKey property or wait till the ReadyForZomeCalls event is fired before attempting to make a zome call.");
+                //throw new InvalidOperationException("The AgentPubKey cannot be empty, please either set manually in the Config.AgentPubKey property or wait till the ReadyForZomeCalls event is fired before attempting to make a zome call.");
 
                 Logger.Log($"Calling Zome Function {function} on Zome {zome} with Id {id} On Holochain Conductor...", LogType.Info, true);
 
@@ -1498,7 +1499,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     {
                         //Cache the props to reduce overhead of reflection.
                         props = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
-                        
+
                         if (cacheEntryDataObjectPropertyInfos)
                             _dictPropertyInfos[typeKey] = props;
                     }
@@ -2160,7 +2161,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
                 string keyValuePairsAsString = "";
                 EntryData entryData = null;
-                
+
                 (appResponseData, keyValuePairs, keyValuePairsAsString, entryData) = DecodeRawZomeData(rawAppResponseData, appResponseData, keyValuePairs, keyValuePairsAsString);
 
                 if (_entryDataObjectTypeLookup.ContainsKey(id) && _entryDataObjectTypeLookup[id] != null)
@@ -2373,14 +2374,14 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                             catch (Exception ex)
                             {
                                 HandleError("Error in HoloNETClient.DecodeZomeReturnData method.", ex);
-                            } 
+                            }
                         }
                     }
                     catch (Exception ex)
                     {
                         HandleError("Error in HoloNETClient.DecodeZomeReturnData method.", ex);
                     }
-                 }
+                }
             }
             catch (Exception ex)
             {
@@ -2432,11 +2433,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         {
             RetrievingAgentPubKeyAndDnaHash = false;
             _taskCompletionAgentPubKeyAndDnaHashRetrieved.SetResult(new AgentPubKeyDnaHash() { AgentPubKey = Config.AgentPubKey, DnaHash = Config.DnaHash });
-            
+
             IsReadyForZomesCalls = true;
             ReadyForZomeCallsEventArgs eventArgs = new ReadyForZomeCallsEventArgs(EndPoint, Config.DnaHash, Config.AgentPubKey);
             OnReadyForZomeCalls?.Invoke(this, eventArgs);
-            _taskCompletionReadyForZomeCalls.SetResult(eventArgs);            
+            _taskCompletionReadyForZomeCalls.SetResult(eventArgs);
         }
 
         private string GetItemFromCache(string id, Dictionary<string, string> cache)
