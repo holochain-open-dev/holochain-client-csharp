@@ -1722,16 +1722,19 @@ This method will load the Holochain entry from the Holochain Conductor using eit
 **NOTE:** The corresponding rust Holochain Entry in your hApp will need to have the same properties contained in your class and have the correct mappings using the [HolochainFieldName](#HolochainFieldName) attribute. Please see [HoloNETEntryBaseClass](#HoloNETEntryBaseClass) for more info...
 
 ````c#
-public virtual async Task<ZomeFunctionCallBackEventArgs> LoadAsync(string entryHash)
-public virtual ZomeFunctionCallBackEventArgs Load(string entryHash)
-public virtual async Task<ZomeFunctionCallBackEventArgs> LoadAsync()
-public virtual ZomeFunctionCallBackEventArgs Load()
+public virtual async Task<ZomeFunctionCallBackEventArgs> LoadAsync(string entryHash, useReflectionToMapKeyValuePairResponseOntoEntryDataObject = true)
+public virtual ZomeFunctionCallBackEventArgs Load(string entryHash, useReflectionToMapKeyValuePairResponseOntoEntryDataObject = true)
+public virtual async Task<ZomeFunctionCallBackEventArgs> LoadAsync(useReflectionToMapKeyValuePairResponseOntoEntryDataObject = true)
+public virtual ZomeFunctionCallBackEventArgs Load(useReflectionToMapKeyValuePairResponseOntoEntryDataObject = true)
+public virtual async Task<ZomeFunctionCallBackEventArgs> LoadAsync(object customFieldToLoadByValue, bool useReflectionToMapKeyValuePairResponseOntoEntryDataObject = true)
+public virtual ZomeFunctionCallBackEventArgs Load(object customFieldToLoadByValue, bool useReflectionToMapKeyValuePairResponseOntoEntryDataObject = true)
 ````
 
-| Parameter | Description                                                                                           
-| --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| entryHash | The hash of the Holochain Entry you wish to load. For the overloads that do not take the entryHash as a paramater it will use the [EntryHash](#EntryHash) property. |                                                
-
+| Parameter                                                 | Description                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| ----------------------------------------------------------| -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| entryHash                                                 | The hash of the Holochain Entry you wish to load. For the overloads that do not take the entryHash as a paramater it will use the [EntryHash](#EntryHash) property.                                                                                                                                                                                                                                                                            |                                                
+| useReflectionToMapKeyValuePairResponseOntoEntryDataObject | This is an optional param, set this to true (default) to map the data returned from the Holochain Conductor onto the Entry Data Object that extends this base class ([HoloNETEntryBaseClass](#HoloNETEntryBaseClass) or [HoloNETAuditEntryBaseClass](#HoloNETAuditEntryBaseClass)). This will have a very small performance overhead but means you do not need to do the mapping yourself from the ZomeFunctionCallBackEventArgs.KeyValuePair. |
+| customFieldToLoadByValue                                  | The custom field value to load by (if you do not wish to load by the EntryHash).                                                                                                                                                                                                                                                                                                                                                               |
 
 ##### Save
 
@@ -1742,23 +1745,24 @@ This method will save the Holochain entry to the Holochain Conductor. This calls
 **NOTE:** The corresponding rust Holochain Entry in your hApp will need to have the same properties contained in your class and have the correct mappings using the [HolochainFieldName](#HolochainFieldName) attribute. Please see [HoloNETEntryBaseClass](#HoloNETEntryBaseClass) for more info...
 
 ````c#
-public virtual async Task<ZomeFunctionCallBackEventArgs> SaveAsync(Dictionary<string, string> customDataKeyValuePair = null, Dictionary<string, bool> holochainFieldsIsEnabledKeyValuePair = null, bool cachePropertyInfos = true)
-public virtual ZomeFunctionCallBackEventArgs Save(Dictionary<string, string> customDataKeyValuePair = null, Dictionary<string, bool> holochainFieldsIsEnabledKeyValuePair = null, bool cachePropertyInfos = true)
-public virtual async Task<ZomeFunctionCallBackEventArgs> SaveAsync(dynamic paramsObject)
-public virtual ZomeFunctionCallBackEventArgs Save(dynamic paramsObject)
+public virtual async Task<ZomeFunctionCallBackEventArgs> SaveAsync(Dictionary<string, string> customDataKeyValuePair = null, Dictionary<string, bool> holochainFieldsIsEnabledKeyValuePair = null, bool cachePropertyInfos = true, bool useReflectionToMapKeyValuePairResponseOntoEntryDataObject = true)
+public virtual ZomeFunctionCallBackEventArgs Save(Dictionary<string, string> customDataKeyValuePair = null, Dictionary<string, bool> holochainFieldsIsEnabledKeyValuePair = null, bool cachePropertyInfos = true, bool useReflectionToMapKeyValuePairResponseOntoEntryDataObject = true)
+public virtual async Task<ZomeFunctionCallBackEventArgs> SaveAsync(dynamic paramsObject, bool useReflectionToMapKeyValuePairResponseOntoEntryDataObject = true)
+public virtual ZomeFunctionCallBackEventArgs Save(dynamic paramsObject, bool useReflectionToMapKeyValuePairResponseOntoEntryDataObject = true)
 ````
 
-| Parameter                             | Description                                                                                           
-| --------------------------------------| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| paramsObject                          | The dynamic data object containing the params you wish to pass to the Create/Update zome function via the [CallZomeFunction](#CallZomeFunction) method. **NOTE:** You do not need to pass this in unless you have a need, if you call one of the overloads that do not have this parameter [HoloNETEntryBaseClass](#HoloNETEntryBaseClass) will automatically generate this object from any properties in your class that contain the [HolochainFieldName](#HolochainFieldName) attribute.       |
-| customDataKeyValuePair                | This is a optional dictionary containing keyvalue pairs of custom data you wish to inject into the params that are sent to the zome function.                                                                                                                                                                                                                                                                                                                                                    |
-| holochainFieldsIsEnabledKeyValuePair  | This is a optional dictionary containing keyvalue pairs to allow properties that contain the HolochainFieldName to be omitted from the data sent to the zome function. The key (case senstive) needs to match a property that has the HolochainFieldName attribute.                                                                                                                                                                                                                              |                                                         
-| cachePropertyInfos                    | Set this to true (default) if you want HoloNET to cache the property info's for the Entry Data Object (this can reduce the slight overhead used by reflection).                                                                                                                                                                                                                                                                                                                                  |
+| Parameter                                                 | Description                                                                                           
+| ----------------------------------------------------------| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| paramsObject                                              | The dynamic data object containing the params you wish to pass to the Create/Update zome function via the [CallZomeFunction](#CallZomeFunction) method. **NOTE:** You do not need to pass this in unless you have a need, if you call one of the overloads that do not have this parameter [HoloNETEntryBaseClass](#HoloNETEntryBaseClass) will automatically generate this object from any properties in your class that contain the [HolochainFieldName](#HolochainFieldName) attribute.       |
+| useReflectionToMapKeyValuePairResponseOntoEntryDataObject | This is an optional param, set this to true (default) to map the data returned from the Holochain Conductor onto the Entry Data Object that extends this base class ([HoloNETEntryBaseClass](#HoloNETEntryBaseClass) or [HoloNETAuditEntryBaseClass](#HoloNETAuditEntryBaseClass)). This will have a very small performance overhead but means you do not need to do the mapping yourself from the ZomeFunctionCallBackEventArgs.KeyValuePair.                                                   |
+| customDataKeyValuePair                                    | This is a optional dictionary containing keyvalue pairs of custom data you wish to inject into the params that are sent to the zome function.                                                                                                                                                                                                                                                                                                                                                    |
+| holochainFieldsIsEnabledKeyValuePair                      | This is a optional dictionary containing keyvalue pairs to allow properties that contain the HolochainFieldName to be omitted from the data sent to the zome function. The key (case senstive) needs to match a property that has the HolochainFieldName attribute.                                                                                                                                                                                                                              |                                                         
+| cachePropertyInfos                                        | This is an optional param, set this to true (default) if you want HoloNET to cache the property info's for the Entry Data Object (this can reduce the slight overhead used by reflection).                                                                                                                                                                                                                                                                                                       |
 
 Below is an example of how to override the SaveAsync in a class that extends the [HoloNETEntryBaseClass](#HoloNETEntryBaseClass) or [HoloNETAuditEntryBaseClass](#HoloNETAuditEntryBaseClass):
 
 ````c#
-public override Task<ZomeFunctionCallBackEventArgs> SaveAsync(Dictionary<string, string> customDataKeyValuePair = null, Dictionary<string, bool> holochainFieldsIsEnabledKeyValuePair = null, bool cachePropertyInfos = true)
+public override Task<ZomeFunctionCallBackEventArgs> SaveAsync(Dictionary<string, string> customDataKeyValuePair = null, Dictionary<string, bool> holochainFieldsIsEnabledKeyValuePair = null, bool cachePropertyInfos = true, useReflectionToMapKeyValuePairResponseOntoEntryDataObject = true)
 {
     //Example of how to disable various holochain fields/ properties so the data is omitted from the data sent to the zome function.
     if (holochainFieldsIsEnabledKeyValuePair == null)
@@ -1774,7 +1778,7 @@ public override Task<ZomeFunctionCallBackEventArgs> SaveAsync(Dictionary<string,
     customDataKeyValuePair["dynamic data"] = "dynamic";
     customDataKeyValuePair["some other data"] = "data";
 
-    return base.SaveAsync(customDataKeyValuePair, holochainFieldsIsEnabledKeyValuePair, cachePropertyInfos);
+    return base.SaveAsync(customDataKeyValuePair, holochainFieldsIsEnabledKeyValuePair, cachePropertyInfos, useReflectionToMapKeyValuePairResponseOntoEntryDataObject);
 }
 ````
 
@@ -1787,16 +1791,18 @@ This method will soft delete the Holochain entry (the previous version can still
 **NOTE:** The corresponding rust Holochain Entry in your hApp will need to have the same properties contained in your class and have the correct mappings using the [HolochainFieldName](#HolochainFieldName) attribute. Please see [HoloNETEntryBaseClass](#HoloNETEntryBaseClass) for more info...
 
 ````c#
-public virtual async Task<ZomeFunctionCallBackEventArgs> DeleteAsync()
-public virtual ZomeFunctionCallBackEventArgs DeleteAsync()
-public virtual async Task<ZomeFunctionCallBackEventArgs> DeleteAsync(string entryHash)
-public virtual ZomeFunctionCallBackEventArgs DeleteAsync(string entryHash)
+public virtual async Task<ZomeFunctionCallBackEventArgs> DeleteAsync(bool useReflectionToMapKeyValuePairResponseOntoEntryDataObject = true)
+public virtual ZomeFunctionCallBackEventArgs DeleteAsync(bool useReflectionToMapKeyValuePairResponseOntoEntryDataObject = true)
+public virtual async Task<ZomeFunctionCallBackEventArgs> DeleteAsync(string entryHash, bool useReflectionToMapKeyValuePairResponseOntoEntryDataObject = true)
+public virtual ZomeFunctionCallBackEventArgs DeleteAsync(string entryHash, bool useReflectionToMapKeyValuePairResponseOntoEntryDataObject = true)
+public virtual async Task<ZomeFunctionCallBackEventArgs> DeleteAsync(object customFieldToDeleteByValue, bool useReflectionToMapKeyValuePairResponseOntoEntryDataObject = true)
+public virtual ZomeFunctionCallBackEventArgs DeleteAsync(object customFieldToDeleteByValue, bool useReflectionToMapKeyValuePairResponseOntoEntryDataObject = true)
 ````
 
-| Parameter | Description                                                                                           
-| --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| entryHash | The hash of the Holochain Entry you wish to delete. For the overloads that do not take the entryHash as a paramater it will use the [EntryHash](#EntryHash) property. | 
-
+| Parameter                  | Description                                                                                           
+| -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| entryHash                  | The hash of the Holochain Entry you wish to delete. For the overloads that do not take the entryHash as a paramater it will use the [EntryHash](#EntryHash) property. | 
+| customFieldToDeleteByValue | The custom field value to delete by (if you do not wish to delete by the EntryHash).                                                                                  |
 
 ##### Close
 

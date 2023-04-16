@@ -10,6 +10,7 @@ using NextGenSoftware.WebSocket;
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
     public abstract class HoloNETEntryBaseClass : IHoloNETEntryBaseClass
+
     //: IDisposable
     {
         private Dictionary<string, string> _holochainProperties = new Dictionary<string, string>();
@@ -510,9 +511,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// NOTE: The corresponding rust Holochain Entry in your hApp will need to have the same properties contained in your class and have the correct mappings using the HolochainFieldName attribute. Please see HoloNETEntryBaseClass in the documentation/README on the GitHub repo https://github.com/NextGenSoftwareUK/holochain-client-csharp for more info...
         /// </summary>
         /// <param name="entryHash">The hash of the Holochain Entry you wish to load.</param>
-        /// <param name="useReflectionToMapOntoEntryDataObject">Set this to true to map the data returned from the Holochain Conductor onto</param>
+        /// <param name="useReflectionToMapKeyValuePairResponseOntoEntryDataObject">This is an optional param, set this to true (default) to map the data returned from the Holochain Conductor onto the Entry Data Object that extends this base class (HoloNETEntryBaseClass or HoloNETAuditEntryBaseClass). This will have a very small performance overhead but means you do not need to do the mapping yourself from the ZomeFunctionCallBackEventArgs.KeyValuePair. </param>
         /// <returns></returns>
-        public virtual async Task<ZomeFunctionCallBackEventArgs> LoadAsync(string entryHash, bool useReflectionToMapOntoEntryDataObject = true)
+        public virtual async Task<ZomeFunctionCallBackEventArgs> LoadAsync(string entryHash, bool useReflectionToMapKeyValuePairResponseOntoEntryDataObject = true)
         {
             try
             {
@@ -520,7 +521,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     await InitializeAsync();
 
                 ZomeFunctionCallBackEventArgs result = await HoloNETClient.CallZomeFunctionAsync(ZomeName, ZomeLoadEntryFunction, EntryHash);
-                ProcessZomeReturnCall(result, useReflectionToMapOntoEntryDataObject);
+                ProcessZomeReturnCall(result, useReflectionToMapKeyValuePairResponseOntoEntryDataObject);
                 OnLoaded?.Invoke(this, result);
                 return result;
             }
@@ -535,30 +536,33 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// NOTE: The corresponding rust Holochain Entry in your hApp will need to have the same properties contained in your class and have the correct mappings using the HolochainFieldName attribute. Please see HoloNETEntryBaseClass in the documentation/README on the GitHub repo https://github.com/NextGenSoftwareUK/holochain-client-csharp for more info...
         /// </summary>
         /// <param name="entryHash">The hash of the Holochain Entry you wish to load.</param>
+        /// <param name="useReflectionToMapKeyValuePairResponseOntoEntryDataObject">This is an optional param, set this to true (default) to map the data returned from the Holochain Conductor onto the Entry Data Object that extends this base class (HoloNETEntryBaseClass or HoloNETAuditEntryBaseClass). This will have a very small performance overhead but means you do not need to do the mapping yourself from the ZomeFunctionCallBackEventArgs.KeyValuePair. </param>
         /// <returns></returns>
-        public virtual ZomeFunctionCallBackEventArgs Load(string entryHash, bool useReflectionToMapOntoEntryDataObject = true)
+        public virtual ZomeFunctionCallBackEventArgs Load(string entryHash, bool useReflectionToMapKeyValuePairResponseOntoEntryDataObject = true)
         {
-            return LoadAsync(entryHash, useReflectionToMapOntoEntryDataObject).Result;
+            return LoadAsync(entryHash, useReflectionToMapKeyValuePairResponseOntoEntryDataObject).Result;
         }
 
         /// <summary>
         /// This method will load the Holochain entry (it will use the EntryHash property to load from) from the Holochain Conductor. This calls the CallZomeFunction on the HoloNET client passing in the zome function name specified in the constructor param `zomeLoadEntryFunction` or property `ZomeLoadEntryFunction` and then maps the data returned from the zome call onto your data object. It will then raise the OnLoaded event.
         /// NOTE: The corresponding rust Holochain Entry in your hApp will need to have the same properties contained in your class and have the correct mappings using the HolochainFieldName attribute. Please see HoloNETEntryBaseClass in the documentation/README on the GitHub repo https://github.com/NextGenSoftwareUK/holochain-client-csharp for more info...
         /// </summary>
+        /// <param name="useReflectionToMapKeyValuePairResponseOntoEntryDataObject">This is an optional param, set this to true (default) to map the data returned from the Holochain Conductor onto the Entry Data Object that extends this base class (HoloNETEntryBaseClass or HoloNETAuditEntryBaseClass). This will have a very small performance overhead but means you do not need to do the mapping yourself from the ZomeFunctionCallBackEventArgs.KeyValuePair. </param>
         /// <returns></returns>
-        public virtual async Task<ZomeFunctionCallBackEventArgs> LoadAsync(bool useReflectionToMapOntoEntryDataObject = true)
+        public virtual async Task<ZomeFunctionCallBackEventArgs> LoadAsync(bool useReflectionToMapKeyValuePairResponseOntoEntryDataObject = true)
         {
-            return await LoadAsync(EntryHash, useReflectionToMapOntoEntryDataObject);
+            return await LoadAsync(EntryHash, useReflectionToMapKeyValuePairResponseOntoEntryDataObject);
         }
 
         /// <summary>
         /// This method will load the Holochain entry (it will use the EntryHash property to load from) from the Holochain Conductor. This calls the CallZomeFunction on the HoloNET client passing in the zome function name specified in the constructor param `zomeLoadEntryFunction` or property `ZomeLoadEntryFunction` and then maps the data returned from the zome call onto your data object. It will then raise the OnLoaded event.
         /// NOTE: The corresponding rust Holochain Entry in your hApp will need to have the same properties contained in your class and have the correct mappings using the HolochainFieldName attribute. Please see HoloNETEntryBaseClass in the documentation/README on the GitHub repo https://github.com/NextGenSoftwareUK/holochain-client-csharp for more info...
         /// </summary>
+        /// <param name="useReflectionToMapKeyValuePairResponseOntoEntryDataObject">This is an optional param, set this to true (default) to map the data returned from the Holochain Conductor onto the Entry Data Object that extends this base class (HoloNETEntryBaseClass or HoloNETAuditEntryBaseClass). This will have a very small performance overhead but means you do not need to do the mapping yourself from the ZomeFunctionCallBackEventArgs.KeyValuePair. </param>
         /// <returns></returns>
-        public virtual ZomeFunctionCallBackEventArgs Load(bool useReflectionToMapOntoEntryDataObject = true)
+        public virtual ZomeFunctionCallBackEventArgs Load(bool useReflectionToMapKeyValuePairResponseOntoEntryDataObject = true)
         {
-            return LoadAsync(useReflectionToMapOntoEntryDataObject).Result;
+            return LoadAsync(useReflectionToMapKeyValuePairResponseOntoEntryDataObject).Result;
         }
 
         /// <summary>
@@ -566,8 +570,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// NOTE: The corresponding rust Holochain Entry in your hApp will need to have the same properties contained in your class and have the correct mappings using the HolochainFieldName attribute. Please see HoloNETEntryBaseClass in the documentation/README on the GitHub repo https://github.com/NextGenSoftwareUK/holochain-client-csharp for more info...
         /// </summary>
         /// <param name="customFieldToLoadByValue">The custom field value to load by (if you do not wish to load by the EntryHash).</param>
+        /// <param name="useReflectionToMapKeyValuePairResponseOntoEntryDataObject">This is an optional param, set this to true (default) to map the data returned from the Holochain Conductor onto the Entry Data Object that extends this base class (HoloNETEntryBaseClass or HoloNETAuditEntryBaseClass). This will have a very small performance overhead but means you do not need to do the mapping yourself from the ZomeFunctionCallBackEventArgs.KeyValuePair. </param>
         /// <returns></returns>
-        public virtual async Task<ZomeFunctionCallBackEventArgs> LoadAsync(object customFieldToLoadByValue, bool useReflectionToMapOntoEntryDataObject = true)
+        public virtual async Task<ZomeFunctionCallBackEventArgs> LoadAsync(object customFieldToLoadByValue, bool useReflectionToMapKeyValuePairResponseOntoEntryDataObject = true)
         {
             try
             {
@@ -575,7 +580,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     await InitializeAsync();
 
                 ZomeFunctionCallBackEventArgs result = await HoloNETClient.CallZomeFunctionAsync(ZomeName, ZomeLoadEntryFunction, customFieldToLoadByValue);
-                ProcessZomeReturnCall(result, useReflectionToMapOntoEntryDataObject);
+                ProcessZomeReturnCall(result, useReflectionToMapKeyValuePairResponseOntoEntryDataObject);
                 OnLoaded?.Invoke(this, result);
                 return result;
             }
@@ -590,18 +595,20 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// NOTE: The corresponding rust Holochain Entry in your hApp will need to have the same properties contained in your class and have the correct mappings using the HolochainFieldName attribute. Please see HoloNETEntryBaseClass in the documentation/README on the GitHub repo https://github.com/NextGenSoftwareUK/holochain-client-csharp for more info...
         /// </summary>
         /// <param name="customFieldToLoadByValue">The custom field value to load by (if you do not wish to load by the EntryHash).</param>
+        /// <param name="useReflectionToMapKeyValuePairResponseOntoEntryDataObject">This is an optional param, set this to true (default) to map the data returned from the Holochain Conductor onto the Entry Data Object that extends this base class (HoloNETEntryBaseClass or HoloNETAuditEntryBaseClass). This will have a very small performance overhead but means you do not need to do the mapping yourself from the ZomeFunctionCallBackEventArgs.KeyValuePair. </param>
         /// <returns></returns>
-        public virtual ZomeFunctionCallBackEventArgs Load(object customFieldToLoadByValue, bool useReflectionToMapOntoEntryDataObject = true)
+        public virtual ZomeFunctionCallBackEventArgs Load(object customFieldToLoadByValue, bool useReflectionToMapKeyValuePairResponseOntoEntryDataObject = true)
         {
-            return LoadAsync(customFieldToLoadByValue, useReflectionToMapOntoEntryDataObject).Result;
+            return LoadAsync(customFieldToLoadByValue, useReflectionToMapKeyValuePairResponseOntoEntryDataObject).Result;
         }
 
+        /*
         /// <summary>
         /// This method will load the Holochain Collection from the Holochain Conductor. This calls the CallZomeFunction on the HoloNET client passing in the zome function name specified in the constructor param `zomeLoadCollectionFunction` or property `ZomeLoadCollectionFunction` and then maps the data returned from the zome call onto your collection of data objects. It will then raise the OnLoaded event.
         /// </summary>
         /// <param name="collectionAnchor">The anchor of the Holochain Collection you wish to load.</param>
         /// <returns></returns>
-        public virtual async Task<ZomeFunctionCallBackEventArgs> LoadCollectionAsync(string collectionAnchor)
+        public virtual async Task<ZomeFunctionCallBackEventArgs> LoadCollectionAsync(string collectionAnchor, bool useReflectionToMapKeyValuePairResponseOntoEntryDataObject = true)
         {
             try
             {
@@ -624,10 +631,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// </summary>
         /// <param name="collectionAnchor">The anchor of the Holochain Collection you wish to load.</param>
         /// <returns></returns>
-        public virtual ZomeFunctionCallBackEventArgs LoadCollection(string collectionAnchor)
+        public virtual ZomeFunctionCallBackEventArgs LoadCollection(string collectionAnchor, bool useReflectionToMapKeyValuePairResponseOntoEntryDataObject = true)
         {
             return LoadCollectionAsync(collectionAnchor).Result;
         }
+        */
 
         /// <summary>
         /// This method will save the Holochain entry to the Holochain Conductor. This calls the CallZomeFunction on the HoloNET client passing in the zome function name specified in the constructor param `zomeCreateEntryFunction` or property ZomeCreateEntryFunction if it is a new entry (empty object) or the `zomeUpdateEntryFunction` param and ZomeUpdateEntryFunction property if it's an existing entry (previously saved object containing a valid value for the EntryHash property). Once it has saved the entry it will then update the EntryHash property with the entry hash returned from the zome call/conductor. The PreviousVersionEntryHash property is also set to the previous EntryHash (if there is one). Once it has finished saving and got a response from the Holochain Conductor it will raise the OnSaved event.
@@ -637,8 +645,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="customDataKeyValuePair">This is a optional dictionary containing keyvalue pairs of custom data you wish to inject into the params that are sent to the zome function.</param>
         /// <param name="holochainFieldsIsEnabledKeyValuePair">This is a optional dictionary containing keyvalue pairs to allow properties that contain the HolochainFieldName to be omitted from the data sent to the zome function. The key (case senstive) needs to match a property that has the HolochainFieldName attribute.</param>
         /// <param name="cachePropertyInfos">Set this to true if you want HoloNET to cache the property info's for the Entry Data Object (this can reduce the slight overhead used by reflection).</param>
+        /// <param name="useReflectionToMapKeyValuePairResponseOntoEntryDataObject">This is an optional param, set this to true (default) to map the data returned from the Holochain Conductor onto the Entry Data Object that extends this base class (HoloNETEntryBaseClass or HoloNETAuditEntryBaseClass). This will have a very small performance overhead but means you do not need to do the mapping yourself from the ZomeFunctionCallBackEventArgs.KeyValuePair. </param>
         /// <returns></returns>
-        public virtual async Task<ZomeFunctionCallBackEventArgs> SaveAsync(Dictionary<string, string> customDataKeyValuePair = null, Dictionary<string, bool> holochainFieldsIsEnabledKeyValuePair = null, bool cachePropertyInfos = true)
+        public virtual async Task<ZomeFunctionCallBackEventArgs> SaveAsync(Dictionary<string, string> customDataKeyValuePair = null, Dictionary<string, bool> holochainFieldsIsEnabledKeyValuePair = null, bool cachePropertyInfos = true, bool useReflectionToMapKeyValuePairResponseOntoEntryDataObject = true)
         {
             try
             {
@@ -725,11 +734,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     ExpandoObjectHelpers.AddProperty(updateParamsObject, "original_action_hash", HoloNETClient.ConvertHoloHashToBytes(EntryHash));
                     //ExpandoObjectHelpers.AddProperty(updateParamsObject, "original_action_hash", EntryHash);
                     ExpandoObjectHelpers.AddProperty(updateParamsObject, "updated_entry", paramsObject);
-                    return await SaveAsync(updateParamsObject);
+                    return await SaveAsync(updateParamsObject, useReflectionToMapKeyValuePairResponseOntoEntryDataObject);
                 }
                 else
                     //Create
-                    return await SaveAsync(paramsObject);
+                    return await SaveAsync(paramsObject, useReflectionToMapKeyValuePairResponseOntoEntryDataObject);
             }
             catch (Exception ex)
             {
@@ -745,18 +754,20 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="customDataKeyValuePair">This is a optional dictionary containing keyvalue pairs of custom data you wish to inject into the params that are sent to the zome function.</param>
         /// <param name="holochainFieldsIsEnabledKeyValuePair">This is a optional dictionary containing keyvalue pairs to allow properties that contain the HolochainFieldName to be omitted from the data sent to the zome function. The key (case senstive) needs to match a property that has the HolochainFieldName attribute.</param>
         /// <param name="cachePropertyInfos">Set this to true if you want HoloNET to cache the property info's for the Entry Data Object (this can reduce the slight overhead used by reflection).</param>
+        /// <param name="useReflectionToMapKeyValuePairResponseOntoEntryDataObject">This is an optional param, set this to true (default) to map the data returned from the Holochain Conductor onto the Entry Data Object that extends this base class (HoloNETEntryBaseClass or HoloNETAuditEntryBaseClass). This will have a very small performance overhead but means you do not need to do the mapping yourself from the ZomeFunctionCallBackEventArgs.KeyValuePair. </param>
         /// <returns></returns>
-        public virtual ZomeFunctionCallBackEventArgs Save(Dictionary<string, string> customDataKeyValuePair = null, Dictionary<string, bool> holochainFieldsIsEnabledKeyValuePair = null, bool cachePropertyInfos = true)
+        public virtual ZomeFunctionCallBackEventArgs Save(Dictionary<string, string> customDataKeyValuePair = null, Dictionary<string, bool> holochainFieldsIsEnabledKeyValuePair = null, bool cachePropertyInfos = true, bool useReflectionToMapKeyValuePairResponseOntoEntryDataObject = true)
         {
-            return SaveAsync(customDataKeyValuePair, holochainFieldsIsEnabledKeyValuePair, cachePropertyInfos).Result;
+            return SaveAsync(customDataKeyValuePair, holochainFieldsIsEnabledKeyValuePair, cachePropertyInfos, useReflectionToMapKeyValuePairResponseOntoEntryDataObject).Result;
         }
 
         /// <summary>
         /// This method will save the Holochain entry using the params object passed in containing the hApp rust properties & their values to save to the Holochain Conductor. This calls the CallZomeFunction on the HoloNET client passing in the zome function name specified in the constructor param `zomeCreateEntryFunction` or property ZomeCreateEntryFunction if it is a new entry (empty object) or the `zomeUpdateEntryFunction` param and ZomeUpdateEntryFunction property if it's an existing entry (previously saved object containing a valid value for the EntryHash property). Once it has saved the entry it will then update the EntryHash property with the entry hash returned from the zome call/conductor. The PreviousVersionEntryHash property is also set to the previous EntryHash (if there is one). Once it has finished saving and got a response from the Holochain Conductor it will raise the OnSaved event.
         /// </summary>
         /// <param name="paramsObject">The dynamic data object containing the params you wish to pass to the Create/Update zome function via the CallZomeFunction method. **NOTE:** You do not need to pass this in unless you have a need, if you call one of the overloads that do not have this parameter HoloNETEntryBaseClass will automatically generate this object from any properties in your class that contain the HolochainFieldName attribute.</param>
+        /// <param name="useReflectionToMapKeyValuePairResponseOntoEntryDataObject">This is an optional param, set this to true (default) to map the data returned from the Holochain Conductor onto the Entry Data Object that extends this base class (HoloNETEntryBaseClass or HoloNETAuditEntryBaseClass). This will have a very small performance overhead but means you do not need to do the mapping yourself from the ZomeFunctionCallBackEventArgs.KeyValuePair. </param>
         /// <returns></returns>
-        public virtual async Task<ZomeFunctionCallBackEventArgs> SaveAsync(dynamic paramsObject)
+        public virtual async Task<ZomeFunctionCallBackEventArgs> SaveAsync(dynamic paramsObject, bool useReflectionToMapKeyValuePairResponseOntoEntryDataObject = true)
         {
             ZomeFunctionCallBackEventArgs result = null;
 
@@ -770,7 +781,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 else
                     result = await HoloNETClient.CallZomeFunctionAsync(ZomeName, ZomeUpdateEntryFunction, paramsObject);
 
-                ProcessZomeReturnCall(result);
+                ProcessZomeReturnCall(result, useReflectionToMapKeyValuePairResponseOntoEntryDataObject);
                 OnSaved?.Invoke(this, result);
             }
             catch (Exception ex)
@@ -786,10 +797,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// NOTE: The corresponding rust Holochain Entry in your hApp will need to have the same properties contained in your class and have the correct mappings using the HolochainFieldName attribute. Please see HoloNETEntryBaseClass in the documentation/README on the GitHub repo https://github.com/NextGenSoftwareUK/holochain-client-csharp for more info...
         /// </summary>
         /// <param name="paramsObject">The dynamic data object containing the params you wish to pass to the Create/Update zome function via the CallZomeFunction method. **NOTE:** You do not need to pass this in unless you have a need, if you call one of the overloads that do not have this parameter HoloNETEntryBaseClass will automatically generate this object from any properties in your class that contain the HolochainFieldName attribute.</param>
+        /// <param name="useReflectionToMapKeyValuePairResponseOntoEntryDataObject">This is an optional param, set this to true (default) to map the data returned from the Holochain Conductor onto the Entry Data Object that extends this base class (HoloNETEntryBaseClass or HoloNETAuditEntryBaseClass). This will have a very small performance overhead but means you do not need to do the mapping yourself from the ZomeFunctionCallBackEventArgs.KeyValuePair. </param>
         /// <returns></returns>
-        public virtual ZomeFunctionCallBackEventArgs Save(dynamic paramsObject)
+        public virtual ZomeFunctionCallBackEventArgs Save(dynamic paramsObject, bool useReflectionToMapKeyValuePairResponseOntoEntryDataObject = true)
         {
-            return SaveAsync(paramsObject).Result;
+            return SaveAsync(paramsObject, useReflectionToMapKeyValuePairResponseOntoEntryDataObject).Result;
         }
 
         /// <summary>
@@ -797,21 +809,23 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// NOTE: This uses the EntryHash property to retrieve the entries hash to soft delete.
         /// NOTE: The corresponding rust Holochain Entry in your hApp will need to have the same properties contained in your class and have the correct mappings using the HolochainFieldName attribute. Please see HoloNETEntryBaseClass in the documentation/README on the GitHub repo https://github.com/NextGenSoftwareUK/holochain-client-csharp for more info...
         /// </summary>
+        /// <param name="useReflectionToMapKeyValuePairResponseOntoEntryDataObject">This is an optional param, set this to true (default) to map the data returned from the Holochain Conductor onto the Entry Data Object that extends this base class (HoloNETEntryBaseClass or HoloNETAuditEntryBaseClass). This will have a very small performance overhead but means you do not need to do the mapping yourself from the ZomeFunctionCallBackEventArgs.KeyValuePair. </param>
         /// <returns></returns>
-        public virtual async Task<ZomeFunctionCallBackEventArgs> DeleteAsync()
+        public virtual async Task<ZomeFunctionCallBackEventArgs> DeleteAsync(bool useReflectionToMapKeyValuePairResponseOntoEntryDataObject = true)
         {
-            return await DeleteAsync(this.EntryHash);
+            return await DeleteAsync(this.EntryHash, useReflectionToMapKeyValuePairResponseOntoEntryDataObject);
         }
 
         /// <summary>
         /// This method will soft delete the Holochain entry (the previous version can still be retrieved). This calls the CallZomeFunction on the HoloNET client passing in the zome function name specified in the constructor param `zomeDeleteEntryFunction` or property ZomeDeleteEntryFunction. It then updates the HoloNET Entry Data Object with the response received from the Holochain Conductor and then finally raises the OnDeleted event.
         /// NOTE: This uses the EntryHash property to retrieve the entries hash to soft delete.
         /// NOTE: The corresponding rust Holochain Entry in your hApp will need to have the same properties contained in your class and have the correct mappings using the HolochainFieldName attribute. Please see HoloNETEntryBaseClass in the documentation/README on the GitHub repo https://github.com/NextGenSoftwareUK/holochain-client-csharp for more info...
+        /// <param name="useReflectionToMapKeyValuePairResponseOntoEntryDataObject">This is an optional param, set this to true (default) to map the data returned from the Holochain Conductor onto the Entry Data Object that extends this base class (HoloNETEntryBaseClass or HoloNETAuditEntryBaseClass). This will have a very small performance overhead but means you do not need to do the mapping yourself from the ZomeFunctionCallBackEventArgs.KeyValuePair. </param>
         /// </summary>
         /// <returns></returns>
-        public virtual ZomeFunctionCallBackEventArgs Delete()
+        public virtual ZomeFunctionCallBackEventArgs Delete(bool useReflectionToMapKeyValuePairResponseOntoEntryDataObject = true)
         {
-            return DeleteAsync().Result;
+            return DeleteAsync(useReflectionToMapKeyValuePairResponseOntoEntryDataObject).Result;
         }
 
         /// <summary>
@@ -819,8 +833,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// NOTE: The corresponding rust Holochain Entry in your hApp will need to have the same properties contained in your class and have the correct mappings using the HolochainFieldName attribute. Please see HoloNETEntryBaseClass in the documentation/README on the GitHub repo https://github.com/NextGenSoftwareUK/holochain-client-csharp for more info...
         /// </summary>
         /// <param name="entryHash">The hash of the Holochain Entry you wish to delete. For the overloads that do not take the entryHash as a paramater it will use the EntryHash property.</param>
+        /// <param name="useReflectionToMapKeyValuePairResponseOntoEntryDataObject">This is an optional param, set this to true (default) to map the data returned from the Holochain Conductor onto the Entry Data Object that extends this base class (HoloNETEntryBaseClass or HoloNETAuditEntryBaseClass). This will have a very small performance overhead but means you do not need to do the mapping yourself from the ZomeFunctionCallBackEventArgs.KeyValuePair. </param>
         /// <returns></returns>
-        public virtual async Task<ZomeFunctionCallBackEventArgs> DeleteAsync(string entryHash)
+        public virtual async Task<ZomeFunctionCallBackEventArgs> DeleteAsync(string entryHash, bool useReflectionToMapKeyValuePairResponseOntoEntryDataObject = true)
         {
             ZomeFunctionCallBackEventArgs result = null;
 
@@ -833,6 +848,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     result = await HoloNETClient.CallZomeFunctionAsync(ZomeName, ZomeDeleteEntryFunction, entryHash);
                 else
                     result = new ZomeFunctionCallBackEventArgs() { IsError = true, Message = "EntryHash is null, please set before calling this function." };
+
+                ProcessZomeReturnCall(result, useReflectionToMapKeyValuePairResponseOntoEntryDataObject);
+                OnDeleted?.Invoke(this, result);
             }
             catch (Exception ex)
             {
@@ -847,19 +865,21 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// NOTE: The corresponding rust Holochain Entry in your hApp will need to have the same properties contained in your class and have the correct mappings using the HolochainFieldName attribute. Please see HoloNETEntryBaseClass in the documentation/README on the GitHub repo https://github.com/NextGenSoftwareUK/holochain-client-csharp for more info...
         /// </summary>
         /// <param name="entryHash">The hash of the Holochain Entry you wish to delete. For the overloads that do not take the entryHash as a paramater it will use the EntryHash property.</param>
+        /// <param name="useReflectionToMapKeyValuePairResponseOntoEntryDataObject">This is an optional param, set this to true (default) to map the data returned from the Holochain Conductor onto the Entry Data Object that extends this base class (HoloNETEntryBaseClass or HoloNETAuditEntryBaseClass). This will have a very small performance overhead but means you do not need to do the mapping yourself from the ZomeFunctionCallBackEventArgs.KeyValuePair. </param>
         /// <returns></returns>
-        public virtual ZomeFunctionCallBackEventArgs Delete(string entryHash)
+        public virtual ZomeFunctionCallBackEventArgs Delete(string entryHash, bool useReflectionToMapKeyValuePairResponseOntoEntryDataObject = true)
         {
-            return DeleteAsync(entryHash).Result;
+            return DeleteAsync(entryHash, useReflectionToMapKeyValuePairResponseOntoEntryDataObject).Result;
         }
 
         /// <summary>
         /// This method will soft delete the Holochain entry (the previous version can still be retrieved). This calls the CallZomeFunction on the HoloNET client passing in the zome function name specified in the constructor param `zomeDeleteEntryFunction` or property ZomeDeleteEntryFunction. It then updates the HoloNET Entry Data Object with the response received from the Holochain Conductor and then finally raises the OnDeleted event.
         /// NOTE: The corresponding rust Holochain Entry in your hApp will need to have the same properties contained in your class and have the correct mappings using the HolochainFieldName attribute. Please see HoloNETEntryBaseClass in the documentation/README on the GitHub repo https://github.com/NextGenSoftwareUK/holochain-client-csharp for more info...
         /// </summary>
-        /// <param name="customFieldToLoadByValue">The custom field value to delete by (if you do not wish to delete by the EntryHash).</param>
+        /// <param name="customFieldToDeleteByValue">The custom field value to delete by (if you do not wish to delete by the EntryHash).</param>
+        /// <param name="useReflectionToMapKeyValuePairResponseOntoEntryDataObject">This is an optional param, set this to true (default) to map the data returned from the Holochain Conductor onto the Entry Data Object that extends this base class (HoloNETEntryBaseClass or HoloNETAuditEntryBaseClass). This will have a very small performance overhead but means you do not need to do the mapping yourself from the ZomeFunctionCallBackEventArgs.KeyValuePair. </param>
         /// <returns></returns>
-        public virtual async Task<ZomeFunctionCallBackEventArgs> DeleteAsync(object customFieldToLoadByValue)
+        public virtual async Task<ZomeFunctionCallBackEventArgs> DeleteAsync(object customFieldToDeleteByValue, bool useReflectionToMapKeyValuePairResponseOntoEntryDataObject = true)
         {
             ZomeFunctionCallBackEventArgs result = null;
 
@@ -869,9 +889,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     await InitializeAsync();
 
                 if (!string.IsNullOrEmpty(EntryHash))
-                    result = await HoloNETClient.CallZomeFunctionAsync(ZomeName, ZomeDeleteEntryFunction, customFieldToLoadByValue);
+                    result = await HoloNETClient.CallZomeFunctionAsync(ZomeName, ZomeDeleteEntryFunction, customFieldToDeleteByValue);
                 else
                     result = new ZomeFunctionCallBackEventArgs() { IsError = true, Message = "EntryHash is null, please set before calling this function." };
+
+                ProcessZomeReturnCall(result, useReflectionToMapKeyValuePairResponseOntoEntryDataObject);
+                OnDeleted?.Invoke(this, result);
             }
             catch (Exception ex)
             {
@@ -885,11 +908,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// This method will soft delete the Holochain entry (the previous version can still be retrieved). This calls the CallZomeFunction on the HoloNET client passing in the zome function name specified in the constructor param `zomeDeleteEntryFunction` or property ZomeDeleteEntryFunction. It then updates the HoloNET Entry Data Object with the response received from the Holochain Conductor and then finally raises the OnDeleted event.
         /// NOTE: The corresponding rust Holochain Entry in your hApp will need to have the same properties contained in your class and have the correct mappings using the HolochainFieldName attribute. Please see HoloNETEntryBaseClass in the documentation/README on the GitHub repo https://github.com/NextGenSoftwareUK/holochain-client-csharp for more info...
         /// </summary>
-        /// <param name="customFieldToLoadByValue">The custom field value to delete by (if you do not wish to delete by the EntryHash).</param>
+        /// <param name="customFieldToDeleteByValue">The custom field value to delete by (if you do not wish to delete by the EntryHash).</param>
+        /// <param name="useReflectionToMapKeyValuePairResponseOntoEntryDataObject">This is an optional param, set this to true (default) to map the data returned from the Holochain Conductor onto the Entry Data Object that extends this base class (HoloNETEntryBaseClass or HoloNETAuditEntryBaseClass). This will have a very small performance overhead but means you do not need to do the mapping yourself from the ZomeFunctionCallBackEventArgs.KeyValuePair. </param>
         /// <returns></returns>
-        public virtual ZomeFunctionCallBackEventArgs Delete(object customFieldToLoadByValue)
+        public virtual ZomeFunctionCallBackEventArgs Delete(object customFieldToDeleteByValue, bool useReflectionToMapKeyValuePairResponseOntoEntryDataObject = true)
         {
-            return DeleteAsync(customFieldToLoadByValue).Result;
+            return DeleteAsync(customFieldToDeleteByValue, useReflectionToMapKeyValuePairResponseOntoEntryDataObject).Result;
         }
 
         /// <summary>
@@ -1023,7 +1047,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// Processes the data returned from the Holochain Conductor/CallZomeFunction method.
         /// </summary>
         /// <param name="result">The data returned from the Holochain Conductor/CallZomeFunction.</param>
-        protected virtual void ProcessZomeReturnCall(ZomeFunctionCallBackEventArgs result, bool useReflectionToMapOntoEntryDataObject = true)
+        protected virtual void ProcessZomeReturnCall(ZomeFunctionCallBackEventArgs result, bool useReflectionToMapKeyValuePairResponseOntoEntryDataObject = true)
         {
             try
             {
@@ -1053,7 +1077,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                         this.EntryHash = result.ZomeReturnHash;
                     }
 
-                    if (result.KeyValuePair != null && useReflectionToMapOntoEntryDataObject)
+                    if (result.KeyValuePair != null && useReflectionToMapKeyValuePairResponseOntoEntryDataObject)
                     {
                         //if (result.KeyValuePair.ContainsKey("entry_hash") && string.IsNullOrEmpty(result.KeyValuePair["entry_hash"]))
                         //    result.KeyValuePair.Remove("entry_hash");
