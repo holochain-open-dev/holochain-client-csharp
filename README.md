@@ -165,6 +165,8 @@ We would LOVE to hear your feedback on how you find using HoloNET including the 
 
 Also please get in touch and let us know of any bugs that need squsihing or improvements/features you would like and we will do our best to provide them for you! (Obviosuly we will squish any bugs you report!) ;-)
 
+We woukd also love to hear how you are using HoloNET? What apps, games, services or websites are you using it in?
+
 Please get in touch either on our [Twitter account](https://twitter.com/H0L0NET), [Telegram Channel](https://t.me/ourworldthegamechat) or [Discord Server](https://discord.gg/q9gMKU6). We look forward to hearing from you! :)
 
 ## How To Use HoloNET 
