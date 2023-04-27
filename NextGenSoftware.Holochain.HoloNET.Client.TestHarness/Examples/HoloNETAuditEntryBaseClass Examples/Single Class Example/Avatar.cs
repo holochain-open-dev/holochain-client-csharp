@@ -29,7 +29,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
         [HolochainFieldName("dob")]
         public DateTime DOB { get; set; }
 
-        public override Task<ZomeFunctionCallBackEventArgs> SaveAsync(Dictionary<string, string> customDataKeyValuePair = null, Dictionary<string, bool> holochainFieldsIsEnabledKeyValuePair = null, bool cachePropertyInfos = true)
+        public override Task<ZomeFunctionCallBackEventArgs> SaveAsync(Dictionary<string, string> customDataKeyValuePair = null, Dictionary<string, bool> holochainFieldsIsEnabledKeyValuePair = null, bool cachePropertyInfos = true, bool useReflectionToMapKeyValuePairResponseOntoEntryDataObject = true)
         {
             //Example of how to disable various holochain fields/ properties so the data is omitted from the data sent to the zome function.
             //if (holochainFieldsIsEnabledKeyValuePair == null)
@@ -48,7 +48,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
             return base.SaveAsync(customDataKeyValuePair, holochainFieldsIsEnabledKeyValuePair, cachePropertyInfos);
         }
 
-        public override ZomeFunctionCallBackEventArgs Save(Dictionary<string, string> customDataKeyValuePair = null, Dictionary<string, bool> holochainFieldsIsEnabledKeyValuePair = null, bool cachePropertyInfos = true)
+        public override ZomeFunctionCallBackEventArgs Save(Dictionary<string, string> customDataKeyValuePair = null, Dictionary<string, bool> holochainFieldsIsEnabledKeyValuePair = null, bool cachePropertyInfos = true, bool useReflectionToMapKeyValuePairResponseOntoEntryDataObject = true)
         {
             //Example of how to disable various holochain fields/properties so the data is omitted from the data sent to the zome function.
             //if (holochainFieldsIsEnabledKeyValuePair == null)
