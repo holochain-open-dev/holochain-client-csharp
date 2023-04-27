@@ -7,6 +7,7 @@
   - [Background](#background)
   - [Initial RSM Version](#initial-rsm-version)
   - [Donations Welcome! Thank you!](#donations-welcome-thank-you)
+  - [Feedback Welcome! Thank you!](#feedback-welcome-thank-you)
   - [How To Use HoloNET](#how-to-use-holonet)
     - [Quick Start](#quick-start)
     - [The Power of .NET Async Methods](#the-power-of-net-async-methods)
@@ -157,6 +158,14 @@ We will also add it here soon...
 
 You can alternatively buy some virtual land NFT's (OLAND's) for Our World from our NFT store here:
 https://opensea.io/collection/theoasisandourworld
+
+## Feedback Welcome! Thank you!
+
+We would LOVE to hear your feedback on how you find using HoloNET including the documentation so we can continue to improve for you all... :)
+
+Also please get in touch and let us know of any bugs that need squsihing or improvements/features you would like and we will do our best to provide them for you! (Obviosuly we will squish any bugs you report!) ;-)
+
+Please get in touch either on our [Twitter account](#https://twitter.com/H0L0NET), [Telegram Channel](#https://t.me/ourworldthegamechat) or [Discord Server](#https://discord.gg/q9gMKU6). We look forward to hearing from you! :)
 
 ## How To Use HoloNET 
 
@@ -2481,7 +2490,8 @@ https://www.thejusticeleagueaccademy.icu
 |Type  |Link  |
 |--|--|
 |Facebook| http://www.facebook.com/ourworldthegame  |
-|Twitter | http://www.twitter.com/ourworldthegame |
+|Twitter HoloNET | https://twitter.com/H0L0NET|
+|Twitter Our World | http://www.twitter.com/ourworldthegame |
 |YouTube| https://www.youtube.com/channel/UC0_O4RwdY3lq1m3-K-njUxA | 
 |Discord| https://discord.gg/q9gMKU6 |
 |Hylo| https://www.hylo.com/c/ourworld |
