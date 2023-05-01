@@ -266,7 +266,7 @@ Saying this, there may be scenarios where you need to use the older non async st
 
 ### HoloNETClient
 
-This is the main HoloNETClient that can be used to make calls directly to the Holochain Conductor. Use this if you need full control over what zome functions you are calling and data being sent and returned. It is recommended you use the [HoloNetEntryBaseClass](#HoloNetEntryBaseClass) or [HoloNetAuditEntryBaseClass](#HoloNetAuditEntryBaseClass) since these wrap around the [HoloNETClient](#HoloNETClient) making it quicker and easier to make calls to your hApp and will automatically handle mapping the data returned from the Holochain Conductor onto your custom data object (Holochain Entry) properties. The [HoloNETClient](#HoloNETClient) also provides automatic mapping via some of the CallZomeFuction(#CallZomeFuction) overloads.
+This is the main HoloNETClient that can be used to make calls directly to the Holochain Conductor. Use this if you need full control over what zome functions you are calling and data being sent and returned. It is recommended you use the [HoloNetEntryBaseClass](#HoloNetEntryBaseClass) or [HoloNetAuditEntryBaseClass](#HoloNetAuditEntryBaseClass) since these wrap around the [HoloNETClient](#HoloNETClient) making it quicker and easier to make calls to your hApp and will automatically handle mapping the data returned from the Holochain Conductor onto your custom data object (Holochain Entry) properties. The [HoloNETClient](#HoloNETClient) also provides automatic mapping via some of the [CallZomeFuction](#CallZomeFuction) overloads.
 
 #### Constructors
 
