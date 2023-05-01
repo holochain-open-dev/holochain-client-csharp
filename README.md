@@ -188,7 +188,7 @@ As the diagram above shows, there are 3 ways you can use HoloNET:
 
 1. Can make calls directly to the Holochain Conductor via the HoloNETClient class.
 
-2. Can extend the [HoloNETEntryBaseClass](#HoloNETEntryBaseClass) to wrap around the `HoloNETClient` making it quicker and easier to build your app. [TheHoloNETEntryBaseClass](#HoloNETEntryBaseClass) represents a Holochain Entry within your hApp. This automatically handles mapping the data returned from the Holochain Conductor onto your custom data object properties(Holochain Entry Class) and provides very simple to use [Load()](#Load), [Save()](#Save) and [Delete()](#Delete) methods.
+2. Can extend the [HoloNETEntryBaseClass](#HoloNETEntryBaseClass) to wrap around the `HoloNETClient` making it quicker and easier to build your app. [TheHoloNETEntryBaseClass](#HoloNETEntryBaseClass) represents a Holochain Entry within your hApp. This automatically handles mapping the data returned from the Holochain Conductor onto your custom data object properties(Holochain Entry Class) and provides very simple to use [Load](#Load), [Save](#Save) and [Delete](#Delete) methods.
 
 3. Can extend the [HoloNETAuditEntryBaseClass](#HoloNETAuditEntryBaseClass), which in itself extends the [HoloNETEntryBaseClass](#HoloNETEntryBaseClass) providing additional auditing and version control capabilities.
 
