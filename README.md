@@ -9,7 +9,8 @@
   - [Donations Welcome! Thank you!](#donations-welcome-thank-you)
   - [Feedback Welcome! Thank you!](#feedback-welcome-thank-you)
   - [How To Use HoloNET](#how-to-use-holonet)
-    - [HoloNET Stack](#holonet-stack)
+    - [The HoloNET Stack](#the-holonet-stack)
+    - [3 Ways To Use HoloNET](#3-ways-to-use-holonet)
     - [Quick Start](#quick-start)
     - [The Power of .NET Async Methods](#the-power-of-net-async-methods)
       - [New Hybrid Async/Event Model](#new-hybrid-asyncevent-model)
@@ -178,9 +179,17 @@ Please get in touch either on our [Twitter account](https://twitter.com/H0L0NET)
 
 The HoloNET Stack can be found below:
 
-<div class="mxgraph" style="max-width:100%;border:1px solid transparent;" data-mxgraph="{&quot;highlight&quot;:&quot;#0000ff&quot;,&quot;nav&quot;:true,&quot;resize&quot;:true,&quot;xml&quot;:&quot;&lt;mxfile host=\&quot;app.diagrams.net\&quot; modified=\&quot;2023-05-01T00:19:37.244Z\&quot; agent=\&quot;5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36\&quot; etag=\&quot;oNM3OnVKXL7rsK9XKcPx\&quot; version=\&quot;17.2.4\&quot; type=\&quot;device\&quot;&gt;&lt;diagram id=\&quot;pUjDQPqHTCoXj2xhr4PX\&quot; name=\&quot;Page-1\&quot;&gt;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&lt;/diagram&gt;&lt;/mxfile&gt;&quot;,&quot;toolbar&quot;:&quot;pages zoom layers lightbox&quot;,&quot;page&quot;:0}"></div>
-<script type="text/javascript" src="https://app.diagrams.net/js/viewer-static.min.js"></script>
+<img src="https://github.com/holochain-open-dev/holochain-client-csharp/blob/main/HoloNET%20Stack.svg"/>
 
+### 3 Ways To Use HoloNET
+
+As the diagram above shows, there are 3 ways you can use HoloNET:
+
+1. Can make calls directly to the Holochain Conductor via the HoloNETClient class.
+
+2. Can extend the [HoloNETEntryBaseClass](#HoloNETEntryBaseClass) to wrap around the `HoloNETClient` making it quicker and easier to build your app. [TheHoloNETEntryBaseClass](#HoloNETEntryBaseClass) represents a Holochain Entry within your hApp. This automatically handles mapping the data returned from the Holochain Conductor onto your custom data object properties(Holochain Entry Class) and provides very simple to use [Load()](#Load), [Save()](#Save) and [Delete()](#Delete) methods.
+
+3. Can extend the [HoloNETAuditEntryBaseClass](#HoloNETAuditEntryBaseClass), which in itself extends the [HoloNETEntryBaseClass](#HoloNETEntryBaseClass) providing additional auditing and version control capabilities.
 
 
 ### Quick Start
