@@ -47,8 +47,8 @@
       - [Properties](#properties)
         - [Config](#config)
         - [WebSocket](#websocket)
-        - [Config](#config)
-        - [State](#state)
+          - [WebSocket.Config](#websocket.config)
+          - [WebSocket.State](#websocket.state)
         - [State](#state)
         - [EndPoint](#endpoint)
       - [Logging](#logging)
@@ -1246,11 +1246,11 @@ This property contains a struct called `HoloNETConfig` containing the following 
 | LoggingMode                                | This passes through to the static LogConfig.LoggingMode property in [NextGenSoftware.Logging](https://www.nuget.org/packages/NextGenSoftware.Logging) package. It can be either `WarningsErrorsInfoAndDebug`, `WarningsErrorsAndInfo`, `WarningsAndErrors` or `ErrorsOnly`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 | ErrorHandlingBehaviour                     | An enum that specifies what to do when anm error occurs. The options are: `AlwaysThrowExceptionOnError`, `OnlyThrowExceptionIfNoErrorHandlerSubscribedToOnErrorEvent` & `NeverThrowExceptions`). The default is `OnlyThrowExceptionIfNoErrorHandlerSubscribedToOnErrorEvent` meaning it will only throw an error if the `OnError` event has not been subscribed to. This delegates error handling to the caller. If no event has been subscribed then HoloNETClient will throw an error. `AlwaysThrowExceptionOnError` will always throw an error even if the `OnError` event has been subscribed to. The `NeverThrowException` enum option will never throw an error even if the `OnError` event has not been subscribed to. Regardless of what enum is selected, the error will always be logged using whatever ILogger`s have been injected into the constructor or set on the static Logging.Loggers property.                        |
 
-#### WebSocket
+##### WebSocket
 
 This property contains a refrence to the internal [NextGenSoftware WebSocket](https://www.nuget.org/packages/NextGenSoftware.WebSocket) that HoloNET uses. You can use this property to access the current state of the WebSocket as well as configure more options.
 
-##### Config
+###### WebSocket.Config
 
 It has a sub-property called Config that contains the following options:
 
@@ -1265,7 +1265,7 @@ It has a sub-property called Config that contains the following options:
 | ReceiveChunkSizeDefault     | The size of the buffer to use when receiving data from the Holochain Conductor. The default is 1024 bytes.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | 
 | ErrorHandlingBehaviour      | An enum that specifies what to do when anm error occurs. The options are: `AlwaysThrowExceptionOnError`, `OnlyThrowExceptionIfNoErrorHandlerSubscribedToOnErrorEvent` & `NeverThrowExceptions`). The default is `OnlyThrowExceptionIfNoErrorHandlerSubscribedToOnErrorEvent` meaning it will only throw an error if the `OnError` event has not been subscribed to. This delegates error handling to the caller. If no event has been subscribed then HoloNETClient will throw an error. `AlwaysThrowExceptionOnError` will always throw an error even if the `OnError` event has been subscribed to. The `NeverThrowException` enum option will never throw an error even if the `OnError` event has not been subscribed to. Regardless of what enum is selected, the error will always be logged using whatever `ILogger`s have been injected into the constructor or set on the static Logging.Loggers property. |
 
-###### State
+###### WebSocket.State
 
 Contains an enumeration that can be one of the following values:
 
