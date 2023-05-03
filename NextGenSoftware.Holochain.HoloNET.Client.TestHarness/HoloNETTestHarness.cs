@@ -138,7 +138,21 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
 
 
                         CLIEngine.ShowWorkingMessage("Saving Avatar...");
-                        ZomeFunctionCallBackEventArgs result =  await avatar.SaveAsync();
+                        ZomeFunctionCallBackEventArgs result =  await avatar.SaveAsync(new Dictionary<string, string>() 
+                        { 
+                            { "custom field 1", "custom value 1" }, 
+                            { "custom field 2", "custom value 2" } 
+                        });
+
+                        //List<KeyValuePair<string, string>> keyValuePairs = new List<KeyValuePair<string, string>>() 
+                        //{ 
+                        //    new KeyValuePair<string, string>("bob", "harper"),
+                        //    new KeyValuePair<string, string>("david", "ellams")
+                        //};
+
+                        //dynamic params = new dynamic() { "david" = "ellams" };
+
+                        //await avatar.LoadAsync(true, new { david = ellams, bob = harper });
 
                         if (result.IsCallSuccessful && !result.IsError && !string.IsNullOrEmpty(result.ZomeReturnHash))
                         {

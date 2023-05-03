@@ -45,23 +45,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         }
 
-        //public ZomeFunctionCallBackEventArgs(string id, string endPoint, string zome, string zomeFunction, bool isCallSuccessful, string rawData, Dictionary<object, object> rawZomeReturnData, Dictionary<string, object> zomeReturnData, string zomeReturnHash, Dictionary<string, string> keyValuePair, string keyValuePairAsString, EntryData entry, byte[] rawBinaryData, string rawJSONData, byte[] rawBinaryDataAfterMessagePackDecode, string rawBinaryDataAfterMessagePackDecodeAsString, WebSocketReceiveResult webSocketResult)
-        //    : base(id, endPoint, isCallSuccessful, rawBinaryData, rawBinaryDataAfterMessagePackDecode, rawBinaryDataAfterMessagePackDecodeAsString, rawJSONData, webSocketResult)
-        //{
-        //    Zome = zome;
-        //    ZomeFunction = zomeFunction;
-        //    RawData = rawData;
-        //    RawZomeReturnData = rawZomeReturnData;
-        //    ZomeReturnData = zomeReturnData;
-        //    ZomeReturnHash = zomeReturnHash;
-        //    KeyValuePair = keyValuePair;
-        //    KeyValuePairAsString = keyValuePairAsString;
-        //    Entry = entry;
-        //}
-
         public string Zome { get; set; }
         public string ZomeFunction { get; set; }
-        //public string RawData { get; set; }
         public Dictionary<string, object> ZomeReturnData { get; set; }
         public Dictionary<object, object> RawZomeReturnData { get; set; }
         public string ZomeReturnHash { get; set; }
@@ -69,6 +54,45 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public Dictionary<string, string> KeyValuePair { get; set; }
         public string KeyValuePairAsString { get; set; }
     }
+
+
+    /*
+    public class ZomeFunctionCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
+    {
+        public ZomeFunctionCallBackEventArgs() : base()
+        {
+
+        }
+
+        public string Zome { get; set; }
+        public string ZomeFunction { get; set; }
+        public Dictionary<string, object> ZomeReturnData { get; set; }
+        public Dictionary<object, object> RawZomeReturnData { get; set; }
+        public string ZomeReturnHash { get; set; }
+        //public EntryData Entry { get; set; }
+        public Dictionary<string, string> KeyValuePair { get; set; }
+        public string KeyValuePairAsString { get; set; }
+    }
+
+    public class ZomeFunctionCallBackForEntryEventArgs : ZomeFunctionCallBackEventArgs
+    {
+        public ZomeFunctionCallBackForEntryEventArgs() : base()
+        {
+
+        }
+
+        public EntryData Entry { get; set; }
+    }
+
+    public class ZomeFunctionCallBackForCollectionEventArgs : ZomeFunctionCallBackEventArgs
+    {
+        public ZomeFunctionCallBackForCollectionEventArgs() : base()
+        {
+
+        }
+
+        public List<EntryData> Entries { get; set; }
+    }*/
 
     public class AppInfoCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
