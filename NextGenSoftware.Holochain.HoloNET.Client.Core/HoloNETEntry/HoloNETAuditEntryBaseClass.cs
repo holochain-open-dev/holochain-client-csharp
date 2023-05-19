@@ -1,7 +1,9 @@
 ﻿
 using NextGenSoftware.Logging;
+using NextGenSoftware.Utilities.ExtentionMethods;
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Threading.Tasks;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
@@ -494,32 +496,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public override async Task<ZomeFunctionCallBackEventArgs> SaveAsync(Dictionary<string, string> customDataKeyValuePair = null, Dictionary<string, bool> holochainFieldsIsEnabledKeyValuePair = null, bool cachePropertyInfos = true, bool useReflectionToMapKeyValuePairResponseOntoEntryDataObject = true)
         {
-            if (string.IsNullOrEmpty(EntryHash))
-            {
-                if (CreatedDate == DateTime.MinValue)
-                {
-                    CreatedDate = DateTime.Now;
+            await ProcessAuditDataAsync();
 
-                    //await this.HoloNETClient.WaitTillReadyForZomeCallsAsync();
-                    await WaitTillHoloNETInitializedAsync();
-                    CreatedBy = this.HoloNETClient.Config.AgentPubKey;
-                }
-            }
-            else
-            {
-                if (ModifiedDate == DateTime.MinValue)
-                {
-                    ModifiedDate = DateTime.Now;
-
-                    //await this.HoloNETClient.WaitTillReadyForZomeCallsAsync();
-                    await WaitTillHoloNETInitializedAsync();
-                    ModifiedBy = this.HoloNETClient.Config.AgentPubKey;
-                }
-            }
-
-            if (IsVersionTrackingEnabled)
-                this.Version++;
-            else
+            if (!IsVersionTrackingEnabled)
                 holochainFieldsIsEnabledKeyValuePair["Version"] = false;
 
             if (!IsAuditAgentCreateModifyDeleteFieldsEnabled)
@@ -532,7 +511,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 holochainFieldsIsEnabledKeyValuePair["DeletedDate"] = false;
             }
 
-            return await base.SaveAsync(customDataKeyValuePair, holochainFieldsIsEnabledKeyValuePair, cachePropertyInfos);
+            return await base.SaveAsync(customDataKeyValuePair, holochainFieldsIsEnabledKeyValuePair, cachePropertyInfos, useReflectionToMapKeyValuePairResponseOntoEntryDataObject);
         }
 
         /// <summary>
@@ -546,7 +525,59 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public override ZomeFunctionCallBackEventArgs Save(Dictionary<string, string> customDataKeyValuePair = null, Dictionary<string, bool> holochainFieldsIsEnabledKeyValuePair = null, bool cachePropertyInfos = true, bool useReflectionToMapKeyValuePairResponseOntoEntryDataObject = true)
         {
-            return SaveAsync(customDataKeyValuePair, holochainFieldsIsEnabledKeyValuePair, cachePropertyInfos).Result;
+            return SaveAsync(customDataKeyValuePair, holochainFieldsIsEnabledKeyValuePair, cachePropertyInfos, useReflectionToMapKeyValuePairResponseOntoEntryDataObject).Result;
+        }
+
+        /// <summary>
+        /// This method will save the Holochain entry using the params object passed in containing the hApp rust properties & their values to save to the Holochain Conductor. This calls the CallZomeFunction on the HoloNET client passing in the zome function name specified in the constructor param `zomeCreateEntryFunction` or property ZomeCreateEntryFunction if it is a new entry (empty object) or the `zomeUpdateEntryFunction` param and ZomeUpdateEntryFunction property if it's an existing entry (previously saved object containing a valid value for the EntryHash property). Once it has saved the entry it will then update the EntryHash property with the entry hash returned from the zome call/conductor. The PreviousVersionEntryHash property is also set to the previous EntryHash (if there is one). Once it has finished saving and got a response from the Holochain Conductor it will raise the OnSaved event.
+        /// </summary>
+        /// <param name="paramsObject">The dynamic data object containing the params you wish to pass to the Create/Update zome function via the CallZomeFunction method. **NOTE:** You do not need to pass this in unless you have a need, if you call one of the overloads that do not have this parameter HoloNETEntryBaseClass will automatically generate this object from any properties in your class that contain the HolochainFieldName attribute.</param>
+        /// <param name="autoGeneratUpdatedEntryObjectAndOriginalEntryHashRustParams">Set this to true if you want HoloNET to auto-generate the updatedEntry object and originalEntryHash params that are passed to the update zome function in your hApp rust code. If this is false then only the paramsObject will be passed to the zome update function and you will need to manually set these object/params yourself. This is an optional param that defaults to true. NOTE: This is set to true for the Save overloads that do not take a paramsobject (use reflection).</param>
+        /// <param name="updatedEntryRustParamName">This is the name of the updated entry object param that is in your rust hApp zome update function. This defaults to 'updated_entry'. NOTE: Whatever name that is given here needs to match the same name in your zome update function. NOTE: This param is ignored if the autoGeneratUpdatedEntryObjectAndOriginalEntryHashRustParams param is false.</param>
+        /// <param name="originalEntryHashRustParamName">This is the name of the original entry/action hash param that is in your rust hApp zome update function. This defaults to 'original_action_hash'. NOTE: Whatever name that is given here needs to match the same name in your zome update function. NOTE: This param is ignored if the autoGeneratUpdatedEntryObjectAndOriginalEntryHashRustParams param is false.</param>
+        /// <param name="addAuditInfoToParams">Set this to true (default) to automatically add the additional audit data such as created_date, created_by, modifed_date, modified_by, deleted_date & deleted_by to the paramsObject passed in. This is an optional param.</param>
+        /// <param name="addVersionToParams">Set this to true (default) to automatically add the version number to the paramsObject passed in. This is an optional param.</param>
+        /// <param name="createdDateRustParamName">Set this to the name of the rust param in your hApp zome update function for the audit param CreatedBy (default is created_by). This is an optional param.</param>
+        /// <param name="createdByRustParamName">Set this to the name of the rust param in your hApp zome update function for the audit param CreatedDate (default is created_date). This is an optional param.</param>
+        /// <param name="modifiedDateRustParamName">Set this to the name of the rust param in your hApp zome update function for the audit param ModifiedBy (default is modified_by). This is an optional param.</param>
+        /// <param name="modifiedByRustParamName">Set this to the name of the rust param in your hApp zome update function for the audit param ModifiedDate (default is modified_date). This is an optional param.</param>
+        /// <param name="deletedDateRustParamName">Set this to the name of the rust param in your hApp zome update function for the audit param DeletedBy (default is deleted_by). This is an optional param.</param>
+        /// <param name="deletedByRustParamName">Set this to the name of the rust param in your hApp zome update function for the audit param DeletedDate (default is deleted_date). This is an optional param.</param>
+        /// <param name="versionRustParamName"><Set this to the name of the rust param in your hApp zome update function for the audit param Version (default is version). This is an optional param.</param>
+        /// <param name="useReflectionToMapKeyValuePairResponseOntoEntryDataObject">This is an optional param, set this to true (default) to map the data returned from the Holochain Conductor onto the Entry Data Object that extends this base class (HoloNETEntryBaseClass or HoloNETAuditEntryBaseClass). This will have a very small performance overhead but means you do not need to do the mapping yourself from the ZomeFunctionCallBackEventArgs.KeyValuePair. </param>
+        /// <returns></returns>
+        public virtual async Task<ZomeFunctionCallBackEventArgs> SaveAsync(dynamic paramsObject, bool autoGeneratUpdatedEntryObjectAndOriginalEntryHashRustParams = true, string updatedEntryRustParamName = "updated_entry", string originalEntryHashRustParamName = "original_action_hash", bool addAuditInfoToParams = true, bool addVersionToParams = true, string createdDateRustParamName = "created_date", string createdByRustParamName = "created_by", string modifiedDateRustParamName = "modified_date", string modifiedByRustParamName = "modified_by", string deletedDateRustParamName = "deleted_date", string deletedByRustParamName = "deleted_by", string versionRustParamName = "version", bool useReflectionToMapKeyValuePairResponseOntoEntryDataObject = true)
+        {
+            await ProcessAuditDataAsync();
+            ProcessAuditRustParams(paramsObject, addAuditInfoToParams, addVersionToParams, createdDateRustParamName, createdByRustParamName, modifiedDateRustParamName, modifiedByRustParamName, deletedDateRustParamName, deletedByRustParamName, versionRustParamName);
+
+            return await base.SaveAsync((object)paramsObject, autoGeneratUpdatedEntryObjectAndOriginalEntryHashRustParams, updatedEntryRustParamName, originalEntryHashRustParamName, useReflectionToMapKeyValuePairResponseOntoEntryDataObject);
+        }
+
+        /// <summary>
+        /// This method will save the Holochain entry using the params object passed in containing the hApp rust properties & their values to save to the Holochain Conductor. This calls the CallZomeFunction on the HoloNET client passing in the zome function name specified in the constructor param `zomeCreateEntryFunction` or property ZomeCreateEntryFunction if it is a new entry (empty object) or the `zomeUpdateEntryFunction` param and ZomeUpdateEntryFunction property if it's an existing entry (previously saved object containing a valid value for the EntryHash property). Once it has saved the entry it will then update the EntryHash property with the entry hash returned from the zome call/conductor. The PreviousVersionEntryHash property is also set to the previous EntryHash (if there is one). Once it has finished saving and got a response from the Holochain Conductor it will raise the OnSaved event.
+        /// </summary>
+        /// <param name="paramsObject">The dynamic data object containing the params you wish to pass to the Create/Update zome function via the CallZomeFunction method. **NOTE:** You do not need to pass this in unless you have a need, if you call one of the overloads that do not have this parameter HoloNETEntryBaseClass will automatically generate this object from any properties in your class that contain the HolochainFieldName attribute.</param>
+        /// <param name="autoGeneratUpdatedEntryObjectAndOriginalEntryHashRustParams">Set this to true if you want HoloNET to auto-generate the updatedEntry object and originalEntryHash params that are passed to the update zome function in your hApp rust code. If this is false then only the paramsObject will be passed to the zome update function and you will need to manually set these object/params yourself. This is an optional param that defaults to true. NOTE: This is set to true for the Save overloads that do not take a paramsobject (use reflection).</param>
+        /// <param name="updatedEntryRustParamName">This is the name of the updated entry object param that is in your rust hApp zome update function. This defaults to 'updated_entry'. NOTE: Whatever name that is given here needs to match the same name in your zome update function. NOTE: This param is ignored if the autoGeneratUpdatedEntryObjectAndOriginalEntryHashRustParams param is false.</param>
+        /// <param name="originalEntryHashRustParamName">This is the name of the original entry/action hash param that is in your rust hApp zome update function. This defaults to 'original_action_hash'. NOTE: Whatever name that is given here needs to match the same name in your zome update function. NOTE: This param is ignored if the autoGeneratUpdatedEntryObjectAndOriginalEntryHashRustParams param is false.</param>
+        /// <param name="addAuditInfoToParams">Set this to true (default) to automatically add the additional audit data such as created_date, created_by, modifed_date, modified_by, deleted_date & deleted_by to the paramsObject passed in. This is an optional param.</param>
+        /// <param name="addVersionToParams">Set this to true (default) to automatically add the version number to the paramsObject passed in. This is an optional param.</param>
+        /// <param name="createdDateRustParamName">Set this to the name of the rust param in your hApp zome update function for the audit param CreatedBy (default is created_by). This is an optional param.</param>
+        /// <param name="createdByRustParamName">Set this to the name of the rust param in your hApp zome update function for the audit param CreatedDate (default is created_date). This is an optional param.</param>
+        /// <param name="modifiedDateRustParamName">Set this to the name of the rust param in your hApp zome update function for the audit param ModifiedBy (default is modified_by). This is an optional param.</param>
+        /// <param name="modifiedByRustParamName">Set this to the name of the rust param in your hApp zome update function for the audit param ModifiedDate (default is modified_date). This is an optional param.</param>
+        /// <param name="deletedDateRustParamName">Set this to the name of the rust param in your hApp zome update function for the audit param DeletedBy (default is deleted_by). This is an optional param.</param>
+        /// <param name="deletedByRustParamName">Set this to the name of the rust param in your hApp zome update function for the audit param DeletedDate (default is deleted_date). This is an optional param.</param>
+        /// <param name="versionRustParamName"><Set this to the name of the rust param in your hApp zome update function for the audit param Version (default is version). This is an optional param.</param>
+        /// <param name="useReflectionToMapKeyValuePairResponseOntoEntryDataObject">This is an optional param, set this to true (default) to map the data returned from the Holochain Conductor onto the Entry Data Object that extends this base class (HoloNETEntryBaseClass or HoloNETAuditEntryBaseClass). This will have a very small performance overhead but means you do not need to do the mapping yourself from the ZomeFunctionCallBackEventArgs.KeyValuePair. </param>
+        /// <returns></returns>
+        public override ZomeFunctionCallBackEventArgs Save(dynamic paramsObject, bool autoGeneratUpdatedEntryObjectAndOriginalEntryHashRustParams = true, string updatedEntryRustParamName = "updated_entry", string originalEntryHashRustParamName = "original_action_hash", bool addAuditInfoToParams = true, bool addVersionToParams = true, string createdDateRustParamName = "created_date", string createdByRustParamName = "created_by", string modifiedDateRustParamName = "modified_date", string modifiedByRustParamName = "modified_by", string deletedDateRustParamName = "deleted_date", string deletedByRustParamName = "deleted_by", string versionRustParamName = "version", bool useReflectionToMapKeyValuePairResponseOntoEntryDataObject = true)
+        {
+            ProcessAuditDataAsync();
+            ProcessAuditRustParams(paramsObject, addAuditInfoToParams, addVersionToParams, createdDateRustParamName, createdByRustParamName, modifiedDateRustParamName, modifiedByRustParamName, deletedDateRustParamName, deletedByRustParamName, versionRustParamName);
+
+            return base.Save(paramsObject, autoGeneratUpdatedEntryObjectAndOriginalEntryHashRustParams, updatedEntryRustParamName, originalEntryHashRustParamName, useReflectionToMapKeyValuePairResponseOntoEntryDataObject);
         }
 
         /// <summary>
@@ -686,6 +717,51 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             {
                 HandleError("Unknown error occurred in ProcessZomeReturnCall method.", ex);
             }
+        }
+
+        private async Task ProcessAuditDataAsync()
+        {
+            if (string.IsNullOrEmpty(EntryHash))
+            {
+                if (CreatedDate == DateTime.MinValue)
+                {
+                    CreatedDate = DateTime.Now;
+
+                    await WaitTillHoloNETInitializedAsync();
+                    CreatedBy = this.HoloNETClient.Config.AgentPubKey;
+                }
+            }
+            else
+            {
+                if (ModifiedDate == DateTime.MinValue)
+                {
+                    ModifiedDate = DateTime.Now;
+
+                    await WaitTillHoloNETInitializedAsync();
+                    ModifiedBy = this.HoloNETClient.Config.AgentPubKey;
+                }
+            }
+
+            if (IsVersionTrackingEnabled)
+                this.Version++;
+        }
+
+        private dynamic ProcessAuditRustParams(dynamic paramsObject, bool addAuditInfoToParams = true, bool addVersionToParams = true, string createdDateRustParamName = "created_date", string createdByRustParamName = "created_by", string modifiedDateRustParamName = "modified_date", string modifiedByRustParamName = "modified_by", string deletedDateRustParamName = "deleted_date", string deletedByRustParamName = "deleted_by", string versionRustParamName = "version")
+        {
+            if (addAuditInfoToParams)
+            {
+                ExpandoObjectHelpers.AddProperty(paramsObject, createdDateRustParamName, CreatedDate.ToShortDateString());
+                ExpandoObjectHelpers.AddProperty(paramsObject, createdByRustParamName, CreatedBy);
+                ExpandoObjectHelpers.AddProperty(paramsObject, modifiedDateRustParamName, ModifiedDate.ToShortDateString());
+                ExpandoObjectHelpers.AddProperty(paramsObject, modifiedByRustParamName, ModifiedBy);
+                ExpandoObjectHelpers.AddProperty(paramsObject, deletedDateRustParamName, DeletedDate.ToShortDateString());
+                ExpandoObjectHelpers.AddProperty(paramsObject, deletedByRustParamName, DeletedBy);
+            }
+
+            if (addVersionToParams)
+                ExpandoObjectHelpers.AddProperty(paramsObject, versionRustParamName, Version);
+
+            return paramsObject;
         }
     }
 }

@@ -45,7 +45,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
             //customDataKeyValuePair["dynamic data"] = "dynamic";
             //customDataKeyValuePair["some other data"] = "data";
 
-            return base.SaveAsync(customDataKeyValuePair, holochainFieldsIsEnabledKeyValuePair, cachePropertyInfos);
+            return base.SaveAsync(customDataKeyValuePair, holochainFieldsIsEnabledKeyValuePair, cachePropertyInfos, useReflectionToMapKeyValuePairResponseOntoEntryDataObject);
         }
 
         public override ZomeFunctionCallBackEventArgs Save(Dictionary<string, string> customDataKeyValuePair = null, Dictionary<string, bool> holochainFieldsIsEnabledKeyValuePair = null, bool cachePropertyInfos = true, bool useReflectionToMapKeyValuePairResponseOntoEntryDataObject = true)
@@ -64,7 +64,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
             //customDataKeyValuePair["dynamic data"] = "dynamic";
             //customDataKeyValuePair["some other data"] = "data";
 
-            return base.Save(customDataKeyValuePair, holochainFieldsIsEnabledKeyValuePair, cachePropertyInfos);
+            return base.Save(customDataKeyValuePair, holochainFieldsIsEnabledKeyValuePair, cachePropertyInfos, useReflectionToMapKeyValuePairResponseOntoEntryDataObject);
         }
     }
 }
