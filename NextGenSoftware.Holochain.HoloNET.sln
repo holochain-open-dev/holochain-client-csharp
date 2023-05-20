@@ -12,6 +12,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NextGenSoftware.Logging", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NextGenSoftware.Utilities", "..\NextGenSoftware-Libraries\NextGenSoftware Libraries\NextGenSoftware.Utilities\NextGenSoftware.Utilities.csproj", "{43517E31-A3F0-4BAB-80F2-C2BF35B7475C}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NextGenSoftware.CLI.Engine", "..\NextGenSoftware-Libraries\NextGenSoftware Libraries\NextGenSoftware.CLI.Engine\NextGenSoftware.CLI.Engine.csproj", "{426F7BCF-4725-465D-A958-954081B494F6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -38,6 +40,10 @@ Global
 		{43517E31-A3F0-4BAB-80F2-C2BF35B7475C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{43517E31-A3F0-4BAB-80F2-C2BF35B7475C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{43517E31-A3F0-4BAB-80F2-C2BF35B7475C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{426F7BCF-4725-465D-A958-954081B494F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{426F7BCF-4725-465D-A958-954081B494F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{426F7BCF-4725-465D-A958-954081B494F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{426F7BCF-4725-465D-A958-954081B494F6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
