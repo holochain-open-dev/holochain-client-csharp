@@ -17,73 +17,11 @@
 	  <Authors>David Ellams (NextGen Software Ltd)</Authors>
 	  <PackageTags>holochain;net;unity</PackageTags>
 	  <PackageReleaseNotes>
-		  This release includes multiple bug fixes and improvements such as now adding support for collections (being able to pass in zome function names to operate on collections such as loadCollection, addEntryToCollection, removeEntryFromCollection &amp; updateCollection).
-
-		  It also has a few performance improvements such as being able to enable/disable reflection for Load/Save operations on HoloNETEntryBaseClass and HoloNETAuditEntryBaseClass.
-
-		  Finally, it also now allows you to load your Holochain Entries with a custom data field (instead of the default Holochain EntryHash).
+		  This release includes 
 
 		  *Full Changes Below:*
 
-		  https://github.com/holochain-open-dev/holochain-client-csharp/commit/259be85c940cb7f177c0d452324c66e830f60716
-
-		  - Added overload to LoadAsync and Load methods on HoloNETEntryBaseClass to be able to load the holochain entry using a custom field and value.
-
-		  - Added overload to DeleteAsync &amp; Delete methods on HoloNETEntryBaseClass to be able to load the holochain entry using a custom field and value.
-		  
-		  https://github.com/holochain-open-dev/holochain-client-csharp/commit/bd564469ee058442d9f83c306a2bc0a08c311cb7
-
-		  - Added ZomeLoadCollectionFunction, ZomeCreateCollectionFunction, ZomeUpdateCollectionFunction and ZomeDeleteCollectionFunction params to HoloNETEntryBaseClass constructors.
-
-		  - Added ZomeLoadCollectionFunction, ZomeCreateCollectionFunction, ZomeUpdateCollectionFunction &amp; ZomeDeleteCollectionFunction properties to HoloNETEntryBaseClass.
-
-		  - Added Load method overload to HoloNETEntryBaseClass.
-
-		  - Added LoadCollectionAsync method to HoloNETEntryBaseClass.
-
-		  https://github.com/holochain-open-dev/holochain-client-csharp/commit/839096212134590895f8f42ce6410ed991e3481a
-
-		  - Added useReflectionToMapOntoEntryDataObject optional param to all LoadAsync &amp; Load methods in HoloNETEntryBaseClass.
-
-		  - Added optional param useReflectionToMapOntoEntryDataObject to ProcessZomeReturnCall method in HoloNETEntryBaseClass.
-
-		  - Added LoadCollection method to HoloNETEntryBaseClass.
-
-		  https://github.com/holochain-open-dev/holochain-client-csharp/commit/8025dced16c893e958318ebb31e92331bc030bcf
-
-		  - Created new IHoloNETClient, IHoloNETAuditEntry, IHoloNETEntryBaseClass &amp; IHoloNETAuditEntryBaseClass interfaces so follows bese practices (SOLID) so different components can be swapped out for others and easily extended etc, makes testing easier such as unit tests etc
-
-		  https://github.com/holochain-open-dev/holochain-client-csharp/commit/05c6cefec2f4f5d35ef2183a0be47f407b6932ac
-
-		  - Added ZomeLoadCollectionFunction, ZomeCreateCollectionFunction, ZomeUpdateCollectionFunction &amp; ZomeDeleteCollectionFunction params to all 7 constructors in HoloNETEntryBaseClass and started adding to HoloNETAuditEntryBaseClass constructors.
-
-		  - Renamed useReflectionToMapOntoEntryDataObject param to useReflectionToMapKeyValuePairResponseOntoEntryDataObject in HoloNETEntryBaseClass Load and LoadAsync methods.
-
-		  - Added useReflectionToMapKeyValuePairResponseOntoEntryDataObject documentation to summary methods in HoloNETEntryBaseClass.
-
-		  - Added useReflectionToMapKeyValuePairResponseOntoEntryDataObject param to all Save and SaveAsync methods in HoloNETEntryBaseClass.
-
-		  - Added useReflectionToMapKeyValuePairResponseOntoEntryDataObject param to all Delete and DeleteAsync methods in HoloNETEntryBaseClass.
-
-		  - Updated README.md/documentation to reflect latest changes above, etc.
-
-		  https://github.com/holochain-open-dev/holochain-client-csharp/commit/5276f69ad7a813a68923f2bc3f1b2cb90dda6ba3
-
-		  - Renamed ZomeCreateCollectionFunction to zomeAddToCollectionFunction on HoloNETAuditEntryBaseClass, HoloNETEntryBaseClass &amp; IHoloNETEntryBaseClass.
-
-		  - Renamed ZomeDeleteCollectionFunction to zomeRemoveFromCollectionFunction on HoloNETAuditEntryBaseClass and HoloNETEntryBaseClass.
-
-		  - Updated intelisense/documentation for zomeLoadCollectionFunction, zomeAddToCollectionFunction, zomeUpdateCollectionFunction &amp; zomeRemoveFromCollectionFunction on HoloNETAuditEntryBaseClass and HoloNETEntryBaseClass.
-
-		  - Added zomeLoadCollectionFunction, zomeAddToCollectionFunction, zomeUpdateCollectionFunction &amp; zomeRemoveFromCollectionFunction params to all constuctors in HoloNETAuditEntryBaseClass.
-
-		  - Added useReflectionToMapKeyValuePairResponseOntoEntryDataObject to SaveAsync, Save, DeleteAsync, Delete &amp; ProcessZomeReturnCall methods on HoloNETAuditEntryBaseClass.
-
-		  - Made ZomeLoadCollectionFunction optional param on HoloNETEntryBaseClass constructors.
-
-		  - Added useReflectionToMapKeyValuePairResponseOntoEntryDataObject param to ProcessZomeReturnCall method in HoloNETEntryBaseClass.
-
-		  *Full Changelog:* https://github.com/holochain-open-dev/holochain-client-csharp/compare/v2.1.3...v2.1.4
+		  *Full Changelog:* https://github.com/holochain-open-dev/holochain-client-csharp/compare/v2.1.4...v2.2.0
 
 	  </PackageReleaseNotes>
 	  <RepositoryType>git</RepositoryType>
@@ -93,7 +31,7 @@
 	  <!--<PackageLicenseExpression>GNU GPLv3</PackageLicenseExpression>-->
 	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
 	  <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-	  <Version>2.1.4</Version>
+	  <Version>2.2.0</Version>
 	  <!--<PackageLicenseFile>..\LICENSE</PackageLicenseFile>-->
 
 	  <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
