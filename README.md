@@ -282,7 +282,7 @@ Saying this, there may be scenarios where you need to use the older non async st
 
 This is the main HoloNETClient that can be used to make calls directly to the Holochain Conductor. Use this if you need full control over what zome functions you are calling and data being sent and returned. It is recommended you use the [HoloNetEntryBaseClass](#HoloNetEntryBaseClass) or [HoloNetAuditEntryBaseClass](#HoloNetAuditEntryBaseClass) since these wrap around the [HoloNETClient](#HoloNETClient) making it quicker and easier to make calls to your hApp and will automatically handle mapping the data returned from the Holochain Conductor onto your custom data object (Holochain Entry) properties. The [HoloNETClient](#HoloNETClient) also provides automatic mapping via some of the [CallZomeFunction](#callzomefunction) overloads.
 
-<a name="HoloNETClientConstructors" />
+<a name="HoloNETClientConstructors"></a>
 #### Constructors
 
 The HoloNETClient has the following constructors:
@@ -312,7 +312,7 @@ public HoloNETClient(IEnumerable<ILogger> loggers, bool alsoUseDefaultLogger = f
 | warningColour                       | The colour to use for `Warning` log entries to the console. **NOTE**: This is only relevant if the built-in [DefaultLogger](#DefaultLogger) is used.                                                                                                                        |
 | errorColour                         | The colour to use for `Error` log entries to the console. **NOTE**: This is only relevant if the built-in [DefaultLogger](#DefaultLogger) is used.                                                                                                                          |
 
-<a name="HoloNETClientEvents" />
+<a name="HoloNETClientEvents"> </a>
 #### Events
 
 You can subscribe to a number of different events:
