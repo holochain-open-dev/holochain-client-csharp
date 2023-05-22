@@ -2121,7 +2121,7 @@ Please see the [Constructors](#HoloNETEntryBaseClassConstructors) for [HoloNETEn
 
 Please see [Events](#HoloNETEntryBaseClassEvents) for [HoloNETEntryBaseClass](#HoloNETEntryBaseClass) because they share the same events.
 
-<a name="HoloNETAuditEntryBaseClassMethods" />
+<a name="HoloNETAuditEntryBaseClassMethods"></a>
 #### Methods
 
 The [HoloNETAuditEntryBaseClass](#HoloNETAuditEntryBaseClass) shares the same [Methods](#HoloNETEntryBaseClassMethods) as [HoloNETEntryBaseClass](#HoloNETEntryBaseClass) but also has these differences:
