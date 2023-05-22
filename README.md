@@ -84,9 +84,9 @@
         - [ZomeDeleteEntryFunction](#zomedeleteentryfunction)
         - [AuditEntries](#auditentries)
     - [HoloNETAuditEntryBaseClass](#holonetauditentrybaseclass)
-      - [Constructors](#HoloNETAuditEntryBaseClassLoadConstructors)
-      - [Events](#HoloNETAuditEntryBaseClassLoadEvents)
-      - [Methods](#HoloNETAuditEntryBaseClassLoadMethods)
+      - [Constructors](#HoloNETAuditEntryBaseClassConstructors)
+      - [Events](#HoloNETAuditEntryBaseClassEvents)
+      - [Methods](#HoloNETAuditEntryBaseClassMethods)
         - [Load](#HoloNETAuditEntryBaseClassLoad)
         - [Save](#HoloNETAuditEntryBaseClassSave)
       - [Properties](#HoloNETAuditEntryBaseClassProperties)
@@ -312,7 +312,7 @@ public HoloNETClient(IEnumerable<ILogger> loggers, bool alsoUseDefaultLogger = f
 | warningColour                       | The colour to use for `Warning` log entries to the console. **NOTE**: This is only relevant if the built-in [DefaultLogger](#DefaultLogger) is used.                                                                                                                        |
 | errorColour                         | The colour to use for `Error` log entries to the console. **NOTE**: This is only relevant if the built-in [DefaultLogger](#DefaultLogger) is used.                                                                                                                          |
 
-<a name="HoloNETClientEvents"> </a>
+<a name="HoloNETClientEvents"></a>
 #### Events
 
 You can subscribe to a number of different events:
@@ -804,7 +804,7 @@ private static void _holoNETClient_OnHoloNETShutdownComplete(object sender, Holo
 | IsError                                                                    | True if there was an error during the initialization, false if not.                                                                                                                                                          |
 | Message                                                                    | If there was an error this will contain the error message, this normally includes a stacktrace to help you track down the cause. If there was no error it can contain any other message such as status etc or will be blank. |
 
-<a name="HoloNETClientMethods" />
+<a name="HoloNETClientMethods"></a>
 #### Methods
 
 HoloNETClient contains the following methods:
@@ -1223,7 +1223,7 @@ public dynamic MapEntryDataObject(dynamic entryDataObject, Dictionary<string, st
 | entryDataObject     | The dynamic data object to map the KeyValuePairs returned from the Holochain Conductor onto.                                                                                        |
 | keyValuePairs       | The KeyValuePairs returned from the Holochain Conductor (after they have been decoded by an internal function called `DecodeRawZomeData`) that will be mapped onto the data object. |
 
-<a name="HoloNETClientProperties" />
+<a name="HoloNETClientProperties"></a>
 #### Properties
 
 HoloNETClient contains the following properties:
@@ -1463,7 +1463,7 @@ pub fn delete_entry_avatar(action_hash: ActionHash) -> ExternResult<ActionHash> 
 
 **NOTE:** This is a preview of some of the advanced functionality that will be present in the upcoming [.NET HDK Low Code Generator](#net-hdk-low-code-generator), which generates dynamic rust and c# code from your metadata freeing you to focus on your amazing business idea and creativity rather than worrying about learning Holochain, Rust and then getting it to all work in Windows and with C#. HAppy Days! ;-)
 
-<a name="HoloNETEntryBaseClassConstructors" />
+<a name="HoloNETEntryBaseClassConstructors"></a>
 #### Constructors
 
 The HoloNETEntryBaseClass has the following constructors:
@@ -2093,7 +2093,7 @@ pub fn delete_entry_avatar(action_hash: ActionHash) -> ExternResult<ActionHash> 
 
 **NOTE:** This is a preview of some of the advanced functionality that will be present in the upcoming [.NET HDK Low Code Generator](#net-hdk-low-code-generator), which generates dynamic rust and c# code from your metadata freeing you to focus on your amazing business idea and creativity rather than worrying about learning Holochain, Rust and then getting it to all work in Windows and with C#. HAppy Days! ;-)
 
-<a name="HoloNETAuditEntryBaseClassConstructors" />
+<a name="HoloNETAuditEntryBaseClassConstructors"></a>
 #### Constructors
 
 The [Constructors](#HoloNETEntryBaseClassConstructors) for [HoloNETEntryBaseClass](#HoloNETEntryBaseClass) are very similar to those for [HoloNETAuditEntryBaseClass](#HoloNETAuditEntryBaseClass) except it adds isVersionTrackingEnabled, isAuditTrackingEnabled & isAuditAgentCreateModifyDeleteFieldsEnabled params.
@@ -2116,7 +2116,7 @@ public HoloNETEntryBaseClass(string zomeName, string zomeLoadEntryFunction, stri
 
 Please see the [Constructors](#HoloNETEntryBaseClassConstructors) for [HoloNETEntryBaseClass](#HoloNETEntryBaseClass) for a description for the rest of the parameters.
 
-<a name="HoloNETAuditEntryBaseClassEvents" />
+<a name="HoloNETAuditEntryBaseClassEvents"></a>
 #### Events
 
 Please see [Events](#HoloNETEntryBaseClassEvents) for [HoloNETEntryBaseClass](#HoloNETEntryBaseClass) because they share the same events.
@@ -2131,7 +2131,7 @@ The [HoloNETAuditEntryBaseClass](#HoloNETAuditEntryBaseClass) shares the same [M
 | [Load](#HoloNETAuditEntryBaseClassLoad)                             | This method will load the Holochain entry from the Holochain Conductor using either the [EntryHash](#entryHash) property or `entryHash` param passed into one of the overloads for this method. This calls the [CallZomeFunction](#CallZomeFunction) on the HoloNET client passing in the zome function name specified in the constructor param `zomeLoadEntryFunction` or property `ZomeLoadEntryFunction` and then maps the data returned from the zome call onto your data object. It will then raise the [OnLoaded](#OnLoaded) event. **NOTE:** The corresponding rust Holochain Entry in your hApp will need to have the same properties contained in your class and have the correct mappings using the [HolochainFieldName](#HolochainFieldName) attribute. Please see [HoloNETEntryBaseClass](#HoloNETEntryBaseClass) for more info...                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | [Save](#HoloNETAuditEntryBaseClassSave)                             | This method will save the Holochain entry to the Holochain Conductor. This calls the [CallZomeFunction](#CallZomeFunction) on the HoloNET client passing in the zome function name specified in the constructor param `zomeCreateEntryFunction` or property [ZomeCreateEntryFunction](#ZomeCreateEntryFunction) if it is a new entry (empty object) or the `zomeUpdateEntryFunction` param and [ZomeUpdateEntryFunction](#ZomeUpdateEntryFunction) property if it's an existing entry (previously saved object containing a valid value for the [EntryHash](#EntryHash) property). Once it has saved the entry it will then update the [EntryHash](#entryHash) property with the entry hash returned from the zome call/conductor. The [PreviousVersionEntryHash](#PreviousVersionEntryHash) property is also set to the previous EntryHash (if there is one). Once it has finished saving and got a response from the Holochain Conductor it will raise the [OnSaved](#OnSaved) event. **NOTE:** The corresponding rust Holochain Entry in your hApp will need to have the same properties contained in your class and have the correct mappings using the [HolochainFieldName](#HolochainFieldName) attribute. Please see [HoloNETEntryBaseClass](#HoloNETEntryBaseClass) for more info... **NOTE:** The parmeterless overload will automatically extrct the properties that need saving (contain the HolochainFieldName attribute). This method uses reflection so has a tiny performance overhead (negligbale), but if you need the extra nanoseconds use the other Save overload passing in your own params object.          |
 
-<a name="HoloNETAuditEntryBaseClassLoad"/>
+<a name="HoloNETAuditEntryBaseClassLoad"></a>
 ##### Load
 
 This method will load the Holochain entry from the Holochain Conductor using either the [EntryHash](#entryHash) property or `entryHash` param passed into one of the overloads for this method. This calls the [CallZomeFunction](#CallZomeFunction) on the HoloNET client passing in the zome function name specified in the constructor param `zomeLoadEntryFunction` or property `ZomeLoadEntryFunction` and then maps the data returned from the zome call onto your data object. It will then raise the [OnLoaded](#OnLoaded) event.                                                                                                                                                                                                                                                                                                                                                                                                                           
@@ -2156,7 +2156,7 @@ public virtual ZomeFunctionCallBackEventArgs Load(string customFieldToLoadByValu
 | customDataKeyValuePairs                                   | This is an optional param where a dictionary containing additional params (KeyValue Pairs) can be passed to the zome function. If this is passed in then the entryHash or customFieldToLoadByValue will automatically be added to the new params with key entry_hash (make sure your hApp zome function is expecting this name) or customFieldToLoadByKey.                                                                                     |
 | useReflectionToMapKeyValuePairResponseOntoEntryDataObject | This is an optional param, set this to true (default) to map the data returned from the Holochain Conductor onto the Entry Data Object that extends this base class ([HoloNETEntryBaseClass](#HoloNETEntryBaseClass) or [HoloNETAuditEntryBaseClass](#HoloNETAuditEntryBaseClass)). This will have a very small performance overhead but means you do not need to do the mapping yourself from the ZomeFunctionCallBackEventArgs.KeyValuePair. |
 
-<a name="HoloNETAuditEntryBaseClassSave"/>
+<a name="HoloNETAuditEntryBaseClassSave"></a>
 ##### Save
 
 This method will save the Holochain entry to the Holochain Conductor. This calls the [CallZomeFunction](#CallZomeFunction) on the HoloNET client passing in the zome function name specified in the constructor param `zomeCreateEntryFunction` or property [ZomeCreateEntryFunction](#ZomeCreateEntryFunction) if it is a new entry (empty object) or the `zomeUpdateEntryFunction` param and [ZomeUpdateEntryFunction](#ZomeUpdateEntryFunction) property if it's an existing entry (previously saved object containing a valid value for the [EntryHash](#EntryHash) property). Once it has saved the entry it will then update the [EntryHash](#entryHash) property with the entry hash returned from the zome call/conductor. The [PreviousVersionEntryHash](#PreviousVersionEntryHash) property is also set to the previous EntryHash (if there is one). Once it has finished saving and got a response from the Holochain Conductor it will raise the [OnSaved](#OnSaved) event.
@@ -2241,7 +2241,7 @@ NOTE: We would recommend you leave this param as well as the others on their def
 
 NOTE: You will notice that currently you can only edit the audit rust param names for the non reflective versions (that take a paramsObject) because the reflective versions (that use reflection to dynamically generate the paramsObject for you) currently have no way for you to rename the audit param rust names. This will be addressed in a future version...
 
-<a name="HoloNETAuditEntryBaseClassProperties" />
+<a name="HoloNETAuditEntryBaseClassProperties"></a>
 #### Properties
 
 The [HoloNETAuditEntryBaseClass](#HoloNETAuditEntryBaseClass) shares the same [Properties](#HoloNETEntryBaseClassProperties) as [HoloNETEntryBaseClass](#HoloNETEntryBaseClass) but also has these:
