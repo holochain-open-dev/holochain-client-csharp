@@ -15,9 +15,36 @@
 	<Authors>David Ellams (NextGen Software Ltd)</Authors>
 	<PackageTags>holochain;net;unity</PackageTags>
 	<PackageReleaseNotes>
-		This release includes
+		This release includes multiple bug fixes and improvements such as now being able to pass in additional custom params (that will be passed to your zome functions in your hApp rust code) to all Load/LoadAsync and Delete/DeleteAsync methods in HoloNETEntryBassClass and HoloNETAuditEntryBassClass derived classes.
+
+		It also allows the version to be specified in all Load/LoadAsync methods in HoloNETAuditEntryBassClass derived classes. If version is 0 (default), it will load the latest.
+
+		The non reflective Save/SaveAsync methods (you pass in your own paramsObject) in HoloNETAuditEntryBassClass derived classes now have the same auditing capabilities as their reflective cousins (auto generates the dynamic paramsObject from the properties (that have the HolochainFieldName attribute defined) defined in the derived classes). This upgrade is also fully customisable so for instance the audit param names defined in your rust zome function in your hApp can be overridden if you desire.
+
+		There is also a BIG performance improvement in this release with the upgrade to the latest .NET version (7) which features many improvements such as security and performance. This is the fastest .NET yet! Check out these links for more info:
+
+		https://learn.microsoft.com/en-us/dotnet/core/whats-new/dotnet-7
+		https://devblogs.microsoft.com/dotnet/performance_improvements_in_net_7/
+		https://devblogs.microsoft.com/dotnet/dotnet-7-networking-improvements/
+		https://devclass.com/2022/09/01/faster-net-in-version-7-500-performance-improvements-detailed/
+
+		Finally, the README/documentation has been updated and fixes have been made to the links/TOC and more...
 
 		*Full Changes Below:*
+
+		https://github.com/holochain-open-dev/holochain-client-csharp/commit/83bc3beb71eb714805b02c1250ba600049372f2b
+
+		- Added useReflectionToMapKeyValuePairResponseOntoEntryDataObject param to SaveAsync and Save override methods in Avatar class in HoloNET Test Harness.
+
+		https://github.com/holochain-open-dev/holochain-client-csharp/commit/73100761371ba0a7950abc1be1af409c8c38fec2
+
+		- Added missing useReflectionToMapKeyValuePairResponseOntoEntryDataObject param to SaveAsync/Save methods in Avatar test object in HoloNET Test Harness.
+
+		https://github.com/holochain-open-dev/holochain-client-csharp/commit/05eebdcb3e4b4e4a5cb49706c2236ac7ea825cf6
+
+		- Updated HoloNET Test Harness Release Notes.
+
+		- Bumped HoloNET Test Harness to v2.2.0.
 
 		*Full Changelog:* https://github.com/holochain-open-dev/holochain-client-csharp/compare/v2.1.4...v2.2.0
 	</PackageReleaseNotes>
