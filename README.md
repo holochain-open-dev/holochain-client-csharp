@@ -2262,6 +2262,51 @@ The [HoloNETAuditEntryBaseClass](#HoloNETAuditEntryBaseClass) shares the same [P
 | [IsAuditTrackingEnabled](#IsAuditTrackingEnabled)                                           | Set this to true if you wish to enable Audit Tracking (the AuditEntries property will be updated every time the entry/object is saved or deleted).                                                                                                                                                                                                   |
 | [IsAuditAgentCreateModifyDeleteFieldsEnabled](#IsAuditAgentCreateModifyDeleteFieldsEnabled) | Set this to true if you wish to update the CreatedDate, CreatedBy, ModifiedDate, ModifiedBy, DeletedData & DeletedBy properties each time the entry/object is saved or deleted (you will need to make sure your hApp rust code has the created_date, created_by, modified_date, modified_by, deleted_date & deleted_by fields in your entry struct). |
 
+##### Id
+
+This is a unique ID (GUID) given to the entry which is consistent across multiple versions.                                                                                                                                                                                                                                                         
+
+##### CreatedDate
+
+The date that the entry was created.
+
+##### ModifiedDate
+
+The date that the entry was last modified.                                                                                                                                                                                                                                                                                                         
+
+##### ModifiedBy
+
+The AgentID of the agent/user that last modified it.                                                                                                                                                                                                                                                                                                
+
+##### DeletedDate
+
+The date that the entry was deleted.
+
+##### IsActive
+
+A boolean flag that determines whether the entry is currently active or not.                                                                                                                                                                                                                                                                      
+
+##### AuditEntries
+
+This contains a collection of audit enties that allow you to track every action that was taken on the Holochain Entry that this instance of the [HoloNETAuditEntryBaseClass](#HoloNETAuditEntryBaseClass) maps onto. Each audit entry contains the [EntryHash](#EntryHash), DateTime & the Type (Create, Modify or Delete).                          |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
+
+##### Version
+
+This is the current version of the HolochainEntry. Each time it is saved with the [Save](#Save) method it will be incremented. **NOTE:** You will need to ensure you add a corresponding property in the rust entry struct for your hApp (pub version: i32), which will then map to this property.                                                 
+
+##### IsVersionTrackingEnabled
+
+Set this to true if you wish to enable Version Tracking (you will need to make sure your hApp rust code has the version field added to your entry struct).                                                                                                                                                                                        
+
+##### IsAuditTrackingEnabled
+
+Set this to true if you wish to enable Audit Tracking (the AuditEntries property will be updated every time the entry/object is saved or deleted).                                                                                                                                                                                                 
+
+##### IsAuditAgentCreateModifyDeleteFieldsEnabled
+
+Set this to true if you wish to update the CreatedDate, CreatedBy, ModifiedDate, ModifiedBy, DeletedData & DeletedBy properties each time the entry/object is saved or deleted (you will need to make sure your hApp rust code has the created_date, created_by, modified_date, modified_by, deleted_date & deleted_by fields in your entry struct).
+
+
 ### Test Harness
 
 You can find the Test Harness here:
