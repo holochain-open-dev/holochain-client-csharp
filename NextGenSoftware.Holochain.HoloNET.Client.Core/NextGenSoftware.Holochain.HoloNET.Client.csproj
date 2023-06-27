@@ -129,7 +129,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\..\..\..\OneDrive\Dropbox\Our World\Prototype\holochain\hc logo.png">
+    <None Include="..\Logos\hc logo.png">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
@@ -142,6 +142,7 @@
   <ItemGroup>
     <PackageReference Include="MessagePack" Version="2.4.59" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
+    <PackageReference Include="NextGenSoftware.WebSocket" Version="1.2.0" />
     <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
   </ItemGroup>
 
@@ -156,10 +157,6 @@
 
   <ItemGroup>
     <Folder Include="Properties\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\NextGenSoftware-Libraries\NextGenSoftware Libraries\NextGenSoftware.WebSocket\NextGenSoftware.WebSocket.csproj" />
   </ItemGroup>
 
 </Project>
