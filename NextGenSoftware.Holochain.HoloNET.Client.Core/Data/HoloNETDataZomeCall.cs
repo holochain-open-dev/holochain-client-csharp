@@ -3,7 +3,7 @@
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
     [MessagePackObject]
-    public struct HoloNETDataZomeCall
+    public class HoloNETDataZomeCall
     {
         [Key("cell_id")]
         public byte[][] cell_id { get; set; }
@@ -17,8 +17,14 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         [Key("payload")]
         public byte[] payload { get; set; } 
 
-        [Key("cap")]
-        public byte[] cap { get; set; } //CapSecret | null = string
+        [Key("cap_secret")]
+        public byte[] cap_secret { get; set; }
+
+        [Key("nonce")]
+        public byte[] nonce { get; set; }
+
+        [Key("expires_at")]
+        public long expires_at { get; set; }
 
         [Key("provenance")]
         public byte[] provenance { get; set; } //AgentPubKey = string

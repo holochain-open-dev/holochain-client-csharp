@@ -159,4 +159,9 @@
     <Folder Include="Properties\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\NextGenSoftware-Libraries\NextGenSoftware Libraries\NextGenSoftware.Utilities\NextGenSoftware.Utilities.csproj" />
+    <ProjectReference Include="..\Chaos.NaCl\Chaos.NaCl.csproj" />
+  </ItemGroup>
+
 </Project>
