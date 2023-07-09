@@ -11,6 +11,10 @@ using NextGenSoftware.WebSocket;
 using NextGenSoftware.Logging;
 using NextGenSoftware.Holochain.HoloNET.Client.Properties;
 using NextGenSoftware.Utilities;
+using Chaos.NaCl;
+using System.Security.Cryptography;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Text;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
@@ -1094,18 +1098,45 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                 }
 
+                var seed = RandomNumberGenerator.GetBytes(32);
+                byte[] privateKey;
+                byte[] publicKey;
+
+                Ed25519.KeyPairFromSeed(out publicKey, out privateKey, seed);
+              
+                HoloNETDataZomeCall payload = new HoloNETDataZomeCall()
+                {
+                    cap_secret = RandomNumberGenerator.GetBytes(64),
+                    cell_id = new byte[2][] { ConvertHoloHashToBytes(Config.DnaHash), ConvertHoloHashToBytes(Config.AgentPubKey) },
+                    fn_name = function,
+                    zome_name = zome,
+                    payload = MessagePackSerializer.Serialize(paramsObject),
+                    //provenance = ConvertHoloHashToBytes(Config.AgentPubKey),
+                    provenance = publicKey, //TODO: May need to adjust it as the js client does. https://github.com/holochain/holochain-client-js/blob/main/src/api/zome-call-signing.ts
+                    nonce = RandomNumberGenerator.GetBytes(32),
+                    expires_at = DateTime.Now.AddMinutes(5).ToBinary(), //TODO: Not sure what format the conductor is expecting this in?
+                };
+
+                byte[] hash = Sha512.Hash(DataHelper.ObjectToByteArray(payload));
+                var sig = Ed25519.Sign(hash, privateKey);
+
+                HoloNETDataZomeCallSigned signedPayload = new HoloNETDataZomeCallSigned()
+                {
+                    cap_secret = payload.cap_secret,
+                    cell_id = payload.cell_id,
+                    fn_name = payload.fn_name,
+                    zome_name = payload.zome_name,
+                    payload = payload.payload,
+                    provenance = payload.provenance,
+                    nonce = payload.nonce,
+                    expires_at = payload.expires_at,
+                    signature = sig
+                };
+
                 HoloNETData holoNETData = new HoloNETData()
                 {
                     type = "zome_call",
-                    data = new HoloNETDataZomeCall()
-                    {
-                        cell_id = new byte[2][] { ConvertHoloHashToBytes(Config.DnaHash), ConvertHoloHashToBytes(Config.AgentPubKey) },
-                        fn_name = function,
-                        zome_name = zome,
-                        payload = MessagePackSerializer.Serialize(paramsObject),
-                        provenance = ConvertHoloHashToBytes(Config.AgentPubKey),
-                        cap = null
-                    }
+                    data = signedPayload
                 };
 
                 await SendHoloNETRequestAsync(id, holoNETData);
@@ -1113,7 +1144,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 if (zomeResultCallBackMode == ZomeResultCallBackMode.WaitForHolochainConductorResponse)
                 {
                     Task<ZomeFunctionCallBackEventArgs> returnValue = _taskCompletionZomeCallBack[id].Task;
-                    //_taskCompletionZomeCallBack.Remove(id);
                     return await returnValue;
                 }
                 else
