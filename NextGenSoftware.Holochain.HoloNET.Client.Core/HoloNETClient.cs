@@ -15,6 +15,7 @@ using Chaos.NaCl;
 using System.Security.Cryptography;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Text;
+using System.Net;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
@@ -1097,6 +1098,24 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 {
 
                 }
+
+                //TODO: Implement the equivalant so it only proceeds if the admin api has been called granting the capability for the zome function (s) or all functions as shown here:
+                //https://github.com/holochain/holochain-client-js/blob/f9ba322b5cef2c9bd34d47f56a8c2b73a6d4ebe5/src/api/admin/websocket.ts#L20
+
+                //TODO: Has part of above need to implement the Admin API ASAP, to begin with will only be the zome signing functionality listed in above file but then the rest ASAP after...
+
+                //Then once the admin api call has been made the code below will check if this requsts cell has been granted.
+
+                //const signingCredentialsForCell = getSigningCredentials(request.cell_id);
+                //            if (!signingCredentialsForCell)
+                //            {
+                //                throw new Error(
+                //  `cannot sign zome call: no signing credentials have been authorized for cell[${
+                //                    encodeHashToBase64(
+                //    request.cell_id[0]
+                //  )}, ${ encodeHashToBase64(request.cell_id[1])}]`
+                //);
+                //}
 
                 var seed = RandomNumberGenerator.GetBytes(32);
                 byte[] privateKey;
