@@ -1117,6 +1117,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 //);
                 //}
 
+                //TODO: Also be good to implement same functionality in js client where it will error if there is no matching request to a response (id etc). I think we can make this optional param for these method overloads like responseMustHaveMatchingRequest which defaults to true.
+
                 var seed = RandomNumberGenerator.GetBytes(32);
                 byte[] privateKey;
                 byte[] publicKey;
