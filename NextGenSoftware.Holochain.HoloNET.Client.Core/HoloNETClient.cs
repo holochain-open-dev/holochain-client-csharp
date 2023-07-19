@@ -16,6 +16,7 @@ using System.Security.Cryptography;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Text;
 using System.Net;
+using Blake2Fast;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
@@ -1138,7 +1139,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     expires_at = DateTime.Now.AddMinutes(5).ToBinary(), //TODO: Not sure what format the conductor is expecting this in?
                 };
 
-                byte[] hash = Sha512.Hash(DataHelper.ObjectToByteArray(payload));
+                //byte[] hash = Sha512.Hash(DataHelper.ObjectToByteArray(payload));
+                byte[] hash = Blake2b.ComputeHash(DataHelper.ObjectToByteArray(payload));
                 var sig = Ed25519.Sign(hash, privateKey);
 
                 HoloNETDataZomeCallSigned signedPayload = new HoloNETDataZomeCallSigned()
