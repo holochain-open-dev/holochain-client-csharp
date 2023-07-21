@@ -1125,7 +1125,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 byte[] publicKey;
 
                 Ed25519.KeyPairFromSeed(out publicKey, out privateKey, seed);
-              
+
+                byte[] DHTLocation = ConvertHoloHashToBytes(Config.AgentPubKey).TakeLast(4).ToArray();
+                byte[] signingKey = new byte[] { 132, 32, 36 }.Concat(publicKey).Concat(DHTLocation).ToArray();
+
                 HoloNETDataZomeCall payload = new HoloNETDataZomeCall()
                 {
                     cap_secret = RandomNumberGenerator.GetBytes(64),
@@ -1134,13 +1137,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     zome_name = zome,
                     payload = MessagePackSerializer.Serialize(paramsObject),
                     //provenance = ConvertHoloHashToBytes(Config.AgentPubKey),
-                    provenance = publicKey, //TODO: May need to adjust it as the js client does. https://github.com/holochain/holochain-client-js/blob/main/src/api/zome-call-signing.ts
+                    provenance = signingKey,
                     nonce = RandomNumberGenerator.GetBytes(32),
-                    expires_at = DateTime.Now.AddMinutes(5).ToBinary(), //TODO: Not sure what format the conductor is expecting this in?
+                    expires_at = DateTime.Now.AddMinutes(5).Ticks / 10 //DateTime.Now.AddMinutes(5).ToBinary(), //Conductor expects it in microseconds.
                 };
 
-                //byte[] hash = Sha512.Hash(DataHelper.ObjectToByteArray(payload));
-                byte[] hash = Blake2b.ComputeHash(DataHelper.ObjectToByteArray(payload));
+                byte[] hash = Blake2b.ComputeHash(MessagePackSerializer.Serialize(payload));
                 var sig = Ed25519.Sign(hash, privateKey);
 
                 HoloNETDataZomeCallSigned signedPayload = new HoloNETDataZomeCallSigned()
