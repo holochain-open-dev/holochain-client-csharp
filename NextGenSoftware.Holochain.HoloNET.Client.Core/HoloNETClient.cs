@@ -14,8 +14,6 @@ using NextGenSoftware.Utilities;
 using Chaos.NaCl;
 using System.Security.Cryptography;
 using static System.Runtime.InteropServices.JavaScript.JSType;
-using System.Text;
-using System.Net;
 using Blake2Fast;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
@@ -38,6 +36,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         private TaskCompletionSource<AgentPubKeyDnaHash> _taskCompletionAgentPubKeyAndDnaHashRetrieved = new TaskCompletionSource<AgentPubKeyDnaHash>();
         //private TaskCompletionSource<AgentPubKeyDnaHash> _taskCompletionAgentPubKeyAndDnaHashRetrievedFromConductor = new TaskCompletionSource<AgentPubKeyDnaHash>();
         private Dictionary<string, PropertyInfo[]> _dictPropertyInfos = new Dictionary<string, PropertyInfo[]>();
+        private Dictionary<byte[][], SigningCredentials> _signingCredentialsForCell = new Dictionary<byte[][], SigningCredentials>();
         private TaskCompletionSource<ReadyForZomeCallsEventArgs> _taskCompletionReadyForZomeCalls = new TaskCompletionSource<ReadyForZomeCallsEventArgs>();
         private TaskCompletionSource<DisconnectedEventArgs> _taskCompletionDisconnected = new TaskCompletionSource<DisconnectedEventArgs>();
         private TaskCompletionSource<HoloNETShutdownEventArgs> _taskCompletionHoloNETShutdown = new TaskCompletionSource<HoloNETShutdownEventArgs>();
@@ -692,13 +691,33 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public async Task SendHoloNETRequestAsync(string id, HoloNETData holoNETData)
         {
+            await SendHoloNETRequestAsync(id, MessagePackSerializer.Serialize(holoNETData));
+        }
+
+        /// <summary>
+        /// This method allows you to send your own raw request to holochain. This method raises the OnDataRecived event once it has received a response from the Holochain conductor.
+        /// </summary>
+        /// <param name="id">The id of the request to send to the Holochain Conductor. This will be matched to the id in the response received from the Holochain Conductor.</param>
+        /// <param name="holoNETData">The raw data packet you wish to send to the Holochain conductor.</param>
+        public void SendHoloNETRequest(string id, HoloNETData holoNETData)
+        {
+            SendHoloNETRequestAsync(id, holoNETData);
+        }
+
+        /// <summary>
+        /// This method allows you to send your own raw request to holochain. This method raises the OnDataRecived event once it has received a response from the Holochain conductor.
+        /// </summary>
+        /// <param name="id">The id of the request to send to the Holochain Conductor. This will be matched to the id in the response received from the Holochain Conductor.</param>
+        /// <param name="holoNETData">The raw data packet you wish to send to the Holochain conductor.</param>
+        public async Task SendHoloNETRequestAsync(string id, byte[] data)
+        {
             try
             {
                 HoloNETRequest request = new HoloNETRequest()
                 {
                     id = Convert.ToUInt64(id),
                     type = "Request",
-                    data = MessagePackSerializer.Serialize(holoNETData)
+                    data = data
                 };
 
                 if (WebSocket.State == WebSocketState.Open)
@@ -719,9 +738,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// </summary>
         /// <param name="id">The id of the request to send to the Holochain Conductor. This will be matched to the id in the response received from the Holochain Conductor.</param>
         /// <param name="holoNETData">The raw data packet you wish to send to the Holochain conductor.</param>
-        public void SendHoloNETRequest(string id, HoloNETData holoNETData)
+        public void SendHoloNETRequest(string id, byte[] data)
         {
-            SendHoloNETRequestAsync(id, holoNETData);
+            SendHoloNETRequestAsync(id, data);
         }
 
         /// <summary>
@@ -1120,59 +1139,60 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                 //TODO: Also be good to implement same functionality in js client where it will error if there is no matching request to a response (id etc). I think we can make this optional param for these method overloads like responseMustHaveMatchingRequest which defaults to true.
 
-                var seed = RandomNumberGenerator.GetBytes(32);
-                byte[] privateKey;
-                byte[] publicKey;
 
-                Ed25519.KeyPairFromSeed(out publicKey, out privateKey, seed);
+                byte[][] cellId = GetCellId();
 
-                byte[] DHTLocation = ConvertHoloHashToBytes(Config.AgentPubKey).TakeLast(4).ToArray();
-                byte[] signingKey = new byte[] { 132, 32, 36 }.Concat(publicKey).Concat(DHTLocation).ToArray();
-
-                HoloNETDataZomeCall payload = new HoloNETDataZomeCall()
+                if (_signingCredentialsForCell.ContainsKey(cellId) && _signingCredentialsForCell[cellId] != null)
                 {
-                    cap_secret = RandomNumberGenerator.GetBytes(64),
-                    cell_id = new byte[2][] { ConvertHoloHashToBytes(Config.DnaHash), ConvertHoloHashToBytes(Config.AgentPubKey) },
-                    fn_name = function,
-                    zome_name = zome,
-                    payload = MessagePackSerializer.Serialize(paramsObject),
-                    //provenance = ConvertHoloHashToBytes(Config.AgentPubKey),
-                    provenance = signingKey,
-                    nonce = RandomNumberGenerator.GetBytes(32),
-                    expires_at = DateTime.Now.AddMinutes(5).Ticks / 10 //DateTime.Now.AddMinutes(5).ToBinary(), //Conductor expects it in microseconds.
-                };
+                    HoloNETDataZomeCall payload = new HoloNETDataZomeCall()
+                    {
+                        cap_secret = RandomNumberGenerator.GetBytes(64),
+                        cell_id = new byte[2][] { ConvertHoloHashToBytes(Config.DnaHash), ConvertHoloHashToBytes(Config.AgentPubKey) },
+                        fn_name = function,
+                        zome_name = zome,
+                        payload = MessagePackSerializer.Serialize(paramsObject),
+                        //provenance = ConvertHoloHashToBytes(Config.AgentPubKey),
+                        provenance = _signingCredentialsForCell[cellId].SigningKey,
+                        nonce = RandomNumberGenerator.GetBytes(32),
+                        expires_at = DateTime.Now.AddMinutes(5).Ticks / 10 //DateTime.Now.AddMinutes(5).ToBinary(), //Conductor expects it in microseconds.
+                    };
 
-                byte[] hash = Blake2b.ComputeHash(MessagePackSerializer.Serialize(payload));
-                var sig = Ed25519.Sign(hash, privateKey);
+                    byte[] hash = Blake2b.ComputeHash(MessagePackSerializer.Serialize(payload));
+                    var sig = Ed25519.Sign(hash, _signingCredentialsForCell[cellId].KeyPair.PrivateKey);
 
-                HoloNETDataZomeCallSigned signedPayload = new HoloNETDataZomeCallSigned()
-                {
-                    cap_secret = payload.cap_secret,
-                    cell_id = payload.cell_id,
-                    fn_name = payload.fn_name,
-                    zome_name = payload.zome_name,
-                    payload = payload.payload,
-                    provenance = payload.provenance,
-                    nonce = payload.nonce,
-                    expires_at = payload.expires_at,
-                    signature = sig
-                };
+                    HoloNETDataZomeCallSigned signedPayload = new HoloNETDataZomeCallSigned()
+                    {
+                        cap_secret = payload.cap_secret,
+                        cell_id = payload.cell_id,
+                        fn_name = payload.fn_name,
+                        zome_name = payload.zome_name,
+                        payload = payload.payload,
+                        provenance = payload.provenance,
+                        nonce = payload.nonce,
+                        expires_at = payload.expires_at,
+                        signature = sig
+                    };
 
-                HoloNETData holoNETData = new HoloNETData()
-                {
-                    type = "zome_call",
-                    data = signedPayload
-                };
+                    HoloNETData holoNETData = new HoloNETData()
+                    {
+                        type = "zome_call",
+                        data = signedPayload
+                    };
 
-                await SendHoloNETRequestAsync(id, holoNETData);
+                    await SendHoloNETRequestAsync(id, holoNETData);
 
-                if (zomeResultCallBackMode == ZomeResultCallBackMode.WaitForHolochainConductorResponse)
-                {
-                    Task<ZomeFunctionCallBackEventArgs> returnValue = _taskCompletionZomeCallBack[id].Task;
-                    return await returnValue;
+                    if (zomeResultCallBackMode == ZomeResultCallBackMode.WaitForHolochainConductorResponse)
+                    {
+                        Task<ZomeFunctionCallBackEventArgs> returnValue = _taskCompletionZomeCallBack[id].Task;
+                        return await returnValue;
+                    }
+                    else
+                        return new ZomeFunctionCallBackEventArgs() { EndPoint = EndPoint, Id = id, Zome = zome, ZomeFunction = function, Message = "ZomeResultCallBackMode is set to UseCallBackEvents so please wait for OnZomeFunctionCallBack event for zome result." };
                 }
-                else
-                    return new ZomeFunctionCallBackEventArgs() { EndPoint = EndPoint, Id = id, Zome = zome, ZomeFunction = function, Message = "ZomeResultCallBackMode is set to UseCallBackEvents so please wait for OnZomeFunctionCallBack event for zome result." };
+                else 
+                { 
+                
+                }
             }
             catch (Exception ex)
             {
@@ -1468,6 +1488,104 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             return CallZomeFunctionAsync(id, zome, function, callback, paramsObject, matchIdToInstanceZomeFuncInCallback, cachReturnData, zomeResultCallBackMode).Result;
         }
 
+        public async Task GrantCapabilityAsync(GrantedFunctions functions, string id = "")
+        {
+            await GrantCapabilityAsync(GetCellId(), functions, id);
+        }
+
+        public void GrantCapability(GrantedFunctions functions, string id = "")
+        {
+            GrantCapabilityAsync(functions, id);
+        }
+
+        public async Task GrantCapabilityAsync(string AgentPubKey, string DnaHash, GrantedFunctions functions, string id = "")
+        {
+            await GrantCapabilityAsync(GetCellId(DnaHash, AgentPubKey), functions, id);
+        }
+
+        public void GrantCapability(string AgentPubKey, string DnaHash, GrantedFunctions functions, string id = "")
+        {
+            GrantCapabilityAsync(AgentPubKey, DnaHash, functions, id);
+        }
+
+        public async Task GrantCapabilityAsync(byte[][] cellId, GrantedFunctions functions, string id = "")
+        {
+            var seed = RandomNumberGenerator.GetBytes(32);
+            byte[] privateKey;
+            byte[] publicKey;
+
+            if (string.IsNullOrEmpty(id))
+            {
+                _currentId++;
+                id = _currentId.ToString();
+            }
+
+            Ed25519.KeyPairFromSeed(out publicKey, out privateKey, seed);
+
+            byte[] DHTLocation = ConvertHoloHashToBytes(Config.AgentPubKey).TakeLast(4).ToArray();
+            byte[] signingKey = new byte[] { 132, 32, 36 }.Concat(publicKey).Concat(DHTLocation).ToArray();
+
+            if (functions == null)
+            {
+                functions = new GrantedFunctions() { Functions = new Dictionary<GrantedFunctionsType, object>() };
+                functions.Functions.Add(GrantedFunctionsType.All, null);
+            }
+
+            HoloNETData holoNETData = new HoloNETData()
+            {
+                type = "grant_zome_call_capability",
+                data = new HoloNETAdminDataCap()
+                {
+                    cell_id = cellId,
+                    cap_grant = new CapGrant()
+                    {
+                        tag = "zome-call-signing-key",
+                        functions = functions,
+                        access = new CapGrantAccess()
+                        {
+                            Assigned = new CapGrantAccessAssigned() 
+                            { 
+                                secret = RandomNumberGenerator.GetBytes(64),
+                                assignees = signingKey
+                            }
+                        }
+
+                    }
+                }
+            };
+
+            _signingCredentialsForCell[cellId] = new SigningCredentials()
+            {
+                CapSecret = holoNETData.data.cap_grant.access.Assigned.secret,
+                KeyPair = new KeyPair() { PrivateKey = privateKey, PublicKey = publicKey },
+                SigningKey = signingKey
+            };
+
+            await SendHoloNETRequestAsync(id, holoNETData);
+
+            //{
+            //cell_id: cellId,
+            //      cap_grant:
+            //                {
+            //                tag: "zome-call-signing-key",
+            //        functions,
+            //        access:
+            //                    {
+            //                    Assigned:
+            //                        {
+            //                        secret: capSecret,
+            //            assignees: [signingKey],
+            //          },
+            //        },
+            //      },
+            //    });
+        }
+
+        public void GrantCapability(byte[][] cellId, GrantedFunctions functions, string id = "")
+        {
+            GrantCapabilityAsync(cellId, functions, id);
+        }
+
         /// <summary>
         /// Call this method to clear all of HoloNETClient's internal cache. This includes the responses that have been cached using the CallZomeFunction methods if the `cacheData` param was set to true for any of the calls.
         /// </summary>
@@ -1504,6 +1622,16 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public string ConvertHoloHashToString(byte[] bytes)
         {
             return string.Concat("u", Convert.ToBase64String(bytes).Replace("+", "-").Replace("/", "_"));
+        }
+
+        public byte[][] GetCellId(string DnaHash, string AgentPubKey)
+        {
+            return new byte[2][] { ConvertHoloHashToBytes(DnaHash), ConvertHoloHashToBytes(AgentPubKey) };
+        }
+
+        public byte[][] GetCellId()
+        {
+            return GetCellId(Config.DnaHash, Config.AgentPubKey);
         }
 
         /// <summary>
