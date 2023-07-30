@@ -32,7 +32,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
 
         public static async Task TestHoloNETClientAsync(TestToRun testToRun)
         {
-            bool isAdminTest = false;
             _timer.Start();
             _testToRun = testToRun;
             Console.WriteLine("NextGenSoftware.Holochain.HoloNET.Client Test Harness v2.1.4");
@@ -53,13 +52,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
 
             switch (testToRun)
             {
-                //case TestToRun.AdminGrantCapability:
-                //    {
-                //        _holoNETClient = new HoloNETClient("ws://localhost:8888");
-                //        isAdminTest = true;
-                //    }
-                //    break;
-
                 case TestToRun.SaveLoadOASISEntryWithEntryDataObject:
                 case TestToRun.SaveLoadOASISEntryWithTypeOfEntryDataObject:
                 case TestToRun.SaveLoadOASISEntryUsingMultipleHoloNETAuditEntryBaseClasses:
