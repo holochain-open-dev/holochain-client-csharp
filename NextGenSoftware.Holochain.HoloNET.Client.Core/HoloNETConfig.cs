@@ -78,6 +78,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public bool OnlyAllowOneHolochainConductorToRunAtATime { get; set; } = false;
 
         /// <summary>
+        /// Set whether you wish to ignore, warn or error when the response id received does not have a matching request id. If it is Ignore it will do nothing, if it is Warn it will give a warning in the Message property of responses returned but still continue, if it is Error it will give a message in the Message property, set the IsError flag and abort the request.
+        /// </summary>
+        public EnforceRequestToResponseIdMatchingBehaviour EnforceRequestToResponseIdMatchingBehaviour { get; set; } = EnforceRequestToResponseIdMatchingBehaviour.Error;
+
+        /// <summary>
         /// This passes through to the static LogConfig.LoggingMode property in [NextGenSoftware.Logging](https://www.nuget.org/packages/NextGenSoftware.Logging) package. It can be either `WarningsErrorsInfoAndDebug`, `WarningsErrorsAndInfo`, `WarningsAndErrors` or `ErrorsOnly`.
         /// </summary>
         public LoggingMode LoggingMode

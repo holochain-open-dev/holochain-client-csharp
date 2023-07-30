@@ -32,6 +32,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
 
         public static async Task TestHoloNETClientAsync(TestToRun testToRun)
         {
+            bool isAdminTest = false;
             _timer.Start();
             _testToRun = testToRun;
             Console.WriteLine("NextGenSoftware.Holochain.HoloNET.Client Test Harness v2.1.4");
@@ -52,6 +53,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
 
             switch (testToRun)
             {
+                //case TestToRun.AdminGrantCapability:
+                //    {
+                //        _holoNETClient = new HoloNETClient("ws://localhost:8888");
+                //        isAdminTest = true;
+                //    }
+                //    break;
+
                 case TestToRun.SaveLoadOASISEntryWithEntryDataObject:
                 case TestToRun.SaveLoadOASISEntryWithTypeOfEntryDataObject:
                 case TestToRun.SaveLoadOASISEntryUsingMultipleHoloNETAuditEntryBaseClasses:
@@ -77,7 +85,16 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
             //No need to create this when the test is SaveLoadOASISEntryUsingSingleHoloNETBaseClass because it will create its own instance of HoloNETClient internally (in the base class).
             if (_testToRun != TestToRun.SaveLoadOASISEntryUsingSingleHoloNETAuditEntryBaseClass)
             {
-                _holoNETClient = new HoloNETClient("ws://localhost:8888");
+                switch (_testToRun)
+                {
+                    case TestToRun.AdminGrantCapability:
+                        _holoNETClient = new HoloNETClient("ws://localhost:33001");
+                        break;
+
+                    default:
+                        _holoNETClient = new HoloNETClient("ws://localhost:8888");
+                        break;
+                }
 
                 //We would normally just set the Config property but in this case we need to share the Config object with multiple HoloNET instances (such as in the SaveLoadOASISEntryUsingSingleHoloNETBaseClass test) 
                 _holoNETClient.Config = config;
@@ -647,6 +664,17 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
 
             switch (_testToRun)
             {
+                case TestToRun.AdminGrantCapability:
+                    {
+                        Console.WriteLine("Calling GrantCapabilityAsync function on Admin API...\n");
+                        await _holoNETClient.GrantCapabilityAsync(GrantedFunctionsType.Listed, new List<(string, string)>()
+                        {
+                            ("zome1", "function1"),
+                            ("zome2", "function2")
+                        });
+                    }
+                    break;
+
                 case TestToRun.WhoAmI:
                     {
                         Console.WriteLine("Calling whoami function on WhoAmI Test Zome...\n");

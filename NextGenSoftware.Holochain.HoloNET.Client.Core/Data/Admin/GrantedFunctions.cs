@@ -1,27 +1,32 @@
 ﻿
+using System;
 using System.Collections.Generic;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
     public class GrantedFunctions
     {
-        public Dictionary<GrantedFunctionsType, object> Functions { get; set; }
+        public Dictionary<GrantedFunctionsType, List<(string, string)>> Functions { get; set; }
 
-        //public GrantedFunctions()
-        //{
-        //    Functions = new Dictionary<GrantedFunctionsType, object>();
-        //}
+        public GrantedFunctions()
+        {
+            Functions = new Dictionary<GrantedFunctionsType, List<(string, string)>>();
+        }
     }
 
-    public class ZomeName
-    {
-        public string Name { get; set; }
-    }
 
-    public class FunctionName
-    {
-        public string Name { get; set; }
-    }
+    //public class GrantedFunctions
+    //{
+    //    //public Dictionary<GrantedFunctionsType, object> Functions { get; set; }
+    //    //public Dictionary<GrantedFunctionsType, List<Tuple<string, string>>> Functions { get; set; }
+    //    public Dictionary<GrantedFunctionsType, List<(string, string)>> Functions { get; set; }
+
+    //    public GrantedFunctions()
+    //    {
+    //        Functions = new Dictionary<GrantedFunctionsType, List<(string, string)>>();
+    //    }
+    //}
+
 }
 
 //public class Program
