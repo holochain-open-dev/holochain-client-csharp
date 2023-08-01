@@ -3,7 +3,7 @@
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
     [MessagePackObject]
-    public struct InstalledCell
+    public class InstalledCell
     {
         [Key("cell_id")]
         public byte[][] cell_id { get; set; }

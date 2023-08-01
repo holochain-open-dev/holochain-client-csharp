@@ -322,7 +322,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     else
                     {
                         WebSocket.Connect();
-                        await RetrieveAgentPubKeyAndDnaHashAsync(retrieveAgentPubKeyAndDnaHashMode, retrieveAgentPubKeyAndDnaHashFromConductor, retrieveAgentPubKeyAndDnaHashFromSandbox, automaticallyAttemptToRetrieveFromConductorIfSandBoxFails, automaticallyAttemptToRetrieveFromSandBoxIfConductorFails, updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved);
+                        
+                        if (retrieveAgentPubKeyAndDnaHashMode != RetrieveAgentPubKeyAndDnaHashMode.DoNotRetreive)
+                            await RetrieveAgentPubKeyAndDnaHashAsync(retrieveAgentPubKeyAndDnaHashMode, retrieveAgentPubKeyAndDnaHashFromConductor, retrieveAgentPubKeyAndDnaHashFromSandbox, automaticallyAttemptToRetrieveFromConductorIfSandBoxFails, automaticallyAttemptToRetrieveFromSandBoxIfConductorFails, updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved);
                     }
                 }
             }
@@ -343,6 +345,26 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public void Connect(bool retrieveAgentPubKeyAndDnaHashFromConductor = true, bool retrieveAgentPubKeyAndDnaHashFromSandbox = false, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true, bool updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved = true)
         {
             ConnectAsync(ConnectedCallBackMode.UseCallBackEvents, RetrieveAgentPubKeyAndDnaHashMode.UseCallBackEvents, retrieveAgentPubKeyAndDnaHashFromConductor, retrieveAgentPubKeyAndDnaHashFromSandbox, automaticallyAttemptToRetrieveFromConductorIfSandBoxFails, automaticallyAttemptToRetrieveFromSandBoxIfConductorFails, updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved);
+        }
+
+        /// <summary>
+        /// This method simply connects to the Holochain conductor. It raises the OnConnected event once it is has successfully established a connection. If the `connectedCallBackMode` flag is set to `WaitForHolochainConductorToConnect` (default) it will await until it is connected before returning, otherwise it will return immediately and then call the OnConnected event once it has finished connecting.
+        /// </summary>
+        /// <param name="connectedCallBackMode">If set to `WaitForHolochainConductorToConnect` (default) it will await until it is connected before returning, otherwise it will return immediately and then call the OnConnected event once it has finished connecting.</param>
+        /// <returns></returns>
+        public async Task ConnectAdminAsync(ConnectedCallBackMode connectedCallBackMode = ConnectedCallBackMode.WaitForHolochainConductorToConnect)
+        {
+            await ConnectAsync(connectedCallBackMode, RetrieveAgentPubKeyAndDnaHashMode.DoNotRetreive, false, false, false, false);
+        }
+
+        /// <summary>
+        /// This method simply connects to the Holochain conductor. It raises the OnConnected event once it is has successfully established a connection. If the `connectedCallBackMode` flag is set to `WaitForHolochainConductorToConnect` (default) it will await until it is connected before returning, otherwise it will return immediately and then call the OnConnected event once it has finished connecting.
+        /// </summary>
+        /// <param name="connectedCallBackMode">If set to `WaitForHolochainConductorToConnect` (default) it will await until it is connected before returning, otherwise it will return immediately and then call the OnConnected event once it has finished connecting.</param>
+        /// <returns></returns>
+        public void ConnectAdmin(bool retrieveAgentPubKeyAndDnaHashFromConductor = true, bool retrieveAgentPubKeyAndDnaHashFromSandbox = false, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true, bool updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved = true)
+        {
+            ConnectAdminAsync(ConnectedCallBackMode.UseCallBackEvents);
         }
 
         /// <summary>
@@ -657,7 +679,14 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     }
                 };
 
-                await SendHoloNETRequestAsync(_currentId.ToString(), holoNETData);
+                //We need to store the id if enforcement of id matching is not set to ignore.
+                if (Config.EnforceRequestToResponseIdMatchingBehaviour != EnforceRequestToResponseIdMatchingBehaviour.Ignore)
+                {
+                    _zomeLookup.Add(_currentId.ToString(), null);
+                    _funcLookup.Add(_currentId.ToString(), null);
+                }
+
+                    await SendHoloNETRequestAsync(_currentId.ToString(), holoNETData);
                 _currentId++;
 
                 if (retrieveAgentPubKeyAndDnaHashMode == RetrieveAgentPubKeyAndDnaHashMode.Wait)
@@ -715,7 +744,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 HoloNETRequest request = new HoloNETRequest()
                 {
                     id = Convert.ToUInt64(id),
-                    type = "Request",
+                    type = "request",
                     data = data
                 };
 
@@ -1571,6 +1600,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             GrantCapabilityAsync(cellId, grantedFunctionsType, functions, id);
         }
 
+
+
         /// <summary>
         /// Call this method to clear all of HoloNETClient's internal cache. This includes the responses that have been cached using the CallZomeFunction methods if the `cacheData` param was set to true for any of the calls.
         /// </summary>
@@ -1986,7 +2017,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     SetReadyForZomeCalls();
 
                 //Otherwise, if the retrieveAgentPubKeyAndDnaHashFromConductor param was set to true when calling the Connect method, retrieve them now...
-                else if (_getAgentPubKeyAndDnaHashFromConductor) //TODO: Might not need to do this now because it is called in the Connect method (need to test this).
+                else if (_getAgentPubKeyAndDnaHashFromConductor) 
                     RetrieveAgentPubKeyAndDnaHashFromConductorAsync();
             }
             catch (Exception ex)
@@ -2226,26 +2257,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 Logger.Log("APP INFO RESPONSE DATA DETECTED\n", LogType.Info);
                 HolonNETAppInfoResponse appInfoResponse = MessagePackSerializer.Deserialize<HolonNETAppInfoResponse>(response.data, messagePackSerializerOptions);
 
-                string dnaHash = ConvertHoloHashToString(appInfoResponse.data.cell_data[0].cell_id[0]);
-                string agentPubKey = ConvertHoloHashToString(appInfoResponse.data.cell_data[0].cell_id[1]);
-
-                if (_updateDnaHashAndAgentPubKey)
-                {
-                    Config.AgentPubKey = agentPubKey;
-                    Config.DnaHash = dnaHash;
-                }
-
-                Logger.Log($"AGENT PUB KEY RETURNED FROM CONDUCTOR: {Config.AgentPubKey}", LogType.Info);
-                Logger.Log($"DNA HASH RETURNED FROM CONDUCTOR:: {Config.DnaHash}", LogType.Info);
-
                 args = new AppInfoCallBackEventArgs()
                 {
-                    AgentPubKey = agentPubKey,
-                    DnaHash = dnaHash,
                     AppInfo = appInfoResponse,
                     EndPoint = dataReceivedEventArgs.EndPoint,
                     Id = response.id.ToString(),
-                    InstalledAppId = appInfoResponse.data.installed_app_id,
                     IsCallSuccessful = true,
                     RawBinaryData = dataReceivedEventArgs.RawBinaryData,
                     RawBinaryDataAsString = rawBinaryDataAsString,
@@ -2256,6 +2272,46 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     RawJSONData = dataReceivedEventArgs.RawJSONData,
                     WebSocketResult = dataReceivedEventArgs.WebSocketResult
                 };
+
+                if (appInfoResponse != null)
+                {
+                    if (appInfoResponse.data != null)
+                    {
+                        if (appInfoResponse.data.cell_data != null)
+                        {
+                            string dnaHash = ConvertHoloHashToString(appInfoResponse.data.cell_data[0].cell_id[0]);
+                            string agentPubKey = ConvertHoloHashToString(appInfoResponse.data.cell_data[0].cell_id[1]);
+
+                            if (_updateDnaHashAndAgentPubKey)
+                            {
+                                Config.AgentPubKey = agentPubKey;
+                                Config.DnaHash = dnaHash;
+                            }
+
+                            Logger.Log($"AGENT PUB KEY RETURNED FROM CONDUCTOR: {Config.AgentPubKey}", LogType.Info);
+                            Logger.Log($"DNA HASH RETURNED FROM CONDUCTOR:: {Config.DnaHash}", LogType.Info);
+
+                            args.AgentPubKey = agentPubKey;
+                            args.DnaHash = dnaHash;
+                            args.InstalledAppId = appInfoResponse.data.installed_app_id;
+                        }
+                        else
+                        {
+                            args.Message = "Error occured in HoloNETClient.DecodeAppInfoDataReceived. appInfoResponse.data.cell_data is null.";
+                            args.IsError = true;
+                        }
+                    }
+                    else
+                    {
+                        args.Message = "Error occured in HoloNETClient.DecodeAppInfoDataReceived. appInfoResponse.data is null.";
+                        args.IsError = true;
+                    }
+                }
+                else
+                {
+                    args.Message = "Error occured in HoloNETClient.DecodeAppInfoDataReceived. appInfoResponse is null.";
+                    args.IsError = true;
+                }
             }
             catch (Exception ex)
             {
@@ -2274,6 +2330,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 else if (_automaticallyAttemptToGetFromSandboxIfConductorFails)
                     RetrieveAgentPubKeyAndDnaHashFromSandbox();
             }
+
+            _zomeLookup.Remove(response.id.ToString());
+            _funcLookup.Remove(response.id.ToString());
 
             RaiseAppInfoReceivedEvent(args);
         }

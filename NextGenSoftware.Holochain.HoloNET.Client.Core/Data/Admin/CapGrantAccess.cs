@@ -7,6 +7,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
     public class CapGrantAccess
     {
         [Key("Assigned")]
-        public CapGrantAccessAsigned Assigned { get; set; }
+        public CapGrantAccessAssigned Assigned { get; set; }
     }
 }

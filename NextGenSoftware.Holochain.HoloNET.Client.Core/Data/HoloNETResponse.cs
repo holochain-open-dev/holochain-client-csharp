@@ -15,6 +15,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         [Key("data")]
         public byte[] data { get; set; }
 
+        [IgnoreMember]
         public bool IsError { get; set; }
     }
 }

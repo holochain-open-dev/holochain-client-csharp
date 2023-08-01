@@ -3,7 +3,7 @@
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
     [MessagePackObject]
-    public struct HoloNETDataAppInfoCall
+    public class HoloNETDataAppInfoCall
     {
         [Key("installed_app_id")]
         public string installed_app_id { get; set; }

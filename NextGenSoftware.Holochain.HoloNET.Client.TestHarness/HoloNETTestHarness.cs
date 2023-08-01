@@ -19,10 +19,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
         private static Stopwatch _timer = new Stopwatch(); // creating new instance of the stopwatch
         private static ConsoleColor _testHeadingColour = ConsoleColor.Yellow;
         private static AvatarEntryDataObject _avatarEntryDataObject = null;
+        private const string _hcAdminURI = "ws://localhost:61872";
+        private const string _hcAppURI = "ws://localhost:8888";
 
         static async Task Main(string[] args)
         {
-            await TestHoloNETClientAsync(TestToRun.SaveLoadOASISEntryUsingSingleHoloNETAuditEntryBaseClass);
+            await TestHoloNETClientAsync(TestToRun.AdminGrantCapability);
+            //await TestHoloNETClientAsync(TestToRun.SaveLoadOASISEntryUsingSingleHoloNETAuditEntryBaseClass);
             //await TestHoloNETClientAsync(TestToRun.Signal);
             //await TestHoloNETClientAsync(TestToRun.SaveLoadOASISEntryWithTypeOfEntryDataObject);
             //await TestHoloNETClientAsync(TestToRun.SaveLoadOASISEntryWithEntryDataObject);
@@ -36,6 +39,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
             _testToRun = testToRun;
             Console.WriteLine("NextGenSoftware.Holochain.HoloNET.Client Test Harness v2.1.4");
             Console.WriteLine("");
+            bool isAdmin = false;
 
             HoloNETConfig config = new HoloNETConfig()
             {
@@ -80,11 +84,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                 switch (_testToRun)
                 {
                     case TestToRun.AdminGrantCapability:
-                        _holoNETClient = new HoloNETClient("ws://localhost:33001");
+                        _holoNETClient = new HoloNETClient(_hcAdminURI);
+                        isAdmin = true;
                         break;
 
                     default:
-                        _holoNETClient = new HoloNETClient("ws://localhost:8888");
+                        _holoNETClient = new HoloNETClient(_hcAppURI);
                         break;
                 }
 
@@ -107,7 +112,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                 //_holoNETClient.Config.DnaHash = "YOUR HASH";
 
                 //await _holoNETClient.Connect(false, false);
-                await _holoNETClient.ConnectAsync();
+
+                if (isAdmin)
+                    await _holoNETClient.ConnectAdminAsync();
+                else
+                    await _holoNETClient.ConnectAsync();
             }
 
             switch (testToRun)
@@ -656,16 +665,16 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
 
             switch (_testToRun)
             {
-                case TestToRun.AdminGrantCapability:
-                    {
-                        Console.WriteLine("Calling GrantCapabilityAsync function on Admin API...\n");
-                        await _holoNETClient.GrantCapabilityAsync(GrantedFunctionsType.Listed, new List<(string, string)>()
-                        {
-                            ("zome1", "function1"),
-                            ("zome2", "function2")
-                        });
-                    }
-                    break;
+                //case TestToRun.AdminGrantCapability:
+                //    {
+                //        Console.WriteLine("Calling GrantCapabilityAsync function on Admin API...\n");
+                //        await _holoNETClient.GrantCapabilityAsync(GrantedFunctionsType.Listed, new List<(string, string)>()
+                //        {
+                //            ("zome1", "function1"),
+                //            ("zome2", "function2")
+                //        });
+                //    }
+                //    break;
 
                 case TestToRun.WhoAmI:
                     {
@@ -916,10 +925,24 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
             }
         }
 
-        private static void HoloNETClient_OnConnected(object sender, ConnectedEventArgs e)
+        private static async void HoloNETClient_OnConnected(object sender, ConnectedEventArgs e)
         {
             Console.WriteLine(string.Concat("TEST HARNESS: CONNECTED CALLBACK: Connected to ", e.EndPoint));
             Console.WriteLine("");
+
+            switch (_testToRun)
+            {
+                case TestToRun.AdminGrantCapability:
+                    {
+                        Console.WriteLine("Calling GrantCapabilityAsync function on Admin API...\n");
+                        await _holoNETClient.GrantCapabilityAsync(GrantedFunctionsType.Listed, new List<(string, string)>()
+                        {
+                            ("zome1", "function1"),
+                            ("zome2", "function2")
+                        });
+                    }
+                    break;
+            }
         }
     }
 }
