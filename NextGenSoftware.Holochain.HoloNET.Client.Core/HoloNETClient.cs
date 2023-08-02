@@ -14,6 +14,7 @@ using NextGenSoftware.Utilities;
 using Chaos.NaCl;
 using System.Security.Cryptography;
 using Blake2Fast;
+using System.ComponentModel;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
@@ -24,6 +25,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         private bool _getAgentPubKeyAndDnaHashFromConductor;
         private bool _automaticallyAttemptToGetFromSandboxIfConductorFails;
         private bool _updateDnaHashAndAgentPubKey = true;
+        private List<string> _pendingRequests = new List<string>();
         private Dictionary<string, string> _zomeLookup = new Dictionary<string, string>();
         private Dictionary<string, string> _funcLookup = new Dictionary<string, string>();
         private Dictionary<string, Type> _entryDataObjectTypeLookup = new Dictionary<string, Type>();
@@ -104,6 +106,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// Fired when the client receives AppInfo from the conductor containing the cell id for the running hApp (which in itself contains the AgentPubKey & DnaHash). It also contains the AppId and other info.
         /// </summary>
         public event AppInfoCallBack OnAppInfoCallBack;
+
+        public delegate void AdminAgentPubKeyGeneratedCallBack(object sender, AdminAgentPubKeyGeneratedCallBackEventArgs e);
+
+        /// <summary>
+        /// Fired when the client receives the generated AgentPubKey from the conductor.
+        /// </summary>
+        public event AdminAgentPubKeyGeneratedCallBack OnAdminAgentPubKeyGeneratedCallBackEventArgs;
 
         public delegate void ReadyForZomeCalls(object sender, ReadyForZomeCallsEventArgs e);
 
@@ -679,15 +688,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     }
                 };
 
-                //We need to store the id if enforcement of id matching is not set to ignore.
-                if (Config.EnforceRequestToResponseIdMatchingBehaviour != EnforceRequestToResponseIdMatchingBehaviour.Ignore)
-                {
-                    _zomeLookup.Add(_currentId.ToString(), null);
-                    _funcLookup.Add(_currentId.ToString(), null);
-                }
-
-                    await SendHoloNETRequestAsync(_currentId.ToString(), holoNETData);
-                _currentId++;
+                await SendHoloNETRequestAsync(holoNETData);
 
                 if (retrieveAgentPubKeyAndDnaHashMode == RetrieveAgentPubKeyAndDnaHashMode.Wait)
                     return await _taskCompletionAgentPubKeyAndDnaHashRetrieved.Task;
@@ -717,9 +718,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="id">The id of the request to send to the Holochain Conductor. This will be matched to the id in the response received from the Holochain Conductor.</param>
         /// <param name="holoNETData">The raw data packet you wish to send to the Holochain conductor.</param>
         /// <returns></returns>
-        public async Task SendHoloNETRequestAsync(string id, HoloNETData holoNETData)
+        public async Task SendHoloNETRequestAsync(HoloNETData holoNETData, string id = "")
         {
-            await SendHoloNETRequestAsync(id, MessagePackSerializer.Serialize(holoNETData));
+            await SendHoloNETRequestAsync(MessagePackSerializer.Serialize(holoNETData), id);
         }
 
         /// <summary>
@@ -727,9 +728,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// </summary>
         /// <param name="id">The id of the request to send to the Holochain Conductor. This will be matched to the id in the response received from the Holochain Conductor.</param>
         /// <param name="holoNETData">The raw data packet you wish to send to the Holochain conductor.</param>
-        public void SendHoloNETRequest(string id, HoloNETData holoNETData)
+        public void SendHoloNETRequest(HoloNETData holoNETData, string id = "")
         {
-            SendHoloNETRequestAsync(id, holoNETData);
+            SendHoloNETRequestAsync(holoNETData, id);
         }
 
         /// <summary>
@@ -737,16 +738,25 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// </summary>
         /// <param name="id">The id of the request to send to the Holochain Conductor. This will be matched to the id in the response received from the Holochain Conductor.</param>
         /// <param name="holoNETData">The raw data packet you wish to send to the Holochain conductor.</param>
-        public async Task SendHoloNETRequestAsync(string id, byte[] data)
+        public async Task SendHoloNETRequestAsync(byte[] data, string id = "")
         {
             try
             {
+                if (string.IsNullOrEmpty(id))
+                {
+                    _currentId++;
+                    id = _currentId.ToString();
+                }
+
                 HoloNETRequest request = new HoloNETRequest()
                 {
                     id = Convert.ToUInt64(id),
                     type = "request",
                     data = data
                 };
+
+                if (Config.EnforceRequestToResponseIdMatchingBehaviour != EnforceRequestToResponseIdMatchingBehaviour.Ignore)
+                    _pendingRequests.Add(id);
 
                 if (WebSocket.State == WebSocketState.Open)
                 {
@@ -766,9 +776,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// </summary>
         /// <param name="id">The id of the request to send to the Holochain Conductor. This will be matched to the id in the response received from the Holochain Conductor.</param>
         /// <param name="holoNETData">The raw data packet you wish to send to the Holochain conductor.</param>
-        public void SendHoloNETRequest(string id, byte[] data)
+        public void SendHoloNETRequest(byte[] data, string id = "")
         {
-            SendHoloNETRequestAsync(id, data);
+            SendHoloNETRequestAsync(data, id);
         }
 
         /// <summary>
@@ -1188,7 +1198,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                         data = signedPayload
                     };
 
-                    await SendHoloNETRequestAsync(id, holoNETData);
+                    await SendHoloNETRequestAsync(holoNETData, id);
 
                     if (zomeResultCallBackMode == ZomeResultCallBackMode.WaitForHolochainConductorResponse)
                     {
@@ -1525,12 +1535,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             byte[] privateKey;
             byte[] publicKey;
 
-            if (string.IsNullOrEmpty(id))
-            {
-                _currentId++;
-                id = _currentId.ToString();
-            }
-
             Ed25519.KeyPairFromSeed(out publicKey, out privateKey, seed);
 
             byte[] DHTLocation = ConvertHoloHashToBytes(Config.AgentPubKey).TakeLast(4).ToArray();
@@ -1575,7 +1579,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 SigningKey = signingKey
             };
 
-            await SendHoloNETRequestAsync(id, holoNETData);
+            await SendHoloNETRequestAsync(holoNETData, id);
 
             //{
             //cell_id: cellId,
@@ -1600,16 +1604,37 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             GrantCapabilityAsync(cellId, grantedFunctionsType, functions, id);
         }
 
+        public async Task GenerateAgentPubKeyAsync(string id = "")
+        {
+            HoloNETData holoNETData = new HoloNETData()
+            {
+                type = "generate_agent_pub_key",
+            };
+
+            await SendHoloNETRequestAsync(holoNETData, id);
+        }
+
+        public void GenerateAgentPubKey(string id = "")
+        {
+            GenerateAgentPubKeyAsync(id);
+        }
 
 
         /// <summary>
         /// Call this method to clear all of HoloNETClient's internal cache. This includes the responses that have been cached using the CallZomeFunction methods if the `cacheData` param was set to true for any of the calls.
         /// </summary>
-        public void ClearCache()
+        public void ClearCache(bool clearPendingRequsts = false)
         {
             _zomeReturnDataLookup.Clear();
             _cacheZomeReturnDataLookup.Clear();
             _dictPropertyInfos.Clear();
+
+            if (clearPendingRequsts)
+            {
+                _pendingRequests.Clear();
+                _zomeLookup.Clear();
+                _funcLookup.Clear();
+            }
         }
 
         /// <summary>
@@ -2036,14 +2061,16 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         {
             try
             {
-                if (_zomeLookup.Keys.Count > 0)
+                if (_pendingRequests.Count > 0)
                 {
                     string requests = "";
 
-                    foreach (string id in _zomeLookup.Keys)
+                    foreach (string id in _pendingRequests)
                         requests = string.Concat(requests, ", id: ", id, "| zome: ", _zomeLookup[id], "| function: ", _funcLookup[id]);
 
                     e.Reason = $"Error Occured. The WebSocket closed with the following requests still in progress: {requests}. Reason: {e.Reason}";
+                    
+                    _pendingRequests.Clear();
                     HandleError(e.Reason, null);
                 }
 
@@ -2093,6 +2120,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                         else if (response.type.ToUpper() == "SIGNAL")
                             DecodeSignalDataReceived(response, dataReceivedEventArgs, rawBinaryDataAsString, rawBinaryDataDecoded, rawBinaryDataAfterMessagePackDecodeAsString, rawBinaryDataAfterMessagePackDecodeDecoded);
+
+                        else if (rawBinaryDataDecoded.ToLower().Contains("agent_pub_key_generated"))
+                            DecodeAdminAgentPubKeyGeneratedReceived(response, dataReceivedEventArgs, rawBinaryDataAsString, rawBinaryDataDecoded, rawBinaryDataAfterMessagePackDecodeAsString, rawBinaryDataAfterMessagePackDecodeDecoded);
+
                         else
                             DecodeZomeDataReceived(response, dataReceivedEventArgs, rawBinaryDataAsString, rawBinaryDataDecoded, rawBinaryDataAfterMessagePackDecodeAsString, rawBinaryDataAfterMessagePackDecodeDecoded);
                     }
@@ -2224,16 +2255,17 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 };
 
                 if (Config.EnforceRequestToResponseIdMatchingBehaviour != EnforceRequestToResponseIdMatchingBehaviour.Ignore
-                    && (!_zomeLookup.ContainsKey(id) || !_funcLookup.ContainsKey(id)))
+                    && !_pendingRequests.Contains(id))
                 {
                     holoNETDataReceivedEventArgs.IsError = Config.EnforceRequestToResponseIdMatchingBehaviour == EnforceRequestToResponseIdMatchingBehaviour.Error;
                     holoNETDataReceivedEventArgs.IsCallSuccessful = false;
-                    holoNETDataReceivedEventArgs.Message = $"The id returned in the response ({id} does not match any pending request.";
+                    holoNETDataReceivedEventArgs.Message = $"The id returned in the response ({id}) does not match any pending request.";
 
                     if (holoNETDataReceivedEventArgs.IsError)
                         holoNETDataReceivedEventArgs.Message = string.Concat(holoNETDataReceivedEventArgs.Message, " Config.EnforceRequestToResponseIdMatchingBehaviour is set to Error so Aborting Request.");
                 }
 
+                _pendingRequests.Remove(id);
                 response.IsError = holoNETDataReceivedEventArgs.IsError;
             }
             catch (Exception ex)
@@ -2246,6 +2278,41 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             OnDataReceived?.Invoke(this, holoNETDataReceivedEventArgs);
             return response;
+        }
+
+        private void DecodeAdminAgentPubKeyGeneratedReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs, string rawBinaryDataAsString, string rawBinaryDataDecoded, string rawBinaryDataAfterMessagePackDecodeAsString, string rawBinaryDataAfterMessagePackDecodeDecoded)
+        {
+            AdminAgentPubKeyGeneratedCallBackEventArgs args = new AdminAgentPubKeyGeneratedCallBackEventArgs();
+
+            try
+            {
+                Logger.Log("ADMIN AGENT PUB KEY GENERATED DATA DETECTED\n", LogType.Info);
+                HolonNETAppResponse appResponse = MessagePackSerializer.Deserialize<HolonNETAppResponse>(response.data, messagePackSerializerOptions);
+                args.AgentPubKey = ConvertHoloHashToString(appResponse.data);
+                args.AppResponse = appResponse;
+                args.EndPoint = dataReceivedEventArgs.EndPoint;
+                args.Id = response.id.ToString();
+                args.IsCallSuccessful = true;
+                args.RawBinaryData = dataReceivedEventArgs.RawBinaryData;
+                args.RawBinaryDataAsString = rawBinaryDataAsString;
+                args.RawBinaryDataDecoded = rawBinaryDataDecoded;
+                args.RawBinaryDataAfterMessagePackDecode = response != null ? response.data : null;
+                args.RawBinaryDataAfterMessagePackDecodeAsString = rawBinaryDataAfterMessagePackDecodeAsString;
+                args.RawBinaryDataAfterMessagePackDecodeDecoded = rawBinaryDataAfterMessagePackDecodeDecoded;
+                args.RawJSONData = dataReceivedEventArgs.RawJSONData;
+                args.WebSocketResult = dataReceivedEventArgs.WebSocketResult;
+
+                Logger.Log($"AGENT PUB KEY GENERATED: {args.AgentPubKey}\n", LogType.Info);
+            }
+            catch (Exception ex)
+            {
+                string msg = $"An unknown error occurred in HoloNETClient.DecodeAdminAgentPubKeyGeneratedReceived. Reason: {ex}";
+                args.IsError = true;
+                args.Message = msg;
+                HandleError(msg, ex);
+            }
+
+            RaiseAdminGenerateAgentPubKeyReceivedEvent(args);
         }
 
         private void DecodeAppInfoDataReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs, string rawBinaryDataAsString, string rawBinaryDataDecoded, string rawBinaryDataAfterMessagePackDecodeAsString, string rawBinaryDataAfterMessagePackDecodeDecoded)
@@ -2330,9 +2397,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 else if (_automaticallyAttemptToGetFromSandboxIfConductorFails)
                     RetrieveAgentPubKeyAndDnaHashFromSandbox();
             }
-
-            _zomeLookup.Remove(response.id.ToString());
-            _funcLookup.Remove(response.id.ToString());
 
             RaiseAppInfoReceivedEvent(args);
         }
@@ -2681,6 +2745,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             _entryDataObjectLookup.Remove(zomeFunctionCallBackArgs.Id);
             _cacheZomeReturnDataLookup.Remove(zomeFunctionCallBackArgs.Id);
             _taskCompletionZomeCallBack.Remove(zomeFunctionCallBackArgs.Id);
+        }
+
+        private void RaiseAdminGenerateAgentPubKeyReceivedEvent(AdminAgentPubKeyGeneratedCallBackEventArgs adminGenerateAgentPubKeyCallBackEventArgs)
+        {
+            Logger.Log(string.Concat("Id: ", adminGenerateAgentPubKeyCallBackEventArgs.Id, ", Is Call Successful: ", adminGenerateAgentPubKeyCallBackEventArgs.IsCallSuccessful ? "True" : "False", ", AgentPubKey: ", adminGenerateAgentPubKeyCallBackEventArgs.AgentPubKey, ", Raw Binary Data: ", adminGenerateAgentPubKeyCallBackEventArgs.RawBinaryData, ", Raw JSON Data: ", adminGenerateAgentPubKeyCallBackEventArgs.RawJSONData, "\n"), LogType.Info);
+            OnAdminAgentPubKeyGeneratedCallBackEventArgs?.Invoke(this, adminGenerateAgentPubKeyCallBackEventArgs);
         }
 
         private void SetReadyForZomeCalls()

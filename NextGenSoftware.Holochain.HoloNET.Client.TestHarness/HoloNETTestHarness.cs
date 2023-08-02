@@ -24,7 +24,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
 
         static async Task Main(string[] args)
         {
-            await TestHoloNETClientAsync(TestToRun.AdminGrantCapability);
+            await TestHoloNETClientAsync(TestToRun.AdminGenerateAgentPubKey);
+            //await TestHoloNETClientAsync(TestToRun.AdminGrantCapability);
             //await TestHoloNETClientAsync(TestToRun.SaveLoadOASISEntryUsingSingleHoloNETAuditEntryBaseClass);
             //await TestHoloNETClientAsync(TestToRun.Signal);
             //await TestHoloNETClientAsync(TestToRun.SaveLoadOASISEntryWithTypeOfEntryDataObject);
@@ -84,6 +85,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                 switch (_testToRun)
                 {
                     case TestToRun.AdminGrantCapability:
+                    case TestToRun.AdminGenerateAgentPubKey:
                         _holoNETClient = new HoloNETClient(_hcAdminURI);
                         isAdmin = true;
                         break;
@@ -106,6 +108,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                 _holoNETClient.OnError += HoloNETClient_OnError;
                 _holoNETClient.OnHolochainConductorsShutdownComplete += _holoNETClient_OnHolochainConductorsShutdownComplete;
                 _holoNETClient.OnHoloNETShutdownComplete += _holoNETClient_OnHoloNETShutdownComplete;
+                _holoNETClient.OnAdminAgentPubKeyGeneratedCallBackEventArgs += _holoNETClient_OnAdminAgentPubKeyGeneratedCallBackEventArgs;
 
                 ////Use this if you to manually pass in the AgentPubKey &DnaHash(otherwise it will be automatically queried from the conductor or sandbox).
                 //_holoNETClient.Config.AgentPubKey = "YOUR KEY";
@@ -481,6 +484,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                     }
                     break;
             }
+        }
+
+        private static void _holoNETClient_OnAdminAgentPubKeyGeneratedCallBackEventArgs(object sender, AdminAgentPubKeyGeneratedCallBackEventArgs e)
+        {
+            string msg = $"TEST HARNESS: _holoNETClient_OnAdminAgentPubKeyGeneratedCallBackEventArgs, EndPoint: {e.EndPoint}, AgentPubKey: {e.AgentPubKey}, IsError: {e.IsError}, Message: {e.Message}";
+            CLIEngine.ShowMessage(msg);
         }
 
         private static void _holoNETClient_OnHoloNETShutdownComplete(object sender, HoloNETShutdownEventArgs e)
@@ -932,6 +941,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
 
             switch (_testToRun)
             {
+                case TestToRun.AdminGenerateAgentPubKey:
+                    {
+                        Console.WriteLine("Calling GenerateAgentPubKey function on Admin API...\n");
+                        await _holoNETClient.GenerateAgentPubKeyAsync();
+                    }
+                    break;
+
                 case TestToRun.AdminGrantCapability:
                     {
                         Console.WriteLine("Calling GrantCapabilityAsync function on Admin API...\n");

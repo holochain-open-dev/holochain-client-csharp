@@ -15,6 +15,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
         SaveLoadOASISEntryUsingMultipleHoloNETAuditEntryBaseClasses,
         LoadTestNumbers,
         LoadTestSaveLoadOASISEntry,
-        AdminGrantCapability
+        AdminGrantCapability,
+        AdminGenerateAgentPubKey
     }
 }
