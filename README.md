@@ -2609,9 +2609,6 @@ Of course if they wanted use the OASIS API then the first code listing is how it
 
 **More to come soon...**
 
-
-
-
 ## Why this is important & vital to the holochain community
 
 This is really vital and important to the wonderful holochain community because it will open the doors to the massive .NET, Unity and Enterprise sectors bringing the flood of devs, resources and exposure we all really want holochain to see... :)
@@ -2792,3 +2789,20 @@ https://www.thejusticeleagueaccademy.icu
 [Our World Interviews With David Atkinson, Commercial Director of Holochain – Part 1](https://www.youtube.com/watch?v=UICajpltv1Y)  
 [Our World Interviews With David Atkinson, Commercial Director of Holochain – Part 2](https://www.youtube.com/watch?v=SsNsEDPglos)  
 [ThreeFold, Our World, Protocol Love, Soulfie API Meeting](https://www.youtube.com/watch?v=H5JJyLxGFe0)  
+
+## Contribute
+
+Holochain is an open source project.  We welcome all sorts of participation and are actively working on increasing surface area to accept it.  Please see our [contribution guidelines](/CONTRIBUTING.md) for our general practices and protocols on participating in the community, as well as specific expectations around things like code formatting, testing practices, continuous integration, etc.
+
+* Connect with us on [Discord](https://discord.gg/k55DS5dmPH)
+
+## License
+
+ [![License: CAL 1.0](https://img.shields.io/badge/License-CAL%201.0-blue.svg)](https://github.com/holochain/cryptographic-autonomy-license)
+
+Copyright (C) 2020-2023, Holochain Foundation
+
+This program is free software: you can redistribute it and/or modify it under the terms of the license
+provided in the LICENSE file (CAL-1.0).  This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.
