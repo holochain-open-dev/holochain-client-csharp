@@ -2344,29 +2344,40 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 {
                     if (appInfoResponse.data != null)
                     {
-                        if (appInfoResponse.data.cell_data != null)
-                        {
-                            string dnaHash = ConvertHoloHashToString(appInfoResponse.data.cell_data[0].cell_id[0]);
-                            string agentPubKey = ConvertHoloHashToString(appInfoResponse.data.cell_data[0].cell_id[1]);
+                        //Dictionary<object, object> rawManifestData = appInfoResponse.data.manifest as Dictionary<object, object>;
+                        //Dictionary<string, object> manifestData = new Dictionary<string, object>();
+                        //Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
+                        //string keyValuePairsAsString = "";
+                        //EntryData entryData = null;
 
-                            if (_updateDnaHashAndAgentPubKey)
-                            {
-                                Config.AgentPubKey = agentPubKey;
-                                Config.DnaHash = dnaHash;
-                            }
+                        //(manifestData, keyValuePairs, keyValuePairsAsString, entryData) = DecodeRawZomeData(rawManifestData, manifestData, keyValuePairs, keyValuePairsAsString);
 
-                            Logger.Log($"AGENT PUB KEY RETURNED FROM CONDUCTOR: {Config.AgentPubKey}", LogType.Info);
-                            Logger.Log($"DNA HASH RETURNED FROM CONDUCTOR:: {Config.DnaHash}", LogType.Info);
+                        //if (appInfoResponse.data.cell_data != null)
+                        //{
+                        //    //appInfoResponse.data.cell_data[""][0].Cell.name
 
-                            args.AgentPubKey = agentPubKey;
-                            args.DnaHash = dnaHash;
-                            args.InstalledAppId = appInfoResponse.data.installed_app_id;
-                        }
-                        else
-                        {
-                            args.Message = "Error occured in HoloNETClient.DecodeAppInfoDataReceived. appInfoResponse.data.cell_data is null.";
-                            args.IsError = true;
-                        }
+
+                        //    //string dnaHash = ConvertHoloHashToString(appInfoResponse.data.cell_data[0].cell_id[0]);
+                        //    //string agentPubKey = ConvertHoloHashToString(appInfoResponse.data.cell_data[0].cell_id[1]);
+
+                        //    //if (_updateDnaHashAndAgentPubKey)
+                        //    //{
+                        //    //    Config.AgentPubKey = agentPubKey;
+                        //    //    Config.DnaHash = dnaHash;
+                        //    //}
+
+                        //    //Logger.Log($"AGENT PUB KEY RETURNED FROM CONDUCTOR: {Config.AgentPubKey}", LogType.Info);
+                        //    //Logger.Log($"DNA HASH RETURNED FROM CONDUCTOR:: {Config.DnaHash}", LogType.Info);
+
+                        //    //args.AgentPubKey = agentPubKey;
+                        //    //args.DnaHash = dnaHash;
+                        //    args.InstalledAppId = appInfoResponse.data.installed_app_id;
+                        //}
+                        //else
+                        //{
+                        //    args.Message = "Error occured in HoloNETClient.DecodeAppInfoDataReceived. appInfoResponse.data.cell_data is null.";
+                        //    args.IsError = true;
+                        //}
                     }
                     else
                     {

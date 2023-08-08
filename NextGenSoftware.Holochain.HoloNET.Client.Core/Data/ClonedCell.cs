@@ -1,9 +1,11 @@
 ﻿
 using MessagePack;
+using NextGenSoftware.Holochain.HoloNET.Client.Interfaces;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
-    public struct ClonedCell
+    [MessagePackObject]
+    public struct ClonedCell : ICell
     {
         [Key("cell_id")]
         public byte[][] cell_id { get; set; }

@@ -1,7 +1,8 @@
 ﻿using MessagePack;
 
-namespace NextGenSoftware.Holochain.HoloNET.Client.Data
+namespace NextGenSoftware.Holochain.HoloNET.Client.Data.AppManifest
 {
+    [MessagePackObject]
     public struct AppManifestCurrent //Or maybe AppManifestV1?
     {
         [Key("name")]

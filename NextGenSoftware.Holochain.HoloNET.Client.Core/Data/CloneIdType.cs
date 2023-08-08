@@ -3,6 +3,7 @@ using MessagePack;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
+    [MessagePackObject]
     public struct CloneIdType
     {
         [Key("cell_id")]

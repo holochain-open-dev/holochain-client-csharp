@@ -24,9 +24,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
 
         static async Task Main(string[] args)
         {
-            await TestHoloNETClientAsync(TestToRun.AdminGenerateAgentPubKey);
+          //  await TestHoloNETClientAsync(TestToRun.AdminGenerateAgentPubKey);
             //await TestHoloNETClientAsync(TestToRun.AdminGrantCapability);
-            //await TestHoloNETClientAsync(TestToRun.SaveLoadOASISEntryUsingSingleHoloNETAuditEntryBaseClass);
+            await TestHoloNETClientAsync(TestToRun.SaveLoadOASISEntryUsingSingleHoloNETAuditEntryBaseClass);
             //await TestHoloNETClientAsync(TestToRun.Signal);
             //await TestHoloNETClientAsync(TestToRun.SaveLoadOASISEntryWithTypeOfEntryDataObject);
             //await TestHoloNETClientAsync(TestToRun.SaveLoadOASISEntryWithEntryDataObject);

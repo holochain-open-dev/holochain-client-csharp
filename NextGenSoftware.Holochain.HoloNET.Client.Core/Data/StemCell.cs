@@ -1,10 +1,11 @@
 ﻿
 using MessagePack;
-using NextGenSoftware.Holochain.HoloNET.Client.Enums;
+using NextGenSoftware.Holochain.HoloNET.Client.Interfaces;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
-    public struct StemCell
+    [MessagePackObject]
+    public struct StemCell : ICell
     {
         [Key("original_dna_hash")]
         public byte[] original_dna_hash { get; set; }
@@ -13,6 +14,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public byte[] dna_modifiers { get; set; } //DnaModifiers
 
         [Key("name")]
-        public OptionType name { get; set; } // pub name: Option<String>,
+        //public OptionType name { get; set; } // pub name: Option<String>,
+        public string name { get; set; } // pub name: Option<String>,
     }
 }
