@@ -15,6 +15,7 @@ using Chaos.NaCl;
 using System.Security.Cryptography;
 using Blake2Fast;
 using System.ComponentModel;
+using NextGenSoftware.Utilities.ExtentionMethods;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
@@ -2344,13 +2345,31 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 {
                     if (appInfoResponse.data != null)
                     {
-                        //Dictionary<object, object> rawManifestData = appInfoResponse.data.manifest as Dictionary<object, object>;
-                        //Dictionary<string, object> manifestData = new Dictionary<string, object>();
-                        //Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
-                        //string keyValuePairsAsString = "";
-                        //EntryData entryData = null;
+                        string agentPubKey = ConvertHoloHashToString(appInfoResponse.data.agent_pub_key);
 
-                        //(manifestData, keyValuePairs, keyValuePairsAsString, entryData) = DecodeRawZomeData(rawManifestData, manifestData, keyValuePairs, keyValuePairsAsString);
+                        if (_updateDnaHashAndAgentPubKey)
+                        {
+                            Config.AgentPubKey = agentPubKey;
+                            //Config.DnaHash = dnaHash;
+                        }
+
+                        Logger.Log($"AGENT PUB KEY RETURNED FROM CONDUCTOR: {Config.AgentPubKey}", LogType.Info);
+                        //Logger.Log($"DNA HASH RETURNED FROM CONDUCTOR:: {Config.DnaHash}", LogType.Info);
+
+                        args.AgentPubKey = agentPubKey;
+                        //args.DnaHash = dnaHash;
+                        args.InstalledAppId = appInfoResponse.data.installed_app_id;
+
+                        if (appInfoResponse.data.manifest != null)
+                        {
+                            if (appInfoResponse.data.manifest.roles != null && appInfoResponse.data.manifest.roles.Length > 0)
+                            {
+                                string strategy = appInfoResponse.data.manifest.roles[0].provisioning.strategy.ToPascalCase();
+
+                                if (appInfoResponse.data.manifest.roles[0].provisioning != null)
+                                    appInfoResponse.data.manifest.roles[0].provisioning.StrategyType = (ProvisioningStrategyType)Enum.Parse(typeof(ProvisioningStrategyType), appInfoResponse.data.manifest.roles[0].provisioning.strategy.ToPascalCase());
+                            }
+                        }
 
                         //if (appInfoResponse.data.cell_data != null)
                         //{

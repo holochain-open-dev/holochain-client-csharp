@@ -12,15 +12,15 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         [Key("cell_data")]
         //public InstalledCell[] cell_data { get; set; }
-        //public Dictionary<string, List<CellInfoType>> cell_data { get; set; }
-        public object cell_data { get; set; }
+        public Dictionary<string, List<CellInfoType>> cell_data { get; set; }
+        //public object cell_data { get; set; }
 
         [Key("agent_pub_key")]
         public byte[] agent_pub_key { get; set; }
 
         [Key("status")]
-        //public InstalledAppInfoStatusType status { get; set; }
-        public object status { get; set; }
+        public InstalledAppInfoStatusType status { get; set; }
+        //public object status { get; set; }
 
         [Key("manifest")]
         public AppManifest manifest { get; set; }

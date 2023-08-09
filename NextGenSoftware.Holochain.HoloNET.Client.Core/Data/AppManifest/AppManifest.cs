@@ -11,7 +11,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Data.AppManifest
     //}
 
     [MessagePackObject]
-    public struct AppManifest
+    public class AppManifest
     {
         [Key("manifest_version")]
         public string manifest_version { get; set; }
@@ -23,7 +23,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Data.AppManifest
         public string description { get; set; }
 
         [Key("roles")]
-        //public Roles roles { get; set; }
-        public object roles { get; set; }
+        public Roles[] roles { get; set; }
     }
 }

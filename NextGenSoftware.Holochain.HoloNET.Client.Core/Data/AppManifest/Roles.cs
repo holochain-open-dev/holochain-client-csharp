@@ -10,10 +10,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Data.AppManifest
         public string name { get; set; }
 
         [Key("provisioning")]
-        //public Provisioning provisioning { get; set; }
-        public object provisioning { get; set; }
+        public Provisioning provisioning { get; set; }
 
         [Key("dna")]
-        public object dna { get; set; }
+        public Dna dna { get; set; }
     }
 }

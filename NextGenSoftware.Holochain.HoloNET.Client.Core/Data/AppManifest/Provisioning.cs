@@ -4,18 +4,15 @@ using MessagePack;
 namespace NextGenSoftware.Holochain.HoloNET.Client.Data.AppManifest
 {
     [MessagePackObject]
-    public struct Provisioning
+    public class Provisioning
     {
         [Key("strategy")]
         public string strategy { get; set; }
 
-        [Key("deferred")]
-        public string deferred { get; set; }
-    }
+        [IgnoreMember]
+        public ProvisioningStrategyType StrategyType { get; set; }
 
-    //public enum Provisioning
-    //{
-    //    strategy,
-    //    deferred
-    //}
+        [Key("deferred")]
+        public bool deferred { get; set; }
+    }
 }
