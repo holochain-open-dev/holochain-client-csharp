@@ -1,7 +1,7 @@
 ﻿
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
-    public enum ZomeResultCallBackMode
+    public enum ConductorResponseCallBackMode
     {
         WaitForHolochainConductorResponse,
         UseCallBackEvents

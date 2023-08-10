@@ -19,14 +19,14 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
         private static Stopwatch _timer = new Stopwatch(); // creating new instance of the stopwatch
         private static ConsoleColor _testHeadingColour = ConsoleColor.Yellow;
         private static AvatarEntryDataObject _avatarEntryDataObject = null;
-        private const string _hcAdminURI = "ws://localhost:61872";
+        private const string _hcAdminURI = "ws://localhost:56125";
         private const string _hcAppURI = "ws://localhost:8888";
 
         static async Task Main(string[] args)
         {
           //  await TestHoloNETClientAsync(TestToRun.AdminGenerateAgentPubKey);
-            //await TestHoloNETClientAsync(TestToRun.AdminGrantCapability);
-            await TestHoloNETClientAsync(TestToRun.SaveLoadOASISEntryUsingSingleHoloNETAuditEntryBaseClass);
+            await TestHoloNETClientAsync(TestToRun.AdminGrantCapability);
+           // await TestHoloNETClientAsync(TestToRun.SaveLoadOASISEntryUsingSingleHoloNETAuditEntryBaseClass);
             //await TestHoloNETClientAsync(TestToRun.Signal);
             //await TestHoloNETClientAsync(TestToRun.SaveLoadOASISEntryWithTypeOfEntryDataObject);
             //await TestHoloNETClientAsync(TestToRun.SaveLoadOASISEntryWithEntryDataObject);
