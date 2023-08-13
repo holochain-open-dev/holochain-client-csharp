@@ -36,9 +36,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         private Dictionary<string, ZomeFunctionCallBackEventArgs> _zomeReturnDataLookup = new Dictionary<string, ZomeFunctionCallBackEventArgs>();
         private Dictionary<string, bool> _cacheZomeReturnDataLookup = new Dictionary<string, bool>();
         private Dictionary<string, TaskCompletionSource<ZomeFunctionCallBackEventArgs>> _taskCompletionZomeCallBack = new Dictionary<string, TaskCompletionSource<ZomeFunctionCallBackEventArgs>>();
-        private Dictionary<string, TaskCompletionSource<AdminAgentPubKeyGeneratedCallBackEventArgs>> _taskCompletionAdminAgentPubKeyGeneratedCallBack = new Dictionary<string, TaskCompletionSource<AdminAgentPubKeyGeneratedCallBackEventArgs>>();
         private TaskCompletionSource<AgentPubKeyDnaHash> _taskCompletionAgentPubKeyAndDnaHashRetrieved = new TaskCompletionSource<AgentPubKeyDnaHash>();
         //private TaskCompletionSource<AgentPubKeyDnaHash> _taskCompletionAgentPubKeyAndDnaHashRetrievedFromConductor = new TaskCompletionSource<AgentPubKeyDnaHash>();
+        private Dictionary<string, TaskCompletionSource<AdminAgentPubKeyGeneratedCallBackEventArgs>> _taskCompletionAdminAgentPubKeyGeneratedCallBack = new Dictionary<string, TaskCompletionSource<AdminAgentPubKeyGeneratedCallBackEventArgs>>();
+        private Dictionary<string, TaskCompletionSource<AdminAppInstalledCallBackEventArgs>> _taskCompletionAdminInstallAppCallBack = new Dictionary<string, TaskCompletionSource<AdminAppInstalledCallBackEventArgs>>();
         private Dictionary<string, PropertyInfo[]> _dictPropertyInfos = new Dictionary<string, PropertyInfo[]>();
         private Dictionary<byte[][], SigningCredentials> _signingCredentialsForCell = new Dictionary<byte[][], SigningCredentials>();
         private TaskCompletionSource<ReadyForZomeCallsEventArgs> _taskCompletionReadyForZomeCalls = new TaskCompletionSource<ReadyForZomeCallsEventArgs>();
@@ -110,12 +111,22 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// </summary>
         public event AppInfoCallBack OnAppInfoCallBack;
 
+
         public delegate void AdminAgentPubKeyGeneratedCallBack(object sender, AdminAgentPubKeyGeneratedCallBackEventArgs e);
 
         /// <summary>
         /// Fired when the client receives the generated AgentPubKey from the conductor.
         /// </summary>
-        public event AdminAgentPubKeyGeneratedCallBack OnAdminAgentPubKeyGeneratedCallBackEventArgs;
+        public event AdminAgentPubKeyGeneratedCallBack OnAdminAgentPubKeyGeneratedCallBackEvent;
+
+
+        public delegate void AdminAppInstalledCallBack(object sender, AdminAppInstalledCallBackEventArgs e);
+
+        /// <summary>
+        /// Fired when a response is received from the conductor after a hApp has been installed via the AdminInstallAppAsyc/AdminInstallApp method.
+        /// </summary>
+        public event AdminAppInstalledCallBack OnAdminAppInstalledCallBack;
+
 
         public delegate void ReadyForZomeCalls(object sender, ReadyForZomeCallsEventArgs e);
 
@@ -749,10 +760,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             try
             {
                 if (string.IsNullOrEmpty(id))
-                {
-                    _currentId++;
-                    id = _currentId.ToString();
-                }
+                    id = GetRequestId();
 
                 HoloNETRequest request = new HoloNETRequest()
                 {
@@ -1517,7 +1525,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         public async Task AdminGrantCapabilityAsync(GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null, string id = "")
         {
-            await AdminGrantCapabilityAsync(GetCellId(), grantedFunctionsType, functions, id);
+            await AdminGrantCapabilityAsync(await GetCellId(), grantedFunctionsType, functions, id);
         }
 
         public void AdminGrantCapability(GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null, string id = "")
@@ -1541,16 +1549,28 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             byte[] privateKey;
             byte[] publicKey;
 
-            Ed25519.KeyPairFromSeed(out publicKey, out privateKey, seed);
+            if (cellId == null)
+            {
+                HandleError("Error occured in GrantCapabilityAsync function. cellId is null.", null);
+                return;
+            }
 
-            byte[] DHTLocation = ConvertHoloHashToBytes(Config.AgentPubKey).TakeLast(4).ToArray();
-            byte[] signingKey = new byte[] { 132, 32, 36 }.Concat(publicKey).Concat(DHTLocation).ToArray();
+            if (string.IsNullOrEmpty(Config.AgentPubKey))
+            {
+                HandleError("Error occured in GrantCapabilityAsync function. Config.AgentPubKey is null. Please set or call AdminGenerateAgentPubKey method.", null);
+                return;
+            }
 
             if (grantedFunctionsType == GrantedFunctionsType.Listed && functions == null)
             {
                 HandleError("Error occured in GrantCapabilityAsync function. GrantedFunctionsType was set to Listed but no functions were passed in.", null);
                 return;
             }
+
+            Ed25519.KeyPairFromSeed(out publicKey, out privateKey, seed);
+
+            byte[] DHTLocation = ConvertHoloHashToBytes(Config.AgentPubKey).TakeLast(4).ToArray();
+            byte[] signingKey = new byte[] { 132, 32, 36 }.Concat(publicKey).Concat(DHTLocation).ToArray();
 
             GrantedFunctions grantedFunction = new GrantedFunctions();
             grantedFunction.Functions.Add(grantedFunctionsType, functions);
@@ -1619,6 +1639,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 type = "generate_agent_pub_key",
             };
 
+            if (string.IsNullOrEmpty(id))
+                id = GetRequestId();
+
+            _taskCompletionAdminAgentPubKeyGeneratedCallBack[id] = new TaskCompletionSource<AdminAgentPubKeyGeneratedCallBackEventArgs> { };
             await SendHoloNETRequestAsync(holoNETData, id);
 
             if (conductorResponseCallBackMode == ConductorResponseCallBackMode.WaitForHolochainConductorResponse)
@@ -1635,6 +1659,34 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             AdminGenerateAgentPubKeyAsync(ConductorResponseCallBackMode.UseCallBackEvents, updateAgentPubKeyInConfig, id);
         }
 
+        public async Task<AdminAppInstalledCallBackEventArgs> AdminInstallAppAsync(ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, bool updateAgentPubKeyInConfig = true, string id = "")
+        {
+            HoloNETData holoNETData = new HoloNETData()
+            {
+                type = "install_app",
+                data = new 
+            };
+
+            if (string.IsNullOrEmpty(id))
+                id = GetRequestId();
+
+            _taskCompletionAdminInstallAppCallBack[id] = new TaskCompletionSource<AdminAppInstalledCallBackEventArgs> { };
+            await SendHoloNETRequestAsync(holoNETData, id);
+
+            if (conductorResponseCallBackMode == ConductorResponseCallBackMode.WaitForHolochainConductorResponse)
+            {
+                Task<AdminAppInstalledCallBackEventArgs> returnValue = _taskCompletionAdminInstallAppCallBack[id].Task;
+                return await returnValue;
+            }
+            else
+                return new AdminAppInstalledCallBackEventArgs() { EndPoint = EndPoint, Id = id, Message = "conductorResponseCallBackMode is set to UseCallBackEvents so please wait for OnAdminAppInstalledCallBack event for the result." };
+
+        }
+
+        public void AdminInstallApp(bool updateAgentPubKeyInConfig = true, string id = "")
+        {
+            AdminInstallAppAsync(ConductorResponseCallBackMode.UseCallBackEvents, updateAgentPubKeyInConfig, id);
+        }
 
         /// <summary>
         /// Call this method to clear all of HoloNETClient's internal cache. This includes the responses that have been cached using the CallZomeFunction methods if the `cacheData` param was set to true for any of the calls.
@@ -1698,13 +1750,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             if (string.IsNullOrEmpty(Config.AgentPubKey))
             {
-                HandleError("Config.AgentPubKey is null, please set before calling this method.", null);
+                HandleError("Error occured in GetCellId. Config.AgentPubKey is null, please set before calling this method.", null);
                 return null;
             }
 
             if (string.IsNullOrEmpty(Config.DnaHash))
             {
-                HandleError("Config.DnaHash is null, please set before calling this method.", null);
+                HandleError("Error occured in GetCellId. Config.DnaHash is null, please set before calling this method.", null);
                 return null;
             }
 
@@ -1984,6 +2036,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public HolochainConductorsShutdownEventArgs ShutDownHolochainConductors(ShutdownHolochainConductorsMode shutdownHolochainConductorsMode = ShutdownHolochainConductorsMode.UseConfigSettings)
         {
             return ShutDownHolochainConductorsAsync(shutdownHolochainConductorsMode).Result;
+        }
+
+        private string GetRequestId()
+        {
+            _currentId++;
+            return _currentId.ToString();
         }
 
         private async Task<HolochainConductorsShutdownEventArgs> ShutDownAllHolochainConductorsAsync()

@@ -4,7 +4,7 @@ using MessagePack;
 namespace NextGenSoftware.Holochain.HoloNET.Client.Data.AppManifest
 {
     [MessagePackObject]
-    public struct Modifiers
+    public struct DnaModifiers
     {
         [Key("network_seed")]
         public string network_seed { get; set; }

@@ -1,4 +1,5 @@
 ﻿using MessagePack;
+using NextGenSoftware.Holochain.HoloNET.Client.Data.AppManifest;
 using NextGenSoftware.Holochain.HoloNET.Client.Interfaces;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client.Data
@@ -7,10 +8,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Data
     public struct ProvisionedCell : ICell
     {
         [Key("cell_id")]
-        public byte[] cell_id { get; set; }
+        public byte[][] cell_id { get; set; }
 
         [Key("dna_modifiers")]
-        public byte[] dna_modifiers { get; set; } //pub dna_modifiers: DnaModifiers,
+        public DnaModifiers dna_modifiers { get; set; } //pub dna_modifiers: DnaModifiers,
 
         [Key("name")]
         public string name { get; set; }
