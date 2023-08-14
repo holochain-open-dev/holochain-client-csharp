@@ -21,6 +21,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
         private static AvatarEntryDataObject _avatarEntryDataObject = null;
         private const string _hcAdminURI = "ws://localhost:52251";
         private const string _hcAppURI = "ws://localhost:8888";
+        private const string _oasisHappPath = @"\hApps\OASIS-Holochain-hApp\zomes\workdir\happ";
+        private const string _numbersHappPath = @"\hApps\happ-build-tutorial-develop\workdir\happ";
 
         static async Task Main(string[] args)
         {
@@ -65,7 +67,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                 case TestToRun.Signal:
                     {
                         config.FullPathToRootHappFolder = string.Concat(Environment.CurrentDirectory, @"\hApps\OASIS-Holochain-hApp");
-                        config.FullPathToCompiledHappFolder = string.Concat(Environment.CurrentDirectory, @"\hApps\OASIS-Holochain-hApp\zomes\workdir\happ");
+                        config.FullPathToCompiledHappFolder = string.Concat(Environment.CurrentDirectory, _oasisHappPath);
                     }
                     break;
 
@@ -74,7 +76,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                 case TestToRun.LoadTestNumbers:
                     {
                         config.FullPathToRootHappFolder = string.Concat(Environment.CurrentDirectory, @"\hApps\happ-build-tutorial-develop");
-                        config.FullPathToCompiledHappFolder = string.Concat(Environment.CurrentDirectory, @"\hApps\happ-build-tutorial-develop\workdir\happ");
+                        config.FullPathToCompiledHappFolder = string.Concat(Environment.CurrentDirectory, _numbersHappPath);
                     }
                     break;
             }
@@ -84,8 +86,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
             {
                 switch (_testToRun)
                 {
-                    case TestToRun.AdminGrantCapability:
+                    case TestToRun.AdminAuthorizeSigningCredentials:
                     case TestToRun.AdminGenerateAgentPubKey:
+                    case TestToRun.AdminInstallApp:
+                    case TestToRun.AdminEnableApp:
+                    case TestToRun.AdminDisableApp:
+                    case TestToRun.AdminAttachAppInterface:
                         _holoNETClient = new HoloNETClient(_hcAdminURI);
                         isAdmin = true;
                         break;
@@ -108,7 +114,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                 _holoNETClient.OnError += HoloNETClient_OnError;
                 _holoNETClient.OnHolochainConductorsShutdownComplete += _holoNETClient_OnHolochainConductorsShutdownComplete;
                 _holoNETClient.OnHoloNETShutdownComplete += _holoNETClient_OnHoloNETShutdownComplete;
-                _holoNETClient.OnAdminAgentPubKeyGeneratedCallBackEventArgs += _holoNETClient_OnAdminAgentPubKeyGeneratedCallBackEventArgs;
+                _holoNETClient.OnAdminAgentPubKeyGeneratedCallBack += _holoNETClient_OnAdminAgentPubKeyGeneratedCallBack;
+                _holoNETClient.OnAdminAppInstalledCallBack += _holoNETClient_OnAdminAppInstalledCallBack;
+                _holoNETClient.OnAdminAppEnabledCallBack += _holoNETClient_OnAdminAppEnabledCallBack;
+                _holoNETClient.OnAdminAppDisabledCallBack += _holoNETClient_OnAdminAppDisabledCallBack;
+                _holoNETClient.OnAdminAppInterfaceAttachedCallBack += _holoNETClient_OnAdminAppInterfaceAttachedCallBack;
+                _holoNETClient.OnAdminSigningCredentialsAuthorized += _holoNETClient_OnAdminSigningCredentialsAuthorized;
 
                 ////Use this if you to manually pass in the AgentPubKey &DnaHash(otherwise it will be automatically queried from the conductor or sandbox).
                 //_holoNETClient.Config.AgentPubKey = "YOUR KEY";
@@ -486,9 +497,39 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
             }
         }
 
-        private static void _holoNETClient_OnAdminAgentPubKeyGeneratedCallBackEventArgs(object sender, AdminAgentPubKeyGeneratedCallBackEventArgs e)
+        private static void _holoNETClient_OnAdminSigningCredentialsAuthorized(object sender, AdminSigningCredentialsAuthorizedEventArgs e)
         {
-            string msg = $"TEST HARNESS: _holoNETClient_OnAdminAgentPubKeyGeneratedCallBackEventArgs, EndPoint: {e.EndPoint}, AgentPubKey: {e.AgentPubKey}, IsError: {e.IsError}, Message: {e.Message}";
+            string msg = $"TEST HARNESS: _holoNETClient_OnAdminSigningCredentialsAuthorized, EndPoint: {e.EndPoint}, Id: {e.Id}, Raw Binary Data: {e.RawBinaryData}, Raw Binary Data As String: {e.RawBinaryDataAsString}, Raw Binary Data Decoded: {e.RawBinaryDataDecoded}, IsError: {e.IsError}, Message: {e.Message}";
+            CLIEngine.ShowMessage(msg);
+        }
+
+        private static void _holoNETClient_OnAdminAppInterfaceAttachedCallBack(object sender, AdminAppInterfaceAttachedCallBackEventArgs e)
+        {
+            string msg = $"TEST HARNESS: _holoNETClient_OnAdminAppInterfaceAttachedCallBack, EndPoint: {e.EndPoint}, Id: {e.Id}, Raw Binary Data: {e.RawBinaryData}, Raw Binary Data As String: {e.RawBinaryDataAsString}, Raw Binary Data Decoded: {e.RawBinaryDataDecoded}, IsError: {e.IsError}, Message: {e.Message}";
+            CLIEngine.ShowMessage(msg);
+        }
+
+        private static void _holoNETClient_OnAdminAppDisabledCallBack(object sender, AdminAppDisabledCallBackEventArgs e)
+        {
+            string msg = $"TEST HARNESS: _holoNETClient_OnAdminAppDisabledCallBack, EndPoint: {e.EndPoint}, Id: {e.Id}, Raw Binary Data: {e.RawBinaryData}, Raw Binary Data As String: {e.RawBinaryDataAsString}, Raw Binary Data Decoded: {e.RawBinaryDataDecoded}, IsError: {e.IsError}, Message: {e.Message}";
+            CLIEngine.ShowMessage(msg);
+        }
+
+        private static void _holoNETClient_OnAdminAppEnabledCallBack(object sender, AdminAppEnabledCallBackEventArgs e)
+        {
+            string msg = $"TEST HARNESS: _holoNETClient_OnAdminAppEnabledCallBack, EndPoint: {e.EndPoint}, Id: {e.Id}, AgentPubKey: {e.AgentPubKey}, Raw Binary Data: {e.RawBinaryData}, Raw Binary Data As String: {e.RawBinaryDataAsString}, Raw Binary Data Decoded: {e.RawBinaryDataDecoded}, IsError: {e.IsError}, Message: {e.Message}";
+            CLIEngine.ShowMessage(msg);
+        }
+
+        private static void _holoNETClient_OnAdminAppInstalledCallBack(object sender, AdminAppInstalledCallBackEventArgs e)
+        {
+            string msg = $"TEST HARNESS: _holoNETClient_OnAdminAppInstalledCallBack, EndPoint: {e.EndPoint}, Id: {e.Id}, AgentPubKey: {e.AgentPubKey}, Raw Binary Data: {e.RawBinaryData}, Raw Binary Data As String: {e.RawBinaryDataAsString}, Raw Binary Data Decoded: {e.RawBinaryDataDecoded}, IsError: {e.IsError}, Message: {e.Message}";
+            CLIEngine.ShowMessage(msg);
+        }
+
+        private static void _holoNETClient_OnAdminAgentPubKeyGeneratedCallBack(object sender, AdminAgentPubKeyGeneratedCallBackEventArgs e)
+        {
+            string msg = $"TEST HARNESS: _holoNETClient_OnAdminAgentPubKeyGeneratedCallBack, EndPoint: {e.EndPoint}, Id: {e.Id},  AgentPubKey: {e.AgentPubKey}, IsError: {e.IsError}, Message: {e.Message}";
             CLIEngine.ShowMessage(msg);
         }
 
@@ -943,19 +984,47 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
             {
                 case TestToRun.AdminGenerateAgentPubKey:
                     {
-                        Console.WriteLine("Calling GenerateAgentPubKey function on Admin API...\n");
+                        Console.WriteLine("Calling AdminGenerateAgentPubKeyAsync function on Admin API...\n");
                         await _holoNETClient.AdminGenerateAgentPubKeyAsync();
                     }
                     break;
 
-                case TestToRun.AdminGrantCapability:
+                case TestToRun.AdminInstallApp:
                     {
-                        Console.WriteLine("Calling GrantCapabilityAsync function on Admin API...\n");
-                        await _holoNETClient.AdminGrantCapabilityAsync(GrantedFunctionsType.Listed, new List<(string, string)>()
+                        Console.WriteLine("Calling AdminInstallAppAsync function on Admin API...\n");
+                        await _holoNETClient.AdminInstallAppAsync("test-app", $"{_oasisHappPath}\\oasis.happ");
+                    }
+                    break;
+
+                case TestToRun.AdminEnableApp:
+                    {
+                        Console.WriteLine("Calling AdminEnableAppAsync function on Admin API...\n");
+                        await _holoNETClient.AdminEnableAppAsync("test-app");
+                    }
+                    break;
+
+                case TestToRun.AdminDisableApp:
+                    {
+                        Console.WriteLine("Calling AdminDisableAppAsync function on Admin API...\n");
+                        await _holoNETClient.AdminDisableAppAsync("test-app");
+                    }
+                    break;
+
+                case TestToRun.AdminAuthorizeSigningCredentials:
+                    {
+                        Console.WriteLine("Calling AdminAuthorizeSigningCredentialsAsync function on Admin API...\n");
+                        await _holoNETClient.AdminAuthorizeSigningCredentialsAsync(GrantedFunctionsType.Listed, new List<(string, string)>()
                         {
                             ("zome1", "function1"),
                             ("zome2", "function2")
                         });
+                    }
+                    break;
+
+                case TestToRun.AdminAttachAppInterface:
+                    {
+                        Console.WriteLine("Calling AdminAttachAppInterfaceAsync function on Admin API...\n");
+                        await _holoNETClient.AdminAttachAppInterfaceAsync(777);
                     }
                     break;
             }

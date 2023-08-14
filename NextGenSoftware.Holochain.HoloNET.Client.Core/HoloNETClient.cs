@@ -14,9 +14,7 @@ using NextGenSoftware.Utilities;
 using Chaos.NaCl;
 using System.Security.Cryptography;
 using Blake2Fast;
-using System.ComponentModel;
 using NextGenSoftware.Utilities.ExtentionMethods;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
@@ -39,7 +37,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         private TaskCompletionSource<AgentPubKeyDnaHash> _taskCompletionAgentPubKeyAndDnaHashRetrieved = new TaskCompletionSource<AgentPubKeyDnaHash>();
         //private TaskCompletionSource<AgentPubKeyDnaHash> _taskCompletionAgentPubKeyAndDnaHashRetrievedFromConductor = new TaskCompletionSource<AgentPubKeyDnaHash>();
         private Dictionary<string, TaskCompletionSource<AdminAgentPubKeyGeneratedCallBackEventArgs>> _taskCompletionAdminAgentPubKeyGeneratedCallBack = new Dictionary<string, TaskCompletionSource<AdminAgentPubKeyGeneratedCallBackEventArgs>>();
-        private Dictionary<string, TaskCompletionSource<AdminAppInstalledCallBackEventArgs>> _taskCompletionAdminInstallAppCallBack = new Dictionary<string, TaskCompletionSource<AdminAppInstalledCallBackEventArgs>>();
+        private Dictionary<string, TaskCompletionSource<AdminAppInstalledCallBackEventArgs>> _taskCompletionAdminAppInstalledCallBack = new Dictionary<string, TaskCompletionSource<AdminAppInstalledCallBackEventArgs>>();
+        private Dictionary<string, TaskCompletionSource<AdminAppEnabledCallBackEventArgs>> _taskCompletionAdminAppEnabledCallBack = new Dictionary<string, TaskCompletionSource<AdminAppEnabledCallBackEventArgs>>();
+        private Dictionary<string, TaskCompletionSource<AdminAppDisabledCallBackEventArgs>> _taskCompletionAdminAppDisabledCallBack = new Dictionary<string, TaskCompletionSource<AdminAppDisabledCallBackEventArgs>>();
+        private Dictionary<string, TaskCompletionSource<AdminSigningCredentialsAuthorizedEventArgs>> _taskCompletionAdminSigningCredentialsAuthorizedCallBack = new Dictionary<string, TaskCompletionSource<AdminSigningCredentialsAuthorizedEventArgs>>();
+        private Dictionary<string, TaskCompletionSource<AdminAppInterfaceAttachedCallBackEventArgs>> _taskCompletionAdminAppInterfaceAttachedCallBack = new Dictionary<string, TaskCompletionSource<AdminAppInterfaceAttachedCallBackEventArgs>>();
         private Dictionary<string, PropertyInfo[]> _dictPropertyInfos = new Dictionary<string, PropertyInfo[]>();
         private Dictionary<byte[][], SigningCredentials> _signingCredentialsForCell = new Dictionary<byte[][], SigningCredentials>();
         private TaskCompletionSource<ReadyForZomeCallsEventArgs> _taskCompletionReadyForZomeCalls = new TaskCompletionSource<ReadyForZomeCallsEventArgs>();
@@ -117,7 +119,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <summary>
         /// Fired when the client receives the generated AgentPubKey from the conductor.
         /// </summary>
-        public event AdminAgentPubKeyGeneratedCallBack OnAdminAgentPubKeyGeneratedCallBackEvent;
+        public event AdminAgentPubKeyGeneratedCallBack OnAdminAgentPubKeyGeneratedCallBack;
 
 
         public delegate void AdminAppInstalledCallBack(object sender, AdminAppInstalledCallBackEventArgs e);
@@ -126,6 +128,38 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// Fired when a response is received from the conductor after a hApp has been installed via the AdminInstallAppAsyc/AdminInstallApp method.
         /// </summary>
         public event AdminAppInstalledCallBack OnAdminAppInstalledCallBack;
+
+
+        public delegate void AdminAppEnabledCallBack(object sender, AdminAppEnabledCallBackEventArgs e);
+
+        /// <summary>
+        /// Fired when a response is received from the conductor after a hApp has been enabled via the AdminEnableAppAsyc/AdminEnableApp method.
+        /// </summary>
+        public event AdminAppEnabledCallBack OnAdminAppEnabledCallBack;
+
+
+        public delegate void AdminAppDisabledCallBack(object sender, AdminAppDisabledCallBackEventArgs e);
+
+        /// <summary>
+        /// Fired when a response is received from the conductor after a hApp has been disabled via the AdminDisableAppAsyc/AdminDisableApp method.
+        /// </summary>
+        public event AdminAppDisabledCallBack OnAdminAppDisabledCallBack;
+
+
+        public delegate void AdminSigningCredentialsAuthorized(object sender, AdminSigningCredentialsAuthorizedEventArgs e);
+
+        /// <summary>
+        /// Fired when a response is received from the conductor after a cell has been authorized via the AdminAuthorizeSigningCredentialsAsync/AdminAuthorizeSigningCredentials method.
+        /// </summary>
+        public event AdminSigningCredentialsAuthorized OnAdminSigningCredentialsAuthorized;
+
+
+        public delegate void AdminAppInterfaceAttachedCallBack(object sender, AdminAppInterfaceAttachedCallBackEventArgs e);
+
+        /// <summary>
+        /// Fired when a response is received from the conductor after the app interface has been attached via the AdminAttachAppInterfaceAsyc/AdminAttachAppInterface method.
+        /// </summary>
+        public event AdminAppInterfaceAttachedCallBack OnAdminAppInterfaceAttachedCallBack;
 
 
         public delegate void ReadyForZomeCalls(object sender, ReadyForZomeCallsEventArgs e);
@@ -1523,27 +1557,27 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             return CallZomeFunctionAsync(id, zome, function, callback, paramsObject, matchIdToZomeFuncInCallback, cachReturnData, zomeResultCallBackMode).Result;
         }
 
-        public async Task AdminGrantCapabilityAsync(GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null, string id = "")
+        public async Task<AdminSigningCredentialsAuthorizedEventArgs> AdminAuthorizeSigningCredentialsAsync(GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = "")
         {
-            await AdminGrantCapabilityAsync(await GetCellId(), grantedFunctionsType, functions, id);
+            return await AdminAuthorizeSigningCredentialsAsync(await GetCellId(), grantedFunctionsType, functions, conductorResponseCallBackMode, id);
         }
 
-        public void AdminGrantCapability(GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null, string id = "")
+        public AdminSigningCredentialsAuthorizedEventArgs AdminAuthorizeSigningCredentials(GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = "")
         {
-            AdminGrantCapabilityAsync(grantedFunctionsType, functions, id);
+            return AdminAuthorizeSigningCredentialsAsync(grantedFunctionsType, functions, conductorResponseCallBackMode, id).Result;
         }
 
-        public async Task AdminGrantCapabilityAsync(string AgentPubKey, string DnaHash, GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions= null, string id = "")
+        public async Task<AdminSigningCredentialsAuthorizedEventArgs> AdminAuthorizeSigningCredentialsAsync(string AgentPubKey, string DnaHash, GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions= null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = "")
         {
-            await AdminGrantCapabilityAsync(GetCellId(DnaHash, AgentPubKey), grantedFunctionsType, functions, id);
+            return await AdminAuthorizeSigningCredentialsAsync(GetCellId(DnaHash, AgentPubKey), grantedFunctionsType, functions, conductorResponseCallBackMode, id);
         }
 
-        public void AdminGrantCapability(string AgentPubKey, string DnaHash, GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null, string id = "")
+        public AdminSigningCredentialsAuthorizedEventArgs AdminAuthorizeSigningCredentials(string AgentPubKey, string DnaHash, GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = "")
         {
-            AdminGrantCapabilityAsync(AgentPubKey, DnaHash, grantedFunctionsType, functions, id);
+            return AdminAuthorizeSigningCredentialsAsync(AgentPubKey, DnaHash, grantedFunctionsType, functions, conductorResponseCallBackMode, id).Result;
         }
 
-        public async Task AdminGrantCapabilityAsync(byte[][] cellId, GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null, string id = "")
+        public async Task<AdminSigningCredentialsAuthorizedEventArgs> AdminAuthorizeSigningCredentialsAsync(byte[][] cellId, GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = "")
         {
             var seed = RandomNumberGenerator.GetBytes(32);
             byte[] privateKey;
@@ -1551,20 +1585,23 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             if (cellId == null)
             {
-                HandleError("Error occured in GrantCapabilityAsync function. cellId is null.", null);
-                return;
+                string msg = "Error occured in AuthorizeSigningCredentialsAsync function. cellId is null.";
+                HandleError(msg, null);
+                return new AdminSigningCredentialsAuthorizedEventArgs() { IsError = true, EndPoint = EndPoint, Id = id, Message = msg };
             }
 
             if (string.IsNullOrEmpty(Config.AgentPubKey))
             {
-                HandleError("Error occured in GrantCapabilityAsync function. Config.AgentPubKey is null. Please set or call AdminGenerateAgentPubKey method.", null);
-                return;
+                string msg = "Error occured in AuthorizeSigningCredentialsAsync function. Config.AgentPubKey is null. Please set or call AdminGenerateAgentPubKey method.";
+                HandleError(msg, null);
+                return new AdminSigningCredentialsAuthorizedEventArgs() { IsError = true, EndPoint = EndPoint, Id = id, Message = msg };
             }
 
             if (grantedFunctionsType == GrantedFunctionsType.Listed && functions == null)
             {
-                HandleError("Error occured in GrantCapabilityAsync function. GrantedFunctionsType was set to Listed but no functions were passed in.", null);
-                return;
+                string msg = "Error occured in AuthorizeSigningCredentialsAsync function. GrantedFunctionsType was set to Listed but no functions were passed in.";
+                HandleError(msg, null);
+                return new AdminSigningCredentialsAuthorizedEventArgs() { IsError = true, EndPoint = EndPoint, Id = id, Message = msg };
             }
 
             Ed25519.KeyPairFromSeed(out publicKey, out privateKey, seed);
@@ -1605,7 +1642,20 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 SigningKey = signingKey
             };
 
+            if (string.IsNullOrEmpty(id))
+                id = GetRequestId();
+
+            _taskCompletionAdminSigningCredentialsAuthorizedCallBack[id] = new TaskCompletionSource<AdminSigningCredentialsAuthorizedEventArgs> { };
+
             await SendHoloNETRequestAsync(holoNETData, id);
+
+            if (conductorResponseCallBackMode == ConductorResponseCallBackMode.WaitForHolochainConductorResponse)
+            {
+                Task<AdminSigningCredentialsAuthorizedEventArgs> returnValue = _taskCompletionAdminSigningCredentialsAuthorizedCallBack[id].Task;
+                return await returnValue;
+            }
+            else
+                return new AdminSigningCredentialsAuthorizedEventArgs() { EndPoint = EndPoint, Id = id, Message = "conductorResponseCallBackMode is set to UseCallBackEvents so please wait for OnAdminSigningCredentialsAuthorized event for the result." };
 
             //{
             //cell_id: cellId,
@@ -1625,9 +1675,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             //    });
         }
 
-        public void AdminGrantCapability(byte[][] cellId, GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null, string id = "")
+        public AdminSigningCredentialsAuthorizedEventArgs AdminAuthorizeSigningCredentials(byte[][] cellId, GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = "")
         {
-            AdminGrantCapabilityAsync(cellId, grantedFunctionsType, functions, id);
+            return AdminAuthorizeSigningCredentialsAsync(cellId, grantedFunctionsType, functions, conductorResponseCallBackMode, id).Result;
         }
 
         public async Task<AdminAgentPubKeyGeneratedCallBackEventArgs> AdminGenerateAgentPubKeyAsync(ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, bool updateAgentPubKeyInConfig = true, string id = "")
@@ -1659,33 +1709,146 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             AdminGenerateAgentPubKeyAsync(ConductorResponseCallBackMode.UseCallBackEvents, updateAgentPubKeyInConfig, id);
         }
 
-        public async Task<AdminAppInstalledCallBackEventArgs> AdminInstallAppAsync(ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, bool updateAgentPubKeyInConfig = true, string id = "")
+        public async Task<AdminAppInstalledCallBackEventArgs> AdminInstallAppAsync(string installedAppId, string hAppPath, string agentKey = null, Dictionary<string, byte[]> membraneProofs = null, string network_seed = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
+            if (string.IsNullOrEmpty(agentKey))
+            {
+                if (string.IsNullOrEmpty(Config.AgentPubKey))
+                    await AdminGenerateAgentPubKeyAsync();
+                
+                agentKey = Config.AgentPubKey;
+            }
+
+            if (membraneProofs == null)
+                membraneProofs = new Dictionary<string, byte[]>();
+
             HoloNETData holoNETData = new HoloNETData()
             {
                 type = "install_app",
-                data = new 
+                data = new HoloNETAdminInstallAppRequest()
+                {
+                    source = hAppPath,
+                    agent_key =  ConvertHoloHashToBytes(agentKey),
+                    installed_app_id = installedAppId,
+                    membrane_proofs = membraneProofs,
+                    network_seed = network_seed
+                }
             };
 
             if (string.IsNullOrEmpty(id))
                 id = GetRequestId();
 
-            _taskCompletionAdminInstallAppCallBack[id] = new TaskCompletionSource<AdminAppInstalledCallBackEventArgs> { };
+            _taskCompletionAdminAppInstalledCallBack[id] = new TaskCompletionSource<AdminAppInstalledCallBackEventArgs> { };
             await SendHoloNETRequestAsync(holoNETData, id);
 
             if (conductorResponseCallBackMode == ConductorResponseCallBackMode.WaitForHolochainConductorResponse)
             {
-                Task<AdminAppInstalledCallBackEventArgs> returnValue = _taskCompletionAdminInstallAppCallBack[id].Task;
+                Task<AdminAppInstalledCallBackEventArgs> returnValue = _taskCompletionAdminAppInstalledCallBack[id].Task;
                 return await returnValue;
             }
             else
                 return new AdminAppInstalledCallBackEventArgs() { EndPoint = EndPoint, Id = id, Message = "conductorResponseCallBackMode is set to UseCallBackEvents so please wait for OnAdminAppInstalledCallBack event for the result." };
-
         }
 
-        public void AdminInstallApp(bool updateAgentPubKeyInConfig = true, string id = "")
+        public void AdminInstallApp(string installedAppId, string hAppPath, string agentKey = null, Dictionary<string, byte[]> membraneProofs = null, string network_seed = null, string id = null)
         {
-            AdminInstallAppAsync(ConductorResponseCallBackMode.UseCallBackEvents, updateAgentPubKeyInConfig, id);
+            AdminInstallAppAsync(installedAppId, hAppPath, agentKey, membraneProofs, network_seed, ConductorResponseCallBackMode.UseCallBackEvents, id);
+        }
+
+        public async Task<AdminAppEnabledCallBackEventArgs> AdminEnableAppAsync(string installedAppId, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
+        {
+
+            HoloNETData holoNETData = new HoloNETData()
+            {
+                type = "enable_app",
+                data = new HoloNETAdminEnableAppRequest()
+                {
+                    installed_app_id = installedAppId
+                }
+            };
+
+            if (string.IsNullOrEmpty(id))
+                id = GetRequestId();
+
+            _taskCompletionAdminAppEnabledCallBack[id] = new TaskCompletionSource<AdminAppEnabledCallBackEventArgs> { };
+            await SendHoloNETRequestAsync(holoNETData, id);
+
+            if (conductorResponseCallBackMode == ConductorResponseCallBackMode.WaitForHolochainConductorResponse)
+            {
+                Task<AdminAppEnabledCallBackEventArgs> returnValue = _taskCompletionAdminAppEnabledCallBack[id].Task;
+                return await returnValue;
+            }
+            else
+                return new AdminAppEnabledCallBackEventArgs() { EndPoint = EndPoint, Id = id, Message = "conductorResponseCallBackMode is set to UseCallBackEvents so please wait for OnAdminAppEnabledCallBack event for the result." };
+        }
+
+        public void AdminEnablelApp(string installedAppId, string id = null)
+        {
+            AdminEnableAppAsync(installedAppId, ConductorResponseCallBackMode.UseCallBackEvents, id);
+        }
+
+        public async Task<AdminAppDisabledCallBackEventArgs> AdminDisableAppAsync(string installedAppId, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
+        {
+
+            HoloNETData holoNETData = new HoloNETData()
+            {
+                type = "disable_app",
+                data = new HoloNETAdminEnableAppRequest()
+                {
+                    installed_app_id = installedAppId
+                }
+            };
+
+            if (string.IsNullOrEmpty(id))
+                id = GetRequestId();
+
+            _taskCompletionAdminAppDisabledCallBack[id] = new TaskCompletionSource<AdminAppDisabledCallBackEventArgs> { };
+            await SendHoloNETRequestAsync(holoNETData, id);
+
+            if (conductorResponseCallBackMode == ConductorResponseCallBackMode.WaitForHolochainConductorResponse)
+            {
+                Task<AdminAppDisabledCallBackEventArgs> returnValue = _taskCompletionAdminAppDisabledCallBack[id].Task;
+                return await returnValue;
+            }
+            else
+                return new AdminAppDisabledCallBackEventArgs() { EndPoint = EndPoint, Id = id, Message = "conductorResponseCallBackMode is set to UseCallBackEvents so please wait for OnAdminAppDisabledCallBack event for the result." };
+        }
+
+        public void AdminDisableApp(string installedAppId, string id = null)
+        {
+            AdminDisableAppAsync(installedAppId, ConductorResponseCallBackMode.UseCallBackEvents, id);
+        }
+
+        public async Task<AdminAppInterfaceAttachedCallBackEventArgs> AdminAttachAppInterfaceAsync(int port, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
+        {
+
+            HoloNETData holoNETData = new HoloNETData()
+            {
+                type = "attach_app_interface",
+                data = new HoloNETAdminAttachAppInterfaceRequest()
+                {
+                    port = port
+                }
+            };
+
+            if (string.IsNullOrEmpty(id))
+                id = GetRequestId();
+
+            _taskCompletionAdminAppInterfaceAttachedCallBack[id] = new TaskCompletionSource<AdminAppInterfaceAttachedCallBackEventArgs> { };
+            await SendHoloNETRequestAsync(holoNETData, id);
+
+            if (conductorResponseCallBackMode == ConductorResponseCallBackMode.WaitForHolochainConductorResponse)
+            {
+                Task<AdminAppInterfaceAttachedCallBackEventArgs> returnValue = _taskCompletionAdminAppInterfaceAttachedCallBack[id].Task;
+                return await returnValue;
+            }
+            else
+                return new AdminAppInterfaceAttachedCallBackEventArgs() { EndPoint = EndPoint, Id = id, Message = "conductorResponseCallBackMode is set to UseCallBackEvents so please wait for OnAdminAppInterfaceAttachedCallBack event for the result." };
+        }
+
+        public void AdminAttachAppInterface(int port, string id = null)
+        {
+            AdminAttachAppInterfaceAsync(port, ConductorResponseCallBackMode.UseCallBackEvents, id);
         }
 
         /// <summary>
@@ -2876,7 +3039,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         private void RaiseAdminGenerateAgentPubKeyReceivedEvent(AdminAgentPubKeyGeneratedCallBackEventArgs adminGenerateAgentPubKeyCallBackEventArgs)
         {
             Logger.Log(string.Concat("Id: ", adminGenerateAgentPubKeyCallBackEventArgs.Id, ", Is Call Successful: ", adminGenerateAgentPubKeyCallBackEventArgs.IsCallSuccessful ? "True" : "False", ", AgentPubKey: ", adminGenerateAgentPubKeyCallBackEventArgs.AgentPubKey, ", Raw Binary Data: ", adminGenerateAgentPubKeyCallBackEventArgs.RawBinaryData, ", Raw JSON Data: ", adminGenerateAgentPubKeyCallBackEventArgs.RawJSONData, "\n"), LogType.Info);
-            OnAdminAgentPubKeyGeneratedCallBackEventArgs?.Invoke(this, adminGenerateAgentPubKeyCallBackEventArgs);
+            OnAdminAgentPubKeyGeneratedCallBack?.Invoke(this, adminGenerateAgentPubKeyCallBackEventArgs);
             _taskCompletionAdminAgentPubKeyGeneratedCallBack[adminGenerateAgentPubKeyCallBackEventArgs.Id].SetResult(adminGenerateAgentPubKeyCallBackEventArgs);
         }
 

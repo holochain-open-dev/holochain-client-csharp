@@ -63,6 +63,28 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public string AgentPubKey { get; set; }
     }
 
+    public class AdminAppEnabledCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
+    {
+        public HolonNETAppResponse AppResponse { get; set; }
+        public string AgentPubKey { get; set; }
+    }
+
+    public class AdminAppDisabledCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
+    {
+        public HolonNETAppResponse AppResponse { get; set; }
+    }
+
+    public class AdminSigningCredentialsAuthorizedEventArgs : HoloNETDataReceivedBaseEventArgs
+    {
+        public HolonNETAppResponse AppResponse { get; set; }
+    }
+
+    public class AdminAppInterfaceAttachedCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
+    {
+        public HolonNETAppResponse AppResponse { get; set; }
+    }
+
+
     public class ReadyForZomeCallsEventArgs : CallBackBaseEventArgs
     {
         public ReadyForZomeCallsEventArgs(string endPoint, string dnaHash, string agentPubKey)
