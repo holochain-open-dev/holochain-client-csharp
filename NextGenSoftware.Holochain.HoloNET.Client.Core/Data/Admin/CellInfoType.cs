@@ -4,7 +4,7 @@ using NextGenSoftware.Holochain.HoloNET.Client.Data;
 using NextGenSoftware.Holochain.HoloNET.Client.Interfaces;
 using System.Collections.Generic;
 
-namespace NextGenSoftware.Holochain.HoloNET.Client
+namespace NextGenSoftware.Holochain.HoloNET.Client.Data.Admin
 {
     //public enum CellInfoType
     //{

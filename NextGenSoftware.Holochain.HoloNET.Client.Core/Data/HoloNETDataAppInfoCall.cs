@@ -1,4 +1,5 @@
 ﻿using MessagePack;
+using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin;
 using NextGenSoftware.Holochain.HoloNET.Client.Data.AppManifest;
 using System.Collections.Generic;
 

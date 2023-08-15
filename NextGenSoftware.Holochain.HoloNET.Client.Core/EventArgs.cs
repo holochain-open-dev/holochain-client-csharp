@@ -84,6 +84,36 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public HolonNETAppResponse AppResponse { get; set; }
     }
 
+    public class AdminRegisterDnaCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
+    {
+        public HolonNETAppResponse AppResponse { get; set; }
+    }
+
+    public class AdminListAppsCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
+    {
+        public HolonNETAppResponse AppResponse { get; set; }
+    }
+
+    public class AdminListDnasCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
+    {
+        public HolonNETAppResponse AppResponse { get; set; }
+    }
+
+    public class AdminListCellIdsCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
+    {
+        public HolonNETAppResponse AppResponse { get; set; }
+    }
+
+    public class AdminListAppInterfacesCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
+    {
+        public HolonNETAppResponse AppResponse { get; set; }
+    }
+
+    public class AdminListDumpFullStateCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
+    {
+        public HolonNETAppResponse AppResponse { get; set; }
+    }
+
 
     public class ReadyForZomeCallsEventArgs : CallBackBaseEventArgs
     {
