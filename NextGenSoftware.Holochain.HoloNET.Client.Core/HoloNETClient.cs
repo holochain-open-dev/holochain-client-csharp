@@ -15,6 +15,8 @@ using Chaos.NaCl;
 using System.Security.Cryptography;
 using Blake2Fast;
 using NextGenSoftware.Utilities.ExtentionMethods;
+using NextGenSoftware.Holochain.HoloNET.Client.Data.AppManifest;
+using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
@@ -1802,48 +1804,22 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         public async Task<AdminAppInstalledCallBackEventArgs> AdminInstallAppAsync(string installedAppId, string hAppPath, string agentKey = null, Dictionary<string, byte[]> membraneProofs = null, string network_seed = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
-            if (string.IsNullOrEmpty(agentKey))
-            {
-                if (string.IsNullOrEmpty(Config.AgentPubKey))
-                    await AdminGenerateAgentPubKeyAsync();
-                
-                agentKey = Config.AgentPubKey;
-            }
-
-            if (membraneProofs == null)
-                membraneProofs = new Dictionary<string, byte[]>();
-
-            HoloNETData holoNETData = new HoloNETData()
-            {
-                type = "install_app",
-                data = new HoloNETAdminInstallAppRequest()
-                {
-                    source = hAppPath,
-                    agent_key =  ConvertHoloHashToBytes(agentKey),
-                    installed_app_id = installedAppId,
-                    membrane_proofs = membraneProofs,
-                    network_seed = network_seed
-                }
-            };
-
-            if (string.IsNullOrEmpty(id))
-                id = GetRequestId();
-
-            _taskCompletionAdminAppInstalledCallBack[id] = new TaskCompletionSource<AdminAppInstalledCallBackEventArgs> { };
-            await SendHoloNETRequestAsync(holoNETData, id);
-
-            if (conductorResponseCallBackMode == ConductorResponseCallBackMode.WaitForHolochainConductorResponse)
-            {
-                Task<AdminAppInstalledCallBackEventArgs> returnValue = _taskCompletionAdminAppInstalledCallBack[id].Task;
-                return await returnValue;
-            }
-            else
-                return new AdminAppInstalledCallBackEventArgs() { EndPoint = EndPoint, Id = id, Message = "conductorResponseCallBackMode is set to UseCallBackEvents so please wait for OnAdminAppInstalledCallBack event for the result." };
+            return await AdminInstallAppAsync(installedAppId, hAppPath, null, agentKey, membraneProofs, network_seed, conductorResponseCallBackMode, id);
         }
 
         public AdminAppInstalledCallBackEventArgs AdminInstallApp(string installedAppId, string hAppPath, string agentKey = null, Dictionary<string, byte[]> membraneProofs = null, string network_seed = null, string id = null)
         {
-            return AdminInstallAppAsync(installedAppId, hAppPath, agentKey, membraneProofs, network_seed, ConductorResponseCallBackMode.UseCallBackEvents, id).Result;
+            return AdminInstallAppAsync(installedAppId, hAppPath, null, agentKey, membraneProofs, network_seed, ConductorResponseCallBackMode.UseCallBackEvents, id).Result;
+        }
+
+        public async Task<AdminAppInstalledCallBackEventArgs> AdminInstallAppAsync(string installedAppId, AppBundle appBundle, string agentKey = null, Dictionary<string, byte[]> membraneProofs = null, string network_seed = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
+        {
+            return await AdminInstallAppAsync(installedAppId, null, appBundle, agentKey, membraneProofs, network_seed, conductorResponseCallBackMode, id);
+        }
+
+        public AdminAppInstalledCallBackEventArgs AdminInstallApp(string installedAppId, AppBundle appBundle, string agentKey = null, Dictionary<string, byte[]> membraneProofs = null, string network_seed = null, string id = null)
+        {
+            return AdminInstallAppAsync(installedAppId, null, appBundle, agentKey, membraneProofs, network_seed, ConductorResponseCallBackMode.UseCallBackEvents, id).Result;
         }
 
         public async Task<AdminAppEnabledCallBackEventArgs> AdminEnableAppAsync(string installedAppId, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
@@ -2685,6 +2661,53 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             return _currentId.ToString();
         }
 
+        private async Task<AdminAppInstalledCallBackEventArgs> AdminInstallAppAsync(string installedAppId, string hAppPath = null, AppBundle appBundle = null, string agentKey = null, Dictionary<string, byte[]> membraneProofs = null, string network_seed = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
+        {
+            if (string.IsNullOrEmpty(agentKey))
+            {
+                if (string.IsNullOrEmpty(Config.AgentPubKey))
+                    await AdminGenerateAgentPubKeyAsync();
+
+                agentKey = Config.AgentPubKey;
+            }
+
+            if (membraneProofs == null)
+                membraneProofs = new Dictionary<string, byte[]>();
+
+            HoloNETData holoNETData = new HoloNETData()
+            {
+                type = "install_app",
+                data = new HoloNETAdminInstallAppRequest()
+                {
+                    path = hAppPath,
+                    bundle = appBundle,
+                    agent_key = ConvertHoloHashToBytes(agentKey),
+                    installed_app_id = installedAppId,
+                    membrane_proofs = membraneProofs,
+                    network_seed = network_seed
+                }
+            };
+
+            if (string.IsNullOrEmpty(id))
+                id = GetRequestId();
+
+            _taskCompletionAdminAppInstalledCallBack[id] = new TaskCompletionSource<AdminAppInstalledCallBackEventArgs> { };
+            await SendHoloNETRequestAsync(holoNETData, id);
+
+            if (conductorResponseCallBackMode == ConductorResponseCallBackMode.WaitForHolochainConductorResponse)
+            {
+                Task<AdminAppInstalledCallBackEventArgs> returnValue = _taskCompletionAdminAppInstalledCallBack[id].Task;
+                return await returnValue;
+            }
+            else
+                return new AdminAppInstalledCallBackEventArgs() { EndPoint = EndPoint, Id = id, Message = "conductorResponseCallBackMode is set to UseCallBackEvents so please wait for OnAdminAppInstalledCallBack event for the result." };
+        }
+
+        //private AdminAppInstalledCallBackEventArgs AdminInstallApp(string installedAppId, string hAppPath = null, AppBundle appBundle = null, string agentKey = null, Dictionary<string, byte[]> membraneProofs = null, string network_seed = null, string id = null)
+        //{
+        //    return AdminInstallAppAsync(installedAppId, hAppPath, appBundle, agentKey, membraneProofs, network_seed, ConductorResponseCallBackMode.UseCallBackEvents, id).Result;
+        //}
+
         private async Task<HolochainConductorsShutdownEventArgs> ShutDownAllHolochainConductorsAsync()
         {
             HolochainConductorsShutdownEventArgs result = new HolochainConductorsShutdownEventArgs();
@@ -3083,18 +3106,48 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     if (appInfoResponse.data != null)
                     {
                         string agentPubKey = ConvertHoloHashToString(appInfoResponse.data.agent_pub_key);
+                        string agentPubKeyFromCell = "";
+                        string dnaHash = "";
+
+                        if (appInfoResponse.data.cell_info != null)
+                        {
+                            var first = appInfoResponse.data.cell_info.First();
+
+                            if (first.Value != null && first.Value.Count > 0 && first.Value[0].provisioned != null && first.Value[0].provisioned.cell_id != null)
+                            {
+                                agentPubKeyFromCell = ConvertHoloHashToString(first.Value[0].provisioned.cell_id[1]);
+                                dnaHash = ConvertHoloHashToString(first.Value[0].provisioned.cell_id[0]);
+
+                                if (agentPubKeyFromCell != agentPubKey)
+                                {
+                                    args.Message = $"Error occured in HoloNETClient.DecodeAppInfoDataReceived. appInfoResponse.data.agent_pub_key and agentPubKey dervived from cell data do not match! appInfoResponse.data.agent_pub_key = {agentPubKey}, cellData = {agentPubKeyFromCell} ";
+                                    args.IsError = true;
+                                }
+
+
+                                //Conductor time is in microseconds so we need to multiple it by 10 to get the ticks needed to convert it to a DateTime.
+                                //Also UNIX dateime (which hc uses) starts from 1970).
+                                first.Value[0].provisioned.dna_modifiers.OriginTime = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddTicks(first.Value[0].provisioned.dna_modifiers.origin_time * 10); 
+                                //first.Value[0].provisioned.dna_modifiers.OriginTime = new DateTime(first.Value[0].provisioned.dna_modifiers.origin_time * 10); 
+                                //first.Value[0].provisioned.dna_modifiers.OriginTime = new DateTime(first.Value[0].provisioned.dna_modifiers.origin_time); 
+                                //first.Value[0].provisioned.dna_modifiers.OriginTime = Convert.ToDateTime(first.Value[0].provisioned.dna_modifiers.origin_time);
+                            }
+                        }
 
                         if (_updateDnaHashAndAgentPubKey)
                         {
-                            Config.AgentPubKey = agentPubKey;
-                            //Config.DnaHash = dnaHash;
+                            if (!string.IsNullOrEmpty(agentPubKey))
+                                Config.AgentPubKey = agentPubKey;
+
+                            if (!string.IsNullOrEmpty(dnaHash))
+                                Config.DnaHash = dnaHash;
                         }
 
                         Logger.Log($"AGENT PUB KEY RETURNED FROM CONDUCTOR: {Config.AgentPubKey}", LogType.Info);
-                        //Logger.Log($"DNA HASH RETURNED FROM CONDUCTOR:: {Config.DnaHash}", LogType.Info);
+                        Logger.Log($"DNA HASH RETURNED FROM CONDUCTOR:: {Config.DnaHash}", LogType.Info);
 
                         args.AgentPubKey = agentPubKey;
-                        //args.DnaHash = dnaHash;
+                        args.DnaHash = dnaHash;
                         args.InstalledAppId = appInfoResponse.data.installed_app_id;
 
                         if (appInfoResponse.data.manifest != null)
@@ -3108,32 +3161,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                             }
                         }
 
-                        //if (appInfoResponse.data.cell_data != null)
-                        //{
-                        //    //appInfoResponse.data.cell_data[""][0].Cell.name
 
-
-                        //    //string dnaHash = ConvertHoloHashToString(appInfoResponse.data.cell_data[0].cell_id[0]);
-                        //    //string agentPubKey = ConvertHoloHashToString(appInfoResponse.data.cell_data[0].cell_id[1]);
-
-                        //    //if (_updateDnaHashAndAgentPubKey)
-                        //    //{
-                        //    //    Config.AgentPubKey = agentPubKey;
-                        //    //    Config.DnaHash = dnaHash;
-                        //    //}
-
-                        //    //Logger.Log($"AGENT PUB KEY RETURNED FROM CONDUCTOR: {Config.AgentPubKey}", LogType.Info);
-                        //    //Logger.Log($"DNA HASH RETURNED FROM CONDUCTOR:: {Config.DnaHash}", LogType.Info);
-
-                        //    //args.AgentPubKey = agentPubKey;
-                        //    //args.DnaHash = dnaHash;
-                        //    args.InstalledAppId = appInfoResponse.data.installed_app_id;
-                        //}
-                        //else
-                        //{
-                        //    args.Message = "Error occured in HoloNETClient.DecodeAppInfoDataReceived. appInfoResponse.data.cell_data is null.";
-                        //    args.IsError = true;
-                        //}
                     }
                     else
                     {

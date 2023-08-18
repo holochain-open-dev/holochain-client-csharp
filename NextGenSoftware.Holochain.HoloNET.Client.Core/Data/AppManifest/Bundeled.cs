@@ -7,7 +7,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Data.AppManifest
     public struct Bundeled
     {
         [Key("modifiers")]
-        public Modifiers modifiers { get; set; }
+        public DnaModifiers modifiers { get; set; }
 
         [Key("installed_hash")]
         public object installed_hash { get; set; }

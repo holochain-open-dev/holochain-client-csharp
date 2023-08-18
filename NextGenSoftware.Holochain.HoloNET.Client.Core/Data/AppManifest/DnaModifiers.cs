@@ -1,10 +1,12 @@
 ﻿
 using MessagePack;
+using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin;
+using System;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client.Data.AppManifest
 {
     [MessagePackObject]
-    public struct DnaModifiers
+    public class DnaModifiers
     {
         [Key("network_seed")]
         public string network_seed { get; set; }
@@ -13,9 +15,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Data.AppManifest
         public object properties { get; set; } //Could be object or byte[]?
 
         [Key("origin_time")]
-        public string origin_time { get; set; } //RegisterDnaRequest doesn't need this.
+        public long origin_time { get; set; } //RegisterDnaRequest doesn't need this.
+
+        [IgnoreMember]
+        public DateTime OriginTime { get; set; } //RegisterDnaRequest doesn't need this.
 
         [Key("quantum_time")]
-        public object quantum_time { get; set; } //RegisterDnaRequest doesn't need this.
+        public RustDuration quantum_time { get; set; } //RegisterDnaRequest doesn't need this.
+        //public object quantum_time { get; set; } //RegisterDnaRequest doesn't need this.
     }
 }

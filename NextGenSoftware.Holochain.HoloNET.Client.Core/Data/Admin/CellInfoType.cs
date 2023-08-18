@@ -20,13 +20,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Data.Admin
 
         //Dictionary<string, ICell> Cell { get;set; }
 
-        [Key("Provisioned")]
-        public ProvisionedCell Provisioned { get; set; }
+        [Key("provisioned")]
+        public ProvisionedCell provisioned { get; set; }
 
-        [Key("Cloned")]
-        public ClonedCell Cloned { get; set; }
+        [Key("cloned")]
+        public ClonedCell cloned { get; set; }
 
-        [Key("Stem")]
-        public StemCell Stem { get; set; }
+        [Key("stem")]
+        public StemCell stem { get; set; }
     }
 }

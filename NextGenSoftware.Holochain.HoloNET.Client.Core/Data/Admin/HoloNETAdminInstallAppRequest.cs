@@ -1,5 +1,6 @@
 ﻿
 using MessagePack;
+using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin;
 using System.Collections.Generic;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
@@ -19,8 +20,14 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         [Key("network_seed")]
         public string network_seed { get; set; }
 
-        [Key("source")]
-        public string source { get; set; }
+        //[Key("source")]
+        //public string source { get; set; }
+
+        [Key("path")]
+        public string path { get; set; }
+
+        [Key("bundle")]
+        public AppBundle bundle { get; set; }
 
         //https://docs.rs/holochain_types/0.2.1/holochain_types/app/enum.AppBundleSource.html
         //pub enum AppBundleSource

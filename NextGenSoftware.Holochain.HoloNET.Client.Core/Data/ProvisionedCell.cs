@@ -5,7 +5,7 @@ using NextGenSoftware.Holochain.HoloNET.Client.Interfaces;
 namespace NextGenSoftware.Holochain.HoloNET.Client.Data
 {
     [MessagePackObject]
-    public struct ProvisionedCell : ICell
+    public class ProvisionedCell : ICell
     {
         [Key("cell_id")]
         public byte[][] cell_id { get; set; }
