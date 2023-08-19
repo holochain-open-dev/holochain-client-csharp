@@ -177,6 +177,19 @@
           "lib/net7.0/NextGenSoftware.WebSocket.dll": {}
         }
       },
+      "SauceControl.Blake2Fast/2.0.0": {
+        "type": "package",
+        "compile": {
+          "lib/netcoreapp3.0/SauceControl.Blake2Fast.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/netcoreapp3.0/SauceControl.Blake2Fast.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "System.Collections/4.0.11": {
         "type": "package",
         "dependencies": {
@@ -697,6 +710,7 @@
           "Newtonsoft.Json": "13.0.2",
           "NextGenSoftware.Utilities": "1.1.0",
           "NextGenSoftware.WebSocket": "1.2.0",
+          "SauceControl.Blake2Fast": "2.0.0",
           "System.Threading.Tasks.Extensions": "4.5.4"
         },
         "compile": {
@@ -966,6 +980,33 @@
         "lib/net7.0/NextGenSoftware.WebSocket.dll",
         "nextgensoftware.websocket.1.2.0.nupkg.sha512",
         "nextgensoftware.websocket.nuspec"
+      ]
+    },
+    "SauceControl.Blake2Fast/2.0.0": {
+      "sha512": "8BHH1BGyrLykFrjayIUiKj6G7Xjad0+AygpIePZeYIQTXtIs1axC608uKYyYnsvYdvxmQV9igcEsvAAIkrUF6w==",
+      "type": "package",
+      "path": "saucecontrol.blake2fast/2.0.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/net45/SauceControl.Blake2Fast.dll",
+        "lib/net45/SauceControl.Blake2Fast.xml",
+        "lib/netcoreapp2.1/SauceControl.Blake2Fast.dll",
+        "lib/netcoreapp2.1/SauceControl.Blake2Fast.xml",
+        "lib/netcoreapp3.0/SauceControl.Blake2Fast.dll",
+        "lib/netcoreapp3.0/SauceControl.Blake2Fast.xml",
+        "lib/netstandard1.1/SauceControl.Blake2Fast.dll",
+        "lib/netstandard1.1/SauceControl.Blake2Fast.xml",
+        "lib/netstandard1.3/SauceControl.Blake2Fast.dll",
+        "lib/netstandard1.3/SauceControl.Blake2Fast.xml",
+        "lib/netstandard2.0/SauceControl.Blake2Fast.dll",
+        "lib/netstandard2.0/SauceControl.Blake2Fast.xml",
+        "lib/netstandard2.1/SauceControl.Blake2Fast.dll",
+        "lib/netstandard2.1/SauceControl.Blake2Fast.xml",
+        "package/SauceControl.png",
+        "package/license",
+        "saucecontrol.blake2fast.2.0.0.nupkg.sha512",
+        "saucecontrol.blake2fast.nuspec"
       ]
     },
     "System.Collections/4.0.11": {

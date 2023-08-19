@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "g4CeCE7Pg7RRa4zsBhz3jen78pyUnoJ+QbOvfmlPjObUvZaY8F1DaUtHvla2EPWLIVe2V0d8K72qfHXaC8HXjQ==",
+  "dgSpecHash": "NIA0tCJGV2zh1VkOJBSqzfjM8Bv3YgWn4w4HCe5DTrt7KVsIL+IYK+eJ2xqX5W8AnxxWBG0OTVoswhU6NNp0aw==",
   "success": true,
   "projectFilePath": "C:\\Users\\USER\\source\\repos\\holochain-client-csharp\\NextGenSoftware.Holochain.HoloNET.Client.TestHarness\\NextGenSoftware.Holochain.HoloNET.Client.TestHarness.csproj",
   "expectedPackageFiles": [
@@ -15,6 +15,7 @@
     "C:\\Users\\USER\\.nuget\\packages\\nextgensoftware.cli.engine\\1.2.0\\nextgensoftware.cli.engine.1.2.0.nupkg.sha512",
     "C:\\Users\\USER\\.nuget\\packages\\nextgensoftware.logging\\1.2.0\\nextgensoftware.logging.1.2.0.nupkg.sha512",
     "C:\\Users\\USER\\.nuget\\packages\\nextgensoftware.websocket\\1.2.0\\nextgensoftware.websocket.1.2.0.nupkg.sha512",
+    "C:\\Users\\USER\\.nuget\\packages\\saucecontrol.blake2fast\\2.0.0\\saucecontrol.blake2fast.2.0.0.nupkg.sha512",
     "C:\\Users\\USER\\.nuget\\packages\\system.collections\\4.0.11\\system.collections.4.0.11.nupkg.sha512",
     "C:\\Users\\USER\\.nuget\\packages\\system.collections.concurrent\\4.0.12\\system.collections.concurrent.4.0.12.nupkg.sha512",
     "C:\\Users\\USER\\.nuget\\packages\\system.console\\4.0.0\\system.console.4.0.0.nupkg.sha512",
