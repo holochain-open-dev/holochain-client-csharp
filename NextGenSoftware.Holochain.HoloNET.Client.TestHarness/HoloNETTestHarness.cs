@@ -19,16 +19,19 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
         private static Stopwatch _timer = new Stopwatch(); // creating new instance of the stopwatch
         private static ConsoleColor _testHeadingColour = ConsoleColor.Yellow;
         private static AvatarEntryDataObject _avatarEntryDataObject = null;
-        private const string _hcAdminURI = "ws://localhost:52251";
+        private const string _hcAdminURI = "ws://localhost:51265";
         private const string _hcAppURI = "ws://localhost:8888";
-        private const string _oasisHappPath = @"\hApps\OASIS-Holochain-hApp\zomes\workdir\happ";
+        //private const string _oasisHappPath = @"\hApps\oasis\zomes\workdir\happ";
+        private const string _oasisHappPath = @"C:\Users\USER\holochain-holochain-0.1.5\happs\oasis\BUILD\happ\oasis.happ";
         private const string _numbersHappPath = @"\hApps\happ-build-tutorial-develop\workdir\happ";
+        private const string _oasisHappFolder = @"C:\Users\USER\holochain-holochain-0.1.5\happs\oasis\BUILD\happ";
 
         static async Task Main(string[] args)
         {
-          //  await TestHoloNETClientAsync(TestToRun.AdminGenerateAgentPubKey);
-            //await TestHoloNETClientAsync(TestToRun.AdminGrantCapability);
-            await TestHoloNETClientAsync(TestToRun.SaveLoadOASISEntryUsingSingleHoloNETAuditEntryBaseClass);
+            //  await TestHoloNETClientAsync(TestToRun.AdminGenerateAgentPubKey);
+            await TestHoloNETClientAsync(TestToRun.AdminInstallApp);
+            //await TestHoloNETClientAsync(TestToRun.AdminAuthorizeSigningCredentials);
+            //await TestHoloNETClientAsync(TestToRun.SaveLoadOASISEntryUsingSingleHoloNETAuditEntryBaseClass);
             //await TestHoloNETClientAsync(TestToRun.Signal);
             //await TestHoloNETClientAsync(TestToRun.SaveLoadOASISEntryWithTypeOfEntryDataObject);
             //await TestHoloNETClientAsync(TestToRun.SaveLoadOASISEntryWithEntryDataObject);
@@ -67,7 +70,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                 case TestToRun.Signal:
                     {
                         config.FullPathToRootHappFolder = string.Concat(Environment.CurrentDirectory, @"\hApps\OASIS-Holochain-hApp");
-                        config.FullPathToCompiledHappFolder = string.Concat(Environment.CurrentDirectory, _oasisHappPath);
+                        config.FullPathToCompiledHappFolder = string.Concat(Environment.CurrentDirectory, _oasisHappFolder);
                     }
                     break;
 
@@ -992,7 +995,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                 case TestToRun.AdminInstallApp:
                     {
                         Console.WriteLine("Calling AdminInstallAppAsync function on Admin API...\n");
-                        await _holoNETClient.AdminInstallAppAsync("test-app", $"{_oasisHappPath}\\oasis.happ");
+                        await _holoNETClient.AdminInstallAppAsync("oasis-app9", _oasisHappPath);
                     }
                     break;
 
