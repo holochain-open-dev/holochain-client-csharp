@@ -1,5 +1,5 @@
 ﻿
-using NextGenSoftware.Holochain.HoloNET.Client.Data.AppManifest;
+using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.AppManifest;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client.Interfaces
 {

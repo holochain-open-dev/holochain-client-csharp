@@ -19,7 +19,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
         private static Stopwatch _timer = new Stopwatch(); // creating new instance of the stopwatch
         private static ConsoleColor _testHeadingColour = ConsoleColor.Yellow;
         private static AvatarEntryDataObject _avatarEntryDataObject = null;
-        private const string _hcAdminURI = "ws://localhost:51265";
+        private const string _hcAdminURI = "ws://localhost:51783";
         private const string _hcAppURI = "ws://localhost:8888";
         //private const string _oasisHappPath = @"\hApps\oasis\zomes\workdir\happ";
         private const string _oasisHappPath = @"C:\Users\USER\holochain-holochain-0.1.5\happs\oasis\BUILD\happ\oasis.happ";
@@ -520,13 +520,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
 
         private static void _holoNETClient_OnAdminAppEnabledCallBack(object sender, AdminAppEnabledCallBackEventArgs e)
         {
-            string msg = $"TEST HARNESS: _holoNETClient_OnAdminAppEnabledCallBack, EndPoint: {e.EndPoint}, Id: {e.Id}, AgentPubKey: {e.AgentPubKey}, Raw Binary Data: {e.RawBinaryData}, Raw Binary Data As String: {e.RawBinaryDataAsString}, Raw Binary Data Decoded: {e.RawBinaryDataDecoded}, IsError: {e.IsError}, Message: {e.Message}";
+            string msg = $"TEST HARNESS: _holoNETClient_OnAdminAppEnabledCallBack, EndPoint: {e.EndPoint}, Id: {e.Id}, Raw Binary Data: {e.RawBinaryData}, Raw Binary Data As String: {e.RawBinaryDataAsString}, Raw Binary Data Decoded: {e.RawBinaryDataDecoded}, IsError: {e.IsError}, Message: {e.Message}";
             CLIEngine.ShowMessage(msg);
         }
 
         private static void _holoNETClient_OnAdminAppInstalledCallBack(object sender, AdminAppInstalledCallBackEventArgs e)
         {
-            string msg = $"TEST HARNESS: _holoNETClient_OnAdminAppInstalledCallBack, EndPoint: {e.EndPoint}, Id: {e.Id}, AgentPubKey: {e.AgentPubKey}, Raw Binary Data: {e.RawBinaryData}, Raw Binary Data As String: {e.RawBinaryDataAsString}, Raw Binary Data Decoded: {e.RawBinaryDataDecoded}, IsError: {e.IsError}, Message: {e.Message}";
+            string msg = $"TEST HARNESS: _holoNETClient_OnAdminAppInstalledCallBack, EndPoint: {e.EndPoint}, Id: {e.Id}, Raw Binary Data: {e.RawBinaryData}, Raw Binary Data As String: {e.RawBinaryDataAsString}, Raw Binary Data Decoded: {e.RawBinaryDataDecoded}, IsError: {e.IsError}, Message: {e.Message}";
             CLIEngine.ShowMessage(msg);
         }
 
@@ -995,7 +995,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                 case TestToRun.AdminInstallApp:
                     {
                         Console.WriteLine("Calling AdminInstallAppAsync function on Admin API...\n");
-                        await _holoNETClient.AdminInstallAppAsync("oasis-app9", _oasisHappPath);
+                        await _holoNETClient.AdminInstallAppAsync("oasis-app10", _oasisHappPath);
                     }
                     break;
 

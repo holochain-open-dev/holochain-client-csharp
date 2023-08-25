@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.WebSockets;
-using Newtonsoft.Json.Linq;
 using NextGenSoftware.WebSocket;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
     public class HoloNETDataReceivedBaseEventArgs : CallBackBaseEventArgsWithId
     {
+        public string Type { get; set; }
+        public HoloNETResponseType HoloNETResponseType { get; set; }
         public byte[] RawBinaryDataAfterMessagePackDecode { get; set; }
         public string RawBinaryDataAfterMessagePackDecodeAsString { get; set; }
         public string RawBinaryDataAfterMessagePackDecodeDecoded { get; set; }
@@ -59,14 +60,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
     public class AdminAppInstalledCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
-        public HolonNETAppResponse AppResponse { get; set; }
-        public string AgentPubKey { get; set; }
+        public HolonNETAdminAppInstalledResponse AppResponse { get; set; }
     }
 
     public class AdminAppEnabledCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
         public HolonNETAppResponse AppResponse { get; set; }
-        public string AgentPubKey { get; set; }
     }
 
     public class AdminAppDisabledCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
@@ -109,12 +108,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public HolonNETAppResponse AppResponse { get; set; }
     }
 
-    public class AdminDumpFullStateCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
+    public class AdminDumpStateCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
         public HolonNETAppResponse AppResponse { get; set; }
     }
 
-    public class AdminDumpStateCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
+    public class AdminDumpFullStateCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
         public HolonNETAppResponse AppResponse { get; set; }
     }
