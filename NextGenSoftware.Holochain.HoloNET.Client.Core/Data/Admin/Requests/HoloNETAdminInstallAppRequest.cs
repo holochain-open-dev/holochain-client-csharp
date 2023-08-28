@@ -1,5 +1,6 @@
 ﻿
 using MessagePack;
+using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects;
 using System.Collections.Generic;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests
@@ -23,10 +24,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests
         //public string source { get; set; }
 
         [Key("path")]
-        public string path { get; set; }
+        public string path { get; set; } //Can ONLY be path OR bundle
 
         [Key("bundle")]
-        public AppBundle bundle { get; set; }
+        public AppBundle bundle { get; set; } //Can ONLY be path OR bundle
 
         //https://docs.rs/holochain_types/0.2.1/holochain_types/app/enum.AppBundleSource.html
         //pub enum AppBundleSource

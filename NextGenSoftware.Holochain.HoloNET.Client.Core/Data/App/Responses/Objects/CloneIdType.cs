@@ -1,7 +1,7 @@
 ﻿
 using MessagePack;
 
-namespace NextGenSoftware.Holochain.HoloNET.Client
+namespace NextGenSoftware.Holochain.HoloNET.Client.Data.App.Responses.Objects
 {
     [MessagePackObject]
     public struct CloneIdType

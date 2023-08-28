@@ -1,5 +1,6 @@
 ﻿
 using MessagePack;
+using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects;
 using System;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.AppManifest

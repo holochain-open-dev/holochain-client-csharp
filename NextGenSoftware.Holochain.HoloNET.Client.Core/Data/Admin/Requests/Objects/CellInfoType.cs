@@ -1,7 +1,8 @@
 ﻿
 using MessagePack;
+using NextGenSoftware.Holochain.HoloNET.Client.Data.App.Responses.Objects;
 
-namespace NextGenSoftware.Holochain.HoloNET.Client.Data.Admin
+namespace NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects
 {
     //public enum CellInfoType
     //{

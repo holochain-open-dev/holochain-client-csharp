@@ -2,7 +2,7 @@
 using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.AppManifest;
 using NextGenSoftware.Holochain.HoloNET.Client.Interfaces;
 
-namespace NextGenSoftware.Holochain.HoloNET.Client.Data
+namespace NextGenSoftware.Holochain.HoloNET.Client.Data.App.Responses.Objects
 {
     [MessagePackObject]
     public class ProvisionedCell : ICell

@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace NextGenSoftware.Holochain.HoloNET.Client
+namespace NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects
 {
     public class GrantedFunctions
     {

@@ -20,6 +20,20 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
         AdminInstallApp,
         AdminEnableApp,
         AdminDisableApp,
-        AdminAttachAppInterface
+        AdminAttachAppInterface,
+        AdminRegisterDna,
+        AdminListApps,
+        AdminListDnas,
+        AdminListCellIds,
+        AdminListInterfaces,
+        AdminDumpFullState,
+        AdminDumpState,
+        AdminGetDnaDefinition,
+        AdminUpdateCoordinators,
+        AdminGetAgentInfo,
+        AdminAddAgentInfo,
+        AdminDeleteCloneCell,
+        AdminGetStorageInfo,
+        AdminDumpNetworkStats
     }
 }

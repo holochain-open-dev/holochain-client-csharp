@@ -1,6 +1,6 @@
 ﻿
 using MessagePack;
-using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin;
+using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects;
 using System.Collections.Generic;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
