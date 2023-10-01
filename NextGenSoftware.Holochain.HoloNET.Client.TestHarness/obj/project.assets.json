@@ -133,50 +133,6 @@
           }
         }
       },
-      "NextGenSoftware.CLI.Engine/1.2.0": {
-        "type": "package",
-        "dependencies": {
-          "Colorful.Console": "1.2.15",
-          "NextGenSoftware.Utilities": "1.1.0"
-        },
-        "compile": {
-          "lib/net7.0/NextGenSoftware.CLI.Engine.dll": {}
-        },
-        "runtime": {
-          "lib/net7.0/NextGenSoftware.CLI.Engine.dll": {}
-        },
-        "contentFiles": {
-          "contentFiles/any/any/_._": {
-            "buildAction": "None",
-            "codeLanguage": "any",
-            "copyToOutput": false
-          }
-        }
-      },
-      "NextGenSoftware.Logging/1.2.0": {
-        "type": "package",
-        "dependencies": {
-          "NextGenSoftware.CLI.Engine": "1.2.0"
-        },
-        "compile": {
-          "lib/net7.0/NextGenSoftware.Logging.dll": {}
-        },
-        "runtime": {
-          "lib/net7.0/NextGenSoftware.Logging.dll": {}
-        }
-      },
-      "NextGenSoftware.WebSocket/1.2.0": {
-        "type": "package",
-        "dependencies": {
-          "NextGenSoftware.Logging": "1.2.0"
-        },
-        "compile": {
-          "lib/net7.0/NextGenSoftware.WebSocket.dll": {}
-        },
-        "runtime": {
-          "lib/net7.0/NextGenSoftware.WebSocket.dll": {}
-        }
-      },
       "SauceControl.Blake2Fast/2.0.0": {
         "type": "package",
         "compile": {
@@ -701,6 +657,20 @@
           "bin/placeholder/Chaos.NaCl.dll": {}
         }
       },
+      "NextGenSoftware.CLI.Engine/1.2.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v7.0",
+        "dependencies": {
+          "Colorful.Console": "1.2.15",
+          "NextGenSoftware.Utilities": "1.1.0"
+        },
+        "compile": {
+          "bin/placeholder/NextGenSoftware.CLI.Engine.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/NextGenSoftware.CLI.Engine.dll": {}
+        }
+      },
       "NextGenSoftware.Holochain.HoloNET.Client/2.2.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v7.0",
@@ -720,6 +690,19 @@
           "bin/placeholder/NextGenSoftware.Holochain.HoloNET.Client.dll": {}
         }
       },
+      "NextGenSoftware.Logging/1.2.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v7.0",
+        "dependencies": {
+          "NextGenSoftware.CLI.Engine": "1.2.0"
+        },
+        "compile": {
+          "bin/placeholder/NextGenSoftware.Logging.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/NextGenSoftware.Logging.dll": {}
+        }
+      },
       "NextGenSoftware.Utilities/1.1.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v7.0",
@@ -728,6 +711,19 @@
         },
         "runtime": {
           "bin/placeholder/NextGenSoftware.Utilities.dll": {}
+        }
+      },
+      "NextGenSoftware.WebSocket/1.2.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v7.0",
+        "dependencies": {
+          "NextGenSoftware.Logging": "1.2.0"
+        },
+        "compile": {
+          "bin/placeholder/NextGenSoftware.WebSocket.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/NextGenSoftware.WebSocket.dll": {}
         }
       }
     }
@@ -934,52 +930,6 @@
         "newtonsoft.json.13.0.2.nupkg.sha512",
         "newtonsoft.json.nuspec",
         "packageIcon.png"
-      ]
-    },
-    "NextGenSoftware.CLI.Engine/1.2.0": {
-      "sha512": "AuAf/9O2yyhD4PxkTkHSGhBeBnXYxtLG68haGRWYaxBHlUEsnjztCSv20ZhcmCsVg1HHi27VnEltEHPRwLsX/A==",
-      "type": "package",
-      "path": "nextgensoftware.cli.engine/1.2.0",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "README.md",
-        "STARJPG.JPG",
-        "content/Spectre.Console.deps.json",
-        "content/Spectre.Console.xml",
-        "contentFiles/any/net7.0/Spectre.Console.deps.json",
-        "contentFiles/any/net7.0/Spectre.Console.xml",
-        "lib/net7.0/NextGenSoftware.CLI.Engine.dll",
-        "nextgensoftware.cli.engine.1.2.0.nupkg.sha512",
-        "nextgensoftware.cli.engine.nuspec"
-      ]
-    },
-    "NextGenSoftware.Logging/1.2.0": {
-      "sha512": "iNpqtFdXRfuPaom92v6O6cQOgNVzAUge14zvzcI/73o0MctZhBWfgT3CmZ+9GB0khZBQc4Vwg+HAKkwcJ5wBGA==",
-      "type": "package",
-      "path": "nextgensoftware.logging/1.2.0",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "README.md",
-        "STARJPG.JPG",
-        "lib/net7.0/NextGenSoftware.Logging.dll",
-        "nextgensoftware.logging.1.2.0.nupkg.sha512",
-        "nextgensoftware.logging.nuspec"
-      ]
-    },
-    "NextGenSoftware.WebSocket/1.2.0": {
-      "sha512": "vae1Tktcv9NI0v8ZsDp5nRtb2oJ+fPFFZ/2jwJmXj+2Co2tYu4FPMPrqAhNINzvjhIkkFObgBxLkPCJ5R44S4A==",
-      "type": "package",
-      "path": "nextgensoftware.websocket/1.2.0",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "README.md",
-        "STARJPG.JPG",
-        "lib/net7.0/NextGenSoftware.WebSocket.dll",
-        "nextgensoftware.websocket.1.2.0.nupkg.sha512",
-        "nextgensoftware.websocket.nuspec"
       ]
     },
     "SauceControl.Blake2Fast/2.0.0": {
@@ -2949,21 +2899,35 @@
       "path": "../Chaos.NaCl/Chaos.NaCl.csproj",
       "msbuildProject": "../Chaos.NaCl/Chaos.NaCl.csproj"
     },
+    "NextGenSoftware.CLI.Engine/1.2.0": {
+      "type": "project",
+      "path": "../../NextGenSoftware-Libraries/NextGenSoftware Libraries/NextGenSoftware.CLI.Engine/NextGenSoftware.CLI.Engine.csproj",
+      "msbuildProject": "../../NextGenSoftware-Libraries/NextGenSoftware Libraries/NextGenSoftware.CLI.Engine/NextGenSoftware.CLI.Engine.csproj"
+    },
     "NextGenSoftware.Holochain.HoloNET.Client/2.2.0": {
       "type": "project",
       "path": "../NextGenSoftware.Holochain.HoloNET.Client.Core/NextGenSoftware.Holochain.HoloNET.Client.csproj",
       "msbuildProject": "../NextGenSoftware.Holochain.HoloNET.Client.Core/NextGenSoftware.Holochain.HoloNET.Client.csproj"
     },
+    "NextGenSoftware.Logging/1.2.0": {
+      "type": "project",
+      "path": "../../NextGenSoftware-Libraries/NextGenSoftware Libraries/NextGenSoftware.Logging/NextGenSoftware.Logging.csproj",
+      "msbuildProject": "../../NextGenSoftware-Libraries/NextGenSoftware Libraries/NextGenSoftware.Logging/NextGenSoftware.Logging.csproj"
+    },
     "NextGenSoftware.Utilities/1.1.0": {
       "type": "project",
       "path": "../../NextGenSoftware-Libraries/NextGenSoftware Libraries/NextGenSoftware.Utilities/NextGenSoftware.Utilities.csproj",
       "msbuildProject": "../../NextGenSoftware-Libraries/NextGenSoftware Libraries/NextGenSoftware.Utilities/NextGenSoftware.Utilities.csproj"
+    },
+    "NextGenSoftware.WebSocket/1.2.0": {
+      "type": "project",
+      "path": "../../NextGenSoftware-Libraries/NextGenSoftware Libraries/NextGenSoftware.WebSocket/NextGenSoftware.WebSocket.csproj",
+      "msbuildProject": "../../NextGenSoftware-Libraries/NextGenSoftware Libraries/NextGenSoftware.WebSocket/NextGenSoftware.WebSocket.csproj"
     }
   },
   "projectFileDependencyGroups": {
     "net7.0": [
-      "NextGenSoftware.Holochain.HoloNET.Client >= 2.2.0",
-      "NextGenSoftware.WebSocket >= 1.2.0"
+      "NextGenSoftware.Holochain.HoloNET.Client >= 2.2.0"
     ]
   },
   "packageFolders": {
@@ -3014,12 +2978,6 @@
     "frameworks": {
       "net7.0": {
         "targetAlias": "net7.0",
-        "dependencies": {
-          "NextGenSoftware.WebSocket": {
-            "target": "Package",
-            "version": "[1.2.0, )"
-          }
-        },
         "imports": [
           "net461",
           "net462",

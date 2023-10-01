@@ -21,7 +21,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
         private static Stopwatch _timer = new Stopwatch(); // creating new instance of the stopwatch
         private static ConsoleColor _testHeadingColour = ConsoleColor.Yellow;
         private static AvatarEntryDataObject _avatarEntryDataObject = null;
-        private const string _hcAdminURI = "ws://localhost:61685";
+        private const string _hcAdminURI = "ws://localhost:65464";
         private const string _hcAppURI = "ws://localhost:8888";
         //private const string _oasisHappPath = @"\hApps\oasis\zomes\workdir\happ";
         private const string _oasisHappPath = @"C:\Users\USER\holochain-holochain-0.1.5\happs\oasis\BUILD\happ\oasis.happ";
@@ -32,6 +32,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
 
         static async Task Main(string[] args)
         {
+            AppDomain currentDomain = AppDomain.CurrentDomain;
+            currentDomain.UnhandledException += CurrentDomain_UnhandledException;
+                
+
             //  await TestHoloNETClientAsync(TestToRun.AdminGenerateAgentPubKey);
             await TestHoloNETClientAsync(TestToRun.AdminInstallApp);
             //await TestHoloNETClientAsync(TestToRun.AdminAuthorizeSigningCredentials);
@@ -41,6 +45,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
             //await TestHoloNETClientAsync(TestToRun.SaveLoadOASISEntryWithEntryDataObject);
             //await TestHoloNETClientAsync(TestToRun.LoadTestSaveLoadOASISEntry);
             //await TestHoloNETClientAsync(TestToRun.WhoAmI);
+        }
+
+        private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            Console.WriteLine($"CurrentDomain_UnhandledException: UNKNOWN ERROR OCCURED! ERROR DETAILS: {e.ExceptionObject.ToString()}");
         }
 
         public static async Task TestHoloNETClientAsync(TestToRun testToRun)
@@ -62,6 +71,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                 ShowHolochainConductorWindow = true, //Defaults to false.
                 HolochainConductorMode = HolochainConductorModeEnum.UseEmbedded,
                 HolochainConductorToUse = HolochainConductorEnum.HcDevTool
+                 
             };
 
             switch (testToRun)
@@ -1112,7 +1122,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                 case TestToRun.AdminInstallApp:
                     {
                         Console.WriteLine("Calling AdminInstallAppAsync function on Admin API...\n");
-                        await _holoNETClient.AdminInstallAppAsync("oasis-app5", _oasisHappPath);
+                        await _holoNETClient.AdminInstallAppAsync("oasis-app4", _oasisHappPath);
                     }
                     break;
 

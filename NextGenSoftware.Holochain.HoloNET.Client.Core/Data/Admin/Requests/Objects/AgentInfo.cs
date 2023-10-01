@@ -12,8 +12,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects
         [Key("agent")]
         public KitsuneAgent agent { get; set; }
 
-        //[Key("storage_arc")]
+        [Key("storage_arc")]
         //public DhtArc storage_arc { get; set; }
+        public object storage_arc { get; set; }
 
         [Key("url_list")]
         public string[] url_list { get; set; }

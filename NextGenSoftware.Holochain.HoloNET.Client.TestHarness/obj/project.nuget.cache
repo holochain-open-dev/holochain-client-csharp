@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "NIA0tCJGV2zh1VkOJBSqzfjM8Bv3YgWn4w4HCe5DTrt7KVsIL+IYK+eJ2xqX5W8AnxxWBG0OTVoswhU6NNp0aw==",
+  "dgSpecHash": "VuA6EWcwGahKPzuuQQ3SO0dB0rrLsk9wd13QN9EIXh4kTaxMJaQbr8/pmV1GiTRDxcoczMQOEh8Rs9fHrGZDHA==",
   "success": true,
   "projectFilePath": "C:\\Users\\USER\\source\\repos\\holochain-client-csharp\\NextGenSoftware.Holochain.HoloNET.Client.TestHarness\\NextGenSoftware.Holochain.HoloNET.Client.TestHarness.csproj",
   "expectedPackageFiles": [
@@ -12,9 +12,6 @@
     "C:\\Users\\USER\\.nuget\\packages\\microsoft.netcore.platforms\\1.0.1\\microsoft.netcore.platforms.1.0.1.nupkg.sha512",
     "C:\\Users\\USER\\.nuget\\packages\\microsoft.netcore.targets\\1.0.1\\microsoft.netcore.targets.1.0.1.nupkg.sha512",
     "C:\\Users\\USER\\.nuget\\packages\\newtonsoft.json\\13.0.2\\newtonsoft.json.13.0.2.nupkg.sha512",
-    "C:\\Users\\USER\\.nuget\\packages\\nextgensoftware.cli.engine\\1.2.0\\nextgensoftware.cli.engine.1.2.0.nupkg.sha512",
-    "C:\\Users\\USER\\.nuget\\packages\\nextgensoftware.logging\\1.2.0\\nextgensoftware.logging.1.2.0.nupkg.sha512",
-    "C:\\Users\\USER\\.nuget\\packages\\nextgensoftware.websocket\\1.2.0\\nextgensoftware.websocket.1.2.0.nupkg.sha512",
     "C:\\Users\\USER\\.nuget\\packages\\saucecontrol.blake2fast\\2.0.0\\saucecontrol.blake2fast.2.0.0.nupkg.sha512",
     "C:\\Users\\USER\\.nuget\\packages\\system.collections\\4.0.11\\system.collections.4.0.11.nupkg.sha512",
     "C:\\Users\\USER\\.nuget\\packages\\system.collections.concurrent\\4.0.12\\system.collections.concurrent.4.0.12.nupkg.sha512",
@@ -48,7 +45,10 @@
     "C:\\Users\\USER\\.nuget\\packages\\system.threading\\4.0.11\\system.threading.4.0.11.nupkg.sha512",
     "C:\\Users\\USER\\.nuget\\packages\\system.threading.tasks\\4.0.11\\system.threading.tasks.4.0.11.nupkg.sha512",
     "C:\\Users\\USER\\.nuget\\packages\\system.threading.tasks.extensions\\4.5.4\\system.threading.tasks.extensions.4.5.4.nupkg.sha512",
-    "C:\\Users\\USER\\.nuget\\packages\\nextgensoftware.utilities\\1.1.0\\nextgensoftware.utilities.1.1.0.nupkg.sha512"
+    "C:\\Users\\USER\\.nuget\\packages\\nextgensoftware.cli.engine\\1.2.0\\nextgensoftware.cli.engine.1.2.0.nupkg.sha512",
+    "C:\\Users\\USER\\.nuget\\packages\\nextgensoftware.logging\\1.2.0\\nextgensoftware.logging.1.2.0.nupkg.sha512",
+    "C:\\Users\\USER\\.nuget\\packages\\nextgensoftware.utilities\\1.1.0\\nextgensoftware.utilities.1.1.0.nupkg.sha512",
+    "C:\\Users\\USER\\.nuget\\packages\\nextgensoftware.websocket\\1.2.0\\nextgensoftware.websocket.1.2.0.nupkg.sha512"
   ],
   "logs": []
 }

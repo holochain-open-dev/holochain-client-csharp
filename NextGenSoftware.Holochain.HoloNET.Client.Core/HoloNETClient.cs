@@ -18,7 +18,6 @@ using NextGenSoftware.Utilities.ExtentionMethods;
 using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests;
 using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.AppManifest;
 using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects;
-using System.Reflection.Metadata;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
@@ -512,7 +511,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     else
                     {
                         WebSocket.Connect();
-                        
+
                         if (retrieveAgentPubKeyAndDnaHashMode != RetrieveAgentPubKeyAndDnaHashMode.DoNotRetreive)
                             await RetrieveAgentPubKeyAndDnaHashAsync(retrieveAgentPubKeyAndDnaHashMode, retrieveAgentPubKeyAndDnaHashFromConductor, retrieveAgentPubKeyAndDnaHashFromSandbox, automaticallyAttemptToRetrieveFromConductorIfSandBoxFails, automaticallyAttemptToRetrieveFromSandBoxIfConductorFails, updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved);
                     }
@@ -940,7 +939,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 if (WebSocket.State == WebSocketState.Open)
                 {
                     Logger.Log("Sending HoloNET Request to Holochain Conductor...", LogType.Info, true);
-                    await WebSocket.SendRawDataAsync(MessagePackSerializer.Serialize(request)); //This is the fastest and most popular .NET MessagePack Serializer.
+                    //await WebSocket.SendRawDataAsync(MessagePackSerializer.Serialize(request)); //This is the fastest and most popular .NET MessagePack Serializer.
+                    await WebSocket.UnityWebSocket.Send(MessagePackSerializer.Serialize(request));
                     Logger.Log("HoloNET Request Successfully Sent To Holochain Conductor.", LogType.Info, false);
                 }
             }
@@ -1922,7 +1922,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// Dump the full state of the specified cell, including its chain and DHT shard, as JSON.
         /// </summary>
         /// <param name="cellId">The cell id to dump the full state for.</param>
-        /// <param name="dHTOpsCursor"></param>
+        /// <param name="dHTOpsCursor">The last seen DhtOp RowId, returned in the full dump state. Only DhtOps with RowId greater than the cursor will be returned.</param>
         /// <param name="conductorResponseCallBackMode">The Concuctor Response CallBack Mode, set this to 'WaitForHolochainConductorResponse' if you want the function to wait for the Holochain Conductor response before returning that response or set it to 'UseCallBackEvents' to return from the function immediately and then raise the 'OnAdminDumpFullStateCallBack' event when the conductor responds.   </param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
@@ -1939,7 +1939,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// Dump the full state of the specified cell, including its chain and DHT shard, as JSON.
         /// </summary>
         /// <param name="cellId">The cell id to dump the full state for.</param>
-        /// <param name="dHTOpsCursor"></param>
+        /// <param name="dHTOpsCursor">The last seen DhtOp RowId, returned in the full dump state. Only DhtOps with RowId greater than the cursor will be returned.</param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
         public AdminDumpFullStateCallBackEventArgs AdminDumpFullState(byte[][] cellId, int? dHTOpsCursor = null, string id = null)
@@ -1952,7 +1952,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// </summary>
         /// <param name="agentPubKey">The AgentPubKey for the cell to dump the full state for.</param>
         /// <param name="dnaHash">The DnaHash for the cell to dump the full state for.</param>
-        /// <param name="dHTOpsCursor"></param>
+        /// <param name="dHTOpsCursor">The last seen DhtOp RowId, returned in the full dump state. Only DhtOps with RowId greater than the cursor will be returned.</param>
         /// <param name="conductorResponseCallBackMode">The Concuctor Response CallBack Mode, set this to 'WaitForHolochainConductorResponse' if you want the function to wait for the Holochain Conductor response before returning that response or set it to 'UseCallBackEvents' to return from the function immediately and then raise the 'OnAdminDumpFullStateCallBack' event when the conductor responds.   </param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
@@ -1966,7 +1966,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// </summary>
         /// <param name="agentPubKey">The AgentPubKey for the cell to dump the full state for.</param>
         /// <param name="dnaHash">The DnaHash for the cell to dump the full state for.</param>
-        /// <param name="dHTOpsCursor"></param>
+        /// <param name="dHTOpsCursor">The last seen DhtOp RowId, returned in the full dump state. Only DhtOps with RowId greater than the cursor will be returned.</param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
         public AdminDumpFullStateCallBackEventArgs AdminDumpFullState(string agentPubKey, string dnaHash, int? dHTOpsCursor = null, string id = null)
@@ -1975,9 +1975,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         }
 
         /// <summary>
-        /// Dump the full state of the specified cell, including its chain and DHT shard, as JSON. This will dump the state for the current AgentPubKey/DnaHash stored in Config.AgentPubKey & Config.DnaHash.
+        /// Dump the full state of the specified cell, including its chain and DHT shard, as JSON. This will dump the state for the current AgentPubKey/DnaHash stored in Config.AgentPubKey & Config.DnaHash. If there it is not stored in the Config it will automatically generate one for you and retrieve from the conductor.
         /// </summary>
-        /// <param name="dHTOpsCursor"></param>
+        /// <param name="dHTOpsCursor">The last seen DhtOp RowId, returned in the full dump state. Only DhtOps with RowId greater than the cursor will be returned.</param>
         /// <param name="conductorResponseCallBackMode">The Concuctor Response CallBack Mode, set this to 'WaitForHolochainConductorResponse' if you want the function to wait for the Holochain Conductor response before returning that response or set it to 'UseCallBackEvents' to return from the function immediately and then raise the 'OnAdminDumpFullStateCallBack' event when the conductor responds.   </param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
@@ -1989,7 +1989,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <summary>
         /// Dump the full state of the specified cell, including its chain and DHT shard, as JSON. This will dump the state for the current AgentPubKey/DnaHash stored in Config.AgentPubKey & Config.DnaHash.
         /// </summary>
-        /// <param name="dHTOpsCursor"></param>
+        /// <param name="dHTOpsCursor">The last seen DhtOp RowId, returned in the full dump state. Only DhtOps with RowId greater than the cursor will be returned.</param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
         public AdminDumpFullStateCallBackEventArgs AdminDumpFullState(int? dHTOpsCursor = null, string id = null)
@@ -2001,7 +2001,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// Dump the state of the specified cell, including its source chain, as JSON.
         /// </summary>
         /// <param name="cellId">The cell id to dump the full state for.</param>
-        /// <param name="dHTOpsCursor"></param>
+        /// <param name="dHTOpsCursor">The last seen DhtOp RowId, returned in the full dump state. Only DhtOps with RowId greater than the cursor will be returned.</param>
         /// <param name="conductorResponseCallBackMode">The Concuctor Response CallBack Mode, set this to 'WaitForHolochainConductorResponse' if you want the function to wait for the Holochain Conductor response before returning that response or set it to 'UseCallBackEvents' to return from the function immediately and then raise the 'OnAdminDumpFullStateCallBack' event when the conductor responds.   </param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
@@ -2017,7 +2017,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// Dump the state of the specified cell, including its source chain, as JSON.
         /// </summary>
         /// <param name="cellId">The cell id to dump the full state for.</param>
-        /// <param name="dHTOpsCursor"></param>
+        /// <param name="dHTOpsCursor">The last seen DhtOp RowId, returned in the full dump state. Only DhtOps with RowId greater than the cursor will be returned.</param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
         public AdminDumpStateCallBackEventArgs AdminDumpState(byte[][] cellId, int? dHTOpsCursor = null, string id = null)
@@ -2996,6 +2996,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         {
             try
             {
+                AppDomain currentDomain = AppDomain.CurrentDomain;
+                currentDomain.UnhandledException += CurrentDomain_UnhandledException;
+
                 WebSocket = new WebSocket.WebSocket(holochainConductorURI, Logger.Loggers);
 
                 //TODO: Impplemnt IDispoasable to unsubscribe event handlers to prevent memory leaks... 
@@ -3008,6 +3011,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             {
                 HandleError("Error in HoloNETClient.Init method.", ex);
             }
+        }
+
+        private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            HandleError("CurrentDomain_UnhandledException was raised.", (Exception)e.ExceptionObject);
         }
 
         private void WebSocket_OnConnected(object sender, ConnectedEventArgs e)

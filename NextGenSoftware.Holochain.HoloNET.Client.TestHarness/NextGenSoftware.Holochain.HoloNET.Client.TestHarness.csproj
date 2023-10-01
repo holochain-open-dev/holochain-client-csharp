@@ -73,10 +73,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="NextGenSoftware.WebSocket" Version="1.2.0" />
-	</ItemGroup>
-
-	<ItemGroup>
 	  <None Update="README.md">
 	    <PackagePath>\</PackagePath>
 	    <Pack>True</Pack>
