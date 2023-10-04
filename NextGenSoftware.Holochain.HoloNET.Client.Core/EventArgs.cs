@@ -60,7 +60,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
     public class AdminAppInstalledCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
-        public HolonNETAdminAppInstalledResponse AppResponse { get; set; }
+        //public HolonNETAdminAppInstalledResponse AppResponse { get; set; }
+        public HoloNETDataAppInfoCall AppResponse { get; set; }
+        //public AppInfoCallBackEventArgs AppInfo { get; set; }
     }
 
     public class AdminAppEnabledCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
