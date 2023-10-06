@@ -8,6 +8,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         AppInfo,
         AdminAgentPubKeyGenerated,
         AdminAppInstalled,
+        AdminAppEnabled,
+        AdminAppDisabled,
+        AdminGrantZomeCallCapability,
         Error
     }
 }

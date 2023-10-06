@@ -4,9 +4,9 @@ using MessagePack;
 namespace NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests
 {
     [MessagePackObject]
-    public class HoloNETAdminDumpStateRequest
+    public class ListDnasRequest
     {
-        [Key("cell_id")]
-        public byte[][] cell_id { get; set; }
+        [Key("status_filter")]
+        public AppStatusFilter status_filter { get; set; }
     }
 }

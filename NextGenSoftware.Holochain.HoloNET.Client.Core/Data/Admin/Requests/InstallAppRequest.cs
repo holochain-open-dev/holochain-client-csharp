@@ -6,7 +6,7 @@ using System.Collections.Generic;
 namespace NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests
 {
     [MessagePackObject]
-    public class HoloNETAdminInstallAppRequest
+    public class InstallAppRequest
     {
         [Key("agent_key")]
         public byte[] agent_key { get; set; }

@@ -5,7 +5,7 @@ using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects;
 namespace NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests
 {
     [MessagePackObject]
-    public class HoloNETAdminAddAgentInfoRequest
+    public class AddAgentInfoRequest
     {
         [Key("agent_infos")]
         public object[] agent_infos { get; set; }

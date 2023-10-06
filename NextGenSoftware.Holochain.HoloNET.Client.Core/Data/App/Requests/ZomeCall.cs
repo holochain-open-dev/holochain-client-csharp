@@ -3,7 +3,7 @@
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
     [MessagePackObject]
-    public class HoloNETDataZomeCall
+    public class ZomeCall
     {
         [Key("cell_id")]
         public byte[][] cell_id { get; set; }

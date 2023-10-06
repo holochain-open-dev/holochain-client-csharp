@@ -6,7 +6,7 @@ using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects;
 namespace NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests
 {
     [MessagePackObject]
-    public class HoloNETAdminRegisterDnaRequest
+    public class RegisterDnaRequest
     {
         [Key("modifiers")]
         public DnaModifiers modifiers { get; set; }

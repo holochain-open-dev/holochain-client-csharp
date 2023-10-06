@@ -5,7 +5,7 @@ using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects;
 namespace NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests
 {
     [MessagePackObject]
-    public class HoloNETAdminUpdateCoordinatorsRequest
+    public class UpdateCoordinatorsRequest
     {
         [Key("dnaHash")]
         public byte[] dnaHash { get; set; }

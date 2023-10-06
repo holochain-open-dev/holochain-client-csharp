@@ -6,7 +6,7 @@ using NextGenSoftware.Holochain.HoloNET.Client.Interfaces;
 namespace NextGenSoftware.Holochain.HoloNET.Client.Data.App.Responses.Objects
 {
     [MessagePackObject]
-    public struct StemCell : ICell
+    public class StemCell : ICell
     {
         [Key("original_dna_hash")]
         public byte[] original_dna_hash { get; set; }

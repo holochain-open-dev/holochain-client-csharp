@@ -6,7 +6,7 @@ using NextGenSoftware.Holochain.HoloNET.Client.Interfaces;
 namespace NextGenSoftware.Holochain.HoloNET.Client.Data.App.Responses.Objects
 {
     [MessagePackObject]
-    public struct ClonedCell : ICell
+    public class ClonedCell : ICell
     {
         [Key("cell_id")]
         public byte[][] cell_id { get; set; }

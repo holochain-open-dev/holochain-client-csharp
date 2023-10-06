@@ -26,6 +26,51 @@
           "lib/netstandard2.0/Colorful.Console.dll": {}
         }
       },
+      "libsodium/1.0.19": {
+        "type": "package",
+        "runtimeTargets": {
+          "runtimes/linux-arm/native/libsodium.so": {
+            "assetType": "native",
+            "rid": "linux-arm"
+          },
+          "runtimes/linux-arm64/native/libsodium.so": {
+            "assetType": "native",
+            "rid": "linux-arm64"
+          },
+          "runtimes/linux-musl-arm/native/libsodium.so": {
+            "assetType": "native",
+            "rid": "linux-musl-arm"
+          },
+          "runtimes/linux-musl-arm64/native/libsodium.so": {
+            "assetType": "native",
+            "rid": "linux-musl-arm64"
+          },
+          "runtimes/linux-musl-x64/native/libsodium.so": {
+            "assetType": "native",
+            "rid": "linux-musl-x64"
+          },
+          "runtimes/linux-x64/native/libsodium.so": {
+            "assetType": "native",
+            "rid": "linux-x64"
+          },
+          "runtimes/osx-arm64/native/libsodium.dylib": {
+            "assetType": "native",
+            "rid": "osx-arm64"
+          },
+          "runtimes/osx-x64/native/libsodium.dylib": {
+            "assetType": "native",
+            "rid": "osx-x64"
+          },
+          "runtimes/win-x64/native/libsodium.dll": {
+            "assetType": "native",
+            "rid": "win-x64"
+          },
+          "runtimes/win-x86/native/libsodium.dll": {
+            "assetType": "native",
+            "rid": "win-x86"
+          }
+        }
+      },
       "MessagePack/2.4.59": {
         "type": "package",
         "dependencies": {
@@ -142,6 +187,22 @@
         },
         "runtime": {
           "lib/netcoreapp3.0/SauceControl.Blake2Fast.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "Sodium.Core/1.3.4": {
+        "type": "package",
+        "dependencies": {
+          "libsodium": "1.0.19"
+        },
+        "compile": {
+          "lib/netstandard2.1/Sodium.Core.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard2.1/Sodium.Core.dll": {
             "related": ".xml"
           }
         }
@@ -681,6 +742,7 @@
           "NextGenSoftware.Utilities": "1.1.0",
           "NextGenSoftware.WebSocket": "1.2.0",
           "SauceControl.Blake2Fast": "2.0.0",
+          "Sodium.Core": "1.3.4",
           "System.Threading.Tasks.Extensions": "4.5.4"
         },
         "compile": {
@@ -745,6 +807,30 @@
         "lib/net46/Colorful.Console.dll",
         "lib/net461/Colorful.Console.dll",
         "lib/netstandard2.0/Colorful.Console.dll"
+      ]
+    },
+    "libsodium/1.0.19": {
+      "sha512": "tupm/HViwBN6Knd/gckR+cLaJGR39GLmiU4iDMM5hp/1BoczMr8fwJhSU+3/C2V4hi9nBK/4FICRKtTLU30TCA==",
+      "type": "package",
+      "path": "libsodium/1.0.19",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "AUTHORS",
+        "ChangeLog",
+        "LICENSE",
+        "libsodium.1.0.19.nupkg.sha512",
+        "libsodium.nuspec",
+        "runtimes/linux-arm/native/libsodium.so",
+        "runtimes/linux-arm64/native/libsodium.so",
+        "runtimes/linux-musl-arm/native/libsodium.so",
+        "runtimes/linux-musl-arm64/native/libsodium.so",
+        "runtimes/linux-musl-x64/native/libsodium.so",
+        "runtimes/linux-x64/native/libsodium.so",
+        "runtimes/osx-arm64/native/libsodium.dylib",
+        "runtimes/osx-x64/native/libsodium.dylib",
+        "runtimes/win-x64/native/libsodium.dll",
+        "runtimes/win-x86/native/libsodium.dll"
       ]
     },
     "MessagePack/2.4.59": {
@@ -957,6 +1043,23 @@
         "package/license",
         "saucecontrol.blake2fast.2.0.0.nupkg.sha512",
         "saucecontrol.blake2fast.nuspec"
+      ]
+    },
+    "Sodium.Core/1.3.4": {
+      "sha512": "BB0ni8tcIhGsz7yQElC6qdj6ez+XMuR98pz3o+pQ4ngF0QqFS7skKzaj1mhCwDMLqctinikhgvqMdXK4uCs2Fg==",
+      "type": "package",
+      "path": "sodium.core/1.3.4",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "LICENSE",
+        "icon.png",
+        "lib/netstandard2.0/Sodium.Core.dll",
+        "lib/netstandard2.0/Sodium.Core.xml",
+        "lib/netstandard2.1/Sodium.Core.dll",
+        "lib/netstandard2.1/Sodium.Core.xml",
+        "sodium.core.1.3.4.nupkg.sha512",
+        "sodium.core.nuspec"
       ]
     },
     "System.Collections/4.0.11": {

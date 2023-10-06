@@ -9,9 +9,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
     {
         public string Type { get; set; }
         public HoloNETResponseType HoloNETResponseType { get; set; }
-        public byte[] RawBinaryDataAfterMessagePackDecode { get; set; }
-        public string RawBinaryDataAfterMessagePackDecodeAsString { get; set; }
-        public string RawBinaryDataAfterMessagePackDecodeDecoded { get; set; }
+        //public byte[] RawBinaryDataAfterMessagePackDecode { get; set; }
+       // public string RawBinaryDataAfterMessagePackDecodeAsString { get; set; }
+        //public string RawBinaryDataAfterMessagePackDecodeDecoded { get; set; }
     }
 
     public class HoloNETErrorEventArgs : EventArgs
@@ -46,113 +46,114 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
     public class AppInfoCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
-        public HolonNETAppInfoResponse AppInfo { get; set; }
+        public AppInfoResponse AppInfoResponse { get; set; }
+        //public AppInfo AppInfo { get; set; }
         public string InstalledAppId { get; set; }
         public string DnaHash { get; set; }
         public string AgentPubKey { get; set; }
     }
 
+    public class AdminAppInstalledCallBackEventArgs : AppInfoCallBackEventArgs
+    {
+
+    }
+
     public class AdminAgentPubKeyGeneratedCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
-        public HolonNETAppResponse AppResponse { get; set; }
+        public AppResponse AppResponse { get; set; }
         public string AgentPubKey { get; set; }
     }
 
-    public class AdminAppInstalledCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
+    //public class AdminAppEnabledCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
+    public class AdminAppEnabledCallBackEventArgs : AppInfoCallBackEventArgs
     {
-        //public HolonNETAdminAppInstalledResponse AppResponse { get; set; }
-        public HoloNETDataAppInfoCall AppResponse { get; set; }
-        //public AppInfoCallBackEventArgs AppInfo { get; set; }
-    }
-
-    public class AdminAppEnabledCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
-    {
-        public HolonNETAppResponse AppResponse { get; set; }
+        public object Errors { get; set; }
+        // public EnableAppResponse EnableAppResponse { get; set; }
     }
 
     public class AdminAppDisabledCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
-        public HolonNETAppResponse AppResponse { get; set; }
+        public AppResponse AppResponse { get; set; }
     }
 
     public class AdminSigningCredentialsAuthorizedEventArgs : HoloNETDataReceivedBaseEventArgs
     {
-        public HolonNETAppResponse AppResponse { get; set; }
+        public AppResponse AppResponse { get; set; }
     }
 
     public class AdminAppInterfaceAttachedCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
-        public HolonNETAppResponse AppResponse { get; set; }
+        public AppResponse AppResponse { get; set; }
     }
 
     public class AdminRegisterDnaCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
-        public HolonNETAppResponse AppResponse { get; set; }
+        public AppResponse AppResponse { get; set; }
     }
 
     public class AdminListAppsCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
-        public HolonNETAppResponse AppResponse { get; set; }
+        public AppResponse AppResponse { get; set; }
     }
 
     public class AdminListDnasCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
-        public HolonNETAppResponse AppResponse { get; set; }
+        public AppResponse AppResponse { get; set; }
     }
 
     public class AdminListCellIdsCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
-        public HolonNETAppResponse AppResponse { get; set; }
+        public AppResponse AppResponse { get; set; }
     }
 
     public class AdminListAppInterfacesCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
-        public HolonNETAppResponse AppResponse { get; set; }
+        public AppResponse AppResponse { get; set; }
     }
 
     public class AdminDumpStateCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
-        public HolonNETAppResponse AppResponse { get; set; }
+        public AppResponse AppResponse { get; set; }
     }
 
     public class AdminDumpFullStateCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
-        public HolonNETAppResponse AppResponse { get; set; }
+        public AppResponse AppResponse { get; set; }
     }
 
     public class AdminGetDnaDefinitionCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
-        public HolonNETAppResponse AppResponse { get; set; }
+        public AppResponse AppResponse { get; set; }
     }
 
     public class AdminUpdateCoordinatorsCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
-        public HolonNETAppResponse AppResponse { get; set; }
+        public AppResponse AppResponse { get; set; }
     }
 
     public class AdminGetAgentInfoCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
-        public HolonNETAppResponse AppResponse { get; set; }
+        public AppResponse AppResponse { get; set; }
     }
 
     public class AdminAddAgentInfoCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
-        public HolonNETAppResponse AppResponse { get; set; }
+        public AppResponse AppResponse { get; set; }
     }
 
     public class AdminDeleteCloneCellCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
-        public HolonNETAppResponse AppResponse { get; set; }
+        public AppResponse AppResponse { get; set; }
     }
 
     public class AdminGetStorageInfoCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
-        public HolonNETAppResponse AppResponse { get; set; }
+        public AppResponse AppResponse { get; set; }
     }
 
     public class AdminDumpNetworkStatsCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
-        public HolonNETAppResponse AppResponse { get; set; }
+        public AppResponse AppResponse { get; set; }
     }
 
     public class ReadyForZomeCallsEventArgs : CallBackBaseEventArgs
@@ -205,7 +206,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public string AgentPubKey { get; set; }
         public string DnaHash { get; set; }
         public SignalType SignalType { get; set; }
-        public HoloNETSignalData RawSignalData { get;set;}
+        public SignalData RawSignalData { get;set;}
         public Dictionary<string, object> SignalData { get; set; }
         public string SignalDataAsString { get; set; }
     }

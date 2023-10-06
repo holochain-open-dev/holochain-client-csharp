@@ -4,7 +4,7 @@ using MessagePack;
 namespace NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests
 {
     [MessagePackObject]
-    public class HoloNETAdminDeleteCloneCellRequest //Same as DisableCloneCellRequest on App API.
+    public class DeleteCloneCellRequest //Same as DisableCloneCellRequest on App API.
     {
         /// <summary>
         /// The app id that the clone cell belongs to

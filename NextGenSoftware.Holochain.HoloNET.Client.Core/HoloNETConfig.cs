@@ -15,6 +15,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// </summary>
         public string DnaHash { get; set; } = "";
 
+        public string InstalledAppId { get; set; }
+
         /// <summary>
         /// The full path to the root of the hApp that HoloNET will start the Holochain Conductor (currenty uses hc.exe) with and then make zome calls to.
         /// </summary>

@@ -4,9 +4,9 @@ using MessagePack;
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
     [MessagePackObject]
-    public class HoloNETSignalResponse
+    public class SignalResponse
     {
         [Key("App")]
-        public HoloNETSignalData App { get; set; }
+        public SignalData App { get; set; }
     }
 }

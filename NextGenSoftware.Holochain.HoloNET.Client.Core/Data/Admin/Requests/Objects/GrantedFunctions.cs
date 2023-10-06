@@ -1,11 +1,14 @@
 ﻿
+using MessagePack;
 using System;
 using System.Collections.Generic;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects
 {
+    [MessagePackObject]
     public class GrantedFunctions
     {
+        [Key("functions")]
         public Dictionary<GrantedFunctionsType, List<(string, string)>> Functions { get; set; }
 
         public GrantedFunctions()

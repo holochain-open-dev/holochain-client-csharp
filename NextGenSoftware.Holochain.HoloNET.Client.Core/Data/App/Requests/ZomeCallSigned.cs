@@ -3,7 +3,7 @@
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
     [MessagePackObject]
-    public class HoloNETDataZomeCallSigned : HoloNETDataZomeCall
+    public class ZomeCallSigned : ZomeCall
     {
         [Key("signature")]
         public byte[] signature { get; set; }

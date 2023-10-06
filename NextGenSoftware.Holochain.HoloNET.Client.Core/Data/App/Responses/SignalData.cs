@@ -4,12 +4,12 @@ using MessagePack;
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
     [MessagePackObject]
-    public class HoloNETSignalData
+    public class SignalData
     {
         [Key(0)]
         public byte[][] CellData { get; set; }
 
         [Key(1)]
-        public byte[] SignalData { get; set; }
+        public byte[] Data { get; set; }
     }
 }

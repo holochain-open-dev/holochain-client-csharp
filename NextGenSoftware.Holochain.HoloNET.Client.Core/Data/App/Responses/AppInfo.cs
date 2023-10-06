@@ -6,13 +6,13 @@ using System.Collections.Generic;
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
     [MessagePackObject]
-    public class HoloNETDataAppInfoCall
+    public class AppInfo
     {
         [Key("installed_app_id")]
         public string installed_app_id { get; set; }
 
         [Key("cell_info")]
-        public Dictionary<string, List<CellInfoType>> cell_info { get; set; }
+        public Dictionary<string, List<CellInfo>> cell_info { get; set; }
         //public object cell_info { get; set; }
 
         [Key("agent_pub_key")]
