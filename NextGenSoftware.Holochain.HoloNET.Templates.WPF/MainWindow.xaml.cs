@@ -12,10 +12,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
     public partial class MainWindow : Window
     {
         private const string _hcAdminURI = "ws://localhost:60236";
-        private const string _hcAppURI = "ws://localhost:8888";
+        private const string _hcAppURI = "ws://localhost:88888";
         private const string _oasisHappPath = @"C:\Users\USER\holochain-holochain-0.1.5\happs\oasis\BUILD\happ\oasis.happ";
         private const string _role_name = "oasis";
-        private const string _installed_app_id = "oasis-app7";
+        private const string _installed_app_id = "oasis-app88888888";
         private HoloNETClient _holoNETClient = new HoloNETClient(_hcAdminURI);
 
         public MainWindow()
@@ -57,12 +57,14 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
         {
             lstOutput.Items.Add($"ADMIN: hApp Enabled.");
             lstOutput.Items.Add("ADMIN: Authorize Signing Credentials For hApp...");
-            _holoNETClient.AdminAuthorizeSigningCredentials(GrantedFunctionsType.Listed, new List<(string, string)>()
-            {
-                ("oasis", "create_avatar"),
-                ("oasis", "get_avatar"),
-                ("oasis", "update_avatar")
-            });
+            //_holoNETClient.AdminAuthorizeSigningCredentials(GrantedFunctionsType.Listed, new List<(string, string)>()
+            //{
+            //    ("oasis", "create_avatar"),
+            //    ("oasis", "get_avatar"),
+            //    ("oasis", "update_avatar")
+            //});
+
+            _holoNETClient.AdminAuthorizeSigningCredentials(GrantedFunctionsType.All, null);
         }
 
         private void _holoNETClient_OnAdminAgentPubKeyGeneratedCallBack(object sender, AdminAgentPubKeyGeneratedCallBackEventArgs e)
@@ -84,7 +86,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
             if (e.AppInfoResponse != null && e.AppInfoResponse.data != null && e.AppInfoResponse.data.cell_info != null && e.AppInfoResponse.data.cell_info.ContainsKey(_role_name) && e.AppInfoResponse.data.cell_info[_role_name] != null && e.AppInfoResponse.data.cell_info[_role_name].Count > 0 && e.AppInfoResponse.data.cell_info[_role_name][0] != null)
                 cellType = e.AppInfoResponse.data.cell_info[_role_name][0].CellInfoType;
 
-            lstOutput.Items.Add($"ADMIN: hApp Installed: EndPoint: {e.EndPoint}, Id: {e.Id}, installed_app_id: {(e.AppInfoResponse.data != null ? e.AppInfoResponse.data.installed_app_id : "")}, AgentPubKey: {(e.AppInfoResponse.data != null ? e.AppInfoResponse.data.agent_pub_key : "")}, Manifest: {(e.AppInfoResponse.data != null ? e.AppInfoResponse.data.manifest.name : "")}, CellType: {Enum.GetName(typeof(CellInfoType), cellType)}, Raw Binary Data Decoded: {e.RawBinaryDataDecoded}, IsError: {e.IsError}, Message: {e.Message}");
+            lstOutput.Items.Add($"ADMIN: hApp Installed: EndPoint: {e.EndPoint}, Id: {e.Id}, installed_app_id: {(e.AppInfoResponse != null && e.AppInfoResponse.data != null ? e.AppInfoResponse.data.installed_app_id : "")}, AgentPubKey: {(e.AppInfoResponse != null && e.AppInfoResponse.data != null ? e.AppInfoResponse.data.agent_pub_key : "")}, Manifest: {(e.AppInfoResponse != null && e.AppInfoResponse.data != null ? e.AppInfoResponse.data.manifest.name : "")}, CellType: {Enum.GetName(typeof(CellInfoType), cellType)}, Raw Binary Data Decoded: {e.RawBinaryDataDecoded}, IsError: {e.IsError}, Message: {e.Message}");
 
             if (cellType != CellInfoType.Provisioned)
                 lstOutput.Items.Add("CellType is not Provisioned so aborting...");

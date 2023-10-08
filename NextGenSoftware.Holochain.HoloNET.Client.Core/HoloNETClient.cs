@@ -18,6 +18,7 @@ using NextGenSoftware.Utilities.ExtentionMethods;
 using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests;
 using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.AppManifest;
 using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
@@ -947,8 +948,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 if (WebSocket.State == WebSocketState.Open)
                 {
                     Logger.Log("Sending HoloNET Request to Holochain Conductor...", LogType.Info, true);
-                    //await WebSocket.SendRawDataAsync(MessagePackSerializer.Serialize(request)); //This is the fastest and most popular .NET MessagePack Serializer.
-                    await WebSocket.UnityWebSocket.Send(MessagePackSerializer.Serialize(request));
+                    await WebSocket.SendRawDataAsync(MessagePackSerializer.Serialize(request)); //This is the fastest and most popular .NET MessagePack Serializer.
+                    //await WebSocket.UnityWebSocket.Send(MessagePackSerializer.Serialize(request));
                     Logger.Log("HoloNET Request Successfully Sent To Holochain Conductor.", LogType.Info, false);
                 }
             }
@@ -1346,7 +1347,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                 //TODO: Also be good to implement same functionality in js client where it will error if there is no matching request to a response (id etc). I think we can make this optional param for these method overloads like responseMustHaveMatchingRequest which defaults to true.
 
-                byte[][] cellId = await GetCellId();
+                byte[][] cellId = await GetCellIdAsync();
 
                 if (_signingCredentialsForCell.ContainsKey(cellId) && _signingCredentialsForCell[cellId] != null)
                 {
@@ -1698,12 +1699,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         public async Task<AdminSigningCredentialsAuthorizedEventArgs> AdminAuthorizeSigningCredentialsAsync(GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = "")
         {
-            return await AdminAuthorizeSigningCredentialsAsync(await GetCellId(), grantedFunctionsType, functions, conductorResponseCallBackMode, id);
+            return await AdminAuthorizeSigningCredentialsAsync(await GetCellIdAsync(), grantedFunctionsType, functions, conductorResponseCallBackMode, id);
         }
 
         public AdminSigningCredentialsAuthorizedEventArgs AdminAuthorizeSigningCredentials(GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = "")
         {
-            return AdminAuthorizeSigningCredentialsAsync(grantedFunctionsType, functions, conductorResponseCallBackMode, id).Result;
+            return AdminAuthorizeSigningCredentials(GetCellId(), grantedFunctionsType, functions, id);
         }
 
         public async Task<AdminSigningCredentialsAuthorizedEventArgs> AdminAuthorizeSigningCredentialsAsync(string AgentPubKey, string DnaHash, GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions= null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = "")
@@ -1713,10 +1714,69 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         public AdminSigningCredentialsAuthorizedEventArgs AdminAuthorizeSigningCredentials(string AgentPubKey, string DnaHash, GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = "")
         {
-            return AdminAuthorizeSigningCredentialsAsync(AgentPubKey, DnaHash, grantedFunctionsType, functions, conductorResponseCallBackMode, id).Result;
+            return AdminAuthorizeSigningCredentials(GetCellId(DnaHash, AgentPubKey), grantedFunctionsType, functions, id);
         }
 
         public async Task<AdminSigningCredentialsAuthorizedEventArgs> AdminAuthorizeSigningCredentialsAsync(byte[][] cellId, GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = "")
+        {
+            (AdminSigningCredentialsAuthorizedEventArgs args, Dictionary<GrantedFunctionsType, List<(string, string)>> grantedFunctions, byte[] signingKey) = AuthorizeSigningCredentials(cellId, grantedFunctionsType, functions, id);
+
+            if (!args.IsError)
+            {
+                return await CallAdminFunctionAsync("grant_zome_call_capability", new GrantZomeCallCapabilityRequest()
+                {
+                    cell_id = cellId,
+                    cap_grant = new ZomeCallCapGrant()
+                    {
+                        tag = "zome-call-signing-key",
+                        functions = grantedFunctions,
+                        access = new CapGrantAccess()
+                        {
+                            Assigned = new CapGrantAccessAssigned()
+                            {
+                                secret = _signingCredentialsForCell[cellId].CapSecret,
+                                assignees = signingKey
+                            }
+                        }
+                    }
+                },
+                _taskCompletionAdminSigningCredentialsAuthorizedCallBack, "OnAdminSigningCredentialsAuthorized", conductorResponseCallBackMode, id);
+            }
+            else
+                return args;
+        }
+
+        public AdminSigningCredentialsAuthorizedEventArgs AdminAuthorizeSigningCredentials(byte[][] cellId, GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null, string id = "")
+        {
+            (AdminSigningCredentialsAuthorizedEventArgs args, Dictionary<GrantedFunctionsType, List<(string, string)>> grantedFunctions, byte[] signingKey) = AuthorizeSigningCredentials(cellId, grantedFunctionsType, functions, id);
+
+            if (!args.IsError)
+            {
+                CallAdminFunction("grant_zome_call_capability", new GrantZomeCallCapabilityRequest()
+                {
+                    cell_id = cellId,
+                    cap_grant = new ZomeCallCapGrant()
+                    {
+                        tag = "zome-call-signing-key",
+                        functions = grantedFunctions,
+                        access = new CapGrantAccess()
+                        {
+                            Assigned = new CapGrantAccessAssigned()
+                            {
+                                secret = _signingCredentialsForCell[cellId].CapSecret,
+                                assignees = signingKey
+                            }
+                        }
+                    }
+                }, id);
+
+                return new AdminSigningCredentialsAuthorizedEventArgs() { IsCallSuccessful = true, EndPoint = EndPoint, Id = id, Message = "The call has been sent to the conductor.  Please wait for the event 'OnAdminAgentPubKeyGeneratedCallBack' to view the response." };
+            }
+            else
+                return args;
+        }
+
+        private (AdminSigningCredentialsAuthorizedEventArgs, Dictionary<GrantedFunctionsType, List<(string, string)>>, byte[]) AuthorizeSigningCredentials(byte[][] cellId, GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null, string id = "")
         {
             var seed = RandomNumberGenerator.GetBytes(32);
             byte[] privateKey;
@@ -1726,21 +1786,21 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             {
                 string msg = "Error occured in AuthorizeSigningCredentialsAsync function. cellId is null.";
                 HandleError(msg, null);
-                return new AdminSigningCredentialsAuthorizedEventArgs() { IsError = true, EndPoint = EndPoint, Id = id, Message = msg };
+                return (new AdminSigningCredentialsAuthorizedEventArgs() { IsError = true, EndPoint = EndPoint, Id = id, Message = msg }, null, null);
             }
 
             if (string.IsNullOrEmpty(Config.AgentPubKey))
             {
                 string msg = "Error occured in AuthorizeSigningCredentialsAsync function. Config.AgentPubKey is null. Please set or call AdminGenerateAgentPubKey method.";
                 HandleError(msg, null);
-                return new AdminSigningCredentialsAuthorizedEventArgs() { IsError = true, EndPoint = EndPoint, Id = id, Message = msg };
+                return (new AdminSigningCredentialsAuthorizedEventArgs() { IsError = true, EndPoint = EndPoint, Id = id, Message = msg }, null, null);
             }
 
             if (grantedFunctionsType == GrantedFunctionsType.Listed && functions == null)
             {
                 string msg = "Error occured in AuthorizeSigningCredentialsAsync function. GrantedFunctionsType was set to Listed but no functions were passed in.";
                 HandleError(msg, null);
-                return new AdminSigningCredentialsAuthorizedEventArgs() { IsError = true, EndPoint = EndPoint, Id = id, Message = msg };
+                return (new AdminSigningCredentialsAuthorizedEventArgs() { IsError = true, EndPoint = EndPoint, Id = id, Message = msg }, null, null);
             }
 
             //Ed25519.KeyPairFromSeed(out publicKey, out privateKey, seed);
@@ -1752,8 +1812,15 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             byte[] DHTLocation = ConvertHoloHashToBytes(Config.AgentPubKey).TakeLast(4).ToArray();
             byte[] signingKey = new byte[] { 132, 32, 36 }.Concat(pair.PublicKey).Concat(DHTLocation).ToArray();
 
-            GrantedFunctions grantedFunction = new GrantedFunctions();
-            grantedFunction.Functions.Add(grantedFunctionsType, functions);
+            //GrantedFunctions grantedFunction = new GrantedFunctions();
+            //grantedFunction.Functions.Add(grantedFunctionsType, functions);
+
+            Dictionary<GrantedFunctionsType, List<(string, string)>>  grantedFunctions = new Dictionary<GrantedFunctionsType, List<(string, string)>>();
+
+            if (grantedFunctionsType == GrantedFunctionsType.All)
+                grantedFunctions[GrantedFunctionsType.All] = null;
+            else
+                grantedFunctions[GrantedFunctionsType.Listed] = functions;
 
             _signingCredentialsForCell[cellId] = new SigningCredentials()
             {
@@ -1762,30 +1829,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 SigningKey = signingKey
             };
 
-            return await CallAdminFunctionAsync("grant_zome_call_capability", new HoloNETAdminDataCap()
-            {
-                cell_id = cellId,
-                cap_grant = new CapGrant()
-                {
-                    tag = "zome-call-signing-key",
-                    functions = grantedFunction,
-                    access = new CapGrantAccess()
-                    {
-                        Assigned = new CapGrantAccessAssigned()
-                        {
-                            secret = _signingCredentialsForCell[cellId].CapSecret,
-                            assignees = signingKey
-                        }
-                    }
-                }
-            },
-            _taskCompletionAdminSigningCredentialsAuthorizedCallBack, "OnAdminSigningCredentialsAuthorized", conductorResponseCallBackMode, id);
+            return (new AdminSigningCredentialsAuthorizedEventArgs(), grantedFunctions, signingKey);
         }
 
-        public AdminSigningCredentialsAuthorizedEventArgs AdminAuthorizeSigningCredentials(byte[][] cellId, GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = "")
-        {
-            return AdminAuthorizeSigningCredentialsAsync(cellId, grantedFunctionsType, functions, conductorResponseCallBackMode, id).Result;
-        }
 
         public async Task<AdminAgentPubKeyGeneratedCallBackEventArgs> AdminGenerateAgentPubKeyAsync(ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, bool updateAgentPubKeyInConfig = true, string id = "")
         {
@@ -1995,7 +2041,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public async Task<AdminDumpFullStateCallBackEventArgs> AdminDumpFullStateAsync(int? dHTOpsCursor = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
-            return await AdminDumpFullStateAsync(await GetCellId(), dHTOpsCursor, conductorResponseCallBackMode, id);
+            return await AdminDumpFullStateAsync(await GetCellIdAsync(), dHTOpsCursor, conductorResponseCallBackMode, id);
         }
 
         /// <summary>
@@ -2073,7 +2119,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public async Task<AdminDumpStateCallBackEventArgs> AdminDumpStateAsync(int? dHTOpsCursor = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
-            return await AdminDumpStateAsync(await GetCellId(), dHTOpsCursor, conductorResponseCallBackMode, id);
+            return await AdminDumpStateAsync(await GetCellIdAsync(), dHTOpsCursor, conductorResponseCallBackMode, id);
         }
 
         /// <summary>
@@ -2284,7 +2330,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public async Task<AdminGetAgentInfoCallBackEventArgs> AdminGetAgentInfoAsync(ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
-            return await AdminGetAgentInfoAsync(await GetCellId(), conductorResponseCallBackMode, id);
+            return await AdminGetAgentInfoAsync(await GetCellIdAsync(), conductorResponseCallBackMode, id);
         }
 
         /// <summary>
@@ -2447,7 +2493,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public async Task<AdminDeleteCloneCellCallBackEventArgs> AdminDeleteCloneCellAsync(string appId, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
-            return await AdminDeleteCloneCellAsync(appId, await GetCellId(), conductorResponseCallBackMode, id);
+            return await AdminDeleteCloneCellAsync(appId, await GetCellIdAsync(), conductorResponseCallBackMode, id);
         }
 
         /// <summary>
@@ -2571,7 +2617,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             return new byte[2][] { ConvertHoloHashToBytes(DnaHash), ConvertHoloHashToBytes(AgentPubKey) };
         }
 
-        public async Task<byte[][]> GetCellId()
+        public async Task<byte[][]> GetCellIdAsync()
         {
             if (string.IsNullOrEmpty(Config.AgentPubKey))
             {
@@ -2580,6 +2626,32 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 else
                     await RetrieveAgentPubKeyAndDnaHashAsync();
             }
+
+            if (string.IsNullOrEmpty(Config.AgentPubKey))
+            {
+                HandleError("Error occured in GetCellId. Config.AgentPubKey is null, please set before calling this method.", null);
+                return null;
+            }
+
+            if (string.IsNullOrEmpty(Config.DnaHash))
+            {
+                HandleError("Error occured in GetCellId. Config.DnaHash is null, please set before calling this method.", null);
+                return null;
+            }
+
+            return GetCellId(Config.DnaHash, Config.AgentPubKey);
+        }
+
+        public byte[][] GetCellId()
+        {
+            //TODO: Implement this in non async way...
+            //if (string.IsNullOrEmpty(Config.AgentPubKey))
+            //{
+            //    if (IsAdmin)
+            //        await AdminGenerateAgentPubKeyAsync();
+            //    else
+            //        await RetrieveAgentPubKeyAndDnaHashAsync();
+            //}
 
             if (string.IsNullOrEmpty(Config.AgentPubKey))
             {
