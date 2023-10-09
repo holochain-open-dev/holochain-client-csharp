@@ -5,7 +5,7 @@ using NextGenSoftware.WebSocket;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
-    public class HoloNETDataReceivedBaseEventArgs : CallBackBaseEventArgsWithId
+    public class HoloNETDataReceivedBaseEventArgs : CallBackBaseEventArgsWithDataAndId
     {
         public string Type { get; set; }
         public HoloNETResponseType HoloNETResponseType { get; set; }
@@ -24,6 +24,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
     public class HoloNETDataReceivedEventArgs : HoloNETDataReceivedBaseEventArgs
     {
         public bool IsConductorDebugInfo { get; set; }
+    }
+
+    public class HoloNETDataSentEventArgs : DataSentEventArgs
+    {
+
     }
 
 

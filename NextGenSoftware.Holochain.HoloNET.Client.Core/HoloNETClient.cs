@@ -6,19 +6,18 @@ using System.IO;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Security.Cryptography;
 using MessagePack;
+using Chaos.NaCl;
+using Blake2Fast;
 using NextGenSoftware.WebSocket;
 using NextGenSoftware.Logging;
-using NextGenSoftware.Holochain.HoloNET.Client.Properties;
 using NextGenSoftware.Utilities;
-using Chaos.NaCl;
-using System.Security.Cryptography;
-using Blake2Fast;
 using NextGenSoftware.Utilities.ExtentionMethods;
-using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests;
+using NextGenSoftware.Holochain.HoloNET.Client.Properties;
 using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.AppManifest;
+using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests;
 using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
@@ -37,9 +36,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         private Dictionary<string, ZomeFunctionCallBack> _callbackLookup = new Dictionary<string, ZomeFunctionCallBack>();
         private Dictionary<string, ZomeFunctionCallBackEventArgs> _zomeReturnDataLookup = new Dictionary<string, ZomeFunctionCallBackEventArgs>();
         private Dictionary<string, bool> _cacheZomeReturnDataLookup = new Dictionary<string, bool>();
-        private Dictionary<string, TaskCompletionSource<ZomeFunctionCallBackEventArgs>> _taskCompletionZomeCallBack = new Dictionary<string, TaskCompletionSource<ZomeFunctionCallBackEventArgs>>();
         private TaskCompletionSource<AgentPubKeyDnaHash> _taskCompletionAgentPubKeyAndDnaHashRetrieved = new TaskCompletionSource<AgentPubKeyDnaHash>();
-        //private TaskCompletionSource<AgentPubKeyDnaHash> _taskCompletionAgentPubKeyAndDnaHashRetrievedFromConductor = new TaskCompletionSource<AgentPubKeyDnaHash>();
+        private Dictionary<string, TaskCompletionSource<ZomeFunctionCallBackEventArgs>> _taskCompletionZomeCallBack = new Dictionary<string, TaskCompletionSource<ZomeFunctionCallBackEventArgs>>();
         private Dictionary<string, TaskCompletionSource<AdminAgentPubKeyGeneratedCallBackEventArgs>> _taskCompletionAdminAgentPubKeyGeneratedCallBack = new Dictionary<string, TaskCompletionSource<AdminAgentPubKeyGeneratedCallBackEventArgs>>();
         private Dictionary<string, TaskCompletionSource<AdminAppInstalledCallBackEventArgs>> _taskCompletionAdminAppInstalledCallBack = new Dictionary<string, TaskCompletionSource<AdminAppInstalledCallBackEventArgs>>();
         private Dictionary<string, TaskCompletionSource<AdminAppEnabledCallBackEventArgs>> _taskCompletionAdminAppEnabledCallBack = new Dictionary<string, TaskCompletionSource<AdminAppEnabledCallBackEventArgs>>();
@@ -60,6 +58,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         private Dictionary<string, TaskCompletionSource<AdminDeleteCloneCellCallBackEventArgs>> _taskCompletionAdminDeleteCloneCellCallBack = new Dictionary<string, TaskCompletionSource<AdminDeleteCloneCellCallBackEventArgs>>();
         private Dictionary<string, TaskCompletionSource<AdminGetStorageInfoCallBackEventArgs>> _taskCompletionAdminGetStorageInfoCallBack = new Dictionary<string, TaskCompletionSource<AdminGetStorageInfoCallBackEventArgs>>();
         private Dictionary<string, TaskCompletionSource<AdminDumpNetworkStatsCallBackEventArgs>> _taskCompletionAdminDumpNetworkStatsCallBack = new Dictionary<string, TaskCompletionSource<AdminDumpNetworkStatsCallBackEventArgs>>();
+        //private Dictionary<string, TaskCompletionSource<ReadyForZomeCallsEventArgs>> _taskCompletionReadyForZomeCalls = new Dictionary<string, TaskCompletionSource<ReadyForZomeCallsEventArgs>>();
+        //private Dictionary<string, TaskCompletionSource<DisconnectedEventArgs>> _taskCompletionDisconnected = new Dictionary<string, TaskCompletionSource<DisconnectedEventArgs>>();
+
         private Dictionary<string, PropertyInfo[]> _dictPropertyInfos = new Dictionary<string, PropertyInfo[]>();
         private Dictionary<byte[][], SigningCredentials> _signingCredentialsForCell = new Dictionary<byte[][], SigningCredentials>();
         private TaskCompletionSource<ReadyForZomeCallsEventArgs> _taskCompletionReadyForZomeCalls = new TaskCompletionSource<ReadyForZomeCallsEventArgs>();
@@ -100,12 +101,22 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// </summary>
         public event HoloNETShutdownComplete OnHoloNETShutdownComplete;
 
+
         public delegate void DataReceived(object sender, HoloNETDataReceivedEventArgs e);
 
         /// <summary>
         /// Fired when any data is received from the Holochain conductor. This returns the raw data.                                     
         /// </summary>
         public event DataReceived OnDataReceived;
+
+
+        public delegate void DataSent(object sender, HoloNETDataSentEventArgs e);
+
+        /// <summary>
+        /// Fired when any data is sent to the Holochain conductor.
+        /// </summary>
+        public event DataSent OnDataSent;
+
 
         public delegate void ZomeFunctionCallBack(object sender, ZomeFunctionCallBackEventArgs e);
 
@@ -508,10 +519,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                         await StartHolochainConductorAsync();
 
                     if (connectedCallBackMode == ConnectedCallBackMode.WaitForHolochainConductorToConnect)
-                        await WebSocket.Connect();
+                        await WebSocket.ConnectAsync();
                     else
                     {
-                        WebSocket.Connect();
+                        WebSocket.ConnectAsync();
 
                         //if (retrieveAgentPubKeyAndDnaHashMode != RetrieveAgentPubKeyAndDnaHashMode.DoNotRetreive)
                         //    await RetrieveAgentPubKeyAndDnaHashAsync(retrieveAgentPubKeyAndDnaHashMode, retrieveAgentPubKeyAndDnaHashFromConductor, retrieveAgentPubKeyAndDnaHashFromSandbox, automaticallyAttemptToRetrieveFromConductorIfSandBoxFails, automaticallyAttemptToRetrieveFromSandBoxIfConductorFails, updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved);
@@ -978,7 +989,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public async Task DisconnectAsync(DisconnectedCallBackMode disconnectedCallBackMode = DisconnectedCallBackMode.WaitForHolochainConductorToDisconnect, ShutdownHolochainConductorsMode shutdownHolochainConductorsMode = ShutdownHolochainConductorsMode.UseConfigSettings)
         {
             _shutdownHolochainConductorsMode = shutdownHolochainConductorsMode;
-            await WebSocket.Disconnect();
+            await WebSocket.DisconnectAsync();
 
             if (disconnectedCallBackMode == DisconnectedCallBackMode.WaitForHolochainConductorToDisconnect)
                 await _taskCompletionDisconnected.Task;
@@ -3159,6 +3170,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                 //TODO: Impplemnt IDispoasable to unsubscribe event handlers to prevent memory leaks... 
                 WebSocket.OnConnected += WebSocket_OnConnected;
+                WebSocket.OnDataSent += WebSocket_OnDataSent;
                 WebSocket.OnDataReceived += WebSocket_OnDataReceived;
                 WebSocket.OnDisconnected += WebSocket_OnDisconnected;
                 WebSocket.OnError += WebSocket_OnError;
@@ -3167,6 +3179,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             {
                 HandleError("Error in HoloNETClient.Init method.", ex);
             }
+        }
+
+        private void WebSocket_OnDataSent(object sender, DataSentEventArgs e)
+        {
+            OnDataSent?.Invoke(this, new HoloNETDataSentEventArgs { IsCallSuccessful = e.IsCallSuccessful, EndPoint = e.EndPoint, RawBinaryData = e.RawBinaryData, RawBinaryDataAsString = e.RawBinaryDataAsString, RawBinaryDataDecoded = e.RawBinaryDataDecoded });
         }
 
         private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
@@ -3219,6 +3236,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                 if (!_taskCompletionDisconnected.Task.IsCompleted)
                     _taskCompletionDisconnected.SetResult(e);
+
+                //We need to dispose and nullify the socket in case we want to use it to connect again later.
+                if (WebSocket.ClientWebSocket != null)
+                {
+                    WebSocket.ClientWebSocket.Dispose();
+                    WebSocket.ClientWebSocket = null;
+                }
 
                 OnDisconnected?.Invoke(this, e);
                 ShutDownHolochainConductorsAsync(_shutdownHolochainConductorsMode);
@@ -4121,7 +4145,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         {
             Logger.Log(string.Concat("Id: ", adminAgentPubKeyGeneratedCallBackEventArgs.Id, ", Is Call Successful: ", adminAgentPubKeyGeneratedCallBackEventArgs.IsCallSuccessful ? "True" : "False", ", AgentPubKey: ", adminAgentPubKeyGeneratedCallBackEventArgs.AgentPubKey, ", Raw Binary Data: ", adminAgentPubKeyGeneratedCallBackEventArgs.RawBinaryData, ", Raw JSON Data: ", adminAgentPubKeyGeneratedCallBackEventArgs.RawJSONData, "\n"), LogType.Info);
             OnAdminAgentPubKeyGeneratedCallBack?.Invoke(this, adminAgentPubKeyGeneratedCallBackEventArgs);
-            _taskCompletionAdminAgentPubKeyGeneratedCallBack[adminAgentPubKeyGeneratedCallBackEventArgs.Id].SetResult(adminAgentPubKeyGeneratedCallBackEventArgs);
+            
+            if (_taskCompletionAdminAgentPubKeyGeneratedCallBack != null && !string.IsNullOrEmpty(adminAgentPubKeyGeneratedCallBackEventArgs.Id) && _taskCompletionAdminAgentPubKeyGeneratedCallBack.ContainsKey(adminAgentPubKeyGeneratedCallBackEventArgs.Id))
+                _taskCompletionAdminAgentPubKeyGeneratedCallBack[adminAgentPubKeyGeneratedCallBackEventArgs.Id].SetResult(adminAgentPubKeyGeneratedCallBackEventArgs);
         }
 
         private void RaiseAdminAppInstalledEvent(AdminAppInstalledCallBackEventArgs adminAppInstalledCallBackEventArgs)
@@ -4129,7 +4155,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             Logger.Log(string.Concat("Id: ", adminAppInstalledCallBackEventArgs.Id, ", Is Call Successful: ", adminAppInstalledCallBackEventArgs.IsCallSuccessful ? "True" : "False", ", Raw Binary Data: ", adminAppInstalledCallBackEventArgs.RawBinaryData, ", Raw JSON Data: ", adminAppInstalledCallBackEventArgs.RawJSONData, "\n"), LogType.Info);
             OnAdminAppInstalledCallBack?.Invoke(this, adminAppInstalledCallBackEventArgs);
 
-            if (_taskCompletionAdminAppInstalledCallBack != null && _taskCompletionAdminAppInstalledCallBack.ContainsKey(adminAppInstalledCallBackEventArgs.Id))
+            if (_taskCompletionAdminAppInstalledCallBack != null && !string.IsNullOrEmpty(adminAppInstalledCallBackEventArgs.Id) && _taskCompletionAdminAppInstalledCallBack.ContainsKey(adminAppInstalledCallBackEventArgs.Id))
                 _taskCompletionAdminAppInstalledCallBack[adminAppInstalledCallBackEventArgs.Id].SetResult(adminAppInstalledCallBackEventArgs);
         }
 
@@ -4138,7 +4164,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             Logger.Log(string.Concat("Id: ", adminAppEnabledCallBackEventArgs.Id, ", Is Call Successful: ", adminAppEnabledCallBackEventArgs.IsCallSuccessful ? "True" : "False", ", Raw Binary Data: ", adminAppEnabledCallBackEventArgs.RawBinaryData, ", Raw JSON Data: ", adminAppEnabledCallBackEventArgs.RawJSONData, "\n"), LogType.Info);
             OnAdminAppEnabledCallBack?.Invoke(this, adminAppEnabledCallBackEventArgs);
 
-            if (_taskCompletionAdminAppEnabledCallBack != null && _taskCompletionAdminAppEnabledCallBack.ContainsKey(adminAppEnabledCallBackEventArgs.Id))
+            if (_taskCompletionAdminAppEnabledCallBack != null && !string.IsNullOrEmpty(adminAppEnabledCallBackEventArgs.Id) && _taskCompletionAdminAppEnabledCallBack.ContainsKey(adminAppEnabledCallBackEventArgs.Id))
                 _taskCompletionAdminAppEnabledCallBack[adminAppEnabledCallBackEventArgs.Id].SetResult(adminAppEnabledCallBackEventArgs);
         }
 
@@ -4147,7 +4173,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             Logger.Log(string.Concat("Id: ", adminAppDisabledCallBackEventArgs.Id, ", Is Call Successful: ", adminAppDisabledCallBackEventArgs.IsCallSuccessful ? "True" : "False", ", Raw Binary Data: ", adminAppDisabledCallBackEventArgs.RawBinaryData, ", Raw JSON Data: ", adminAppDisabledCallBackEventArgs.RawJSONData, "\n"), LogType.Info);
             OnAdminAppDisabledCallBack?.Invoke(this, adminAppDisabledCallBackEventArgs);
 
-            if (_taskCompletionAdminAppDisabledCallBack != null && _taskCompletionAdminAppDisabledCallBack.ContainsKey(adminAppDisabledCallBackEventArgs.Id))
+            if (_taskCompletionAdminAppDisabledCallBack != null && !string.IsNullOrEmpty(adminAppDisabledCallBackEventArgs.Id) && _taskCompletionAdminAppDisabledCallBack.ContainsKey(adminAppDisabledCallBackEventArgs.Id))
                 _taskCompletionAdminAppDisabledCallBack[adminAppDisabledCallBackEventArgs.Id].SetResult(adminAppDisabledCallBackEventArgs);
         }
 

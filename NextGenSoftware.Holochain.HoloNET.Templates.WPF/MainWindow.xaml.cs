@@ -11,12 +11,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
     /// </summary>
     public partial class MainWindow : Window
     {
-        private const string _hcAdminURI = "ws://localhost:60236";
+        private const string _hcAdminURI = "ws://localhost:62153";
         private const string _hcAppURI = "ws://localhost:88888";
         private const string _oasisHappPath = @"C:\Users\USER\holochain-holochain-0.1.5\happs\oasis\BUILD\happ\oasis.happ";
         private const string _role_name = "oasis";
         private const string _installed_app_id = "oasis-app88888888";
         private HoloNETClient _holoNETClient = new HoloNETClient(_hcAdminURI);
+        private bool _rebooting = false;
 
         public MainWindow()
         {
@@ -34,6 +35,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
             _holoNETClient.OnConnected += HoloNETClient_OnConnected;
             _holoNETClient.OnReadyForZomeCalls += HoloNETClient_OnReadyForZomeCalls;
             _holoNETClient.OnError += HoloNETClient_OnError;
+            _holoNETClient.OnDataSent += _holoNETClient_OnDataSent;
             _holoNETClient.OnDataReceived += HoloNETClient_OnDataReceived;
             _holoNETClient.OnZomeFunctionCallBack += HoloNETClient_OnZomeFunctionCallBack;
             _holoNETClient.OnDisconnected += HoloNETClient_OnDisconnected;
@@ -42,15 +44,32 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
             _holoNETClient.OnAdminAppEnabledCallBack += _holoNETClient_OnAdminAppEnabledCallBack;
             _holoNETClient.OnAdminSigningCredentialsAuthorized += _holoNETClient_OnAdminSigningCredentialsAuthorized;
 
-            //_holoNETClient.Connect();
+            Init();
+        }
 
-            lstOutput.Items.Add("ADMIN: Connecting...");
+        private void Init()
+        {
+            lstOutput.Items.Add("Booting...");
+            lstOutput.Items.Add("Connecting...");
             _holoNETClient.ConnectAdmin();
+            //_holoNETClient.Connect();
+        }
+
+        private void _holoNETClient_OnDataSent(object sender, HoloNETDataSentEventArgs e)
+        {
+            if (chkShowDetailedMessages.IsChecked.HasValue && chkShowDetailedMessages.IsChecked.Value)
+                lstOutput.Items.Add($"Data Sent to EndPoint {e.EndPoint}: {e.RawBinaryDataDecoded} ({e.RawBinaryDataAsString})");
+        }
+
+        private void HoloNETClient_OnDataReceived(object sender, HoloNETDataReceivedEventArgs e)
+        {
+            if (chkShowDetailedMessages.IsChecked.HasValue && chkShowDetailedMessages.IsChecked.Value)
+                lstOutput.Items.Add(string.Concat("Data Received for EndPoint: ", e.EndPoint, ": ", e.RawBinaryDataDecoded, "(", e.RawBinaryDataAsString, ")"));
         }
 
         private void _holoNETClient_OnAdminSigningCredentialsAuthorized(object sender, AdminSigningCredentialsAuthorizedEventArgs e)
         {
-            lstOutput.Items.Add($"ADMIN: Signing Credentials Autorized.");
+            lstOutput.Items.Add($"ADMIN: Signing Credentials Authorized.");
         }
 
         private void _holoNETClient_OnAdminAppEnabledCallBack(object sender, AdminAppEnabledCallBackEventArgs e)
@@ -69,7 +88,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
 
         private void _holoNETClient_OnAdminAgentPubKeyGeneratedCallBack(object sender, AdminAgentPubKeyGeneratedCallBackEventArgs e)
         {
-            lstOutput.Items.Add($"ADMIN: AgentPubKey Generated: EndPoint: {e.EndPoint}, Id: {e.Id},  AgentPubKey: {e.AgentPubKey}, IsError: {e.IsError}, Message: {e.Message}");
+            lstOutput.Items.Add($"ADMIN: AgentPubKey Generated for EndPoint: {e.EndPoint} and Id: {e.Id}: AgentPubKey: {e.AgentPubKey}");
             lstOutput.Items.Add("ADMIN: Installing hApp...");
             _holoNETClient.AdminInstallApp(e.AgentPubKey, _installed_app_id, _oasisHappPath);
         }
@@ -77,16 +96,27 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
         private void HoloNETClient_OnDisconnected(object sender, WebSocket.DisconnectedEventArgs e)
         {
             lstOutput.Items.Add("Disconnected");
+
+            if (_rebooting)
+            {
+                //lstOutput.Items.Clear();
+                Init();
+            }
         }
 
         private void HoloNETClient_OnAdminAppInstalledCallBack(object sender, AdminAppInstalledCallBackEventArgs e)
         {
             CellInfoType cellType = CellInfoType.None;
 
-            if (e.AppInfoResponse != null && e.AppInfoResponse.data != null && e.AppInfoResponse.data.cell_info != null && e.AppInfoResponse.data.cell_info.ContainsKey(_role_name) && e.AppInfoResponse.data.cell_info[_role_name] != null && e.AppInfoResponse.data.cell_info[_role_name].Count > 0 && e.AppInfoResponse.data.cell_info[_role_name][0] != null)
-                cellType = e.AppInfoResponse.data.cell_info[_role_name][0].CellInfoType;
+            if (e.IsCallSuccessful && !e.IsError)
+            {
+                if (e.AppInfoResponse != null && e.AppInfoResponse.data != null && e.AppInfoResponse.data.cell_info != null && e.AppInfoResponse.data.cell_info.ContainsKey(_role_name) && e.AppInfoResponse.data.cell_info[_role_name] != null && e.AppInfoResponse.data.cell_info[_role_name].Count > 0 && e.AppInfoResponse.data.cell_info[_role_name][0] != null)
+                    cellType = e.AppInfoResponse.data.cell_info[_role_name][0].CellInfoType;
 
-            lstOutput.Items.Add($"ADMIN: hApp Installed: EndPoint: {e.EndPoint}, Id: {e.Id}, installed_app_id: {(e.AppInfoResponse != null && e.AppInfoResponse.data != null ? e.AppInfoResponse.data.installed_app_id : "")}, AgentPubKey: {(e.AppInfoResponse != null && e.AppInfoResponse.data != null ? e.AppInfoResponse.data.agent_pub_key : "")}, Manifest: {(e.AppInfoResponse != null && e.AppInfoResponse.data != null ? e.AppInfoResponse.data.manifest.name : "")}, CellType: {Enum.GetName(typeof(CellInfoType), cellType)}, Raw Binary Data Decoded: {e.RawBinaryDataDecoded}, IsError: {e.IsError}, Message: {e.Message}");
+                lstOutput.Items.Add($"ADMIN: hApp Installed for EndPoint: {e.EndPoint} and Id: {e.Id}: installed_app_id: {(e.AppInfoResponse != null && e.AppInfoResponse.data != null ? e.AppInfoResponse.data.installed_app_id : "")}, AgentPubKey: {(e.AppInfoResponse != null && e.AppInfoResponse.data != null ? e.AppInfoResponse.data.agent_pub_key : "")}, Manifest: {(e.AppInfoResponse != null && e.AppInfoResponse.data != null ? e.AppInfoResponse.data.manifest.name : "")}, CellType: {Enum.GetName(typeof(CellInfoType), cellType)}");
+            }
+            else
+                lstOutput.Items.Add($"ADMIN hApp NOT Installed! Reason: {e.Message}");
 
             if (cellType != CellInfoType.Provisioned)
                 lstOutput.Items.Add("CellType is not Provisioned so aborting...");
@@ -100,12 +130,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
         private void HoloNETClient_OnZomeFunctionCallBack(object sender, ZomeFunctionCallBackEventArgs e)
         {
             lstOutput.Items.Add(string.Concat("Zome CallBack: ", ProcessZomeFunctionCallBackEventArgs(e)));
-        }
-
-        private void HoloNETClient_OnDataReceived(object sender, HoloNETDataReceivedEventArgs e)
-        {
-            //lstOutput.Items.Add(string.Concat("Data Received: EndPoint: ", e.EndPoint, ", Raw JSON Data: ", e.RawJSONData, ", Raw Binary Data: ", e.RawBinaryData, ", Raw Binary Data After MessagePack Decode: ", e.RawBinaryDataAfterMessagePackDecode, ", Raw Binary Data After MessagePack Decode As String: ", e.RawBinaryDataAfterMessagePackDecodeAsString, ", IsError: ", e.IsError, ", Message:", e.Message));
-            lstOutput.Items.Add(string.Concat("Data Received: EndPoint: ", e.EndPoint, ", Raw Binary Data: ", e.RawBinaryDataAsString, ", Raw Binary Data Decoded: ", e.RawBinaryDataDecoded, ", IsError: ", e.IsError, ", Message:", e.Message));
         }
 
         private void HoloNETClient_OnError(object sender, HoloNETErrorEventArgs e)
@@ -124,7 +148,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
         {
             // lblOutput.Content = "Connected";
             lstOutput.Items.Add("Connected");
-            lstOutput.Items.Add("ADMIN: Generating AgentPubKey hApp...");
+            lstOutput.Items.Add("ADMIN: Generating AgentPubKey For hApp...");
             _holoNETClient.AdminGenerateAgentPubKey();
             
             //_holoNETClient.AdminInstallApp("oasis-app", _oasisHappPath);
@@ -152,6 +176,19 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
             //    result = BuildEntryDataObjectMessage(_avatarEntryDataObject, "Global.EntryDataObject", result);
 
             return result;
+        }
+
+        private void btnClearLog_Click(object sender, RoutedEventArgs e)
+        {
+            lstOutput.Items.Clear();
+        }
+
+        private void btnReboot_Click(object sender, RoutedEventArgs e)
+        {
+            lstOutput.Items.Add("Rebooting...");
+            lstOutput.Items.Add("Disconneting...");
+            _rebooting = true;
+            _holoNETClient.Disconnect();
         }
     }
 }
