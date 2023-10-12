@@ -4,7 +4,7 @@ using MessagePack;
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
     [MessagePackObject]
-    public struct AppResponse
+    public class AppResponse
     {
         [Key("type")]
         public string type { get; set; }

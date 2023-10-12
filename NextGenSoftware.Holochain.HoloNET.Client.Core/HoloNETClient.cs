@@ -42,7 +42,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         private Dictionary<string, TaskCompletionSource<AdminAppInstalledCallBackEventArgs>> _taskCompletionAdminAppInstalledCallBack = new Dictionary<string, TaskCompletionSource<AdminAppInstalledCallBackEventArgs>>();
         private Dictionary<string, TaskCompletionSource<AdminAppEnabledCallBackEventArgs>> _taskCompletionAdminAppEnabledCallBack = new Dictionary<string, TaskCompletionSource<AdminAppEnabledCallBackEventArgs>>();
         private Dictionary<string, TaskCompletionSource<AdminAppDisabledCallBackEventArgs>> _taskCompletionAdminAppDisabledCallBack = new Dictionary<string, TaskCompletionSource<AdminAppDisabledCallBackEventArgs>>();
-        private Dictionary<string, TaskCompletionSource<AdminSigningCredentialsAuthorizedEventArgs>> _taskCompletionAdminSigningCredentialsAuthorizedCallBack = new Dictionary<string, TaskCompletionSource<AdminSigningCredentialsAuthorizedEventArgs>>();
+        private Dictionary<string, TaskCompletionSource<AdminZomeCallCapabilityGrantedEventArgs>> _taskCompletionAdminZomeCapabilityGrantedCallBack = new Dictionary<string, TaskCompletionSource<AdminZomeCallCapabilityGrantedEventArgs>>();
         private Dictionary<string, TaskCompletionSource<AdminAppInterfaceAttachedCallBackEventArgs>> _taskCompletionAdminAppInterfaceAttachedCallBack = new Dictionary<string, TaskCompletionSource<AdminAppInterfaceAttachedCallBackEventArgs>>();
         private Dictionary<string, TaskCompletionSource<AdminRegisterDnaCallBackEventArgs>> _taskCompletionAdminRegisterDnaCallBack = new Dictionary<string, TaskCompletionSource<AdminRegisterDnaCallBackEventArgs>>();
         private Dictionary<string, TaskCompletionSource<AdminListAppsCallBackEventArgs>> _taskCompletionAdminListAppsCallBack = new Dictionary<string, TaskCompletionSource<AdminListAppsCallBackEventArgs>>();
@@ -58,9 +58,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         private Dictionary<string, TaskCompletionSource<AdminDeleteCloneCellCallBackEventArgs>> _taskCompletionAdminDeleteCloneCellCallBack = new Dictionary<string, TaskCompletionSource<AdminDeleteCloneCellCallBackEventArgs>>();
         private Dictionary<string, TaskCompletionSource<AdminGetStorageInfoCallBackEventArgs>> _taskCompletionAdminGetStorageInfoCallBack = new Dictionary<string, TaskCompletionSource<AdminGetStorageInfoCallBackEventArgs>>();
         private Dictionary<string, TaskCompletionSource<AdminDumpNetworkStatsCallBackEventArgs>> _taskCompletionAdminDumpNetworkStatsCallBack = new Dictionary<string, TaskCompletionSource<AdminDumpNetworkStatsCallBackEventArgs>>();
-        //private Dictionary<string, TaskCompletionSource<ReadyForZomeCallsEventArgs>> _taskCompletionReadyForZomeCalls = new Dictionary<string, TaskCompletionSource<ReadyForZomeCallsEventArgs>>();
-        //private Dictionary<string, TaskCompletionSource<DisconnectedEventArgs>> _taskCompletionDisconnected = new Dictionary<string, TaskCompletionSource<DisconnectedEventArgs>>();
-
         private Dictionary<string, PropertyInfo[]> _dictPropertyInfos = new Dictionary<string, PropertyInfo[]>();
         private Dictionary<byte[][], SigningCredentials> _signingCredentialsForCell = new Dictionary<byte[][], SigningCredentials>();
         private TaskCompletionSource<ReadyForZomeCallsEventArgs> _taskCompletionReadyForZomeCalls = new TaskCompletionSource<ReadyForZomeCallsEventArgs>();
@@ -175,12 +172,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public event AdminAppDisabledCallBack OnAdminAppDisabledCallBack;
 
 
-        public delegate void AdminSigningCredentialsAuthorized(object sender, AdminSigningCredentialsAuthorizedEventArgs e);
+        public delegate void AdminZomeCallCapabilityGranted(object sender, AdminZomeCallCapabilityGrantedEventArgs e);
 
         /// <summary>
         /// Fired when a response is received from the conductor after a cell has been authorized via the AdminAuthorizeSigningCredentialsAsync/AdminAuthorizeSigningCredentials method.
         /// </summary>
-        public event AdminSigningCredentialsAuthorized OnAdminSigningCredentialsAuthorized;
+        public event AdminZomeCallCapabilityGranted OnAdminZomeCallCapabilityGranted;
 
 
         public delegate void AdminAppInterfaceAttachedCallBack(object sender, AdminAppInterfaceAttachedCallBackEventArgs e);
@@ -1708,123 +1705,99 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             return CallZomeFunctionAsync(id, zome, function, callback, paramsObject, matchIdToZomeFuncInCallback, cachReturnData, zomeResultCallBackMode).Result;
         }
 
-        public async Task<AdminSigningCredentialsAuthorizedEventArgs> AdminAuthorizeSigningCredentialsAsync(GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = "")
+        public async Task<AdminZomeCallCapabilityGrantedEventArgs> AdminAuthorizeSigningCredentialsAsync(GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = "")
         {
             return await AdminAuthorizeSigningCredentialsAsync(await GetCellIdAsync(), grantedFunctionsType, functions, conductorResponseCallBackMode, id);
         }
 
-        public AdminSigningCredentialsAuthorizedEventArgs AdminAuthorizeSigningCredentials(GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = "")
+        public AdminZomeCallCapabilityGrantedEventArgs AdminAuthorizeSigningCredentials(GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = "")
         {
             return AdminAuthorizeSigningCredentials(GetCellId(), grantedFunctionsType, functions, id);
         }
 
-        public async Task<AdminSigningCredentialsAuthorizedEventArgs> AdminAuthorizeSigningCredentialsAsync(string AgentPubKey, string DnaHash, GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions= null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = "")
+        public async Task<AdminZomeCallCapabilityGrantedEventArgs> AdminAuthorizeSigningCredentialsAsync(string AgentPubKey, string DnaHash, GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions= null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = "")
         {
             return await AdminAuthorizeSigningCredentialsAsync(GetCellId(DnaHash, AgentPubKey), grantedFunctionsType, functions, conductorResponseCallBackMode, id);
         }
 
-        public AdminSigningCredentialsAuthorizedEventArgs AdminAuthorizeSigningCredentials(string AgentPubKey, string DnaHash, GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = "")
+        public AdminZomeCallCapabilityGrantedEventArgs AdminAuthorizeSigningCredentials(string AgentPubKey, string DnaHash, GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = "")
         {
             return AdminAuthorizeSigningCredentials(GetCellId(DnaHash, AgentPubKey), grantedFunctionsType, functions, id);
         }
 
-        public async Task<AdminSigningCredentialsAuthorizedEventArgs> AdminAuthorizeSigningCredentialsAsync(byte[][] cellId, GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = "")
+        public async Task<AdminZomeCallCapabilityGrantedEventArgs> AdminAuthorizeSigningCredentialsAsync(byte[][] cellId, GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = "")
         {
-            (AdminSigningCredentialsAuthorizedEventArgs args, Dictionary<GrantedFunctionsType, List<(string, string)>> grantedFunctions, byte[] signingKey) = AuthorizeSigningCredentials(cellId, grantedFunctionsType, functions, id);
+            (AdminZomeCallCapabilityGrantedEventArgs args, Dictionary<GrantedFunctionsType, List<(string, string)>> grantedFunctions, byte[] signingKey) = AuthorizeSigningCredentials(cellId, grantedFunctionsType, functions, id);
 
             if (!args.IsError)
             {
-                return await CallAdminFunctionAsync("grant_zome_call_capability", new GrantZomeCallCapabilityRequest()
-                {
-                    cell_id = cellId,
-                    cap_grant = new ZomeCallCapGrant()
-                    {
-                        tag = "zome-call-signing-key",
-                        functions = grantedFunctions,
-                        access = new CapGrantAccess()
-                        {
-                            Assigned = new CapGrantAccessAssigned()
-                            {
-                                secret = _signingCredentialsForCell[cellId].CapSecret,
-                                assignees = signingKey
-                            }
-                        }
-                    }
-                },
-                _taskCompletionAdminSigningCredentialsAuthorizedCallBack, "OnAdminSigningCredentialsAuthorized", conductorResponseCallBackMode, id);
+                return await CallAdminFunctionAsync("grant_zome_call_capability", CreateGrantZomeCallCapabilityRequest(cellId, grantedFunctions, signingKey),
+                _taskCompletionAdminZomeCapabilityGrantedCallBack, "OnAdminZomeCallCapabilityGranted", conductorResponseCallBackMode, id);
             }
             else
                 return args;
         }
 
-        public AdminSigningCredentialsAuthorizedEventArgs AdminAuthorizeSigningCredentials(byte[][] cellId, GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null, string id = "")
+        public AdminZomeCallCapabilityGrantedEventArgs AdminAuthorizeSigningCredentials(byte[][] cellId, GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null, string id = "")
         {
-            (AdminSigningCredentialsAuthorizedEventArgs args, Dictionary<GrantedFunctionsType, List<(string, string)>> grantedFunctions, byte[] signingKey) = AuthorizeSigningCredentials(cellId, grantedFunctionsType, functions, id);
+            (AdminZomeCallCapabilityGrantedEventArgs args, Dictionary<GrantedFunctionsType, List<(string, string)>> grantedFunctions, byte[] signingKey) = AuthorizeSigningCredentials(cellId, grantedFunctionsType, functions, id);
 
             if (!args.IsError)
             {
-                CallAdminFunction("grant_zome_call_capability", new GrantZomeCallCapabilityRequest()
-                {
-                    cell_id = cellId,
-                    cap_grant = new ZomeCallCapGrant()
-                    {
-                        tag = "zome-call-signing-key",
-                        functions = grantedFunctions,
-                        access = new CapGrantAccess()
-                        {
-                            Assigned = new CapGrantAccessAssigned()
-                            {
-                                secret = _signingCredentialsForCell[cellId].CapSecret,
-                                assignees = signingKey
-                            }
-                        }
-                    }
-                }, id);
-
-                return new AdminSigningCredentialsAuthorizedEventArgs() { IsCallSuccessful = true, EndPoint = EndPoint, Id = id, Message = "The call has been sent to the conductor.  Please wait for the event 'OnAdminAgentPubKeyGeneratedCallBack' to view the response." };
+                CallAdminFunction("grant_zome_call_capability", CreateGrantZomeCallCapabilityRequest(cellId, grantedFunctions, signingKey), id);
+                return new AdminZomeCallCapabilityGrantedEventArgs() { IsCallSuccessful = true, EndPoint = EndPoint, Id = id, Message = "The call has been sent to the conductor.  Please wait for the event 'OnAdminZomeCallCapabilityGranted' to view the response." };
             }
             else
                 return args;
         }
 
-        private (AdminSigningCredentialsAuthorizedEventArgs, Dictionary<GrantedFunctionsType, List<(string, string)>>, byte[]) AuthorizeSigningCredentials(byte[][] cellId, GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null, string id = "")
+        private GrantZomeCallCapabilityRequest CreateGrantZomeCallCapabilityRequest(byte[][] cellId, Dictionary<GrantedFunctionsType, List<(string, string)>> grantedFunctions, byte[] signingKey)
         {
-            var seed = RandomNumberGenerator.GetBytes(32);
-            byte[] privateKey;
-            byte[] publicKey;
+            return new GrantZomeCallCapabilityRequest()
+            {
+                cell_id = cellId,
+                cap_grant = new ZomeCallCapGrant()
+                {
+                    tag = "zome-call-signing-key",
+                    functions = grantedFunctions,
+                    access = new CapGrantAccess()
+                    {
+                        Assigned = new CapGrantAccessAssigned()
+                        {
+                            secret = _signingCredentialsForCell[cellId].CapSecret,
+                            assignees = new byte[1][] { signingKey }
+                        }
+                    }
+                }
+            };
+        }
 
+        private (AdminZomeCallCapabilityGrantedEventArgs, Dictionary<GrantedFunctionsType, List<(string, string)>>, byte[]) AuthorizeSigningCredentials(byte[][] cellId, GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null, string id = "")
+        {
             if (cellId == null)
             {
                 string msg = "Error occured in AuthorizeSigningCredentialsAsync function. cellId is null.";
                 HandleError(msg, null);
-                return (new AdminSigningCredentialsAuthorizedEventArgs() { IsError = true, EndPoint = EndPoint, Id = id, Message = msg }, null, null);
+                return (new AdminZomeCallCapabilityGrantedEventArgs() { IsError = true, EndPoint = EndPoint, Id = id, Message = msg }, null, null);
             }
 
             if (string.IsNullOrEmpty(Config.AgentPubKey))
             {
                 string msg = "Error occured in AuthorizeSigningCredentialsAsync function. Config.AgentPubKey is null. Please set or call AdminGenerateAgentPubKey method.";
                 HandleError(msg, null);
-                return (new AdminSigningCredentialsAuthorizedEventArgs() { IsError = true, EndPoint = EndPoint, Id = id, Message = msg }, null, null);
+                return (new AdminZomeCallCapabilityGrantedEventArgs() { IsError = true, EndPoint = EndPoint, Id = id, Message = msg }, null, null);
             }
 
             if (grantedFunctionsType == GrantedFunctionsType.Listed && functions == null)
             {
                 string msg = "Error occured in AuthorizeSigningCredentialsAsync function. GrantedFunctionsType was set to Listed but no functions were passed in.";
                 HandleError(msg, null);
-                return (new AdminSigningCredentialsAuthorizedEventArgs() { IsError = true, EndPoint = EndPoint, Id = id, Message = msg }, null, null);
+                return (new AdminZomeCallCapabilityGrantedEventArgs() { IsError = true, EndPoint = EndPoint, Id = id, Message = msg }, null, null);
             }
 
-            //Ed25519.KeyPairFromSeed(out publicKey, out privateKey, seed);
-
-            Sodium.KeyPair pair = Sodium.PublicKeyAuth.GenerateKeyPair(seed);
-
-            //NSec.Cryptography.Ed25519
-
+            Sodium.KeyPair pair = Sodium.PublicKeyAuth.GenerateKeyPair(RandomNumberGenerator.GetBytes(32));
             byte[] DHTLocation = ConvertHoloHashToBytes(Config.AgentPubKey).TakeLast(4).ToArray();
             byte[] signingKey = new byte[] { 132, 32, 36 }.Concat(pair.PublicKey).Concat(DHTLocation).ToArray();
-
-            //GrantedFunctions grantedFunction = new GrantedFunctions();
-            //grantedFunction.Functions.Add(grantedFunctionsType, functions);
 
             Dictionary<GrantedFunctionsType, List<(string, string)>>  grantedFunctions = new Dictionary<GrantedFunctionsType, List<(string, string)>>();
 
@@ -1840,7 +1813,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 SigningKey = signingKey
             };
 
-            return (new AdminSigningCredentialsAuthorizedEventArgs(), grantedFunctions, signingKey);
+            return (new AdminZomeCallCapabilityGrantedEventArgs(), grantedFunctions, signingKey);
         }
 
 
@@ -3262,8 +3235,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         {
             string rawBinaryDataAsString = "";
             string rawBinaryDataDecoded = "";
-            string rawBinaryDataAfterMessagePackDecodeAsString = "";
-            string rawBinaryDataAfterMessagePackDecodeDecoded = "";
 
             try
             {
@@ -3274,58 +3245,45 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 Logger.Log("Raw Data Received: " + rawBinaryDataAsString, LogType.Debug);
                 Logger.Log("Raw Data Decoded: " + rawBinaryDataDecoded, LogType.Debug);
 
-                //if (rawBinaryDataDecoded.Contains("error"))
-                //    ProcessErrorReceivedFromConductor(dataReceivedEventArgs, rawBinaryDataDecoded, rawBinaryDataAsString, rawBinaryDataAfterMessagePackDecodeAsString, rawBinaryDataAfterMessagePackDecodeDecoded);
-                //else
-                //{
-                    HoloNETResponse response = DecodeDataReceived(dataReceivedEventArgs.RawBinaryData, dataReceivedEventArgs, rawBinaryDataAsString, rawBinaryDataDecoded);
+                HoloNETResponse response = DecodeDataReceived(dataReceivedEventArgs.RawBinaryData, dataReceivedEventArgs);
 
-                    if (!response.IsError)
+                if (!response.IsError)
+                {
+                    switch (response.HoloNETResponseType)
                     {
-                        switch (response.HoloNETResponseType)
-                        {
-                            case HoloNETResponseType.AppInfo:
-                                DecodeAppInfoDataReceived(response, dataReceivedEventArgs, rawBinaryDataAsString, rawBinaryDataDecoded, rawBinaryDataAfterMessagePackDecodeAsString, rawBinaryDataAfterMessagePackDecodeDecoded, false);
-                                break;
+                        case HoloNETResponseType.AppInfo:
+                            DecodeAppInfoDataReceived(response, dataReceivedEventArgs);
+                            break;
 
-                            case HoloNETResponseType.Signal:
-                                DecodeSignalDataReceived(response, dataReceivedEventArgs, rawBinaryDataAsString, rawBinaryDataDecoded, rawBinaryDataAfterMessagePackDecodeAsString, rawBinaryDataAfterMessagePackDecodeDecoded);
-                                break;
+                        case HoloNETResponseType.Signal:
+                            DecodeSignalDataReceived(response, dataReceivedEventArgs);
+                            break;
 
-                            case HoloNETResponseType.ZomeResponse:
-                                DecodeZomeDataReceived(response, dataReceivedEventArgs, rawBinaryDataAsString, rawBinaryDataDecoded, rawBinaryDataAfterMessagePackDecodeAsString, rawBinaryDataAfterMessagePackDecodeDecoded);
-                                break;
+                        case HoloNETResponseType.ZomeResponse:
+                            DecodeZomeDataReceived(response, dataReceivedEventArgs);
+                            break;
 
-                            case HoloNETResponseType.AdminAgentPubKeyGenerated:
-                                DecodeAdminAgentPubKeyGeneratedReceived(response, dataReceivedEventArgs, rawBinaryDataAsString, rawBinaryDataDecoded, rawBinaryDataAfterMessagePackDecodeAsString, rawBinaryDataAfterMessagePackDecodeDecoded);
-                                break;
+                        case HoloNETResponseType.AdminAgentPubKeyGenerated:
+                            DecodeAdminAgentPubKeyGeneratedReceived(response, dataReceivedEventArgs);
+                            break;
 
-                            case HoloNETResponseType.AdminAppInstalled:
-                                DecodeAdminAppInstalledReceived(response, dataReceivedEventArgs, rawBinaryDataAsString, rawBinaryDataDecoded, rawBinaryDataAfterMessagePackDecodeAsString, rawBinaryDataAfterMessagePackDecodeDecoded);
-                                break;
+                        case HoloNETResponseType.AdminAppInstalled:
+                            DecodeAdminAppInstalledReceived(response, dataReceivedEventArgs);
+                            break;
 
-                            case HoloNETResponseType.AdminAppEnabled:
-                                DecodeAdminAppEnabledReceived(response, dataReceivedEventArgs, rawBinaryDataAsString, rawBinaryDataDecoded, rawBinaryDataAfterMessagePackDecodeAsString, rawBinaryDataAfterMessagePackDecodeDecoded);
-                                break;
+                        case HoloNETResponseType.AdminAppEnabled:
+                            DecodeAdminAppEnabledReceived(response, dataReceivedEventArgs);
+                            break;
 
-                            case HoloNETResponseType.Error:
-                                ProcessErrorReceivedFromConductor(response, dataReceivedEventArgs, rawBinaryDataDecoded, rawBinaryDataAsString, rawBinaryDataAfterMessagePackDecodeAsString, rawBinaryDataAfterMessagePackDecodeDecoded);
-                                break;
-                        }
-                        
-                        //if (rawBinaryDataDecoded.ToUpper().Contains("APP_INFO"))
-                        //    DecodeAppInfoDataReceived(response, dataReceivedEventArgs, rawBinaryDataAsString, rawBinaryDataDecoded, rawBinaryDataAfterMessagePackDecodeAsString, rawBinaryDataAfterMessagePackDecodeDecoded);
+                        case HoloNETResponseType.AdminZomeCallCapabilityGranted:
+                            DecodeAdminZomeCallCapabilityGrantedReceived(response, dataReceivedEventArgs);
+                            break;
 
-                        //else if (response.type.ToUpper() == "SIGNAL")
-                        //    DecodeSignalDataReceived(response, dataReceivedEventArgs, rawBinaryDataAsString, rawBinaryDataDecoded, rawBinaryDataAfterMessagePackDecodeAsString, rawBinaryDataAfterMessagePackDecodeDecoded);
-
-                        //else if (rawBinaryDataDecoded.ToLower().Contains("agent_pub_key_generated"))
-                        //    DecodeAdminAgentPubKeyGeneratedReceived(response, dataReceivedEventArgs, rawBinaryDataAsString, rawBinaryDataDecoded, rawBinaryDataAfterMessagePackDecodeAsString, rawBinaryDataAfterMessagePackDecodeDecoded);
-
-                        //else
-                        //    DecodeZomeDataReceived(response, dataReceivedEventArgs, rawBinaryDataAsString, rawBinaryDataDecoded, rawBinaryDataAfterMessagePackDecodeAsString, rawBinaryDataAfterMessagePackDecodeDecoded);
+                        case HoloNETResponseType.Error:
+                            ProcessErrorReceivedFromConductor(response, dataReceivedEventArgs);
+                            break;
                     }
-               // }
+                }
             }
             catch (Exception ex)
             {
@@ -3334,15 +3292,35 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
         }
 
-        private void ProcessErrorReceivedFromConductor(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs, string rawBinaryDataDecoded, string rawBinaryDataAsString, string rawBinaryDataAfterMessagePackDecodeAsString, string rawBinaryDataAfterMessagePackDecodeDecoded)
+        private void ProcessErrorReceivedFromConductor(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
         {
-            string msg = $"Error in HoloNETClient.ProcessErrorReceivedFromConductor method. Error received from Holochain Conductor: {rawBinaryDataDecoded}";
+            string msg = $"Error in HoloNETClient.ProcessErrorReceivedFromConductor method. Error received from Holochain Conductor: ";
+
+            if (response != null)
+            {
+                try
+                {
+                    AppResponse appResponse = MessagePackSerializer.Deserialize<AppResponse>(response.data, messagePackSerializerOptions);
+
+                    if (appResponse != null)
+                        msg = $"'{msg}{appResponse.type}: {appResponse.data["type"]}: {appResponse.data["data"]}.'";
+                    else
+                        msg = $"'{msg}{dataReceivedEventArgs.RawBinaryDataDecoded}'";
+                }
+                catch (Exception ex)
+                {
+                    msg = $"'{msg}{dataReceivedEventArgs.RawBinaryDataDecoded}'";
+                }
+            }
+            else
+                msg = $"'{msg}{dataReceivedEventArgs.RawBinaryDataDecoded}'";
+
             HandleError(msg, null);
 
-            if (rawBinaryDataDecoded.Contains("app_info"))
+            if (dataReceivedEventArgs.RawBinaryDataDecoded.Contains("app_info"))
             {
                 Logger.Log("APPINFO ERROR", LogType.Error);
-                AppInfoCallBackEventArgs args = CreateHoloNETArgs<AppInfoCallBackEventArgs>(response, dataReceivedEventArgs, rawBinaryDataAsString, rawBinaryDataDecoded, rawBinaryDataAfterMessagePackDecodeAsString, rawBinaryDataAfterMessagePackDecodeDecoded);
+                AppInfoCallBackEventArgs args = CreateHoloNETArgs<AppInfoCallBackEventArgs>(response, dataReceivedEventArgs);
                 args.IsError = true;
                 args.IsCallSuccessful = false;
                 args.Message = msg;
@@ -3353,16 +3331,16 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 if (response.type.ToUpper() == "SIGNAL")
                 {
                     Logger.Log("SIGNAL ERROR", LogType.Error);
-                    SignalCallBackEventArgs signalCallBackEventArgs = CreateHoloNETArgs<SignalCallBackEventArgs>(response, dataReceivedEventArgs, rawBinaryDataAsString, rawBinaryDataDecoded, rawBinaryDataAfterMessagePackDecodeAsString, rawBinaryDataAfterMessagePackDecodeDecoded);
+                    SignalCallBackEventArgs signalCallBackEventArgs = CreateHoloNETArgs<SignalCallBackEventArgs>(response, dataReceivedEventArgs);
                     signalCallBackEventArgs.IsError = true;
                     signalCallBackEventArgs.IsCallSuccessful = false;
                     signalCallBackEventArgs.Message = msg;
                     RaiseSignalReceivedEvent(signalCallBackEventArgs);
                 }
-                else if (rawBinaryDataDecoded.ToUpper().Contains("APPALREADYINSTALLED")) //TODO: Improve all error handling code and other areas so can remove this string parsing code, need to decode the conductor response into proper objects asap! ;-)
+                else if (dataReceivedEventArgs.RawBinaryDataDecoded.ToUpper().Contains("APPALREADYINSTALLED")) //TODO: Improve all error handling code and other areas so can remove this string parsing code, need to decode the conductor response into proper objects asap! ;-)
                 {
                     Logger.Log("APPALREADYINSTALLED ERROR", LogType.Error);
-                    AdminAppInstalledCallBackEventArgs adminAppInstalledCallBackEventArgs = CreateHoloNETArgs<AdminAppInstalledCallBackEventArgs>(response, dataReceivedEventArgs, rawBinaryDataAsString, rawBinaryDataDecoded, rawBinaryDataAfterMessagePackDecodeAsString, rawBinaryDataAfterMessagePackDecodeDecoded);
+                    AdminAppInstalledCallBackEventArgs adminAppInstalledCallBackEventArgs = CreateHoloNETArgs<AdminAppInstalledCallBackEventArgs>(response, dataReceivedEventArgs);
                     adminAppInstalledCallBackEventArgs.IsError = true;
                     adminAppInstalledCallBackEventArgs.IsCallSuccessful = false;
                     adminAppInstalledCallBackEventArgs.Message = msg;
@@ -3372,7 +3350,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             else
             {
                 Logger.Log("ZOME CALL ERROR", LogType.Error);
-                ZomeFunctionCallBackEventArgs zomeFunctionCallBackArgs = CreateHoloNETArgs<ZomeFunctionCallBackEventArgs>(response, dataReceivedEventArgs, rawBinaryDataAsString, rawBinaryDataDecoded, rawBinaryDataAfterMessagePackDecodeAsString, rawBinaryDataAfterMessagePackDecodeDecoded);
+                ZomeFunctionCallBackEventArgs zomeFunctionCallBackArgs = CreateHoloNETArgs<ZomeFunctionCallBackEventArgs>(response, dataReceivedEventArgs);
                 zomeFunctionCallBackArgs.IsError = true;
                 zomeFunctionCallBackArgs.IsCallSuccessful = false;
                 zomeFunctionCallBackArgs.Message = msg;
@@ -3382,7 +3360,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
         }
 
-        private HoloNETResponse DecodeDataReceived(byte[] rawBinaryData, WebSocket.DataReceivedEventArgs dataReceivedEventArgs, string rawBinaryDataAsString, string rawBinaryDataDecoded)
+        private HoloNETResponse DecodeDataReceived(byte[] rawBinaryData, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
         {
             HoloNETResponse response = null;
             HoloNETDataReceivedEventArgs holoNETDataReceivedEventArgs = new HoloNETDataReceivedEventArgs();
@@ -3443,8 +3421,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                         response.HoloNETResponseType = HoloNETResponseType.AdminAppDisabled;
                         break;
 
-                    case "grant_zome_call_capability":
-                        response.HoloNETResponseType = HoloNETResponseType.AdminGrantZomeCallCapability;
+                    case "zome_call_capability_granted":
+                        response.HoloNETResponseType = HoloNETResponseType.AdminZomeCallCapabilityGranted;
                         break;
 
                     case "error":
@@ -3452,24 +3430,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                         break;
                 }
 
-                holoNETDataReceivedEventArgs = CreateHoloNETArgs<HoloNETDataReceivedEventArgs>(response, dataReceivedEventArgs, rawBinaryDataAsString, rawBinaryDataDecoded, rawBinaryDataAfterMessagePackDecodeAsString, rawBinaryDataAfterMessagePackDecodeDecoded);
-
-                //holoNETDataReceivedEventArgs = new HoloNETDataReceivedEventArgs()
-                //{
-                //    Id = id,
-                //    EndPoint = dataReceivedEventArgs.EndPoint,
-                //    Type = response.type,
-                //    HoloNETResponseType = response.HoloNETResponseType,
-                //    IsCallSuccessful = true,
-                //    RawBinaryData = rawBinaryData,
-                //    RawBinaryDataAsString = rawBinaryDataAsString,
-                //    RawBinaryDataDecoded = rawBinaryDataDecoded,
-                //    RawBinaryDataAfterMessagePackDecode = response != null ? response.data : null,
-                //    RawBinaryDataAfterMessagePackDecodeAsString = rawBinaryDataAfterMessagePackDecodeAsString,
-                //    RawBinaryDataAfterMessagePackDecodeDecoded = rawBinaryDataAfterMessagePackDecodeDecoded,
-                //    RawJSONData = dataReceivedEventArgs.RawJSONData,
-                //    WebSocketResult = dataReceivedEventArgs.WebSocketResult
-                //};
+                holoNETDataReceivedEventArgs = CreateHoloNETArgs<HoloNETDataReceivedEventArgs>(response, dataReceivedEventArgs);
 
                 if (Config.EnforceRequestToResponseIdMatchingBehaviour != EnforceRequestToResponseIdMatchingBehaviour.Ignore
                     && !_pendingRequests.Contains(id))
@@ -3497,9 +3458,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             return response;
         }
 
-        private void DecodeAdminAgentPubKeyGeneratedReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs, string rawBinaryDataAsString, string rawBinaryDataDecoded, string rawBinaryDataAfterMessagePackDecodeAsString, string rawBinaryDataAfterMessagePackDecodeDecoded)
+        private void DecodeAdminAgentPubKeyGeneratedReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
         {
-            AdminAgentPubKeyGeneratedCallBackEventArgs args = CreateHoloNETArgs<AdminAgentPubKeyGeneratedCallBackEventArgs>(response, dataReceivedEventArgs, rawBinaryDataAsString, rawBinaryDataDecoded, rawBinaryDataAfterMessagePackDecodeAsString, rawBinaryDataAfterMessagePackDecodeDecoded);
+            AdminAgentPubKeyGeneratedCallBackEventArgs args = CreateHoloNETArgs<AdminAgentPubKeyGeneratedCallBackEventArgs>(response, dataReceivedEventArgs);
 
             try
             {
@@ -3507,17 +3468,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 AppResponse appResponse = MessagePackSerializer.Deserialize<AppResponse>(response.data, messagePackSerializerOptions);
                 args.AgentPubKey = ConvertHoloHashToString(appResponse.data);
                 args.AppResponse = appResponse;
-                //args.EndPoint = dataReceivedEventArgs.EndPoint;
-                //args.Id = response.id.ToString();
-                //args.IsCallSuccessful = true;
-                //args.RawBinaryData = dataReceivedEventArgs.RawBinaryData;
-                //args.RawBinaryDataAsString = rawBinaryDataAsString;
-                //args.RawBinaryDataDecoded = rawBinaryDataDecoded;
-                //args.RawBinaryDataAfterMessagePackDecode = response != null ? response.data : null;
-                //args.RawBinaryDataAfterMessagePackDecodeAsString = rawBinaryDataAfterMessagePackDecodeAsString;
-                //args.RawBinaryDataAfterMessagePackDecodeDecoded = rawBinaryDataAfterMessagePackDecodeDecoded;
-                //args.RawJSONData = dataReceivedEventArgs.RawJSONData;
-                //args.WebSocketResult = dataReceivedEventArgs.WebSocketResult;
 
                 Logger.Log($"AGENT PUB KEY GENERATED: {args.AgentPubKey}\n", LogType.Info);
 
@@ -3536,14 +3486,27 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             RaiseAdminAgentPubKeyGeneratedEvent(args);
         }
 
-        private void DecodeAdminAppInstalledReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs, string rawBinaryDataAsString, string rawBinaryDataDecoded, string rawBinaryDataAfterMessagePackDecodeAsString, string rawBinaryDataAfterMessagePackDecodeDecoded)
+        private void DecodeAdminAppInstalledReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
         {
             AdminAppInstalledCallBackEventArgs args = new AdminAppInstalledCallBackEventArgs();
 
             try
             {
                 Logger.Log("ADMIN APP INSTALLED DATA DETECTED\n", LogType.Info);
-                DecodeAppInfoDataReceived(response, dataReceivedEventArgs, rawBinaryDataAsString, rawBinaryDataDecoded, rawBinaryDataAfterMessagePackDecodeAsString, rawBinaryDataAfterMessagePackDecodeDecoded, true);
+
+                AppInfoResponse appInfoResponse = MessagePackSerializer.Deserialize<AppInfoResponse>(response.data, messagePackSerializerOptions);
+                args = CreateHoloNETArgs<AdminAppInstalledCallBackEventArgs>(response, dataReceivedEventArgs);
+
+                if (appInfoResponse != null)
+                {
+                    appInfoResponse.data = ProcessAppInfo(appInfoResponse.data, args);
+                    args.AppInfoResponse = appInfoResponse;
+                }
+                else
+                {
+                    args.Message = "Error occured in HoloNETClient.DecodeAppInfoDataReceived. appInfoResponse is null.";
+                    args.IsError = true;
+                }
             }
             catch (Exception ex)
             {
@@ -3551,15 +3514,16 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 args.IsError = true;
                 args.IsCallSuccessful = false;
                 args.Message = msg;
-                RaiseAdminAppInstalledEvent(args);
                 HandleError(msg, ex);
             }
+
+            RaiseAdminAppInstalledEvent(args);
         }
 
-        private void DecodeAdminAppEnabledReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs, string rawBinaryDataAsString, string rawBinaryDataDecoded, string rawBinaryDataAfterMessagePackDecodeAsString, string rawBinaryDataAfterMessagePackDecodeDecoded)
+        private void DecodeAdminAppEnabledReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
         {
             string errorMessage = "An unknown error occurred in HoloNETClient.DecodeAdminAppEnabledReceived. Reason: ";
-            AdminAppEnabledCallBackEventArgs args = CreateHoloNETArgs<AdminAppEnabledCallBackEventArgs>(response, dataReceivedEventArgs, rawBinaryDataAsString, rawBinaryDataDecoded, rawBinaryDataAfterMessagePackDecodeAsString, rawBinaryDataAfterMessagePackDecodeDecoded);
+            AdminAppEnabledCallBackEventArgs args = CreateHoloNETArgs<AdminAppEnabledCallBackEventArgs>(response, dataReceivedEventArgs);
 
             try
             {
@@ -3569,7 +3533,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 if (enableAppResponse != null)
                 {
                     enableAppResponse.App = ProcessAppInfo(enableAppResponse.App, args);
-                    //args.AppInfo = enableAppResponse.App;
                     args.AppInfoResponse = new AppInfoResponse() { data = enableAppResponse.App };
                     args.HoloNETResponseType = HoloNETResponseType.AdminAppEnabled;
                     args.Errors = enableAppResponse.Errors; //TODO: Need to find out what this contains and the correct data structure.
@@ -3595,7 +3558,29 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             RaiseAdminAppEnabledEvent(args);
         }
 
-        private void DecodeAppInfoDataReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs, string rawBinaryDataAsString, string rawBinaryDataDecoded, string rawBinaryDataAfterMessagePackDecodeAsString, string rawBinaryDataAfterMessagePackDecodeDecoded, bool isAdminInstallingApp)
+        private void DecodeAdminZomeCallCapabilityGrantedReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
+        {
+            string errorMessage = "An unknown error occurred in HoloNETClient.DecodeAdminZomeCallCapabilityGrantedReceived. Reason: ";
+            AdminZomeCallCapabilityGrantedEventArgs args = CreateHoloNETArgs<AdminZomeCallCapabilityGrantedEventArgs>(response, dataReceivedEventArgs);
+
+            try
+            {
+                Logger.Log("ADMIN ZOME CALL CAPABILITY GRANTED\n", LogType.Info);
+                args.HoloNETResponseType = HoloNETResponseType.AdminZomeCallCapabilityGranted;
+            }
+            catch (Exception ex)
+            {
+                string msg = $"{errorMessage} {ex}";
+                args.IsError = true;
+                args.IsCallSuccessful = false;
+                args.Message = msg;
+                HandleError(msg, ex);
+            }
+
+            RaiseAdminZomeCallCapabilityGrantedEvent(args);
+        }
+
+        private void DecodeAppInfoDataReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
         {
             AppInfoCallBackEventArgs args = new AppInfoCallBackEventArgs();
             AppInfoResponse appInfoResponse = null;
@@ -3604,29 +3589,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             {
                 Logger.Log("APP INFO RESPONSE DATA DETECTED\n", LogType.Info);
                 appInfoResponse = MessagePackSerializer.Deserialize<AppInfoResponse>(response.data, messagePackSerializerOptions);
-                args = CreateHoloNETArgs<AppInfoCallBackEventArgs>(response, dataReceivedEventArgs, rawBinaryDataAsString, rawBinaryDataDecoded, rawBinaryDataAfterMessagePackDecodeAsString, rawBinaryDataAfterMessagePackDecodeDecoded);
-
-                //args = new AppInfoCallBackEventArgs()
-                //{
-                //    AppInfoResponse = appInfoResponse,
-                //    AppInfo = appInfoResponse.data, //TEMP
-                //    EndPoint = dataReceivedEventArgs.EndPoint,
-                //    Id = response.id.ToString(),
-                //    IsCallSuccessful = true,
-                //    RawBinaryData = dataReceivedEventArgs.RawBinaryData,
-                //    RawBinaryDataAsString = rawBinaryDataAsString,
-                //    RawBinaryDataDecoded = rawBinaryDataDecoded,
-                //    RawBinaryDataAfterMessagePackDecode = response != null ? response.data : null,
-                //    RawBinaryDataAfterMessagePackDecodeAsString = rawBinaryDataAfterMessagePackDecodeAsString,
-                //    RawBinaryDataAfterMessagePackDecodeDecoded = rawBinaryDataAfterMessagePackDecodeDecoded,
-                //    RawJSONData = dataReceivedEventArgs.RawJSONData,
-                //    WebSocketResult = dataReceivedEventArgs.WebSocketResult
-                //};
+                args = CreateHoloNETArgs<AppInfoCallBackEventArgs>(response, dataReceivedEventArgs);
 
                 if (appInfoResponse != null)
                 {
                     appInfoResponse.data = ProcessAppInfo(appInfoResponse.data, args);
-                    //args.AppInfo = appInfoResponse.data; //TEMP
                     args.AppInfoResponse = appInfoResponse;
                 }
                 else
@@ -3645,7 +3612,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
 
             //If either the AgentPubKey or DnaHash is empty then attempt to get from the sandbox cmd.
-            if (!args.IsError && !isAdminInstallingApp)
+            if (!args.IsError)
             {
                 if (!string.IsNullOrEmpty(Config.AgentPubKey) && !string.IsNullOrEmpty(Config.DnaHash))
                     SetReadyForZomeCalls();
@@ -3654,91 +3621,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     RetrieveAgentPubKeyAndDnaHashFromSandbox();
             }
 
-            if (isAdminInstallingApp)
-            {
-                AdminAppInstalledCallBackEventArgs installedCallBackEventArgs = new AdminAppInstalledCallBackEventArgs()
-                {
-                    AgentPubKey = args.AgentPubKey,
-                    DnaHash = args.DnaHash,
-                    InstalledAppId = args.InstalledAppId,
-                    //AppInfo = args.AppInfo,
-                    AppInfoResponse = args.AppInfoResponse,
-                    HoloNETResponseType = HoloNETResponseType.AdminAppInstalled
-                };
-
-                CopyHoloNETArgs(args, installedCallBackEventArgs);
-                RaiseAdminAppInstalledEvent(installedCallBackEventArgs);
-
-                //RaiseAdminAppInstalledEvent(new AdminAppInstalledCallBackEventArgs()
-                //{
-                //    AgentPubKey = args.AgentPubKey,
-                //    DnaHash = args.DnaHash,
-                //    InstalledAppId = args.InstalledAppId,
-                //    AppInfo = args.AppInfo,
-                //    HoloNETResponseType = HoloNETResponseType.AdminAppInstalled
-                //    //EndPoint = args.EndPoint,
-                //    //Excception = args.Excception,
-                //    //HoloNETResponseType = HoloNETResponseType.AdminAppInstalled,
-                //    //Id = args.Id,
-                //    //IsCallSuccessful = args.IsCallSuccessful,
-                //    //IsError = args.IsError,
-                //    //Message = args.Message,
-                //    //RawBinaryData = args.RawBinaryData,
-                //    //RawBinaryDataAfterMessagePackDecode = args.RawBinaryDataAfterMessagePackDecode,
-                //    //RawBinaryDataAfterMessagePackDecodeAsString = args.RawBinaryDataAfterMessagePackDecodeAsString,
-                //    //RawBinaryDataAfterMessagePackDecodeDecoded = args.RawBinaryDataAfterMessagePackDecodeDecoded,
-                //    //RawBinaryDataDecoded = args.RawBinaryDataDecoded,
-                //    //RawBinaryDataAsString = args.RawBinaryDataAsString,
-                //    //RawJSONData = args.RawJSONData,
-                //    //WebSocketResult = args.WebSocketResult 
-                //});
-            }
-            else
-                RaiseAppInfoReceivedEvent(args);
-
-            //return appInfoResponse;
+            RaiseAppInfoReceivedEvent(args);
         }
 
-        private T CreateHoloNETArgs<T>(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs, string rawBinaryDataAsString, string rawBinaryDataDecoded, string rawBinaryDataAfterMessagePackDecodeAsString, string rawBinaryDataAfterMessagePackDecodeDecoded) where T : HoloNETDataReceivedBaseEventArgs, new()
-        {
-            return new T()
-            {
-                EndPoint = dataReceivedEventArgs != null ? dataReceivedEventArgs.EndPoint : "",
-                Id = response != null ? response.id.ToString() : "",
-                IsCallSuccessful = true,
-                RawBinaryData = dataReceivedEventArgs != null ? dataReceivedEventArgs.RawBinaryData : null,
-                RawBinaryDataAsString = dataReceivedEventArgs != null ? rawBinaryDataAsString : "",
-                RawBinaryDataDecoded = rawBinaryDataDecoded,
-                //RawBinaryDataAfterMessagePackDecode = response != null ? response.data : null,
-                //RawBinaryDataAfterMessagePackDecodeAsString = rawBinaryDataAfterMessagePackDecodeAsString,
-                //RawBinaryDataAfterMessagePackDecodeDecoded = rawBinaryDataAfterMessagePackDecodeDecoded,
-                RawJSONData = dataReceivedEventArgs != null ? dataReceivedEventArgs.RawJSONData : "",
-                WebSocketResult = dataReceivedEventArgs != null ? dataReceivedEventArgs.WebSocketResult : null
-            };
-        }
-
-        private T1 CopyHoloNETArgs<T1>(T1 sourceArgs, T1 targetArgs) where T1 : HoloNETDataReceivedBaseEventArgs
-        {
-            targetArgs.EndPoint = sourceArgs.EndPoint;
-            targetArgs.Excception = sourceArgs.Excception;
-            //targetArgs.HoloNETResponseType = sourceArgs.HoloNETResponseType;
-            targetArgs.Id = sourceArgs.Id;
-            targetArgs.IsCallSuccessful = sourceArgs.IsCallSuccessful;
-            targetArgs.IsError = sourceArgs.IsError;
-            targetArgs.Message = sourceArgs.Message;
-            targetArgs.RawBinaryData = sourceArgs.RawBinaryData;
-            //targetArgs.RawBinaryDataAfterMessagePackDecode = sourceArgs.RawBinaryDataAfterMessagePackDecode;
-            //targetArgs.RawBinaryDataAfterMessagePackDecodeAsString = sourceArgs.RawBinaryDataAfterMessagePackDecodeAsString;
-            //targetArgs.RawBinaryDataAfterMessagePackDecodeDecoded = sourceArgs.RawBinaryDataAfterMessagePackDecodeDecoded;
-            targetArgs.RawBinaryDataDecoded = sourceArgs.RawBinaryDataDecoded;
-            targetArgs.RawBinaryDataAsString = sourceArgs.RawBinaryDataAsString;
-            targetArgs.RawJSONData = sourceArgs.RawJSONData;
-            targetArgs.WebSocketResult = sourceArgs.WebSocketResult;
-
-            return targetArgs;
-        }
-
-        private void DecodeSignalDataReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs, string rawBinaryDataAsString, string rawBinaryDataDecoded, string rawBinaryDataAfterMessagePackDecodeAsString, string rawBinaryDataAfterMessagePackDecodeDecoded)
+        private void DecodeSignalDataReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
         {
             SignalCallBackEventArgs signalCallBackEventArgs = new SignalCallBackEventArgs();
 
@@ -3770,7 +3656,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 else
                     signalType = SignalType.System;
 
-                signalCallBackEventArgs = CreateHoloNETArgs<SignalCallBackEventArgs>(response, dataReceivedEventArgs, rawBinaryDataAsString, rawBinaryDataDecoded, rawBinaryDataAfterMessagePackDecodeAsString, rawBinaryDataAfterMessagePackDecodeDecoded);
+                signalCallBackEventArgs = CreateHoloNETArgs<SignalCallBackEventArgs>(response, dataReceivedEventArgs);
                 signalCallBackEventArgs.DnaHash = dnaHash;
                 signalCallBackEventArgs.AgentPubKey = agentPublicKey;
                 signalCallBackEventArgs.RawSignalData = appResponse.App;
@@ -3789,7 +3675,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             RaiseSignalReceivedEvent(signalCallBackEventArgs);
         }
 
-        private void DecodeZomeDataReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs, string rawBinaryDataAsString, string rawBinaryDataDecoded, string rawBinaryDataAfterMessagePackDecodeAsString, string rawBinaryDataAfterMessagePackDecodeDecoded)
+        private void DecodeZomeDataReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
         {
             Logger.Log("ZOME RESPONSE DATA DETECTED\n", LogType.Info);
             AppResponse appResponse = MessagePackSerializer.Deserialize<AppResponse>(response.data, messagePackSerializerOptions);
@@ -3814,30 +3700,14 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
 
                 Logger.Log($"Decoded Data:\n{keyValuePairsAsString}", LogType.Info);
-                //Logger.Log($"appResponse.data as string: {DataHelper.ConvertBinaryDataToString(appResponse.data)}", LogType.Debug);
-                //Logger.Log($"appResponse.data decoded: {DataHelper.DecodeBinaryData(appResponse.data)}", LogType.Debug);
 
-                zomeFunctionCallBackArgs = new ZomeFunctionCallBackEventArgs
-                {
-                    Id = id,
-                    EndPoint = dataReceivedEventArgs.EndPoint,
-                    Zome = GetItemFromCache(id, _zomeLookup),
-                    ZomeFunction = GetItemFromCache(id, _funcLookup),
-                    IsCallSuccessful = true,
-                    RawZomeReturnData = rawAppResponseData,
-                    ZomeReturnData = appResponseData,
-                    KeyValuePair = keyValuePairs,
-                    KeyValuePairAsString = keyValuePairsAsString,
-                    Entry = entryData,
-                    RawBinaryData = dataReceivedEventArgs.RawBinaryData,
-                    RawBinaryDataAsString = rawBinaryDataAsString,
-                    RawBinaryDataDecoded = rawBinaryDataDecoded,
-                    //RawBinaryDataAfterMessagePackDecode = response != null ? response.data : null,
-                    //RawBinaryDataAfterMessagePackDecodeAsString = rawBinaryDataAfterMessagePackDecodeAsString,
-                    //RawBinaryDataAfterMessagePackDecodeDecoded = rawBinaryDataAfterMessagePackDecodeDecoded,
-                    RawJSONData = dataReceivedEventArgs.RawJSONData,
-                    WebSocketResult = dataReceivedEventArgs.WebSocketResult
-                };
+                zomeFunctionCallBackArgs = CreateHoloNETArgs<ZomeFunctionCallBackEventArgs>(response, dataReceivedEventArgs);
+                zomeFunctionCallBackArgs.Zome = GetItemFromCache(id, _zomeLookup);
+                zomeFunctionCallBackArgs.ZomeFunction = GetItemFromCache(id, _funcLookup);
+                zomeFunctionCallBackArgs.RawZomeReturnData = rawAppResponseData;
+                zomeFunctionCallBackArgs.KeyValuePair = keyValuePairs;
+                zomeFunctionCallBackArgs.KeyValuePairAsString = keyValuePairsAsString;
+                zomeFunctionCallBackArgs.Entry = entryData;
             }
             catch (Exception ex)
             {
@@ -3846,22 +3716,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     object rawAppResponseData = MessagePackSerializer.Deserialize<object>(appResponse.data, messagePackSerializerOptions);
                     byte[] holoHash = rawAppResponseData as byte[];
 
-                    zomeFunctionCallBackArgs = new ZomeFunctionCallBackEventArgs
-                    {
-                        Id = id,
-                        EndPoint = dataReceivedEventArgs.EndPoint,
-                        Zome = GetItemFromCache(id, _zomeLookup),
-                        ZomeFunction = GetItemFromCache(id, _funcLookup),
-                        IsCallSuccessful = true,
-                        RawBinaryData = dataReceivedEventArgs.RawBinaryData,
-                        RawBinaryDataAsString = rawBinaryDataAsString,
-                        RawBinaryDataDecoded = rawBinaryDataDecoded,
-                        //RawBinaryDataAfterMessagePackDecode = response != null ? response.data : null,
-                        //RawBinaryDataAfterMessagePackDecodeAsString = rawBinaryDataAfterMessagePackDecodeAsString,
-                        //RawBinaryDataAfterMessagePackDecodeDecoded = rawBinaryDataAfterMessagePackDecodeDecoded,
-                        RawJSONData = dataReceivedEventArgs.RawJSONData,
-                        WebSocketResult = dataReceivedEventArgs.WebSocketResult
-                    };
+                    zomeFunctionCallBackArgs = CreateHoloNETArgs<ZomeFunctionCallBackEventArgs>(response, dataReceivedEventArgs);
+                    zomeFunctionCallBackArgs.Zome = GetItemFromCache(id, _zomeLookup);
+                    zomeFunctionCallBackArgs.ZomeFunction = GetItemFromCache(id, _funcLookup);
 
                     if (holoHash != null)
                     {
@@ -3914,13 +3771,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                             args.IsError = true;
                         }
 
-
                         //Conductor time is in microseconds so we need to multiple it by 10 to get the ticks needed to convert it to a DateTime.
                         //Also UNIX dateime (which hc uses) starts from 1970).
                         first.Value[0].Provisioned.dna_modifiers.OriginTime = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddTicks(first.Value[0].Provisioned.dna_modifiers.origin_time * 10);
-                        //first.Value[0].provisioned.dna_modifiers.OriginTime = new DateTime(first.Value[0].provisioned.dna_modifiers.origin_time * 10); 
-                        //first.Value[0].provisioned.dna_modifiers.OriginTime = new DateTime(first.Value[0].provisioned.dna_modifiers.origin_time); 
-                        //first.Value[0].provisioned.dna_modifiers.OriginTime = Convert.ToDateTime(first.Value[0].provisioned.dna_modifiers.origin_time);
                     }
                 }
 
@@ -3958,6 +3811,38 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
 
             return appInfo;
+        }
+
+        private T CreateHoloNETArgs<T>(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs) where T : HoloNETDataReceivedBaseEventArgs, new()
+        {
+            return new T()
+            {
+                EndPoint = dataReceivedEventArgs != null ? dataReceivedEventArgs.EndPoint : "",
+                Id = response != null ? response.id.ToString() : "",
+                IsCallSuccessful = true,
+                RawBinaryData = dataReceivedEventArgs != null ? dataReceivedEventArgs.RawBinaryData : null,
+                RawBinaryDataAsString = dataReceivedEventArgs != null ? dataReceivedEventArgs.RawBinaryDataAsString : "",
+                RawBinaryDataDecoded = dataReceivedEventArgs != null ? dataReceivedEventArgs.RawBinaryDataDecoded : "",
+                RawJSONData = dataReceivedEventArgs != null ? dataReceivedEventArgs.RawJSONData : "",
+                WebSocketResult = dataReceivedEventArgs != null ? dataReceivedEventArgs.WebSocketResult : null
+            };
+        }
+
+        private T1 CopyHoloNETArgs<T1>(T1 sourceArgs, T1 targetArgs) where T1 : HoloNETDataReceivedBaseEventArgs
+        {
+            targetArgs.EndPoint = sourceArgs.EndPoint;
+            targetArgs.Excception = sourceArgs.Excception;
+            targetArgs.Id = sourceArgs.Id;
+            targetArgs.IsCallSuccessful = sourceArgs.IsCallSuccessful;
+            targetArgs.IsError = sourceArgs.IsError;
+            targetArgs.Message = sourceArgs.Message;
+            targetArgs.RawBinaryData = sourceArgs.RawBinaryData;
+            targetArgs.RawBinaryDataDecoded = sourceArgs.RawBinaryDataDecoded;
+            targetArgs.RawBinaryDataAsString = sourceArgs.RawBinaryDataAsString;
+            targetArgs.RawJSONData = sourceArgs.RawJSONData;
+            targetArgs.WebSocketResult = sourceArgs.WebSocketResult;
+
+            return targetArgs;
         }
 
         private (Dictionary<string, object>, Dictionary<string, string> keyValuePair, string keyValuePairAsString, EntryData entry) DecodeRawZomeData(Dictionary<object, object> rawAppResponseData, Dictionary<string, object> appResponseData, Dictionary<string, string> keyValuePair, string keyValuePairAsString, EntryData entryData = null)
@@ -4104,21 +3989,20 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         private void RaiseSignalReceivedEvent(SignalCallBackEventArgs signalCallBackEventArgs)
         {
-            //TODO: Copy Test Harness logging into appropriate logs in this method for log/debug logtypes... (espcially decoded data)
-            Logger.Log(string.Concat("Id: ", signalCallBackEventArgs.Id, ", Is Call Successful: ", signalCallBackEventArgs.IsCallSuccessful ? "True" : "False", ", AgentPubKey: ", signalCallBackEventArgs.AgentPubKey, ", DnaHash: ", signalCallBackEventArgs.DnaHash, " Raw Binary Data: ", signalCallBackEventArgs.RawBinaryData, ", Raw JSON Data: ", signalCallBackEventArgs.RawJSONData, ", Signal Type: ", Enum.GetName(typeof(SignalType), signalCallBackEventArgs.SignalType), ", Signal Data: ", signalCallBackEventArgs.SignalDataAsString, "\n"), LogType.Info);
+            LogEvent("SignalCallBack", signalCallBackEventArgs);
+            Logger.Log(string.Concat("AgentPubKey: ", signalCallBackEventArgs.AgentPubKey, ", DnaHash: ", signalCallBackEventArgs.DnaHash, ", Signal Type: ", Enum.GetName(typeof(SignalType), signalCallBackEventArgs.SignalType), ", Signal Data: ", signalCallBackEventArgs.SignalDataAsString, "\n"), LogType.Info);
             OnSignalCallBack?.Invoke(this, signalCallBackEventArgs);
         }
 
         private void RaiseAppInfoReceivedEvent(AppInfoCallBackEventArgs appInfoCallBackEventArgs)
         {
-            Logger.Log(string.Concat("Id: ", appInfoCallBackEventArgs.Id, ", Is Call Successful: ", appInfoCallBackEventArgs.IsCallSuccessful ? "True" : "False", ", AgentPubKey: ", appInfoCallBackEventArgs.AgentPubKey, ", DnaHash: ", appInfoCallBackEventArgs.DnaHash, ", Installed App Id: ", appInfoCallBackEventArgs.InstalledAppId, ", Raw Binary Data: ", appInfoCallBackEventArgs.RawBinaryData, ", Raw JSON Data: ", appInfoCallBackEventArgs.RawJSONData, "\n"), LogType.Info);
+            LogEvent("AppInfoCallBack", appInfoCallBackEventArgs, string.Concat("AgentPubKey: ", appInfoCallBackEventArgs.AgentPubKey, ", DnaHash: ", appInfoCallBackEventArgs.DnaHash, ", Installed App Id: ", appInfoCallBackEventArgs.InstalledAppId));
             OnAppInfoCallBack?.Invoke(this, appInfoCallBackEventArgs);
         }
 
         private void RaiseZomeDataReceivedEvent(ZomeFunctionCallBackEventArgs zomeFunctionCallBackArgs)
         {
-            //Logger.Log(string.Concat("Id: ", zomeFunctionCallBackArgs.Id, ", Zome: ", zomeFunctionCallBackArgs.Zome, ", Zome Function: ", zomeFunctionCallBackArgs.ZomeFunction, ", Is Zome Call Successful: ", zomeFunctionCallBackArgs.IsCallSuccessful ? "True" : "False", ", Raw Zome Return Data: ", zomeFunctionCallBackArgs.RawZomeReturnData, ", Zome Return Data: ", zomeFunctionCallBackArgs.ZomeReturnData, ", Zome Return Hash: ", zomeFunctionCallBackArgs.ZomeReturnHash, ", Raw Binary Data: ", zomeFunctionCallBackArgs.RawBinaryData, ", Raw Binary Data As String: ", zomeFunctionCallBackArgs.RawBinaryDataAsString, "Raw Binary Data Decoded: ", zomeFunctionCallBackArgs.RawBinaryDataDecoded, ", Raw Binary Data After MessagePack Decode: ", zomeFunctionCallBackArgs.RawBinaryDataAfterMessagePackDecode, ",  Raw Binary Data After MessagePack Decode As String: ", zomeFunctionCallBackArgs.RawBinaryDataAfterMessagePackDecodeAsString, ", Raw Binary Data Decoded After MessagePack Decode: ", zomeFunctionCallBackArgs.RawBinaryDataAfterMessagePackDecodeDecoded, ", Raw JSON Data: ", zomeFunctionCallBackArgs.RawJSONData), LogType.Info);
-            Logger.Log(string.Concat("Id: ", zomeFunctionCallBackArgs.Id, ", Zome: ", zomeFunctionCallBackArgs.Zome, ", Zome Function: ", zomeFunctionCallBackArgs.ZomeFunction, ", Is Zome Call Successful: ", zomeFunctionCallBackArgs.IsCallSuccessful ? "True" : "False", ", Raw Zome Return Data: ", zomeFunctionCallBackArgs.RawZomeReturnData, ", Zome Return Data: ", zomeFunctionCallBackArgs.ZomeReturnData, ", Zome Return Hash: ", zomeFunctionCallBackArgs.ZomeReturnHash, ", Raw Binary Data: ", zomeFunctionCallBackArgs.RawBinaryData, ", Raw Binary Data As String: ", zomeFunctionCallBackArgs.RawBinaryDataAsString, "Raw Binary Data Decoded: ", zomeFunctionCallBackArgs.RawBinaryDataDecoded, " Raw JSON Data: ", zomeFunctionCallBackArgs.RawJSONData), LogType.Info);
+            LogEvent("ZomeFunctionCallBack", zomeFunctionCallBackArgs, string.Concat("Zome: ", zomeFunctionCallBackArgs.Zome, ", Zome Function: ", zomeFunctionCallBackArgs.ZomeFunction, ", Raw Zome Return Data: ", zomeFunctionCallBackArgs.RawZomeReturnData, ", Zome Return Data: ", zomeFunctionCallBackArgs.ZomeReturnData, ", Zome Return Hash: ", zomeFunctionCallBackArgs.ZomeReturnHash));
 
             if (_callbackLookup.ContainsKey(zomeFunctionCallBackArgs.Id) && _callbackLookup[zomeFunctionCallBackArgs.Id] != null)
                 _callbackLookup[zomeFunctionCallBackArgs.Id].DynamicInvoke(this, zomeFunctionCallBackArgs);
@@ -4143,7 +4027,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         private void RaiseAdminAgentPubKeyGeneratedEvent(AdminAgentPubKeyGeneratedCallBackEventArgs adminAgentPubKeyGeneratedCallBackEventArgs)
         {
-            Logger.Log(string.Concat("Id: ", adminAgentPubKeyGeneratedCallBackEventArgs.Id, ", Is Call Successful: ", adminAgentPubKeyGeneratedCallBackEventArgs.IsCallSuccessful ? "True" : "False", ", AgentPubKey: ", adminAgentPubKeyGeneratedCallBackEventArgs.AgentPubKey, ", Raw Binary Data: ", adminAgentPubKeyGeneratedCallBackEventArgs.RawBinaryData, ", Raw JSON Data: ", adminAgentPubKeyGeneratedCallBackEventArgs.RawJSONData, "\n"), LogType.Info);
+            LogEvent("AdminAgentPubKeyGeneratedCallBack", adminAgentPubKeyGeneratedCallBackEventArgs);
             OnAdminAgentPubKeyGeneratedCallBack?.Invoke(this, adminAgentPubKeyGeneratedCallBackEventArgs);
             
             if (_taskCompletionAdminAgentPubKeyGeneratedCallBack != null && !string.IsNullOrEmpty(adminAgentPubKeyGeneratedCallBackEventArgs.Id) && _taskCompletionAdminAgentPubKeyGeneratedCallBack.ContainsKey(adminAgentPubKeyGeneratedCallBackEventArgs.Id))
@@ -4152,7 +4036,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         private void RaiseAdminAppInstalledEvent(AdminAppInstalledCallBackEventArgs adminAppInstalledCallBackEventArgs)
         {
-            Logger.Log(string.Concat("Id: ", adminAppInstalledCallBackEventArgs.Id, ", Is Call Successful: ", adminAppInstalledCallBackEventArgs.IsCallSuccessful ? "True" : "False", ", Raw Binary Data: ", adminAppInstalledCallBackEventArgs.RawBinaryData, ", Raw JSON Data: ", adminAppInstalledCallBackEventArgs.RawJSONData, "\n"), LogType.Info);
+            LogEvent("AdminAppInstalledCallBack", adminAppInstalledCallBackEventArgs);
             OnAdminAppInstalledCallBack?.Invoke(this, adminAppInstalledCallBackEventArgs);
 
             if (_taskCompletionAdminAppInstalledCallBack != null && !string.IsNullOrEmpty(adminAppInstalledCallBackEventArgs.Id) && _taskCompletionAdminAppInstalledCallBack.ContainsKey(adminAppInstalledCallBackEventArgs.Id))
@@ -4161,7 +4045,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         private void RaiseAdminAppEnabledEvent(AdminAppEnabledCallBackEventArgs adminAppEnabledCallBackEventArgs)
         {
-            Logger.Log(string.Concat("Id: ", adminAppEnabledCallBackEventArgs.Id, ", Is Call Successful: ", adminAppEnabledCallBackEventArgs.IsCallSuccessful ? "True" : "False", ", Raw Binary Data: ", adminAppEnabledCallBackEventArgs.RawBinaryData, ", Raw JSON Data: ", adminAppEnabledCallBackEventArgs.RawJSONData, "\n"), LogType.Info);
+            LogEvent("AdminAppEnabledCallBack", adminAppEnabledCallBackEventArgs);
             OnAdminAppEnabledCallBack?.Invoke(this, adminAppEnabledCallBackEventArgs);
 
             if (_taskCompletionAdminAppEnabledCallBack != null && !string.IsNullOrEmpty(adminAppEnabledCallBackEventArgs.Id) && _taskCompletionAdminAppEnabledCallBack.ContainsKey(adminAppEnabledCallBackEventArgs.Id))
@@ -4170,11 +4054,28 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         private void RaiseAdminAppDisabledEvent(AdminAppDisabledCallBackEventArgs adminAppDisabledCallBackEventArgs)
         {
-            Logger.Log(string.Concat("Id: ", adminAppDisabledCallBackEventArgs.Id, ", Is Call Successful: ", adminAppDisabledCallBackEventArgs.IsCallSuccessful ? "True" : "False", ", Raw Binary Data: ", adminAppDisabledCallBackEventArgs.RawBinaryData, ", Raw JSON Data: ", adminAppDisabledCallBackEventArgs.RawJSONData, "\n"), LogType.Info);
+            LogEvent("AdminAppDisabledCallBack", adminAppDisabledCallBackEventArgs);
             OnAdminAppDisabledCallBack?.Invoke(this, adminAppDisabledCallBackEventArgs);
 
             if (_taskCompletionAdminAppDisabledCallBack != null && !string.IsNullOrEmpty(adminAppDisabledCallBackEventArgs.Id) && _taskCompletionAdminAppDisabledCallBack.ContainsKey(adminAppDisabledCallBackEventArgs.Id))
                 _taskCompletionAdminAppDisabledCallBack[adminAppDisabledCallBackEventArgs.Id].SetResult(adminAppDisabledCallBackEventArgs);
+        }
+
+        private void RaiseAdminZomeCallCapabilityGrantedEvent(AdminZomeCallCapabilityGrantedEventArgs adminZomeCallCapabilityGrantedEventArgs)
+        {
+            LogEvent("AdminZomeCallCapabilityGranted", adminZomeCallCapabilityGrantedEventArgs);
+            OnAdminZomeCallCapabilityGranted?.Invoke(this, adminZomeCallCapabilityGrantedEventArgs);
+
+            if (_taskCompletionAdminZomeCapabilityGrantedCallBack != null && !string.IsNullOrEmpty(adminZomeCallCapabilityGrantedEventArgs.Id) && _taskCompletionAdminAppEnabledCallBack.ContainsKey(adminZomeCallCapabilityGrantedEventArgs.Id))
+                _taskCompletionAdminZomeCapabilityGrantedCallBack[adminZomeCallCapabilityGrantedEventArgs.Id].SetResult(adminZomeCallCapabilityGrantedEventArgs);
+        }
+
+        private void LogEvent(string eventName, HoloNETDataReceivedBaseEventArgs holoNETEvent, string optionalAdditionalLogDetails = "")
+        {
+            if (!string.IsNullOrEmpty(optionalAdditionalLogDetails))
+                optionalAdditionalLogDetails = $", {optionalAdditionalLogDetails}";
+
+            Logger.Log(string.Concat("EVENT RAISED: ", eventName, ": Id: ", holoNETEvent.Id, ", Is Call Successful: ", holoNETEvent.IsCallSuccessful ? "True" : "False", optionalAdditionalLogDetails, ", Raw Binary Data: ", holoNETEvent.RawBinaryDataDecoded, "(", holoNETEvent.RawBinaryDataAsString, ")\n"), LogType.Info);
         }
 
         private void SetReadyForZomeCalls()

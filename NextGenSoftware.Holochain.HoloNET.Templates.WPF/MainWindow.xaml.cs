@@ -11,11 +11,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
     /// </summary>
     public partial class MainWindow : Window
     {
-        private const string _hcAdminURI = "ws://localhost:62153";
+        private const string _hcAdminURI = "ws://localhost:64610";
         private const string _hcAppURI = "ws://localhost:88888";
         private const string _oasisHappPath = @"C:\Users\USER\holochain-holochain-0.1.5\happs\oasis\BUILD\happ\oasis.happ";
         private const string _role_name = "oasis";
-        private const string _installed_app_id = "oasis-app88888888";
+        private const string _installed_app_id = "oasis-app88";
         private HoloNETClient _holoNETClient = new HoloNETClient(_hcAdminURI);
         private bool _rebooting = false;
 
@@ -42,7 +42,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
             _holoNETClient.OnAdminAgentPubKeyGeneratedCallBack += _holoNETClient_OnAdminAgentPubKeyGeneratedCallBack;
             _holoNETClient.OnAdminAppInstalledCallBack += HoloNETClient_OnAdminAppInstalledCallBack;
             _holoNETClient.OnAdminAppEnabledCallBack += _holoNETClient_OnAdminAppEnabledCallBack;
-            _holoNETClient.OnAdminSigningCredentialsAuthorized += _holoNETClient_OnAdminSigningCredentialsAuthorized;
+            _holoNETClient.OnAdminZomeCallCapabilityGranted += _holoNETClient_OnAdminZomeCallCapabilityGranted;
 
             Init();
         }
@@ -67,9 +67,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
                 lstOutput.Items.Add(string.Concat("Data Received for EndPoint: ", e.EndPoint, ": ", e.RawBinaryDataDecoded, "(", e.RawBinaryDataAsString, ")"));
         }
 
-        private void _holoNETClient_OnAdminSigningCredentialsAuthorized(object sender, AdminSigningCredentialsAuthorizedEventArgs e)
+        private void _holoNETClient_OnAdminZomeCallCapabilityGranted(object sender, AdminZomeCallCapabilityGrantedEventArgs e)
         {
-            lstOutput.Items.Add($"ADMIN: Signing Credentials Authorized.");
+            lstOutput.Items.Add($"ADMIN: Zome Call Capability Granted (Signing Credentials Authorized).");
         }
 
         private void _holoNETClient_OnAdminAppEnabledCallBack(object sender, AdminAppEnabledCallBackEventArgs e)

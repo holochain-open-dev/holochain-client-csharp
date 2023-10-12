@@ -10,6 +10,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects
         public byte[] secret { get; set; }
 
         [Key("assignees")]
-        public byte[] assignees { get; set; }
+        public byte[][] assignees { get; set; }
     }
 }

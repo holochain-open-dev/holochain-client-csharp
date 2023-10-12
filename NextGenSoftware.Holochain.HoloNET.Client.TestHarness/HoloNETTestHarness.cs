@@ -150,7 +150,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                 _holoNETClient.OnAdminAppEnabledCallBack += _holoNETClient_OnAdminAppEnabledCallBack;
                 _holoNETClient.OnAdminAppDisabledCallBack += _holoNETClient_OnAdminAppDisabledCallBack;
                 _holoNETClient.OnAdminAppInterfaceAttachedCallBack += _holoNETClient_OnAdminAppInterfaceAttachedCallBack;
-                _holoNETClient.OnAdminSigningCredentialsAuthorized += _holoNETClient_OnAdminSigningCredentialsAuthorized;
+                _holoNETClient.OnAdminZomeCallCapabilityGranted += _holoNETClient_OnAdminZomeCallCapabilityGranted;
                 _holoNETClient.OnAdminRegisterDnaCallBack += _holoNETClient_OnAdminRegisterDnaCallBack;
                 _holoNETClient.OnAdminListAppsCallBack += _holoNETClient_OnAdminListAppsCallBack;
                 _holoNETClient.OnAdminListDnasCallBack += _holoNETClient_OnAdminListDnasCallBack;
@@ -542,6 +542,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
             }
         }
 
+        private static void _holoNETClient_OnAdminZomeCallCapabilityGranted(object sender, AdminZomeCallCapabilityGrantedEventArgs e)
+        {
+            string msg = $"TEST HARNESS: _holoNETClient_OnAdminZomeCallCapabilityGranted, EndPoint: {e.EndPoint}, Id: {e.Id}, Raw Binary Data: {e.RawBinaryData}, Raw Binary Data As String: {e.RawBinaryDataAsString}, Raw Binary Data Decoded: {e.RawBinaryDataDecoded}, IsError: {e.IsError}, Message: {e.Message}";
+            CLIEngine.ShowMessage(msg);
+        }
+
         private static void _holoNETClient_OnAdminDumpNetworkStatsCallBack(object sender, AdminDumpNetworkStatsCallBackEventArgs e)
         {
             string msg = $"TEST HARNESS: _holoNETClient_OnAdminDumpNetworkStatsCallBack, EndPoint: {e.EndPoint}, Id: {e.Id}, Raw Binary Data: {e.RawBinaryData}, Raw Binary Data As String: {e.RawBinaryDataAsString}, Raw Binary Data Decoded: {e.RawBinaryDataDecoded}, IsError: {e.IsError}, Message: {e.Message}";
@@ -623,12 +629,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
         private static void _holoNETClient_OnAdminRegisterDnaCallBack(object sender, AdminRegisterDnaCallBackEventArgs e)
         {
             string msg = $"TEST HARNESS: _holoNETClient_OnAdminRegisterDnaCallBack, EndPoint: {e.EndPoint}, Id: {e.Id}, Raw Binary Data: {e.RawBinaryData}, Raw Binary Data As String: {e.RawBinaryDataAsString}, Raw Binary Data Decoded: {e.RawBinaryDataDecoded}, IsError: {e.IsError}, Message: {e.Message}";
-            CLIEngine.ShowMessage(msg);
-        }
-
-        private static void _holoNETClient_OnAdminSigningCredentialsAuthorized(object sender, AdminSigningCredentialsAuthorizedEventArgs e)
-        {
-            string msg = $"TEST HARNESS: _holoNETClient_OnAdminSigningCredentialsAuthorized, EndPoint: {e.EndPoint}, Id: {e.Id}, Raw Binary Data: {e.RawBinaryData}, Raw Binary Data As String: {e.RawBinaryDataAsString}, Raw Binary Data Decoded: {e.RawBinaryDataDecoded}, IsError: {e.IsError}, Message: {e.Message}";
             CLIEngine.ShowMessage(msg);
         }
 

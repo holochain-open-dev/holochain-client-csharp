@@ -9,9 +9,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
     {
         public string Type { get; set; }
         public HoloNETResponseType HoloNETResponseType { get; set; }
-        //public byte[] RawBinaryDataAfterMessagePackDecode { get; set; }
-       // public string RawBinaryDataAfterMessagePackDecodeAsString { get; set; }
-        //public string RawBinaryDataAfterMessagePackDecodeDecoded { get; set; }
     }
 
     public class HoloNETErrorEventArgs : EventArgs
@@ -30,7 +27,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
     {
 
     }
-
 
     public class ZomeFunctionCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
@@ -52,7 +48,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
     public class AppInfoCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
         public AppInfoResponse AppInfoResponse { get; set; }
-        //public AppInfo AppInfo { get; set; }
         public string InstalledAppId { get; set; }
         public string DnaHash { get; set; }
         public string AgentPubKey { get; set; }
@@ -69,11 +64,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public string AgentPubKey { get; set; }
     }
 
-    //public class AdminAppEnabledCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     public class AdminAppEnabledCallBackEventArgs : AppInfoCallBackEventArgs
     {
         public object Errors { get; set; }
-        // public EnableAppResponse EnableAppResponse { get; set; }
     }
 
     public class AdminAppDisabledCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
@@ -81,9 +74,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public AppResponse AppResponse { get; set; }
     }
 
-    public class AdminSigningCredentialsAuthorizedEventArgs : HoloNETDataReceivedBaseEventArgs
+    public class AdminZomeCallCapabilityGrantedEventArgs : HoloNETDataReceivedBaseEventArgs
     {
-        public AppResponse AppResponse { get; set; }
+        //public AppResponse AppResponse { get; set; }
     }
 
     public class AdminAppInterfaceAttachedCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
