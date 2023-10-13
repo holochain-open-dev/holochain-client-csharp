@@ -11,6 +11,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         AdminAppEnabled,
         AdminAppDisabled,
         AdminZomeCallCapabilityGranted,
+        AdminAppInterfaceAttached,
         Error
     }
 }

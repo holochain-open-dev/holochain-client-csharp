@@ -74,14 +74,14 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public AppResponse AppResponse { get; set; }
     }
 
-    public class AdminZomeCallCapabilityGrantedEventArgs : HoloNETDataReceivedBaseEventArgs
+    public class AdminZomeCallCapabilityGrantedCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
         //public AppResponse AppResponse { get; set; }
     }
 
     public class AdminAppInterfaceAttachedCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
-        public AppResponse AppResponse { get; set; }
+        public UInt16? Port { get; set; }
     }
 
     public class AdminRegisterDnaCallBackEventArgs : HoloNETDataReceivedBaseEventArgs

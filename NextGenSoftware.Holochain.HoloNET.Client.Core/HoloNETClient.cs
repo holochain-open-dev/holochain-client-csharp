@@ -42,7 +42,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         private Dictionary<string, TaskCompletionSource<AdminAppInstalledCallBackEventArgs>> _taskCompletionAdminAppInstalledCallBack = new Dictionary<string, TaskCompletionSource<AdminAppInstalledCallBackEventArgs>>();
         private Dictionary<string, TaskCompletionSource<AdminAppEnabledCallBackEventArgs>> _taskCompletionAdminAppEnabledCallBack = new Dictionary<string, TaskCompletionSource<AdminAppEnabledCallBackEventArgs>>();
         private Dictionary<string, TaskCompletionSource<AdminAppDisabledCallBackEventArgs>> _taskCompletionAdminAppDisabledCallBack = new Dictionary<string, TaskCompletionSource<AdminAppDisabledCallBackEventArgs>>();
-        private Dictionary<string, TaskCompletionSource<AdminZomeCallCapabilityGrantedEventArgs>> _taskCompletionAdminZomeCapabilityGrantedCallBack = new Dictionary<string, TaskCompletionSource<AdminZomeCallCapabilityGrantedEventArgs>>();
+        private Dictionary<string, TaskCompletionSource<AdminZomeCallCapabilityGrantedCallBackEventArgs>> _taskCompletionAdminZomeCapabilityGrantedCallBack = new Dictionary<string, TaskCompletionSource<AdminZomeCallCapabilityGrantedCallBackEventArgs>>();
         private Dictionary<string, TaskCompletionSource<AdminAppInterfaceAttachedCallBackEventArgs>> _taskCompletionAdminAppInterfaceAttachedCallBack = new Dictionary<string, TaskCompletionSource<AdminAppInterfaceAttachedCallBackEventArgs>>();
         private Dictionary<string, TaskCompletionSource<AdminRegisterDnaCallBackEventArgs>> _taskCompletionAdminRegisterDnaCallBack = new Dictionary<string, TaskCompletionSource<AdminRegisterDnaCallBackEventArgs>>();
         private Dictionary<string, TaskCompletionSource<AdminListAppsCallBackEventArgs>> _taskCompletionAdminListAppsCallBack = new Dictionary<string, TaskCompletionSource<AdminListAppsCallBackEventArgs>>();
@@ -172,12 +172,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public event AdminAppDisabledCallBack OnAdminAppDisabledCallBack;
 
 
-        public delegate void AdminZomeCallCapabilityGranted(object sender, AdminZomeCallCapabilityGrantedEventArgs e);
+        public delegate void AdminZomeCallCapabilityGrantedCallBack(object sender, AdminZomeCallCapabilityGrantedCallBackEventArgs e);
 
         /// <summary>
-        /// Fired when a response is received from the conductor after a cell has been authorized via the AdminAuthorizeSigningCredentialsAsync/AdminAuthorizeSigningCredentials method.
+        /// Fired when a response is received from the conductor after a cell has been authorized via the AdminAuthorizeSigningCredentialsForZomeCallsAsync/AdminAuthorizeSigningCredentialsForZomeCalls method.
         /// </summary>
-        public event AdminZomeCallCapabilityGranted OnAdminZomeCallCapabilityGranted;
+        public event AdminZomeCallCapabilityGrantedCallBack OnAdminZomeCallCapabilityGrantedCallBack;
 
 
         public delegate void AdminAppInterfaceAttachedCallBack(object sender, AdminAppInterfaceAttachedCallBackEventArgs e);
@@ -1705,29 +1705,29 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             return CallZomeFunctionAsync(id, zome, function, callback, paramsObject, matchIdToZomeFuncInCallback, cachReturnData, zomeResultCallBackMode).Result;
         }
 
-        public async Task<AdminZomeCallCapabilityGrantedEventArgs> AdminAuthorizeSigningCredentialsAsync(GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = "")
+        public async Task<AdminZomeCallCapabilityGrantedCallBackEventArgs> AdminAuthorizeSigningCredentialsForZomeCallsAsync(GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = "")
         {
-            return await AdminAuthorizeSigningCredentialsAsync(await GetCellIdAsync(), grantedFunctionsType, functions, conductorResponseCallBackMode, id);
+            return await AdminAuthorizeSigningCredentialsForZomeCallsAsync(await GetCellIdAsync(), grantedFunctionsType, functions, conductorResponseCallBackMode, id);
         }
 
-        public AdminZomeCallCapabilityGrantedEventArgs AdminAuthorizeSigningCredentials(GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = "")
+        public AdminZomeCallCapabilityGrantedCallBackEventArgs AdminAuthorizeSigningCredentialsForZomeCalls(GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = "")
         {
-            return AdminAuthorizeSigningCredentials(GetCellId(), grantedFunctionsType, functions, id);
+            return AdminAuthorizeSigningCredentialsForZomeCalls(GetCellId(), grantedFunctionsType, functions, id);
         }
 
-        public async Task<AdminZomeCallCapabilityGrantedEventArgs> AdminAuthorizeSigningCredentialsAsync(string AgentPubKey, string DnaHash, GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions= null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = "")
+        public async Task<AdminZomeCallCapabilityGrantedCallBackEventArgs> AdminAuthorizeSigningCredentialsForZomeCallsAsync(string AgentPubKey, string DnaHash, GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions= null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = "")
         {
-            return await AdminAuthorizeSigningCredentialsAsync(GetCellId(DnaHash, AgentPubKey), grantedFunctionsType, functions, conductorResponseCallBackMode, id);
+            return await AdminAuthorizeSigningCredentialsForZomeCallsAsync(GetCellId(DnaHash, AgentPubKey), grantedFunctionsType, functions, conductorResponseCallBackMode, id);
         }
 
-        public AdminZomeCallCapabilityGrantedEventArgs AdminAuthorizeSigningCredentials(string AgentPubKey, string DnaHash, GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = "")
+        public AdminZomeCallCapabilityGrantedCallBackEventArgs AdminAuthorizeSigningCredentialsForZomeCalls(string AgentPubKey, string DnaHash, GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = "")
         {
-            return AdminAuthorizeSigningCredentials(GetCellId(DnaHash, AgentPubKey), grantedFunctionsType, functions, id);
+            return AdminAuthorizeSigningCredentialsForZomeCalls(GetCellId(DnaHash, AgentPubKey), grantedFunctionsType, functions, id);
         }
 
-        public async Task<AdminZomeCallCapabilityGrantedEventArgs> AdminAuthorizeSigningCredentialsAsync(byte[][] cellId, GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = "")
+        public async Task<AdminZomeCallCapabilityGrantedCallBackEventArgs> AdminAuthorizeSigningCredentialsForZomeCallsAsync(byte[][] cellId, GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = "")
         {
-            (AdminZomeCallCapabilityGrantedEventArgs args, Dictionary<GrantedFunctionsType, List<(string, string)>> grantedFunctions, byte[] signingKey) = AuthorizeSigningCredentials(cellId, grantedFunctionsType, functions, id);
+            (AdminZomeCallCapabilityGrantedCallBackEventArgs args, Dictionary<GrantedFunctionsType, List<(string, string)>> grantedFunctions, byte[] signingKey) = AuthorizeSigningCredentials(cellId, grantedFunctionsType, functions, id);
 
             if (!args.IsError)
             {
@@ -1738,14 +1738,14 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 return args;
         }
 
-        public AdminZomeCallCapabilityGrantedEventArgs AdminAuthorizeSigningCredentials(byte[][] cellId, GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null, string id = "")
+        public AdminZomeCallCapabilityGrantedCallBackEventArgs AdminAuthorizeSigningCredentialsForZomeCalls(byte[][] cellId, GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null, string id = "")
         {
-            (AdminZomeCallCapabilityGrantedEventArgs args, Dictionary<GrantedFunctionsType, List<(string, string)>> grantedFunctions, byte[] signingKey) = AuthorizeSigningCredentials(cellId, grantedFunctionsType, functions, id);
+            (AdminZomeCallCapabilityGrantedCallBackEventArgs args, Dictionary<GrantedFunctionsType, List<(string, string)>> grantedFunctions, byte[] signingKey) = AuthorizeSigningCredentials(cellId, grantedFunctionsType, functions, id);
 
             if (!args.IsError)
             {
                 CallAdminFunction("grant_zome_call_capability", CreateGrantZomeCallCapabilityRequest(cellId, grantedFunctions, signingKey), id);
-                return new AdminZomeCallCapabilityGrantedEventArgs() { IsCallSuccessful = true, EndPoint = EndPoint, Id = id, Message = "The call has been sent to the conductor.  Please wait for the event 'OnAdminZomeCallCapabilityGranted' to view the response." };
+                return new AdminZomeCallCapabilityGrantedCallBackEventArgs() { IsCallSuccessful = true, EndPoint = EndPoint, Id = id, Message = "The call has been sent to the conductor.  Please wait for the event 'OnAdminZomeCallCapabilityGranted' to view the response." };
             }
             else
                 return args;
@@ -1772,27 +1772,27 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             };
         }
 
-        private (AdminZomeCallCapabilityGrantedEventArgs, Dictionary<GrantedFunctionsType, List<(string, string)>>, byte[]) AuthorizeSigningCredentials(byte[][] cellId, GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null, string id = "")
+        private (AdminZomeCallCapabilityGrantedCallBackEventArgs, Dictionary<GrantedFunctionsType, List<(string, string)>>, byte[]) AuthorizeSigningCredentials(byte[][] cellId, GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null, string id = "")
         {
             if (cellId == null)
             {
                 string msg = "Error occured in AuthorizeSigningCredentialsAsync function. cellId is null.";
                 HandleError(msg, null);
-                return (new AdminZomeCallCapabilityGrantedEventArgs() { IsError = true, EndPoint = EndPoint, Id = id, Message = msg }, null, null);
+                return (new AdminZomeCallCapabilityGrantedCallBackEventArgs() { IsError = true, EndPoint = EndPoint, Id = id, Message = msg }, null, null);
             }
 
             if (string.IsNullOrEmpty(Config.AgentPubKey))
             {
                 string msg = "Error occured in AuthorizeSigningCredentialsAsync function. Config.AgentPubKey is null. Please set or call AdminGenerateAgentPubKey method.";
                 HandleError(msg, null);
-                return (new AdminZomeCallCapabilityGrantedEventArgs() { IsError = true, EndPoint = EndPoint, Id = id, Message = msg }, null, null);
+                return (new AdminZomeCallCapabilityGrantedCallBackEventArgs() { IsError = true, EndPoint = EndPoint, Id = id, Message = msg }, null, null);
             }
 
             if (grantedFunctionsType == GrantedFunctionsType.Listed && functions == null)
             {
                 string msg = "Error occured in AuthorizeSigningCredentialsAsync function. GrantedFunctionsType was set to Listed but no functions were passed in.";
                 HandleError(msg, null);
-                return (new AdminZomeCallCapabilityGrantedEventArgs() { IsError = true, EndPoint = EndPoint, Id = id, Message = msg }, null, null);
+                return (new AdminZomeCallCapabilityGrantedCallBackEventArgs() { IsError = true, EndPoint = EndPoint, Id = id, Message = msg }, null, null);
             }
 
             Sodium.KeyPair pair = Sodium.PublicKeyAuth.GenerateKeyPair(RandomNumberGenerator.GetBytes(32));
@@ -1813,7 +1813,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 SigningKey = signingKey
             };
 
-            return (new AdminZomeCallCapabilityGrantedEventArgs(), grantedFunctions, signingKey);
+            return (new AdminZomeCallCapabilityGrantedCallBackEventArgs(), grantedFunctions, signingKey);
         }
 
 
@@ -1874,15 +1874,15 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             return AdminDisableAppAsync(installedAppId, ConductorResponseCallBackMode.UseCallBackEvents, id).Result;
         }
 
-        public async Task<AdminAppInterfaceAttachedCallBackEventArgs> AdminAttachAppInterfaceAsync(int port, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
+        public async Task<AdminAppInterfaceAttachedCallBackEventArgs> AdminAttachAppInterfaceAsync(UInt16? port = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
-            return await CallAdminFunctionAsync("register_dna", new AttachAppInterfaceRequest()
+            return await CallAdminFunctionAsync("attach_app_interface", new AttachAppInterfaceRequest()
             {
                 port = port
             }, _taskCompletionAdminAppInterfaceAttachedCallBack, "OnAdminAppInterfaceAttachedCallBack", conductorResponseCallBackMode, id);
         }
 
-        public AdminAppInterfaceAttachedCallBackEventArgs AdminAttachAppInterface(int port, string id = null)
+        public AdminAppInterfaceAttachedCallBackEventArgs AdminAttachAppInterface(UInt16? port = null, string id = null)
         {
             return AdminAttachAppInterfaceAsync(port, ConductorResponseCallBackMode.UseCallBackEvents, id).Result;
         }
@@ -3279,6 +3279,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                             DecodeAdminZomeCallCapabilityGrantedReceived(response, dataReceivedEventArgs);
                             break;
 
+                        case HoloNETResponseType.AdminAppInterfaceAttached:
+                            DecodeAdminAppInterfaceAttachedReceived(response, dataReceivedEventArgs);
+                            break;
+
                         case HoloNETResponseType.Error:
                             ProcessErrorReceivedFromConductor(response, dataReceivedEventArgs);
                             break;
@@ -3425,6 +3429,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                         response.HoloNETResponseType = HoloNETResponseType.AdminZomeCallCapabilityGranted;
                         break;
 
+                    case "app_interface_attached":
+                        response.HoloNETResponseType = HoloNETResponseType.AdminAppInterfaceAttached;
+                        break;
+
                     case "error":
                         response.HoloNETResponseType = HoloNETResponseType.Error;
                         break;
@@ -3451,6 +3459,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 string msg = $"An unknown error occurred in HoloNETClient.DecodeDataReceived. Reason: {ex}";
                 holoNETDataReceivedEventArgs.IsError = true;
                 holoNETDataReceivedEventArgs.Message = msg;
+                holoNETDataReceivedEventArgs.IsCallSuccessful = false;
                 HandleError(msg, ex);
             }
 
@@ -3561,7 +3570,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         private void DecodeAdminZomeCallCapabilityGrantedReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
         {
             string errorMessage = "An unknown error occurred in HoloNETClient.DecodeAdminZomeCallCapabilityGrantedReceived. Reason: ";
-            AdminZomeCallCapabilityGrantedEventArgs args = CreateHoloNETArgs<AdminZomeCallCapabilityGrantedEventArgs>(response, dataReceivedEventArgs);
+            AdminZomeCallCapabilityGrantedCallBackEventArgs args = CreateHoloNETArgs<AdminZomeCallCapabilityGrantedCallBackEventArgs>(response, dataReceivedEventArgs);
 
             try
             {
@@ -3578,6 +3587,39 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
 
             RaiseAdminZomeCallCapabilityGrantedEvent(args);
+        }
+
+        private void DecodeAdminAppInterfaceAttachedReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
+        {
+            string errorMessage = "An unknown error occurred in HoloNETClient.DecodeAdminAppInterfaceAttachedReceived. Reason: ";
+            AdminAppInterfaceAttachedCallBackEventArgs args = CreateHoloNETArgs<AdminAppInterfaceAttachedCallBackEventArgs>(response, dataReceivedEventArgs);
+            args.HoloNETResponseType = HoloNETResponseType.AdminAppInterfaceAttached;
+
+            try
+            {
+                Logger.Log("ADMIN APP INTERFACE ATTACHED\n", LogType.Info);
+                AttachAppInterfaceResponse attachAppInterfaceResponse = MessagePackSerializer.Deserialize<AttachAppInterfaceResponse>(response.data, messagePackSerializerOptions);
+
+                if (attachAppInterfaceResponse != null) 
+                    attachAppInterfaceResponse.Port = attachAppInterfaceResponse.Port;
+                else
+                {
+                    args.Message = "Error occured in HoloNETClient.DecodeAdminAppInterfaceAttachedReceived. attachAppInterfaceResponse is null.";
+                    args.IsError = true;
+                    args.IsCallSuccessful = false;
+                    HandleError(args.Message);
+                }
+            }
+            catch (Exception ex)
+            {
+                string msg = $"{errorMessage} {ex}";
+                args.IsError = true;
+                args.IsCallSuccessful = false;
+                args.Message = msg;
+                HandleError(msg, ex);
+            }
+
+            RaiseAdminAppInterfaceAttachedEvent(args);
         }
 
         private void DecodeAppInfoDataReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
@@ -3600,6 +3642,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 {
                     args.Message = "Error occured in HoloNETClient.DecodeAppInfoDataReceived. appInfoResponse is null.";
                     args.IsError = true;
+                    args.IsCallSuccessful = false;
+                    HandleError(args.Message);
                 }
             }
             catch (Exception ex)
@@ -3668,6 +3712,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             {
                 string msg = $"An unknown error occurred in HoloNETClient.DecodeSignalDataReceived. Reason: {ex}";
                 signalCallBackEventArgs.IsError = true;
+                signalCallBackEventArgs.IsCallSuccessful = false;
                 signalCallBackEventArgs.Message = msg;
                 HandleError(msg, ex);
             }
@@ -3740,6 +3785,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 {
                     string msg = $"An unknown error occurred in HoloNETClient.DecodeZomeDataReceived. Reason: {ex2}";
                     zomeFunctionCallBackArgs.IsError = true;
+                    zomeFunctionCallBackArgs.IsCallSuccessful = false;
                     zomeFunctionCallBackArgs.Message = msg;
                     HandleError(msg, ex2);
                 }
@@ -4061,13 +4107,22 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 _taskCompletionAdminAppDisabledCallBack[adminAppDisabledCallBackEventArgs.Id].SetResult(adminAppDisabledCallBackEventArgs);
         }
 
-        private void RaiseAdminZomeCallCapabilityGrantedEvent(AdminZomeCallCapabilityGrantedEventArgs adminZomeCallCapabilityGrantedEventArgs)
+        private void RaiseAdminZomeCallCapabilityGrantedEvent(AdminZomeCallCapabilityGrantedCallBackEventArgs adminZomeCallCapabilityGrantedCallBackEventArgs)
         {
-            LogEvent("AdminZomeCallCapabilityGranted", adminZomeCallCapabilityGrantedEventArgs);
-            OnAdminZomeCallCapabilityGranted?.Invoke(this, adminZomeCallCapabilityGrantedEventArgs);
+            LogEvent("AdminZomeCallCapabilityGranted", adminZomeCallCapabilityGrantedCallBackEventArgs);
+            OnAdminZomeCallCapabilityGrantedCallBack?.Invoke(this, adminZomeCallCapabilityGrantedCallBackEventArgs);
 
-            if (_taskCompletionAdminZomeCapabilityGrantedCallBack != null && !string.IsNullOrEmpty(adminZomeCallCapabilityGrantedEventArgs.Id) && _taskCompletionAdminAppEnabledCallBack.ContainsKey(adminZomeCallCapabilityGrantedEventArgs.Id))
-                _taskCompletionAdminZomeCapabilityGrantedCallBack[adminZomeCallCapabilityGrantedEventArgs.Id].SetResult(adminZomeCallCapabilityGrantedEventArgs);
+            if (_taskCompletionAdminZomeCapabilityGrantedCallBack != null && !string.IsNullOrEmpty(adminZomeCallCapabilityGrantedCallBackEventArgs.Id) && _taskCompletionAdminAppEnabledCallBack.ContainsKey(adminZomeCallCapabilityGrantedCallBackEventArgs.Id))
+                _taskCompletionAdminZomeCapabilityGrantedCallBack[adminZomeCallCapabilityGrantedCallBackEventArgs.Id].SetResult(adminZomeCallCapabilityGrantedCallBackEventArgs);
+        }
+
+        private void RaiseAdminAppInterfaceAttachedEvent(AdminAppInterfaceAttachedCallBackEventArgs adminAppInterfaceAttachedCallBackEventArgs)
+        {
+            LogEvent("AdminAppInterfaceAttached", adminAppInterfaceAttachedCallBackEventArgs);
+            OnAdminAppInterfaceAttachedCallBack?.Invoke(this, adminAppInterfaceAttachedCallBackEventArgs);
+
+            if (_taskCompletionAdminAppInterfaceAttachedCallBack != null && !string.IsNullOrEmpty(adminAppInterfaceAttachedCallBackEventArgs.Id) && _taskCompletionAdminAppEnabledCallBack.ContainsKey(adminAppInterfaceAttachedCallBackEventArgs.Id))
+                _taskCompletionAdminAppInterfaceAttachedCallBack[adminAppInterfaceAttachedCallBackEventArgs.Id].SetResult(adminAppInterfaceAttachedCallBackEventArgs);
         }
 
         private void LogEvent(string eventName, HoloNETDataReceivedBaseEventArgs holoNETEvent, string optionalAdditionalLogDetails = "")

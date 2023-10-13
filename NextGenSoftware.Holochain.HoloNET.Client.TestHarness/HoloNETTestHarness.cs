@@ -150,7 +150,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                 _holoNETClient.OnAdminAppEnabledCallBack += _holoNETClient_OnAdminAppEnabledCallBack;
                 _holoNETClient.OnAdminAppDisabledCallBack += _holoNETClient_OnAdminAppDisabledCallBack;
                 _holoNETClient.OnAdminAppInterfaceAttachedCallBack += _holoNETClient_OnAdminAppInterfaceAttachedCallBack;
-                _holoNETClient.OnAdminZomeCallCapabilityGranted += _holoNETClient_OnAdminZomeCallCapabilityGranted;
+                _holoNETClient.OnAdminZomeCallCapabilityGrantedCallBack += _holoNETClient_OnAdminZomeCallCapabilityGranted;
                 _holoNETClient.OnAdminRegisterDnaCallBack += _holoNETClient_OnAdminRegisterDnaCallBack;
                 _holoNETClient.OnAdminListAppsCallBack += _holoNETClient_OnAdminListAppsCallBack;
                 _holoNETClient.OnAdminListDnasCallBack += _holoNETClient_OnAdminListDnasCallBack;
@@ -542,7 +542,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
             }
         }
 
-        private static void _holoNETClient_OnAdminZomeCallCapabilityGranted(object sender, AdminZomeCallCapabilityGrantedEventArgs e)
+        private static void _holoNETClient_OnAdminZomeCallCapabilityGranted(object sender, AdminZomeCallCapabilityGrantedCallBackEventArgs e)
         {
             string msg = $"TEST HARNESS: _holoNETClient_OnAdminZomeCallCapabilityGranted, EndPoint: {e.EndPoint}, Id: {e.Id}, Raw Binary Data: {e.RawBinaryData}, Raw Binary Data As String: {e.RawBinaryDataAsString}, Raw Binary Data Decoded: {e.RawBinaryDataDecoded}, IsError: {e.IsError}, Message: {e.Message}";
             CLIEngine.ShowMessage(msg);
@@ -1144,7 +1144,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                 case TestToRun.AdminAuthorizeSigningCredentials:
                     {
                         Console.WriteLine("Calling AdminAuthorizeSigningCredentialsAsync function on Admin API...\n");
-                        await _holoNETClient.AdminAuthorizeSigningCredentialsAsync(GrantedFunctionsType.Listed, new List<(string, string)>()
+                        await _holoNETClient.AdminAuthorizeSigningCredentialsForZomeCallsAsync(GrantedFunctionsType.Listed, new List<(string, string)>()
                         {
                             ("zome1", "function1"),
                             ("zome2", "function2")

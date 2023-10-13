@@ -1,5 +1,6 @@
 ﻿
 using MessagePack;
+using System;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests
 {
@@ -7,6 +8,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests
     public class AttachAppInterfaceRequest
     {
         [Key("port")]
-        public int port { get; set; }
+        public UInt16? port { get; set; }
     }
 }
