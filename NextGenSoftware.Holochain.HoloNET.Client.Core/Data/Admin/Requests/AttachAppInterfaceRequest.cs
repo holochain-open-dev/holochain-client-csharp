@@ -9,5 +9,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests
     {
         [Key("port")]
         public UInt16? port { get; set; }
+        //public int port { get; set; }
     }
 }

@@ -1144,7 +1144,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                 case TestToRun.AdminAuthorizeSigningCredentials:
                     {
                         Console.WriteLine("Calling AdminAuthorizeSigningCredentialsAsync function on Admin API...\n");
-                        await _holoNETClient.AdminAuthorizeSigningCredentialsForZomeCallsAsync(GrantedFunctionsType.Listed, new List<(string, string)>()
+                        await _holoNETClient.AdminAuthorizeSigningCredentialsAndGrantZomeCallCapabilityAsync(GrantedFunctionsType.Listed, new List<(string, string)>()
                         {
                             ("zome1", "function1"),
                             ("zome2", "function2")

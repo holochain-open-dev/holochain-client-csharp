@@ -8,6 +8,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
     public class AttachAppInterfaceResponse
     {
         [Key("port")]
-        public UInt16 Port { get; set; }
+        public UInt16 port { get; set; }
+        //public object port { get; set; }
+
+        //[Key("p_id")]
+        //public string AppName { get; set; }
+
+        //[Key("p_id")]
+        //public string AppName { get; set; }
     }
 }

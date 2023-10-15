@@ -14,7 +14,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects
         //public dynamic cap_grant { get; set; }
 
         [Key("access")]
-        public CapGrantAccess access { get; set; }
+        //public CapGrantAccess access { get; set; }
+        public dynamic access { get; set; }
 
         [Key("functions")]
         //public GrantedFunctions functions { get; set; }

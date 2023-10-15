@@ -30,8 +30,10 @@
             <Label x:Name="lblOutput" HorizontalAlignment="Center" Foreground="White" FontWeight="Bold" Margin="20" FontSize="14" Content="NextGen Software HoloNET WPF Test Harness v1.0" VerticalAlignment="Center"/>
             <StackPanel Orientation="Horizontal">
                 <CheckBox x:Name="chkShowDetailedMessages" Content="Show Detailed Logs" Margin="20" Foreground="White"></CheckBox>
+                <Button x:Name="btnStartDemo" Content="Start Demo" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnStartDemo_Click"></Button>
                 <Button x:Name="btnClearLog" Content="Clear Log" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnClearLog_Click"></Button>
-                <Button x:Name="btnReboot" Content="Reboot" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnReboot_Click"/>
+                <Button x:Name="btnShowLog" Content="Show Log" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnShowLog_Click"></Button>
+                <Button x:Name="btnReboot" Content="Reboot" Margin="10" Foreground="DarkGray"  IsEnabled="False" Padding="5,2,5,2"  Background="Black" Click="btnReboot_Click"/>
             </StackPanel>
         
     </StackPanel>
