@@ -9,7 +9,9 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="150"></RowDefinition>
+            <RowDefinition Height="160"></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition Height="40"></RowDefinition>
             <RowDefinition></RowDefinition>
         </Grid.RowDefinitions>
 
@@ -31,14 +33,52 @@
             <StackPanel Orientation="Horizontal">
                 <CheckBox x:Name="chkShowDetailedMessages" Content="Show Detailed Logs" Margin="20" Foreground="White"></CheckBox>
                 <Button x:Name="btnStartDemo" Content="Start Demo" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnStartDemo_Click"></Button>
+                <Button x:Name="btnInstall" Content="Install hApp" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnInstall_Click" ></Button>
+                <Button x:Name="btnRefreshInstalledhApps" Content="Refresh hApps" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnRefreshInstalledhApps_Click" ></Button>
+                <Button x:Name="btnListDNAs" Content="List DNAs" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnListDNAs_Click" ></Button>
+                <Button x:Name="btnListCellIds" Content="List Cell Ids" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnListCellIds_Click" ></Button>
+                <Button x:Name="btnListAttachedInterfaces" Content="List Attached Interfaces" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnListAttachedInterfaces_Click" ></Button>
                 <Button x:Name="btnClearLog" Content="Clear Log" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnClearLog_Click"></Button>
                 <Button x:Name="btnShowLog" Content="Show Log" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnShowLog_Click"></Button>
                 <Button x:Name="btnReboot" Content="Reboot" Margin="10" Foreground="DarkGray"  IsEnabled="False" Padding="5,2,5,2"  Background="Black" Click="btnReboot_Click"/>
             </StackPanel>
-        
-    </StackPanel>
-        <ListBox Grid.Row="1" x:Name="lstOutput" Background="Transparent"   Foreground="White">
+
+            <Label  HorizontalAlignment="Left" Foreground="White" FontWeight="Bold" Margin="1" FontSize="12" Content="Installed hApps" VerticalAlignment="Center"/>
+
+        </StackPanel>
+        <ListBox Grid.Row="1" x:Name="lstHapps" Background="Transparent"   Foreground="White">
 
         </ListBox>
+
+        <Label Grid.Row="2" Content="Log:" Margin="0,10,0,0" Foreground="WhiteSmoke" FontWeight="Bold"></Label>
+        
+        <ListBox Grid.Row="3" x:Name="lstOutput" Background="Transparent"   Foreground="White">
+
+        </ListBox>
+
+        <!-- It's important that this is in the end of the XAML as it needs to be on top of everything else! -->
+        <Grid x:Name="InputBox" Grid.Row="0" Grid.RowSpan="4" Visibility="Collapsed">
+            <Grid Background="Transparent" Opacity="0.5"/>
+            <Border
+            MinWidth="250"
+            Background="DarkBlue" 
+            Opacity="50"
+            BorderBrush="Black" 
+            BorderThickness="1" 
+            CornerRadius="0,55,0,55" 
+            HorizontalAlignment="Center" 
+            VerticalAlignment="Center">
+                <StackPanel>
+                    <TextBlock Margin="5" Text="Enter hApp Name" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14" FontFamily="Cambria" />
+                    <TextBox MinWidth="150" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10" FontSize="14" x:Name="InputTextBox"/>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Button x:Name="NoButton" Margin="5" Foreground="WhiteSmoke" Width="50" FontSize="14" Content="Cancel" Background="{x:Null}" Click="NoButton_Click" />
+                        <Button x:Name="YesButton" Margin="5" Foreground="WhiteSmoke" Width="50" FontSize="14" Content="OK" Background="{x:Null}" Click="YesButton_Click"/>
+                    </StackPanel>
+                    <TextBlock Margin="5" x:Name="lblEnterName" Visibility="Hidden" HorizontalAlignment="Right" FontSize="14"  Text="Please enter the hApp name" Foreground="Red" FontWeight="Bold" FontFamily="Cambria" />
+                </StackPanel>
+            </Border>
+        </Grid>
+
     </Grid>
 </Window>

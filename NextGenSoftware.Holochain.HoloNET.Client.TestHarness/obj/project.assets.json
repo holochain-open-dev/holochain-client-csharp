@@ -709,15 +709,6 @@
           "lib/netcoreapp2.1/_._": {}
         }
       },
-      "Chaos.NaCl/1.0.0": {
-        "type": "project",
-        "compile": {
-          "bin/placeholder/Chaos.NaCl.dll": {}
-        },
-        "runtime": {
-          "bin/placeholder/Chaos.NaCl.dll": {}
-        }
-      },
       "NextGenSoftware.CLI.Engine/1.2.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v7.0",
@@ -736,7 +727,6 @@
         "type": "project",
         "framework": ".NETCoreApp,Version=v7.0",
         "dependencies": {
-          "Chaos.NaCl": "1.0.0",
           "MessagePack": "2.4.59",
           "Newtonsoft.Json": "13.0.2",
           "NextGenSoftware.Utilities": "1.1.0",
@@ -2996,11 +2986,6 @@
         "useSharedDesignerContext.txt",
         "version.txt"
       ]
-    },
-    "Chaos.NaCl/1.0.0": {
-      "type": "project",
-      "path": "../Chaos.NaCl/Chaos.NaCl.csproj",
-      "msbuildProject": "../Chaos.NaCl/Chaos.NaCl.csproj"
     },
     "NextGenSoftware.CLI.Engine/1.2.0": {
       "type": "project",

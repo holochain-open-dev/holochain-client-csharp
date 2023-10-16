@@ -1,28 +1,42 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Media;
+using Microsoft.Win32;
 using NextGenSoftware.Holochain.HoloNET.Client;
 using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects;
 
 namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
 {
+    public enum AdminOperation
+    {
+        InstallHapp,
+        ListHapps,
+        ListDNAs,
+        ListCellIds,
+        ListAttachedInterfaces
+    }
+    
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
     {
-        private const string _hcAdminURI = "ws://localhost:52988";
+        private const string _hcAdminURI = "ws://localhost:50780";
         private const string _hcAppURI = "ws://localhost:888888";
         private const string _oasisHappPath = @"C:\Users\USER\holochain-holochain-0.1.5\happs\oasis\BUILD\happ\oasis.happ";
         private const string _role_name = "oasis";
-        private const string _installed_app_id = "oasis-app7777";
+        private const string _installed_app_id = "oasis-app77777";
         private HoloNETClient _holoNETClientApp;
         private HoloNETClient _holoNETClientAdmin = new HoloNETClient(_hcAdminURI);
         private bool _rebooting = false;
         private bool _adminDisconnected = false;
         private bool _appDisconnected = false;
+        private bool _adminConnected = false;
+        private bool _doDemo = false;
+        private string _installinghAppName = "";
+        private string _installinghAppPath = "";
+        private AdminOperation _adminOperation;
 
         public MainWindow()
         {
@@ -129,9 +143,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
         private void _holoNETClientApp_OnReadyForZomeCalls(object sender, ReadyForZomeCallsEventArgs e)
         {
             lstOutput.Items.Add("APP: Ready For Zome Calls.");
-            lstOutput.Items.Add("APP: Calling Zome Function...");
 
-            _holoNETClientApp.CallZomeFunction("oasis", "create_avatar", null);
+            if (_doDemo)
+            {
+                lstOutput.Items.Add("APP: Calling Zome Function...");
+                _holoNETClientApp.CallZomeFunction("oasis", "create_avatar", null);
+            }
         }
 
         private void _holoNETClientApp_OnConnected(object sender, WebSocket.ConnectedEventArgs e)
@@ -170,32 +187,81 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
 
         private void _holoNETClient_OnAdminAppEnabledCallBack(object sender, AdminAppEnabledCallBackEventArgs e)
         {
-            lstOutput.Items.Add($"ADMIN: hApp Enabled.");
-            lstOutput.Items.Add("ADMIN: Authorize Signing Credentials For hApp...");
-            _holoNETClientAdmin.AdminAuthorizeSigningCredentialsAndGrantZomeCallCapability(GrantedFunctionsType.Listed, new List<(string, string)>()
-            {
-                ("oasis", "create_avatar"),
-                ("oasis", "get_avatar"),
-                ("oasis", "update_avatar")
-            });
+            lstOutput.Items.Add($"ADMIN: hApp {e.InstalledAppId} Enabled.");
+            lstOutput.Items.Add($"ADMIN: Authorize Signing Credentials For {e.InstalledAppId} hApp...");
+            //_holoNETClientAdmin.AdminAuthorizeSigningCredentialsAndGrantZomeCallCapability(GrantedFunctionsType.Listed, new List<(string, string)>()
+            //{
+            //    ("oasis", "create_avatar"),
+            //    ("oasis", "get_avatar"),
+            //    ("oasis", "update_avatar")
+            //});
 
-            //_holoNETClientAdmin.AdminAuthorizeSigningCredentials(GrantedFunctionsType.All, null);
+            _holoNETClientAdmin.AdminAuthorizeSigningCredentialsAndGrantZomeCallCapability(GrantedFunctionsType.All, null);
         }
 
         private void _holoNETClient_OnAdminAgentPubKeyGeneratedCallBack(object sender, AdminAgentPubKeyGeneratedCallBackEventArgs e)
         {
             lstOutput.Items.Add($"ADMIN: AgentPubKey Generated for EndPoint: {e.EndPoint} and Id: {e.Id}: AgentPubKey: {e.AgentPubKey}");
-            lstOutput.Items.Add("ADMIN: Installing hApp...");
-            _holoNETClientAdmin.AdminInstallApp(e.AgentPubKey, _installed_app_id, _oasisHappPath);
+            _adminConnected = true;
+
+            if (_doDemo)
+            {
+                lstOutput.Items.Add("ADMIN: Installing OASIS Demo hApp...");
+                _holoNETClientAdmin.AdminInstallApp(e.AgentPubKey, _installed_app_id, _oasisHappPath);
+            }
+            else
+            {
+                switch (_adminOperation)
+                {
+                    case AdminOperation.InstallHapp:
+                    {
+                        lstOutput.Items.Add($"ADMIN: Installing {_installinghAppName} hApp ({_installinghAppPath})...");
+                        _holoNETClientAdmin.AdminInstallApp(e.AgentPubKey, _installinghAppName, _installinghAppPath);
+                    }
+                    break;
+
+                    case AdminOperation.ListHapps:
+                    {
+                        lstOutput.Items.Add($"ADMIN: Listing hApps...");
+                        _holoNETClientAdmin.AdminListApps(AppStatusFilter.All);
+                    }
+                    break;
+
+                    case AdminOperation.ListDNAs:
+                    {
+                        lstOutput.Items.Add($"ADMIN: Listing DNAs...");
+                        _holoNETClientAdmin.AdminListDnas();
+                    }
+                    break;
+
+                    case AdminOperation.ListCellIds:
+                    {
+                        lstOutput.Items.Add($"ADMIN: Listing Cell Ids...");
+                        _holoNETClientAdmin.AdminListCellIds();
+                    }
+                    break;
+
+                    case AdminOperation.ListAttachedInterfaces:
+                    {
+                        lstOutput.Items.Add("ADMIN: Listning Attached Interfaces...");
+                        _holoNETClientAdmin.AdminListInterfaces();
+                    }
+                    break;   
+                }
+            }
         }
 
         private void HoloNETClient_OnDisconnected(object sender, WebSocket.DisconnectedEventArgs e)
         {
             lstOutput.Items.Add("ADMIN: Disconnected");
             _adminDisconnected = true;
+            _adminConnected = false;
 
             if (_rebooting && _adminDisconnected && _appDisconnected)
+            {
+                _doDemo = true;
                 Init();
+            }
         }
 
         private void HoloNETClient_OnAdminAppInstalledCallBack(object sender, AdminAppInstalledCallBackEventArgs e)
@@ -207,17 +273,18 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
                 if (e.AppInfoResponse != null && e.AppInfoResponse.data != null && e.AppInfoResponse.data.cell_info != null && e.AppInfoResponse.data.cell_info.ContainsKey(_role_name) && e.AppInfoResponse.data.cell_info[_role_name] != null && e.AppInfoResponse.data.cell_info[_role_name].Count > 0 && e.AppInfoResponse.data.cell_info[_role_name][0] != null)
                     cellType = e.AppInfoResponse.data.cell_info[_role_name][0].CellInfoType;
 
-                lstOutput.Items.Add($"ADMIN: hApp Installed for EndPoint: {e.EndPoint} and Id: {e.Id}: installed_app_id: {(e.AppInfoResponse != null && e.AppInfoResponse.data != null ? e.AppInfoResponse.data.installed_app_id : "")}, AgentPubKey: {e.AgentPubKey}, DnaHash: {e.DnaHash}, Manifest: {(e.AppInfoResponse != null && e.AppInfoResponse.data != null ? e.AppInfoResponse.data.manifest.name : "")}, CellType: {Enum.GetName(typeof(CellInfoType), cellType)}");
+                lstOutput.Items.Add($"ADMIN: hApp {(e.AppInfoResponse != null && e.AppInfoResponse.data != null ? e.AppInfoResponse.data.installed_app_id : "")} Installed for EndPoint: {e.EndPoint} and Id: {e.Id}:, AgentPubKey: {e.AgentPubKey}, DnaHash: {e.DnaHash}, Manifest: {(e.AppInfoResponse != null && e.AppInfoResponse.data != null ? e.AppInfoResponse.data.manifest.name : "")}, CellType: {Enum.GetName(typeof(CellInfoType), cellType)}");
             }
             else
                 lstOutput.Items.Add($"ADMIN hApp NOT Installed! Reason: {e.Message}");
 
             if (cellType != CellInfoType.Provisioned)
                 lstOutput.Items.Add("CellType is not Provisioned so aborting...");
-            else
+            
+            else if (e.AppInfoResponse != null && e.AppInfoResponse.data != null)
             {
-                lstOutput.Items.Add("ADMIN: Enabling hApp...");
-                _holoNETClientAdmin.AdminEnablelApp(_installed_app_id);
+                lstOutput.Items.Add($"ADMIN: Enabling {e.AppInfoResponse.data.installed_app_id} hApp...");
+                _holoNETClientAdmin.AdminEnablelApp(e.AppInfoResponse.data.installed_app_id);
             }
         }
 
@@ -270,14 +337,14 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
 
             if (_holoNETClientApp != null && _holoNETClientApp.State == System.Net.WebSockets.WebSocketState.Open)
             {
-                lstOutput.Items.Add("APP: Disconneting...");
+                lstOutput.Items.Add("APP: Disconnecting...");
                 _appDisconnected = false;
                 _holoNETClientApp.Disconnect();
             }
             else
                 _appDisconnected = true;
 
-            lstOutput.Items.Add("ADMIN: Disconneting...");
+            lstOutput.Items.Add("ADMIN: Disconnecting...");
             _rebooting = true;
             _adminDisconnected = false;
             _holoNETClientAdmin.Disconnect();
@@ -294,7 +361,115 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
             btnStartDemo.Foreground = new SolidColorBrush(Colors.DarkGray);
             btnReboot.IsEnabled = true;
             btnReboot.Foreground = new SolidColorBrush(Colors.White);
+
+            _doDemo = true;
             Init();
+        }
+
+        private void btnInstall_Click(object sender, RoutedEventArgs e)
+        {
+            InputBox.Visibility = Visibility.Visible;
+        }
+
+        private void YesButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (InputTextBox.Text == "")
+                lblEnterName.Visibility = Visibility.Visible;
+            else
+            {
+                lblEnterName.Visibility = Visibility.Hidden;
+                InputBox.Visibility = Visibility.Collapsed;
+
+                OpenFileDialog openFileDialog = new OpenFileDialog();
+                openFileDialog.Filter = "hApp files (*.hApp)|*.hApp";
+
+                if (openFileDialog.ShowDialog() == true)
+                {
+                    lstHapps.Items.Add(InputTextBox.Text);
+                    _doDemo = false;
+
+                    if (_adminConnected)
+                    {
+                        lstOutput.Items.Add($"ADMIN: Installing hApp {InputTextBox.Text} ({openFileDialog.FileName})...");
+                        _holoNETClientAdmin.AdminInstallApp(_holoNETClientAdmin.Config.AgentPubKey, InputTextBox.Text, openFileDialog.FileName);
+                    }
+                    else
+                    {
+                        _installinghAppName = InputTextBox.Text;
+                        _installinghAppPath = openFileDialog.FileName;
+                        Init();
+                    }
+                }
+            }
+        }
+
+        private void NoButton_Click(object sender, RoutedEventArgs e)
+        {
+            InputBox.Visibility = Visibility.Collapsed;
+        }
+
+        private void btnRefreshInstalledhApps_Click(object sender, RoutedEventArgs e)
+        {
+            _doDemo = false;
+
+            if (_adminConnected)
+            {
+                lstOutput.Items.Add("ADMIN: Listning hApps...");
+                _holoNETClientAdmin.AdminListApps(AppStatusFilter.All);
+            }
+            else
+            {
+                _adminOperation = AdminOperation.ListHapps;
+                Init();
+            }
+        }
+
+        private void btnListDNAs_Click(object sender, RoutedEventArgs e)
+        {
+            _doDemo = false;
+
+            if (_adminConnected)
+            {
+                lstOutput.Items.Add("ADMIN: Listning DNAs...");
+                _holoNETClientAdmin.AdminListApps(AppStatusFilter.All);
+            }
+            else
+            {
+                _adminOperation = AdminOperation.ListDNAs;
+                Init();
+            }
+        }
+
+        private void btnListCellIds_Click(object sender, RoutedEventArgs e)
+        {
+            _doDemo = false;
+
+            if (_adminConnected)
+            {
+                lstOutput.Items.Add("ADMIN: Listning Cell Ids...");
+                _holoNETClientAdmin.AdminListCellIds();
+            }
+            else
+            {
+                _adminOperation = AdminOperation.ListCellIds;
+                Init();
+            }
+        }
+
+        private void btnListAttachedInterfaces_Click(object sender, RoutedEventArgs e)
+        {
+            _doDemo = false;
+
+            if (_adminConnected)
+            {
+                lstOutput.Items.Add("ADMIN: Listning Attached Interfaces...");
+                _holoNETClientAdmin.AdminListInterfaces();
+            }
+            else
+            {
+                _adminOperation = AdminOperation.ListAttachedInterfaces;
+                Init();
+            }
         }
     }
 }

@@ -7,6 +7,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests
     public class ListAppsRequest
     {
         [Key("status_filter")]
-        public AppStatusFilter status_filter { get; set; }
+        public AppStatusFilter? status_filter { get; set; }
     }
 }

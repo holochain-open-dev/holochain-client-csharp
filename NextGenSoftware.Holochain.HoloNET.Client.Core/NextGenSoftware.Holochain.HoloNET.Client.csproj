@@ -163,7 +163,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\NextGenSoftware-Libraries\NextGenSoftware Libraries\NextGenSoftware.Utilities\NextGenSoftware.Utilities.csproj" />
     <ProjectReference Include="..\..\NextGenSoftware-Libraries\NextGenSoftware Libraries\NextGenSoftware.WebSocket\NextGenSoftware.WebSocket.csproj" />
-    <ProjectReference Include="..\Chaos.NaCl\Chaos.NaCl.csproj" />
   </ItemGroup>
 
 </Project>

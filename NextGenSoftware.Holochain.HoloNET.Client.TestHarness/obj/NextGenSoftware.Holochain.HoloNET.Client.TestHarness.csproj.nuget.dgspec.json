@@ -4,21 +4,6 @@
     "C:\\Users\\USER\\source\\repos\\holochain-client-csharp\\NextGenSoftware.Holochain.HoloNET.Client.TestHarness\\NextGenSoftware.Holochain.HoloNET.Client.TestHarness.csproj": {}
   },
   "projects": {
-    "C:\\Users\\USER\\source\\repos\\holochain-client-csharp\\Chaos.NaCl\\Chaos.NaCl.csproj": {
-      "restore": {
-        "projectUniqueName": "C:\\Users\\USER\\source\\repos\\holochain-client-csharp\\Chaos.NaCl\\Chaos.NaCl.csproj",
-        "projectName": "Chaos.NaCl",
-        "projectPath": "C:\\Users\\USER\\source\\repos\\holochain-client-csharp\\Chaos.NaCl\\Chaos.NaCl.csproj",
-        "frameworks": {
-          "net48": {
-            "projectReferences": {}
-          }
-        }
-      },
-      "frameworks": {
-        "net48": {}
-      }
-    },
     "C:\\Users\\USER\\source\\repos\\holochain-client-csharp\\NextGenSoftware.Holochain.HoloNET.Client.Core\\NextGenSoftware.Holochain.HoloNET.Client.csproj": {
       "version": "2.2.0",
       "restore": {
@@ -48,9 +33,6 @@
           "net7.0": {
             "targetAlias": "net7.0",
             "projectReferences": {
-              "C:\\Users\\USER\\source\\repos\\holochain-client-csharp\\Chaos.NaCl\\Chaos.NaCl.csproj": {
-                "projectPath": "C:\\Users\\USER\\source\\repos\\holochain-client-csharp\\Chaos.NaCl\\Chaos.NaCl.csproj"
-              },
               "C:\\Users\\USER\\source\\repos\\NextGenSoftware-Libraries\\NextGenSoftware Libraries\\NextGenSoftware.Utilities\\NextGenSoftware.Utilities.csproj": {
                 "projectPath": "C:\\Users\\USER\\source\\repos\\NextGenSoftware-Libraries\\NextGenSoftware Libraries\\NextGenSoftware.Utilities\\NextGenSoftware.Utilities.csproj"
               },

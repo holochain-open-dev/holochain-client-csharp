@@ -1935,7 +1935,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         {
             return await CallAdminFunctionAsync("list_apps", new ListAppsRequest()
             {
-                status_filter = appStatusFilter
+                status_filter = appStatusFilter != AppStatusFilter.All ? appStatusFilter : null
             }, _taskCompletionAdminListAppsCallBack, "OnAdminListAppsCallBack", conductorResponseCallBackMode, id);
         }
 
