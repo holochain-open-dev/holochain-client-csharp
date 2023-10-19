@@ -152,7 +152,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                 _holoNETClient.OnAdminAppInterfaceAttachedCallBack += _holoNETClient_OnAdminAppInterfaceAttachedCallBack;
                 _holoNETClient.OnAdminZomeCallCapabilityGrantedCallBack += _holoNETClient_OnAdminZomeCallCapabilityGranted;
                 _holoNETClient.OnAdminRegisterDnaCallBack += _holoNETClient_OnAdminRegisterDnaCallBack;
-                _holoNETClient.OnAdminListAppsCallBack += _holoNETClient_OnAdminListAppsCallBack;
+                _holoNETClient.OnAdminAppsListedCallBack += _holoNETClient_OnAdminListAppsCallBack;
                 _holoNETClient.OnAdminListDnasCallBack += _holoNETClient_OnAdminListDnasCallBack;
                 _holoNETClient.OnAdminListCellIdsCallBack += _holoNETClient_OnAdminListCellIdsCallBack;
                 _holoNETClient.OnAdminListAppInterfacesCallBack += _holoNETClient_OnAdminListAppInterfacesCallBack;
@@ -620,9 +620,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
             CLIEngine.ShowMessage(msg);
         }
 
-        private static void _holoNETClient_OnAdminListAppsCallBack(object sender, AdminListAppsCallBackEventArgs e)
+        private static void _holoNETClient_OnAdminListAppsCallBack(object sender, AdminAppsListedCallBackEventArgs e)
         {
-            string msg = $"TEST HARNESS: _holoNETClient_OnAdminListAppsCallBack, EndPoint: {e.EndPoint}, Id: {e.Id}, Raw Binary Data: {e.RawBinaryData}, Raw Binary Data As String: {e.RawBinaryDataAsString}, Raw Binary Data Decoded: {e.RawBinaryDataDecoded}, IsError: {e.IsError}, Message: {e.Message}";
+            string msg = $"TEST HARNESS: _holoNETClient_OnAdminAppsListedCallBack, EndPoint: {e.EndPoint}, Id: {e.Id}, Raw Binary Data: {e.RawBinaryData}, Raw Binary Data As String: {e.RawBinaryDataAsString}, Raw Binary Data Decoded: {e.RawBinaryDataDecoded}, IsError: {e.IsError}, Message: {e.Message}";
             CLIEngine.ShowMessage(msg);
         }
 

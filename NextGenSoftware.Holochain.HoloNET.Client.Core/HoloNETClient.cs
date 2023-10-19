@@ -47,7 +47,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         private Dictionary<string, TaskCompletionSource<AdminZomeCallCapabilityGrantedCallBackEventArgs>> _taskCompletionAdminZomeCapabilityGrantedCallBack = new Dictionary<string, TaskCompletionSource<AdminZomeCallCapabilityGrantedCallBackEventArgs>>();
         private Dictionary<string, TaskCompletionSource<AdminAppInterfaceAttachedCallBackEventArgs>> _taskCompletionAdminAppInterfaceAttachedCallBack = new Dictionary<string, TaskCompletionSource<AdminAppInterfaceAttachedCallBackEventArgs>>();
         private Dictionary<string, TaskCompletionSource<AdminRegisterDnaCallBackEventArgs>> _taskCompletionAdminRegisterDnaCallBack = new Dictionary<string, TaskCompletionSource<AdminRegisterDnaCallBackEventArgs>>();
-        private Dictionary<string, TaskCompletionSource<AdminListAppsCallBackEventArgs>> _taskCompletionAdminListAppsCallBack = new Dictionary<string, TaskCompletionSource<AdminListAppsCallBackEventArgs>>();
+        private Dictionary<string, TaskCompletionSource<AdminAppsListedCallBackEventArgs>> _taskCompletionAdminAppsListedCallBack = new Dictionary<string, TaskCompletionSource<AdminAppsListedCallBackEventArgs>>();
         private Dictionary<string, TaskCompletionSource<AdminListDnasCallBackEventArgs>> _taskCompletionAdminListDnasCallBack = new Dictionary<string, TaskCompletionSource<AdminListDnasCallBackEventArgs>>();
         private Dictionary<string, TaskCompletionSource<AdminListCellIdsCallBackEventArgs>> _taskCompletionAdminListCellIdsCallBack = new Dictionary<string, TaskCompletionSource<AdminListCellIdsCallBackEventArgs>>();
         private Dictionary<string, TaskCompletionSource<AdminListAppInterfacesCallBackEventArgs>> _taskCompletionAdminListAppInterfacesCallBack = new Dictionary<string, TaskCompletionSource<AdminListAppInterfacesCallBackEventArgs>>();
@@ -197,12 +197,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public event AdminRegisterDnaCallBack OnAdminRegisterDnaCallBack;
 
 
-        public delegate void AdminListAppsCallBack(object sender, AdminListAppsCallBackEventArgs e);
+        public delegate void AdminAppsListedCallBack(object sender, AdminAppsListedCallBackEventArgs e);
 
         /// <summary>
         /// Fired when a response is received from the conductor after the AdminListAppsAsync/AdminListApps method is called.
         /// </summary>
-        public event AdminListAppsCallBack OnAdminListAppsCallBack;
+        public event AdminAppsListedCallBack OnAdminAppsListedCallBack;
 
 
         public delegate void AdminListDnasCallBack(object sender, AdminListDnasCallBackEventArgs e);
@@ -1379,15 +1379,15 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                         fn_name = function,
                         zome_name = zome,
                         payload = MessagePackSerializer.Serialize(paramsObject),
-                        //provenance = ConvertHoloHashToBytes(Config.AgentPubKey),
-                        provenance = _signingCredentialsForCell[cellId].SigningKey,
+                        provenance = ConvertHoloHashToBytes(Config.AgentPubKey),
+                        //provenance = _signingCredentialsForCell[cellId].SigningKey,
                         nonce = RandomNumberGenerator.GetBytes(32),
                         expires_at = DateTime.Now.AddMinutes(5).Ticks / 10 //DateTime.Now.AddMinutes(5).ToBinary(), //Conductor expects it in microseconds.
                     };
 
                     byte[] hash = Blake2b.ComputeHash(MessagePackSerializer.Serialize(payload));
                     //var sig = Ed25519.Sign(hash, _signingCredentialsForCell[cellId].KeyPair.PrivateKey);
-                    var sig = Sodium.PublicKeyAuth.Sign(hash, _signingCredentialsForCell[cellId].KeyPair.PrivateKey);
+                    var sig = Sodium.PublicKeyAuth.Sign(hash, _signingCredentialsForCell[cellId].KeyPair.PrivateKey).Take(64).ToArray();
 
                     ZomeCallSigned signedPayload = new ZomeCallSigned()
                     {
@@ -1931,15 +1931,15 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             return AdminRegisterDnaAsync(bundle, network_seed, properties, ConductorResponseCallBackMode.UseCallBackEvents, id).Result;
         }
 
-        public async Task<AdminListAppsCallBackEventArgs> AdminListAppsAsync(AppStatusFilter appStatusFilter, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
+        public async Task<AdminAppsListedCallBackEventArgs> AdminListAppsAsync(AppStatusFilter appStatusFilter, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
             return await CallAdminFunctionAsync("list_apps", new ListAppsRequest()
             {
                 status_filter = appStatusFilter != AppStatusFilter.All ? appStatusFilter : null
-            }, _taskCompletionAdminListAppsCallBack, "OnAdminListAppsCallBack", conductorResponseCallBackMode, id);
+            }, _taskCompletionAdminAppsListedCallBack, "OnAdminListAppsCallBack", conductorResponseCallBackMode, id);
         }
 
-        public AdminListAppsCallBackEventArgs AdminListApps(AppStatusFilter appStatusFilter, string id = null)
+        public AdminAppsListedCallBackEventArgs AdminListApps(AppStatusFilter appStatusFilter, string id = null)
         {
             return AdminListAppsAsync(appStatusFilter, ConductorResponseCallBackMode.UseCallBackEvents, id).Result;
         }
@@ -3304,6 +3304,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                             DecodeAdminAppInterfaceAttachedReceived(response, dataReceivedEventArgs);
                             break;
 
+                        case HoloNETResponseType.AdminAppsListed:
+                            DecodeAdminAppsListedReceived(response, dataReceivedEventArgs);
+                            break;
+
                         case HoloNETResponseType.Error:
                             ProcessErrorReceivedFromConductor(response, dataReceivedEventArgs);
                             break;
@@ -3443,6 +3447,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                     case "app_interface_attached":
                         response.HoloNETResponseType = HoloNETResponseType.AdminAppInterfaceAttached;
+                        break;
+
+                    case "apps_listed":
+                        response.HoloNETResponseType = HoloNETResponseType.AdminAppsListed;
                         break;
 
                     case "error":
@@ -3618,7 +3626,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     args.Port = Convert.ToUInt16(appResponse.data["port"]);
                     
                     //AttachAppInterfaceResponse attachAppInterfaceResponse = MessagePackSerializer.Deserialize<AttachAppInterfaceResponse>(appResponse.data, messagePackSerializerOptions);
-
                     //attachAppInterfaceResponse.Port = attachAppInterfaceResponse.Port;
                 }
                 else
@@ -3639,6 +3646,78 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
 
             RaiseAdminAppInterfaceAttachedEvent(args);
+        }
+
+        private void DecodeAdminAppsListedReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
+        {
+            string errorMessage = "An unknown error occurred in HoloNETClient.DecodeAdminAppsListedReceived. Reason: ";
+            AdminAppsListedCallBackEventArgs args = CreateHoloNETArgs<AdminAppsListedCallBackEventArgs>(response, dataReceivedEventArgs);
+            args.HoloNETResponseType = HoloNETResponseType.AdminAppInterfaceAttached;
+
+            try
+            {
+                Logger.Log("ADMIN APPS LISTED\n", LogType.Info);
+                //AppResponse appResponse = MessagePackSerializer.Deserialize<AppResponse>(response.data, messagePackSerializerOptions);
+                ListAppsResponse appResponse = MessagePackSerializer.Deserialize<ListAppsResponse>(response.data, messagePackSerializerOptions);
+
+                if (appResponse != null)
+                {
+                    foreach (AppInfo appInfo in appResponse.Apps)
+                    {
+                        AppInfoCallBackEventArgs appInfoArgs = new AppInfoCallBackEventArgs();
+                        AppInfo processedAppInfo = ProcessAppInfo(appInfo, appInfoArgs);
+
+                        if (!appInfoArgs.IsError)
+                            args.Apps.Add(processedAppInfo);
+                        else
+                        {
+                            args.IsError = true;
+                            args.IsCallSuccessful = false;
+                            args.Message = $"{args.Message} # {appInfoArgs.Message}";
+                        }
+                    }
+
+                    //foreach (Dictionary<object, object> data in appResponse.data)
+                    //{
+                    //    AppInfoCallBackEventArgs appInfoArgs = new AppInfoCallBackEventArgs();
+                    //    AppInfo appInfo = new AppInfo();
+                    //    appInfo.installed_app_id = data["installed_app_id"].ToString();
+                    //    //appInfo.agent_pub_key = Convert.ToByte(data["agent_pub_key"]);
+
+
+                    //    //AppInfo processedAppInfo = ProcessAppInfo(appInfo, appInfoArgs);
+
+                    //    //if (!appInfoArgs.IsError)
+                    //    //    args.Apps.Add(processedAppInfo);
+                    //    //else
+                    //    //{
+                    //    //    args.IsError = true;
+                    //    //    args.IsCallSuccessful = false;
+                    //    //    args.Message = $"{args.Message} # {appInfoArgs.Message}";
+                    //    //}
+                    //}
+
+                    if (args.IsError)
+                        HandleError(args.Message);
+                }
+                else
+                {
+                    args.Message = "Error occured in HoloNETClient.DecodeAdminAppsListedReceived. appResponse is null.";
+                    args.IsError = true;
+                    args.IsCallSuccessful = false;
+                    HandleError(args.Message);
+                }
+            }
+            catch (Exception ex)
+            {
+                string msg = $"{errorMessage} {ex}";
+                args.IsError = true;
+                args.IsCallSuccessful = false;
+                args.Message = msg;
+                HandleError(msg, ex);
+            }
+
+            RaiseAdminAppsListedEvent(args);
         }
 
         private void DecodeAppInfoDataReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
@@ -4142,6 +4221,15 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             if (_taskCompletionAdminAppInterfaceAttachedCallBack != null && !string.IsNullOrEmpty(adminAppInterfaceAttachedCallBackEventArgs.Id) && _taskCompletionAdminAppEnabledCallBack.ContainsKey(adminAppInterfaceAttachedCallBackEventArgs.Id))
                 _taskCompletionAdminAppInterfaceAttachedCallBack[adminAppInterfaceAttachedCallBackEventArgs.Id].SetResult(adminAppInterfaceAttachedCallBackEventArgs);
+        }
+
+        private void RaiseAdminAppsListedEvent(AdminAppsListedCallBackEventArgs adminAppsListedCallBackEventArgs)
+        {
+            LogEvent("AdminAppsListed", adminAppsListedCallBackEventArgs);
+            OnAdminAppsListedCallBack?.Invoke(this, adminAppsListedCallBackEventArgs);
+
+            if (_taskCompletionAdminAppsListedCallBack != null && !string.IsNullOrEmpty(adminAppsListedCallBackEventArgs.Id) && _taskCompletionAdminAppsListedCallBack.ContainsKey(adminAppsListedCallBackEventArgs.Id))
+                _taskCompletionAdminAppsListedCallBack[adminAppsListedCallBackEventArgs.Id].SetResult(adminAppsListedCallBackEventArgs);
         }
 
         private void LogEvent(string eventName, HoloNETDataReceivedBaseEventArgs holoNETEvent, string optionalAdditionalLogDetails = "")

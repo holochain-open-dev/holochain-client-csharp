@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Windows;
 using System.Windows.Media;
 using Microsoft.Win32;
@@ -22,11 +24,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
     /// </summary>
     public partial class MainWindow : Window
     {
-        private const string _hcAdminURI = "ws://localhost:50780";
+        private const string _hcAdminURI = "ws://localhost:60173";
         private const string _hcAppURI = "ws://localhost:888888";
         private const string _oasisHappPath = @"C:\Users\USER\holochain-holochain-0.1.5\happs\oasis\BUILD\happ\oasis.happ";
         private const string _role_name = "oasis";
-        private const string _installed_app_id = "oasis-app77777";
+        private const string _installed_app_id = "oasis-app7775877";
         private HoloNETClient _holoNETClientApp;
         private HoloNETClient _holoNETClientAdmin = new HoloNETClient(_hcAdminURI);
         private bool _rebooting = false;
@@ -47,8 +49,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             _holoNETClientAdmin.Config.AutoStartHolochainConductor = false;
+            _holoNETClientAdmin.Config.ShowHolochainConductorWindow = true;
             _holoNETClientAdmin.Config.AutoShutdownHolochainConductor = false;
-           // _holoNETClientAdmin.Config.LoggingMode = Logging.LoggingMode.WarningsErrorsInfoAndDebug;
+            _holoNETClientAdmin.Config.FullPathToRootHappFolder = @"C:\Users\USER\holochain-holochain-0.1.5\happs\oasis\BUILD\happ";
+            _holoNETClientAdmin.Config.FullPathToCompiledHappFolder = @"C:\Users\USER\holochain-holochain-0.1.5\happs\oasis\BUILD\happ";
+            // _holoNETClientAdmin.Config.LoggingMode = Logging.LoggingMode.WarningsErrorsInfoAndDebug;
 
             _holoNETClientAdmin.OnConnected += HoloNETClient_OnConnected;
             _holoNETClientAdmin.OnError += HoloNETClient_OnError;
@@ -60,11 +65,29 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
             _holoNETClientAdmin.OnAdminAppEnabledCallBack += _holoNETClient_OnAdminAppEnabledCallBack;
             _holoNETClientAdmin.OnAdminZomeCallCapabilityGrantedCallBack += _holoNETClient_OnAdminZomeCallCapabilityGrantedCallBack;
             _holoNETClientAdmin.OnAdminAppInterfaceAttachedCallBack += _holoNETClient_OnAdminAppInterfaceAttachedCallBack;
+            _holoNETClientAdmin.OnAdminAppsListedCallBack += _holoNETClientAdmin_OnAdminAppsListedCallBack;
+        }
+
+        private void _holoNETClientAdmin_OnAdminAppsListedCallBack(object sender, AdminAppsListedCallBackEventArgs e)
+        {
+            lstHapps.Items.Clear();
+            string hApps = "";
+
+            foreach (AppInfo app in e.Apps)
+            {
+                if (hApps != "")
+                    hApps = $"{hApps}, ";
+
+                hApps = $"{hApps}{app.installed_app_id}";
+                lstHapps.Items.Add($"Name: {app.installed_app_id} Manifest: {app.manifest.name} v{app.manifest.manifest_version} Description: {(!string.IsNullOrEmpty(app.manifest.description) ? app.manifest.description : "None")} Status: {(app.status.running != null ? app.status.running : "Running")} AgentPubKey: {_holoNETClientAdmin.ConvertHoloHashToString(app.agent_pub_key)}");
+            }
+
+            lstOutput.Items.Add($"ADMIN: hApps Listed: {hApps}");
         }
 
         private void _holoNETClient_OnAdminAppInterfaceAttachedCallBack(object sender, AdminAppInterfaceAttachedCallBackEventArgs e)
         {
-            lstOutput.Items.Add($"ADMIN App Interface Attached On Port {e.Port}.");
+            lstOutput.Items.Add($"ADMIN: App Interface Attached On Port {e.Port}.");
 
             //lstOutput.Items.Add("APP: Calling Zome Function...");
 
@@ -189,14 +212,14 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
         {
             lstOutput.Items.Add($"ADMIN: hApp {e.InstalledAppId} Enabled.");
             lstOutput.Items.Add($"ADMIN: Authorize Signing Credentials For {e.InstalledAppId} hApp...");
-            //_holoNETClientAdmin.AdminAuthorizeSigningCredentialsAndGrantZomeCallCapability(GrantedFunctionsType.Listed, new List<(string, string)>()
-            //{
-            //    ("oasis", "create_avatar"),
-            //    ("oasis", "get_avatar"),
-            //    ("oasis", "update_avatar")
-            //});
+            _holoNETClientAdmin.AdminAuthorizeSigningCredentialsAndGrantZomeCallCapability(GrantedFunctionsType.Listed, new List<(string, string)>()
+            {
+                ("oasis", "create_avatar"),
+                ("oasis", "get_avatar"),
+                ("oasis", "update_avatar")
+            });
 
-            _holoNETClientAdmin.AdminAuthorizeSigningCredentialsAndGrantZomeCallCapability(GrantedFunctionsType.All, null);
+            //_holoNETClientAdmin.AdminAuthorizeSigningCredentialsAndGrantZomeCallCapability(GrantedFunctionsType.All, null);
         }
 
         private void _holoNETClient_OnAdminAgentPubKeyGeneratedCallBack(object sender, AdminAgentPubKeyGeneratedCallBackEventArgs e)
@@ -366,9 +389,60 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
             Init();
         }
 
+        //private void btnInstall_Click(object sender, RoutedEventArgs e)
+        //{
+        //    InputBox.Visibility = Visibility.Visible;
+        //}
+
+        //private void YesButton_Click(object sender, RoutedEventArgs e)
+        //{
+        //    if (InputTextBox.Text == "")
+        //        lblEnterName.Visibility = Visibility.Visible;
+        //    else
+        //    {
+        //        lblEnterName.Visibility = Visibility.Hidden;
+        //        InputBox.Visibility = Visibility.Collapsed;
+
+        //        OpenFileDialog openFileDialog = new OpenFileDialog();
+        //        openFileDialog.Filter = "hApp files (*.hApp)|*.hApp";
+
+        //        if (openFileDialog.ShowDialog() == true)
+        //        {
+        //            lstHapps.Items.Add(InputTextBox.Text);
+        //            _doDemo = false;
+
+        //            if (_adminConnected)
+        //            {
+        //                lstOutput.Items.Add($"ADMIN: Installing hApp {InputTextBox.Text} ({openFileDialog.FileName})...");
+        //                _holoNETClientAdmin.AdminInstallApp(_holoNETClientAdmin.Config.AgentPubKey, InputTextBox.Text, openFileDialog.FileName);
+        //            }
+        //            else
+        //            {
+        //                _installinghAppName = InputTextBox.Text;
+        //                _installinghAppPath = openFileDialog.FileName;
+        //                Init();
+        //            }
+        //        }
+        //    }
+        //}
+
         private void btnInstall_Click(object sender, RoutedEventArgs e)
         {
-            InputBox.Visibility = Visibility.Visible;
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "hApp files (*.hApp)|*.hApp";
+
+            if (openFileDialog.ShowDialog() == true)
+            {
+                if (!string.IsNullOrEmpty(openFileDialog.FileName)) 
+                {
+                    _installinghAppPath = openFileDialog.FileName;
+                    FileInfo fileInfo = new FileInfo(openFileDialog.FileName);
+                    string[] parts = fileInfo.Name.Split('.');
+                    _installinghAppName = parts[0];
+                    InputTextBox.Text = _installinghAppName;
+                    InputBox.Visibility = Visibility.Visible;
+                }
+            }
         }
 
         private void YesButton_Click(object sender, RoutedEventArgs e)
@@ -380,25 +454,18 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
                 lblEnterName.Visibility = Visibility.Hidden;
                 InputBox.Visibility = Visibility.Collapsed;
 
-                OpenFileDialog openFileDialog = new OpenFileDialog();
-                openFileDialog.Filter = "hApp files (*.hApp)|*.hApp";
+                lstHapps.Items.Add(InputTextBox.Text);
+                _doDemo = false;
 
-                if (openFileDialog.ShowDialog() == true)
+                if (_adminConnected)
                 {
-                    lstHapps.Items.Add(InputTextBox.Text);
-                    _doDemo = false;
-
-                    if (_adminConnected)
-                    {
-                        lstOutput.Items.Add($"ADMIN: Installing hApp {InputTextBox.Text} ({openFileDialog.FileName})...");
-                        _holoNETClientAdmin.AdminInstallApp(_holoNETClientAdmin.Config.AgentPubKey, InputTextBox.Text, openFileDialog.FileName);
-                    }
-                    else
-                    {
-                        _installinghAppName = InputTextBox.Text;
-                        _installinghAppPath = openFileDialog.FileName;
-                        Init();
-                    }
+                    lstOutput.Items.Add($"ADMIN: Installing hApp {InputTextBox.Text} ({_installinghAppPath})...");
+                    _holoNETClientAdmin.AdminInstallApp(_holoNETClientAdmin.Config.AgentPubKey, InputTextBox.Text, _installinghAppPath);
+                }
+                else
+                {
+                    _installinghAppName = InputTextBox.Text;
+                    Init();
                 }
             }
         }
