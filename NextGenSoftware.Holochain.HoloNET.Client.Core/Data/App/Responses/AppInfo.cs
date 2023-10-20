@@ -1,6 +1,7 @@
 ﻿using MessagePack;
 using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.AppManifest;
 using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects;
+using NextGenSoftware.Holochain.HoloNET.Client.Data.App.Responses.Objects;
 using System.Collections.Generic;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
@@ -13,14 +14,21 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         [Key("cell_info")]
         public Dictionary<string, List<CellInfo>> cell_info { get; set; }
-        //public object cell_info { get; set; }
 
         [Key("agent_pub_key")]
         public byte[] agent_pub_key { get; set; }
 
+        [IgnoreMember]
+        public string AgentPubKey { get; set; }
+
+        [IgnoreMember]
+        public string DnaHash { get; set; }
+
+        [IgnoreMember]
+        public byte[][] CellId { get; set; }
+
         [Key("status")]
-        public InstalledAppInfoStatusType status { get; set; }
-        //public object status { get; set; }
+        public AppInfoStatus status { get; set; }
 
         [Key("manifest")]
         public AppManifest manifest { get; set; }

@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:NextGenSoftware.Holochain.HoloNET.Templates.WPF"
         mc:Ignorable="d"
-        Title="NextGen Software HoloNET WPF Test Harness v1.0" Height="450" Width="1200">
+        Title="NextGen Software HoloNET WPF Test Harness v1.0" Height="700" Width="1200">
 
     <Grid>
         <Grid.RowDefinitions>
@@ -43,16 +43,34 @@
                 <Button x:Name="btnReboot" Content="Reboot" Margin="10" Foreground="DarkGray"  IsEnabled="False" Padding="5,2,5,2"  Background="Black" Click="btnReboot_Click"/>
             </StackPanel>
 
-            <Label  HorizontalAlignment="Left" Foreground="White" FontWeight="Bold" Margin="1" FontSize="12" Content="Installed hApps" VerticalAlignment="Center"/>
+            <Label  HorizontalAlignment="Left" Foreground="White" FontWeight="Bold" Margin="10" FontSize="12" Content="Installed hApps" VerticalAlignment="Center"/>
 
         </StackPanel>
-        <ListBox Grid.Row="1" x:Name="lstHapps" Background="Transparent"   Foreground="White">
+        <!--<ListBox Grid.Row="1" x:Name="lstHapps" Background="Transparent"   Foreground="White">
 
-        </ListBox>
+        </ListBox>-->
 
-        <Label Grid.Row="2" Content="Log:" Margin="0,10,0,0" Foreground="WhiteSmoke" FontWeight="Bold"></Label>
+        <DataGrid Grid.Row="1" x:Name="gridHapps" HeadersVisibility="Column" Margin="10" AutoGenerateColumns="False" IsReadOnly="true"  RowBackground="Blue" AlternatingRowBackground="DarkBlue" Background="Transparent"  Foreground="White">
+            <DataGrid.Resources>
+                <Style BasedOn="{StaticResource {x:Type DataGridColumnHeader}}" TargetType="{x:Type DataGridColumnHeader}">
+                    <Setter Property="Background" Value="Blue" />
+                    <!--<Setter Property="Foreground" Value="White" />-->
+                </Style>
+            </DataGrid.Resources>
+
+            <DataGrid.Columns>
+                <DataGridTextColumn Width="*" Header="Name" Binding="{Binding Path=Name}" CanUserSort="True" ></DataGridTextColumn>
+                <DataGridTextColumn Width="*" Header="Status" Binding="{Binding Path=Status}" CanUserSort="True" ></DataGridTextColumn>
+                <DataGridTextColumn Width="*" Header="Manifest" Binding="{Binding Path=Manifest}" CanUserSort="True" ></DataGridTextColumn>
+                <DataGridTextColumn Width="4*" MinWidth="200" Header="Agent Pub Key" Binding="{Binding Path=AgentPubKey}" CanUserSort="True" ></DataGridTextColumn>
+                <DataGridTextColumn Width="4*" MinWidth="200" Header="Dna Hash" Binding="{Binding Path=DnaHash}" CanUserSort="True" ></DataGridTextColumn>
+                <DataGridComboBoxColumn Width="*" Header="Enabled"  CanUserSort="True"></DataGridComboBoxColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <Label Grid.Row="2" Content="Log:" Margin="10,10,0,0" Foreground="WhiteSmoke" FontWeight="Bold"></Label>
         
-        <ListBox Grid.Row="3" x:Name="lstOutput" Background="Transparent"   Foreground="White">
+        <ListBox Grid.Row="3" x:Name="lstOutput" Margin="10" Background="Transparent"   Foreground="White">
 
         </ListBox>
 
@@ -82,3 +100,5 @@
 
     </Grid>
 </Window>
+
+    

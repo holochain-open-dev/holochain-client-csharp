@@ -51,6 +51,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public string InstalledAppId { get; set; }
         public string DnaHash { get; set; }
         public string AgentPubKey { get; set; }
+        public byte[][] CellId { get; set; }
     }
 
     public class AdminAppInstalledCallBackEventArgs : AppInfoCallBackEventArgs

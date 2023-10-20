@@ -14,5 +14,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects
 
         [Key("Assigned")]
         public CapGrantAccessAssigned Assigned { get; set; }
+
+        //[Key("Unrestricted")]
+        //public object Unrestricted { get; set; }
     }
 }

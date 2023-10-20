@@ -824,6 +824,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     {
                         Config.AgentPubKey = agentPubKey;
                         Config.DnaHash = dnaHash;
+                        Config.CellId = new byte[2][] { ConvertHoloHashToBytes(dnaHash), ConvertHoloHashToBytes(agentPubKey) };
                     }
 
                     Logger.Log("AgentPubKey & DnaHash successfully retrieved from hc sandbox.", LogType.Info, false);
@@ -1369,7 +1370,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 //byte[][] cellId = await GetCellIdAsync();
                 string cellId = $"{Config.AgentPubKey}:{Config.DnaHash}";
 
-                //if (_signingCredentialsForCell.ContainsKey(cellId) && _signingCredentialsForCell[cellId] != null)
                 if (_signingCredentialsForCell.ContainsKey(cellId) && _signingCredentialsForCell[cellId] != null)
                 {
                     ZomeCall payload = new ZomeCall()
@@ -1387,7 +1387,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                     byte[] hash = Blake2b.ComputeHash(MessagePackSerializer.Serialize(payload));
                     //var sig = Ed25519.Sign(hash, _signingCredentialsForCell[cellId].KeyPair.PrivateKey);
-                    var sig = Sodium.PublicKeyAuth.Sign(hash, _signingCredentialsForCell[cellId].KeyPair.PrivateKey).Take(64).ToArray();
+                    //var sig = Sodium.PublicKeyAuth.Sign(hash, _signingCredentialsForCell[cellId].KeyPair.PrivateKey).Take(64).ToArray();
+                    var sig = Sodium.PublicKeyAuth.SignDetached(hash, _signingCredentialsForCell[cellId].KeyPair.PrivateKey);
 
                     ZomeCallSigned signedPayload = new ZomeCallSigned()
                     {
@@ -1710,22 +1711,32 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             return CallZomeFunctionAsync(id, zome, function, callback, paramsObject, matchIdToZomeFuncInCallback, cachReturnData, ConductorResponseCallBackMode.UseCallBackEvents).Result;
         }
 
-        public async Task<AdminZomeCallCapabilityGrantedCallBackEventArgs> AdminAuthorizeSigningCredentialsAndGrantZomeCallCapabilityAsync(GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = "")
-        {
-            return await AdminAuthorizeSigningCredentialsAndGrantZomeCallCapabilityAsync(await GetCellIdAsync(), grantedFunctionsType, functions, conductorResponseCallBackMode, id);
-        }
+        //public async Task<AdminZomeCallCapabilityGrantedCallBackEventArgs> AdminAuthorizeSigningCredentialsAndGrantZomeCallCapabilityAsync(GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = "")
+        //{
+        //    return await AdminAuthorizeSigningCredentialsAndGrantZomeCallCapabilityAsync(await GetCellIdAsync(), grantedFunctionsType, functions, conductorResponseCallBackMode, id);
+        //}
 
-        public AdminZomeCallCapabilityGrantedCallBackEventArgs AdminAuthorizeSigningCredentialsAndGrantZomeCallCapability(GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = "")
-        {
-            return AdminAuthorizeSigningCredentialsAndGrantZomeCallCapability(GetCellId(), grantedFunctionsType, functions, id);
-        }
+        //public AdminZomeCallCapabilityGrantedCallBackEventArgs AdminAuthorizeSigningCredentialsAndGrantZomeCallCapability(GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = "")
+        //{
+        //    return AdminAuthorizeSigningCredentialsAndGrantZomeCallCapability(GetCellId(), grantedFunctionsType, functions, id);
+        //}
 
         public async Task<AdminZomeCallCapabilityGrantedCallBackEventArgs> AdminAuthorizeSigningCredentialsAndGrantZomeCallCapabilityAsync(string AgentPubKey, string DnaHash, GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions= null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = "")
         {
             return await AdminAuthorizeSigningCredentialsAndGrantZomeCallCapabilityAsync(GetCellId(DnaHash, AgentPubKey), grantedFunctionsType, functions, conductorResponseCallBackMode, id);
         }
 
-        public AdminZomeCallCapabilityGrantedCallBackEventArgs AdminAuthorizeSigningCredentialsAndGrantZomeCallCapability(string AgentPubKey, string DnaHash, GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = "")
+        public AdminZomeCallCapabilityGrantedCallBackEventArgs AdminAuthorizeSigningCredentialsAndGrantZomeCallCapability(string AgentPubKey, string DnaHash, GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null,  string id = "")
+        {
+            return AdminAuthorizeSigningCredentialsAndGrantZomeCallCapability(GetCellId(DnaHash, AgentPubKey), grantedFunctionsType, functions, id);
+        }
+
+        public async Task<AdminZomeCallCapabilityGrantedCallBackEventArgs> AdminAuthorizeSigningCredentialsAndGrantZomeCallCapabilityAsync(byte[] AgentPubKey, byte[] DnaHash, GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = "")
+        {
+            return await AdminAuthorizeSigningCredentialsAndGrantZomeCallCapabilityAsync(GetCellId(DnaHash, AgentPubKey), grantedFunctionsType, functions, conductorResponseCallBackMode, id);
+        }
+
+        public AdminZomeCallCapabilityGrantedCallBackEventArgs AdminAuthorizeSigningCredentialsAndGrantZomeCallCapability(byte[] AgentPubKey, byte[] DnaHash, GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null, string id = "")
         {
             return AdminAuthorizeSigningCredentialsAndGrantZomeCallCapability(GetCellId(DnaHash, AgentPubKey), grantedFunctionsType, functions, id);
         }
@@ -1774,6 +1785,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                         //    secret = _signingCredentialsForCell[cellId].CapSecret
                         //}
                         //Unrestricted = new CapGrantAccessUnrestricted()
+                        //Unrestricted = null,
                         Assigned = new CapGrantAccessAssigned()
                         {
                             //secret = _signingCredentialsForCell[cellId].CapSecret,
@@ -1933,6 +1945,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         public async Task<AdminAppsListedCallBackEventArgs> AdminListAppsAsync(AppStatusFilter appStatusFilter, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
+            _updateDnaHashAndAgentPubKey = false;
+
             return await CallAdminFunctionAsync("list_apps", new ListAppsRequest()
             {
                 status_filter = appStatusFilter != AppStatusFilter.All ? appStatusFilter : null
@@ -2613,6 +2627,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public byte[][] GetCellId(string DnaHash, string AgentPubKey)
         {
             return new byte[2][] { ConvertHoloHashToBytes(DnaHash), ConvertHoloHashToBytes(AgentPubKey) };
+        }
+
+        public byte[][] GetCellId(byte[] DnaHash, byte[] AgentPubKey)
+        {
+            return new byte[2][] { DnaHash, AgentPubKey };
         }
 
         public async Task<byte[][]> GetCellIdAsync()
@@ -3904,10 +3923,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 {
                     var first = appInfo.cell_info.First();
 
-                    if (first.Value != null && first.Value.Count > 0 && first.Value[0].Provisioned != null && first.Value[0].Provisioned.cell_id != null)
+                    if (first.Value != null && first.Value.Count > 0 && first.Value[0].Provisioned != null && first.Value[0].Provisioned.cell_id != null && first.Value[0].Provisioned.cell_id.Length == 2 && first.Value[0].Provisioned.cell_id[0] != null && first.Value[0].Provisioned.cell_id[1] != null)
                     {
                         agentPubKeyFromCell = ConvertHoloHashToString(first.Value[0].Provisioned.cell_id[1]);
                         dnaHash = ConvertHoloHashToString(first.Value[0].Provisioned.cell_id[0]);
+                        appInfo.CellId = first.Value[0].Provisioned.cell_id;
+                        args.CellId = appInfo.CellId;
 
                         if (agentPubKeyFromCell != agentPubKey)
                         {
@@ -3928,6 +3949,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                     if (!string.IsNullOrEmpty(dnaHash))
                         Config.DnaHash = dnaHash;
+
+                    if (args.CellId != null) 
+                        Config.CellId = args.CellId;
                 }
 
                 Logger.Log($"AGENT PUB KEY RETURNED FROM CONDUCTOR: {Config.AgentPubKey}", LogType.Info);
@@ -3936,6 +3960,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 args.AgentPubKey = agentPubKey;
                 args.DnaHash = dnaHash;
                 args.InstalledAppId = appInfo.installed_app_id;
+                appInfo.AgentPubKey = agentPubKey;
+                appInfo.DnaHash = dnaHash;
 
                 if (appInfo.manifest != null)
                 {

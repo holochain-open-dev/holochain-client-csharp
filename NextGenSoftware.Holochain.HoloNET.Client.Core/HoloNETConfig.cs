@@ -15,6 +15,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// </summary>
         public string DnaHash { get; set; } = "";
 
+        public byte[][] CellId { get; set; }
+
         public string InstalledAppId { get; set; }
 
         /// <summary>
