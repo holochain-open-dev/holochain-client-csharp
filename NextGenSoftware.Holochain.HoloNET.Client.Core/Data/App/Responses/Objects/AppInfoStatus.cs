@@ -24,27 +24,27 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Data.App.Responses.Objects
     [MessagePackObject]
     public struct AppInfoStatus
     {
-        [Key("Paused")]
-        public object Paused { get; set; }
+        [Key("paused")]
+        public object paused { get; set; }
 
-        [Key("Disabled")]
-        public object Disabled { get; set; }
+        [Key("disabled")]
+        public object disabled { get; set; }
 
-        [Key("Running")]
-        public object Running { get; set; }
+        [Key("running")]
+        public object running { get; set; }
 
         [IgnoreMember]
         public AppInfoStatusEnum Status
         {
             get
             {
-                if (Paused != null)
+                if (paused != null)
                     return AppInfoStatusEnum.Paused;
 
-                else if (Disabled != null)
+                else if (disabled != null)
                     return AppInfoStatusEnum.Disabled;
 
-                else if (Running != null)
+                else if (running != null)
                     return AppInfoStatusEnum.Running;
 
                 else

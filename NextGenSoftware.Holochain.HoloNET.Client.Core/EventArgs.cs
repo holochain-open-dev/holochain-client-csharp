@@ -59,6 +59,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
     }
 
+    public class AdminAppUninstalledCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
+    {
+
+    }
+
     public class AdminAgentPubKeyGeneratedCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
         public AppResponse AppResponse { get; set; }
@@ -72,7 +77,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
     public class AdminAppDisabledCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
-        public AppResponse AppResponse { get; set; }
+
     }
 
     public class AdminZomeCallCapabilityGrantedCallBackEventArgs : HoloNETDataReceivedBaseEventArgs

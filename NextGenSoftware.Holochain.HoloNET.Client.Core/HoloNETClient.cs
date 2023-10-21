@@ -42,6 +42,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         private Dictionary<string, TaskCompletionSource<ZomeFunctionCallBackEventArgs>> _taskCompletionZomeCallBack = new Dictionary<string, TaskCompletionSource<ZomeFunctionCallBackEventArgs>>();
         private Dictionary<string, TaskCompletionSource<AdminAgentPubKeyGeneratedCallBackEventArgs>> _taskCompletionAdminAgentPubKeyGeneratedCallBack = new Dictionary<string, TaskCompletionSource<AdminAgentPubKeyGeneratedCallBackEventArgs>>();
         private Dictionary<string, TaskCompletionSource<AdminAppInstalledCallBackEventArgs>> _taskCompletionAdminAppInstalledCallBack = new Dictionary<string, TaskCompletionSource<AdminAppInstalledCallBackEventArgs>>();
+        private Dictionary<string, TaskCompletionSource<AdminAppUninstalledCallBackEventArgs>> _taskCompletionAdminAppUninstalledCallBack = new Dictionary<string, TaskCompletionSource<AdminAppUninstalledCallBackEventArgs>>();
         private Dictionary<string, TaskCompletionSource<AdminAppEnabledCallBackEventArgs>> _taskCompletionAdminAppEnabledCallBack = new Dictionary<string, TaskCompletionSource<AdminAppEnabledCallBackEventArgs>>();
         private Dictionary<string, TaskCompletionSource<AdminAppDisabledCallBackEventArgs>> _taskCompletionAdminAppDisabledCallBack = new Dictionary<string, TaskCompletionSource<AdminAppDisabledCallBackEventArgs>>();
         private Dictionary<string, TaskCompletionSource<AdminZomeCallCapabilityGrantedCallBackEventArgs>> _taskCompletionAdminZomeCapabilityGrantedCallBack = new Dictionary<string, TaskCompletionSource<AdminZomeCallCapabilityGrantedCallBackEventArgs>>();
@@ -155,6 +156,14 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// Fired when a response is received from the conductor after a hApp has been installed via the AdminInstallAppAsyc/AdminInstallApp method.
         /// </summary>
         public event AdminAppInstalledCallBack OnAdminAppInstalledCallBack;
+
+
+        public delegate void AdminAppUninstalledCallBack(object sender, AdminAppUninstalledCallBackEventArgs e);
+
+        /// <summary>
+        /// Fired when a response is received from the conductor after a hApp has been uninstalled via the AdminUninstallAppAsyc/AdminUninstallApp method.
+        /// </summary>
+        public event AdminAppUninstalledCallBack OnAdminAppUninstalledCallBack;
 
 
         public delegate void AdminAppEnabledCallBack(object sender, AdminAppEnabledCallBackEventArgs e);
@@ -1900,6 +1909,19 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             return AdminDisableAppAsync(installedAppId, ConductorResponseCallBackMode.UseCallBackEvents, id).Result;
         }
 
+        public async Task<AdminAppUninstalledCallBackEventArgs> AdminUninstallAppAsync(string installedAppId, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
+        {
+            return await CallAdminFunctionAsync("uninstall_app", new UninstallAppRequest()
+            {
+                installed_app_id = installedAppId
+            }, _taskCompletionAdminAppUninstalledCallBack, "OnAdminAppUninstalledCallBack", conductorResponseCallBackMode, id);
+        }
+
+        public AdminAppUninstalledCallBackEventArgs AdminUninstallApp(string installedAppId, string id = null)
+        {
+            return AdminUninstallAppAsync(installedAppId, ConductorResponseCallBackMode.UseCallBackEvents, id).Result;
+        }
+
         public async Task<AdminAppInterfaceAttachedCallBackEventArgs> AdminAttachAppInterfaceAsync(UInt16? port = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
             return await CallAdminFunctionAsync("attach_app_interface", new AttachAppInterfaceRequest()
@@ -3311,8 +3333,16 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                             DecodeAdminAppInstalledReceived(response, dataReceivedEventArgs);
                             break;
 
+                        case HoloNETResponseType.AdminAppUninstalled:
+                            DecodeAdminAppUninstalledReceived(response, dataReceivedEventArgs);
+                            break;
+
                         case HoloNETResponseType.AdminAppEnabled:
                             DecodeAdminAppEnabledReceived(response, dataReceivedEventArgs);
+                            break;
+
+                        case HoloNETResponseType.AdminAppDisabled:
+                            DecodeAdminAppDisabledReceived(response, dataReceivedEventArgs);
                             break;
 
                         case HoloNETResponseType.AdminZomeCallCapabilityGranted:
@@ -3452,6 +3482,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                         response.HoloNETResponseType = HoloNETResponseType.AdminAppInstalled;
                         break;
 
+                    case "app_uninstalled":
+                        response.HoloNETResponseType = HoloNETResponseType.AdminAppUninstalled;
+                        break;
+
                     case "app_enabled":
                         response.HoloNETResponseType = HoloNETResponseType.AdminAppEnabled;
                         break;
@@ -3568,6 +3602,28 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             RaiseAdminAppInstalledEvent(args);
         }
 
+        private void DecodeAdminAppUninstalledReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
+        {
+            AdminAppUninstalledCallBackEventArgs args = new AdminAppUninstalledCallBackEventArgs();
+
+            try
+            {
+                Logger.Log("ADMIN APP UNINSTALLED DATA DETECTED\n", LogType.Info);
+                args = CreateHoloNETArgs<AdminAppUninstalledCallBackEventArgs>(response, dataReceivedEventArgs);
+                args.HoloNETResponseType = HoloNETResponseType.AdminAppUninstalled;
+            }
+            catch (Exception ex)
+            {
+                string msg = $"An unknown error occurred in HoloNETClient.DecodeAdminAppUninstalledReceived. Reason: {ex}";
+                args.IsError = true;
+                args.IsCallSuccessful = false;
+                args.Message = msg;
+                HandleError(msg, ex);
+            }
+
+            RaiseAdminAppUninstalledEvent(args);
+        }
+
         private void DecodeAdminAppEnabledReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
         {
             string errorMessage = "An unknown error occurred in HoloNETClient.DecodeAdminAppEnabledReceived. Reason: ";
@@ -3604,6 +3660,28 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
 
             RaiseAdminAppEnabledEvent(args);
+        }
+
+        private void DecodeAdminAppDisabledReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
+        {
+            string errorMessage = "An unknown error occurred in HoloNETClient.DecodeAdminAppEnabledReceived. Reason: ";
+            AdminAppDisabledCallBackEventArgs args = CreateHoloNETArgs<AdminAppDisabledCallBackEventArgs>(response, dataReceivedEventArgs);
+
+            try
+            {
+                Logger.Log("ADMIN APP DISABLED DATA DETECTED\n", LogType.Info);
+                args.HoloNETResponseType = HoloNETResponseType.AdminAppDisabled;
+            }
+            catch (Exception ex)
+            {
+                string msg = $"{errorMessage} {ex}";
+                args.IsError = true;
+                args.IsCallSuccessful = false;
+                args.Message = msg;
+                HandleError(msg, ex);
+            }
+
+            RaiseAdminAppDisabledEvent(args);
         }
 
         private void DecodeAdminZomeCallCapabilityGrantedReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
@@ -4211,6 +4289,15 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             if (_taskCompletionAdminAppInstalledCallBack != null && !string.IsNullOrEmpty(adminAppInstalledCallBackEventArgs.Id) && _taskCompletionAdminAppInstalledCallBack.ContainsKey(adminAppInstalledCallBackEventArgs.Id))
                 _taskCompletionAdminAppInstalledCallBack[adminAppInstalledCallBackEventArgs.Id].SetResult(adminAppInstalledCallBackEventArgs);
+        }
+
+        private void RaiseAdminAppUninstalledEvent(AdminAppUninstalledCallBackEventArgs adminAppUninstalledCallBackEventArgs)
+        {
+            LogEvent("AdminAppUninstalledCallBack", adminAppUninstalledCallBackEventArgs);
+            OnAdminAppUninstalledCallBack?.Invoke(this, adminAppUninstalledCallBackEventArgs);
+
+            if (_taskCompletionAdminAppUninstalledCallBack != null && !string.IsNullOrEmpty(adminAppUninstalledCallBackEventArgs.Id) && _taskCompletionAdminAppInstalledCallBack.ContainsKey(adminAppUninstalledCallBackEventArgs.Id))
+                _taskCompletionAdminAppUninstalledCallBack[adminAppUninstalledCallBackEventArgs.Id].SetResult(adminAppUninstalledCallBackEventArgs);
         }
 
         private void RaiseAdminAppEnabledEvent(AdminAppEnabledCallBackEventArgs adminAppEnabledCallBackEventArgs)

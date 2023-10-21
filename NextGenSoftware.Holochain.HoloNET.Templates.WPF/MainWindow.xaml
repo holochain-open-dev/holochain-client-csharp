@@ -11,6 +11,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="160"></RowDefinition>
             <RowDefinition></RowDefinition>
+            <!--<RowDefinition Height="50"></RowDefinition>-->
             <RowDefinition Height="40"></RowDefinition>
             <RowDefinition></RowDefinition>
         </Grid.RowDefinitions>
@@ -50,7 +51,7 @@
 
         </ListBox>-->
 
-        <DataGrid Grid.Row="1" x:Name="gridHapps" HeadersVisibility="Column" Margin="10" AutoGenerateColumns="False" IsReadOnly="true"  RowBackground="Blue" AlternatingRowBackground="DarkBlue" Background="Transparent"  Foreground="White">
+        <DataGrid Grid.Row="1" x:Name="gridHapps" HeadersVisibility="Column" Margin="10" AutoGenerateColumns="False" IsReadOnly="true"  RowBackground="DarkBlue" AlternatingRowBackground="Blue"  Background="Transparent"  Foreground="White">
             <DataGrid.Resources>
                 <Style BasedOn="{StaticResource {x:Type DataGridColumnHeader}}" TargetType="{x:Type DataGridColumnHeader}">
                     <Setter Property="Background" Value="Blue" />
@@ -61,12 +62,31 @@
             <DataGrid.Columns>
                 <DataGridTextColumn Width="*" Header="Name" Binding="{Binding Path=Name}" CanUserSort="True" ></DataGridTextColumn>
                 <DataGridTextColumn Width="*" Header="Status" Binding="{Binding Path=Status}" CanUserSort="True" ></DataGridTextColumn>
+                <DataGridTextColumn Width="*" Header="Status Reason" Binding="{Binding Path=StatusReason}" CanUserSort="True" ></DataGridTextColumn>
                 <DataGridTextColumn Width="*" Header="Manifest" Binding="{Binding Path=Manifest}" CanUserSort="True" ></DataGridTextColumn>
                 <DataGridTextColumn Width="4*" MinWidth="200" Header="Agent Pub Key" Binding="{Binding Path=AgentPubKey}" CanUserSort="True" ></DataGridTextColumn>
                 <DataGridTextColumn Width="4*" MinWidth="200" Header="Dna Hash" Binding="{Binding Path=DnaHash}" CanUserSort="True" ></DataGridTextColumn>
-                <DataGridComboBoxColumn Width="*" Header="Enabled"  CanUserSort="True"></DataGridComboBoxColumn>
+                <DataGridTemplateColumn Width="220">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel Grid.Row="2" Orientation="Horizontal">
+                                <Button x:Name="btnEnableApp" Background="Black" Margin="10,0,10,10"  Padding="5,2,5,2"  Foreground="WhiteSmoke" Content="Enable" Click="btnEnableApp_Click"></Button>
+                                <Button x:Name="btnDisableApp" Background="Black" Margin="10,0,10,10"  Padding="5,2,5,2" Foreground="WhiteSmoke" Content="Disable" Click="btnDisableApp_Click"></Button>
+                                <Button x:Name="btnUninstallApp" Background="Black" Margin="10,0,10,10"  Padding="5,2,5,2" Foreground="WhiteSmoke" Content="Uninstall" Click="btnUninstallApp_Click"></Button>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                
+                <!--<DataGridComboBoxColumn Width="*" Header="Enabled"  CanUserSort="True"></DataGridComboBoxColumn>-->
             </DataGrid.Columns>
         </DataGrid>
+
+        <!--<StackPanel Grid.Row="2" Orientation="Horizontal">
+            <Button x:Name="btnEnableApp" Background="Black" Margin="10,0,10,10"  Padding="5,2,5,2"  Foreground="WhiteSmoke" Content="Enable hApp"></Button>
+            <Button x:Name="btnDisableApp" Background="Black" Margin="10,0,10,10"  Padding="5,2,5,2" Foreground="WhiteSmoke" Content="Disable hApp"></Button>
+            <Button x:Name="btnUninstallApp" Background="Black" Margin="10,0,10,10"  Padding="5,2,5,2" Foreground="WhiteSmoke" Content="Uninstall hApp"></Button>
+        </StackPanel>-->
 
         <Label Grid.Row="2" Content="Log:" Margin="10,10,0,0" Foreground="WhiteSmoke" FontWeight="Bold"></Label>
         
@@ -101,4 +121,5 @@
     </Grid>
 </Window>
 
+    
     
