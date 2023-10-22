@@ -14,6 +14,7 @@
             <!--<RowDefinition Height="50"></RowDefinition>-->
             <RowDefinition Height="40"></RowDefinition>
             <RowDefinition></RowDefinition>
+            <RowDefinition Height="40"></RowDefinition>
         </Grid.RowDefinitions>
 
         <Grid.Background>
@@ -66,13 +67,26 @@
                 <DataGridTextColumn Width="*" Header="Manifest" Binding="{Binding Path=Manifest}" CanUserSort="True" ></DataGridTextColumn>
                 <DataGridTextColumn Width="4*" MinWidth="200" Header="Agent Pub Key" Binding="{Binding Path=AgentPubKey}" CanUserSort="True" ></DataGridTextColumn>
                 <DataGridTextColumn Width="4*" MinWidth="200" Header="Dna Hash" Binding="{Binding Path=DnaHash}" CanUserSort="True" ></DataGridTextColumn>
-                <DataGridTemplateColumn Width="220">
+                <DataGridTemplateColumn Width="350">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <StackPanel Grid.Row="2" Orientation="Horizontal">
-                                <Button x:Name="btnEnableApp" Background="Black" Margin="10,0,10,10"  Padding="5,2,5,2"  Foreground="WhiteSmoke" Content="Enable" Click="btnEnableApp_Click"></Button>
-                                <Button x:Name="btnDisableApp" Background="Black" Margin="10,0,10,10"  Padding="5,2,5,2" Foreground="WhiteSmoke" Content="Disable" Click="btnDisableApp_Click"></Button>
+                                <!--<Button x:Name="btnEnableApp" IsEnabled="{Binding Path=IsDisabled}"  Background="Black" Margin="10,0,10,10"  Padding="5,2,5,2" Foreground="{DynamicResource columnDisabledForeground}"  Content="Enable" Click="btnEnableApp_Click">-->
+                                <Button x:Name="btnEnableApp" IsEnabled="{Binding Path=IsDisabled}"  Background="Black" Margin="10,0,10,10"  Padding="5,2,5,2" Foreground="{Binding Path=EnabledButtonForegroundColour}"  Content="Enable" Click="btnEnableApp_Click">
+                                    <!--<Button.Style>
+                                        <Style>
+                                            <Setter Property="Foreground" Value="#454545"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Path=Status}" Value="Disabled">
+                                                    <Setter Property="IsEnabled" Value="True" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>-->
+                                </Button>
+                                <Button x:Name="btnDisableApp" IsEnabled="{Binding Path=IsEnabled}" Background="Black" Margin="10,0,10,10"  Padding="5,2,5,2" Foreground="{Binding Path=DisabledButtonForegroundColour}" Content="Disable" Click="btnDisableApp_Click"></Button>
                                 <Button x:Name="btnUninstallApp" Background="Black" Margin="10,0,10,10"  Padding="5,2,5,2" Foreground="WhiteSmoke" Content="Uninstall" Click="btnUninstallApp_Click"></Button>
+                                <Button x:Name="btnCallZomeFunction" Background="Black" Margin="10,0,10,10"  Padding="5,2,5,2" Foreground="WhiteSmoke" Content="Call Zome Function" Click="btnCallZomeFunction_Click"></Button>
                             </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
@@ -94,8 +108,10 @@
 
         </ListBox>
 
+        <Label Grid.Row="4" x:Name="lblStatus" FontWeight="Bold"  Content="Status: Ready" HorizontalAlignment="Left" Margin="10,0,0,10" VerticalAlignment="Center" Foreground="WhiteSmoke"></Label>
+
         <!-- It's important that this is in the end of the XAML as it needs to be on top of everything else! -->
-        <Grid x:Name="InputBox" Grid.Row="0" Grid.RowSpan="4" Visibility="Collapsed">
+        <Grid x:Name="InputBox" Grid.Row="0" Grid.RowSpan="6" Visibility="Collapsed">
             <Grid Background="Transparent" Opacity="0.5"/>
             <Border
             MinWidth="250"
@@ -113,11 +129,54 @@
                         <Button x:Name="NoButton" Margin="5" Foreground="WhiteSmoke" Width="50" FontSize="14" Content="Cancel" Background="{x:Null}" Click="NoButton_Click" />
                         <Button x:Name="YesButton" Margin="5" Foreground="WhiteSmoke" Width="50" FontSize="14" Content="OK" Background="{x:Null}" Click="YesButton_Click"/>
                     </StackPanel>
-                    <TextBlock Margin="5" x:Name="lblEnterName" Visibility="Hidden" HorizontalAlignment="Right" FontSize="14"  Text="Please enter the hApp name" Foreground="Red" FontWeight="Bold" FontFamily="Cambria" />
+                    <TextBlock Margin="5" x:Name="lblEnterName" Visibility="Collapsed" HorizontalAlignment="Right" FontSize="14"  Text="Please enter the hApp name" Foreground="Red" FontWeight="Bold" FontFamily="Cambria" />
                 </StackPanel>
             </Border>
         </Grid>
 
+        <Grid x:Name="gridMakeZomeCall" Grid.Row="0" Grid.RowSpan="6" Visibility="Collapsed">
+            <Grid Background="Transparent" Opacity="0.5"/>
+            <Border
+
+            Background="DarkBlue" 
+            Opacity="50"
+            BorderBrush="Black" 
+            BorderThickness="1" 
+            CornerRadius="0,55,0,55" 
+            HorizontalAlignment="Center" 
+            VerticalAlignment="Center">
+                <StackPanel>
+                    <Grid Margin="20">
+                        <Grid.RowDefinitions>
+                            <RowDefinition></RowDefinition>
+                            <RowDefinition></RowDefinition>
+                            <RowDefinition></RowDefinition>
+                        </Grid.RowDefinitions>
+
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition></ColumnDefinition>
+                            <ColumnDefinition></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="0" Grid.Column="0" Text="Zome Name:" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14" FontFamily="Cambria" />
+                        <TextBox MinWidth="150" Grid.Row="0" Grid.Column="1" Margin="10" FontSize="14" x:Name="txtZomeName"/>
+
+                        <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="1" Grid.Column="0"  Text="Zome Function:" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14" FontFamily="Cambria" />
+                        <TextBox MinWidth="150"  Grid.Row="1" Grid.Column="1"  Margin="10" FontSize="14" x:Name="txtZomeFunction"/>
+
+                        <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="2" Grid.Column="0"  Text="Zome Params:" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14" FontFamily="Cambria" />
+                        <TextBox MinWidth="150" Grid.Row="2" Grid.Column="1" Margin="10" FontSize="14" Text="param1=1;param2=2;param3=3" x:Name="txtZomeParams"/>
+                    </Grid>
+
+                    <TextBlock Margin="5" x:Name="lblCallZomeFunctionErrors" Visibility="Collapsed" HorizontalAlignment="Center" FontSize="14"  Text="" Foreground="Red" FontWeight="Bold" FontFamily="Cambria" />
+
+                    <StackPanel Orientation="Horizontal" Margin="0,10,0,10" HorizontalAlignment="Center">
+                        <Button x:Name="btnCallZomeFunctionPopupCancel" Margin="5" Foreground="WhiteSmoke" Width="50" FontSize="14" Content="Cancel" Background="{x:Null}" Click="btnCallZomeFunctionPopupCancel_Click" />
+                        <Button x:Name="btnCallZomeFunctionPopupOk" Margin="5" Foreground="WhiteSmoke" Width="50" FontSize="14" Content="OK" Background="{x:Null}" Click="btnCallZomeFunctionPopupOk_Click"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Grid>
     </Grid>
 </Window>
 
