@@ -6,12 +6,12 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 using System.Windows.Media;
 using Microsoft.Win32;
 using NextGenSoftware.Holochain.HoloNET.Client;
 using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects;
 using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Enums;
+using NextGenSoftware.Holochain.HoloNET.Templates.WPF.HoloNETDNA;
 using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Models;
 using NextGenSoftware.Utilities.ExtentionMethods;
 
@@ -50,7 +50,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
+            HoloNETDNAManager.LoadDNA();
 
+            if (HoloNETDNAManager.HoloNETDNA != null)
+                txtAdminURI.Text = HoloNETDNAManager.HoloNETDNA.HcAdminURI;
 
             //if (VisualTreeHelper.GetChildrenCount(lstOutput) > 0)
             //{
@@ -63,7 +66,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
 
             //}
 
-            
+
             //scrollbar.Foreground = Brushes.Blue;
 
             //gridHapps.Resources["columnDisabledForeground"] = Brushes.Black;
@@ -73,7 +76,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
 
         private void _holoNETClientAdmin_OnAdminAppDisabledCallBack(object sender, AdminAppDisabledCallBackEventArgs e)
         {
-            LogMessage("ADMIN: App Disabled.");
+            LogMessage("ADMIN: App Disabled."); //TODO: ADD INSTALL APP ID TO RETURN ARGS TOMORROW! ;-) same with uninstall etc...
             ShowStatusMessage("App Disabled.");
             ListHapps();
         }
@@ -264,7 +267,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
 
         private void _holoNETClient_OnAdminAppEnabledCallBack(object sender, AdminAppEnabledCallBackEventArgs e)
         {
-            LogMessage($"ADMIN: hApp {e.InstalledAppId} Enabled.");
+            LogMessage($"ADMIN: hApp {e.InstalledAppId} Enabled."); //TODO: FIX InstalledAppId BEING NULL TOMORROW! ;-)
             ShowStatusMessage($"hApp {e.InstalledAppId} Enabled.");
 
             ListHapps();
@@ -681,6 +684,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
                 spinner.Visibility = Visibility.Visible;
             else
                 spinner.Visibility = Visibility.Hidden;
+
+            //lblStatus.SizeChanged
+
+            sbAnimateStatus.Begin();
         }
 
         private void LogMessage(string message)
@@ -781,17 +788,27 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
         private void btnAdminURIPopupCancel_Click(object sender, RoutedEventArgs e)
         {
             gridAdminURI.Visibility = Visibility.Collapsed;
-            System.Windows.Application.Current.Shutdown();
+            Application.Current.Shutdown();
         }
 
         private void btnAdminURIPopupOK_Click(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrEmpty(txtAdminURI.Text))
                 lblAdminURIError.Visibility = Visibility.Visible;
+
+            //else if (!Uri.IsWellFormedUriString(txtAdminURI.Text, UriKind.Absolute))
+            //{
+            //    //lblAdminURIError.Visibility = Visibility.Visible;
+            //}
+
             else
             {
                 lblAdminURIError.Visibility = Visibility.Collapsed;
                 gridAdminURI.Visibility = Visibility.Collapsed;
+
+                HoloNETDNAManager.HoloNETDNA.HcAdminURI = txtAdminURI.Text;
+                HoloNETDNAManager.SaveDNA();
+
                 Init();
             }
         }
