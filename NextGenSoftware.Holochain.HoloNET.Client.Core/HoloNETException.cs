@@ -4,7 +4,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 {
     public class HoloNETException : Exception
     {
-        public string EndPoint { get; set; }
+        public Uri EndPoint { get; set; }
 
         public HoloNETException()
         {
@@ -21,7 +21,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         }
 
-        public HoloNETException(string message, Exception innerException, string endPoint) : base(message, innerException)
+        public HoloNETException(string message, Exception innerException, Uri endPoint) : base(message, innerException)
         {
             this.EndPoint = endPoint;
         }

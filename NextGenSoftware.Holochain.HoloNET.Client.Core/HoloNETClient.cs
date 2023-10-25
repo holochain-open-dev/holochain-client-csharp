@@ -364,14 +364,14 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <summary>
         /// This property is a shortcut to the EndPoint property on the WebSocket property.
         /// </summary>
-        public string EndPoint
+        public Uri EndPoint
         {
             get
             {
                 if (WebSocket != null)
                     return WebSocket.EndPoint;
 
-                return "";
+                return null;
             }
         }
 
@@ -404,7 +404,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public HoloNETClient(string holochainConductorURI = "ws://localhost:8888", bool logToConsole = true, bool logToFile = true, string releativePathToLogFolder = "Logs", string logFileName = "HoloNET.log", bool addAdditionalSpaceAfterEachLogEntry = false, bool showColouredLogs = true, ConsoleColor debugColour = ConsoleColor.White, ConsoleColor infoColour = ConsoleColor.Green, ConsoleColor warningColour = ConsoleColor.Yellow, ConsoleColor errorColour = ConsoleColor.Red)
         {
             Logger.Loggers.Add(new DefaultLogger(logToConsole, logToFile, releativePathToLogFolder, logFileName, addAdditionalSpaceAfterEachLogEntry, showColouredLogs, debugColour, infoColour, warningColour, errorColour));
-            Init(holochainConductorURI);
+            Init(new Uri(holochainConductorURI));
         }
 
         /// <summary>
@@ -420,7 +420,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             if (alsoUseDefaultLogger)
                 Logger.Loggers.Add(new DefaultLogger());
 
-            Init(holochainConductorURI);
+            Init(new Uri(holochainConductorURI));
         }
 
         /// <summary>
@@ -446,7 +446,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             if (alsoUseDefaultLogger)
                 Logger.Loggers.Add(new DefaultLogger(logToConsole, logToFile, releativePathToLogFolder, logFileName, addAdditionalSpaceAfterEachLogEntry, showColouredLogs, debugColour, infoColour, warningColour, errorColour));
 
-            Init(holochainConductorURI);
+            Init(new Uri(holochainConductorURI));
         }
 
         /// <summary>
@@ -462,7 +462,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             if (alsoUseDefaultLogger)
                 Logger.Loggers.Add(new DefaultLogger());
 
-            Init(holochainConductorURI);
+            Init(new Uri(holochainConductorURI));
         }
 
         /// <summary>
@@ -488,7 +488,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             if (alsoUseDefaultLogger)
                 Logger.Loggers.Add(new DefaultLogger(logToConsole, logToFile, releativePathToLogFolder, logFileName, addAdditionalSpaceAfterEachLogEntry, showColouredLogs, debugColour, infoColour, warningColour, errorColour));
 
-            Init(holochainConductorURI);
+            Init(new Uri(holochainConductorURI));
         }
 
         /// <summary>
@@ -1798,7 +1798,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                         Assigned = new CapGrantAccessAssigned()
                         {
                             //secret = _signingCredentialsForCell[cellId].CapSecret,
-                            secret = _signingCredentialsForCell[$"{Config.AgentPubKey}:{Config.DnaHash}"].CapSecret,
+                            //secret = _signingCredentialsForCell[$"{Config.AgentPubKey}:{Config.DnaHash}"].CapSecret,
+                            secret = _signingCredentialsForCell[$"{ConvertHoloHashToString(cellId[1])}:{ConvertHoloHashToString(cellId[0])}"].CapSecret,
                             assignees = new byte[1][] { signingKey }
                         }
                     }
@@ -1841,7 +1842,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 grantedFunctions[GrantedFunctionsType.Listed] = functions;
 
             //_signingCredentialsForCell[cellId] = new SigningCredentials()
-            _signingCredentialsForCell[$"{Config.AgentPubKey}:{Config.DnaHash}"] = new SigningCredentials()
+            //_signingCredentialsForCell[$"{Config.AgentPubKey}:{Config.DnaHash}"] = new SigningCredentials()
+            _signingCredentialsForCell[$"{ConvertHoloHashToString(cellId[1])}:{ConvertHoloHashToString(cellId[0])}"] = new SigningCredentials()
             {
                 CapSecret = RandomNumberGenerator.GetBytes(64),
                 KeyPair = new KeyPair() { PrivateKey = pair.PrivateKey, PublicKey = pair.PublicKey },
@@ -3187,7 +3189,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             return result;
         }
 
-        private void Init(string holochainConductorURI)
+        private void Init(Uri holochainConductorURI)
         {
             try
             {
@@ -3636,10 +3638,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                 if (enableAppResponse != null)
                 {
-                    enableAppResponse.App = ProcessAppInfo(enableAppResponse.App, args);
-                    args.AppInfoResponse = new AppInfoResponse() { data = enableAppResponse.App };
+                    enableAppResponse.app = ProcessAppInfo(enableAppResponse.app, args);
+                    args.AppInfoResponse = new AppInfoResponse() { data = enableAppResponse.app };
                     args.HoloNETResponseType = HoloNETResponseType.AdminAppEnabled;
-                    args.Errors = enableAppResponse.Errors; //TODO: Need to find out what this contains and the correct data structure.
+                    args.Errors = enableAppResponse.errors; //TODO: Need to find out what this contains and the correct data structure.
                 }
                 else
                 {
@@ -4065,7 +4067,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         {
             return new T()
             {
-                EndPoint = dataReceivedEventArgs != null ? dataReceivedEventArgs.EndPoint : "",
+                EndPoint = dataReceivedEventArgs != null ? dataReceivedEventArgs.EndPoint : null,
                 Id = response != null ? response.id.ToString() : "",
                 IsCallSuccessful = true,
                 RawBinaryData = dataReceivedEventArgs != null ? dataReceivedEventArgs.RawBinaryData : null,

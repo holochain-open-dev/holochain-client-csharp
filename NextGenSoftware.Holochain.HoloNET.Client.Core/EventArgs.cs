@@ -13,7 +13,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
     public class HoloNETErrorEventArgs : EventArgs
     {
-        public string EndPoint { get; set; }
+        public Uri EndPoint { get; set; }
         public string Reason { get; set; }
         public Exception ErrorDetails { get; set; }
     }
@@ -162,14 +162,14 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
     public class ReadyForZomeCallsEventArgs : CallBackBaseEventArgs
     {
-        public ReadyForZomeCallsEventArgs(string endPoint, string dnaHash, string agentPubKey)
+        public ReadyForZomeCallsEventArgs(Uri endPoint, string dnaHash, string agentPubKey)
         {
             EndPoint = endPoint;
             DnaHash = dnaHash;
             AgentPubKey = agentPubKey;
         }
 
-        public string EndPoint { get; set; }
+        public Uri EndPoint { get; set; }
         public string DnaHash { get; set; }
         public string AgentPubKey { get; set; }
     }
@@ -181,7 +181,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         }
 
-        public HoloNETShutdownEventArgs(string endPoint, string dnaHash, string agentPubKey, HolochainConductorsShutdownEventArgs holochainConductorsShutdownEventArgs)
+        public HoloNETShutdownEventArgs(Uri endPoint, string dnaHash, string agentPubKey, HolochainConductorsShutdownEventArgs holochainConductorsShutdownEventArgs)
         {
             EndPoint = endPoint;
             DnaHash = dnaHash;
@@ -190,7 +190,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         }
 
         public HolochainConductorsShutdownEventArgs HolochainConductorsShutdownEventArgs { get; private set; }
-        public string EndPoint { get; set; }
+        public Uri EndPoint { get; set; }
         public string DnaHash { get; set; }
         public string AgentPubKey { get; set; }
     }
@@ -200,7 +200,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public int NumberOfHolochainExeInstancesShutdown { get; set; }
         public int NumberOfHcExeInstancesShutdown { get; set; }
         public int NumberOfRustcExeInstancesShutdown { get; set; }
-        public string EndPoint { get; set; }
+        public Uri EndPoint { get; set; }
         public string DnaHash { get; set; }
         public string AgentPubKey { get; set; }
     }

@@ -3,7 +3,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:NextGenSoftware.Holochain.HoloNET.Templates.WPF"
         xmlns:fa="http://schemas.fontawesome.io/icons/"
         mc:Ignorable="d"
         Title="NextGen Software HoloNET WPF Test Harness v1.0" Height="700" Width="1555">
@@ -557,7 +556,6 @@
             <DataGrid.Resources>
                 <Style BasedOn="{StaticResource {x:Type DataGridColumnHeader}}" TargetType="{x:Type DataGridColumnHeader}">
                     <Setter Property="Background" Value="Blue" />
-                    <!--<Setter Property="Foreground" Value="White" />-->
                 </Style>
 
                 <ResourceDictionary x:Key="gridResources">
@@ -597,12 +595,10 @@
                 <DataGridTextColumn Width="*" Header="Manifest" Binding="{Binding Path=Manifest}" CanUserSort="True" ></DataGridTextColumn>
                 <DataGridTextColumn Width="4*" MinWidth="200" Header="Agent Pub Key" Binding="{Binding Path=AgentPubKey}" CanUserSort="True" ></DataGridTextColumn>
                 <DataGridTextColumn Width="4*" MinWidth="200" Header="Dna Hash" Binding="{Binding Path=DnaHash}" CanUserSort="True" ></DataGridTextColumn>
-                <!--<DataGridTemplateColumn Width="450">-->
                 <DataGridTemplateColumn Width="450">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <StackPanel Grid.Row="2" Orientation="Horizontal">
-                                <!--<Button x:Name="btnEnableApp" IsEnabled="{Binding Path=IsDisabled}"  Background="Black" Margin="10,0,10,10"  Padding="5,2,5,2" Foreground="{DynamicResource columnDisabledForeground}"  Content="Enable" Click="btnEnableApp_Click">-->
                                 <Button x:Name="btnEnableApp" Style="{StaticResource ButtonStyle}" FontSize="12" Cursor="Hand" IsEnabled="{Binding Path=IsDisabled}"  Background="Black" Margin="10,0,10,10"  Padding="5,5,5,5" Foreground="{Binding Path=EnabledButtonForegroundColour}"  Content="Enable" Click="btnEnableApp_Click">
                                     <Button.Effect>
                                         <DropShadowEffect x:Name="btnEnableAppGlowEffect" ShadowDepth="0"
@@ -635,17 +631,6 @@
                                             </BeginStoryboard>
                                         </EventTrigger>
                                     </Button.Triggers>
-
-                                    <!--<Button.Style>
-                                        <Style>
-                                            <Setter Property="Foreground" Value="#454545"/>
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding Path=Status}" Value="Disabled">
-                                                    <Setter Property="IsEnabled" Value="True" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Button.Style>-->
                                 </Button>
                                 <Button x:Name="btnDisableApp" Style="{StaticResource ButtonStyle}" FontSize="12" Cursor="Hand" IsEnabled="{Binding Path=IsEnabled}" Background="Black" Margin="10,0,10,10" Padding="5,5,5,5" Foreground="{Binding Path=DisabledButtonForegroundColour}" Content="Disable" Click="btnDisableApp_Click">
                                     <Button.Effect>
@@ -680,7 +665,7 @@
                                         </EventTrigger>
                                     </Button.Triggers>
                                 </Button>
-                                <Button x:Name="btnUninstallApp" Style="{StaticResource ButtonStyle}" FontSize="12"  Cursor="Hand" Background="Black" Margin="10,0,10,10"  Padding="5,5,5,5" Foreground="WhiteSmoke" Content="Uninstall" Click="btnUninstallApp_Click">
+                                <Button x:Name="btnUninstallApp" Style="{StaticResource ButtonStyle}" Foreground="WhiteSmoke" FontSize="12"  Cursor="Hand" Background="Black" Margin="10,0,10,10"  Padding="5,5,5,5" Content="Uninstall" Click="btnUninstallApp_Click">
                                     <Button.Effect>
                                         <DropShadowEffect x:Name="btnUninstallAppGlowEffect" ShadowDepth="0"
                           Color="White"
@@ -713,7 +698,7 @@
                                         </EventTrigger>
                                     </Button.Triggers>
                                 </Button>
-                                <Button x:Name="btnCallZomeFunction" Style="{StaticResource ButtonStyle}" FontSize="12"  Cursor="Hand" Background="Black" Margin="10,0,10,10"  Padding="5,5,5,5" Foreground="WhiteSmoke" Content="Call Zome Function" Click="btnCallZomeFunction_Click">
+                                <Button x:Name="btnCallZomeFunction" Style="{StaticResource ButtonStyle}" IsEnabled="{Binding Path=IsEnabled}" Foreground="{Binding Path=DisabledButtonForegroundColour}" FontSize="12"  Cursor="Hand" Background="Black" Margin="10,0,10,10"  Padding="5,5,5,5" Content="Call Zome Function" Click="btnCallZomeFunction_Click">
                                     <Button.Effect>
                                         <DropShadowEffect x:Name="btnCallZomeFunctionGlowEffect" ShadowDepth="0"
                           Color="White"
@@ -750,16 +735,9 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-
-                <!--<DataGridComboBoxColumn Width="*" Header="Enabled"  CanUserSort="True"></DataGridComboBoxColumn>-->
             </DataGrid.Columns>
         </DataGrid>
 
-        <!--<StackPanel Grid.Row="2" Orientation="Horizontal">
-            <Button x:Name="btnEnableApp" Background="Black" Margin="10,0,10,10"  Padding="5,2,5,2"  Foreground="WhiteSmoke" Content="Enable hApp"></Button>
-            <Button x:Name="btnDisableApp" Background="Black" Margin="10,0,10,10"  Padding="5,2,5,2" Foreground="WhiteSmoke" Content="Disable hApp"></Button>
-            <Button x:Name="btnUninstallApp" Background="Black" Margin="10,0,10,10"  Padding="5,2,5,2" Foreground="WhiteSmoke" Content="Uninstall hApp"></Button>
-        </StackPanel>-->
 
         <Label Grid.Row="2" Content="Log:" Margin="10,10,0,0" Foreground="WhiteSmoke" FontWeight="Bold"></Label>
         
@@ -1284,7 +1262,7 @@
 
 
 
-        <Grid x:Name="gridAdminURI" Grid.Row="0" Opacity="0.9" Grid.RowSpan="6" Visibility="Visible">
+        <Grid x:Name="popupAdminURI" Grid.Row="0" Opacity="0.9" Grid.RowSpan="6" Visibility="Visible">
             <Grid Background="Transparent" Opacity="0.5"/>
             <Border
             MinWidth="350"
@@ -1300,17 +1278,81 @@
                     <TextBox MinWidth="250" HorizontalAlignment="Center" VerticalAlignment="Center" Text="ws://localhost:77777" Margin="10" FontSize="14" x:Name="txtAdminURI"/>
                     <TextBlock Margin="5" x:Name="lblAdminURIError" Visibility="Collapsed" HorizontalAlignment="Center" FontSize="12"  Text="Please enter a valid Holochain Conductor Admin URI" Foreground="Red" FontWeight="Bold" FontFamily="Cambria" />
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                        <Button x:Name="btnAdminURIPopupCancel"  Cursor="Hand" Margin="10" Foreground="WhiteSmoke" Width="100" FontSize="14" Content="Cancel" Background="{x:Null}" Click="btnAdminURIPopupCancel_Click" />
-                        <Button x:Name="btnAdminURIPopupOK" Cursor="Hand" Margin="10" Foreground="WhiteSmoke" Width="100" FontSize="14" Content="OK" Background="{x:Null}" Click="btnAdminURIPopupOK_Click"/>
+                        <Button x:Name="btnAdminURIPopupCancel"  Cursor="Hand" Style="{StaticResource ButtonStyle}" Margin="10" Foreground="WhiteSmoke" Width="100" FontSize="14" Content="Cancel" Background="{x:Null}" Click="btnAdminURIPopupCancel_Click">
+                            <Button.Effect>
+                                <DropShadowEffect x:Name="btnAdminURIPopupCancelGlowEffect" ShadowDepth="0"
+                          Color="White"
+                          Opacity="0"
+                          BlurRadius="10"/>
+                            </Button.Effect>
+
+                            <Button.Triggers>
+                                <EventTrigger RoutedEvent="Button.MouseEnter">
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation
+                                    Storyboard.TargetName="btnAdminURIPopupCancelGlowEffect" 
+                                    Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+                                    From="0.0" To="1.0" Duration="0:0:0.5" 
+                                    AutoReverse="False" RepeatBehavior="1x" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                                <EventTrigger RoutedEvent="Button.MouseLeave">
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation
+                                    Storyboard.TargetName="btnAdminURIPopupCancelGlowEffect" 
+                                    Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+                                    From="1" To="0" Duration="0:0:0.5" 
+                                    AutoReverse="False" RepeatBehavior="1x" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                            </Button.Triggers>
+                        </Button>
+                        <Button x:Name="btnAdminURIPopupOK" Cursor="Hand" Style="{StaticResource ButtonStyle}" Margin="10" Foreground="WhiteSmoke" Width="100" FontSize="14" Content="OK" Background="{x:Null}" Click="btnAdminURIPopupOK_Click">
+                            <Button.Effect>
+                                <DropShadowEffect x:Name="btnAdminURIPopupOKGlowEffect" ShadowDepth="0"
+                          Color="White"
+                          Opacity="0"
+                          BlurRadius="10"/>
+                            </Button.Effect>
+
+                            <Button.Triggers>
+                                <EventTrigger RoutedEvent="Button.MouseEnter">
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation
+                                    Storyboard.TargetName="btnAdminURIPopupOKGlowEffect" 
+                                    Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+                                    From="0.0" To="1.0" Duration="0:0:0.5" 
+                                    AutoReverse="False" RepeatBehavior="1x" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                                <EventTrigger RoutedEvent="Button.MouseLeave">
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation
+                                    Storyboard.TargetName="btnAdminURIPopupOKGlowEffect" 
+                                    Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+                                    From="1" To="0" Duration="0:0:0.5" 
+                                    AutoReverse="False" RepeatBehavior="1x" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                            </Button.Triggers>
+                        </Button>
                     </StackPanel>
                 </StackPanel>
             </Border>
         </Grid>
 
         <!-- It's important that this is in the end of the XAML as it needs to be on top of everything else! -->
-        <Grid x:Name="InputBox" Grid.Row="0" Opacity="0.9" Grid.RowSpan="6" Visibility="Collapsed">
+        <Grid x:Name="popupInstallhApp" Grid.Row="0" Opacity="0.9" Grid.RowSpan="6" Visibility="Collapsed" >
             <Grid Background="Transparent" Opacity="0.5"/>
-            <Border
+            <Border Padding="10"
             MinWidth="250"
             Background="DarkBlue" 
             Opacity="50"
@@ -1322,16 +1364,81 @@
                 <StackPanel>
                     <TextBlock Margin="5" Text="Enter hApp Name" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14" FontFamily="Cambria" />
                     <TextBox MinWidth="150" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10" FontSize="14" x:Name="InputTextBox"/>
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                        <Button x:Name="NoButton" Style="{StaticResource ButtonStyle}" Cursor="Hand" Margin="5" Foreground="WhiteSmoke" Width="50" FontSize="14" Content="Cancel" Background="{x:Null}" Click="NoButton_Click" />
-                        <Button x:Name="YesButton" Style="{StaticResource ButtonStyle}" Cursor="Hand" Margin="5" Foreground="WhiteSmoke" Width="50" FontSize="14" Content="OK" Background="{x:Null}" Click="YesButton_Click"/>
-                    </StackPanel>
                     <TextBlock Margin="5" x:Name="lblEnterName" Visibility="Collapsed" HorizontalAlignment="Right" FontSize="14"  Text="Please enter the hApp name" Foreground="Red" FontWeight="Bold" FontFamily="Cambria" />
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Button x:Name="btnPopupInstallhAppCancel" Style="{StaticResource ButtonStyle}" Cursor="Hand" Margin="5" Foreground="WhiteSmoke" Width="50" FontSize="14" Content="Cancel" Click="btnPopupInstallhAppCancel_Click">
+                            <Button.Effect>
+                                <DropShadowEffect x:Name="btnPopupInstallhAppCancelGlowEffect" ShadowDepth="0"
+                          Color="White"
+                          Opacity="0"
+                          BlurRadius="10"/>
+                            </Button.Effect>
+
+                            <Button.Triggers>
+                                <EventTrigger RoutedEvent="Button.MouseEnter">
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation
+                                    Storyboard.TargetName="btnPopupInstallhAppCancelGlowEffect" 
+                                    Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+                                    From="0.0" To="1.0" Duration="0:0:0.5" 
+                                    AutoReverse="False" RepeatBehavior="1x" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                                <EventTrigger RoutedEvent="Button.MouseLeave">
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation
+                                    Storyboard.TargetName="btnPopupInstallhAppCancelGlowEffect" 
+                                    Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+                                    From="1" To="0" Duration="0:0:0.5" 
+                                    AutoReverse="False" RepeatBehavior="1x" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                            </Button.Triggers>
+                        </Button>
+
+                        <Button x:Name="btnPopupInstallhAppOk" Style="{StaticResource ButtonStyle}" Cursor="Hand" Margin="5" Foreground="WhiteSmoke" Width="50" FontSize="14" Content="Ok" Click="btnPopupInstallhAppOk_Click">
+                            <Button.Effect>
+                                <DropShadowEffect x:Name="btnPopupInstallhAppOkGlowEffect" ShadowDepth="0"
+                          Color="White"
+                          Opacity="0"
+                          BlurRadius="10"/>
+                            </Button.Effect>
+
+                            <Button.Triggers>
+                                <EventTrigger RoutedEvent="Button.MouseEnter">
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation
+                                    Storyboard.TargetName="btnPopupInstallhAppOkGlowEffect" 
+                                    Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+                                    From="0.0" To="1.0" Duration="0:0:0.5" 
+                                    AutoReverse="False" RepeatBehavior="1x" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                                <EventTrigger RoutedEvent="Button.MouseLeave">
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation
+                                    Storyboard.TargetName="btnPopupInstallhAppOkGlowEffect" 
+                                    Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+                                    From="1" To="0" Duration="0:0:0.5" 
+                                    AutoReverse="False" RepeatBehavior="1x" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                            </Button.Triggers>
+                        </Button>
+                    </StackPanel>
                 </StackPanel>
             </Border>
         </Grid>
 
-        <Grid x:Name="gridMakeZomeCall" Opacity="0.9" Grid.Row="0" Grid.RowSpan="6" Visibility="Collapsed">
+        <Grid x:Name="popupMakeZomeCall" Opacity="0.9" Grid.Row="0" Grid.RowSpan="6" Visibility="Collapsed">
             <Grid Background="Transparent" Opacity="0.5"/>
             <Border
 
@@ -1368,8 +1475,72 @@
                     <TextBlock Margin="5" x:Name="lblCallZomeFunctionErrors" Visibility="Collapsed" HorizontalAlignment="Center" FontSize="14"  Text="" Foreground="Red" FontWeight="Bold" FontFamily="Cambria" />
                         
                     <StackPanel Orientation="Horizontal" Margin="0,10,0,10" HorizontalAlignment="Center">
-                        <Button x:Name="btnCallZomeFunctionPopupCancel" Style="{StaticResource ButtonStyle}" Cursor="Hand" Margin="5" Foreground="WhiteSmoke" Width="50" FontSize="14" Content="Cancel" Background="{x:Null}" Click="btnCallZomeFunctionPopupCancel_Click" />
-                        <Button x:Name="btnCallZomeFunctionPopupOk" Margin="5" Style="{StaticResource ButtonStyle}" Cursor="Hand" Foreground="WhiteSmoke" Width="50" FontSize="14" Content="OK" Background="{x:Null}" Click="btnCallZomeFunctionPopupOk_Click"/>
+                        <Button x:Name="btnCallZomeFunctionPopupCancel" Style="{StaticResource ButtonStyle}" Cursor="Hand" Margin="5" Foreground="WhiteSmoke" Width="50" FontSize="14" Content="Cancel" Background="{x:Null}" Click="btnCallZomeFunctionPopupCancel_Click">
+                            <Button.Effect>
+                                <DropShadowEffect x:Name="btnCallZomeFunctionPopupCancelGlowEffect" ShadowDepth="0"
+                          Color="White"
+                          Opacity="0"
+                          BlurRadius="10"/>
+                            </Button.Effect>
+
+                            <Button.Triggers>
+                                <EventTrigger RoutedEvent="Button.MouseEnter">
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation
+                                    Storyboard.TargetName="btnCallZomeFunctionPopupCancelGlowEffect" 
+                                    Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+                                    From="0.0" To="1.0" Duration="0:0:0.5" 
+                                    AutoReverse="False" RepeatBehavior="1x" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                                <EventTrigger RoutedEvent="Button.MouseLeave">
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation
+                                    Storyboard.TargetName="btnCallZomeFunctionPopupCancelGlowEffect" 
+                                    Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+                                    From="1" To="0" Duration="0:0:0.5" 
+                                    AutoReverse="False" RepeatBehavior="1x" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                            </Button.Triggers>
+                        </Button>
+                        <Button x:Name="btnCallZomeFunctionPopupOk" Margin="5" Style="{StaticResource ButtonStyle}" Cursor="Hand" Foreground="WhiteSmoke" Width="50" FontSize="14" Content="OK" Background="{x:Null}" Click="btnCallZomeFunctionPopupOk_Click">
+                            <Button.Effect>
+                                <DropShadowEffect x:Name="btnCallZomeFunctionPopupOkEffect" ShadowDepth="0"
+                          Color="White"
+                          Opacity="0"
+                          BlurRadius="10"/>
+                            </Button.Effect>
+
+                            <Button.Triggers>
+                                <EventTrigger RoutedEvent="Button.MouseEnter">
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation
+                                    Storyboard.TargetName="btnCallZomeFunctionPopupOkEffect" 
+                                    Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+                                    From="0.0" To="1.0" Duration="0:0:0.5" 
+                                    AutoReverse="False" RepeatBehavior="1x" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                                <EventTrigger RoutedEvent="Button.MouseLeave">
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation
+                                    Storyboard.TargetName="btnCallZomeFunctionPopupOkEffect" 
+                                    Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+                                    From="1" To="0" Duration="0:0:0.5" 
+                                    AutoReverse="False" RepeatBehavior="1x" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                            </Button.Triggers>
+                        </Button>
                     </StackPanel>
                 </StackPanel>
             </Border>

@@ -8,7 +8,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
     public interface IHoloNETClient
     {
         HoloNETConfig Config { get; set; }
-        string EndPoint { get; }
+        Uri EndPoint { get; }
         bool IsReadyForZomesCalls { get; }
         bool RetrievingAgentPubKeyAndDnaHash { get; }
         WebSocketState State { get; }
