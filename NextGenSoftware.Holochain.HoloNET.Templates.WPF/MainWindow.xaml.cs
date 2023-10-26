@@ -52,25 +52,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
             this.Unloaded += MainWindow_Unloaded;
         }
 
-        private void MainWindow_Unloaded(object sender, RoutedEventArgs e)
-        {
-            if (_holoNETClientAdmin != null)
-            {
-                if (_holoNETClientAdmin.State == System.Net.WebSockets.WebSocketState.Open)
-                    _holoNETClientAdmin.Disconnect();
-
-                _holoNETClientAdmin = null;
-            }
-
-            foreach (HoloNETClient client in _holoNETappClients) 
-            {
-                if (client.State == System.Net.WebSockets.WebSocketState.Open)
-                    client.Disconnect();
-
-                //client = null;
-            }
-        }
-
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             HoloNETDNAManager.LoadDNA();
@@ -95,6 +76,56 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
             //gridHapps.Resources["columnDisabledForeground"] = Brushes.Black;
 
             //Init();
+        }
+
+        private void MainWindow_Unloaded(object sender, RoutedEventArgs e)
+        {
+            if (_holoNETClientAdmin != null)
+            {
+                if (_holoNETClientAdmin.State == System.Net.WebSockets.WebSocketState.Open)
+                    _holoNETClientAdmin.Disconnect();
+
+                _holoNETClientAdmin = null;
+            }
+
+            foreach (HoloNETClient client in _holoNETappClients)
+            {
+                if (client.State == System.Net.WebSockets.WebSocketState.Open)
+                    client.Disconnect();
+
+                //client = null;
+            }
+        }
+
+        private void Init()
+        {
+            LogMessage($"ADMIN: Connecting to Admin WebSocket on endpoint: {txtAdminURI.Text}...");
+            ShowStatusMessage($"Admin WebSocket Connecting To Endpoint {txtAdminURI.Text}...", StatusMessageType.Information, true);
+
+            _holoNETClientAdmin = new HoloNETClient(txtAdminURI.Text);
+            _holoNETClientAdmin.Config.AutoStartHolochainConductor = false;
+            _holoNETClientAdmin.Config.ShowHolochainConductorWindow = true;
+            _holoNETClientAdmin.Config.AutoShutdownHolochainConductor = false;
+            _holoNETClientAdmin.Config.FullPathToRootHappFolder = @"C:\Users\USER\holochain-holochain-0.1.5\happs\oasis\BUILD\happ";
+            _holoNETClientAdmin.Config.FullPathToCompiledHappFolder = @"C:\Users\USER\holochain-holochain-0.1.5\happs\oasis\BUILD\happ";
+            // _holoNETClientAdmin.Config.LoggingMode = Logging.LoggingMode.WarningsErrorsInfoAndDebug;
+
+            _holoNETClientAdmin.OnConnected += HoloNETClient_OnConnected;
+            _holoNETClientAdmin.OnError += HoloNETClient_OnError;
+            _holoNETClientAdmin.OnDataSent += _holoNETClient_OnDataSent;
+            _holoNETClientAdmin.OnDataReceived += HoloNETClient_OnDataReceived;
+            _holoNETClientAdmin.OnDisconnected += HoloNETClient_OnDisconnected;
+            _holoNETClientAdmin.OnAdminAgentPubKeyGeneratedCallBack += _holoNETClient_OnAdminAgentPubKeyGeneratedCallBack;
+            _holoNETClientAdmin.OnAdminAppInstalledCallBack += HoloNETClient_OnAdminAppInstalledCallBack;
+            _holoNETClientAdmin.OnAdminAppUninstalledCallBack += _holoNETClientAdmin_OnAdminAppUninstalledCallBack;
+            _holoNETClientAdmin.OnAdminAppEnabledCallBack += _holoNETClient_OnAdminAppEnabledCallBack;
+            _holoNETClientAdmin.OnAdminAppDisabledCallBack += _holoNETClientAdmin_OnAdminAppDisabledCallBack;
+            _holoNETClientAdmin.OnAdminZomeCallCapabilityGrantedCallBack += _holoNETClient_OnAdminZomeCallCapabilityGrantedCallBack;
+            _holoNETClientAdmin.OnAdminAppInterfaceAttachedCallBack += _holoNETClient_OnAdminAppInterfaceAttachedCallBack;
+            _holoNETClientAdmin.OnAdminAppsListedCallBack += _holoNETClientAdmin_OnAdminAppsListedCallBack;
+
+            _adminOperation = AdminOperation.ListHapps;
+            _holoNETClientAdmin.ConnectAdmin();
         }
 
         private void _holoNETClientAdmin_OnAdminAppDisabledCallBack(object sender, AdminAppDisabledCallBackEventArgs e)
@@ -213,10 +244,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
                         ShowStatusMessage($"Connecting To HoloNETClient AppAgent WebSocket On Port {e.Port}...", StatusMessageType.Information, true);
                         LogMessage($"APP: Connecting To HoloNETClient AppAgent WebSocket On Port {e.Port}...");
                         client.Connect();
-                    }
 
-                    foundClient = true;
-                    break;
+                        foundClient = true;
+                        break;
+                    }
                 }
 
                 if (!foundClient)
@@ -249,6 +280,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
                 newClient.Connect();
 
                 _holoNETappClients.Add(newClient);
+                txtConnections.Text = $"Client Connections: {_holoNETappClients.Count}";
+                sbAnimateConnections.Begin();
             }
         }
 
@@ -325,37 +358,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
             ShowStatusMessage("App WebSocket Connected.", StatusMessageType.Success);
         }
 
-        private void Init()
-        {
-            LogMessage($"ADMIN: Connecting to Admin WebSocket on endpoint: {txtAdminURI.Text}...");
-            ShowStatusMessage($"Admin WebSocket Connecting To Endpoint {txtAdminURI.Text}...", StatusMessageType.Information, true);
-
-            _holoNETClientAdmin = new HoloNETClient(txtAdminURI.Text);
-            _holoNETClientAdmin.Config.AutoStartHolochainConductor = false;
-            _holoNETClientAdmin.Config.ShowHolochainConductorWindow = true;
-            _holoNETClientAdmin.Config.AutoShutdownHolochainConductor = false;
-            _holoNETClientAdmin.Config.FullPathToRootHappFolder = @"C:\Users\USER\holochain-holochain-0.1.5\happs\oasis\BUILD\happ";
-            _holoNETClientAdmin.Config.FullPathToCompiledHappFolder = @"C:\Users\USER\holochain-holochain-0.1.5\happs\oasis\BUILD\happ";
-            // _holoNETClientAdmin.Config.LoggingMode = Logging.LoggingMode.WarningsErrorsInfoAndDebug;
-
-            _holoNETClientAdmin.OnConnected += HoloNETClient_OnConnected;
-            _holoNETClientAdmin.OnError += HoloNETClient_OnError;
-            _holoNETClientAdmin.OnDataSent += _holoNETClient_OnDataSent;
-            _holoNETClientAdmin.OnDataReceived += HoloNETClient_OnDataReceived;
-            _holoNETClientAdmin.OnDisconnected += HoloNETClient_OnDisconnected;
-            _holoNETClientAdmin.OnAdminAgentPubKeyGeneratedCallBack += _holoNETClient_OnAdminAgentPubKeyGeneratedCallBack;
-            _holoNETClientAdmin.OnAdminAppInstalledCallBack += HoloNETClient_OnAdminAppInstalledCallBack;
-            _holoNETClientAdmin.OnAdminAppUninstalledCallBack += _holoNETClientAdmin_OnAdminAppUninstalledCallBack;
-            _holoNETClientAdmin.OnAdminAppEnabledCallBack += _holoNETClient_OnAdminAppEnabledCallBack;
-            _holoNETClientAdmin.OnAdminAppDisabledCallBack += _holoNETClientAdmin_OnAdminAppDisabledCallBack;
-            _holoNETClientAdmin.OnAdminZomeCallCapabilityGrantedCallBack += _holoNETClient_OnAdminZomeCallCapabilityGrantedCallBack;
-            _holoNETClientAdmin.OnAdminAppInterfaceAttachedCallBack += _holoNETClient_OnAdminAppInterfaceAttachedCallBack;
-            _holoNETClientAdmin.OnAdminAppsListedCallBack += _holoNETClientAdmin_OnAdminAppsListedCallBack;
-
-            _adminOperation = AdminOperation.ListHapps;
-            _holoNETClientAdmin.ConnectAdmin();
-        }
-
         private void _holoNETClient_OnDataSent(object sender, HoloNETDataSentEventArgs e)
         {
             if (chkShowDetailedMessages.IsChecked.HasValue && chkShowDetailedMessages.IsChecked.Value)
@@ -377,7 +379,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
             LogMessage("ADMIN: Attaching App Interface...");
             ShowStatusMessage($"Attaching App Interface...", StatusMessageType.Information, true);
 
-            //_holoNETClientAdmin.AdminAttachAppInterface(65001);
+            //_holoNETClientAdmin.AdminAttachAppInterface(65002);
             _holoNETClientAdmin.AdminAttachAppInterface();
         }
 
@@ -749,20 +751,20 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
 
         private void ShowStatusMessage(string message, StatusMessageType type = StatusMessageType.Information, bool showSpinner = false)
         {
-            lblStatus.Content = $"{message}";
+            txtStatus.Text = $"{message}";
 
             switch (type) 
             {
                 case StatusMessageType.Success:
-                    lblStatus.Foreground = Brushes.LightGreen;
+                    txtStatus.Foreground = Brushes.LightGreen;
                     break;
 
                 case StatusMessageType.Information:
-                    lblStatus.Foreground = Brushes.White; 
+                    txtStatus.Foreground = Brushes.White; 
                     break;
 
                 case StatusMessageType.Error:
-                    lblStatus.Foreground= Brushes.LightSalmon;
+                    txtStatus.Foreground= Brushes.LightSalmon;
                     break;
             }
 
@@ -870,8 +872,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
                         }
                         else
                         {
-                            LogMessage($"ADMIN: Authorize Signing Credentials For {app.Name} hApp...");
-                            ShowStatusMessage($"Authorize Signing Credentials For {app.Name} hApp...", StatusMessageType.Information, true);
+                            LogMessage($"ADMIN: No Existing HoloNETClient AppAgent WebSocket Found For AgentPubKey {app.AgentPubKey}, DnaHash {app.DnaHash} And InstalledAppId {app.Name} So New Connection Needs To Be Made...");
+                            LogMessage($"ADMIN: Authorizing Signing Credentials For {app.Name} hApp...");
+                            ShowStatusMessage($"Authorizing Signing Credentials For {app.Name} hApp...", StatusMessageType.Information, true);
 
                             //_holoNETClientAdmin.AdminAuthorizeSigningCredentialsAndGrantZomeCallCapability(GrantedFunctionsType.Listed, new List<(string, string)>()
                             //{
@@ -881,7 +884,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
                             //});
 
                             _attachingApp = app;
-                            _holoNETClientAdmin.AdminAuthorizeSigningCredentialsAndGrantZomeCallCapability(_holoNETClientAdmin.GetCellId(app.DnaHash, app.AgentPubKey), GrantedFunctionsType.All, null);
+                            _holoNETClientAdmin.AdminAuthorizeSigningCredentialsAndGrantZomeCallCapability(_holoNETClientAdmin.GetCellId(app.DnaHash, app.AgentPubKey), CapGrantAccessType.Unrestricted, GrantedFunctionsType.All, null);
                         }
                     }
                 }

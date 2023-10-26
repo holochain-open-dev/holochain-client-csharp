@@ -1379,17 +1379,20 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 //byte[][] cellId = await GetCellIdAsync();
                 string cellId = $"{Config.AgentPubKey}:{Config.DnaHash}";
 
+               // global using BandPass = (int Min, int Max); //TODO: Need to upgrade to C#12 (.NET 8) before names tuple aliases will work...
+
                 if (_signingCredentialsForCell.ContainsKey(cellId) && _signingCredentialsForCell[cellId] != null)
                 {
                     ZomeCall payload = new ZomeCall()
                     {
                         cap_secret = _signingCredentialsForCell[cellId].CapSecret,
                         cell_id = new byte[2][] { ConvertHoloHashToBytes(Config.DnaHash), ConvertHoloHashToBytes(Config.AgentPubKey) },
+                        //cell_id = new CellId() { agent_pubkey = ConvertHoloHashToBytes(Config.AgentPubKey), dna_hash = ConvertHoloHashToBytes(Config.DnaHash) },
+                        //cell_id = (ConvertHoloHashToBytes(Config.DnaHash), ConvertHoloHashToBytes(Config.AgentPubKey)),
                         fn_name = function,
                         zome_name = zome,
                         payload = MessagePackSerializer.Serialize(paramsObject),
                         provenance = ConvertHoloHashToBytes(Config.AgentPubKey),
-                        //provenance = _signingCredentialsForCell[cellId].SigningKey,
                         nonce = RandomNumberGenerator.GetBytes(32),
                         expires_at = DateTime.Now.AddMinutes(5).Ticks / 10 //DateTime.Now.AddMinutes(5).ToBinary(), //Conductor expects it in microseconds.
                     };
@@ -1730,81 +1733,104 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         //    return AdminAuthorizeSigningCredentialsAndGrantZomeCallCapability(GetCellId(), grantedFunctionsType, functions, id);
         //}
 
-        public async Task<AdminZomeCallCapabilityGrantedCallBackEventArgs> AdminAuthorizeSigningCredentialsAndGrantZomeCallCapabilityAsync(string AgentPubKey, string DnaHash, GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions= null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = "")
+        public async Task<AdminZomeCallCapabilityGrantedCallBackEventArgs> AdminAuthorizeSigningCredentialsAndGrantZomeCallCapabilityAsync(string AgentPubKey, string DnaHash, CapGrantAccessType capGrantAccessType, GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions= null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = "")
         {
-            return await AdminAuthorizeSigningCredentialsAndGrantZomeCallCapabilityAsync(GetCellId(DnaHash, AgentPubKey), grantedFunctionsType, functions, conductorResponseCallBackMode, id);
+            return await AdminAuthorizeSigningCredentialsAndGrantZomeCallCapabilityAsync(GetCellId(DnaHash, AgentPubKey), capGrantAccessType, grantedFunctionsType, functions, conductorResponseCallBackMode, id);
         }
 
-        public AdminZomeCallCapabilityGrantedCallBackEventArgs AdminAuthorizeSigningCredentialsAndGrantZomeCallCapability(string AgentPubKey, string DnaHash, GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null,  string id = "")
+        public AdminZomeCallCapabilityGrantedCallBackEventArgs AdminAuthorizeSigningCredentialsAndGrantZomeCallCapability(string AgentPubKey, string DnaHash, CapGrantAccessType capGrantAccessType, GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null,  string id = "")
         {
-            return AdminAuthorizeSigningCredentialsAndGrantZomeCallCapability(GetCellId(DnaHash, AgentPubKey), grantedFunctionsType, functions, id);
+            return AdminAuthorizeSigningCredentialsAndGrantZomeCallCapability(GetCellId(DnaHash, AgentPubKey), capGrantAccessType, grantedFunctionsType, functions, id);
         }
 
-        public async Task<AdminZomeCallCapabilityGrantedCallBackEventArgs> AdminAuthorizeSigningCredentialsAndGrantZomeCallCapabilityAsync(byte[] AgentPubKey, byte[] DnaHash, GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = "")
+        public async Task<AdminZomeCallCapabilityGrantedCallBackEventArgs> AdminAuthorizeSigningCredentialsAndGrantZomeCallCapabilityAsync(byte[] AgentPubKey, byte[] DnaHash, CapGrantAccessType capGrantAccessType, GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = "")
         {
-            return await AdminAuthorizeSigningCredentialsAndGrantZomeCallCapabilityAsync(GetCellId(DnaHash, AgentPubKey), grantedFunctionsType, functions, conductorResponseCallBackMode, id);
+            return await AdminAuthorizeSigningCredentialsAndGrantZomeCallCapabilityAsync(GetCellId(DnaHash, AgentPubKey), capGrantAccessType, grantedFunctionsType, functions, conductorResponseCallBackMode, id);
         }
 
-        public AdminZomeCallCapabilityGrantedCallBackEventArgs AdminAuthorizeSigningCredentialsAndGrantZomeCallCapability(byte[] AgentPubKey, byte[] DnaHash, GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null, string id = "")
+        public AdminZomeCallCapabilityGrantedCallBackEventArgs AdminAuthorizeSigningCredentialsAndGrantZomeCallCapability(byte[] AgentPubKey, byte[] DnaHash, CapGrantAccessType capGrantAccessType, GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null, string id = "")
         {
-            return AdminAuthorizeSigningCredentialsAndGrantZomeCallCapability(GetCellId(DnaHash, AgentPubKey), grantedFunctionsType, functions, id);
+            return AdminAuthorizeSigningCredentialsAndGrantZomeCallCapability(GetCellId(DnaHash, AgentPubKey), capGrantAccessType, grantedFunctionsType, functions, id);
         }
 
-        public async Task<AdminZomeCallCapabilityGrantedCallBackEventArgs> AdminAuthorizeSigningCredentialsAndGrantZomeCallCapabilityAsync(byte[][] cellId, GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = "")
+        public async Task<AdminZomeCallCapabilityGrantedCallBackEventArgs> AdminAuthorizeSigningCredentialsAndGrantZomeCallCapabilityAsync(byte[][] cellId, CapGrantAccessType capGrantAccessType, GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = "")
         {
             (AdminZomeCallCapabilityGrantedCallBackEventArgs args, Dictionary<GrantedFunctionsType, List<(string, string)>> grantedFunctions, byte[] signingKey) = AuthorizeSigningCredentials(cellId, grantedFunctionsType, functions, id);
 
             if (!args.IsError)
             {
-                return await CallAdminFunctionAsync("grant_zome_call_capability", CreateGrantZomeCallCapabilityRequest(cellId, grantedFunctions, signingKey),
+                return await CallAdminFunctionAsync("grant_zome_call_capability", CreateGrantZomeCallCapabilityRequest(cellId, capGrantAccessType, grantedFunctions, signingKey),
                 _taskCompletionAdminZomeCapabilityGrantedCallBack, "OnAdminZomeCallCapabilityGranted", conductorResponseCallBackMode, id);
             }
             else
                 return args;
         }
 
-        public AdminZomeCallCapabilityGrantedCallBackEventArgs AdminAuthorizeSigningCredentialsAndGrantZomeCallCapability(byte[][] cellId, GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null, string id = "")
+        public AdminZomeCallCapabilityGrantedCallBackEventArgs AdminAuthorizeSigningCredentialsAndGrantZomeCallCapability(byte[][] cellId, CapGrantAccessType capGrantAccessType, GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null, string id = "")
         {
             (AdminZomeCallCapabilityGrantedCallBackEventArgs args, Dictionary<GrantedFunctionsType, List<(string, string)>> grantedFunctions, byte[] signingKey) = AuthorizeSigningCredentials(cellId, grantedFunctionsType, functions, id);
 
             if (!args.IsError)
             {
-                CallAdminFunction("grant_zome_call_capability", CreateGrantZomeCallCapabilityRequest(cellId, grantedFunctions, signingKey), id);
+                CallAdminFunction("grant_zome_call_capability", CreateGrantZomeCallCapabilityRequest(cellId, capGrantAccessType, grantedFunctions, signingKey), id);
                 return new AdminZomeCallCapabilityGrantedCallBackEventArgs() { IsCallSuccessful = true, EndPoint = EndPoint, Id = id, Message = "The call has been sent to the conductor.  Please wait for the event 'OnAdminZomeCallCapabilityGranted' to view the response." };
             }
             else
                 return args;
         }
 
-        private GrantZomeCallCapabilityRequest CreateGrantZomeCallCapabilityRequest(byte[][] cellId, Dictionary<GrantedFunctionsType, List<(string, string)>> grantedFunctions, byte[] signingKey)
+        private GrantZomeCallCapabilityRequest CreateGrantZomeCallCapabilityRequest(byte[][] cellId, CapGrantAccessType capGrantAccessType, Dictionary<GrantedFunctionsType, List<(string, string)>> grantedFunctions, byte[] signingKey)
         {
-            return new GrantZomeCallCapabilityRequest()
+            byte[] secret = _signingCredentialsForCell[$"{ConvertHoloHashToString(cellId[1])}:{ConvertHoloHashToString(cellId[0])}"].CapSecret;
+
+            GrantZomeCallCapabilityRequest request = new GrantZomeCallCapabilityRequest()
             {
                 cell_id = cellId,
                 cap_grant = new ZomeCallCapGrant()
                 {
                     tag = "zome-call-signing-key",
                     functions = grantedFunctions,
-                    //access = 0
-                    //access = "Unrestricted"
-                    access = new CapGrantAccess()
-                    {
-                        //Transferable = new CapGrantAccessTransferable()
-                        //{
-                        //    secret = _signingCredentialsForCell[cellId].CapSecret
-                        //}
-                        //Unrestricted = new CapGrantAccessUnrestricted()
-                        //Unrestricted = null,
-                        Assigned = new CapGrantAccessAssigned()
-                        {
-                            //secret = _signingCredentialsForCell[cellId].CapSecret,
-                            //secret = _signingCredentialsForCell[$"{Config.AgentPubKey}:{Config.DnaHash}"].CapSecret,
-                            secret = _signingCredentialsForCell[$"{ConvertHoloHashToString(cellId[1])}:{ConvertHoloHashToString(cellId[0])}"].CapSecret,
-                            assignees = new byte[1][] { signingKey }
-                        }
-                    }
                 }
             };
+
+            switch (capGrantAccessType)
+            {
+                case CapGrantAccessType.Assigned:
+                    {
+                        request.cap_grant.access = new CapGrantAccessAssigned()
+                        {
+                            Assigned = new CapGrantAccessAssignedDetails()
+                            {
+                                secret = secret,
+                                assignees = new byte[1][] { signingKey }
+                            }
+                        };
+                    }
+                    break;
+
+                case CapGrantAccessType.Unrestricted:
+                    {
+                        request.cap_grant.access = new CapGrantAccessUnrestricted()
+                        {
+                            Unrestricted = null
+                        };
+                    }
+                    break;
+
+                case CapGrantAccessType.Transferable:
+                    {
+                        request.cap_grant.access = new CapGrantAccessTransferable()
+                        {
+                             Transferable = new CapGrantAccessTransferableDetails()
+                             {
+                                 secret = secret
+                             }
+                        };
+                    }
+                    break;  
+            }
+
+            return request;
         }
 
         private (AdminZomeCallCapabilityGrantedCallBackEventArgs, Dictionary<GrantedFunctionsType, List<(string, string)>>, byte[]) AuthorizeSigningCredentials(byte[][] cellId, GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null, string id = "")

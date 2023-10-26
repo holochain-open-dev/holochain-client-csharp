@@ -1228,39 +1228,70 @@
             </ListBox.Resources>
         </ListBox>
 
-        <StackPanel Grid.Row="4" Orientation="Horizontal">
-            <Label x:Name="lblStatus" FontWeight="Bold"  Content="Status: Ready" HorizontalAlignment="Left" Margin="10,0,0,10" VerticalAlignment="Center" Foreground="WhiteSmoke">
-                <Label.Effect>
-                    <DropShadowEffect x:Name="glowEffect" ShadowDepth="0"
+        <Grid Grid.Row="4">
+            <Grid.RowDefinitions>
+                <RowDefinition></RowDefinition>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition Width="150"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal">
+                <TextBlock x:Name="txtStatus" TextWrapping="Wrap" FontWeight="Bold"  Text="Status: Ready" HorizontalAlignment="Left" Margin="10,0,0,10" VerticalAlignment="Center" Foreground="WhiteSmoke">
+                    <TextBlock.Effect>
+                        <DropShadowEffect x:Name="glowEffect" ShadowDepth="0"
                           Color="White"
                           Opacity="0"
                           BlurRadius="10"/>
-                </Label.Effect>
+                    </TextBlock.Effect>
 
-                <Label.Triggers>
-                    <EventTrigger x:Name="eventTriggerAnimateStatus" RoutedEvent="Label.Loaded">
-                        <BeginStoryboard>
-                            <Storyboard x:Name="sbAnimateStatus">
-                                <DoubleAnimation
+                    <TextBlock.Triggers>
+                        <EventTrigger x:Name="eventTriggerAnimateStatus" RoutedEvent="TextBlock.Loaded">
+                            <BeginStoryboard>
+                                <Storyboard x:Name="sbAnimateStatus">
+                                    <DoubleAnimation
                                     Storyboard.TargetName="glowEffect" 
                                     Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
                                     From="0.0" To="1.0" Duration="0:0:0.5" 
                                     AutoReverse="True" RepeatBehavior="1x" />
-                            </Storyboard>
-                            <!--<DoubleAnimation
+                                </Storyboard>
+                                <!--<DoubleAnimation
                                     Storyboard.TargetName="lblStatus" 
                                     Storyboard.TargetProperty="(Label.Opacity)"
                                     From="1.0" To="0.0" Duration="0:0:0.5" 
                                     AutoReverse="True" RepeatBehavior="1x" />              
                             </Storyboard>-->
+                            </BeginStoryboard>
+                        </EventTrigger>
+                    </TextBlock.Triggers>
+                </TextBlock>
+                <fa:ImageAwesome x:Name="spinner" Icon="Cog" Visibility="Hidden" Spin="True" Foreground="WhiteSmoke" VerticalAlignment="Center" Margin="5,0,0,4" Height="20" Width="20" />
+            </StackPanel>
+
+            <TextBlock x:Name="txtConnections" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right" FontWeight="Bold"  Text="Client Connections: 0" VerticalAlignment="Center" Margin="0,0,15,10" Foreground="WhiteSmoke">
+                <TextBlock.Effect>
+                    <DropShadowEffect x:Name="glowEffectConnections" ShadowDepth="0"
+                          Color="White"
+                          Opacity="0"
+                          BlurRadius="10"/>
+                </TextBlock.Effect>
+
+                <TextBlock.Triggers>
+                    <EventTrigger RoutedEvent="TextBlock.Loaded">
+                        <BeginStoryboard>
+                            <Storyboard x:Name="sbAnimateConnections">
+                                <DoubleAnimation
+                                    Storyboard.TargetName="glowEffectConnections" 
+                                    Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+                                    From="0.0" To="1.0" Duration="0:0:0.5" 
+                                    AutoReverse="True" RepeatBehavior="1x" />
+                            </Storyboard>
                         </BeginStoryboard>
                     </EventTrigger>
-                </Label.Triggers>
-            </Label>
-            <fa:ImageAwesome x:Name="spinner" Icon="Cog" Visibility="Hidden" Spin="True" Foreground="WhiteSmoke" VerticalAlignment="Center" Margin="5,0,0,4" Height="20" Width="20" />
-        </StackPanel>
-
-
+                </TextBlock.Triggers>
+            </TextBlock>
+        </Grid>
 
         <Grid x:Name="popupAdminURI" Grid.Row="0" Opacity="0.9" Grid.RowSpan="6" Visibility="Visible">
             <Grid Background="Transparent" Opacity="0.5"/>
@@ -1471,8 +1502,8 @@
                         <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="2" Grid.Column="0"  Text="Zome Params:" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14" FontFamily="Cambria" />
                         <TextBox MinWidth="150" Grid.Row="2" Grid.Column="1" Margin="10" FontSize="14" Text="param1=1;param2=2;param3=3" x:Name="txtZomeParams"/>
                     </Grid>
-                   
-                    <TextBlock Margin="5" x:Name="lblCallZomeFunctionErrors" Visibility="Collapsed" HorizontalAlignment="Center" FontSize="14"  Text="" Foreground="Red" FontWeight="Bold" FontFamily="Cambria" />
+
+                    <TextBlock Name="lblCallZomeFunctionErrors" Width="380" TextWrapping="Wrap" Margin="20,10,10,10"  Visibility="Collapsed" HorizontalAlignment="Center" FontSize="14"  Text="" Foreground="Red" FontWeight="Bold" FontFamily="Cambria" />
                         
                     <StackPanel Orientation="Horizontal" Margin="0,10,0,10" HorizontalAlignment="Center">
                         <Button x:Name="btnCallZomeFunctionPopupCancel" Style="{StaticResource ButtonStyle}" Cursor="Hand" Margin="5" Foreground="WhiteSmoke" Width="50" FontSize="14" Content="Cancel" Background="{x:Null}" Click="btnCallZomeFunctionPopupCancel_Click">

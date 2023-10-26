@@ -4,9 +4,9 @@ using MessagePack;
 namespace NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects
 {
     [MessagePackObject]
-    public class CapGrantAccessUnrestricted
+    public class CapGrantAccessTransferableDetails
     {
-        [Key("Unrestricted")]
-        public object Unrestricted { get; set; }
+        [Key("secret")]
+        public byte[] secret { get; set; }
     }
 }
