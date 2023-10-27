@@ -3,8 +3,12 @@ using NextGenSoftware.Logging;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
-    public class HoloNETConfig
+    public class HoloNETDNA
     {
+        //private HoloNETDNAManager _holoNETDNAManager = new HoloNETDNAManager();
+
+        public string HolochainConductorAdminURI { get; set; } = "ws://localhost:77777";
+
         /// <summary>
         /// The AgentPubKey to use for Zome calls. If this is not set then HoloNET will automatically retrieve this along with the DnaHash after it connects (if the Connect method defaults are not overriden).
         /// </summary>
@@ -49,7 +53,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <summary>
         /// The seconds to wait for the Holochain Conductor to start before attempting to connect to it.
         /// </summary>
-        public int SecondsToWaitForHolochainConductorToStart { get; set; } = 7;
+        public int SecondsToWaitForHolochainConductorToStart { get; set; } = 5;
 
         /// <summary>
         /// Set this to true if you with HoloNET to auto-start the Holochain Conductor defined in the `FullPathToExternalHolochainConductorBinary parameter if `HolochainConductorToUse` is `Holochain`, otherwise if it`s `Hc` then it will use `FullPathToExternalHCToolBinary`. Default is true.
@@ -105,5 +109,15 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// An enum that specifies what to do when anm error occurs. The options are: `AlwaysThrowExceptionOnError`, `OnlyThrowExceptionIfNoErrorHandlerSubscribedToOnErrorEvent` & `NeverThrowExceptions`). The default is `OnlyThrowExceptionIfNoErrorHandlerSubscribedToOnErrorEvent` meaning it will only throw an error if the `OnError` event has not been subscribed to. This delegates error handling to the caller. If no event has been subscribed then HoloNETClient will throw an error. `AlwaysThrowExceptionOnError` will always throw an error even if the `OnError` event has been subscribed to. The `NeverThrowException` enum option will never throw an error even if the `OnError` event has not been subscribed to. Regardless of what enum is selected, the error will always be logged using whatever ILogger`s have been injected into the constructor or set on the static Logging.Loggers property.
         /// </summary>
         public ErrorHandlingBehaviour ErrorHandlingBehaviour { get; set; } = ErrorHandlingBehaviour.OnlyThrowExceptionIfNoErrorHandlerSubscribedToOnErrorEvent;
+
+        //public HoloNETDNA LoadDNA()
+        //{
+        //    return _holoNETDNAManager.LoadDNA();
+        //}
+
+        //public bool SaveDNA() 
+        //{
+        //    return _holoNETDNAManager.SaveDNA();
+        //}
     }
 }

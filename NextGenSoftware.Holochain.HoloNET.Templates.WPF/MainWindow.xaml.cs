@@ -12,7 +12,6 @@ using Microsoft.Win32;
 using NextGenSoftware.Holochain.HoloNET.Client;
 using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects;
 using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Enums;
-using NextGenSoftware.Holochain.HoloNET.Templates.WPF.HoloNETDNA;
 using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Models;
 using NextGenSoftware.Utilities.ExtentionMethods;
 
@@ -29,19 +28,20 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
         private const string _role_name = "oasis";
         private const string _installed_app_id = "oasis-app7777";
         private HoloNETClient? _holoNETClientAdmin;
-        //private HoloNETClient _holoNETClientApp;
         private List<HoloNETClient> _holoNETappClients = new List<HoloNETClient>();
         private bool _rebooting = false;
         private bool _adminDisconnected = false;
         private bool _appDisconnected = false;
         private bool _adminConnected = false;
-        private bool _doDemo = false;
+        //private bool _doDemo = false;
         private string _installinghAppName = "";
         private string _installinghAppPath = "";
-        private AdminOperation _adminOperation;
+        //private AdminOperation _adminOperation;
         private byte[][] _installingAppCellId = null;
         dynamic paramsObject = null;
         InstalledApp _attachingApp = null;
+        int _clientsToDisconnect = 0;
+        int _clientsDisconnected = 0;
 
         public ObservableCollection<InstalledApp> InstalledApps { get; set; } = new ObservableCollection<InstalledApp>();
 
@@ -54,11 +54,16 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            HoloNETDNAManager.LoadDNA();
+            Init();
+        }
 
-            if (HoloNETDNAManager.HoloNETDNA != null)
-                txtAdminURI.Text = HoloNETDNAManager.HoloNETDNA.HcAdminURI;
+        private void MainWindow_Unloaded(object sender, RoutedEventArgs e)
+        {
+            CloseAllConnections();
+        }
 
+        private void Init()
+        {
             //if (VisualTreeHelper.GetChildrenCount(lstOutput) > 0)
             //{
             //    Border border = (Border)VisualTreeHelper.GetChild(lstOutput, 0);
@@ -69,47 +74,39 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
             //    scrollbar.Background = Brushes.Blue;
 
             //}
-
-
             //scrollbar.Foreground = Brushes.Blue;
-
             //gridHapps.Resources["columnDisabledForeground"] = Brushes.Black;
 
-            //Init();
-        }
+            //if (HoloNETDNAManager.HoloNETDNA != null)
+            //{
+            //    txtAdminURI.Text = HoloNETDNAManager.HoloNETDNA.HolochainConductorAdminURI;
+            //    chkAutoStartConductor.IsChecked = HoloNETDNAManager.HoloNETDNA.AutoStartHolochainConductor;
+            //    chkAutoShutdownConductor.IsChecked = HoloNETDNAManager.HoloNETDNA.AutoShutdownHolochainConductor;
+            //    chkShowConductorWindow.IsChecked = HoloNETDNAManager.HoloNETDNA.ShowHolochainConductorWindow;
+            //    txtSecondsToWaitForConductorToStart.Text = HoloNETDNAManager.HoloNETDNA.SecondsToWaitForHolochainConductorToStart.ToString();
+            //}
 
-        private void MainWindow_Unloaded(object sender, RoutedEventArgs e)
-        {
-            if (_holoNETClientAdmin != null)
-            {
-                if (_holoNETClientAdmin.State == System.Net.WebSockets.WebSocketState.Open)
-                    _holoNETClientAdmin.Disconnect();
+            //_holoNETClientAdmin = new HoloNETClient(HoloNETDNAManager.HoloNETDNA.HolochainConductorAdminURI);
+            //_holoNETClientAdmin.HoloNETDNA.AutoStartHolochainConductor = chkAutoStartConductor.IsChecked.Value;
+            //_holoNETClientAdmin.HoloNETDNA.ShowHolochainConductorWindow = chkShowConductorWindow.IsChecked.Value;
+            //_holoNETClientAdmin.HoloNETDNA.AutoShutdownHolochainConductor = chkAutoShutdownConductor.IsChecked.Value;
+            //_holoNETClientAdmin.HoloNETDNA.SecondsToWaitForHolochainConductorToStart = Convert.ToInt32(txtSecondsToWaitForConductorToStart.Text);
 
-                _holoNETClientAdmin = null;
-            }
-
-            foreach (HoloNETClient client in _holoNETappClients)
-            {
-                if (client.State == System.Net.WebSockets.WebSocketState.Open)
-                    client.Disconnect();
-
-                //client = null;
-            }
-        }
-
-        private void Init()
-        {
-            LogMessage($"ADMIN: Connecting to Admin WebSocket on endpoint: {txtAdminURI.Text}...");
-            ShowStatusMessage($"Admin WebSocket Connecting To Endpoint {txtAdminURI.Text}...", StatusMessageType.Information, true);
-
-            _holoNETClientAdmin = new HoloNETClient(txtAdminURI.Text);
-            _holoNETClientAdmin.Config.AutoStartHolochainConductor = false;
-            _holoNETClientAdmin.Config.ShowHolochainConductorWindow = true;
-            _holoNETClientAdmin.Config.AutoShutdownHolochainConductor = false;
-            _holoNETClientAdmin.Config.FullPathToRootHappFolder = @"C:\Users\USER\holochain-holochain-0.1.5\happs\oasis\BUILD\happ";
-            _holoNETClientAdmin.Config.FullPathToCompiledHappFolder = @"C:\Users\USER\holochain-holochain-0.1.5\happs\oasis\BUILD\happ";
+            //_holoNETClientAdmin.Config.FullPathToRootHappFolder = @"C:\Users\USER\holochain-holochain-0.1.5\happs\oasis\BUILD\happ";
+            // _holoNETClientAdmin.HoloNETDNA.FullPathToCompiledHappFolder = @"C:\Users\USER\holochain-holochain-0.1.5\happs\oasis\BUILD\happ";
             // _holoNETClientAdmin.Config.LoggingMode = Logging.LoggingMode.WarningsErrorsInfoAndDebug;
 
+            _holoNETClientAdmin = new HoloNETClient();
+
+            txtAdminURI.Text = _holoNETClientAdmin.HoloNETDNA.HolochainConductorAdminURI;
+            chkAutoStartConductor.IsChecked = _holoNETClientAdmin.HoloNETDNA.AutoStartHolochainConductor;
+            chkAutoShutdownConductor.IsChecked = _holoNETClientAdmin.HoloNETDNA.AutoShutdownHolochainConductor;
+            chkShowConductorWindow.IsChecked = _holoNETClientAdmin.HoloNETDNA.ShowHolochainConductorWindow;
+            txtSecondsToWaitForConductorToStart.Text = _holoNETClientAdmin.HoloNETDNA.SecondsToWaitForHolochainConductorToStart.ToString();
+            //_holoNETClientAdmin.HoloNETDNA.FullPathToRootHappFolder = @"C:\Users\USER\holochain-holochain-0.1.5\happs\oasis";
+
+            _holoNETClientAdmin.OnHolochainConductorStarting += _holoNETClientAdmin_OnHolochainConductorStarting;
+            _holoNETClientAdmin.OnHolochainConductorStarted += _holoNETClientAdmin_OnHolochainConductorStarted;
             _holoNETClientAdmin.OnConnected += HoloNETClient_OnConnected;
             _holoNETClientAdmin.OnError += HoloNETClient_OnError;
             _holoNETClientAdmin.OnDataSent += _holoNETClient_OnDataSent;
@@ -123,9 +120,39 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
             _holoNETClientAdmin.OnAdminZomeCallCapabilityGrantedCallBack += _holoNETClient_OnAdminZomeCallCapabilityGrantedCallBack;
             _holoNETClientAdmin.OnAdminAppInterfaceAttachedCallBack += _holoNETClient_OnAdminAppInterfaceAttachedCallBack;
             _holoNETClientAdmin.OnAdminAppsListedCallBack += _holoNETClientAdmin_OnAdminAppsListedCallBack;
+        }
 
-            _adminOperation = AdminOperation.ListHapps;
-            _holoNETClientAdmin.ConnectAdmin();
+        private void ConnectAdmin()
+        {
+            _clientsDisconnected = 0;
+            _clientsToDisconnect = 0;
+            _rebooting = false;
+            _adminDisconnected = false;
+            _adminConnected = false;
+
+            if (!_holoNETClientAdmin.HoloNETDNA.AutoStartHolochainConductor)
+            {
+                LogMessage($"ADMIN: Connecting to Admin WebSocket on endpoint: {_holoNETClientAdmin.HoloNETDNA.HolochainConductorAdminURI}...");
+                ShowStatusMessage($"Admin WebSocket Connecting To Endpoint {_holoNETClientAdmin.HoloNETDNA.HolochainConductorAdminURI}...", StatusMessageType.Information, true);
+            }
+
+            //_adminOperation = AdminOperation.ListHapps;
+            _holoNETClientAdmin.ConnectAdmin(_holoNETClientAdmin.HoloNETDNA.HolochainConductorAdminURI);
+        }
+
+        private void _holoNETClientAdmin_OnHolochainConductorStarting(object sender, HolochainConductorStartingEventArgs e)
+        {
+            LogMessage($"ADMIN: Starting Holochain Conductor...");
+            ShowStatusMessage("Starting Holochain Conductor...", StatusMessageType.Information, true);
+        }
+
+        private void _holoNETClientAdmin_OnHolochainConductorStarted(object sender, HolochainConductorStartedEventArgs e)
+        {
+            LogMessage($"ADMIN: Holochain Conductor Started.");
+            ShowStatusMessage("Holochain Conductor Started.", StatusMessageType.Success);
+
+            LogMessage($"ADMIN: Connecting to Admin WebSocket on endpoint: {txtAdminURI.Text}...");
+            ShowStatusMessage($"Admin WebSocket Connecting To Endpoint {txtAdminURI.Text}...", StatusMessageType.Information, true);
         }
 
         private void _holoNETClientAdmin_OnAdminAppDisabledCallBack(object sender, AdminAppDisabledCallBackEventArgs e)
@@ -144,7 +171,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
 
         private void _holoNETClientAdmin_OnAdminAppsListedCallBack(object sender, AdminAppsListedCallBackEventArgs e)
         {
-            //lstHapps.Items.Clear();
             string hApps = "";
             InstalledApps.Clear();
 
@@ -182,9 +208,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
             bool foundClient = false;
             foreach (HoloNETClient client in _holoNETappClients)
             {
-                if (client != null && client.Config.DnaHash == _attachingApp.DnaHash && client.Config.AgentPubKey == _attachingApp.AgentPubKey && client.Config.InstalledAppId == _attachingApp.Name)
+                if (client != null && client.HoloNETDNA.DnaHash == _attachingApp.DnaHash && client.HoloNETDNA.AgentPubKey == _attachingApp.AgentPubKey && client.HoloNETDNA.InstalledAppId == _attachingApp.Name)
                 {
-                    LogMessage($"APP: Found Exsting Existing HoloNETClient AppAgent WebSocket For AgentPubKey {client.Config.AgentPubKey}, DnaHash {client.Config.DnaHash} And InstalledAppId {client.Config.InstalledAppId} Running On Port {client.EndPoint.Port}.");
+                    LogMessage($"APP: Found Exsting Existing HoloNETClient AppAgent WebSocket For AgentPubKey {client.HoloNETDNA.AgentPubKey}, DnaHash {client.HoloNETDNA.DnaHash} And InstalledAppId {client.HoloNETDNA.InstalledAppId} Running On Port {client.EndPoint.Port}.");
 
                     if (client.State == System.Net.WebSockets.WebSocketState.Open)
                     {
@@ -267,12 +293,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
                 newClient.OnDataSent += _holoNETClientApp_OnDataSent;
                 newClient.OnError += _holoNETClientApp_OnError;
 
-                newClient.Config.AutoStartHolochainConductor = false;
-                newClient.Config.AutoShutdownHolochainConductor = false;
+                newClient.HoloNETDNA.AutoStartHolochainConductor = false;
+                newClient.HoloNETDNA.AutoShutdownHolochainConductor = false;
 
-                newClient.Config.AgentPubKey = _attachingApp.AgentPubKey;
-                newClient.Config.DnaHash = _attachingApp.DnaHash;
-                newClient.Config.InstalledAppId = _attachingApp.Name;
+                newClient.HoloNETDNA.AgentPubKey = _attachingApp.AgentPubKey;
+                newClient.HoloNETDNA.DnaHash = _attachingApp.DnaHash;
+                newClient.HoloNETDNA.InstalledAppId = _attachingApp.Name;
 
                 LogMessage($"APP: New HoloNETClient AppAgent WebSocket Created.");
                 ShowStatusMessage($"Connecting To HoloNETClient AppAgent WebSocket On Port {e.Port}...", StatusMessageType.Information, true);
@@ -308,10 +334,15 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
             LogMessage("APP: Disconnected");
             ShowStatusMessage("App WebSocket Disconnected.");
 
-            _appDisconnected = true;
+            HoloNETClient client = sender as HoloNETClient;
 
-            if (_rebooting && _adminDisconnected && _appDisconnected)
-                Init();
+            if (client != null)
+                _holoNETappClients.Remove(client);
+
+            _clientsDisconnected++;
+
+            if (_clientsDisconnected == _clientsToDisconnect && _rebooting && _adminDisconnected)
+                ConnectAdmin();
         }
 
         private void _holoNETClientApp_OnZomeFunctionCallBack(object sender, ZomeFunctionCallBackEventArgs e)
@@ -329,13 +360,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
 
             if (client != null)
             {
-                if (_doDemo)
-                {
-                    LogMessage("APP: Calling Zome Function...");
-                    ShowStatusMessage("Calling Zome Function...", StatusMessageType.Information, true);
-                    client.CallZomeFunction("oasis", "create_avatar", null);
-                }
-                else if (paramsObject != null)
+                if (paramsObject != null)
                 {
                     LogMessage("APP: Calling Zome Function...");
                     ShowStatusMessage("Calling Zome Function...", StatusMessageType.Information, true);
@@ -349,7 +374,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
 
         private HoloNETClient GetClient(string dnaHash, string agentPubKey, string installedAppId)
         {
-            return _holoNETappClients.FirstOrDefault(x => x.Config.DnaHash == dnaHash && x.Config.AgentPubKey == agentPubKey && x.Config.InstalledAppId == installedAppId);
+            return _holoNETappClients.FirstOrDefault(x => x.HoloNETDNA.DnaHash == dnaHash && x.HoloNETDNA.AgentPubKey == agentPubKey && x.HoloNETDNA.InstalledAppId == installedAppId);
         }
 
         private void _holoNETClientApp_OnConnected(object sender, WebSocket.ConnectedEventArgs e)
@@ -413,6 +438,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
 
             _adminConnected = true;
 
+            LogMessage($"ADMIN: Listing hApps...");
+            ShowStatusMessage($"Listing hApps...", StatusMessageType.Information, true);
+            _holoNETClientAdmin.AdminListApps(AppStatusFilter.All);
+
+            /*
             switch (_adminOperation)
             {
                 case AdminOperation.InstallHapp:
@@ -454,7 +484,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
                         _holoNETClientAdmin.AdminListInterfaces();
                 }
                 break;   
-            }
+            }*/
         }
 
         private void HoloNETClient_OnDisconnected(object sender, WebSocket.DisconnectedEventArgs e)
@@ -465,11 +495,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
             _adminDisconnected = true;
             _adminConnected = false;
 
-            if (_rebooting && _adminDisconnected && _appDisconnected)
-            {
-                _doDemo = true;
-                Init();
-            }
+            if (_rebooting && _adminDisconnected && _clientsDisconnected == _clientsToDisconnect)
+                ConnectAdmin();
         }
 
         private void HoloNETClient_OnAdminAppInstalledCallBack(object sender, AdminAppInstalledCallBackEventArgs e)
@@ -554,26 +581,39 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
 
         private void btnReboot_Click(object sender, RoutedEventArgs e)
         {
-            //LogMessage("Rebooting...");
-            //ShowStatusMessage($"Rebooting...");
+            LogMessage("Rebooting...");
+            ShowStatusMessage($"Rebooting...");
 
-            //if (_holoNETClientApp != null && _holoNETClientApp.State == System.Net.WebSockets.WebSocketState.Open)
-            //{
-            //    LogMessage("APP: Disconnecting...");
-            //    ShowStatusMessage($"App WebSocket Disconnecting...", StatusMessageType.Information, true);
+            _clientsToDisconnect = _holoNETappClients.Count;
+            _rebooting = true;
+            CloseAllConnections();
+        }
 
-            //    _appDisconnected = false;
-            //    _holoNETClientApp.Disconnect();
-            //}
-            //else
-            //    _appDisconnected = true;
+        private void CloseAllConnections()
+        {
+            LogMessage("APP: Disconnecting All HoloNETClient AppAgent WebSockets...");
+            ShowStatusMessage($"Disconnecting All HoloNETClient AppAgent WebSockets...", StatusMessageType.Information, true);
 
-            //LogMessage("ADMIN: Disconnecting...");
-            //ShowStatusMessage($"Admin WebSocket Disconnecting...", StatusMessageType.Information, true);
+            foreach (HoloNETClient client in _holoNETappClients)
+            {
+                if (client.State == System.Net.WebSockets.WebSocketState.Open)
+                    client.Disconnect();
 
-            //_rebooting = true;
-            //_adminDisconnected = false;
-            //_holoNETClientAdmin.Disconnect();
+                //client = null;
+            }
+
+            LogMessage("ADMIN: Disconnecting...");
+            ShowStatusMessage($"Disconnecting Admin WebSocket...", StatusMessageType.Information, true);
+
+            _adminDisconnected = false;
+
+            if (_holoNETClientAdmin != null)
+            {
+                if (_holoNETClientAdmin.State == System.Net.WebSockets.WebSocketState.Open)
+                    _holoNETClientAdmin.Disconnect();
+
+                _holoNETClientAdmin = null;
+            }
         }
 
         private void btnShowLog_Click(object sender, RoutedEventArgs e)
@@ -581,21 +621,21 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
             Process.Start("notepad.exe", "Logs\\HoloNET.log");
         }
 
-        private void btnStartDemo_Click(object sender, RoutedEventArgs e)
-        {
-            btnStartDemo.IsEnabled = false;
-            btnStartDemo.Foreground = new SolidColorBrush(Colors.DarkGray);
-            btnReboot.IsEnabled = true;
-            btnReboot.Foreground = new SolidColorBrush(Colors.White);
+        //private void btnStartDemo_Click(object sender, RoutedEventArgs e)
+        //{
+        //    btnStartDemo.IsEnabled = false;
+        //    btnStartDemo.Foreground = new SolidColorBrush(Colors.DarkGray);
+        //    btnReboot.IsEnabled = true;
+        //    btnReboot.Foreground = new SolidColorBrush(Colors.White);
 
-            _doDemo = true;
-            //Init();
+        //    _doDemo = true;
+        //    //Init();
 
-            LogMessage("ADMIN: Installing OASIS Demo hApp...");
-            ShowStatusMessage($"Installing OASIS Demo hApp...", StatusMessageType.Information, true);
+        //    LogMessage("ADMIN: Installing OASIS Demo hApp...");
+        //    ShowStatusMessage($"Installing OASIS Demo hApp...", StatusMessageType.Information, true);
 
-            _holoNETClientAdmin.AdminInstallApp(_holoNETClientAdmin.Config.AgentPubKey, _installed_app_id, _oasisHappPath);
-        }
+        //    _holoNETClientAdmin.AdminInstallApp(_holoNETClientAdmin.HoloNETDNA.AgentPubKey, _installed_app_id, _oasisHappPath);
+        //}
 
         private void btnInstall_Click(object sender, RoutedEventArgs e)
         {
@@ -623,70 +663,30 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
 
         private void btnListDNAs_Click(object sender, RoutedEventArgs e)
         {
-            _doDemo = false;
-
-            if (_adminConnected)
-            {
-                LogMessage("ADMIN: Listning DNAs...");
-                ShowStatusMessage($"Listning DNAs...");
-                _holoNETClientAdmin.AdminListApps(AppStatusFilter.All);
-            }
-            else
-            {
-                _adminOperation = AdminOperation.ListDNAs;
-                Init();
-            }
+            LogMessage("ADMIN: Listning DNAs...");
+            ShowStatusMessage($"Listning DNAs...");
+            _holoNETClientAdmin.AdminListApps(AppStatusFilter.All);
         }
 
         private void btnListCellIds_Click(object sender, RoutedEventArgs e)
         {
-            _doDemo = false;
-
-            if (_adminConnected)
-            {
-                LogMessage("ADMIN: Listning Cell Ids...");
-                ShowStatusMessage($"Listning Cell Ids...", StatusMessageType.Information, true);
-                _holoNETClientAdmin.AdminListCellIds();
-            }
-            else
-            {
-                _adminOperation = AdminOperation.ListCellIds;
-                Init();
-            }
+            LogMessage("ADMIN: Listning Cell Ids...");
+            ShowStatusMessage($"Listning Cell Ids...", StatusMessageType.Information, true);
+            _holoNETClientAdmin.AdminListCellIds();
         }
 
         private void btnListAttachedInterfaces_Click(object sender, RoutedEventArgs e)
         {
-            _doDemo = false;
-
-            if (_adminConnected)
-            {
-                LogMessage("ADMIN: Listning Attached Interfaces...");
-                ShowStatusMessage($"Listning Attached Interfaces...", StatusMessageType.Information, true);
-                _holoNETClientAdmin.AdminListInterfaces();
-            }
-            else
-            {
-                _adminOperation = AdminOperation.ListAttachedInterfaces;
-                Init();
-            }
+            LogMessage("ADMIN: Listning Attached Interfaces...");
+            ShowStatusMessage($"Listning Attached Interfaces...", StatusMessageType.Information, true);
+            _holoNETClientAdmin.AdminListInterfaces();
         }
 
         private void ListHapps()
         {
-            _doDemo = false;
-
-            if (_adminConnected)
-            {
-                LogMessage("ADMIN: Listning hApps...");
-                ShowStatusMessage($"Listning hApps...", StatusMessageType.Information, true);
-                _holoNETClientAdmin.AdminListApps(AppStatusFilter.All);
-            }
-            else
-            {
-                _adminOperation = AdminOperation.ListHapps;
-                Init();
-            }
+            LogMessage("ADMIN: Listning hApps...");
+            ShowStatusMessage($"Listning hApps...", StatusMessageType.Information, true);
+            _holoNETClientAdmin.AdminListApps(AppStatusFilter.All);
         }
 
         private void btnEnableApp_Click(object sender, RoutedEventArgs e)
@@ -773,16 +773,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
             else
                 spinner.Visibility = Visibility.Hidden;
 
-            //lblStatus.SizeChanged
-
             sbAnimateStatus.Begin();
         }
 
         private void LogMessage(string message)
         {
             lstOutput.Items.Add(message);
-            //lstOutput.SelectedIndex = lstOutput.Items.Count - 1;
-            //lstOutput.ScrollIntoView(lstOutput.SelectedItem);
 
             if (VisualTreeHelper.GetChildrenCount(lstOutput) > 0)
             {
@@ -850,7 +846,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
                         //If we find an existing client then that means it has already been authorized, attached and connected.
                         if (client != null)
                         {
-                            LogMessage($"APP: Found Exsting Existing HoloNETClient AppAgent WebSocket For AgentPubKey {client.Config.AgentPubKey}, DnaHash {client.Config.DnaHash} And InstalledAppId {client.Config.InstalledAppId} Running On Port {client.EndPoint.Port}.");
+                            LogMessage($"APP: Found Exsting Existing HoloNETClient AppAgent WebSocket For AgentPubKey {client.HoloNETDNA.AgentPubKey}, DnaHash {client.HoloNETDNA.DnaHash} And InstalledAppId {client.HoloNETDNA.InstalledAppId} Running On Port {client.EndPoint.Port}.");
                             
                             if (client.State == System.Net.WebSockets.WebSocketState.Open)
                             {
@@ -905,6 +901,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
 
         private void btnAdminURIPopupOK_Click(object sender, RoutedEventArgs e)
         {
+            txtSecondsToWaitForConductorToStartError.Visibility = Visibility.Hidden;
+
             if (string.IsNullOrEmpty(txtAdminURI.Text))
                 lblAdminURIError.Visibility = Visibility.Visible;
 
@@ -915,13 +913,27 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
 
             else
             {
-                lblAdminURIError.Visibility = Visibility.Collapsed;
-                popupAdminURI.Visibility = Visibility.Collapsed;
+                try
+                {
+                    int number = Convert.ToInt32(txtSecondsToWaitForConductorToStart.Text);
 
-                HoloNETDNAManager.HoloNETDNA.HcAdminURI = txtAdminURI.Text;
-                HoloNETDNAManager.SaveDNA();
+                    lblAdminURIError.Visibility = Visibility.Collapsed;
+                    popupAdminURI.Visibility = Visibility.Collapsed;
 
-                Init();
+                    _holoNETClientAdmin.HoloNETDNA.HolochainConductorAdminURI = txtAdminURI.Text;
+                    _holoNETClientAdmin.HoloNETDNA.AutoStartHolochainConductor = chkAutoStartConductor.IsChecked.Value;
+                    _holoNETClientAdmin.HoloNETDNA.AutoShutdownHolochainConductor = chkAutoShutdownConductor.IsChecked.Value;
+                    _holoNETClientAdmin.HoloNETDNA.ShowHolochainConductorWindow = chkShowConductorWindow.IsChecked.Value;
+                    _holoNETClientAdmin.HoloNETDNA.SecondsToWaitForHolochainConductorToStart = Convert.ToInt32(txtSecondsToWaitForConductorToStart.Text);
+                    _holoNETClientAdmin.SaveDNA();
+
+                    ConnectAdmin();
+                }
+                catch (Exception ex)
+                {
+                    //popupSecondsToWaitForConductorToStart.IsOpen = true;
+                    txtSecondsToWaitForConductorToStartError.Visibility = Visibility.Visible;
+                }
             }
         }
 
@@ -933,19 +945,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
             {
                 lblEnterName.Visibility = Visibility.Collapsed;
                 popupInstallhApp.Visibility = Visibility.Collapsed;
-                _doDemo = false;
 
-                if (_adminConnected)
-                {
-                    LogMessage($"ADMIN: Installing hApp {InputTextBox.Text} ({_installinghAppPath})...");
-                    ShowStatusMessage($"Installing hApp {InputTextBox.Text}...", StatusMessageType.Information, true);
-                    _holoNETClientAdmin.AdminInstallApp(_holoNETClientAdmin.Config.AgentPubKey, InputTextBox.Text, _installinghAppPath);
-                }
-                else
-                {
-                    _installinghAppName = InputTextBox.Text;
-                    Init();
-                }
+                LogMessage($"ADMIN: Installing hApp {InputTextBox.Text} ({_installinghAppPath})...");
+                ShowStatusMessage($"Installing hApp {InputTextBox.Text}...", StatusMessageType.Information, true);
+                _holoNETClientAdmin.AdminInstallApp(_holoNETClientAdmin.HoloNETDNA.AgentPubKey, InputTextBox.Text, _installinghAppPath);
             }
         }
 
@@ -953,6 +956,45 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
         {
             popupInstallhApp.Visibility = Visibility.Collapsed;
             lblEnterName.Visibility = Visibility.Collapsed;
+        }
+
+        private void chkAutoStartConductor_Checked(object sender, RoutedEventArgs e)
+        {
+            if (chkAutoShutdownConductor != null)
+                chkAutoShutdownConductor.IsEnabled = true;
+                
+            if (chkShowConductorWindow != null)
+                chkShowConductorWindow.IsEnabled = true;
+
+            if (txtSecondsToWaitForConductorToStart != null)
+                txtSecondsToWaitForConductorToStart.IsEnabled = true;
+
+            if (lblSecondsToWaitForConductorToStart != null)
+            {
+                lblSecondsToWaitForConductorToStart.IsEnabled = true;
+                lblSecondsToWaitForConductorToStart.Foreground = Brushes.WhiteSmoke;
+            }
+        }
+
+        private void chkAutoStartConductor_Unchecked(object sender, RoutedEventArgs e)
+        {
+            if (chkAutoShutdownConductor != null)
+                chkAutoShutdownConductor.IsEnabled = false;
+
+            if (chkShowConductorWindow != null)
+                chkShowConductorWindow.IsEnabled = false;
+
+            if (txtSecondsToWaitForConductorToStart != null)
+                txtSecondsToWaitForConductorToStart.IsEnabled = false;
+
+            if (lblSecondsToWaitForConductorToStart != null)
+            {
+                lblSecondsToWaitForConductorToStart.IsEnabled = false;
+                lblSecondsToWaitForConductorToStart.Foreground = Brushes.Gray;
+            }
+
+            if (txtSecondsToWaitForConductorToStartError != null)
+                txtSecondsToWaitForConductorToStartError.Visibility = Visibility.Hidden;
         }
     }
 }

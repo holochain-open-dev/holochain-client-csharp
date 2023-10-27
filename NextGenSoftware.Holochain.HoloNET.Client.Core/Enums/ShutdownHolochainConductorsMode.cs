@@ -6,6 +6,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         ShutdownCurrentConductorOnly,
         ShutdownAllConductors,
         DoNotShutdownAnyConductors,
-        UseConfigSettings
+        UseHoloNETDNASettings
     }
 }

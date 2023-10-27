@@ -195,6 +195,17 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public string AgentPubKey { get; set; }
     }
 
+
+    public class HolochainConductorStartingEventArgs : CallBackBaseEventArgs
+    {
+
+    }
+
+    public class HolochainConductorStartedEventArgs : CallBackBaseEventArgs
+    {
+
+    }
+
     public class HolochainConductorsShutdownEventArgs : CallBackBaseEventArgs
     {
         public int NumberOfHolochainExeInstancesShutdown { get; set; }

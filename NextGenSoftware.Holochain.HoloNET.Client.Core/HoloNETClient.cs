@@ -13,14 +13,14 @@ using NextGenSoftware.WebSocket;
 using NextGenSoftware.Logging;
 using NextGenSoftware.Utilities;
 using NextGenSoftware.Utilities.ExtentionMethods;
-using NextGenSoftware.Holochain.HoloNET.Client.Properties;
 using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.AppManifest;
 using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests;
 using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
-    public class HoloNETClient : IHoloNETClient
+    public class HoloNETClient// : IHoloNETClient
+
     //: IDisposable //, IAsyncDisposable
     {
         //private Dictionary<byte[][], SigningCredentials> _signingCredentialsForCell = new Dictionary<byte[][], SigningCredentials>();
@@ -66,10 +66,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         private TaskCompletionSource<DisconnectedEventArgs> _taskCompletionDisconnected = new TaskCompletionSource<DisconnectedEventArgs>();
         private TaskCompletionSource<HoloNETShutdownEventArgs> _taskCompletionHoloNETShutdown = new TaskCompletionSource<HoloNETShutdownEventArgs>();
         private int _currentId = 0;
-        private HoloNETConfig _config = null;
+        private HoloNETDNA _holoNETDNA = null;
         private Process _conductorProcess = null;
-        private ShutdownHolochainConductorsMode _shutdownHolochainConductorsMode = ShutdownHolochainConductorsMode.UseConfigSettings;
+        private ShutdownHolochainConductorsMode _shutdownHolochainConductorsMode = ShutdownHolochainConductorsMode.UseHoloNETDNASettings;
         private MessagePackSerializerOptions messagePackSerializerOptions = MessagePackSerializerOptions.Standard.WithSecurity(MessagePackSecurity.UntrustedData);
+        private HoloNETDNAManager _holoNETDNAManager = new HoloNETDNAManager();
 
         //Events
         public delegate void Connected(object sender, ConnectedEventArgs e);
@@ -86,12 +87,31 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// </summary>
         public event Disconnected OnDisconnected;
 
+
+        public delegate void HolochainConductorStarting(object sender, HolochainConductorStartingEventArgs e);
+
+        /// <summary>
+        /// Fired when the Holochain Conductor has been started.
+        /// </summary>
+        public event HolochainConductorStarting OnHolochainConductorStarting;
+
+
+        public delegate void HolochainConductorStarted(object sender, HolochainConductorStartedEventArgs e);
+
+        /// <summary>
+        /// Fired when the Holochain Conductor has been started.
+        /// </summary>
+        public event HolochainConductorStarted OnHolochainConductorStarted;
+
+
         public delegate void HolochainConductorsShutdownComplete(object sender, HolochainConductorsShutdownEventArgs e);
 
         /// <summary>
         /// Fired when all Holochain Conductors have been shutdown.
         /// </summary>
         public event HolochainConductorsShutdownComplete OnHolochainConductorsShutdownComplete;
+
+
 
         public delegate void HoloNETShutdownComplete(object sender, HoloNETShutdownEventArgs e);
 
@@ -333,20 +353,29 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public WebSocket.WebSocket WebSocket { get; set; }
 
         /// <summary>
-        /// This property contains a struct called HoloNETConfig containing the sub-properties: AgentPubKey, DnaHash, FullPathToRootHappFolder, FullPathToCompiledHappFolder, HolochainConductorMode, FullPathToExternalHolochainConductorBinary, FullPathToExternalHCToolBinary, SecondsToWaitForHolochainConductorToStart, AutoStartHolochainConductor, ShowHolochainConductorWindow, AutoShutdownHolochainConductor, ShutDownALLHolochainConductors, HolochainConductorToUse, OnlyAllowOneHolochainConductorToRunAtATime, LoggingMode & ErrorHandlingBehaviour.
+        /// This property contains a struct called HoloNETHoloNETDNA containing the sub-properties: AgentPubKey, DnaHash, FullPathToRootHappFolder, FullPathToCompiledHappFolder, HolochainConductorMode, FullPathToExternalHolochainConductorBinary, FullPathToExternalHCToolBinary, SecondsToWaitForHolochainConductorToStart, AutoStartHolochainConductor, ShowHolochainConductorWindow, AutoShutdownHolochainConductor, ShutDownALLHolochainConductors, HolochainConductorToUse, OnlyAllowOneHolochainConductorToRunAtATime, LoggingMode & ErrorHandlingBehaviour.
         /// </summary>
-        public HoloNETConfig Config
+
+        public HoloNETDNA HoloNETDNA
         {
             get
             {
-                if (_config == null)
-                    _config = new HoloNETConfig();
+                if (!_holoNETDNAManager.IsLoaded)
+                    _holoNETDNAManager.LoadDNA();
 
-                return _config;
+                return _holoNETDNAManager.HoloNETDNA;
             }
             set
             {
-                _config = value;
+                _holoNETDNAManager.HoloNETDNA = value;
+            }
+        }
+
+        public bool IsHoloNETDNALoaded
+        {
+            get
+            {
+                return _holoNETDNAManager.IsLoaded;
             }
         }
 
@@ -372,6 +401,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     return WebSocket.EndPoint;
 
                 return null;
+            }
+            set
+            {
+                if (WebSocket != null)  
+                    WebSocket.EndPoint = value;
             }
         }
 
@@ -500,43 +534,98 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             return await _taskCompletionReadyForZomeCalls.Task;
         }
 
+        public HoloNETDNA LoadDNA()
+        {
+            return _holoNETDNAManager.LoadDNA();
+        }
+
+        public bool SaveDNA()
+        {
+            return _holoNETDNAManager.SaveDNA();
+        }
+
+
         /// <summary>
         /// This method simply connects to the Holochain conductor. It raises the OnConnected event once it is has successfully established a connection. It then calls the RetrieveAgentPubKeyAndDnaHash method to retrieve the AgentPubKey & DnaHash. If the `connectedCallBackMode` flag is set to `WaitForHolochainConductorToConnect` (default) it will await until it is connected before returning, otherwise it will return immediately and then call the OnConnected event once it has finished connecting.
         /// </summary>
+        /// <param name="holochainConductorURI">The URI that the Holochain Conductor is running.</param>
         /// <param name="connectedCallBackMode">If set to `WaitForHolochainConductorToConnect` (default) it will await until it is connected before returning, otherwise it will return immediately and then call the OnConnected event once it has finished connecting.</param>
         /// <param name="retrieveAgentPubKeyAndDnaHashMode">If set to `Wait` (default) it will await until it has finished retrieving the AgentPubKey & DnaHash before returning, otherwise it will return immediately and then call the OnReadyForZomeCalls event once it has finished retrieving the DnaHash & AgentPubKey.</param>
         /// <param name="retrieveAgentPubKeyAndDnaHashFromConductor">Set this to true for HoloNET to automatically retrieve the AgentPubKey & DnaHash from the Holochain Conductor after it has connected. This defaults to true.</param>
         /// <param name="retrieveAgentPubKeyAndDnaHashFromSandbox">Set this to true if you wish HoloNET to automatically retrieve the AgentPubKey & DnaHash from the hc sandbox after it has connected. This defaults to true.</param>
         /// <param name="automaticallyAttemptToRetrieveFromConductorIfSandBoxFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the Holochain Conductor if it fails to get them from the HC Sandbox command. This defaults to true.</param>
         /// <param name="automaticallyAttemptToRetrieveFromSandBoxIfConductorFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the HC Sandbox command if it fails to get them from the Holochain Conductor. This defaults to true.</param>
-        /// <param name="updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved">Set this to true (default) to automatically update the [HoloNETConfig](#holonetconfig) once it has retrieved the DnaHash & AgentPubKey.</param>
+        /// <param name="updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved">Set this to true (default) to automatically update the [HoloNETHoloNETDNA](#holonetconfig) once it has retrieved the DnaHash & AgentPubKey.</param>
         /// <returns></returns>
-        public async Task ConnectAsync(ConnectedCallBackMode connectedCallBackMode = ConnectedCallBackMode.WaitForHolochainConductorToConnect, RetrieveAgentPubKeyAndDnaHashMode retrieveAgentPubKeyAndDnaHashMode = RetrieveAgentPubKeyAndDnaHashMode.Wait, bool retrieveAgentPubKeyAndDnaHashFromConductor = true, bool retrieveAgentPubKeyAndDnaHashFromSandbox = true, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true, bool updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved = true)
+        public async Task ConnectAsync(Uri holochainConductorURI, ConnectedCallBackMode connectedCallBackMode = ConnectedCallBackMode.WaitForHolochainConductorToConnect, RetrieveAgentPubKeyAndDnaHashMode retrieveAgentPubKeyAndDnaHashMode = RetrieveAgentPubKeyAndDnaHashMode.Wait, bool retrieveAgentPubKeyAndDnaHashFromConductor = true, bool retrieveAgentPubKeyAndDnaHashFromSandbox = true, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true, bool updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved = true)
+        {
+            await ConnectAsync(holochainConductorURI.AbsoluteUri, connectedCallBackMode, retrieveAgentPubKeyAndDnaHashMode, retrieveAgentPubKeyAndDnaHashFromConductor, retrieveAgentPubKeyAndDnaHashFromSandbox, automaticallyAttemptToRetrieveFromConductorIfSandBoxFails, automaticallyAttemptToRetrieveFromSandBoxIfConductorFails, updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved);
+        }
+
+        /// <summary>
+        /// This method simply connects to the Holochain conductor. It raises the OnConnected event once it is has successfully established a connection. It then calls the RetrieveAgentPubKeyAndDnaHash method to retrieve the AgentPubKey & DnaHash. If the `connectedCallBackMode` flag is set to `WaitForHolochainConductorToConnect` (default) it will await until it is connected before returning, otherwise it will return immediately and then call the OnConnected event once it has finished connecting.
+        /// </summary>
+        /// <param name="holochainConductorURI">The URI that the Holochain Conductor is running.</param>
+        /// <param name="connectedCallBackMode">If set to `WaitForHolochainConductorToConnect` (default) it will await until it is connected before returning, otherwise it will return immediately and then call the OnConnected event once it has finished connecting.</param>
+        /// <param name="retrieveAgentPubKeyAndDnaHashMode">If set to `Wait` (default) it will await until it has finished retrieving the AgentPubKey & DnaHash before returning, otherwise it will return immediately and then call the OnReadyForZomeCalls event once it has finished retrieving the DnaHash & AgentPubKey.</param>
+        /// <param name="retrieveAgentPubKeyAndDnaHashFromConductor">Set this to true for HoloNET to automatically retrieve the AgentPubKey & DnaHash from the Holochain Conductor after it has connected. This defaults to true.</param>
+        /// <param name="retrieveAgentPubKeyAndDnaHashFromSandbox">Set this to true if you wish HoloNET to automatically retrieve the AgentPubKey & DnaHash from the hc sandbox after it has connected. This defaults to true.</param>
+        /// <param name="automaticallyAttemptToRetrieveFromConductorIfSandBoxFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the Holochain Conductor if it fails to get them from the HC Sandbox command. This defaults to true.</param>
+        /// <param name="automaticallyAttemptToRetrieveFromSandBoxIfConductorFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the HC Sandbox command if it fails to get them from the Holochain Conductor. This defaults to true.</param>
+        /// <param name="updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved">Set this to true (default) to automatically update the [HoloNETHoloNETDNA](#holonetconfig) once it has retrieved the DnaHash & AgentPubKey.</param>
+        /// <returns></returns>
+        public void Connect(Uri holochainConductorURI, RetrieveAgentPubKeyAndDnaHashMode retrieveAgentPubKeyAndDnaHashMode = RetrieveAgentPubKeyAndDnaHashMode.Wait, bool retrieveAgentPubKeyAndDnaHashFromConductor = true, bool retrieveAgentPubKeyAndDnaHashFromSandbox = true, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true, bool updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved = true)
+        {
+            ConnectAsync(holochainConductorURI, ConnectedCallBackMode.UseCallBackEvents, retrieveAgentPubKeyAndDnaHashMode, retrieveAgentPubKeyAndDnaHashFromConductor, retrieveAgentPubKeyAndDnaHashFromSandbox, automaticallyAttemptToRetrieveFromConductorIfSandBoxFails, automaticallyAttemptToRetrieveFromSandBoxIfConductorFails, updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved);
+        }
+
+        /// <summary>
+        /// This method simply connects to the Holochain conductor. It raises the OnConnected event once it is has successfully established a connection. It then calls the RetrieveAgentPubKeyAndDnaHash method to retrieve the AgentPubKey & DnaHash. If the `connectedCallBackMode` flag is set to `WaitForHolochainConductorToConnect` (default) it will await until it is connected before returning, otherwise it will return immediately and then call the OnConnected event once it has finished connecting.
+        /// </summary>
+        /// <param name="holochainConductorURI">The URI that the Holochain Conductor is running.</param>
+        /// <param name="connectedCallBackMode">If set to `WaitForHolochainConductorToConnect` (default) it will await until it is connected before returning, otherwise it will return immediately and then call the OnConnected event once it has finished connecting.</param>
+        /// <param name="retrieveAgentPubKeyAndDnaHashMode">If set to `Wait` (default) it will await until it has finished retrieving the AgentPubKey & DnaHash before returning, otherwise it will return immediately and then call the OnReadyForZomeCalls event once it has finished retrieving the DnaHash & AgentPubKey.</param>
+        /// <param name="retrieveAgentPubKeyAndDnaHashFromConductor">Set this to true for HoloNET to automatically retrieve the AgentPubKey & DnaHash from the Holochain Conductor after it has connected. This defaults to true.</param>
+        /// <param name="retrieveAgentPubKeyAndDnaHashFromSandbox">Set this to true if you wish HoloNET to automatically retrieve the AgentPubKey & DnaHash from the hc sandbox after it has connected. This defaults to true.</param>
+        /// <param name="automaticallyAttemptToRetrieveFromConductorIfSandBoxFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the Holochain Conductor if it fails to get them from the HC Sandbox command. This defaults to true.</param>
+        /// <param name="automaticallyAttemptToRetrieveFromSandBoxIfConductorFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the HC Sandbox command if it fails to get them from the Holochain Conductor. This defaults to true.</param>
+        /// <param name="updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved">Set this to true (default) to automatically update the [HoloNETHoloNETDNA](#holonetconfig) once it has retrieved the DnaHash & AgentPubKey.</param>
+        /// <returns></returns>
+        public async Task ConnectAsync(string holochainConductorURI = "ws://localhost:8888", ConnectedCallBackMode connectedCallBackMode = ConnectedCallBackMode.WaitForHolochainConductorToConnect, RetrieveAgentPubKeyAndDnaHashMode retrieveAgentPubKeyAndDnaHashMode = RetrieveAgentPubKeyAndDnaHashMode.Wait, bool retrieveAgentPubKeyAndDnaHashFromConductor = true, bool retrieveAgentPubKeyAndDnaHashFromSandbox = true, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true, bool updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved = true)
         {
             try
             {
                 _getAgentPubKeyAndDnaHashFromConductor = retrieveAgentPubKeyAndDnaHashFromConductor;
 
+                //if ((string.IsNullOrEmpty(holochainConductorURI) && EndPoint == null) || (EndPoint != null && !EndPoint.IsUnc))
+                if (string.IsNullOrEmpty(holochainConductorURI) && EndPoint == null)
+                    throw new HoloNETException("ERROR: No Holochain Conductor URI has been specified. Either pass it in through a contructor, set the EndPoint property or as a param to one of the Connect methods.");
+
                 if (Logger.Loggers.Count == 0)
                     throw new HoloNETException("ERROR: No Logger Has Been Specified! Please set a Logger with the Logger.Loggers Property.");
 
+                if (string.IsNullOrEmpty(holochainConductorURI))
+                    holochainConductorURI = EndPoint.AbsoluteUri;
+
+                this.EndPoint = new Uri(holochainConductorURI);
+
                 if (WebSocket.State != WebSocketState.Connecting && WebSocket.State != WebSocketState.Open && WebSocket.State != WebSocketState.Aborted)
                 {
-                    if (Config.AutoStartHolochainConductor)
+                    if (HoloNETDNA.AutoStartHolochainConductor)
                         await StartHolochainConductorAsync();
 
                     if (connectedCallBackMode == ConnectedCallBackMode.WaitForHolochainConductorToConnect)
                     {
                         _connectingAsync = true;
-                        await WebSocket.ConnectAsync();
+                        await WebSocket.ConnectAsync(new Uri(holochainConductorURI));
                     }
                     else
                     {
                         _connectingAsync = false;
-                        WebSocket.ConnectAsync();
+                        WebSocket.ConnectAsync(new Uri(holochainConductorURI));
 
                         //if (retrieveAgentPubKeyAndDnaHashMode != RetrieveAgentPubKeyAndDnaHashMode.DoNotRetreive)
-                        //    await RetrieveAgentPubKeyAndDnaHashAsync(retrieveAgentPubKeyAndDnaHashMode, retrieveAgentPubKeyAndDnaHashFromConductor, retrieveAgentPubKeyAndDnaHashFromSandbox, automaticallyAttemptToRetrieveFromConductorIfSandBoxFails, automaticallyAttemptToRetrieveFromSandBoxIfConductorFails, updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved);
+                        //    await RetrieveAgentPubKeyAndDnaHashAsync(retrieveAgentPubKeyAndDnaHashMode, retrieveAgentPubKeyAndDnaHashFromConductor, retrieveAgentPubKeyAndDnaHashFromSandbox, automaticallyAttemptToRetrieveFromConductorIfSandBoxFails, automaticallyAttemptToRetrieveFromSandBoxIfConductorFails, updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved);
                     }
                 }
             }
@@ -549,25 +638,27 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <summary>
         /// This method simply connects to the Holochain conductor. It raises the OnConnected event once it is has successfully established a connection. It then calls the RetrieveAgentPubKeyAndDnaHash method to retrieve the AgentPubKey & DnaHash.
         /// </summary>
+        /// <param name="holochainConductorURI">The URI that the Holochain Conductor is running.</param>
         /// <param name="retrieveAgentPubKeyAndDnaHashFromConductor">Set this to true for HoloNET to automatically retrieve the AgentPubKey & DnaHash from the Holochain Conductor after it has connected. This defaults to true.</param>
         /// <param name="retrieveAgentPubKeyAndDnaHashFromSandbox">Set this to true if you wish HoloNET to automatically retrieve the AgentPubKey & DnaHash from the hc sandbox after it has connected. This defaults to true.</param>
         /// <param name="automaticallyAttemptToRetrieveFromConductorIfSandBoxFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the Holochain Conductor if it fails to get them from the HC Sandbox command. This defaults to true.</param>
         /// <param name="automaticallyAttemptToRetrieveFromSandBoxIfConductorFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the HC Sandbox command if it fails to get them from the Holochain Conductor. This defaults to true.</param>
-        /// <param name="updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved">Set this to true (default) to automatically update the [HoloNETConfig](#holonetconfig) once it has retrieved the DnaHash & AgentPubKey.</param>
-        public void Connect(bool retrieveAgentPubKeyAndDnaHashFromConductor = true, bool retrieveAgentPubKeyAndDnaHashFromSandbox = false, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true, bool updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved = true)
+        /// <param name="updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved">Set this to true (default) to automatically update the [HoloNETHoloNETDNA](#holonetconfig) once it has retrieved the DnaHash & AgentPubKey.</param>
+        public void Connect(string holochainConductorURI = "ws://localhost:8888", bool retrieveAgentPubKeyAndDnaHashFromConductor = true, bool retrieveAgentPubKeyAndDnaHashFromSandbox = false, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true, bool updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved = true)
         {
-            ConnectAsync(ConnectedCallBackMode.UseCallBackEvents, RetrieveAgentPubKeyAndDnaHashMode.UseCallBackEvents, retrieveAgentPubKeyAndDnaHashFromConductor, retrieveAgentPubKeyAndDnaHashFromSandbox, automaticallyAttemptToRetrieveFromConductorIfSandBoxFails, automaticallyAttemptToRetrieveFromSandBoxIfConductorFails, updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved);
+            ConnectAsync(holochainConductorURI, ConnectedCallBackMode.UseCallBackEvents, RetrieveAgentPubKeyAndDnaHashMode.UseCallBackEvents, retrieveAgentPubKeyAndDnaHashFromConductor, retrieveAgentPubKeyAndDnaHashFromSandbox, automaticallyAttemptToRetrieveFromConductorIfSandBoxFails, automaticallyAttemptToRetrieveFromSandBoxIfConductorFails, updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved);
         }
 
+     
         /// <summary>
         /// This method simply connects to the Holochain conductor. It raises the OnConnected event once it is has successfully established a connection. If the `connectedCallBackMode` flag is set to `WaitForHolochainConductorToConnect` (default) it will await until it is connected before returning, otherwise it will return immediately and then call the OnConnected event once it has finished connecting.
         /// </summary>
         /// <param name="connectedCallBackMode">If set to `WaitForHolochainConductorToConnect` (default) it will await until it is connected before returning, otherwise it will return immediately and then call the OnConnected event once it has finished connecting.</param>
         /// <returns></returns>
-        public async Task ConnectAdminAsync(ConnectedCallBackMode connectedCallBackMode = ConnectedCallBackMode.WaitForHolochainConductorToConnect)
+        public async Task ConnectAdminAsync(string holochainConductorURI = "ws://localhost:8888", ConnectedCallBackMode connectedCallBackMode = ConnectedCallBackMode.WaitForHolochainConductorToConnect)
         {
             IsAdmin = true;
-            await ConnectAsync(connectedCallBackMode, RetrieveAgentPubKeyAndDnaHashMode.DoNotRetreive, false, false, false, false);
+            await ConnectAsync(holochainConductorURI, connectedCallBackMode, RetrieveAgentPubKeyAndDnaHashMode.DoNotRetreive, false, false, false, false);
         }
 
         /// <summary>
@@ -575,13 +666,187 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// </summary>
         /// <param name="connectedCallBackMode">If set to `WaitForHolochainConductorToConnect` (default) it will await until it is connected before returning, otherwise it will return immediately and then call the OnConnected event once it has finished connecting.</param>
         /// <returns></returns>
-        public void ConnectAdmin(bool retrieveAgentPubKeyAndDnaHashFromConductor = true, bool retrieveAgentPubKeyAndDnaHashFromSandbox = false, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true, bool updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved = true)
+        public void ConnectAdmin(string holochainConductorURI = "ws://localhost:8888")
         {
-            ConnectAdminAsync(ConnectedCallBackMode.UseCallBackEvents);
+            ConnectAdminAsync(holochainConductorURI, ConnectedCallBackMode.UseCallBackEvents);
         }
 
         /// <summary>
-        /// This method will start the Holochain Conducutor using the appropriate settings defined in the Config property.
+        /// This method simply connects to the Holochain conductor. It raises the OnConnected event once it is has successfully established a connection. If the `connectedCallBackMode` flag is set to `WaitForHolochainConductorToConnect` (default) it will await until it is connected before returning, otherwise it will return immediately and then call the OnConnected event once it has finished connecting.
+        /// </summary>
+        /// <param name="connectedCallBackMode">If set to `WaitForHolochainConductorToConnect` (default) it will await until it is connected before returning, otherwise it will return immediately and then call the OnConnected event once it has finished connecting.</param>
+        /// <returns></returns>
+        public async Task ConnectAdminAsync(Uri holochainConductorURI, ConnectedCallBackMode connectedCallBackMode = ConnectedCallBackMode.WaitForHolochainConductorToConnect)
+        {
+            IsAdmin = true;
+            await ConnectAsync(holochainConductorURI, connectedCallBackMode, RetrieveAgentPubKeyAndDnaHashMode.DoNotRetreive, false, false, false, false);
+        }
+
+        /// <summary>
+        /// This method simply connects to the Holochain conductor. It raises the OnConnected event once it is has successfully established a connection. If the `connectedCallBackMode` flag is set to `WaitForHolochainConductorToConnect` (default) it will await until it is connected before returning, otherwise it will return immediately and then call the OnConnected event once it has finished connecting.
+        /// </summary>
+        /// <param name="connectedCallBackMode">If set to `WaitForHolochainConductorToConnect` (default) it will await until it is connected before returning, otherwise it will return immediately and then call the OnConnected event once it has finished connecting.</param>
+        /// <returns></returns>
+        public void ConnectAdmin(Uri holochainConductorURI)
+        {
+            ConnectAdminAsync(holochainConductorURI, ConnectedCallBackMode.UseCallBackEvents);
+        }
+
+        ///// <summary>
+        ///// This method will start the Holochain Conducutor using the appropriate settings defined in the HoloNETDNA property.
+        ///// </summary>
+        ///// <returns></returns>
+        //public async Task StartHolochainConductorAsync()
+        //{
+        //    try
+        //    {
+        //        // Was used when they were set to Content rather than Embedded.
+        //        //string fullPathToEmbeddedHolochainConductorBinary = string.Concat(Directory.GetCurrentDirectory(), "\\HolochainBinaries\\holochain.exe");
+        //        //string fullPathToEmbeddedHCToolBinary = string.Concat(Directory.GetCurrentDirectory(), "\\HolochainBinaries\\hc.exe");
+
+        //        _conductorProcess = new Process();
+
+        //        if (string.IsNullOrEmpty(HoloNETDNA.FullPathToExternalHolochainConductorBinary) && HoloNETDNA.HolochainConductorMode == HolochainConductorModeEnum.UseExternal && HoloNETDNA.HolochainConductorToUse == HolochainConductorEnum.HolochainProductionConductor)
+        //            throw new ArgumentNullException("FullPathToExternalHolochainConductorBinary", "When HolochainConductorMode is set to 'UseExternal' and HolochainConductorToUse is set to 'HolochainProductionConductor', FullPathToExternalHolochainConductorBinary cannot be empty.");
+
+        //        if (string.IsNullOrEmpty(HoloNETDNA.FullPathToExternalHCToolBinary) && HoloNETDNA.HolochainConductorMode == HolochainConductorModeEnum.UseExternal && HoloNETDNA.HolochainConductorToUse == HolochainConductorEnum.HcDevTool)
+        //            throw new ArgumentNullException("FullPathToExternalHCToolBinary", "When HolochainConductorMode is set to 'UseExternal' and HolochainConductorToUse is set to 'HcDevTool', FullPathToExternalHCToolBinary cannot be empty.");
+
+        //        if (!File.Exists(HoloNETDNA.FullPathToExternalHolochainConductorBinary) && HoloNETDNA.HolochainConductorMode == HolochainConductorModeEnum.UseExternal && HoloNETDNA.HolochainConductorToUse == HolochainConductorEnum.HolochainProductionConductor)
+        //            throw new FileNotFoundException($"When HolochainConductorMode is set to 'UseExternal' and HolochainConductorToUse is set to 'HolochainProductionConductor', FullPathToExternalHolochainConductorBinary ({HoloNETDNA.FullPathToExternalHolochainConductorBinary}) must point to a valid file.");
+
+        //        if (!File.Exists(HoloNETDNA.FullPathToExternalHCToolBinary) && HoloNETDNA.HolochainConductorMode == HolochainConductorModeEnum.UseExternal && HoloNETDNA.HolochainConductorToUse == HolochainConductorEnum.HcDevTool)
+        //            throw new FileNotFoundException($"When HolochainConductorMode is set to 'UseExternal' and HolochainConductorToUse is set to 'HcDevTool', FullPathToExternalHCToolBinary ({HoloNETDNA.FullPathToExternalHCToolBinary}) must point to a valid file.");
+
+        //        //if (!File.Exists(fullPathToEmbeddedHolochainConductorBinary) && HoloNETDNA.HolochainConductorMode == HolochainConductorModeEnum.UseEmbedded && HoloNETDNA.HolochainConductorToUse == HolochainConductorEnum.HolochainProductionConductor)
+        //        //    throw new FileNotFoundException($"When HolochainConductorMode is set to 'UseEmbedded' and HolochainConductorToUse is set to 'HolochainProductionConductor', you must ensure the holochain.exe is found here: {fullPathToEmbeddedHolochainConductorBinary}.");
+
+        //        //if (!File.Exists(fullPathToEmbeddedHCToolBinary) && HoloNETDNA.HolochainConductorMode == HolochainConductorModeEnum.UseEmbedded && HoloNETDNA.HolochainConductorToUse == HolochainConductorEnum.HcDevTool)
+        //        //    throw new FileNotFoundException($"When HolochainConductorMode is set to 'UseEmbedded' and HolochainConductorToUse is set to 'HcDevTool', you must ensure the hc.exe is found here: {fullPathToEmbeddedHCToolBinary}.");
+
+        //        if (!Directory.Exists(HoloNETDNA.FullPathToRootHappFolder))
+        //            throw new DirectoryNotFoundException($"The path for HoloNETDNA.FullPathToRootHappFolder ({HoloNETDNA.FullPathToRootHappFolder}) was not found.");
+
+        //        if (!Directory.Exists(HoloNETDNA.FullPathToCompiledHappFolder))
+        //            throw new DirectoryNotFoundException($"The path for HoloNETDNA.FullPathToCompiledHappFolder ({HoloNETDNA.FullPathToCompiledHappFolder}) was not found.");
+
+
+        //        if (HoloNETDNA.HolochainConductorToUse == HolochainConductorEnum.HcDevTool)
+        //        {
+        //            switch (HoloNETDNA.HolochainConductorMode)
+        //            {
+        //                case HolochainConductorModeEnum.UseExternal:
+        //                    _conductorProcess.StartInfo.FileName = HoloNETDNA.FullPathToExternalHCToolBinary;
+        //                    break;
+
+        //                case HolochainConductorModeEnum.UseEmbedded:
+        //                    {
+        //                        //throw new InvalidOperationException("You must install the Embedded version if you wish to use HolochainConductorMode.UseEmbedded.");
+
+        //                        //_conductorProcess.StartInfo.FileName = fullPathToEmbeddedHCToolBinary;
+
+        //                        string hcPath = Path.Combine(Directory.GetCurrentDirectory(), "hc.exe");
+
+        //                        if (!File.Exists(hcPath))
+        //                        {
+        //                            using (FileStream fsDst = new FileStream(hcPath, FileMode.CreateNew, FileAccess.Write))
+        //                            {
+        //                                byte[] bytes = Resources.hc;
+        //                                fsDst.Write(bytes, 0, bytes.Length);
+        //                            }
+        //                        }
+
+        //                        _conductorProcess.StartInfo.FileName = hcPath;
+        //                    }
+        //                    break;
+
+        //                case HolochainConductorModeEnum.UseSystemGlobal:
+        //                    _conductorProcess.StartInfo.FileName = "hc.exe";
+        //                    break;
+        //            }
+        //        }
+        //        else
+        //        {
+        //            switch (HoloNETDNA.HolochainConductorMode)
+        //            {
+        //                case HolochainConductorModeEnum.UseExternal:
+        //                    _conductorProcess.StartInfo.FileName = HoloNETDNA.FullPathToExternalHolochainConductorBinary;
+        //                    break;
+
+        //                case HolochainConductorModeEnum.UseEmbedded:
+        //                    {
+        //                        //throw new InvalidOperationException("You must install the Embedded version if you wish to use HolochainConductorMode.UseEmbedded.");
+
+        //                        //_conductorProcess.StartInfo.FileName = fullPathToEmbeddedHolochainConductorBinary;
+
+        //                        string holochainPath = Path.Combine(Directory.GetCurrentDirectory(), "holochain.exe");
+
+        //                        if (!File.Exists(holochainPath))
+        //                        {
+        //                            using (FileStream fsDst = new FileStream(holochainPath, FileMode.CreateNew, FileAccess.Write))
+        //                            {
+        //                                byte[] bytes = Resources.holochain;
+        //                                fsDst.Write(bytes, 0, bytes.Length);
+        //                            }
+        //                        }
+
+        //                        _conductorProcess.StartInfo.FileName = holochainPath;
+        //                    }
+        //                    break;
+
+        //                case HolochainConductorModeEnum.UseSystemGlobal:
+        //                    _conductorProcess.StartInfo.FileName = "holochain.exe";
+        //                    break;
+        //            }
+        //        }
+
+        //        //Make sure the condctor is not already running
+        //        if (!HoloNETDNA.OnlyAllowOneHolochainConductorToRunAtATime || (HoloNETDNA.OnlyAllowOneHolochainConductorToRunAtATime && !Process.GetProcesses().Any(x => x.ProcessName == _conductorProcess.StartInfo.FileName)))
+        //        {
+        //            Logger.Log("Starting Holochain Conductor...", LogType.Info, true);
+        //            _conductorProcess.StartInfo.WorkingDirectory = HoloNETDNA.FullPathToRootHappFolder;
+
+        //            if (HoloNETDNA.HolochainConductorToUse == HolochainConductorEnum.HcDevTool)
+        //            {
+        //                //_conductorProcess.StartInfo.Arguments = "sandbox run 0";
+        //                _conductorProcess.StartInfo.Arguments = $"sandbox generate {HoloNETDNA.FullPathToCompiledHappFolder}";
+        //            }
+
+        //            _conductorProcess.StartInfo.UseShellExecute = true;
+        //            _conductorProcess.StartInfo.RedirectStandardOutput = false;
+
+        //            if (HoloNETDNA.ShowHolochainConductorWindow)
+        //            {
+        //                _conductorProcess.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
+        //                _conductorProcess.StartInfo.CreateNoWindow = false;
+        //            }
+        //            else
+        //            {
+        //                _conductorProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+        //                _conductorProcess.StartInfo.CreateNoWindow = true;
+        //            }
+
+        //            _conductorProcess.Start();
+
+        //            if (HoloNETDNA.HolochainConductorToUse == HolochainConductorEnum.HcDevTool)
+        //            {
+        //                await Task.Delay(3000);
+        //                _conductorProcess.Close();
+        //                _conductorProcess.StartInfo.Arguments = "sandbox run 0";
+        //                _conductorProcess.Start();
+        //            }
+
+        //            await Task.Delay(HoloNETDNA.SecondsToWaitForHolochainConductorToStart * 1000); // Give the conductor 7 (default) seconds to start up...
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        HandleError("Error in HoloNETClient.StartConductor method.", ex);
+        //    }
+        //}
+
+        /// <summary>
+        /// This method will start the Holochain Conducutor using the appropriate settings defined in the HoloNETDNA property.
         /// </summary>
         /// <returns></returns>
         public async Task StartHolochainConductorAsync()
@@ -592,39 +857,41 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 //string fullPathToEmbeddedHolochainConductorBinary = string.Concat(Directory.GetCurrentDirectory(), "\\HolochainBinaries\\holochain.exe");
                 //string fullPathToEmbeddedHCToolBinary = string.Concat(Directory.GetCurrentDirectory(), "\\HolochainBinaries\\hc.exe");
 
+                OnHolochainConductorStarting?.Invoke(this, new HolochainConductorStartingEventArgs());
                 _conductorProcess = new Process();
 
-                if (string.IsNullOrEmpty(Config.FullPathToExternalHolochainConductorBinary) && Config.HolochainConductorMode == HolochainConductorModeEnum.UseExternal && Config.HolochainConductorToUse == HolochainConductorEnum.HolochainProductionConductor)
+                if (string.IsNullOrEmpty(HoloNETDNA.FullPathToExternalHolochainConductorBinary) && HoloNETDNA.HolochainConductorMode == HolochainConductorModeEnum.UseExternal && HoloNETDNA.HolochainConductorToUse == HolochainConductorEnum.HolochainProductionConductor)
                     throw new ArgumentNullException("FullPathToExternalHolochainConductorBinary", "When HolochainConductorMode is set to 'UseExternal' and HolochainConductorToUse is set to 'HolochainProductionConductor', FullPathToExternalHolochainConductorBinary cannot be empty.");
 
-                if (string.IsNullOrEmpty(Config.FullPathToExternalHCToolBinary) && Config.HolochainConductorMode == HolochainConductorModeEnum.UseExternal && Config.HolochainConductorToUse == HolochainConductorEnum.HcDevTool)
+                if (string.IsNullOrEmpty(HoloNETDNA.FullPathToExternalHCToolBinary) && HoloNETDNA.HolochainConductorMode == HolochainConductorModeEnum.UseExternal && HoloNETDNA.HolochainConductorToUse == HolochainConductorEnum.HcDevTool)
                     throw new ArgumentNullException("FullPathToExternalHCToolBinary", "When HolochainConductorMode is set to 'UseExternal' and HolochainConductorToUse is set to 'HcDevTool', FullPathToExternalHCToolBinary cannot be empty.");
 
-                if (!File.Exists(Config.FullPathToExternalHolochainConductorBinary) && Config.HolochainConductorMode == HolochainConductorModeEnum.UseExternal && Config.HolochainConductorToUse == HolochainConductorEnum.HolochainProductionConductor)
-                    throw new FileNotFoundException($"When HolochainConductorMode is set to 'UseExternal' and HolochainConductorToUse is set to 'HolochainProductionConductor', FullPathToExternalHolochainConductorBinary ({Config.FullPathToExternalHolochainConductorBinary}) must point to a valid file.");
+                if (!File.Exists(HoloNETDNA.FullPathToExternalHolochainConductorBinary) && HoloNETDNA.HolochainConductorMode == HolochainConductorModeEnum.UseExternal && HoloNETDNA.HolochainConductorToUse == HolochainConductorEnum.HolochainProductionConductor)
+                    throw new FileNotFoundException($"When HolochainConductorMode is set to 'UseExternal' and HolochainConductorToUse is set to 'HolochainProductionConductor', FullPathToExternalHolochainConductorBinary ({HoloNETDNA.FullPathToExternalHolochainConductorBinary}) must point to a valid file.");
 
-                if (!File.Exists(Config.FullPathToExternalHCToolBinary) && Config.HolochainConductorMode == HolochainConductorModeEnum.UseExternal && Config.HolochainConductorToUse == HolochainConductorEnum.HcDevTool)
-                    throw new FileNotFoundException($"When HolochainConductorMode is set to 'UseExternal' and HolochainConductorToUse is set to 'HcDevTool', FullPathToExternalHCToolBinary ({Config.FullPathToExternalHCToolBinary}) must point to a valid file.");
+                if (!File.Exists(HoloNETDNA.FullPathToExternalHCToolBinary) && HoloNETDNA.HolochainConductorMode == HolochainConductorModeEnum.UseExternal && HoloNETDNA.HolochainConductorToUse == HolochainConductorEnum.HcDevTool)
+                    throw new FileNotFoundException($"When HolochainConductorMode is set to 'UseExternal' and HolochainConductorToUse is set to 'HcDevTool', FullPathToExternalHCToolBinary ({HoloNETDNA.FullPathToExternalHCToolBinary}) must point to a valid file.");
 
-                //if (!File.Exists(fullPathToEmbeddedHolochainConductorBinary) && Config.HolochainConductorMode == HolochainConductorModeEnum.UseEmbedded && Config.HolochainConductorToUse == HolochainConductorEnum.HolochainProductionConductor)
+                //if (!File.Exists(fullPathToEmbeddedHolochainConductorBinary) && HoloNETDNA.HolochainConductorMode == HolochainConductorModeEnum.UseEmbedded && HoloNETDNA.HolochainConductorToUse == HolochainConductorEnum.HolochainProductionConductor)
                 //    throw new FileNotFoundException($"When HolochainConductorMode is set to 'UseEmbedded' and HolochainConductorToUse is set to 'HolochainProductionConductor', you must ensure the holochain.exe is found here: {fullPathToEmbeddedHolochainConductorBinary}.");
 
-                //if (!File.Exists(fullPathToEmbeddedHCToolBinary) && Config.HolochainConductorMode == HolochainConductorModeEnum.UseEmbedded && Config.HolochainConductorToUse == HolochainConductorEnum.HcDevTool)
+                //if (!File.Exists(fullPathToEmbeddedHCToolBinary) && HoloNETDNA.HolochainConductorMode == HolochainConductorModeEnum.UseEmbedded && HoloNETDNA.HolochainConductorToUse == HolochainConductorEnum.HcDevTool)
                 //    throw new FileNotFoundException($"When HolochainConductorMode is set to 'UseEmbedded' and HolochainConductorToUse is set to 'HcDevTool', you must ensure the hc.exe is found here: {fullPathToEmbeddedHCToolBinary}.");
 
-                if (!Directory.Exists(Config.FullPathToRootHappFolder))
-                    throw new DirectoryNotFoundException($"The path for Config.FullPathToRootHappFolder ({Config.FullPathToRootHappFolder}) was not found.");
+                //if (!Directory.Exists(HoloNETDNA.FullPathToRootHappFolder))
+                //    throw new DirectoryNotFoundException($"The path for HoloNETDNA.FullPathToRootHappFolder ({HoloNETDNA.FullPathToRootHappFolder}) was not found.");
 
-                if (!Directory.Exists(Config.FullPathToCompiledHappFolder))
-                    throw new DirectoryNotFoundException($"The path for Config.FullPathToCompiledHappFolder ({Config.FullPathToCompiledHappFolder}) was not found.");
+                //if (!Directory.Exists(HoloNETDNA.FullPathToCompiledHappFolder))
+                //    throw new DirectoryNotFoundException($"The path for HoloNETDNA.FullPathToCompiledHappFolder ({HoloNETDNA.FullPathToCompiledHappFolder}) was not found.");
 
 
-                if (Config.HolochainConductorToUse == HolochainConductorEnum.HcDevTool)
+                /*
+                if (HoloNETDNA.HolochainConductorToUse == HolochainConductorEnum.HcDevTool)
                 {
-                    switch (Config.HolochainConductorMode)
+                    switch (HoloNETDNA.HolochainConductorMode)
                     {
                         case HolochainConductorModeEnum.UseExternal:
-                            _conductorProcess.StartInfo.FileName = Config.FullPathToExternalHCToolBinary;
+                            _conductorProcess.StartInfo.FileName = HoloNETDNA.FullPathToExternalHCToolBinary;
                             break;
 
                         case HolochainConductorModeEnum.UseEmbedded:
@@ -655,10 +922,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 }
                 else
                 {
-                    switch (Config.HolochainConductorMode)
+                    switch (HoloNETDNA.HolochainConductorMode)
                     {
                         case HolochainConductorModeEnum.UseExternal:
-                            _conductorProcess.StartInfo.FileName = Config.FullPathToExternalHolochainConductorBinary;
+                            _conductorProcess.StartInfo.FileName = HoloNETDNA.FullPathToExternalHolochainConductorBinary;
                             break;
 
                         case HolochainConductorModeEnum.UseEmbedded:
@@ -686,24 +953,26 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                             _conductorProcess.StartInfo.FileName = "holochain.exe";
                             break;
                     }
-                }
+                }*/
+
 
                 //Make sure the condctor is not already running
-                if (!Config.OnlyAllowOneHolochainConductorToRunAtATime || (Config.OnlyAllowOneHolochainConductorToRunAtATime && !Process.GetProcesses().Any(x => x.ProcessName == _conductorProcess.StartInfo.FileName)))
+                if (!HoloNETDNA.OnlyAllowOneHolochainConductorToRunAtATime || (HoloNETDNA.OnlyAllowOneHolochainConductorToRunAtATime && !Process.GetProcesses().Any(x => x.ProcessName == _conductorProcess.StartInfo.FileName)))
                 {
                     Logger.Log("Starting Holochain Conductor...", LogType.Info, true);
-                    _conductorProcess.StartInfo.WorkingDirectory = Config.FullPathToRootHappFolder;
+                    _conductorProcess.StartInfo.WorkingDirectory = HoloNETDNA.FullPathToRootHappFolder;
 
-                    if (Config.HolochainConductorToUse == HolochainConductorEnum.HcDevTool)
+                    if (HoloNETDNA.HolochainConductorToUse == HolochainConductorEnum.HcDevTool)
                     {
                         //_conductorProcess.StartInfo.Arguments = "sandbox run 0";
-                        _conductorProcess.StartInfo.Arguments = $"sandbox generate {Config.FullPathToCompiledHappFolder}";
+                        //_conductorProcess.StartInfo.Arguments = $"sandbox generate {HoloNETDNA.FullPathToCompiledHappFolder}";
+                        _conductorProcess.StartInfo.Arguments = $"sandbox generate {HoloNETDNA.FullPathToCompiledHappFolder}";
                     }
 
                     _conductorProcess.StartInfo.UseShellExecute = true;
                     _conductorProcess.StartInfo.RedirectStandardOutput = false;
 
-                    if (Config.ShowHolochainConductorWindow)
+                    if (HoloNETDNA.ShowHolochainConductorWindow)
                     {
                         _conductorProcess.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
                         _conductorProcess.StartInfo.CreateNoWindow = false;
@@ -714,17 +983,22 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                         _conductorProcess.StartInfo.CreateNoWindow = true;
                     }
 
-                    _conductorProcess.Start();
+                    //_conductorProcess.Start();
 
-                    if (Config.HolochainConductorToUse == HolochainConductorEnum.HcDevTool)
+                    if (HoloNETDNA.HolochainConductorToUse == HolochainConductorEnum.HcDevTool)
                     {
-                        await Task.Delay(3000);
-                        _conductorProcess.Close();
-                        _conductorProcess.StartInfo.Arguments = "sandbox run 0";
+                        //await Task.Delay(3000);
+                        //_conductorProcess.Close();
+
+                        _conductorProcess.StartInfo.FileName = "PowerShell.exe";
+                        _conductorProcess.StartInfo.Arguments = $"-NoExit -Command \"'' | hc s --piped -f={EndPoint.Port} run 0\"";
+                        //_conductorProcess.StartInfo.Arguments = "sandbox run 0";
+
                         _conductorProcess.Start();
                     }
 
-                    await Task.Delay(Config.SecondsToWaitForHolochainConductorToStart * 1000); // Give the conductor 7 (default) seconds to start up...
+                    await Task.Delay(HoloNETDNA.SecondsToWaitForHolochainConductorToStart * 1000); // Give the conductor 7 (default) seconds to start up...
+                    OnHolochainConductorStarted?.Invoke(this, new HolochainConductorStartedEventArgs());
                 }
             }
             catch (Exception ex)
@@ -734,7 +1008,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         }
 
         /// <summary>
-        /// This method will start the Holochain Conducutor using the appropriate settings defined in the Config property.
+        /// This method will start the Holochain Conducutor using the appropriate settings defined in the HoloNETDNA property.
         /// </summary>
         /// <returns></returns>
         public void StartHolochainConductor()
@@ -749,11 +1023,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="retrieveAgentPubKeyAndDnaHashFromSandbox">Set this to true if you wish HoloNET to automatically retrieve the AgentPubKey & DnaHash from the hc sandbox after it has connected. This defaults to true.</param>
         /// <param name="automaticallyAttemptToRetrieveFromConductorIfSandBoxFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the Holochain Conductor if it fails to get them from the HC Sandbox command. This defaults to true.</param>
         /// <param name="automaticallyAttemptToRetrieveFromSandBoxIfConductorFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the HC Sandbox command if it fails to get them from the Holochain Conductor. This defaults to true.</param>
-        /// <param name="updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved">Set this to true (default) to automatically update the Config property once it has retrieved the DnaHash & AgentPubKey.</param>
+        /// <param name="updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved">Set this to true (default) to automatically update the HoloNETDNA property once it has retrieved the DnaHash & AgentPubKey.</param>
         /// <returns>The AgentPubKey and DnaHash</returns>
-        public AgentPubKeyDnaHash RetrieveAgentPubKeyAndDnaHash(bool retrieveAgentPubKeyAndDnaHashFromConductor = true, bool retrieveAgentPubKeyAndDnaHashFromSandbox = false, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true, bool updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved = true)
+        public AgentPubKeyDnaHash RetrieveAgentPubKeyAndDnaHash(bool retrieveAgentPubKeyAndDnaHashFromConductor = true, bool retrieveAgentPubKeyAndDnaHashFromSandbox = false, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true, bool updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved = true)
         {
-            return RetrieveAgentPubKeyAndDnaHashAsync(RetrieveAgentPubKeyAndDnaHashMode.UseCallBackEvents, retrieveAgentPubKeyAndDnaHashFromConductor, retrieveAgentPubKeyAndDnaHashFromSandbox, automaticallyAttemptToRetrieveFromConductorIfSandBoxFails, automaticallyAttemptToRetrieveFromSandBoxIfConductorFails, updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved).Result;
+            return RetrieveAgentPubKeyAndDnaHashAsync(RetrieveAgentPubKeyAndDnaHashMode.UseCallBackEvents, retrieveAgentPubKeyAndDnaHashFromConductor, retrieveAgentPubKeyAndDnaHashFromSandbox, automaticallyAttemptToRetrieveFromConductorIfSandBoxFails, automaticallyAttemptToRetrieveFromSandBoxIfConductorFails, updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved).Result;
         }
 
         /// <summary>
@@ -764,9 +1038,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="retrieveAgentPubKeyAndDnaHashFromSandbox">Set this to true if you wish HoloNET to automatically retrieve the AgentPubKey & DnaHash from the hc sandbox after it has connected. This defaults to true.</param>
         /// <param name="automaticallyAttemptToRetrieveFromConductorIfSandBoxFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the Holochain Conductor if it fails to get them from the HC Sandbox command. This defaults to true.</param>
         /// <param name="automaticallyAttemptToRetrieveFromSandBoxIfConductorFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the HC Sandbox command if it fails to get them from the Holochain Conductor. This defaults to true.</param>
-        /// <param name="updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved">Set this to true (default) to automatically update the Config property once it has retrieved the DnaHash & AgentPubKey.</param>
+        /// <param name="updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved">Set this to true (default) to automatically update the HoloNETDNA property once it has retrieved the DnaHash & AgentPubKey.</param>
         /// <returns>The AgentPubKey and DnaHash</returns>
-        public async Task<AgentPubKeyDnaHash> RetrieveAgentPubKeyAndDnaHashAsync(RetrieveAgentPubKeyAndDnaHashMode retrieveAgentPubKeyAndDnaHashMode = RetrieveAgentPubKeyAndDnaHashMode.Wait, bool retrieveAgentPubKeyAndDnaHashFromConductor = true, bool retrieveAgentPubKeyAndDnaHashFromSandbox = true, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true, bool updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved = true)
+        public async Task<AgentPubKeyDnaHash> RetrieveAgentPubKeyAndDnaHashAsync(RetrieveAgentPubKeyAndDnaHashMode retrieveAgentPubKeyAndDnaHashMode = RetrieveAgentPubKeyAndDnaHashMode.Wait, bool retrieveAgentPubKeyAndDnaHashFromConductor = true, bool retrieveAgentPubKeyAndDnaHashFromSandbox = true, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true, bool updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved = true)
         {
             if (RetrievingAgentPubKeyAndDnaHash)
                 return null;
@@ -775,26 +1049,26 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             //Try to first get from the conductor.
             if (retrieveAgentPubKeyAndDnaHashFromConductor)
-                return await RetrieveAgentPubKeyAndDnaHashFromConductorAsync(null, retrieveAgentPubKeyAndDnaHashMode, updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved, automaticallyAttemptToRetrieveFromSandBoxIfConductorFails);
+                return await RetrieveAgentPubKeyAndDnaHashFromConductorAsync(null, retrieveAgentPubKeyAndDnaHashMode, updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved, automaticallyAttemptToRetrieveFromSandBoxIfConductorFails);
 
             else if (retrieveAgentPubKeyAndDnaHashFromSandbox)
             {
-                AgentPubKeyDnaHash agentPubKeyDnaHash = await RetrieveAgentPubKeyAndDnaHashFromSandboxAsync(updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved, automaticallyAttemptToRetrieveFromConductorIfSandBoxFails);
+                AgentPubKeyDnaHash agentPubKeyDnaHash = await RetrieveAgentPubKeyAndDnaHashFromSandboxAsync(updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved, automaticallyAttemptToRetrieveFromConductorIfSandBoxFails);
 
                 if (agentPubKeyDnaHash != null)
                     RetrievingAgentPubKeyAndDnaHash = false;
             }
 
-            return new AgentPubKeyDnaHash() { AgentPubKey = Config.AgentPubKey, DnaHash = Config.DnaHash };
+            return new AgentPubKeyDnaHash() { AgentPubKey = HoloNETDNA.AgentPubKey, DnaHash = HoloNETDNA.DnaHash };
         }
 
         /// <summary>
         /// This method gets the AgentPubKey & DnaHash from the HC Sandbox command. It will raise the [OnReadyForZomeCalls](#onreadyforzomecalls) event once it successfully retrieves them and the WebSocket has connected to the Holochain Conductor. If it fails to retrieve the AgentPubKey and DnaHash from the HC Sandbox and the optional `automaticallyAttemptToRetrieveFromConductorIfSandBoxFails` flag is true (defaults to true), it will call the RetrieveAgentPubKeyAndDnaHashFromConductor method to attempt to retrieve them directly from the conductor (default).
         /// </summary>
-        /// <param name="updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved">Set this to true (default) to automatically update the Config property once it has retrieved the DnaHash & AgentPubKey.</param>
+        /// <param name="updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved">Set this to true (default) to automatically update the HoloNETDNA property once it has retrieved the DnaHash & AgentPubKey.</param>
         /// <param name="automaticallyAttemptToRetrieveFromConductorIfSandBoxFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the HC Sandbox command if it fails to get them from the Holochain Conductor. This defaults to true.</param>
         /// <returns>The AgentPubKey and DnaHash</returns>
-        public async Task<AgentPubKeyDnaHash> RetrieveAgentPubKeyAndDnaHashFromSandboxAsync(bool updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved = true, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true)
+        public async Task<AgentPubKeyDnaHash> RetrieveAgentPubKeyAndDnaHashFromSandboxAsync(bool updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved = true, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true)
         {
             try
             {
@@ -804,13 +1078,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 RetrievingAgentPubKeyAndDnaHash = true;
                 Logger.Log("Attempting To Retrieve AgentPubKey & DnaHash From hc sandbox...", LogType.Info, true);
 
-                if (string.IsNullOrEmpty(Config.FullPathToExternalHCToolBinary))
-                    Config.FullPathToExternalHCToolBinary = string.Concat(Directory.GetCurrentDirectory(), "\\HolochainBinaries\\hc.exe"); //default to the current path
+                if (string.IsNullOrEmpty(HoloNETDNA.FullPathToExternalHCToolBinary))
+                    HoloNETDNA.FullPathToExternalHCToolBinary = string.Concat(Directory.GetCurrentDirectory(), "\\HolochainBinaries\\hc.exe"); //default to the current path
 
                 Process pProcess = new Process();
-                pProcess.StartInfo.WorkingDirectory = Config.FullPathToRootHappFolder;
+                pProcess.StartInfo.WorkingDirectory = HoloNETDNA.FullPathToRootHappFolder;
                 pProcess.StartInfo.FileName = "hc";
-                //pProcess.StartInfo.FileName = Config.FullPathToExternalHCToolBinary; //TODO: Need to get this working later (think currently has a version conflict with keylairstone? But not urgent because AgentPubKey & DnaHash are retrieved from Conductor anyway.
+                //pProcess.StartInfo.FileName = HoloNETDNA.FullPathToExternalHCToolBinary; //TODO: Need to get this working later (think currently has a version conflict with keylairstone? But not urgent because AgentPubKey & DnaHash are retrieved from Conductor anyway.
                 pProcess.StartInfo.Arguments = "sandbox call list-cells";
                 pProcess.StartInfo.UseShellExecute = false;
                 pProcess.StartInfo.RedirectStandardOutput = true;
@@ -829,16 +1103,16 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                 if (!string.IsNullOrEmpty(dnaHash) && !string.IsNullOrEmpty(agentPubKey))
                 {
-                    if (updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved)
+                    if (updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved)
                     {
-                        Config.AgentPubKey = agentPubKey;
-                        Config.DnaHash = dnaHash;
-                        Config.CellId = new byte[2][] { ConvertHoloHashToBytes(dnaHash), ConvertHoloHashToBytes(agentPubKey) };
+                        HoloNETDNA.AgentPubKey = agentPubKey;
+                        HoloNETDNA.DnaHash = dnaHash;
+                        HoloNETDNA.CellId = new byte[2][] { ConvertHoloHashToBytes(dnaHash), ConvertHoloHashToBytes(agentPubKey) };
                     }
 
                     Logger.Log("AgentPubKey & DnaHash successfully retrieved from hc sandbox.", LogType.Info, false);
 
-                    if (WebSocket.State == WebSocketState.Open && !string.IsNullOrEmpty(Config.AgentPubKey) && !string.IsNullOrEmpty(Config.DnaHash))
+                    if (WebSocket.State == WebSocketState.Open && !string.IsNullOrEmpty(HoloNETDNA.AgentPubKey) && !string.IsNullOrEmpty(HoloNETDNA.DnaHash))
                         SetReadyForZomeCalls();
 
                     return new AgentPubKeyDnaHash() { DnaHash = dnaHash, AgentPubKey = agentPubKey };
@@ -857,22 +1131,22 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <summary>
         /// This method gets the AgentPubKey & DnaHash from the HC Sandbox command. It will raise the [OnReadyForZomeCalls](#onreadyforzomecalls) event once it successfully retrieves them and the WebSocket has connected to the Holochain Conductor. If it fails to retrieve the AgentPubKey and DnaHash from the HC Sandbox and the optional `automaticallyAttemptToRetrieveFromConductorIfSandBoxFails` flag is true (defaults to true), it will call the RetrieveAgentPubKeyAndDnaHashFromConductor method to attempt to retrieve them directly from the conductor (default).
         /// </summary>
-        /// <param name="updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved">Set this to true (default) to automatically update the Config property once it has retrieved the DnaHash & AgentPubKey.</param>
+        /// <param name="updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved">Set this to true (default) to automatically update the HoloNETDNA property once it has retrieved the DnaHash & AgentPubKey.</param>
         /// <param name="automaticallyAttemptToRetrieveFromConductorIfSandBoxFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the HC Sandbox command if it fails to get them from the Holochain Conductor. This defaults to true.</param>
         /// <returns>The AgentPubKey and DnaHash</returns>
-        public AgentPubKeyDnaHash RetrieveAgentPubKeyAndDnaHashFromSandbox(bool updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved = true, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true)
+        public AgentPubKeyDnaHash RetrieveAgentPubKeyAndDnaHashFromSandbox(bool updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved = true, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true)
         {
-            return RetrieveAgentPubKeyAndDnaHashFromSandboxAsync(updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved, automaticallyAttemptToRetrieveFromConductorIfSandBoxFails).Result;
+            return RetrieveAgentPubKeyAndDnaHashFromSandboxAsync(updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved, automaticallyAttemptToRetrieveFromConductorIfSandBoxFails).Result;
         }
 
         /// <summary>
         /// This method gets the AgentPubKey & DnaHash from the Holochain Conductor (the Connect method will automatically call this by default). Once it has retrieved them and the WebSocket has connceted to the Holochain Conductor it will raise the OnReadyForZomeCalls event. If it fails to retrieve the AgentPubKey and DnaHash from the Conductor and the optional `automaticallyAttemptToRetrieveFromSandBoxIfConductorFails` flag is true (defaults to true), it will call the RetrieveAgentPubKeyAndDnaHashFromSandbox method. 
         /// </summary>
         /// <param name="retrieveAgentPubKeyAndDnaHashMode">If set to `Wait` (default) it will await until it has finished retrieving the AgentPubKey & DnaHash before returning, otherwise it will return immediately and then raise the OnReadyForZomeCalls event once it has finished retrieving the DnaHash & AgentPubKey.</param>
-        /// <param name="updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved">Set this to true (default) to automatically update the Config property once it has retrieved the DnaHash & AgentPubKey.</param>
+        /// <param name="updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved">Set this to true (default) to automatically update the HoloNETDNA property once it has retrieved the DnaHash & AgentPubKey.</param>
         /// <param name="automaticallyAttemptToRetrieveFromSandBoxIfConductorFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the HC Sandbox command if it fails to get them from the Holochain Conductor. This defaults to true.</param>
         /// <returns>The AgentPubKey and DnaHash</returns>
-        public async Task<AgentPubKeyDnaHash> RetrieveAgentPubKeyAndDnaHashFromConductorAsync(string installedAppId = null, RetrieveAgentPubKeyAndDnaHashMode retrieveAgentPubKeyAndDnaHashMode = RetrieveAgentPubKeyAndDnaHashMode.Wait, bool updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true)
+        public async Task<AgentPubKeyDnaHash> RetrieveAgentPubKeyAndDnaHashFromConductorAsync(string installedAppId = null, RetrieveAgentPubKeyAndDnaHashMode retrieveAgentPubKeyAndDnaHashMode = RetrieveAgentPubKeyAndDnaHashMode.Wait, bool updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true)
         {
             try
             {
@@ -881,15 +1155,15 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                 if (string.IsNullOrEmpty(installedAppId))
                 {
-                    if (!string.IsNullOrEmpty(Config.InstalledAppId))
-                        installedAppId = Config.InstalledAppId;
+                    if (!string.IsNullOrEmpty(HoloNETDNA.InstalledAppId))
+                        installedAppId = HoloNETDNA.InstalledAppId;
                     else
                         installedAppId = "test-app";
                 }
 
                 _automaticallyAttemptToGetFromSandboxIfConductorFails = automaticallyAttemptToRetrieveFromSandBoxIfConductorFails;
                 RetrievingAgentPubKeyAndDnaHash = true;
-                _updateDnaHashAndAgentPubKey = updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved;
+                _updateDnaHashAndAgentPubKey = updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved;
                 Logger.Log("Attempting To Retrieve AgentPubKey & DnaHash from Holochain Conductor...", LogType.Info, true);
 
                 HoloNETData holoNETData = new HoloNETData()
@@ -917,12 +1191,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <summary>
         /// This method gets the AgentPubKey & DnaHash from the Holochain Conductor (the Connect method will automatically call this by default). Once it has retrieved them and the WebSocket has connceted to the Holochain Conductor it will raise the OnReadyForZomeCalls event. If it fails to retrieve the AgentPubKey and DnaHash from the Conductor and the optional `automaticallyAttemptToRetrieveFromSandBoxIfConductorFails` flag is true (defaults to true), it will call the RetrieveAgentPubKeyAndDnaHashFromSandbox method. 
         /// </summary>
-        /// <param name="updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved">Set this to true (default) to automatically update the Config property once it has retrieved the DnaHash & AgentPubKey.</param>
+        /// <param name="updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved">Set this to true (default) to automatically update the HoloNETDNA property once it has retrieved the DnaHash & AgentPubKey.</param>
         /// <param name="automaticallyAttemptToRetrieveFromSandBoxIfConductorFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the HC Sandbox command if it fails to get them from the Holochain Conductor. This defaults to true.</param>
         /// <returns>The AgentPubKey and DnaHash</returns>
-        public AgentPubKeyDnaHash RetrieveAgentPubKeyAndDnaHashFromConductor(string installedAppId = null, bool updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true)
+        public AgentPubKeyDnaHash RetrieveAgentPubKeyAndDnaHashFromConductor(string installedAppId = null, bool updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true)
         {
-            return RetrieveAgentPubKeyAndDnaHashFromConductorAsync(installedAppId, RetrieveAgentPubKeyAndDnaHashMode.UseCallBackEvents, updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved, automaticallyAttemptToRetrieveFromSandBoxIfConductorFails).Result;
+            return RetrieveAgentPubKeyAndDnaHashFromConductorAsync(installedAppId, RetrieveAgentPubKeyAndDnaHashMode.UseCallBackEvents, updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved, automaticallyAttemptToRetrieveFromSandBoxIfConductorFails).Result;
         }
 
         /// <summary>
@@ -965,7 +1239,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     data = data
                 };
 
-                if (Config.EnforceRequestToResponseIdMatchingBehaviour != EnforceRequestToResponseIdMatchingBehaviour.Ignore)
+                if (HoloNETDNA.EnforceRequestToResponseIdMatchingBehaviour != EnforceRequestToResponseIdMatchingBehaviour.Ignore)
                     _pendingRequests.Add(id);
 
                 if (WebSocket.State == WebSocketState.Open)
@@ -993,12 +1267,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         }
 
         /// <summary>
-        /// This method disconnects the client from the Holochain conductor. It raises the OnDisconnected event once it is has successfully disconnected. It will then automatically call the ShutDownAllHolochainConductors method (if the `shutdownHolochainConductorsMode` flag (defaults to `UseConfigSettings`) is not set to `DoNotShutdownAnyConductors`). If the `disconnectedCallBackMode` flag is set to `WaitForHolochainConductorToDisconnect` (default) then it will await until it has disconnected before returning to the caller, otherwise it will return immediately and then raise the OnDisconnected event once it is disconnected.
+        /// This method disconnects the client from the Holochain conductor. It raises the OnDisconnected event once it is has successfully disconnected. It will then automatically call the ShutDownAllHolochainConductors method (if the `shutdownHolochainConductorsMode` flag (defaults to `UseHoloNETDNASettings`) is not set to `DoNotShutdownAnyConductors`). If the `disconnectedCallBackMode` flag is set to `WaitForHolochainConductorToDisconnect` (default) then it will await until it has disconnected before returning to the caller, otherwise it will return immediately and then raise the OnDisconnected event once it is disconnected.
         /// </summary>
         /// <param name="disconnectedCallBackMode">If this is set to `WaitForHolochainConductorToDisconnect` (default) then it will await until it has disconnected before returning to the caller, otherwise (it is set to `UseCallBackEvents`) it will return immediately and then raise the [OnDisconnected](#ondisconnected) once it is disconnected.</param>
-        /// <param name="shutdownHolochainConductorsMode">Once it has successfully disconnected it will automatically call the ShutDownAllHolochainConductors method if the `shutdownHolochainConductorsMode` flag (defaults to `UseConfigSettings`) is not set to `DoNotShutdownAnyConductors`. Other values it can be are 'ShutdownCurrentConductorOnly' or 'ShutdownAllConductors'. Please see the ShutDownConductors method below for more detail.</param>
+        /// <param name="shutdownHolochainConductorsMode">Once it has successfully disconnected it will automatically call the ShutDownAllHolochainConductors method if the `shutdownHolochainConductorsMode` flag (defaults to `UseHoloNETDNASettings`) is not set to `DoNotShutdownAnyConductors`. Other values it can be are 'ShutdownCurrentConductorOnly' or 'ShutdownAllConductors'. Please see the ShutDownConductors method below for more detail.</param>
         /// <returns></returns>
-        public async Task DisconnectAsync(DisconnectedCallBackMode disconnectedCallBackMode = DisconnectedCallBackMode.WaitForHolochainConductorToDisconnect, ShutdownHolochainConductorsMode shutdownHolochainConductorsMode = ShutdownHolochainConductorsMode.UseConfigSettings)
+        public async Task DisconnectAsync(DisconnectedCallBackMode disconnectedCallBackMode = DisconnectedCallBackMode.WaitForHolochainConductorToDisconnect, ShutdownHolochainConductorsMode shutdownHolochainConductorsMode = ShutdownHolochainConductorsMode.UseHoloNETDNASettings)
         {
             _shutdownHolochainConductorsMode = shutdownHolochainConductorsMode;
             await WebSocket.DisconnectAsync();
@@ -1008,12 +1282,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         }
 
         /// <summary>
-        /// This method disconnects the client from the Holochain conductor. It raises the OnDisconnected event once it is has successfully disconnected. It will then automatically call the ShutDownAllHolochainConductors method (if the `shutdownHolochainConductorsMode` flag (defaults to `UseConfigSettings`) is not set to `DoNotShutdownAnyConductors`). If the `disconnectedCallBackMode` flag is set to `WaitForHolochainConductorToDisconnect` (default) then it will await until it has disconnected before returning to the caller, otherwise it will return immediately and then raise the OnDisconnected event once it is disconnected.
+        /// This method disconnects the client from the Holochain conductor. It raises the OnDisconnected event once it is has successfully disconnected. It will then automatically call the ShutDownAllHolochainConductors method (if the `shutdownHolochainConductorsMode` flag (defaults to `UseHoloNETDNASettings`) is not set to `DoNotShutdownAnyConductors`). If the `disconnectedCallBackMode` flag is set to `WaitForHolochainConductorToDisconnect` (default) then it will await until it has disconnected before returning to the caller, otherwise it will return immediately and then raise the OnDisconnected event once it is disconnected.
         /// </summary>
         /// <param name="disconnectedCallBackMode">If this is set to `WaitForHolochainConductorToDisconnect` (default) then it will await until it has disconnected before returning to the caller, otherwise (it is set to `UseCallBackEvents`) it will return immediately and then raise the [OnDisconnected](#ondisconnected) once it is disconnected.</param>
-        /// <param name="shutdownHolochainConductorsMode">Once it has successfully disconnected it will automatically call the ShutDownAllHolochainConductors method if the `shutdownHolochainConductorsMode` flag (defaults to `UseConfigSettings`) is not set to `DoNotShutdownAnyConductors`. Other values it can be are 'ShutdownCurrentConductorOnly' or 'ShutdownAllConductors'. Please see the ShutDownConductors method below for more detail.</param>
+        /// <param name="shutdownHolochainConductorsMode">Once it has successfully disconnected it will automatically call the ShutDownAllHolochainConductors method if the `shutdownHolochainConductorsMode` flag (defaults to `UseHoloNETDNASettings`) is not set to `DoNotShutdownAnyConductors`. Other values it can be are 'ShutdownCurrentConductorOnly' or 'ShutdownAllConductors'. Please see the ShutDownConductors method below for more detail.</param>
         /// <returns></returns>
-        public void Disconnect(DisconnectedCallBackMode disconnectedCallBackMode = DisconnectedCallBackMode.WaitForHolochainConductorToDisconnect, ShutdownHolochainConductorsMode shutdownHolochainConductorsMode = ShutdownHolochainConductorsMode.UseConfigSettings)
+        public void Disconnect(DisconnectedCallBackMode disconnectedCallBackMode = DisconnectedCallBackMode.WaitForHolochainConductorToDisconnect, ShutdownHolochainConductorsMode shutdownHolochainConductorsMode = ShutdownHolochainConductorsMode.UseHoloNETDNASettings)
         {
             DisconnectAsync(disconnectedCallBackMode, shutdownHolochainConductorsMode);
         }
@@ -1127,7 +1401,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="zome">The name of the zome you wish to target.</param>
         /// <param name="function">The name of the zome function you wish to call.</param>
         /// <param name="paramsObject">A basic CLR object containing the params the zome function is expecting (optional param).</param>
-        /// <param name="matchIdToZomeFuncInCallback">This is an optional param, which defaults to true. Set this to true if you wish HoloNET to give the zome and zome function that made the call in the callback/event. If this is false then only the id will be given in the callback. This uses a small internal cache to match up the id to the given zome/function. Set this to false if you wish to save a tiny amount of memory by not utilizing this cache. If it is false then the `Zome` and `ZomeFunction` params will be missing in the ZomeCallBack, you will need to manually match the `id` to the call yourself. NOTE: If Config.EnforceRequestToResponseIdMatchingBehaviour is set to Warn or Error then this param will be ignored and the matching will always occur.</param>
+        /// <param name="matchIdToZomeFuncInCallback">This is an optional param, which defaults to true. Set this to true if you wish HoloNET to give the zome and zome function that made the call in the callback/event. If this is false then only the id will be given in the callback. This uses a small internal cache to match up the id to the given zome/function. Set this to false if you wish to save a tiny amount of memory by not utilizing this cache. If it is false then the `Zome` and `ZomeFunction` params will be missing in the ZomeCallBack, you will need to manually match the `id` to the call yourself. NOTE: If HoloNETDNA.EnforceRequestToResponseIdMatchingBehaviour is set to Warn or Error then this param will be ignored and the matching will always occur.</param>
         /// <param name="cachReturnData">This is an optional param, which defaults to false. Set this to true if you wish HoloNET to cache the response retrieved from holochain. Subsequent calls will return this cached data rather than calling the Holochain conductor again. Use this for static data that is not going to change for performance gains.</param>
         /// <param name="entryDataObjectTypeReturnedFromZome">This is an optional param, where the caller can pass in the type of the dynamic data object they wish the entry data returned to be mapped to. This newly created data object will then be returned in the ZomeFunctionCallBackEventArgs.Entry.EntryDataObject property.</param>
         /// <param name="zomeResultCallBackMode">This is an optional param, where the caller can choose whether to wait for the Holochain Conductor response before returning to the caller or to return immediately once the request has been sent to the Holochain Conductor and then raise the OnDataReceived and then the OnZomeFunctionCallBack or OnSignalsCallBack events depending on the type of request sent to the Holochain Conductor.</param>
@@ -1145,7 +1419,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="zome">The name of the zome you wish to target.</param>
         /// <param name="function">The name of the zome function you wish to call.</param>
         /// <param name="paramsObject">A basic CLR object containing the params the zome function is expecting (optional param).</param>
-        /// <param name="matchIdToZomeFuncInCallback">This is an optional param, which defaults to true. Set this to true if you wish HoloNET to give the zome and zome function that made the call in the callback/event. If this is false then only the id will be given in the callback. This uses a small internal cache to match up the id to the given zome/function. Set this to false if you wish to save a tiny amount of memory by not utilizing this cache. If it is false then the `Zome` and `ZomeFunction` params will be missing in the ZomeCallBack, you will need to manually match the `id` to the call yourself. NOTE: If Config.EnforceRequestToResponseIdMatchingBehaviour is set to Warn or Error then this param will be ignored and the matching will always occur.</param>
+        /// <param name="matchIdToZomeFuncInCallback">This is an optional param, which defaults to true. Set this to true if you wish HoloNET to give the zome and zome function that made the call in the callback/event. If this is false then only the id will be given in the callback. This uses a small internal cache to match up the id to the given zome/function. Set this to false if you wish to save a tiny amount of memory by not utilizing this cache. If it is false then the `Zome` and `ZomeFunction` params will be missing in the ZomeCallBack, you will need to manually match the `id` to the call yourself. NOTE: If HoloNETDNA.EnforceRequestToResponseIdMatchingBehaviour is set to Warn or Error then this param will be ignored and the matching will always occur.</param>
         /// <param name="cachReturnData">This is an optional param, which defaults to false. Set this to true if you wish HoloNET to cache the response retrieved from holochain. Subsequent calls will return this cached data rather than calling the Holochain conductor again. Use this for static data that is not going to change for performance gains.</param>
         /// <param name="entryDataObjectReturnedFromZome">This is an optional param, where the caller can pass in an instance of the dynamic data object they wish the entry data returned to be mapped to. This data object will then be returned in the ZomeFunctionCallBackEventArgs.Entry.EntryDataObject property.</param>
         /// <param name="zomeResultCallBackMode">This is an optional param, where the caller can choose whether to wait for the Holochain Conductor response before returning to the caller or to return immediately once the request has been sent to the Holochain Conductor and then raise the OnDataReceived and then the OnZomeFunctionCallBack or OnSignalsCallBack events depending on the type of request sent to the Holochain Conductor.</param>
@@ -1258,7 +1532,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="function">The name of the zome function you wish to call.</param>
         /// <param name="callback">A delegate to call once the zome function returns. This delegate contains the same signature as the one used for the OnZomeFunctionCallBack event. (optional param).</param>
         /// <param name="paramsObject">A basic CLR object containing the params the zome function is expecting (optional param).</param>
-        /// <param name="matchIdToZomeFuncInCallback">This is an optional param, which defaults to true. Set this to true if you wish HoloNET to give the zome and zome function that made the call in the callback/event. If this is false then only the id will be given in the callback. This uses a small internal cache to match up the id to the given zome/function. Set this to false if you wish to save a tiny amount of memory by not utilizing this cache. If it is false then the `Zome` and `ZomeFunction` params will be missing in the ZomeCallBack, you will need to manually match the `id` to the call yourself. NOTE: If Config.EnforceRequestToResponseIdMatchingBehaviour is set to Warn or Error then this param will be ignored and the matching will always occur.</param>
+        /// <param name="matchIdToZomeFuncInCallback">This is an optional param, which defaults to true. Set this to true if you wish HoloNET to give the zome and zome function that made the call in the callback/event. If this is false then only the id will be given in the callback. This uses a small internal cache to match up the id to the given zome/function. Set this to false if you wish to save a tiny amount of memory by not utilizing this cache. If it is false then the `Zome` and `ZomeFunction` params will be missing in the ZomeCallBack, you will need to manually match the `id` to the call yourself. NOTE: If HoloNETDNA.EnforceRequestToResponseIdMatchingBehaviour is set to Warn or Error then this param will be ignored and the matching will always occur.</param>
         /// <param name="cachReturnData">This is an optional param, which defaults to false. Set this to true if you wish HoloNET to cache the response retrieved from holochain. Subsequent calls will return this cached data rather than calling the Holochain conductor again. Use this for static data that is not going to change for performance gains.</param>
         /// <param name="entryDataObjectReturnedFromZome">This is an optional param, where the caller can pass in an instance of the dynamic data object they wish the entry data returned to be mapped to. This data object will then be returned in the ZomeFunctionCallBackEventArgs.Entry.EntryDataObject property.</param>
         /// <param name="zomeResultCallBackMode">This is an optional param, where the caller can choose whether to wait for the Holochain Conductor response before returning to the caller or to return immediately once the request has been sent to the Holochain Conductor and then raise the OnDataReceived and then the OnZomeFunctionCallBack or OnSignalsCallBack events depending on the type of request sent to the Holochain Conductor.</param>
@@ -1277,7 +1551,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="function">The name of the zome function you wish to call.</param>
         /// <param name="callback">A delegate to call once the zome function returns. This delegate contains the same signature as the one used for the OnZomeFunctionCallBack event. (optional param).</param>
         /// <param name="paramsObject">A basic CLR object containing the params the zome function is expecting (optional param).</param>
-        /// <param name="matchIdToZomeFuncInCallback">This is an optional param, which defaults to true. Set this to true if you wish HoloNET to give the zome and zome function that made the call in the callback/event. If this is false then only the id will be given in the callback. This uses a small internal cache to match up the id to the given zome/function. Set this to false if you wish to save a tiny amount of memory by not utilizing this cache. If it is false then the `Zome` and `ZomeFunction` params will be missing in the ZomeCallBack, you will need to manually match the `id` to the call yourself. NOTE: If Config.EnforceRequestToResponseIdMatchingBehaviour is set to Warn or Error then this param will be ignored and the matching will always occur.</param>
+        /// <param name="matchIdToZomeFuncInCallback">This is an optional param, which defaults to true. Set this to true if you wish HoloNET to give the zome and zome function that made the call in the callback/event. If this is false then only the id will be given in the callback. This uses a small internal cache to match up the id to the given zome/function. Set this to false if you wish to save a tiny amount of memory by not utilizing this cache. If it is false then the `Zome` and `ZomeFunction` params will be missing in the ZomeCallBack, you will need to manually match the `id` to the call yourself. NOTE: If HoloNETDNA.EnforceRequestToResponseIdMatchingBehaviour is set to Warn or Error then this param will be ignored and the matching will always occur.</param>
         /// <param name="cachReturnData">This is an optional param, which defaults to false. Set this to true if you wish HoloNET to cache the response retrieved from holochain. Subsequent calls will return this cached data rather than calling the Holochain conductor again. Use this for static data that is not going to change for performance gains.</param>
         /// <param name="entryDataObjectTypeReturnedFromZome">This is an optional param, where the caller can pass in the type of the dynamic data object they wish the entry data returned to be mapped to. This newly created data object will then be returned in the ZomeFunctionCallBackEventArgs.Entry.EntryDataObject property.</param>
         /// <param name="zomeResultCallBackMode">This is an optional param, where the caller can choose whether to wait for the Holochain Conductor response before returning to the caller or to return immediately once the request has been sent to the Holochain Conductor and then raise the OnDataReceived and then the OnZomeFunctionCallBack or OnSignalsCallBack events depending on the type of request sent to the Holochain Conductor.</param>
@@ -1296,7 +1570,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="function">The name of the zome function you wish to call.</param>
         /// <param name="callback">A delegate to call once the zome function returns. This delegate contains the same signature as the one used for the OnZomeFunctionCallBack event. (optional param).</param>
         /// <param name="paramsObject">A basic CLR object containing the params the zome function is expecting (optional param).</param>
-        /// <param name="matchIdToZomeFuncInCallback">This is an optional param, which defaults to true. Set this to true if you wish HoloNET to give the zome and zome function that made the call in the callback/event. If this is false then only the id will be given in the callback. This uses a small internal cache to match up the id to the given zome/function. Set this to false if you wish to save a tiny amount of memory by not utilizing this cache. If it is false then the `Zome` and `ZomeFunction` params will be missing in the ZomeCallBack, you will need to manually match the `id` to the call yourself. NOTE: If Config.EnforceRequestToResponseIdMatchingBehaviour is set to Warn or Error then this param will be ignored and the matching will always occur.</param>
+        /// <param name="matchIdToZomeFuncInCallback">This is an optional param, which defaults to true. Set this to true if you wish HoloNET to give the zome and zome function that made the call in the callback/event. If this is false then only the id will be given in the callback. This uses a small internal cache to match up the id to the given zome/function. Set this to false if you wish to save a tiny amount of memory by not utilizing this cache. If it is false then the `Zome` and `ZomeFunction` params will be missing in the ZomeCallBack, you will need to manually match the `id` to the call yourself. NOTE: If HoloNETDNA.EnforceRequestToResponseIdMatchingBehaviour is set to Warn or Error then this param will be ignored and the matching will always occur.</param>
         /// <param name="cachReturnData">This is an optional param, which defaults to false. Set this to true if you wish HoloNET to cache the response retrieved from holochain. Subsequent calls will return this cached data rather than calling the Holochain conductor again. Use this for static data that is not going to change for performance gains.</param>
         /// <param name="zomeResultCallBackMode">This is an optional param, where the caller can choose whether to wait for the Holochain Conductor response before returning to the caller or to return immediately once the request has been sent to the Holochain Conductor and then raise the OnDataReceived and then the OnZomeFunctionCallBack or OnSignalsCallBack events depending on the type of request sent to the Holochain Conductor.</param>
         /// <returns></returns>
@@ -1317,13 +1591,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                         return new ZomeFunctionCallBackEventArgs() { EndPoint = EndPoint, Id = id, Zome = zome, ZomeFunction = function, IsError = true, Message = "HoloNET is not ready to make zome calls yet, please wait till the ReadyForZomeCalls event is fired before attempting to make a zome call." };
                 }
 
-                if (string.IsNullOrEmpty(Config.DnaHash))
-                    return new ZomeFunctionCallBackEventArgs() { EndPoint = EndPoint, Id = id, Zome = zome, ZomeFunction = function, IsError = true, Message = "The DnaHash cannot be empty, please either set manually in the Config.DnaHash property or wait till the ReadyForZomeCalls event is fired before attempting to make a zome call." };
-                    //throw new InvalidOperationException("The DnaHash cannot be empty, please either set manually in the Config.DnaHash property or wait till the ReadyForZomeCalls event is fired before attempting to make a zome call.");
+                if (string.IsNullOrEmpty(HoloNETDNA.DnaHash))
+                    return new ZomeFunctionCallBackEventArgs() { EndPoint = EndPoint, Id = id, Zome = zome, ZomeFunction = function, IsError = true, Message = "The DnaHash cannot be empty, please either set manually in the HoloNETDNA.DnaHash property or wait till the ReadyForZomeCalls event is fired before attempting to make a zome call." };
+                //throw new InvalidOperationException("The DnaHash cannot be empty, please either set manually in the HoloNETDNA.DnaHash property or wait till the ReadyForZomeCalls event is fired before attempting to make a zome call.");
 
-                if (string.IsNullOrEmpty(Config.AgentPubKey))
-                    return new ZomeFunctionCallBackEventArgs() { EndPoint = EndPoint, Id = id, Zome = zome, ZomeFunction = function, IsError = true, Message = "The AgentPubKey cannot be empty, please either set manually in the Config.DnaHash property or wait till the ReadyForZomeCalls event is fired before attempting to make a zome call." };
-                    //throw new InvalidOperationException("The AgentPubKey cannot be empty, please either set manually in the Config.AgentPubKey property or wait till the ReadyForZomeCalls event is fired before attempting to make a zome call.");
+                if (string.IsNullOrEmpty(HoloNETDNA.AgentPubKey))
+                    return new ZomeFunctionCallBackEventArgs() { EndPoint = EndPoint, Id = id, Zome = zome, ZomeFunction = function, IsError = true, Message = "The AgentPubKey cannot be empty, please either set manually in the HoloNETDNA.DnaHash property or wait till the ReadyForZomeCalls event is fired before attempting to make a zome call." };
+                //throw new InvalidOperationException("The AgentPubKey cannot be empty, please either set manually in the HoloNETDNA.AgentPubKey property or wait till the ReadyForZomeCalls event is fired before attempting to make a zome call.");
 
                 Logger.Log($"Calling Zome Function {function} on Zome {zome} with Id {id} On Holochain Conductor...", LogType.Info, true);
 
@@ -1349,7 +1623,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     }
                 }
 
-                if (matchIdToZomeFuncInCallback || Config.EnforceRequestToResponseIdMatchingBehaviour != EnforceRequestToResponseIdMatchingBehaviour.Ignore)
+                if (matchIdToZomeFuncInCallback || HoloNETDNA.EnforceRequestToResponseIdMatchingBehaviour != EnforceRequestToResponseIdMatchingBehaviour.Ignore)
                 {
                     _zomeLookup[id] = zome;
                     _funcLookup[id] = function;
@@ -1377,22 +1651,22 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 //TODO: Also be good to implement same functionality in js client where it will error if there is no matching request to a response (id etc). I think we can make this optional param for these method overloads like responseMustHaveMatchingRequest which defaults to true.
 
                 //byte[][] cellId = await GetCellIdAsync();
-                string cellId = $"{Config.AgentPubKey}:{Config.DnaHash}";
+                string cellId = $"{HoloNETDNA.AgentPubKey}:{HoloNETDNA.DnaHash}";
 
-               // global using BandPass = (int Min, int Max); //TODO: Need to upgrade to C#12 (.NET 8) before names tuple aliases will work...
+                // global using BandPass = (int Min, int Max); //TODO: Need to upgrade to C#12 (.NET 8) before names tuple aliases will work...
 
                 if (_signingCredentialsForCell.ContainsKey(cellId) && _signingCredentialsForCell[cellId] != null)
                 {
                     ZomeCall payload = new ZomeCall()
                     {
                         cap_secret = _signingCredentialsForCell[cellId].CapSecret,
-                        cell_id = new byte[2][] { ConvertHoloHashToBytes(Config.DnaHash), ConvertHoloHashToBytes(Config.AgentPubKey) },
-                        //cell_id = new CellId() { agent_pubkey = ConvertHoloHashToBytes(Config.AgentPubKey), dna_hash = ConvertHoloHashToBytes(Config.DnaHash) },
-                        //cell_id = (ConvertHoloHashToBytes(Config.DnaHash), ConvertHoloHashToBytes(Config.AgentPubKey)),
+                        cell_id = new byte[2][] { ConvertHoloHashToBytes(HoloNETDNA.DnaHash), ConvertHoloHashToBytes(HoloNETDNA.AgentPubKey) },
+                        //cell_id = new CellId() { agent_pubkey = ConvertHoloHashToBytes(HoloNETDNA.AgentPubKey), dna_hash = ConvertHoloHashToBytes(HoloNETDNA.DnaHash) },
+                        //cell_id = (ConvertHoloHashToBytes(HoloNETDNA.DnaHash), ConvertHoloHashToBytes(HoloNETDNA.AgentPubKey)),
                         fn_name = function,
                         zome_name = zome,
                         payload = MessagePackSerializer.Serialize(paramsObject),
-                        provenance = ConvertHoloHashToBytes(Config.AgentPubKey),
+                        provenance = ConvertHoloHashToBytes(HoloNETDNA.AgentPubKey),
                         nonce = RandomNumberGenerator.GetBytes(32),
                         expires_at = DateTime.Now.AddMinutes(5).Ticks / 10 //DateTime.Now.AddMinutes(5).ToBinary(), //Conductor expects it in microseconds.
                     };
@@ -1433,7 +1707,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 }
                 else
                 {
-                    string msg = $"Error occurred in HoloNETClient.CallZomeFunctionAsync method: Cannot sign zome call when no signing credentials have been authorized for the cell (AgentPubKey: {Config.AgentPubKey}, DnaHash: {Config.DnaHash}).";
+                    string msg = $"Error occurred in HoloNETClient.CallZomeFunctionAsync method: Cannot sign zome call when no signing credentials have been authorized for the cell (AgentPubKey: {HoloNETDNA.AgentPubKey}, DnaHash: {HoloNETDNA.DnaHash}).";
                     HandleError(msg, null);
                     return new ZomeFunctionCallBackEventArgs() { EndPoint = EndPoint, Id = id, Zome = zome, ZomeFunction = function, Message = msg, IsError = true };
                 }
@@ -1554,7 +1828,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="zome">The name of the zome you wish to target.</param>
         /// <param name="function">The name of the zome function you wish to call.</param>
         /// <param name="paramsObject">A basic CLR object containing the params the zome function is expecting (optional param).</param>
-        /// <param name="matchIdToZomeFuncInCallback">This is an optional param, which defaults to true. Set this to true if you wish HoloNET to give the zome and zome function that made the call in the callback/event. If this is false then only the id will be given in the callback. This uses a small internal cache to match up the id to the given zome/function. Set this to false if you wish to save a tiny amount of memory by not utilizing this cache. If it is false then the `Zome` and `ZomeFunction` params will be missing in the ZomeCallBack, you will need to manually match the `id` to the call yourself. NOTE: If Config.EnforceRequestToResponseIdMatchingBehaviour is set to Warn or Error then this param will be ignored and the matching will always occur.</param>
+        /// <param name="matchIdToZomeFuncInCallback">This is an optional param, which defaults to true. Set this to true if you wish HoloNET to give the zome and zome function that made the call in the callback/event. If this is false then only the id will be given in the callback. This uses a small internal cache to match up the id to the given zome/function. Set this to false if you wish to save a tiny amount of memory by not utilizing this cache. If it is false then the `Zome` and `ZomeFunction` params will be missing in the ZomeCallBack, you will need to manually match the `id` to the call yourself. NOTE: If HoloNETDNA.EnforceRequestToResponseIdMatchingBehaviour is set to Warn or Error then this param will be ignored and the matching will always occur.</param>
         /// <param name="cachReturnData">This is an optional param, which defaults to false. Set this to true if you wish HoloNET to cache the response retrieved from holochain. Subsequent calls will return this cached data rather than calling the Holochain conductor again. Use this for static data that is not going to change for performance gains.</param>
         /// <param name="entryDataObjectTypeReturnedFromZome">This is an optional param, where the caller can pass in the type of the dynamic data object they wish the entry data returned to be mapped to. This newly created data object will then be returned in the ZomeFunctionCallBackEventArgs.Entry.EntryDataObject property.</param>
         /// <param name="zomeResultCallBackMode">This is an optional param, where the caller can choose whether to wait for the Holochain Conductor response before returning to the caller or to return immediately once the request has been sent to the Holochain Conductor and then raise the OnDataReceived and then the OnZomeFunctionCallBack or OnSignalsCallBack events depending on the type of request sent to the Holochain Conductor.</param>
@@ -1572,7 +1846,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="zome">The name of the zome you wish to target.</param>
         /// <param name="function">The name of the zome function you wish to call.</param>
         /// <param name="paramsObject">A basic CLR object containing the params the zome function is expecting (optional param).</param>
-        /// <param name="matchIdToZomeFuncInCallback">This is an optional param, which defaults to true. Set this to true if you wish HoloNET to give the zome and zome function that made the call in the callback/event. If this is false then only the id will be given in the callback. This uses a small internal cache to match up the id to the given zome/function. Set this to false if you wish to save a tiny amount of memory by not utilizing this cache. If it is false then the `Zome` and `ZomeFunction` params will be missing in the ZomeCallBack, you will need to manually match the `id` to the call yourself. NOTE: If Config.EnforceRequestToResponseIdMatchingBehaviour is set to Warn or Error then this param will be ignored and the matching will always occur.</param>
+        /// <param name="matchIdToZomeFuncInCallback">This is an optional param, which defaults to true. Set this to true if you wish HoloNET to give the zome and zome function that made the call in the callback/event. If this is false then only the id will be given in the callback. This uses a small internal cache to match up the id to the given zome/function. Set this to false if you wish to save a tiny amount of memory by not utilizing this cache. If it is false then the `Zome` and `ZomeFunction` params will be missing in the ZomeCallBack, you will need to manually match the `id` to the call yourself. NOTE: If HoloNETDNA.EnforceRequestToResponseIdMatchingBehaviour is set to Warn or Error then this param will be ignored and the matching will always occur.</param>
         /// <param name="cachReturnData">This is an optional param, which defaults to false. Set this to true if you wish HoloNET to cache the response retrieved from holochain. Subsequent calls will return this cached data rather than calling the Holochain conductor again. Use this for static data that is not going to change for performance gains.</param>
         /// <param name="entryDataObjectReturnedFromZome">This is an optional param, where the caller can pass in an instance of the dynamic data object they wish the entry data returned to be mapped to. This data object will then be returned in the ZomeFunctionCallBackEventArgs.Entry.EntryDataObject property.</param>
         /// <returns></returns>
@@ -1679,7 +1953,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="function">The name of the zome function you wish to call.</param>
         /// <param name="callback">A delegate to call once the zome function returns. This delegate contains the same signature as the one used for the OnZomeFunctionCallBack event. (optional param).</param>
         /// <param name="paramsObject">A basic CLR object containing the params the zome function is expecting (optional param).</param>
-        /// <param name="matchIdToZomeFuncInCallback">This is an optional param, which defaults to true. Set this to true if you wish HoloNET to give the zome and zome function that made the call in the callback/event. If this is false then only the id will be given in the callback. This uses a small internal cache to match up the id to the given zome/function. Set this to false if you wish to save a tiny amount of memory by not utilizing this cache. If it is false then the `Zome` and `ZomeFunction` params will be missing in the ZomeCallBack, you will need to manually match the `id` to the call yourself. NOTE: If Config.EnforceRequestToResponseIdMatchingBehaviour is set to Warn or Error then this param will be ignored and the matching will always occur.</param>
+        /// <param name="matchIdToZomeFuncInCallback">This is an optional param, which defaults to true. Set this to true if you wish HoloNET to give the zome and zome function that made the call in the callback/event. If this is false then only the id will be given in the callback. This uses a small internal cache to match up the id to the given zome/function. Set this to false if you wish to save a tiny amount of memory by not utilizing this cache. If it is false then the `Zome` and `ZomeFunction` params will be missing in the ZomeCallBack, you will need to manually match the `id` to the call yourself. NOTE: If HoloNETDNA.EnforceRequestToResponseIdMatchingBehaviour is set to Warn or Error then this param will be ignored and the matching will always occur.</param>
         /// <param name="cachReturnData">This is an optional param, which defaults to false. Set this to true if you wish HoloNET to cache the response retrieved from holochain. Subsequent calls will return this cached data rather than calling the Holochain conductor again. Use this for static data that is not going to change for performance gains.</param>
         /// <param name="entryDataObjectReturnedFromZome">This is an optional param, where the caller can pass in an instance of the dynamic data object they wish the entry data returned to be mapped to. This data object will then be returned in the ZomeFunctionCallBackEventArgs.Entry.EntryDataObject property.</param>
         /// <returns></returns>
@@ -1697,7 +1971,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="function">The name of the zome function you wish to call.</param>
         /// <param name="callback">A delegate to call once the zome function returns. This delegate contains the same signature as the one used for the OnZomeFunctionCallBack event. (optional param).</param>
         /// <param name="paramsObject">A basic CLR object containing the params the zome function is expecting (optional param).</param>
-        /// <param name="matchIdToZomeFuncInCallback">This is an optional param, which defaults to true. Set this to true if you wish HoloNET to give the zome and zome function that made the call in the callback/event. If this is false then only the id will be given in the callback. This uses a small internal cache to match up the id to the given zome/function. Set this to false if you wish to save a tiny amount of memory by not utilizing this cache. If it is false then the `Zome` and `ZomeFunction` params will be missing in the ZomeCallBack, you will need to manually match the `id` to the call yourself. NOTE: If Config.EnforceRequestToResponseIdMatchingBehaviour is set to Warn or Error then this param will be ignored and the matching will always occur.</param>
+        /// <param name="matchIdToZomeFuncInCallback">This is an optional param, which defaults to true. Set this to true if you wish HoloNET to give the zome and zome function that made the call in the callback/event. If this is false then only the id will be given in the callback. This uses a small internal cache to match up the id to the given zome/function. Set this to false if you wish to save a tiny amount of memory by not utilizing this cache. If it is false then the `Zome` and `ZomeFunction` params will be missing in the ZomeCallBack, you will need to manually match the `id` to the call yourself. NOTE: If HoloNETDNA.EnforceRequestToResponseIdMatchingBehaviour is set to Warn or Error then this param will be ignored and the matching will always occur.</param>
         /// <param name="cachReturnData">This is an optional param, which defaults to false. Set this to true if you wish HoloNET to cache the response retrieved from holochain. Subsequent calls will return this cached data rather than calling the Holochain conductor again. Use this for static data that is not going to change for performance gains.</param>
         /// <param name="entryDataObjectTypeReturnedFromZome">This is an optional param, where the caller can pass in the type of the dynamic data object they wish the entry data returned to be mapped to. This newly created data object will then be returned in the ZomeFunctionCallBackEventArgs.Entry.EntryDataObject property.</param>
         /// <returns></returns>
@@ -1715,7 +1989,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="function">The name of the zome function you wish to call.</param>
         /// <param name="callback">A delegate to call once the zome function returns. This delegate contains the same signature as the one used for the OnZomeFunctionCallBack event. (optional param).</param>
         /// <param name="paramsObject">A basic CLR object containing the params the zome function is expecting (optional param).</param>
-        /// <param name="matchIdToZomeFuncInCallback">This is an optional param, which defaults to true. Set this to true if you wish HoloNET to give the zome and zome function that made the call in the callback/event. If this is false then only the id will be given in the callback. This uses a small internal cache to match up the id to the given zome/function. Set this to false if you wish to save a tiny amount of memory by not utilizing this cache. If it is false then the `Zome` and `ZomeFunction` params will be missing in the ZomeCallBack, you will need to manually match the `id` to the call yourself. NOTE: If Config.EnforceRequestToResponseIdMatchingBehaviour is set to Warn or Error then this param will be ignored and the matching will always occur.</param>
+        /// <param name="matchIdToZomeFuncInCallback">This is an optional param, which defaults to true. Set this to true if you wish HoloNET to give the zome and zome function that made the call in the callback/event. If this is false then only the id will be given in the callback. This uses a small internal cache to match up the id to the given zome/function. Set this to false if you wish to save a tiny amount of memory by not utilizing this cache. If it is false then the `Zome` and `ZomeFunction` params will be missing in the ZomeCallBack, you will need to manually match the `id` to the call yourself. NOTE: If HoloNETDNA.EnforceRequestToResponseIdMatchingBehaviour is set to Warn or Error then this param will be ignored and the matching will always occur.</param>
         /// <param name="cachReturnData">This is an optional param, which defaults to false. Set this to true if you wish HoloNET to cache the response retrieved from holochain. Subsequent calls will return this cached data rather than calling the Holochain conductor again. Use this for static data that is not going to change for performance gains.</param>
         /// <returns></returns>
         public ZomeFunctionCallBackEventArgs CallZomeFunction(string id, string zome, string function, ZomeFunctionCallBack callback, object paramsObject, bool matchIdToZomeFuncInCallback = true, bool cachReturnData = false)
@@ -1733,12 +2007,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         //    return AdminAuthorizeSigningCredentialsAndGrantZomeCallCapability(GetCellId(), grantedFunctionsType, functions, id);
         //}
 
-        public async Task<AdminZomeCallCapabilityGrantedCallBackEventArgs> AdminAuthorizeSigningCredentialsAndGrantZomeCallCapabilityAsync(string AgentPubKey, string DnaHash, CapGrantAccessType capGrantAccessType, GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions= null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = "")
+        public async Task<AdminZomeCallCapabilityGrantedCallBackEventArgs> AdminAuthorizeSigningCredentialsAndGrantZomeCallCapabilityAsync(string AgentPubKey, string DnaHash, CapGrantAccessType capGrantAccessType, GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = "")
         {
             return await AdminAuthorizeSigningCredentialsAndGrantZomeCallCapabilityAsync(GetCellId(DnaHash, AgentPubKey), capGrantAccessType, grantedFunctionsType, functions, conductorResponseCallBackMode, id);
         }
 
-        public AdminZomeCallCapabilityGrantedCallBackEventArgs AdminAuthorizeSigningCredentialsAndGrantZomeCallCapability(string AgentPubKey, string DnaHash, CapGrantAccessType capGrantAccessType, GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null,  string id = "")
+        public AdminZomeCallCapabilityGrantedCallBackEventArgs AdminAuthorizeSigningCredentialsAndGrantZomeCallCapability(string AgentPubKey, string DnaHash, CapGrantAccessType capGrantAccessType, GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null, string id = "")
         {
             return AdminAuthorizeSigningCredentialsAndGrantZomeCallCapability(GetCellId(DnaHash, AgentPubKey), capGrantAccessType, grantedFunctionsType, functions, id);
         }
@@ -1821,13 +2095,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     {
                         request.cap_grant.access = new CapGrantAccessTransferable()
                         {
-                             Transferable = new CapGrantAccessTransferableDetails()
-                             {
-                                 secret = secret
-                             }
+                            Transferable = new CapGrantAccessTransferableDetails()
+                            {
+                                secret = secret
+                            }
                         };
                     }
-                    break;  
+                    break;
             }
 
             return request;
@@ -1842,9 +2116,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 return (new AdminZomeCallCapabilityGrantedCallBackEventArgs() { IsError = true, EndPoint = EndPoint, Id = id, Message = msg }, null, null);
             }
 
-            if (string.IsNullOrEmpty(Config.AgentPubKey))
+            if (string.IsNullOrEmpty(HoloNETDNA.AgentPubKey))
             {
-                string msg = "Error occured in AuthorizeSigningCredentialsAsync function. Config.AgentPubKey is null. Please set or call AdminGenerateAgentPubKey method.";
+                string msg = "Error occured in AuthorizeSigningCredentialsAsync function. HoloNETDNA.AgentPubKey is null. Please set or call AdminGenerateAgentPubKey method.";
                 HandleError(msg, null);
                 return (new AdminZomeCallCapabilityGrantedCallBackEventArgs() { IsError = true, EndPoint = EndPoint, Id = id, Message = msg }, null, null);
             }
@@ -1857,10 +2131,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
 
             Sodium.KeyPair pair = Sodium.PublicKeyAuth.GenerateKeyPair(RandomNumberGenerator.GetBytes(32));
-            byte[] DHTLocation = ConvertHoloHashToBytes(Config.AgentPubKey).TakeLast(4).ToArray();
+            byte[] DHTLocation = ConvertHoloHashToBytes(HoloNETDNA.AgentPubKey).TakeLast(4).ToArray();
             byte[] signingKey = new byte[] { 132, 32, 36 }.Concat(pair.PublicKey).Concat(DHTLocation).ToArray();
 
-            Dictionary<GrantedFunctionsType, List<(string, string)>>  grantedFunctions = new Dictionary<GrantedFunctionsType, List<(string, string)>>();
+            Dictionary<GrantedFunctionsType, List<(string, string)>> grantedFunctions = new Dictionary<GrantedFunctionsType, List<(string, string)>>();
 
             if (grantedFunctionsType == GrantedFunctionsType.All)
                 grantedFunctions[GrantedFunctionsType.All] = null;
@@ -1868,7 +2142,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 grantedFunctions[GrantedFunctionsType.Listed] = functions;
 
             //_signingCredentialsForCell[cellId] = new SigningCredentials()
-            //_signingCredentialsForCell[$"{Config.AgentPubKey}:{Config.DnaHash}"] = new SigningCredentials()
+            //_signingCredentialsForCell[$"{HoloNETDNA.AgentPubKey}:{HoloNETDNA.DnaHash}"] = new SigningCredentials()
             _signingCredentialsForCell[$"{ConvertHoloHashToString(cellId[1])}:{ConvertHoloHashToString(cellId[0])}"] = new SigningCredentials()
             {
                 CapSecret = RandomNumberGenerator.GetBytes(64),
@@ -1880,15 +2154,15 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         }
 
 
-        public async Task<AdminAgentPubKeyGeneratedCallBackEventArgs> AdminGenerateAgentPubKeyAsync(ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, bool updateAgentPubKeyInConfig = true, string id = "")
+        public async Task<AdminAgentPubKeyGeneratedCallBackEventArgs> AdminGenerateAgentPubKeyAsync(ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, bool updateAgentPubKeyInHoloNETDNA = true, string id = "")
         {
-            _updateDnaHashAndAgentPubKey = updateAgentPubKeyInConfig;
+            _updateDnaHashAndAgentPubKey = updateAgentPubKeyInHoloNETDNA;
             return await CallAdminFunctionAsync("generate_agent_pub_key", null, _taskCompletionAdminAgentPubKeyGeneratedCallBack, "OnAdminAgentPubKeyGeneratedCallBack", conductorResponseCallBackMode, id);
         }
 
-        public AdminAgentPubKeyGeneratedCallBackEventArgs AdminGenerateAgentPubKey(bool updateAgentPubKeyInConfig = true, string id = "")
+        public AdminAgentPubKeyGeneratedCallBackEventArgs AdminGenerateAgentPubKey(bool updateAgentPubKeyInHoloNETDNA = true, string id = "")
         {
-            return AdminGenerateAgentPubKeyAsync(ConductorResponseCallBackMode.UseCallBackEvents, updateAgentPubKeyInConfig, id).Result;
+            return AdminGenerateAgentPubKeyAsync(ConductorResponseCallBackMode.UseCallBackEvents, updateAgentPubKeyInHoloNETDNA, id).Result;
         }
 
         public async Task<AdminAppInstalledCallBackEventArgs> AdminInstallAppAsync(string installedAppId, string hAppPath, string agentKey = null, Dictionary<string, byte[]> membraneProofs = null, string network_seed = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
@@ -2095,7 +2369,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         }
 
         /// <summary>
-        /// Dump the full state of the specified cell, including its chain and DHT shard, as JSON. This will dump the state for the current AgentPubKey/DnaHash stored in Config.AgentPubKey & Config.DnaHash. If there it is not stored in the Config it will automatically generate one for you and retrieve from the conductor.
+        /// Dump the full state of the specified cell, including its chain and DHT shard, as JSON. This will dump the state for the current AgentPubKey/DnaHash stored in HoloNETDNA.AgentPubKey & HoloNETDNA.DnaHash. If there it is not stored in the HoloNETDNA it will automatically generate one for you and retrieve from the conductor.
         /// </summary>
         /// <param name="dHTOpsCursor">The last seen DhtOp RowId, returned in the full dump state. Only DhtOps with RowId greater than the cursor will be returned.</param>
         /// <param name="conductorResponseCallBackMode">The Concuctor Response CallBack Mode, set this to 'WaitForHolochainConductorResponse' if you want the function to wait for the Holochain Conductor response before returning that response or set it to 'UseCallBackEvents' to return from the function immediately and then raise the 'OnAdminDumpFullStateCallBack' event when the conductor responds.   </param>
@@ -2107,7 +2381,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         }
 
         /// <summary>
-        /// Dump the full state of the specified cell, including its chain and DHT shard, as JSON. This will dump the state for the current AgentPubKey/DnaHash stored in Config.AgentPubKey & Config.DnaHash.
+        /// Dump the full state of the specified cell, including its chain and DHT shard, as JSON. This will dump the state for the current AgentPubKey/DnaHash stored in HoloNETDNA.AgentPubKey & HoloNETDNA.DnaHash.
         /// </summary>
         /// <param name="dHTOpsCursor">The last seen DhtOp RowId, returned in the full dump state. Only DhtOps with RowId greater than the cursor will be returned.</param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
@@ -2173,7 +2447,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         }
 
         /// <summary>
-        /// Dump the state of the specified cell, including its source chain, as JSON. This will dump the state for the current AgentPubKey/DnaHash stored in Config.AgentPubKey & Config.DnaHash.
+        /// Dump the state of the specified cell, including its source chain, as JSON. This will dump the state for the current AgentPubKey/DnaHash stored in HoloNETDNA.AgentPubKey & HoloNETDNA.DnaHash.
         /// </summary>
         /// <param name="dHTOpsCursor"></param>
         /// <param name="conductorResponseCallBackMode">The Concuctor Response CallBack Mode, set this to 'WaitForHolochainConductorResponse' if you want the function to wait for the Holochain Conductor response before returning that response or set it to 'UseCallBackEvents' to return from the function immediately and then raise the 'OnAdminDumpFullStateCallBack' event when the conductor responds.   </param>
@@ -2185,7 +2459,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         }
 
         /// <summary>
-        /// Dump the state of the specified cell, including its source chain, as JSON. This will dump the state for the current AgentPubKey/DnaHash stored in Config.AgentPubKey & Config.DnaHash.
+        /// Dump the state of the specified cell, including its source chain, as JSON. This will dump the state for the current AgentPubKey/DnaHash stored in HoloNETDNA.AgentPubKey & HoloNETDNA.DnaHash.
         /// </summary>
         /// <param name="dHTOpsCursor"></param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
@@ -2253,7 +2527,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public async Task<AdminUpdateCoordinatorsCallBackEventArgs> AdminUpdateCoordinatorsAsync(byte[] dnaHash, string path, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
-           return await AdminUpdateCoordinatorsAsync(dnaHash, path, null, conductorResponseCallBackMode, id);
+            return await AdminUpdateCoordinatorsAsync(dnaHash, path, null, conductorResponseCallBackMode, id);
         }
 
         /// <summary>
@@ -2385,7 +2659,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         }
 
         /// <summary>
-        /// Request all available info about an agent. This will retreive info for the current AgentPubKey/DnaHash stored in Config.AgentPubKey & Config.DnaHash.
+        /// Request all available info about an agent. This will retreive info for the current AgentPubKey/DnaHash stored in HoloNETDNA.AgentPubKey & HoloNETDNA.DnaHash.
         /// </summary>
         /// <param name="conductorResponseCallBackMode">The Concuctor Response CallBack Mode, set this to 'WaitForHolochainConductorResponse' if you want the function to wait for the Holochain Conductor response before returning that response or set it to 'UseCallBackEvents' to return from the function immediately and then raise the 'OnAdminDumpFullStateCallBack' event when the conductor responds.   </param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
@@ -2396,7 +2670,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         }
 
         /// <summary>
-        /// Request all available info about an agent. This will retreive info for the current AgentPubKey/DnaHash stored in Config.AgentPubKey & Config.DnaHash.
+        /// Request all available info about an agent. This will retreive info for the current AgentPubKey/DnaHash stored in HoloNETDNA.AgentPubKey & HoloNETDNA.DnaHash.
         /// </summary>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
@@ -2547,7 +2821,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         }
 
         /// <summary>
-        /// Delete a clone cell that was previously disabled. This will use the current AgentPubKey/DnaHash stored in Config.AgentPubKey & Config.DnaHash.
+        /// Delete a clone cell that was previously disabled. This will use the current AgentPubKey/DnaHash stored in HoloNETDNA.AgentPubKey & HoloNETDNA.DnaHash.
         /// </summary>
         /// <param name="appId">The app id that the clone cell belongs to.</param>
         /// <param name="conductorResponseCallBackMode">The Concuctor Response CallBack Mode, set this to 'WaitForHolochainConductorResponse' if you want the function to wait for the Holochain Conductor response before returning that response or set it to 'UseCallBackEvents' to return from the function immediately and then raise the 'OnAdminDumpFullStateCallBack' event when the conductor responds.   </param>
@@ -2559,7 +2833,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         }
 
         /// <summary>
-        ///  Delete a clone cell that was previously disabled. This will use the current AgentPubKey/DnaHash stored in Config.AgentPubKey & Config.DnaHash.
+        ///  Delete a clone cell that was previously disabled. This will use the current AgentPubKey/DnaHash stored in HoloNETDNA.AgentPubKey & HoloNETDNA.DnaHash.
         /// </summary>
         /// <param name="appId">The app id that the clone cell belongs to.</param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
@@ -2643,7 +2917,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             {
                 return Convert.FromBase64String(hash.Replace('-', '+').Replace('_', '/').Substring(1, hash.Length - 1)); //also remove the u prefix.
             }
-            catch(Exception e) 
+            catch (Exception e)
             {
                 return null;
             }
@@ -2686,7 +2960,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         public async Task<byte[][]> GetCellIdAsync()
         {
-            if (string.IsNullOrEmpty(Config.AgentPubKey))
+            if (string.IsNullOrEmpty(HoloNETDNA.AgentPubKey))
             {
                 if (IsAdmin)
                     await AdminGenerateAgentPubKeyAsync();
@@ -2694,25 +2968,25 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     await RetrieveAgentPubKeyAndDnaHashAsync();
             }
 
-            if (string.IsNullOrEmpty(Config.AgentPubKey))
+            if (string.IsNullOrEmpty(HoloNETDNA.AgentPubKey))
             {
-                HandleError("Error occured in GetCellId. Config.AgentPubKey is null, please set before calling this method.", null);
+                HandleError("Error occured in GetCellId. HoloNETDNA.AgentPubKey is null, please set before calling this method.", null);
                 return null;
             }
 
-            if (string.IsNullOrEmpty(Config.DnaHash))
+            if (string.IsNullOrEmpty(HoloNETDNA.DnaHash))
             {
-                HandleError("Error occured in GetCellId. Config.DnaHash is null, please set before calling this method.", null);
+                HandleError("Error occured in GetCellId. HoloNETDNA.DnaHash is null, please set before calling this method.", null);
                 return null;
             }
 
-            return GetCellId(Config.DnaHash, Config.AgentPubKey);
+            return GetCellId(HoloNETDNA.DnaHash, HoloNETDNA.AgentPubKey);
         }
 
         public byte[][] GetCellId()
         {
             //TODO: Implement this in non async way...
-            //if (string.IsNullOrEmpty(Config.AgentPubKey))
+            //if (string.IsNullOrEmpty(HoloNETDNA.AgentPubKey))
             //{
             //    if (IsAdmin)
             //        await AdminGenerateAgentPubKeyAsync();
@@ -2720,19 +2994,19 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             //        await RetrieveAgentPubKeyAndDnaHashAsync();
             //}
 
-            if (string.IsNullOrEmpty(Config.AgentPubKey))
+            if (string.IsNullOrEmpty(HoloNETDNA.AgentPubKey))
             {
-                HandleError("Error occured in GetCellId. Config.AgentPubKey is null, please set before calling this method.", null);
+                HandleError("Error occured in GetCellId. HoloNETDNA.AgentPubKey is null, please set before calling this method.", null);
                 return null;
             }
 
-            if (string.IsNullOrEmpty(Config.DnaHash))
+            if (string.IsNullOrEmpty(HoloNETDNA.DnaHash))
             {
-                HandleError("Error occured in GetCellId. Config.DnaHash is null, please set before calling this method.", null);
+                HandleError("Error occured in GetCellId. HoloNETDNA.DnaHash is null, please set before calling this method.", null);
                 return null;
             }
 
-            return GetCellId(Config.DnaHash, Config.AgentPubKey);
+            return GetCellId(HoloNETDNA.DnaHash, HoloNETDNA.AgentPubKey);
         }
 
         /// <summary>
@@ -2905,9 +3179,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// This method will shutdown HoloNET by first calling the Disconnect method to disconnect from the Holochain Conductor and then calling the ShutDownHolochainConductors method to shutdown any running Holochain Conductors. This method will then raise the OnHoloNETShutdown event. This method works very similar to the Disconnect method except it also clears the loggers, does any other shutdown tasks necessary and then returns a `HoloNETShutdownEventArgs` object. You can specify if HoloNET should wait until it has finished disconnecting and shutting down the conductors before returning to the caller or whether it should return immediately and then use the OnDisconnected, OnHolochainConductorsShutdownComplete & OnHoloNETShutdownComplete events to notify the caller. 
         /// </summary>
         /// <param name="disconnectedCallBackMode">If this is set to `WaitForHolochainConductorToDisconnect` (default) then it will await until it has disconnected before returning to the caller, otherwise (it is set to `UseCallBackEvents`) it will return immediately and then raise the OnDisconnected once it is disconnected.</param>
-        /// <param name="shutdownHolochainConductorsMode">Once it has successfully disconnected it will automatically call the [ShutDownAllHolochainConductors](#ShutDownAllHolochainConductors) method if the `shutdownHolochainConductorsMode` flag (defaults to `UseConfigSettings`) is not set to `DoNotShutdownAnyConductors`. Other values it can be are 'ShutdownCurrentConductorOnly' or 'ShutdownAllConductors'. Please see the [ShutDownConductors](#ShutDownConductors) method below for more detail.</param>
+        /// <param name="shutdownHolochainConductorsMode">Once it has successfully disconnected it will automatically call the [ShutDownAllHolochainConductors](#ShutDownAllHolochainConductors) method if the `shutdownHolochainConductorsMode` flag (defaults to `UseHoloNETDNASettings`) is not set to `DoNotShutdownAnyConductors`. Other values it can be are 'ShutdownCurrentConductorOnly' or 'ShutdownAllConductors'. Please see the [ShutDownConductors](#ShutDownConductors) method below for more detail.</param>
         /// <returns></returns>
-        public async Task<HoloNETShutdownEventArgs> ShutdownHoloNETAsync(DisconnectedCallBackMode disconnectedCallBackMode = DisconnectedCallBackMode.WaitForHolochainConductorToDisconnect, ShutdownHolochainConductorsMode shutdownHolochainConductorsMode = ShutdownHolochainConductorsMode.UseConfigSettings)
+        public async Task<HoloNETShutdownEventArgs> ShutdownHoloNETAsync(DisconnectedCallBackMode disconnectedCallBackMode = DisconnectedCallBackMode.WaitForHolochainConductorToDisconnect, ShutdownHolochainConductorsMode shutdownHolochainConductorsMode = ShutdownHolochainConductorsMode.UseHoloNETDNASettings)
         {
             _shuttingDownHoloNET = true;
 
@@ -2917,44 +3191,44 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             if (disconnectedCallBackMode == DisconnectedCallBackMode.WaitForHolochainConductorToDisconnect)
                 return await _taskCompletionHoloNETShutdown.Task;
             else
-                return new HoloNETShutdownEventArgs(EndPoint, Config.DnaHash, Config.AgentPubKey, null);
+                return new HoloNETShutdownEventArgs(EndPoint, HoloNETDNA.DnaHash, HoloNETDNA.AgentPubKey, null);
         }
 
         /// <summary>
         /// This method will shutdown HoloNET by first calling the Disconnect method to disconnect from the Holochain Conductor and then calling the ShutDownHolochainConductors method to shutdown any running Holochain Conductors. This method will then raise the OnHoloNETShutdown event. This method works very similar to the Disconnect method except it also clears the loggers, does any other shutdown tasks necessary and then returns a `HoloNETShutdownEventArgs` object. You can specify if HoloNET should wait until it has finished disconnecting and shutting down the conductors before returning to the caller or whether it should return immediately and then use the OnDisconnected, OnHolochainConductorsShutdownComplete & OnHoloNETShutdownComplete events to notify the caller. 
         /// </summary>
-        /// <param name="shutdownHolochainConductorsMode">Once it has successfully disconnected it will automatically call the [ShutDownAllHolochainConductors](#ShutDownAllHolochainConductors) method if the `shutdownHolochainConductorsMode` flag (defaults to `UseConfigSettings`) is not set to `DoNotShutdownAnyConductors`. Other values it can be are 'ShutdownCurrentConductorOnly' or 'ShutdownAllConductors'. Please see the [ShutDownConductors](#ShutDownConductors) method below for more detail.</param>
+        /// <param name="shutdownHolochainConductorsMode">Once it has successfully disconnected it will automatically call the [ShutDownAllHolochainConductors](#ShutDownAllHolochainConductors) method if the `shutdownHolochainConductorsMode` flag (defaults to `UseHoloNETDNASettings`) is not set to `DoNotShutdownAnyConductors`. Other values it can be are 'ShutdownCurrentConductorOnly' or 'ShutdownAllConductors'. Please see the [ShutDownConductors](#ShutDownConductors) method below for more detail.</param>
         /// <returns></returns>
-        public HoloNETShutdownEventArgs ShutdownHoloNET(ShutdownHolochainConductorsMode shutdownHolochainConductorsMode = ShutdownHolochainConductorsMode.UseConfigSettings)
+        public HoloNETShutdownEventArgs ShutdownHoloNET(ShutdownHolochainConductorsMode shutdownHolochainConductorsMode = ShutdownHolochainConductorsMode.UseHoloNETDNASettings)
         {
             _shuttingDownHoloNET = true;
 
             if (WebSocket.State != WebSocketState.Closed || WebSocket.State != WebSocketState.CloseReceived || WebSocket.State != WebSocketState.CloseSent)
                 Disconnect(DisconnectedCallBackMode.UseCallBackEvents, shutdownHolochainConductorsMode);
 
-            return new HoloNETShutdownEventArgs(EndPoint, Config.DnaHash, Config.AgentPubKey, null);
+            return new HoloNETShutdownEventArgs(EndPoint, HoloNETDNA.DnaHash, HoloNETDNA.AgentPubKey, null);
         }
 
         /// <summary>
-        /// Will automatically shutdown the current Holochain Conductor (if the `shutdownHolochainConductorsMode` param is set to `ShutdownCurrentConductorOnly`) or all Holochain Conductors (if the `shutdownHolochainConductorsMode` param is set to `ShutdownAllConductors`). If the `shutdownHolochainConductorsMode` param is set to `UseConfigSettings` then it will use the `HoloNETClient.Config.AutoShutdownHolochainConductor` and `HoloNETClient.Config.ShutDownALLHolochainConductors` flags to determine which mode to use. The Disconnect method will automatically call this once it has finished disconnecting from the Holochain Conductor. The ShutdownHoloNET will also call this method.
+        /// Will automatically shutdown the current Holochain Conductor (if the `shutdownHolochainConductorsMode` param is set to `ShutdownCurrentConductorOnly`) or all Holochain Conductors (if the `shutdownHolochainConductorsMode` param is set to `ShutdownAllConductors`). If the `shutdownHolochainConductorsMode` param is set to `UseHoloNETDNASettings` then it will use the `HoloNETClient.HoloNETDNA.AutoShutdownHolochainConductor` and `HoloNETClient.HoloNETDNA.ShutDownALLHolochainConductors` flags to determine which mode to use. The Disconnect method will automatically call this once it has finished disconnecting from the Holochain Conductor. The ShutdownHoloNET will also call this method.
         /// </summary>
-        /// <param name="shutdownHolochainConductorsMode">If this flag is set to `ShutdownCurrentConductorOnly` it will shutdown the currently running Holochain Conductor only. If it is set to `ShutdownAllConductors` it will shutdown all running Holochain Conductors. If it is set to `UseConfigSettings` (default) then it will use the `HoloNETClient.Config.AutoShutdownHolochainConductor` and `HoloNETClient.Config.ShutDownALLHolochainConductors` flags to determine which mode to use.</param>
+        /// <param name="shutdownHolochainConductorsMode">If this flag is set to `ShutdownCurrentConductorOnly` it will shutdown the currently running Holochain Conductor only. If it is set to `ShutdownAllConductors` it will shutdown all running Holochain Conductors. If it is set to `UseHoloNETDNASettings` (default) then it will use the `HoloNETClient.HoloNETDNA.AutoShutdownHolochainConductor` and `HoloNETClient.HoloNETDNA.ShutDownALLHolochainConductors` flags to determine which mode to use.</param>
         /// <returns></returns>
-        public async Task<HolochainConductorsShutdownEventArgs> ShutDownHolochainConductorsAsync(ShutdownHolochainConductorsMode shutdownHolochainConductorsMode = ShutdownHolochainConductorsMode.UseConfigSettings)
+        public async Task<HolochainConductorsShutdownEventArgs> ShutDownHolochainConductorsAsync(ShutdownHolochainConductorsMode shutdownHolochainConductorsMode = ShutdownHolochainConductorsMode.UseHoloNETDNASettings)
         {
             HolochainConductorsShutdownEventArgs holochainConductorsShutdownEventArgs = new HolochainConductorsShutdownEventArgs();
-            holochainConductorsShutdownEventArgs.AgentPubKey = Config.AgentPubKey;
-            holochainConductorsShutdownEventArgs.DnaHash = Config.DnaHash;
+            holochainConductorsShutdownEventArgs.AgentPubKey = HoloNETDNA.AgentPubKey;
+            holochainConductorsShutdownEventArgs.DnaHash = HoloNETDNA.DnaHash;
             holochainConductorsShutdownEventArgs.EndPoint = EndPoint;
 
             try
             {
                 // Close any conductors down if necessary.
-                if ((Config.AutoShutdownHolochainConductor && _shutdownHolochainConductorsMode == ShutdownHolochainConductorsMode.UseConfigSettings)
+                if ((HoloNETDNA.AutoShutdownHolochainConductor && _shutdownHolochainConductorsMode == ShutdownHolochainConductorsMode.UseHoloNETDNASettings)
                     || shutdownHolochainConductorsMode == ShutdownHolochainConductorsMode.ShutdownCurrentConductorOnly
                     || shutdownHolochainConductorsMode == ShutdownHolochainConductorsMode.ShutdownAllConductors)
                 {
-                    if ((Config.ShutDownALLHolochainConductors && _shutdownHolochainConductorsMode == ShutdownHolochainConductorsMode.UseConfigSettings)
+                    if ((HoloNETDNA.ShutDownALLHolochainConductors && _shutdownHolochainConductorsMode == ShutdownHolochainConductorsMode.UseHoloNETDNASettings)
                     || shutdownHolochainConductorsMode == ShutdownHolochainConductorsMode.ShutdownAllConductors)
                         holochainConductorsShutdownEventArgs = await ShutDownAllHolochainConductorsAsync();
 
@@ -2962,7 +3236,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     {
                         Logger.Log("Shutting Down Holochain Conductor...", LogType.Info, true);
 
-                        if (Config.ShowHolochainConductorWindow)
+                        if (HoloNETDNA.ShowHolochainConductorWindow)
                             _conductorProcess.CloseMainWindow();
 
                         _conductorProcess.Kill();
@@ -2987,7 +3261,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 {
                     Logger.Loggers.Clear();
 
-                    HoloNETShutdownEventArgs holoNETShutdownEventArgs = new HoloNETShutdownEventArgs(this.EndPoint, Config.DnaHash, Config.AgentPubKey, holochainConductorsShutdownEventArgs);
+                    HoloNETShutdownEventArgs holoNETShutdownEventArgs = new HoloNETShutdownEventArgs(this.EndPoint, HoloNETDNA.DnaHash, HoloNETDNA.AgentPubKey, holochainConductorsShutdownEventArgs);
                     OnHoloNETShutdownComplete?.Invoke(this, holoNETShutdownEventArgs);
                     _taskCompletionHoloNETShutdown.SetResult(holoNETShutdownEventArgs);
                 }
@@ -3001,11 +3275,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         }
 
         /// <summary>
-        /// Will automatically shutdown the current Holochain Conductor (if the `shutdownHolochainConductorsMode` param is set to `ShutdownCurrentConductorOnly`) or all Holochain Conductors (if the `shutdownHolochainConductorsMode` param is set to `ShutdownAllConductors`). If the `shutdownHolochainConductorsMode` param is set to `UseConfigSettings` then it will use the `HoloNETClient.Config.AutoShutdownHolochainConductor` and `HoloNETClient.Config.ShutDownALLHolochainConductors` flags to determine which mode to use. The Disconnect method will automatically call this once it has finished disconnecting from the Holochain Conductor. The ShutdownHoloNET will also call this method.
+        /// Will automatically shutdown the current Holochain Conductor (if the `shutdownHolochainConductorsMode` param is set to `ShutdownCurrentConductorOnly`) or all Holochain Conductors (if the `shutdownHolochainConductorsMode` param is set to `ShutdownAllConductors`). If the `shutdownHolochainConductorsMode` param is set to `UseHoloNETDNASettings` then it will use the `HoloNETClient.HoloNETDNA.AutoShutdownHolochainConductor` and `HoloNETClient.HoloNETDNA.ShutDownALLHolochainConductors` flags to determine which mode to use. The Disconnect method will automatically call this once it has finished disconnecting from the Holochain Conductor. The ShutdownHoloNET will also call this method.
         /// </summary>
-        /// <param name="shutdownHolochainConductorsMode">If this flag is set to `ShutdownCurrentConductorOnly` it will shutdown the currently running Holochain Conductor only. If it is set to `ShutdownAllConductors` it will shutdown all running Holochain Conductors. If it is set to `UseConfigSettings` (default) then it will use the `HoloNETClient.Config.AutoShutdownHolochainConductor` and `HoloNETClient.Config.ShutDownALLHolochainConductors` flags to determine which mode to use.</param>
+        /// <param name="shutdownHolochainConductorsMode">If this flag is set to `ShutdownCurrentConductorOnly` it will shutdown the currently running Holochain Conductor only. If it is set to `ShutdownAllConductors` it will shutdown all running Holochain Conductors. If it is set to `UseHoloNETDNASettings` (default) then it will use the `HoloNETClient.HoloNETDNA.AutoShutdownHolochainConductor` and `HoloNETClient.HoloNETDNA.ShutDownALLHolochainConductors` flags to determine which mode to use.</param>
         /// <returns></returns>
-        public HolochainConductorsShutdownEventArgs ShutDownHolochainConductors(ShutdownHolochainConductorsMode shutdownHolochainConductorsMode = ShutdownHolochainConductorsMode.UseConfigSettings)
+        public HolochainConductorsShutdownEventArgs ShutDownHolochainConductors(ShutdownHolochainConductorsMode shutdownHolochainConductorsMode = ShutdownHolochainConductorsMode.UseHoloNETDNASettings)
         {
             return ShutDownHolochainConductorsAsync(shutdownHolochainConductorsMode).Result;
         }
@@ -3058,10 +3332,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         {
             if (string.IsNullOrEmpty(agentKey))
             {
-                if (string.IsNullOrEmpty(Config.AgentPubKey))
+                if (string.IsNullOrEmpty(HoloNETDNA.AgentPubKey))
                     await AdminGenerateAgentPubKeyAsync();
 
-                agentKey = Config.AgentPubKey;
+                agentKey = HoloNETDNA.AgentPubKey;
             }
 
             if (membraneProofs == null)
@@ -3076,7 +3350,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 membrane_proofs = membraneProofs,
                 network_seed = network_seed
             }, _taskCompletionAdminAppInstalledCallBack, "OnAdminAppInstalledCallBack", conductorResponseCallBackMode, id);
-         }
+        }
 
         Dictionary<string, string> _installingAppId = new Dictionary<string, string>();
 
@@ -3084,7 +3358,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         {
             if (string.IsNullOrEmpty(agentKey))
             {
-                if (string.IsNullOrEmpty(Config.AgentPubKey))
+                if (string.IsNullOrEmpty(HoloNETDNA.AgentPubKey))
                 {
                     //TODO: Later we may want to add the same functionality in the async version to automatically retreive the agentPubKey but for non async version would require a little more work to store the values passed in in a dictionary keyed by id (id would need to be generated first).
 
@@ -3101,7 +3375,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     //    AdminGenerateAgentPubKey();
                 }
 
-                agentKey = Config.AgentPubKey;
+                agentKey = HoloNETDNA.AgentPubKey;
             }
 
             if (!string.IsNullOrEmpty(agentKey))
@@ -3155,8 +3429,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         private async Task<HolochainConductorsShutdownEventArgs> ShutDownAllHolochainConductorsAsync()
         {
             HolochainConductorsShutdownEventArgs result = new HolochainConductorsShutdownEventArgs();
-            result.AgentPubKey = Config.AgentPubKey;
-            result.DnaHash = Config.DnaHash;
+            result.AgentPubKey = HoloNETDNA.AgentPubKey;
+            result.DnaHash = HoloNETDNA.DnaHash;
             result.EndPoint = EndPoint;
 
             try
@@ -3165,7 +3439,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                 foreach (Process process in Process.GetProcessesByName("hc"))
                 {
-                    if (Config.ShowHolochainConductorWindow)
+                    if (HoloNETDNA.ShowHolochainConductorWindow)
                         process.CloseMainWindow();
 
                     process.Kill();
@@ -3176,12 +3450,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     result.NumberOfHcExeInstancesShutdown++;
                 }
 
-                //conductorInfo = new FileInfo(Config.FullPathToExternalHolochainConductorBinary);
+                //conductorInfo = new FileInfo(HoloNETDNA.FullPathToExternalHolochainConductorBinary);
                 //parts = conductorInfo.Name.Split('.');
 
                 foreach (Process process in Process.GetProcessesByName("holochain"))
                 {
-                    if (Config.ShowHolochainConductorWindow)
+                    if (HoloNETDNA.ShowHolochainConductorWindow)
                         process.CloseMainWindow();
 
                     process.Kill();
@@ -3194,7 +3468,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                 foreach (Process process in Process.GetProcessesByName("rustc"))
                 {
-                    if (Config.ShowHolochainConductorWindow)
+                    if (HoloNETDNA.ShowHolochainConductorWindow)
                         process.CloseMainWindow();
 
                     process.Kill();
@@ -3222,7 +3496,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 AppDomain currentDomain = AppDomain.CurrentDomain;
                 currentDomain.UnhandledException += CurrentDomain_UnhandledException;
 
-                WebSocket = new WebSocket.WebSocket(holochainConductorURI, Logger.Loggers);
+                //HoloNETDNAManager.LoadDNA();
+                //WebSocket = new WebSocket.WebSocket(holochainConductorURI, Logger.Loggers);
+                WebSocket = new WebSocket.WebSocket(Logger.Loggers);
+                EndPoint = holochainConductorURI;
 
                 //TODO: Impplemnt IDispoasable to unsubscribe event handlers to prevent memory leaks... 
                 WebSocket.OnConnected += WebSocket_OnConnected;
@@ -3239,8 +3516,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         private void WebSocket_OnDataSent(object sender, DataSentEventArgs e)
         {
-             Logger.Log(string.Concat("EVENT RAISED: DataSent: Raw Binary Data: ", e.RawBinaryDataDecoded, "(", e.RawBinaryDataAsString, ")"), LogType.Info);
-             OnDataSent?.Invoke(this, new HoloNETDataSentEventArgs { IsCallSuccessful = e.IsCallSuccessful, EndPoint = e.EndPoint, RawBinaryData = e.RawBinaryData, RawBinaryDataAsString = e.RawBinaryDataAsString, RawBinaryDataDecoded = e.RawBinaryDataDecoded });
+            Logger.Log(string.Concat("EVENT RAISED: DataSent: Raw Binary Data: ", e.RawBinaryDataDecoded, "(", e.RawBinaryDataAsString, ")"), LogType.Info);
+            OnDataSent?.Invoke(this, new HoloNETDataSentEventArgs { IsCallSuccessful = e.IsCallSuccessful, EndPoint = e.EndPoint, RawBinaryData = e.RawBinaryData, RawBinaryDataAsString = e.RawBinaryDataAsString, RawBinaryDataDecoded = e.RawBinaryDataDecoded });
         }
 
         private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
@@ -3255,7 +3532,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 OnConnected?.Invoke(this, new ConnectedEventArgs { EndPoint = e.EndPoint });
 
                 //If the AgentPubKey & DnaHash have already been retrieved from the hc sandbox command then raise the OnReadyForZomeCalls event.
-                if (WebSocket.State == WebSocketState.Open && !string.IsNullOrEmpty(Config.AgentPubKey) && !string.IsNullOrEmpty(Config.DnaHash))
+                if (WebSocket.State == WebSocketState.Open && !string.IsNullOrEmpty(HoloNETDNA.AgentPubKey) && !string.IsNullOrEmpty(HoloNETDNA.DnaHash))
                     SetReadyForZomeCalls();
 
                 //Otherwise, if the retrieveAgentPubKeyAndDnaHashFromConductor param was set to true when calling the Connect method, retrieve them now...
@@ -3291,7 +3568,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                         requests = string.Concat(requests, ", id: ", id, "| zome: ", _zomeLookup[id], "| function: ", _funcLookup[id]);
 
                     e.Reason = $"Error Occured. The WebSocket closed with the following requests still in progress: {requests}. Reason: {e.Reason}";
-                    
+
                     _pendingRequests.Clear();
                     HandleError(e.Reason, null);
                 }
@@ -3541,15 +3818,15 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                 holoNETDataReceivedEventArgs = CreateHoloNETArgs<HoloNETDataReceivedEventArgs>(response, dataReceivedEventArgs);
 
-                if (Config.EnforceRequestToResponseIdMatchingBehaviour != EnforceRequestToResponseIdMatchingBehaviour.Ignore
+                if (HoloNETDNA.EnforceRequestToResponseIdMatchingBehaviour != EnforceRequestToResponseIdMatchingBehaviour.Ignore
                     && !_pendingRequests.Contains(id))
                 {
-                    holoNETDataReceivedEventArgs.IsError = Config.EnforceRequestToResponseIdMatchingBehaviour == EnforceRequestToResponseIdMatchingBehaviour.Error;
+                    holoNETDataReceivedEventArgs.IsError = HoloNETDNA.EnforceRequestToResponseIdMatchingBehaviour == EnforceRequestToResponseIdMatchingBehaviour.Error;
                     holoNETDataReceivedEventArgs.IsCallSuccessful = false;
                     holoNETDataReceivedEventArgs.Message = $"The id returned in the response ({id}) does not match any pending request.";
 
                     if (holoNETDataReceivedEventArgs.IsError)
-                        holoNETDataReceivedEventArgs.Message = string.Concat(holoNETDataReceivedEventArgs.Message, " Config.EnforceRequestToResponseIdMatchingBehaviour is set to Error so Aborting Request.");
+                        holoNETDataReceivedEventArgs.Message = string.Concat(holoNETDataReceivedEventArgs.Message, " HoloNETDNA.EnforceRequestToResponseIdMatchingBehaviour is set to Error so Aborting Request.");
                 }
 
                 _pendingRequests.Remove(id);
@@ -3582,7 +3859,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 Logger.Log($"AGENT PUB KEY GENERATED: {args.AgentPubKey}\n", LogType.Info);
 
                 if (_updateDnaHashAndAgentPubKey)
-                    Config.AgentPubKey = args.AgentPubKey;
+                    HoloNETDNA.AgentPubKey = args.AgentPubKey;
             }
             catch (Exception ex)
             {
@@ -3749,7 +4026,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 if (appResponse != null)
                 {
                     args.Port = Convert.ToUInt16(appResponse.data["port"]);
-                    
+
                     //AttachAppInterfaceResponse attachAppInterfaceResponse = MessagePackSerializer.Deserialize<AttachAppInterfaceResponse>(appResponse.data, messagePackSerializerOptions);
                     //attachAppInterfaceResponse.Port = attachAppInterfaceResponse.Port;
                 }
@@ -3881,7 +4158,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             //If either the AgentPubKey or DnaHash is empty then attempt to get from the sandbox cmd.
             if (!args.IsError)
             {
-                if (!string.IsNullOrEmpty(Config.AgentPubKey) && !string.IsNullOrEmpty(Config.DnaHash))
+                if (!string.IsNullOrEmpty(HoloNETDNA.AgentPubKey) && !string.IsNullOrEmpty(HoloNETDNA.DnaHash))
                     SetReadyForZomeCalls();
 
                 else if (_automaticallyAttemptToGetFromSandboxIfConductorFails)
@@ -4051,17 +4328,17 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 if (_updateDnaHashAndAgentPubKey)
                 {
                     if (!string.IsNullOrEmpty(agentPubKey))
-                        Config.AgentPubKey = agentPubKey;
+                        HoloNETDNA.AgentPubKey = agentPubKey;
 
                     if (!string.IsNullOrEmpty(dnaHash))
-                        Config.DnaHash = dnaHash;
+                        HoloNETDNA.DnaHash = dnaHash;
 
-                    if (args.CellId != null) 
-                        Config.CellId = args.CellId;
+                    if (args.CellId != null)
+                        HoloNETDNA.CellId = args.CellId;
                 }
 
-                Logger.Log($"AGENT PUB KEY RETURNED FROM CONDUCTOR: {Config.AgentPubKey}", LogType.Info);
-                Logger.Log($"DNA HASH RETURNED FROM CONDUCTOR:: {Config.DnaHash}", LogType.Info);
+                Logger.Log($"AGENT PUB KEY RETURNED FROM CONDUCTOR: {HoloNETDNA.AgentPubKey}", LogType.Info);
+                Logger.Log($"DNA HASH RETURNED FROM CONDUCTOR:: {HoloNETDNA.DnaHash}", LogType.Info);
 
                 args.AgentPubKey = agentPubKey;
                 args.DnaHash = dnaHash;
@@ -4305,7 +4582,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         {
             LogEvent("AdminAgentPubKeyGeneratedCallBack", adminAgentPubKeyGeneratedCallBackEventArgs);
             OnAdminAgentPubKeyGeneratedCallBack?.Invoke(this, adminAgentPubKeyGeneratedCallBackEventArgs);
-            
+
             if (_taskCompletionAdminAgentPubKeyGeneratedCallBack != null && !string.IsNullOrEmpty(adminAgentPubKeyGeneratedCallBackEventArgs.Id) && _taskCompletionAdminAgentPubKeyGeneratedCallBack.ContainsKey(adminAgentPubKeyGeneratedCallBackEventArgs.Id))
                 _taskCompletionAdminAgentPubKeyGeneratedCallBack[adminAgentPubKeyGeneratedCallBackEventArgs.Id].SetResult(adminAgentPubKeyGeneratedCallBackEventArgs);
         }
@@ -4384,10 +4661,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         private void SetReadyForZomeCalls()
         {
             RetrievingAgentPubKeyAndDnaHash = false;
-            _taskCompletionAgentPubKeyAndDnaHashRetrieved.SetResult(new AgentPubKeyDnaHash() { AgentPubKey = Config.AgentPubKey, DnaHash = Config.DnaHash });
+            _taskCompletionAgentPubKeyAndDnaHashRetrieved.SetResult(new AgentPubKeyDnaHash() { AgentPubKey = HoloNETDNA.AgentPubKey, DnaHash = HoloNETDNA.DnaHash });
 
             IsReadyForZomesCalls = true;
-            ReadyForZomeCallsEventArgs eventArgs = new ReadyForZomeCallsEventArgs(EndPoint, Config.DnaHash, Config.AgentPubKey);
+            ReadyForZomeCallsEventArgs eventArgs = new ReadyForZomeCallsEventArgs(EndPoint, HoloNETDNA.DnaHash, HoloNETDNA.AgentPubKey);
             OnReadyForZomeCalls?.Invoke(this, eventArgs);
             _taskCompletionReadyForZomeCalls.SetResult(eventArgs);
         }
@@ -4404,7 +4681,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             OnError?.Invoke(this, new HoloNETErrorEventArgs { EndPoint = WebSocket.EndPoint, Reason = message, ErrorDetails = exception });
 
-            switch (Config.ErrorHandlingBehaviour)
+            switch (HoloNETDNA.ErrorHandlingBehaviour)
             {
                 case ErrorHandlingBehaviour.AlwaysThrowExceptionOnError:
                     throw new HoloNETException(message, exception, WebSocket.EndPoint);

@@ -60,7 +60,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
             Console.WriteLine("");
             bool isAdmin = false;
 
-            HoloNETConfig config = new HoloNETConfig()
+            HoloNETDNA config = new HoloNETDNA()
             {
                 LoggingMode = LoggingMode.WarningsErrorsInfoAndDebug,
 
@@ -133,7 +133,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                 }
 
                 //We would normally just set the Config property but in this case we need to share the Config object with multiple HoloNET instances (such as in the SaveLoadOASISEntryUsingSingleHoloNETBaseClass test) 
-                _holoNETClient.Config = config;
+                _holoNETClient.HoloNETDNA = config;
 
                 _holoNETClient.OnConnected += HoloNETClient_OnConnected;
                 _holoNETClient.OnDataReceived += HoloNETClient_OnDataReceived;
@@ -210,8 +210,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                         //Note that all the CRUD methods LoadAsync, SaveAsync & DeleteAsync will automatically await internally until HoloNET is ready. 
                         //So you only need to use the WaitTillHoloNETInitializedAsync method if you have not used the InitializeAsync method above and if you wish to access the HoloNETClient.Config.AgentPubKey or HoloNETClient.Config.DnaHash properties BEFORE calling any of the CRUD methods.
                         await avatar.WaitTillHoloNETInitializedAsync();
-                        CLIEngine.ShowMessage($"AgentPubKey:{avatar.HoloNETClient.Config.AgentPubKey}");
-                        CLIEngine.ShowMessage($"DnaHash:{avatar.HoloNETClient.Config.DnaHash}");
+                        CLIEngine.ShowMessage($"AgentPubKey:{avatar.HoloNETClient.HoloNETDNA.AgentPubKey}");
+                        CLIEngine.ShowMessage($"DnaHash:{avatar.HoloNETClient.HoloNETDNA.DnaHash}");
 
 
                         CLIEngine.ShowWorkingMessage("Saving Avatar...");
@@ -882,7 +882,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                             email = "davidellams@hotmail.com", 
                             dob = "11/07/1980",
                             created_date = DateTime.Now.ToString(),
-                            created_by = _holoNETClient.Config.AgentPubKey,
+                            created_by = _holoNETClient.HoloNETDNA.AgentPubKey,
                             modified_date = "",
                             modified_by = "",
                             deleted_date = "",
@@ -925,7 +925,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                                 email = "davidellams@hotmail.com",
                                 dob = "11/07/1980",
                                 created_date = DateTime.Now.ToString(),
-                                created_by = _holoNETClient.Config.AgentPubKey,
+                                created_by = _holoNETClient.HoloNETDNA.AgentPubKey,
                                 modified_date = "",
                                 modified_by = "",
                                 deleted_date = "",
@@ -1144,7 +1144,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                 case TestToRun.AdminAuthorizeSigningCredentials:
                     {
                         Console.WriteLine("Calling AdminAuthorizeSigningCredentialsAsync function on Admin API...\n");
-                        await _holoNETClient.AdminAuthorizeSigningCredentialsAndGrantZomeCallCapabilityAsync(_holoNETClient.Config.CellId, CapGrantAccessType.Assigned, GrantedFunctionsType.Listed, new List<(string, string)>()
+                        await _holoNETClient.AdminAuthorizeSigningCredentialsAndGrantZomeCallCapabilityAsync(_holoNETClient.HoloNETDNA.CellId, CapGrantAccessType.Assigned, GrantedFunctionsType.Listed, new List<(string, string)>()
                         {
                             ("zome1", "function1"),
                             ("zome2", "function2")
