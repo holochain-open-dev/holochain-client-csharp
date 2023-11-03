@@ -16,6 +16,7 @@ using NextGenSoftware.Utilities.ExtentionMethods;
 using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.AppManifest;
 using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests;
 using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects;
+using NextGenSoftware.Holochain.HoloNET.Client.Properties;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
@@ -31,6 +32,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         private bool _automaticallyAttemptToGetFromSandboxIfConductorFails;
         private bool _updateDnaHashAndAgentPubKey = true;
         private List<string> _pendingRequests = new List<string>();
+        private Dictionary<string, string> _disablingAppLookup = new Dictionary<string, string>();
+        private Dictionary<string, string> _uninstallingAppLookup = new Dictionary<string, string>();
         private Dictionary<string, string> _zomeLookup = new Dictionary<string, string>();
         private Dictionary<string, string> _funcLookup = new Dictionary<string, string>();
         private Dictionary<string, Type> _entryDataObjectTypeLookup = new Dictionary<string, Type>();
@@ -68,9 +71,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         private int _currentId = 0;
         private HoloNETDNA _holoNETDNA = null;
         private Process _conductorProcess = null;
+        private int _conductorProcessSessionId = 0;
         private ShutdownHolochainConductorsMode _shutdownHolochainConductorsMode = ShutdownHolochainConductorsMode.UseHoloNETDNASettings;
         private MessagePackSerializerOptions messagePackSerializerOptions = MessagePackSerializerOptions.Standard.WithSecurity(MessagePackSecurity.UntrustedData);
         private HoloNETDNAManager _holoNETDNAManager = new HoloNETDNAManager();
+
+        //[DllImport("Shlwapi.dll", SetLastError = true, CharSet = CharSet.Auto)]
+        //static extern uint AssocQueryString(AssocF flags, AssocStr str, string pszAssoc, string pszExtra, [Out] StringBuilder pszOut, ref uint pcchOut);
 
         //Events
         public delegate void Connected(object sender, ConnectedEventArgs e);
@@ -851,11 +858,14 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public async Task StartHolochainConductorAsync()
         {
+            string fullPathToHcExe = "hc.exe";
+            string fullPathToHolochainExe = "holochain.exe";
+
             try
             {
                 // Was used when they were set to Content rather than Embedded.
-                //string fullPathToEmbeddedHolochainConductorBinary = string.Concat(Directory.GetCurrentDirectory(), "\\HolochainBinaries\\holochain.exe");
-                //string fullPathToEmbeddedHCToolBinary = string.Concat(Directory.GetCurrentDirectory(), "\\HolochainBinaries\\hc.exe");
+                string fullPathToEmbeddedHolochainConductorBinary = string.Concat(Directory.GetCurrentDirectory(), "\\HolochainBinaries\\holochain.exe");
+                string fullPathToEmbeddedHCToolBinary = string.Concat(Directory.GetCurrentDirectory(), "\\HolochainBinaries\\hc.exe");
 
                 OnHolochainConductorStarting?.Invoke(this, new HolochainConductorStartingEventArgs());
                 _conductorProcess = new Process();
@@ -878,20 +888,19 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 //if (!File.Exists(fullPathToEmbeddedHCToolBinary) && HoloNETDNA.HolochainConductorMode == HolochainConductorModeEnum.UseEmbedded && HoloNETDNA.HolochainConductorToUse == HolochainConductorEnum.HcDevTool)
                 //    throw new FileNotFoundException($"When HolochainConductorMode is set to 'UseEmbedded' and HolochainConductorToUse is set to 'HcDevTool', you must ensure the hc.exe is found here: {fullPathToEmbeddedHCToolBinary}.");
 
-                //if (!Directory.Exists(HoloNETDNA.FullPathToRootHappFolder))
-                //    throw new DirectoryNotFoundException($"The path for HoloNETDNA.FullPathToRootHappFolder ({HoloNETDNA.FullPathToRootHappFolder}) was not found.");
+                if (!Directory.Exists(HoloNETDNA.FullPathToRootHappFolder))
+                    throw new DirectoryNotFoundException($"The path for HoloNETDNA.FullPathToRootHappFolder ({HoloNETDNA.FullPathToRootHappFolder}) was not found.");
 
-                //if (!Directory.Exists(HoloNETDNA.FullPathToCompiledHappFolder))
-                //    throw new DirectoryNotFoundException($"The path for HoloNETDNA.FullPathToCompiledHappFolder ({HoloNETDNA.FullPathToCompiledHappFolder}) was not found.");
+                if (!Directory.Exists(HoloNETDNA.FullPathToCompiledHappFolder) && HoloNETDNA.HolochainConductorToUse == HolochainConductorEnum.HcDevTool)
+                    throw new DirectoryNotFoundException($"The path for HoloNETDNA.FullPathToCompiledHappFolder ({HoloNETDNA.FullPathToCompiledHappFolder}) was not found.");
 
 
-                /*
                 if (HoloNETDNA.HolochainConductorToUse == HolochainConductorEnum.HcDevTool)
                 {
                     switch (HoloNETDNA.HolochainConductorMode)
                     {
                         case HolochainConductorModeEnum.UseExternal:
-                            _conductorProcess.StartInfo.FileName = HoloNETDNA.FullPathToExternalHCToolBinary;
+                            fullPathToHcExe = HoloNETDNA.FullPathToExternalHCToolBinary;
                             break;
 
                         case HolochainConductorModeEnum.UseEmbedded:
@@ -900,23 +909,21 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                                 //_conductorProcess.StartInfo.FileName = fullPathToEmbeddedHCToolBinary;
 
-                                string hcPath = Path.Combine(Directory.GetCurrentDirectory(), "hc.exe");
+                                fullPathToHcExe = Path.Combine(Directory.GetCurrentDirectory(), "hc.exe");
 
-                                if (!File.Exists(hcPath))
+                                if (!File.Exists(fullPathToHcExe))
                                 {
-                                    using (FileStream fsDst = new FileStream(hcPath, FileMode.CreateNew, FileAccess.Write))
+                                    using (FileStream fsDst = new FileStream(fullPathToHcExe, FileMode.CreateNew, FileAccess.Write))
                                     {
                                         byte[] bytes = Resources.hc;
                                         fsDst.Write(bytes, 0, bytes.Length);
                                     }
                                 }
-
-                                _conductorProcess.StartInfo.FileName = hcPath;
                             }
                             break;
 
                         case HolochainConductorModeEnum.UseSystemGlobal:
-                            _conductorProcess.StartInfo.FileName = "hc.exe";
+                            fullPathToHcExe = "hc.exe";
                             break;
                     }
                 }
@@ -934,43 +941,35 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                                 //_conductorProcess.StartInfo.FileName = fullPathToEmbeddedHolochainConductorBinary;
 
-                                string holochainPath = Path.Combine(Directory.GetCurrentDirectory(), "holochain.exe");
+                                fullPathToHolochainExe = Path.Combine(Directory.GetCurrentDirectory(), "holochain.exe");
 
-                                if (!File.Exists(holochainPath))
+                                if (!File.Exists(fullPathToHolochainExe))
                                 {
-                                    using (FileStream fsDst = new FileStream(holochainPath, FileMode.CreateNew, FileAccess.Write))
+                                    using (FileStream fsDst = new FileStream(fullPathToHolochainExe, FileMode.CreateNew, FileAccess.Write))
                                     {
                                         byte[] bytes = Resources.holochain;
                                         fsDst.Write(bytes, 0, bytes.Length);
                                     }
                                 }
-
-                                _conductorProcess.StartInfo.FileName = holochainPath;
                             }
                             break;
 
                         case HolochainConductorModeEnum.UseSystemGlobal:
-                            _conductorProcess.StartInfo.FileName = "holochain.exe";
+                            fullPathToHolochainExe = "holochain.exe";
                             break;
                     }
-                }*/
-
+                }
 
                 //Make sure the condctor is not already running
                 if (!HoloNETDNA.OnlyAllowOneHolochainConductorToRunAtATime || (HoloNETDNA.OnlyAllowOneHolochainConductorToRunAtATime && !Process.GetProcesses().Any(x => x.ProcessName == _conductorProcess.StartInfo.FileName)))
                 {
                     Logger.Log("Starting Holochain Conductor...", LogType.Info, true);
-                    _conductorProcess.StartInfo.WorkingDirectory = HoloNETDNA.FullPathToRootHappFolder;
 
                     if (HoloNETDNA.HolochainConductorToUse == HolochainConductorEnum.HcDevTool)
                     {
-                        //_conductorProcess.StartInfo.Arguments = "sandbox run 0";
-                        //_conductorProcess.StartInfo.Arguments = $"sandbox generate {HoloNETDNA.FullPathToCompiledHappFolder}";
-                        _conductorProcess.StartInfo.Arguments = $"sandbox generate {HoloNETDNA.FullPathToCompiledHappFolder}";
+                        _conductorProcess.StartInfo.WorkingDirectory = HoloNETDNA.FullPathToRootHappFolder;
+                        _conductorProcess.StartInfo.Arguments = $"-NoExit -Command \"'' | {fullPathToHcExe} s  generate {HoloNETDNA.FullPathToCompiledHappFolder} --piped -f={EndPoint.Port}\"";
                     }
-
-                    _conductorProcess.StartInfo.UseShellExecute = true;
-                    _conductorProcess.StartInfo.RedirectStandardOutput = false;
 
                     if (HoloNETDNA.ShowHolochainConductorWindow)
                     {
@@ -983,21 +982,34 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                         _conductorProcess.StartInfo.CreateNoWindow = true;
                     }
 
-                    //_conductorProcess.Start();
+
+                    _conductorProcess.StartInfo.FileName = "PowerShell.exe";
+                    _conductorProcess.StartInfo.UseShellExecute = true;
+                    _conductorProcess.StartInfo.RedirectStandardOutput = false;
+                    // _conductorProcess.Start();
 
                     if (HoloNETDNA.HolochainConductorToUse == HolochainConductorEnum.HcDevTool)
                     {
                         //await Task.Delay(3000);
-                        //_conductorProcess.Close();
+                        // _conductorProcess.Close();
 
-                        _conductorProcess.StartInfo.FileName = "PowerShell.exe";
-                        _conductorProcess.StartInfo.Arguments = $"-NoExit -Command \"'' | hc s --piped -f={EndPoint.Port} run 0\"";
-                        //_conductorProcess.StartInfo.Arguments = "sandbox run 0";
-
-                        _conductorProcess.Start();
+                        _conductorProcess.StartInfo.Arguments = $"-NoExit -Command \"'' | {fullPathToHcExe} s --piped -f={EndPoint.Port} run 0\"";
+                        //TrueProcessStart("PowerShell.exe -NoExit -Command \"'' | {fullPathToHcExe} s --piped -f={EndPoint.Port} run 0\"");
+                    }
+                    else
+                    {
+                        _conductorProcess.StartInfo.Arguments = $"-NoExit -Command \"'' | {fullPathToHolochainExe} --piped\"";
+                        //TrueProcessStart("PowerShell.exe -NoExit -Command \"'' | {fullPathToHolochainExe} --piped\"");
                     }
 
-                    await Task.Delay(HoloNETDNA.SecondsToWaitForHolochainConductorToStart * 1000); // Give the conductor 7 (default) seconds to start up...
+                    _conductorProcess.Start();
+                    _conductorProcessSessionId = _conductorProcess.Id;
+
+                    
+
+
+
+                    await Task.Delay(HoloNETDNA.SecondsToWaitForHolochainConductorToStart * 1000); // Give the conductor 5 (default) seconds to start up...
                     OnHolochainConductorStarted?.Invoke(this, new HolochainConductorStartedEventArgs());
                 }
             }
@@ -1006,6 +1018,32 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 HandleError("Error in HoloNETClient.StartConductor method.", ex);
             }
         }
+
+        //TODO: Try and get this working because _conductorProcess.Id is not set by Windows when using Powershell etc so not able to shut it down correctly.
+        /*Modified Process.Start*/
+        //public static Process TrueProcessStart(string filename)
+        //{
+        //    ProcessStartInfo psi;
+        //    string ext = System.IO.Path.GetExtension(filename);//get extension
+
+        //    var sb = new StringBuilder(500);//buffer for exe file path
+        //    uint size = 500;//buffer size
+
+        //    /*Get associated app*/
+        //    uint res = AssocQueryString(AssocF.None, AssocStr.Executable, ext, null, sb, ref size);
+
+        //    if (res != 0)
+        //    {
+        //        Debug.WriteLine("AssocQueryString returned error: " + res.ToString("X"));
+        //        psi = new ProcessStartInfo(filename);//can't get app, use standard method
+        //    }
+        //    else
+        //    {
+        //        psi = new ProcessStartInfo(sb.ToString(), filename);
+        //    }
+
+        //    return Process.Start(psi);//actually start process
+        //}
 
         /// <summary>
         /// This method will start the Holochain Conducutor using the appropriate settings defined in the HoloNETDNA property.
@@ -2200,6 +2238,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         public async Task<AdminAppDisabledCallBackEventArgs> AdminDisableAppAsync(string installedAppId, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
+            if (string.IsNullOrEmpty(id))
+                id = GetRequestId();
+
+            _disablingAppLookup[id] = installedAppId;
+
             return await CallAdminFunctionAsync("disable_app", new EnableAppRequest()
             {
                 installed_app_id = installedAppId
@@ -2213,6 +2256,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         public async Task<AdminAppUninstalledCallBackEventArgs> AdminUninstallAppAsync(string installedAppId, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
+            if (string.IsNullOrEmpty(id))
+                id = GetRequestId();
+
+            _uninstallingAppLookup[id] = installedAppId;
+
             return await CallAdminFunctionAsync("uninstall_app", new UninstallAppRequest()
             {
                 installed_app_id = installedAppId
@@ -3232,27 +3280,70 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     || shutdownHolochainConductorsMode == ShutdownHolochainConductorsMode.ShutdownAllConductors)
                         holochainConductorsShutdownEventArgs = await ShutDownAllHolochainConductorsAsync();
 
-                    else if (_conductorProcess != null)
+                    else
                     {
                         Logger.Log("Shutting Down Holochain Conductor...", LogType.Info, true);
+                        List<Process> processes = Process.GetProcesses().Where(x => x.ProcessName == "PowerShell.exe" && x.StartInfo.Arguments.Contains("hc")).ToList();
 
-                        if (HoloNETDNA.ShowHolochainConductorWindow)
-                            _conductorProcess.CloseMainWindow();
+                        foreach (Process process in processes) 
+                        {
+                            if (HoloNETDNA.ShowHolochainConductorWindow)
+                            {
+                                if (process.SessionId > 0)
+                                    process.CloseMainWindow();
+                            }
 
-                        _conductorProcess.Kill();
-                        _conductorProcess.Close();
+                            if (process.SessionId > 0)
+                            {
+                                process.Kill();
+                                process.Close();
 
-                        // _conductorProcess.WaitForExit();
-                        _conductorProcess.Dispose();
+                                // _conductorProcess.WaitForExit();
+                                process.Dispose();
+                            }
 
-                        if (_conductorProcess.StartInfo.FileName.Contains("hc.exe"))
-                            holochainConductorsShutdownEventArgs.NumberOfHcExeInstancesShutdown = 1;
+                            if (process.StartInfo.Arguments.Contains("hc.exe"))
+                                holochainConductorsShutdownEventArgs.NumberOfHcExeInstancesShutdown = 1;
 
-                        else if (_conductorProcess.StartInfo.FileName.Contains("holochain.exe"))
-                            holochainConductorsShutdownEventArgs.NumberOfHolochainExeInstancesShutdown = 1;
+                            else if (_conductorProcess.StartInfo.Arguments.Contains("holochain.exe"))
+                                holochainConductorsShutdownEventArgs.NumberOfHolochainExeInstancesShutdown = 1;
+                        }
+                    
+                        List<Process> processes2 = Process.GetProcesses().Where(x => x.ProcessName == "hc.exe").ToList();
+                        List<Process> processes3 = Process.GetProcesses().Where(x => x.ProcessName == "holochain.exe").ToList();
+
+                        List<Process> processes4 = Process.GetProcesses().ToList();
 
                         Logger.Log("Holochain Conductor Successfully Shutdown.", LogType.Info);
                     }
+
+                    //else if (_conductorProcess != null)
+                    //{
+                    //    Logger.Log("Shutting Down Holochain Conductor...", LogType.Info, true);
+
+                    //    if (HoloNETDNA.ShowHolochainConductorWindow)
+                    //    {
+                    //        if (_conductorProcess.SessionId > 0)
+                    //            _conductorProcess.CloseMainWindow();
+                    //    }
+
+                    //    if (_conductorProcess.SessionId > 0)
+                    //    {
+                    //        _conductorProcess.Kill();
+                    //        _conductorProcess.Close();
+
+                    //        // _conductorProcess.WaitForExit();
+                    //        _conductorProcess.Dispose();
+                    //    }
+
+                    //    if (_conductorProcess.StartInfo.FileName.Contains("hc.exe"))
+                    //        holochainConductorsShutdownEventArgs.NumberOfHcExeInstancesShutdown = 1;
+
+                    //    else if (_conductorProcess.StartInfo.FileName.Contains("holochain.exe"))
+                    //        holochainConductorsShutdownEventArgs.NumberOfHolochainExeInstancesShutdown = 1;
+
+                    //    Logger.Log("Holochain Conductor Successfully Shutdown.", LogType.Info);
+                    //}
                 }
 
                 OnHolochainConductorsShutdownComplete?.Invoke(this, holochainConductorsShutdownEventArgs);
@@ -3910,12 +4001,18 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         private void DecodeAdminAppUninstalledReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
         {
             AdminAppUninstalledCallBackEventArgs args = new AdminAppUninstalledCallBackEventArgs();
+            args.HoloNETResponseType = HoloNETResponseType.AdminAppUninstalled;
 
             try
             {
                 Logger.Log("ADMIN APP UNINSTALLED DATA DETECTED\n", LogType.Info);
                 args = CreateHoloNETArgs<AdminAppUninstalledCallBackEventArgs>(response, dataReceivedEventArgs);
-                args.HoloNETResponseType = HoloNETResponseType.AdminAppUninstalled;
+
+                if (_uninstallingAppLookup != null && _uninstallingAppLookup.ContainsKey(response.id.ToString()))
+                {
+                    args.InstalledAppId = _uninstallingAppLookup[response.id.ToString()];
+                    _uninstallingAppLookup.Remove(response.id.ToString());
+                }
             }
             catch (Exception ex)
             {
@@ -3933,6 +4030,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         {
             string errorMessage = "An unknown error occurred in HoloNETClient.DecodeAdminAppEnabledReceived. Reason: ";
             AdminAppEnabledCallBackEventArgs args = CreateHoloNETArgs<AdminAppEnabledCallBackEventArgs>(response, dataReceivedEventArgs);
+            args.HoloNETResponseType = HoloNETResponseType.AdminAppEnabled;
 
             try
             {
@@ -3941,10 +4039,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                 if (enableAppResponse != null)
                 {
-                    enableAppResponse.app = ProcessAppInfo(enableAppResponse.app, args);
-                    args.AppInfoResponse = new AppInfoResponse() { data = enableAppResponse.app };
-                    args.HoloNETResponseType = HoloNETResponseType.AdminAppEnabled;
-                    args.Errors = enableAppResponse.errors; //TODO: Need to find out what this contains and the correct data structure.
+                    enableAppResponse.data.app = ProcessAppInfo(enableAppResponse.data.app, args);
+                    args.AppInfoResponse = new AppInfoResponse() { data = enableAppResponse.data.app };
+                    args.Errors = enableAppResponse.data.errors; //TODO: Need to find out what this contains and the correct data structure.
                 }
                 else
                 {
@@ -3971,11 +4068,17 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         {
             string errorMessage = "An unknown error occurred in HoloNETClient.DecodeAdminAppEnabledReceived. Reason: ";
             AdminAppDisabledCallBackEventArgs args = CreateHoloNETArgs<AdminAppDisabledCallBackEventArgs>(response, dataReceivedEventArgs);
+            args.HoloNETResponseType = HoloNETResponseType.AdminAppDisabled;
 
             try
             {
                 Logger.Log("ADMIN APP DISABLED DATA DETECTED\n", LogType.Info);
-                args.HoloNETResponseType = HoloNETResponseType.AdminAppDisabled;
+                
+                if (_disablingAppLookup != null && _disablingAppLookup.ContainsKey(response.id.ToString())) 
+                {
+                    args.InstalledAppId = _disablingAppLookup[response.id.ToString()];
+                    _disablingAppLookup.Remove(response.id.ToString());
+                }
             }
             catch (Exception ex)
             {

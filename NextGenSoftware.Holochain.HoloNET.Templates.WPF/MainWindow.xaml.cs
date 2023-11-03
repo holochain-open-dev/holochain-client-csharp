@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Dynamic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -32,19 +33,21 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
         private bool _rebooting = false;
         private bool _adminDisconnected = false;
         private bool _appDisconnected = false;
-        private bool _adminConnected = false;
+       // private bool _adminConnected = false;
         //private bool _doDemo = false;
         private string _installinghAppName = "";
         private string _installinghAppPath = "";
         //private AdminOperation _adminOperation;
         private byte[][] _installingAppCellId = null;
         dynamic paramsObject = null;
-        InstalledApp _attachingApp = null;
-        int _clientsToDisconnect = 0;
-        int _clientsDisconnected = 0;
+        private InstalledApp _attachingApp = null;
+        private int _clientsToDisconnect = 0;
+        private int _clientsDisconnected = 0;
+        private Avatar _avatar;
 
         public ObservableCollection<InstalledApp> InstalledApps { get; set; } = new ObservableCollection<InstalledApp>();
-
+        public ObservableCollection<Avatar> HoloNETEntries { get; set; } = new ObservableCollection<Avatar>();
+        
         public MainWindow()
         {
             InitializeComponent();
@@ -64,46 +67,18 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
 
         private void Init()
         {
-            //if (VisualTreeHelper.GetChildrenCount(lstOutput) > 0)
-            //{
-            //    Border border = (Border)VisualTreeHelper.GetChild(lstOutput, 0);
-            //    ScrollViewer scrollViewer = (ScrollViewer)VisualTreeHelper.GetChild(border, 0);
-
-
-            //    ScrollBar scrollbar = (ScrollBar)VisualTreeHelper.GetChild(scrollViewer, 0);
-            //    scrollbar.Background = Brushes.Blue;
-
-            //}
-            //scrollbar.Foreground = Brushes.Blue;
-            //gridHapps.Resources["columnDisabledForeground"] = Brushes.Black;
-
-            //if (HoloNETDNAManager.HoloNETDNA != null)
-            //{
-            //    txtAdminURI.Text = HoloNETDNAManager.HoloNETDNA.HolochainConductorAdminURI;
-            //    chkAutoStartConductor.IsChecked = HoloNETDNAManager.HoloNETDNA.AutoStartHolochainConductor;
-            //    chkAutoShutdownConductor.IsChecked = HoloNETDNAManager.HoloNETDNA.AutoShutdownHolochainConductor;
-            //    chkShowConductorWindow.IsChecked = HoloNETDNAManager.HoloNETDNA.ShowHolochainConductorWindow;
-            //    txtSecondsToWaitForConductorToStart.Text = HoloNETDNAManager.HoloNETDNA.SecondsToWaitForHolochainConductorToStart.ToString();
-            //}
-
-            //_holoNETClientAdmin = new HoloNETClient(HoloNETDNAManager.HoloNETDNA.HolochainConductorAdminURI);
-            //_holoNETClientAdmin.HoloNETDNA.AutoStartHolochainConductor = chkAutoStartConductor.IsChecked.Value;
-            //_holoNETClientAdmin.HoloNETDNA.ShowHolochainConductorWindow = chkShowConductorWindow.IsChecked.Value;
-            //_holoNETClientAdmin.HoloNETDNA.AutoShutdownHolochainConductor = chkAutoShutdownConductor.IsChecked.Value;
-            //_holoNETClientAdmin.HoloNETDNA.SecondsToWaitForHolochainConductorToStart = Convert.ToInt32(txtSecondsToWaitForConductorToStart.Text);
-
-            //_holoNETClientAdmin.Config.FullPathToRootHappFolder = @"C:\Users\USER\holochain-holochain-0.1.5\happs\oasis\BUILD\happ";
-            // _holoNETClientAdmin.HoloNETDNA.FullPathToCompiledHappFolder = @"C:\Users\USER\holochain-holochain-0.1.5\happs\oasis\BUILD\happ";
-            // _holoNETClientAdmin.Config.LoggingMode = Logging.LoggingMode.WarningsErrorsInfoAndDebug;
-
             _holoNETClientAdmin = new HoloNETClient();
+            _holoNETClientAdmin.HoloNETDNA.HolochainConductorMode = HolochainConductorModeEnum.UseEmbedded;
+            _holoNETClientAdmin.HoloNETDNA.HolochainConductorToUse = HolochainConductorEnum.HcDevTool;
 
             txtAdminURI.Text = _holoNETClientAdmin.HoloNETDNA.HolochainConductorAdminURI;
             chkAutoStartConductor.IsChecked = _holoNETClientAdmin.HoloNETDNA.AutoStartHolochainConductor;
             chkAutoShutdownConductor.IsChecked = _holoNETClientAdmin.HoloNETDNA.AutoShutdownHolochainConductor;
             chkShowConductorWindow.IsChecked = _holoNETClientAdmin.HoloNETDNA.ShowHolochainConductorWindow;
             txtSecondsToWaitForConductorToStart.Text = _holoNETClientAdmin.HoloNETDNA.SecondsToWaitForHolochainConductorToStart.ToString();
-            //_holoNETClientAdmin.HoloNETDNA.FullPathToRootHappFolder = @"C:\Users\USER\holochain-holochain-0.1.5\happs\oasis";
+            _holoNETClientAdmin.HoloNETDNA.FullPathToRootHappFolder = @"C:\Users\USER\holochain-holochain-0.1.5\happs\oasis";
+            //_holoNETClientAdmin.HoloNETDNA.FullPathToRootHappFolder = @"C:\Users\USER\holochain-holochain-0.1.5";
+           // _holoNETClientAdmin.HoloNETDNA.FullPathToCompiledHappFolder = @"C:\Users\USER\holochain-holochain-0.1.5\happs\oasis\BUILD\happ";
 
             _holoNETClientAdmin.OnHolochainConductorStarting += _holoNETClientAdmin_OnHolochainConductorStarting;
             _holoNETClientAdmin.OnHolochainConductorStarted += _holoNETClientAdmin_OnHolochainConductorStarted;
@@ -128,7 +103,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
             _clientsToDisconnect = 0;
             _rebooting = false;
             _adminDisconnected = false;
-            _adminConnected = false;
 
             if (!_holoNETClientAdmin.HoloNETDNA.AutoStartHolochainConductor)
             {
@@ -136,8 +110,145 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
                 ShowStatusMessage($"Admin WebSocket Connecting To Endpoint {_holoNETClientAdmin.HoloNETDNA.HolochainConductorAdminURI}...", StatusMessageType.Information, true);
             }
 
-            //_adminOperation = AdminOperation.ListHapps;
             _holoNETClientAdmin.ConnectAdmin(_holoNETClientAdmin.HoloNETDNA.HolochainConductorAdminURI);
+        }
+
+        private HoloNETClient CreateNewClientConnection(ushort port)
+        {
+            HoloNETClient newClient = new HoloNETClient($"ws://127.0.0.1:{port}");
+            newClient.OnConnected += _holoNETClientApp_OnConnected;
+            newClient.OnReadyForZomeCalls += _holoNETClientApp_OnReadyForZomeCalls;
+            newClient.OnZomeFunctionCallBack += _holoNETClientApp_OnZomeFunctionCallBack;
+            newClient.OnDisconnected += _holoNETClientApp_OnDisconnected;
+            newClient.OnDataReceived += _holoNETClientApp_OnDataReceived;
+            newClient.OnDataSent += _holoNETClientApp_OnDataSent;
+            newClient.OnError += _holoNETClientApp_OnError;
+
+            newClient.HoloNETDNA.AutoStartHolochainConductor = false;
+            newClient.HoloNETDNA.AutoShutdownHolochainConductor = false;
+
+            newClient.HoloNETDNA.AgentPubKey = _attachingApp.AgentPubKey;
+            newClient.HoloNETDNA.DnaHash = _attachingApp.DnaHash;
+            newClient.HoloNETDNA.InstalledAppId = _attachingApp.Name;
+
+            return newClient;
+        }
+
+        private void ListHapps()
+        {
+            LogMessage("ADMIN: Listning hApps...");
+            ShowStatusMessage($"Listning hApps...", StatusMessageType.Information, true);
+            _holoNETClientAdmin.AdminListApps(AppStatusFilter.All);
+        }
+
+        private void CloseAllConnections()
+        {
+            LogMessage("APP: Disconnecting All HoloNETClient AppAgent WebSockets...");
+            ShowStatusMessage($"Disconnecting All HoloNETClient AppAgent WebSockets...", StatusMessageType.Information, true);
+
+            foreach (HoloNETClient client in _holoNETappClients)
+            {
+                if (client.State == System.Net.WebSockets.WebSocketState.Open)
+                    client.Disconnect();
+
+                //client = null;
+            }
+
+            LogMessage("ADMIN: Disconnecting...");
+            ShowStatusMessage($"Disconnecting Admin WebSocket...", StatusMessageType.Information, true);
+
+            _adminDisconnected = false;
+
+            if (_holoNETClientAdmin != null)
+            {
+                if (_holoNETClientAdmin.State == System.Net.WebSockets.WebSocketState.Open)
+                    _holoNETClientAdmin.Disconnect();
+            }
+        }
+
+        private void HandleAvatarSaved(ZomeFunctionCallBackEventArgs result)
+        {
+            if (result.IsCallSuccessful && !result.IsError)
+                HoloNETEntries.Add(result.Entry.EntryDataObject);
+            else
+            {
+                lblNewEntryValidationErrors.Text = result.Message;
+                ShowStatusMessage($"Error occured saving entry: {result.Message}", StatusMessageType.Error);
+                LogMessage($"Error occured saving entry: {result.Message}");
+            }
+        }
+
+        private string GetEntryInfo(ZomeFunctionCallBackEventArgs e)
+        {
+            return $"DateTime: {e.Entry.DateTime}, Author: {e.Entry.Author}, ActionSequence: {e.Entry.ActionSequence}, Signature: {e.Entry.Signature}, Type: {e.Entry.Type}, Hash: {e.Entry.Hash}, Previous Hash: {e.Entry.PreviousHash}, OriginalActionAddress: {e.Entry.OriginalActionAddress}, OriginalEntryAddress: {e.Entry.OriginalEntryAddress}";
+        }
+
+        private void ShowStatusMessage(string message, StatusMessageType type = StatusMessageType.Information, bool showSpinner = false)
+        {
+            txtStatus.Text = $"{message}";
+
+            switch (type)
+            {
+                case StatusMessageType.Success:
+                    txtStatus.Foreground = Brushes.LightGreen;
+                    break;
+
+                case StatusMessageType.Information:
+                    txtStatus.Foreground = Brushes.White;
+                    break;
+
+                case StatusMessageType.Error:
+                    txtStatus.Foreground = Brushes.LightSalmon;
+                    break;
+            }
+
+            if (showSpinner)
+                spinner.Visibility = Visibility.Visible;
+            else
+                spinner.Visibility = Visibility.Hidden;
+
+            sbAnimateStatus.Begin();
+        }
+
+        private void LogMessage(string message)
+        {
+            lstOutput.Items.Add(message);
+
+            if (VisualTreeHelper.GetChildrenCount(lstOutput) > 0)
+            {
+                Border border = (Border)VisualTreeHelper.GetChild(lstOutput, 0);
+                ScrollViewer scrollViewer = (ScrollViewer)VisualTreeHelper.GetChild(border, 0);
+                scrollViewer.ScrollToBottom();
+            }
+        }
+        private void UpdateNumerOfClientConnections()
+        {
+            txtConnections.Text = $"Client Connections: {_holoNETappClients.Count}";
+            sbAnimateConnections.Begin();
+        }
+
+        private static string ProcessZomeFunctionCallBackEventArgs(ZomeFunctionCallBackEventArgs args)
+        {
+            string result = "";
+
+            //result = string.Concat("\nEndPoint: ", args.EndPoint, "\nId: ", args.Id, "\nZome: ", args.Zome, "\nZomeFunction: ", args.ZomeFunction, "\n\nZomeReturnData: ", args.ZomeReturnData, "\nZomeReturnHash: ", args.ZomeReturnHash, "\nRaw Zome Return Data: ", args.RawZomeReturnData, "\nRaw Binary Data: ", args.RawBinaryData, "\nRaw Binary Data As String: ", args.RawBinaryDataAsString, "\nRaw Binary Data Decoded: ", args.RawBinaryDataDecoded, "\nRaw Binary Data After MessagePack Decode: ", args.RawBinaryDataAfterMessagePackDecode, "\nRaw Binary Data After MessagePack Decode As String: ", args.RawBinaryDataAfterMessagePackDecodeAsString, "\nRaw Binary Data Decoded After MessagePack Decode: ", args.RawBinaryDataAfterMessagePackDecodeDecoded, "\nRaw JSON Data: ", args.RawJSONData, "\nIsCallSuccessful: ", args.IsCallSuccessful ? "true" : "false", "\nIsError: ", args.IsError ? "true" : "false", "\nMessage: ", args.Message);
+            result = string.Concat("\nEndPoint: ", args.EndPoint, "\nId: ", args.Id, "\nZome: ", args.Zome, "\nZomeFunction: ", args.ZomeFunction, "\n\nZomeReturnData: ", args.ZomeReturnData, "\nZomeReturnHash: ", args.ZomeReturnHash, "\nRaw Zome Return Data: ", args.RawZomeReturnData, "\n\nRaw Binary Data: ", args.RawBinaryDataDecoded, "(", args.RawBinaryDataAsString, ")\nIsCallSuccessful: ", args.IsCallSuccessful ? "true" : "false", "\nIsError: ", args.IsError ? "true" : "false", "\nMessage: ", args.Message);
+
+            if (!string.IsNullOrEmpty(args.KeyValuePairAsString))
+                result = string.Concat(result, "\n\nProcessed Zome Return Data:\n", args.KeyValuePairAsString);
+
+            //if (args.Entry != null && args.Entry.EntryDataObject != null)
+            //{
+            //    AvatarEntryDataObject avatar = args.Entry.EntryDataObject as AvatarEntryDataObject;
+
+            //    if (avatar != null)
+            //        result = BuildEntryDataObjectMessage(avatar, "Entry.EntryDataObject", result);
+            //}
+
+            //if (_avatarEntryDataObject != null)
+            //    result = BuildEntryDataObjectMessage(_avatarEntryDataObject, "Global.EntryDataObject", result);
+
+            return result;
         }
 
         private void _holoNETClientAdmin_OnHolochainConductorStarting(object sender, HolochainConductorStartingEventArgs e)
@@ -157,15 +268,15 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
 
         private void _holoNETClientAdmin_OnAdminAppDisabledCallBack(object sender, AdminAppDisabledCallBackEventArgs e)
         {
-            LogMessage("ADMIN: App Disabled."); //TODO: ADD INSTALL APP ID TO RETURN ARGS TOMORROW! ;-) same with uninstall etc...
-            ShowStatusMessage("App Disabled.", StatusMessageType.Success);
+            LogMessage($"ADMIN: hApp {e.InstalledAppId} Disabled.");
+            ShowStatusMessage($"hApp {e.InstalledAppId} Disabled.", StatusMessageType.Success);
             ListHapps();
         }
 
         private void _holoNETClientAdmin_OnAdminAppUninstalledCallBack(object sender, AdminAppUninstalledCallBackEventArgs e)
         {
-            LogMessage($"ADMIN: App Uninstalled.");
-            ShowStatusMessage("App Uninstalled.", StatusMessageType.Success);
+            LogMessage($"ADMIN: hApp {e.InstalledAppId} Uninstalled.");
+            ShowStatusMessage($"hApp {e.InstalledAppId} Uninstalled.", StatusMessageType.Success);
             ListHapps();
         }
 
@@ -284,30 +395,15 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
             {
                 LogMessage($"APP: No Existing HoloNETClient AppAgent WebSocket Found Running For AgentPubKey {_attachingApp.AgentPubKey}, DnaHash {_attachingApp.DnaHash} And InstalledAppId {_attachingApp.Name} So Creating New HoloNETClient AppAgent WebSocket Now...");
 
-                HoloNETClient newClient = new HoloNETClient($"ws://127.0.0.1:{e.Port}");
-                newClient.OnConnected += _holoNETClientApp_OnConnected;
-                newClient.OnReadyForZomeCalls += _holoNETClientApp_OnReadyForZomeCalls;
-                newClient.OnZomeFunctionCallBack += _holoNETClientApp_OnZomeFunctionCallBack;
-                newClient.OnDisconnected += _holoNETClientApp_OnDisconnected;
-                newClient.OnDataReceived += _holoNETClientApp_OnDataReceived;
-                newClient.OnDataSent += _holoNETClientApp_OnDataSent;
-                newClient.OnError += _holoNETClientApp_OnError;
-
-                newClient.HoloNETDNA.AutoStartHolochainConductor = false;
-                newClient.HoloNETDNA.AutoShutdownHolochainConductor = false;
-
-                newClient.HoloNETDNA.AgentPubKey = _attachingApp.AgentPubKey;
-                newClient.HoloNETDNA.DnaHash = _attachingApp.DnaHash;
-                newClient.HoloNETDNA.InstalledAppId = _attachingApp.Name;
-
+                HoloNETClient newClient = CreateNewClientConnection(e.Port.Value);
                 LogMessage($"APP: New HoloNETClient AppAgent WebSocket Created.");
+
                 ShowStatusMessage($"Connecting To HoloNETClient AppAgent WebSocket On Port {e.Port}...", StatusMessageType.Information, true);
                 LogMessage($"APP: Connecting To HoloNETClient AppAgent WebSocket On Port {e.Port}...");
                 newClient.Connect();
 
                 _holoNETappClients.Add(newClient);
-                txtConnections.Text = $"Client Connections: {_holoNETappClients.Count}";
-                sbAnimateConnections.Begin();
+                UpdateNumerOfClientConnections();
             }
         }
 
@@ -337,7 +433,18 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
             HoloNETClient client = sender as HoloNETClient;
 
             if (client != null)
+            {
+                client.OnConnected -= _holoNETClientApp_OnConnected;
+                client.OnReadyForZomeCalls -= _holoNETClientApp_OnReadyForZomeCalls;
+                client.OnZomeFunctionCallBack -= _holoNETClientApp_OnZomeFunctionCallBack;
+                client.OnDisconnected -= _holoNETClientApp_OnDisconnected;
+                client.OnDataReceived -= _holoNETClientApp_OnDataReceived;
+                client.OnDataSent -= _holoNETClientApp_OnDataSent;
+                client.OnError -= _holoNETClientApp_OnError;
+
                 _holoNETappClients.Remove(client);
+                UpdateNumerOfClientConnections();
+            }
 
             _clientsDisconnected++;
 
@@ -410,25 +517,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
 
         private void _holoNETClient_OnAdminAppEnabledCallBack(object sender, AdminAppEnabledCallBackEventArgs e)
         {
-            LogMessage($"ADMIN: hApp {e.InstalledAppId} Enabled."); //TODO: FIX InstalledAppId BEING NULL TOMORROW! ;-)
+            LogMessage($"ADMIN: hApp {e.InstalledAppId} Enabled.");
             ShowStatusMessage($"hApp {e.InstalledAppId} Enabled.", StatusMessageType.Success);
 
             ListHapps();
-
-            //if (_installingAppCellId != null)
-            //{
-            //    LogMessage($"ADMIN: Authorize Signing Credentials For {e.InstalledAppId} hApp...");
-            //    ShowStatusMessage($"Authorize Signing Credentials For {e.InstalledAppId} hApp...", StatusMessageType.Information, true);
-
-            //    //_holoNETClientAdmin.AdminAuthorizeSigningCredentialsAndGrantZomeCallCapability(GrantedFunctionsType.Listed, new List<(string, string)>()
-            //    //{
-            //    //    ("oasis", "create_avatar"),
-            //    //    ("oasis", "get_avatar"),
-            //    //    ("oasis", "update_avatar")
-            //    //});
-
-            //    _holoNETClientAdmin.AdminAuthorizeSigningCredentialsAndGrantZomeCallCapability(_installingAppCellId, GrantedFunctionsType.All, null);
-            //}
         }
 
         private void _holoNETClient_OnAdminAgentPubKeyGeneratedCallBack(object sender, AdminAgentPubKeyGeneratedCallBackEventArgs e)
@@ -436,55 +528,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
             LogMessage($"ADMIN: AgentPubKey Generated for EndPoint: {e.EndPoint} and Id: {e.Id}: AgentPubKey: {e.AgentPubKey}");
             ShowStatusMessage($"AgentPubKey Generated.", StatusMessageType.Success);
 
-            _adminConnected = true;
+           // _adminConnected = true;
 
             LogMessage($"ADMIN: Listing hApps...");
             ShowStatusMessage($"Listing hApps...", StatusMessageType.Information, true);
             _holoNETClientAdmin.AdminListApps(AppStatusFilter.All);
-
-            /*
-            switch (_adminOperation)
-            {
-                case AdminOperation.InstallHapp:
-                {
-                        LogMessage($"ADMIN: Installing {_installinghAppName} hApp ({_installinghAppPath})...");
-                        ShowStatusMessage($"Installing {_installinghAppName} hApp...", StatusMessageType.Information, true);
-                        _holoNETClientAdmin.AdminInstallApp(e.AgentPubKey, _installinghAppName, _installinghAppPath);
-                }
-                break;
-
-                case AdminOperation.ListHapps:
-                {
-                        LogMessage($"ADMIN: Listing hApps...");
-                        ShowStatusMessage($"Listing hApps...", StatusMessageType.Information, true);
-                        _holoNETClientAdmin.AdminListApps(AppStatusFilter.All);
-                }
-                break;
-
-                case AdminOperation.ListDNAs:
-                {
-                        LogMessage($"ADMIN: Listing DNAs...");
-                        ShowStatusMessage($"Listing DNAs...", StatusMessageType.Information, true);
-                        _holoNETClientAdmin.AdminListDnas();
-                }
-                break;
-
-                case AdminOperation.ListCellIds:
-                {
-                        LogMessage($"ADMIN: Listing Cell Ids...");
-                        ShowStatusMessage($"Listing Cell Ids...", StatusMessageType.Information, true);
-                        _holoNETClientAdmin.AdminListCellIds();
-                }
-                break;
-
-                case AdminOperation.ListAttachedInterfaces:
-                {
-                        LogMessage("ADMIN: Listning Attached Interfaces...");
-                        ShowStatusMessage($"Listing Attached Interfaces...", StatusMessageType.Information, true);
-                        _holoNETClientAdmin.AdminListInterfaces();
-                }
-                break;   
-            }*/
         }
 
         private void HoloNETClient_OnDisconnected(object sender, WebSocket.DisconnectedEventArgs e)
@@ -493,10 +541,33 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
             ShowStatusMessage($"Admin WebSocket Disconnected.");
 
             _adminDisconnected = true;
-            _adminConnected = false;
+           // _adminConnected = false;
 
             if (_rebooting && _adminDisconnected && _clientsDisconnected == _clientsToDisconnect)
+            {
+                if (_holoNETClientAdmin != null)
+                {
+                    _holoNETClientAdmin.OnHolochainConductorStarting -= _holoNETClientAdmin_OnHolochainConductorStarting;
+                    _holoNETClientAdmin.OnHolochainConductorStarted -= _holoNETClientAdmin_OnHolochainConductorStarted;
+                    _holoNETClientAdmin.OnConnected -= HoloNETClient_OnConnected;
+                    _holoNETClientAdmin.OnError -= HoloNETClient_OnError;
+                    _holoNETClientAdmin.OnDataSent -= _holoNETClient_OnDataSent;
+                    _holoNETClientAdmin.OnDataReceived -= HoloNETClient_OnDataReceived;
+                    _holoNETClientAdmin.OnDisconnected -= HoloNETClient_OnDisconnected;
+                    _holoNETClientAdmin.OnAdminAgentPubKeyGeneratedCallBack -= _holoNETClient_OnAdminAgentPubKeyGeneratedCallBack;
+                    _holoNETClientAdmin.OnAdminAppInstalledCallBack -= HoloNETClient_OnAdminAppInstalledCallBack;
+                    _holoNETClientAdmin.OnAdminAppUninstalledCallBack -= _holoNETClientAdmin_OnAdminAppUninstalledCallBack;
+                    _holoNETClientAdmin.OnAdminAppEnabledCallBack -= _holoNETClient_OnAdminAppEnabledCallBack;
+                    _holoNETClientAdmin.OnAdminAppDisabledCallBack -= _holoNETClientAdmin_OnAdminAppDisabledCallBack;
+                    _holoNETClientAdmin.OnAdminZomeCallCapabilityGrantedCallBack -= _holoNETClient_OnAdminZomeCallCapabilityGrantedCallBack;
+                    _holoNETClientAdmin.OnAdminAppInterfaceAttachedCallBack -= _holoNETClient_OnAdminAppInterfaceAttachedCallBack;
+                    _holoNETClientAdmin.OnAdminAppsListedCallBack -= _holoNETClientAdmin_OnAdminAppsListedCallBack;
+                    _holoNETClientAdmin = null;
+                }
+
+                Init();
                 ConnectAdmin();
+            }
         }
 
         private void HoloNETClient_OnAdminAppInstalledCallBack(object sender, AdminAppInstalledCallBackEventArgs e)
@@ -550,30 +621,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
             _holoNETClientAdmin.AdminGenerateAgentPubKey();
         }
 
-        private static string ProcessZomeFunctionCallBackEventArgs(ZomeFunctionCallBackEventArgs args)
-        {
-            string result = "";
-
-            //result = string.Concat("\nEndPoint: ", args.EndPoint, "\nId: ", args.Id, "\nZome: ", args.Zome, "\nZomeFunction: ", args.ZomeFunction, "\n\nZomeReturnData: ", args.ZomeReturnData, "\nZomeReturnHash: ", args.ZomeReturnHash, "\nRaw Zome Return Data: ", args.RawZomeReturnData, "\nRaw Binary Data: ", args.RawBinaryData, "\nRaw Binary Data As String: ", args.RawBinaryDataAsString, "\nRaw Binary Data Decoded: ", args.RawBinaryDataDecoded, "\nRaw Binary Data After MessagePack Decode: ", args.RawBinaryDataAfterMessagePackDecode, "\nRaw Binary Data After MessagePack Decode As String: ", args.RawBinaryDataAfterMessagePackDecodeAsString, "\nRaw Binary Data Decoded After MessagePack Decode: ", args.RawBinaryDataAfterMessagePackDecodeDecoded, "\nRaw JSON Data: ", args.RawJSONData, "\nIsCallSuccessful: ", args.IsCallSuccessful ? "true" : "false", "\nIsError: ", args.IsError ? "true" : "false", "\nMessage: ", args.Message);
-            result = string.Concat("\nEndPoint: ", args.EndPoint, "\nId: ", args.Id, "\nZome: ", args.Zome, "\nZomeFunction: ", args.ZomeFunction, "\n\nZomeReturnData: ", args.ZomeReturnData, "\nZomeReturnHash: ", args.ZomeReturnHash, "\nRaw Zome Return Data: ", args.RawZomeReturnData, "\n\nRaw Binary Data: ", args.RawBinaryDataDecoded, "(", args.RawBinaryDataAsString, ")\nIsCallSuccessful: ", args.IsCallSuccessful ? "true" : "false", "\nIsError: ", args.IsError ? "true" : "false", "\nMessage: ", args.Message);
-
-            if (!string.IsNullOrEmpty(args.KeyValuePairAsString))
-                result = string.Concat(result, "\n\nProcessed Zome Return Data:\n", args.KeyValuePairAsString);
-
-            //if (args.Entry != null && args.Entry.EntryDataObject != null)
-            //{
-            //    AvatarEntryDataObject avatar = args.Entry.EntryDataObject as AvatarEntryDataObject;
-
-            //    if (avatar != null)
-            //        result = BuildEntryDataObjectMessage(avatar, "Entry.EntryDataObject", result);
-            //}
-
-            //if (_avatarEntryDataObject != null)
-            //    result = BuildEntryDataObjectMessage(_avatarEntryDataObject, "Global.EntryDataObject", result);
-
-            return result;
-        }
-
         private void btnClearLog_Click(object sender, RoutedEventArgs e)
         {
             lstOutput.Items.Clear();
@@ -589,53 +636,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
             CloseAllConnections();
         }
 
-        private void CloseAllConnections()
-        {
-            LogMessage("APP: Disconnecting All HoloNETClient AppAgent WebSockets...");
-            ShowStatusMessage($"Disconnecting All HoloNETClient AppAgent WebSockets...", StatusMessageType.Information, true);
-
-            foreach (HoloNETClient client in _holoNETappClients)
-            {
-                if (client.State == System.Net.WebSockets.WebSocketState.Open)
-                    client.Disconnect();
-
-                //client = null;
-            }
-
-            LogMessage("ADMIN: Disconnecting...");
-            ShowStatusMessage($"Disconnecting Admin WebSocket...", StatusMessageType.Information, true);
-
-            _adminDisconnected = false;
-
-            if (_holoNETClientAdmin != null)
-            {
-                if (_holoNETClientAdmin.State == System.Net.WebSockets.WebSocketState.Open)
-                    _holoNETClientAdmin.Disconnect();
-
-                _holoNETClientAdmin = null;
-            }
-        }
-
         private void btnShowLog_Click(object sender, RoutedEventArgs e)
         {
             Process.Start("notepad.exe", "Logs\\HoloNET.log");
         }
-
-        //private void btnStartDemo_Click(object sender, RoutedEventArgs e)
-        //{
-        //    btnStartDemo.IsEnabled = false;
-        //    btnStartDemo.Foreground = new SolidColorBrush(Colors.DarkGray);
-        //    btnReboot.IsEnabled = true;
-        //    btnReboot.Foreground = new SolidColorBrush(Colors.White);
-
-        //    _doDemo = true;
-        //    //Init();
-
-        //    LogMessage("ADMIN: Installing OASIS Demo hApp...");
-        //    ShowStatusMessage($"Installing OASIS Demo hApp...", StatusMessageType.Information, true);
-
-        //    _holoNETClientAdmin.AdminInstallApp(_holoNETClientAdmin.HoloNETDNA.AgentPubKey, _installed_app_id, _oasisHappPath);
-        //}
 
         private void btnInstall_Click(object sender, RoutedEventArgs e)
         {
@@ -680,13 +684,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
             LogMessage("ADMIN: Listning Attached Interfaces...");
             ShowStatusMessage($"Listning Attached Interfaces...", StatusMessageType.Information, true);
             _holoNETClientAdmin.AdminListInterfaces();
-        }
-
-        private void ListHapps()
-        {
-            LogMessage("ADMIN: Listning hApps...");
-            ShowStatusMessage($"Listning hApps...", StatusMessageType.Information, true);
-            _holoNETClientAdmin.AdminListApps(AppStatusFilter.All);
         }
 
         private void btnEnableApp_Click(object sender, RoutedEventArgs e)
@@ -746,45 +743,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
                         _holoNETClientAdmin.AdminUninstallApp(app.Name);
                     }
                 }
-            }
-        }
-
-        private void ShowStatusMessage(string message, StatusMessageType type = StatusMessageType.Information, bool showSpinner = false)
-        {
-            txtStatus.Text = $"{message}";
-
-            switch (type) 
-            {
-                case StatusMessageType.Success:
-                    txtStatus.Foreground = Brushes.LightGreen;
-                    break;
-
-                case StatusMessageType.Information:
-                    txtStatus.Foreground = Brushes.White; 
-                    break;
-
-                case StatusMessageType.Error:
-                    txtStatus.Foreground= Brushes.LightSalmon;
-                    break;
-            }
-
-            if (showSpinner)
-                spinner.Visibility = Visibility.Visible;
-            else
-                spinner.Visibility = Visibility.Hidden;
-
-            sbAnimateStatus.Begin();
-        }
-
-        private void LogMessage(string message)
-        {
-            lstOutput.Items.Add(message);
-
-            if (VisualTreeHelper.GetChildrenCount(lstOutput) > 0)
-            {
-                Border border = (Border)VisualTreeHelper.GetChild(lstOutput, 0);
-                ScrollViewer scrollViewer = (ScrollViewer)VisualTreeHelper.GetChild(border, 0);
-                scrollViewer.ScrollToBottom();
             }
         }
 
@@ -995,6 +953,130 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
 
             if (txtSecondsToWaitForConductorToStartError != null)
                 txtSecondsToWaitForConductorToStartError.Visibility = Visibility.Hidden;
+        }
+
+        private void tbnViewDataEntries_Click(object sender, RoutedEventArgs e)
+        {
+            popupDataEntries.Visibility = Visibility.Visible;
+
+            //Avatar avatar = new Avatar();
+            //avatar.Load();
+
+        }
+
+        private void btnDataEntriesPopupOk_Click(object sender, RoutedEventArgs e)
+        {
+            if (string.IsNullOrEmpty(txtFirstName.Text))
+            {
+                lblNewEntryValidationErrors.Text = "Enter the first name.";
+                lblNewEntryValidationErrors.Visibility = Visibility.Visible;
+                txtFirstName.Focus();
+            }
+
+            else if (string.IsNullOrEmpty(txtLastName.Text))
+            {
+                lblNewEntryValidationErrors.Text = "Enter the last name.";
+                lblNewEntryValidationErrors.Visibility = Visibility.Visible;
+                txtLastName.Focus();
+            }
+
+            else if (string.IsNullOrEmpty(txtDOB.Text))
+            {
+                lblNewEntryValidationErrors.Text = "Enter the DOB.";
+                lblNewEntryValidationErrors.Visibility = Visibility.Visible;
+                txtDOB.Focus();
+            }
+
+            else if (string.IsNullOrEmpty(txtEmail.Text))
+            {
+                lblNewEntryValidationErrors.Text = "Enter the Email.";
+                lblNewEntryValidationErrors.Visibility = Visibility.Visible;
+                txtEmail.Focus();
+            }
+            else
+            {
+                //If we intend to re-use an object then we can store it globally so we only need to init once...
+                if (_avatar == null)
+                {
+                    _avatar = new Avatar(new HoloNETDNA()
+                    {
+                        AutoStartHolochainConductor = false,
+                        AutoShutdownHolochainConductor = false
+                    });
+
+                    //If we are using SaveAsync below we do not need to worry about any events such as OnSaved if you don't need them.
+                    _avatar.OnInitialized += Avatar_OnInitialized;
+                    _avatar.OnLoaded += Avatar_OnLoaded;
+                    _avatar.OnCollectionLoaded += Avatar_OnCollectionLoaded;
+                    _avatar.OnCollectionUpdated += Avatar_OnCollectionUpdated;
+                    _avatar.OnClosed += Avatar_OnClosed;
+                    _avatar.OnSaved += Avatar_OnSaved;
+                    _avatar.OnDeleted += Avatar_OnDeleted;
+                    _avatar.OnError += Avatar_OnError;
+                }
+
+                //Non async way.
+               // _avatar.Save(); //For this OnSaved event handler above is required.
+
+                //Async way.
+                Dispatcher.InvokeAsync(async () =>
+                {
+                    ZomeFunctionCallBackEventArgs result = await _avatar.SaveAsync(); //No event handlers are needed.
+                    HandleAvatarSaved(result);
+                });
+            }
+        }
+
+        private void Avatar_OnSaved(object sender, ZomeFunctionCallBackEventArgs e)
+        {
+            HandleAvatarSaved(e);
+        }
+
+        private void Avatar_OnLoaded(object sender, ZomeFunctionCallBackEventArgs e)
+        {
+            ShowStatusMessage($"HoloNET Data Entry Loaded", StatusMessageType.Success);
+            LogMessage($"HoloNET Data Entry Loaded: {GetEntryInfo(e)}");
+        }
+
+        private void Avatar_OnInitialized(object sender, ReadyForZomeCallsEventArgs e)
+        {
+            ShowStatusMessage($"HoloNET Data Entry Initialized", StatusMessageType.Success);
+            LogMessage($"HoloNET Data Entry Initialized: AgentPubKey: {e.AgentPubKey}, DnaHash: {e.DnaHash}");
+        }
+
+        private void Avatar_OnError(object sender, HoloNETErrorEventArgs e)
+        {
+            ShowStatusMessage($"HoloNET Data Entry Error", StatusMessageType.Error);
+            LogMessage($"HoloNET Data Entry Error: {e.Reason}");
+        }
+
+        private void Avatar_OnDeleted(object sender, ZomeFunctionCallBackEventArgs e)
+        {
+            ShowStatusMessage($"HoloNET Data Entry Deleted", StatusMessageType.Success);
+            LogMessage($"HoloNET Data Entry Deleted: {GetEntryInfo(e)}");
+        }
+
+        private void Avatar_OnCollectionUpdated(object sender, ZomeFunctionCallBackEventArgs e)
+        {
+            ShowStatusMessage($"HoloNET Data Entry Collection Updated", StatusMessageType.Success);
+            LogMessage($"HoloNET Data Entry Collection Updated");
+        }
+
+        private void Avatar_OnCollectionLoaded(object sender, ZomeFunctionCallBackEventArgs e)
+        {
+            ShowStatusMessage($"HoloNET Data Entry Collection Loaded", StatusMessageType.Success);
+            LogMessage($"HoloNET Data Entry Collection Loaded");
+        }
+
+        private void Avatar_OnClosed(object sender, HoloNETShutdownEventArgs e)
+        {
+            ShowStatusMessage($"HoloNET Data Entry Closed", StatusMessageType.Success);
+            LogMessage($"HoloNET Data Entry Closed: Number Of Holochain Exe Instances Shutdown: {e.HolochainConductorsShutdownEventArgs.NumberOfHolochainExeInstancesShutdown}, Number Of Hc Exe Instances Shutdown: {e.HolochainConductorsShutdownEventArgs.NumberOfHcExeInstancesShutdown}, Number Of Rustc Exe Instances Shutdown: {e.HolochainConductorsShutdownEventArgs.NumberOfRustcExeInstancesShutdown}");
+        }
+
+        private void btnDataEntriesPopupCancel_Click(object sender, RoutedEventArgs e)
+        {
+            popupDataEntries.Visibility = Visibility.Collapsed;
         }
     }
 }
