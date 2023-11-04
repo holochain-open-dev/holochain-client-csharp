@@ -5,7 +5,6 @@ using System.Diagnostics;
 using System.Dynamic;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -40,7 +39,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
         //private AdminOperation _adminOperation;
         private byte[][] _installingAppCellId = null;
         dynamic paramsObject = null;
-        private InstalledApp _attachingApp = null;
+        //private InstalledApp _currentApp = null;
         private int _clientsToDisconnect = 0;
         private int _clientsDisconnected = 0;
         private Avatar _avatar;
@@ -48,6 +47,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
         public ObservableCollection<InstalledApp> InstalledApps { get; set; } = new ObservableCollection<InstalledApp>();
         public ObservableCollection<Avatar> HoloNETEntries { get; set; } = new ObservableCollection<Avatar>();
         
+        public InstalledApp CurrentApp { get; set; }
+
         public MainWindow()
         {
             InitializeComponent();
@@ -127,9 +128,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
             newClient.HoloNETDNA.AutoStartHolochainConductor = false;
             newClient.HoloNETDNA.AutoShutdownHolochainConductor = false;
 
-            newClient.HoloNETDNA.AgentPubKey = _attachingApp.AgentPubKey;
-            newClient.HoloNETDNA.DnaHash = _attachingApp.DnaHash;
-            newClient.HoloNETDNA.InstalledAppId = _attachingApp.Name;
+            newClient.HoloNETDNA.AgentPubKey = CurrentApp.AgentPubKey;
+            newClient.HoloNETDNA.DnaHash = CurrentApp.DnaHash;
+            newClient.HoloNETDNA.InstalledAppId = CurrentApp.Name;
 
             return newClient;
         }
@@ -251,6 +252,26 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
             return result;
         }
 
+        private void SetCurrentAppToConnectedStatus(int port)
+        {
+            CurrentApp = InstalledApps.FirstOrDefault(x => x.Name == CurrentApp.Name && x.DnaHash == CurrentApp.DnaHash && x.AgentPubKey == CurrentApp.AgentPubKey);
+            SetAppToConnectedStatus(CurrentApp, port);
+        }
+
+        private void SetAppToConnectedStatus(InstalledApp app, int port, bool refreshGrid = true)
+        {
+            if (app != null)
+            {
+                app.IsConnected = true;
+                app.Status = "Running (Connected)";
+                app.StatusReason = "AppAgent Client Connected";
+                app.Port = port.ToString();
+
+                if (refreshGrid)
+                    gridHapps.ItemsSource = InstalledApps.OrderBy(x => x.Name);
+            }
+        }
+
         private void _holoNETClientAdmin_OnHolochainConductorStarting(object sender, HolochainConductorStartingEventArgs e)
         {
             LogMessage($"ADMIN: Starting Holochain Conductor...");
@@ -287,17 +308,27 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
 
             foreach (AppInfo app in e.Apps)
             {
-                InstalledApps.Add(new InstalledApp()
+                InstalledApp installedApp = new InstalledApp()
                 {
-                     AgentPubKey = app.AgentPubKey,
-                     DnaHash = app.DnaHash,
-                     Name = app.installed_app_id,
-                     Manifest = $"{ app.manifest.name } v{ app.manifest.manifest_version } { (!string.IsNullOrEmpty(app.manifest.description) ? string.Concat('(', app.manifest.description, ')') : "")}",
-                     Status = $"{Enum.GetName(typeof(AppInfoStatusEnum), app.AppStatus)}",
-                     StatusReason = app.AppStatusReason,
-                     IsEnabled = app.AppStatus == AppInfoStatusEnum.Disabled ? false : true,
-                     IsDisabled = app.AppStatus == AppInfoStatusEnum.Disabled ? true : false
-                });
+                    AgentPubKey = app.AgentPubKey,
+                    DnaHash = app.DnaHash,
+                    Name = app.installed_app_id,
+                    Manifest = $"{app.manifest.name} v{app.manifest.manifest_version} {(!string.IsNullOrEmpty(app.manifest.description) ? string.Concat('(', app.manifest.description, ')') : "")}",
+                    Status = $"{Enum.GetName(typeof(AppInfoStatusEnum), app.AppStatus)}",
+                    StatusReason = app.AppStatusReason,
+                    IsEnabled = app.AppStatus == AppInfoStatusEnum.Disabled ? false : true,
+                    IsDisabled = app.AppStatus == AppInfoStatusEnum.Disabled ? true : false
+                };
+
+                if (app.AppStatus == AppInfoStatusEnum.Running)
+                {
+                    HoloNETClient client = GetClient(installedApp.DnaHash, installedApp.AgentPubKey, installedApp.Name);
+
+                    if (client != null && client.State == System.Net.WebSockets.WebSocketState.Open)
+                        SetAppToConnectedStatus(installedApp, client.EndPoint.Port, false);
+                }
+
+                InstalledApps.Add(installedApp);
 
                 if (hApps != "")
                     hApps = $"{hApps}, ";
@@ -305,11 +336,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
                 hApps = $"{hApps}{app.installed_app_id}";
             }
 
-
             gridHapps.ItemsSource = InstalledApps.OrderBy(x => x.Name);
             LogMessage($"ADMIN: hApps Listed: {hApps}");
-            ShowStatusMessage("hApps Listed.", StatusMessageType.Success);
-        }
+            ShowStatusMessage("hApps Listed.", StatusMessageType.Success);        }
 
         private void _holoNETClient_OnAdminAppInterfaceAttachedCallBack(object sender, AdminAppInterfaceAttachedCallBackEventArgs e)
         {
@@ -319,7 +348,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
             bool foundClient = false;
             foreach (HoloNETClient client in _holoNETappClients)
             {
-                if (client != null && client.HoloNETDNA.DnaHash == _attachingApp.DnaHash && client.HoloNETDNA.AgentPubKey == _attachingApp.AgentPubKey && client.HoloNETDNA.InstalledAppId == _attachingApp.Name)
+                if (client != null && client.HoloNETDNA.DnaHash == CurrentApp.DnaHash && client.HoloNETDNA.AgentPubKey == CurrentApp.AgentPubKey && client.HoloNETDNA.InstalledAppId == CurrentApp.Name)
                 {
                     LogMessage($"APP: Found Exsting Existing HoloNETClient AppAgent WebSocket For AgentPubKey {client.HoloNETDNA.AgentPubKey}, DnaHash {client.HoloNETDNA.DnaHash} And InstalledAppId {client.HoloNETDNA.InstalledAppId} Running On Port {client.EndPoint.Port}.");
 
@@ -369,7 +398,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
 
             if (!foundClient)
             {
-                LogMessage($"APP: No Existing HoloNETClient AppAgent WebSocket Found Running For AgentPubKey {_attachingApp.AgentPubKey}, DnaHash {_attachingApp.DnaHash} And InstalledAppId {_attachingApp.Name} So Looking For Client To Recycle...");
+                LogMessage($"APP: No Existing HoloNETClient AppAgent WebSocket Found Running For AgentPubKey {CurrentApp.AgentPubKey}, DnaHash {CurrentApp.DnaHash} And InstalledAppId {CurrentApp.Name} So Looking For Client To Recycle...");
 
                 foreach (HoloNETClient client in _holoNETappClients)
                 {
@@ -393,7 +422,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
 
             if (!foundClient)
             {
-                LogMessage($"APP: No Existing HoloNETClient AppAgent WebSocket Found Running For AgentPubKey {_attachingApp.AgentPubKey}, DnaHash {_attachingApp.DnaHash} And InstalledAppId {_attachingApp.Name} So Creating New HoloNETClient AppAgent WebSocket Now...");
+                LogMessage($"APP: No Existing HoloNETClient AppAgent WebSocket Found Running For AgentPubKey {CurrentApp.AgentPubKey}, DnaHash {CurrentApp.DnaHash} And InstalledAppId {CurrentApp.Name} So Creating New HoloNETClient AppAgent WebSocket Now...");
 
                 HoloNETClient newClient = CreateNewClientConnection(e.Port.Value);
                 LogMessage($"APP: New HoloNETClient AppAgent WebSocket Created.");
@@ -444,6 +473,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
 
                 _holoNETappClients.Remove(client);
                 UpdateNumerOfClientConnections();
+
+                if (!_rebooting)
+                    ListHapps();
             }
 
             _clientsDisconnected++;
@@ -463,7 +495,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
             LogMessage("APP: Ready For Zome Calls.");
             ShowStatusMessage("Ready For Zome Calls.", StatusMessageType.Success);
 
-            HoloNETClient client = GetClient(_attachingApp.DnaHash, _attachingApp.AgentPubKey, _attachingApp.Name);
+            HoloNETClient client = GetClient(CurrentApp.DnaHash, CurrentApp.AgentPubKey, CurrentApp.Name);
 
             if (client != null)
             {
@@ -488,6 +520,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
         {
             LogMessage("APP: Connected.");
             ShowStatusMessage("App WebSocket Connected.", StatusMessageType.Success);
+            SetCurrentAppToConnectedStatus(e.EndPoint.Port);
         }
 
         private void _holoNETClient_OnDataSent(object sender, HoloNETDataSentEventArgs e)
@@ -795,16 +828,16 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
                         ExpandoObjectHelpers.AddProperty(paramsObject, paramParts[0], paramParts[1]);
                     }
 
-                    InstalledApp app = gridHapps.SelectedItem as InstalledApp;
+                    CurrentApp = gridHapps.SelectedItem as InstalledApp;
 
-                    if (app != null)
+                    if (CurrentApp != null)
                     {
-                        HoloNETClient client = GetClient(app.DnaHash, app.AgentPubKey, app.Name);
+                        HoloNETClient client = GetClient(CurrentApp.DnaHash, CurrentApp.AgentPubKey, CurrentApp.Name);
 
                         //If we find an existing client then that means it has already been authorized, attached and connected.
                         if (client != null)
                         {
-                            LogMessage($"APP: Found Exsting Existing HoloNETClient AppAgent WebSocket For AgentPubKey {client.HoloNETDNA.AgentPubKey}, DnaHash {client.HoloNETDNA.DnaHash} And InstalledAppId {client.HoloNETDNA.InstalledAppId} Running On Port {client.EndPoint.Port}.");
+                            LogMessage($"APP: Found Existing HoloNETClient AppAgent WebSocket For AgentPubKey {client.HoloNETDNA.AgentPubKey}, DnaHash {client.HoloNETDNA.DnaHash} And InstalledAppId {client.HoloNETDNA.InstalledAppId} Running On Port {client.EndPoint.Port}.");
                             
                             if (client.State == System.Net.WebSockets.WebSocketState.Open)
                             {
@@ -826,9 +859,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
                         }
                         else
                         {
-                            LogMessage($"ADMIN: No Existing HoloNETClient AppAgent WebSocket Found For AgentPubKey {app.AgentPubKey}, DnaHash {app.DnaHash} And InstalledAppId {app.Name} So New Connection Needs To Be Made...");
-                            LogMessage($"ADMIN: Authorizing Signing Credentials For {app.Name} hApp...");
-                            ShowStatusMessage($"Authorizing Signing Credentials For {app.Name} hApp...", StatusMessageType.Information, true);
+                            LogMessage($"ADMIN: No Existing HoloNETClient AppAgent WebSocket Found For AgentPubKey {CurrentApp.AgentPubKey}, DnaHash {CurrentApp.DnaHash} And InstalledAppId {CurrentApp.Name} So New Connection Needs To Be Made...");
+                            LogMessage($"ADMIN: Authorizing Signing Credentials For {CurrentApp.Name} hApp...");
+                            ShowStatusMessage($"Authorizing Signing Credentials For {CurrentApp.Name} hApp...", StatusMessageType.Information, true);
 
                             //_holoNETClientAdmin.AdminAuthorizeSigningCredentialsAndGrantZomeCallCapability(GrantedFunctionsType.Listed, new List<(string, string)>()
                             //{
@@ -837,8 +870,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
                             //    ("oasis", "update_avatar")
                             //});
 
-                            _attachingApp = app;
-                            _holoNETClientAdmin.AdminAuthorizeSigningCredentialsAndGrantZomeCallCapability(_holoNETClientAdmin.GetCellId(app.DnaHash, app.AgentPubKey), CapGrantAccessType.Unrestricted, GrantedFunctionsType.All, null);
+                            _holoNETClientAdmin.AdminAuthorizeSigningCredentialsAndGrantZomeCallCapability(_holoNETClientAdmin.GetCellId(CurrentApp.DnaHash, CurrentApp.AgentPubKey), CapGrantAccessType.Unrestricted, GrantedFunctionsType.All, null);
                         }
                     }
                 }
@@ -1077,6 +1109,32 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
         private void btnDataEntriesPopupCancel_Click(object sender, RoutedEventArgs e)
         {
             popupDataEntries.Visibility = Visibility.Collapsed;
+        }
+
+        private void gridLog_LayoutUpdated(object sender, EventArgs e)
+        {
+            if (gridLog.ActualHeight - 60 > 0)
+                lstOutput.Height = gridLog.ActualHeight - 60;
+        }
+
+        private void btnDisconnectClient_Click(object sender, RoutedEventArgs e)
+        {
+            InstalledApp app = gridHapps.SelectedItem as InstalledApp;
+
+            if (app != null)
+            {
+                HoloNETClient client = GetClient(app.DnaHash, app.AgentPubKey, app.Name);
+
+                if (client != null && client.State == System.Net.WebSockets.WebSocketState.Open)
+                {
+                    Button btnDisconnectClient = sender as Button;
+
+                    if (btnDisconnectClient != null)
+                        btnDisconnectClient.IsEnabled = false;
+
+                    client.Disconnect();
+                }
+            }
         }
     }
 }

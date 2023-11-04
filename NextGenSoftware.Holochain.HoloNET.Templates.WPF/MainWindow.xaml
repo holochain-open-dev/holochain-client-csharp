@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:fa="http://schemas.fontawesome.io/icons/"
         mc:Ignorable="d"
-        Title="NextGen Software HoloNET WPF Test Harness v1.0" Height="700" Width="1555">
+        Title="NextGen Software HoloNET WPF Test Harness v1.0" Height="770" Width="1650">
     <!--Title="NextGen Software HoloNET WPF Test Harness v1.0" Height="700" Width="1555">-->
 
 
@@ -459,10 +459,13 @@
                 <DataGridTextColumn Width="*" Header="Name" Binding="{Binding Path=Name}" CanUserSort="True" ></DataGridTextColumn>
                 <DataGridTextColumn Width="*" Header="Status" Binding="{Binding Path=Status}" CanUserSort="True" ></DataGridTextColumn>
                 <DataGridTextColumn Width="*" Header="Status Reason" Binding="{Binding Path=StatusReason}" CanUserSort="True" ></DataGridTextColumn>
+                <DataGridTextColumn Width="*" Header="Port" Binding="{Binding Path=Port}" CanUserSort="True" ></DataGridTextColumn>
                 <DataGridTextColumn Width="*" Header="Manifest" Binding="{Binding Path=Manifest}" CanUserSort="True" ></DataGridTextColumn>
                 <DataGridTextColumn Width="4*" MinWidth="200" Header="Agent Pub Key" Binding="{Binding Path=AgentPubKey}" CanUserSort="True" ></DataGridTextColumn>
                 <DataGridTextColumn Width="4*" MinWidth="200" Header="Dna Hash" Binding="{Binding Path=DnaHash}" CanUserSort="True" ></DataGridTextColumn>
-                <DataGridTemplateColumn Width="450">
+                <!--<DataGridTemplateColumn Width="450">-->
+                <!--<DataGridTemplateColumn Width="560">-->
+                <DataGridTemplateColumn Width="660">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <StackPanel Grid.Row="2" Orientation="Horizontal">
@@ -565,6 +568,39 @@
                                         </EventTrigger>
                                     </Button.Triggers>
                                 </Button>
+                                <Button x:Name="btnDisconnectClient" Style="{StaticResource ButtonStyle}" IsEnabled="{Binding Path=IsConnected}" Foreground="{Binding Path=DisconnectButtonForegroundColour}" FontSize="12"  Cursor="Hand" Background="Black" Margin="10,0,10,10"  Padding="5,5,5,5" Content="Disconnect" Click="btnDisconnectClient_Click">
+                                    <Button.Effect>
+                                        <DropShadowEffect x:Name="btnDisconnectClientGlowEffect" ShadowDepth="0"
+Color="White"
+Opacity="0"
+BlurRadius="10"/>
+                                    </Button.Effect>
+
+                                    <Button.Triggers>
+                                        <EventTrigger RoutedEvent="Button.MouseEnter">
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <DoubleAnimation
+          Storyboard.TargetName="btnDisconnectClientGlowEffect" 
+          Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+          From="0.0" To="1.0" Duration="0:0:0.5" 
+          AutoReverse="False" RepeatBehavior="1x" />
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </EventTrigger>
+                                        <EventTrigger RoutedEvent="Button.MouseLeave">
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <DoubleAnimation
+              Storyboard.TargetName="btnDisconnectClientGlowEffect" 
+              Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+              From="1" To="0" Duration="0:0:0.5" 
+              AutoReverse="False" RepeatBehavior="1x" />
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </EventTrigger>
+                                    </Button.Triggers>
+                                </Button>
                                 <Button x:Name="btnCallZomeFunction" Style="{StaticResource ButtonStyle}" IsEnabled="{Binding Path=IsEnabled}" Foreground="{Binding Path=DisabledButtonForegroundColour}" FontSize="12"  Cursor="Hand" Background="Black" Margin="10,0,10,10"  Padding="5,5,5,5" Content="Call Zome Function" Click="btnCallZomeFunction_Click">
                                     <Button.Effect>
                                         <DropShadowEffect x:Name="btnCallZomeFunctionGlowEffect" ShadowDepth="0"
@@ -641,13 +677,13 @@
 
         <GridSplitter Grid.Column="0" Grid.Row="2" Height="5" HorizontalAlignment="Stretch" />
 
-        <Grid Grid.Row="3">
+        <Grid Grid.Row="3" x:Name="gridLog" LayoutUpdated="gridLog_LayoutUpdated">
             <Grid.RowDefinitions>
                 <RowDefinition Height="40"></RowDefinition>
                 <RowDefinition Height="*"></RowDefinition>
             </Grid.RowDefinitions>
             <Label Grid.Row="0" Content="Log:" Height="40" Margin="10,10,0,0" Foreground="WhiteSmoke" FontWeight="Bold"></Label>
-            <ListBox Grid.Row="1" VerticalAlignment="Top"  MinHeight="200" x:Name="lstOutput" Margin="10" Background="Transparent"   Foreground="White"/>
+            <ListBox Grid.Row="1" VerticalAlignment="Top"  MinHeight="200" x:Name="lstOutput" Margin="10" Background="Transparent"  Foreground="White"/>
         </Grid>
 
         <Grid Grid.Row="5">

@@ -7,6 +7,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         Paused,
         Disabled,
         Running,
+        //RunningAndAttached,
         None
     }
 }
