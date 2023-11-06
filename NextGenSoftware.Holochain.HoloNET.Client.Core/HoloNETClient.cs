@@ -603,6 +603,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             try
             {
                 _getAgentPubKeyAndDnaHashFromConductor = retrieveAgentPubKeyAndDnaHashFromConductor;
+                _taskCompletionReadyForZomeCalls = new TaskCompletionSource<ReadyForZomeCallsEventArgs>();
+                _taskCompletionAgentPubKeyAndDnaHashRetrieved = new TaskCompletionSource<AgentPubKeyDnaHash>(); //TODO: Need to init all of these in the code base for each call! ;-)
 
                 //if ((string.IsNullOrEmpty(holochainConductorURI) && EndPoint == null) || (EndPoint != null && !EndPoint.IsUnc))
                 if (string.IsNullOrEmpty(holochainConductorURI) && EndPoint == null)
@@ -1312,6 +1314,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public async Task DisconnectAsync(DisconnectedCallBackMode disconnectedCallBackMode = DisconnectedCallBackMode.WaitForHolochainConductorToDisconnect, ShutdownHolochainConductorsMode shutdownHolochainConductorsMode = ShutdownHolochainConductorsMode.UseHoloNETDNASettings)
         {
+            _taskCompletionDisconnected = new TaskCompletionSource<DisconnectedEventArgs>();
+
             _shutdownHolochainConductorsMode = shutdownHolochainConductorsMode;
             await WebSocket.DisconnectAsync();
 
@@ -3232,6 +3236,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public async Task<HoloNETShutdownEventArgs> ShutdownHoloNETAsync(DisconnectedCallBackMode disconnectedCallBackMode = DisconnectedCallBackMode.WaitForHolochainConductorToDisconnect, ShutdownHolochainConductorsMode shutdownHolochainConductorsMode = ShutdownHolochainConductorsMode.UseHoloNETDNASettings)
         {
             _shuttingDownHoloNET = true;
+            _taskCompletionHoloNETShutdown = new TaskCompletionSource<HoloNETShutdownEventArgs>();
 
             if (WebSocket.State != WebSocketState.Closed || WebSocket.State != WebSocketState.CloseReceived || WebSocket.State != WebSocketState.CloseSent)
                 await DisconnectAsync(disconnectedCallBackMode, shutdownHolochainConductorsMode);
