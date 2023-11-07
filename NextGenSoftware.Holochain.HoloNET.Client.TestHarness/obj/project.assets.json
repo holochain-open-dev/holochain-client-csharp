@@ -709,6 +709,19 @@
           "lib/netcoreapp2.1/_._": {}
         }
       },
+      "YamlDotNet/13.7.1": {
+        "type": "package",
+        "compile": {
+          "lib/net7.0/YamlDotNet.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net7.0/YamlDotNet.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "NextGenSoftware.CLI.Engine/1.2.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v7.0",
@@ -733,7 +746,8 @@
           "NextGenSoftware.WebSocket": "1.2.0",
           "SauceControl.Blake2Fast": "2.0.0",
           "Sodium.Core": "1.3.4",
-          "System.Threading.Tasks.Extensions": "4.5.4"
+          "System.Threading.Tasks.Extensions": "4.5.4",
+          "YamlDotNet": "13.7.1"
         },
         "compile": {
           "bin/placeholder/NextGenSoftware.Holochain.HoloNET.Client.dll": {}
@@ -2985,6 +2999,33 @@
         "system.threading.tasks.extensions.nuspec",
         "useSharedDesignerContext.txt",
         "version.txt"
+      ]
+    },
+    "YamlDotNet/13.7.1": {
+      "sha512": "X4m1PnFcJwvAj1sCDMntg/eZcX96CJLrWMiYnq41KqhFVZPuw63ZTSxIGqgdCwHWHvCAyTxheELC/VDf1HsU2A==",
+      "type": "package",
+      "path": "yamldotnet/13.7.1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "LICENSE.txt",
+        "images/yamldotnet.png",
+        "lib/net35/YamlDotNet.dll",
+        "lib/net35/YamlDotNet.xml",
+        "lib/net45/YamlDotNet.dll",
+        "lib/net45/YamlDotNet.xml",
+        "lib/net47/YamlDotNet.dll",
+        "lib/net47/YamlDotNet.xml",
+        "lib/net6.0/YamlDotNet.dll",
+        "lib/net6.0/YamlDotNet.xml",
+        "lib/net7.0/YamlDotNet.dll",
+        "lib/net7.0/YamlDotNet.xml",
+        "lib/netstandard2.0/YamlDotNet.dll",
+        "lib/netstandard2.0/YamlDotNet.xml",
+        "lib/netstandard2.1/YamlDotNet.dll",
+        "lib/netstandard2.1/YamlDotNet.xml",
+        "yamldotnet.13.7.1.nupkg.sha512",
+        "yamldotnet.nuspec"
       ]
     },
     "NextGenSoftware.CLI.Engine/1.2.0": {

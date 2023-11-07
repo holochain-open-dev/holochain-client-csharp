@@ -145,6 +145,7 @@
     <PackageReference Include="SauceControl.Blake2Fast" Version="2.0.0" />
     <PackageReference Include="Sodium.Core" Version="1.3.4" />
     <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
+    <PackageReference Include="YamlDotNet" Version="13.7.1" />
   </ItemGroup>
 
   <ItemGroup>

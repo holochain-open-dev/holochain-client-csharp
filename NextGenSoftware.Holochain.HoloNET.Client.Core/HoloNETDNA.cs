@@ -1,12 +1,12 @@
 ﻿
 using NextGenSoftware.Logging;
+using System;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
     public class HoloNETDNA
     {
-        //private HoloNETDNAManager _holoNETDNAManager = new HoloNETDNAManager();
-
+        public string HolochainConductorConfigPath { get; set; } = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\holochain\\holochain\\config\\conductor-config.yml";
         public string HolochainConductorAdminURI { get; set; } = "ws://localhost:77777";
 
         /// <summary>

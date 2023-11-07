@@ -17,6 +17,10 @@ using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.AppManifest;
 using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests;
 using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects;
 using NextGenSoftware.Holochain.HoloNET.Client.Properties;
+using YamlDotNet.Serialization;
+using YamlDotNet.Serialization.NamingConventions;
+using YamlDotNet.Core;
+using System.Dynamic;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
@@ -1000,16 +1004,60 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     }
                     else
                     {
+                        string config = File.ReadAllText(HoloNETDNA.HolochainConductorConfigPath);
+                        string newConfig = "";
+
+                       
+
+                        //var deserializer = new DeserializerBuilder()
+                        //.WithNamingConvention(UnderscoredNamingConvention.Instance)  // see height_in_inches in sample yml 
+                        //.Build();
+
+                        ////yml contains a string containing your YAML
+                        //dynamic myConfig = deserializer.Deserialize<ExpandoObject>(config);
+                        //Dictionary<string, object> yaml = deserializer.Deserialize<Dictionary<string, object>>(config);
+                        //Dictionary<string, object> interfaces = yaml["admin_interfaces"] as Dictionary<string, object>;
+                        //Dictionary<string, object> driver = interfaces["driver"] as Dictionary<string, object>;
+
+                        //interfaces["port"] = EndPoint.Port;
+
+                        //Dictionary<string, object> port = interfaces["port"] as Dictionary<string, object>;
+
+                        //var serializer = new SerializerBuilder()
+                        //.WithNamingConvention(CamelCaseNamingConvention.Instance)
+                        //.Build();
+
+                        //newConfig = serializer.Serialize(yaml);
+
+                        //newConfig = "";
+
+                        //var h = p.Addresses["home"];
+                        //System.Console.WriteLine($"{p.Name} is {p.Age} years old and lives at {h.Street} in {h.City}, {h.State}.");
+
+                        if (!config.Contains("port"))
+                            //newConfig = config.Replace("admin_interfaces: null", $"admin_interfaces:\n\t\t\t- driver:\n\t\t\t\t\ttype: websocket\n\t\t\t\t\tport: {EndPoint.Port}");
+                            newConfig = config.Replace("admin_interfaces: null", $"admin_interfaces:\n      - driver:\n          type: websocket\n          port: {EndPoint.Port}");
+                        else
+                        {
+                            int portStart = config.IndexOf("port");
+                            int portEnd = config.IndexOf("\n", portStart);
+
+                            newConfig = config.Substring(0, portStart);
+                            newConfig = string.Concat(newConfig, $"port: {EndPoint.Port}");
+                            newConfig = string.Concat(newConfig, config.Substring(portEnd));
+                        }
+
+                        File.WriteAllText(HoloNETDNA.HolochainConductorConfigPath, newConfig);
+
+                        //TODO: Try and pipe y and then enter to the command below so it can automatically setup the conductor without needing user input! ;-)
+                        //Alternatively we could try copying a default setup for the conductor such as db/enviroment which is in the roaming appdata folder...
+                       // _conductorProcess.StartInfo.Arguments = $"-NoExit -Command \"'' | {fullPathToHolochainExe} --piped -i\"";
                         _conductorProcess.StartInfo.Arguments = $"-NoExit -Command \"'' | {fullPathToHolochainExe} --piped\"";
                         //TrueProcessStart("PowerShell.exe -NoExit -Command \"'' | {fullPathToHolochainExe} --piped\"");
                     }
 
                     _conductorProcess.Start();
                     _conductorProcessSessionId = _conductorProcess.Id;
-
-                    
-
-
 
                     await Task.Delay(HoloNETDNA.SecondsToWaitForHolochainConductorToStart * 1000); // Give the conductor 5 (default) seconds to start up...
                     OnHolochainConductorStarted?.Invoke(this, new HolochainConductorStartedEventArgs());
