@@ -45,6 +45,18 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public string KeyValuePairAsString { get; set; }
     }
 
+    public class ZomeFunctionCallBackForCollectionEventArgs : HoloNETDataReceivedBaseEventArgs
+    {
+        public string Zome { get; set; }
+        public string ZomeFunction { get; set; }
+        public Dictionary<string, object> ZomeReturnData { get; set; }
+        public Dictionary<object, object> RawZomeReturnData { get; set; }
+        public string ZomeReturnHash { get; set; }
+        public List<EntryData> Entries { get; set; }
+        public Dictionary<string, string> KeyValuePair { get; set; }
+        public string KeyValuePairAsString { get; set; }
+    }
+
     public class AppInfoCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
         public AppInfoResponse AppInfoResponse { get; set; }

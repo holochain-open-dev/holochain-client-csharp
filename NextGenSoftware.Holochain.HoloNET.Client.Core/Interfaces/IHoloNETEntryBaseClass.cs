@@ -11,19 +11,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         bool IsInitialized { get; }
         bool IsInitializing { get; }
         string PreviousVersionEntryHash { get; set; }
-        string ZomeAddToCollectionFunction { get; set; }
         string ZomeCreateEntryFunction { get; set; }
         string ZomeDeleteEntryFunction { get; set; }
-        string ZomeLoadCollectionFunction { get; set; }
         string ZomeLoadEntryFunction { get; set; }
         string ZomeName { get; set; }
-        string ZomeRemoveFromCollectionFunction { get; set; }
-        string ZomeUpdateCollectionFunction { get; set; }
         string ZomeUpdateEntryFunction { get; set; }
 
         event HoloNETEntryBaseClass.Closed OnClosed;
-        event HoloNETEntryBaseClass.CollectionLoaded OnCollectionLoaded;
-        event HoloNETEntryBaseClass.CollectionUpdated OnCollectionUpdated;
         event HoloNETEntryBaseClass.Deleted OnDeleted;
         event HoloNETEntryBaseClass.Error OnError;
         event HoloNETEntryBaseClass.Initialized OnInitialized;

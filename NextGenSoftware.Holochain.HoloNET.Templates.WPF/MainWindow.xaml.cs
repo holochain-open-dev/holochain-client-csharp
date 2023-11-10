@@ -43,14 +43,14 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
         //private InstalledApp _currentApp = null;
         private int _clientsToDisconnect = 0;
         private int _clientsDisconnected = 0;
-        //private Avatar _avatar;
-        private AvatarMultiple _avatar;
+        //private Avatar _holoNETEntry;
+        private AvatarMultiple _holoNETEntry;
         private ClientOperation _clientOperation;
         private ushort _appAgentClientPort = 0;
         private bool _removeClientConnectionFromPoolAfterDisconnect = true;
 
         public ObservableCollection<InstalledApp> InstalledApps { get; set; } = new ObservableCollection<InstalledApp>();
-        public ObservableCollection<Avatar> HoloNETEntries { get; set; } = new ObservableCollection<Avatar>();
+        public ObservableCollection<AvatarMultiple> HoloNETEntries { get; set; } = new ObservableCollection<AvatarMultiple>();
         
         public InstalledApp CurrentApp { get; set; }
 
@@ -109,22 +109,22 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
             LogMessage("APP: Initializing HoloNET Entry...");
             ShowStatusMessage("Initializing HoloNET Entry...", StatusMessageType.Information, true);
 
-            if (_avatar == null)
+            if (_holoNETEntry == null)
             {
-                _avatar = new AvatarMultiple(client);
+                _holoNETEntry = new AvatarMultiple(client);
 
                 //If we are using SaveAsync (or LoadAsync) we do not need to worry about any events such as OnSaved if you don't need them.
-                _avatar.OnInitialized += Avatar_OnInitialized;
-                _avatar.OnLoaded += Avatar_OnLoaded;
-                _avatar.OnCollectionLoaded += Avatar_OnCollectionLoaded;
-                _avatar.OnCollectionUpdated += Avatar_OnCollectionUpdated;
-                _avatar.OnClosed += Avatar_OnClosed;
-                _avatar.OnSaved += Avatar_OnSaved;
-                _avatar.OnDeleted += Avatar_OnDeleted;
-                _avatar.OnError += Avatar_OnError;
+                _holoNETEntry.OnInitialized += Avatar_OnInitialized;
+                _holoNETEntry.OnLoaded += Avatar_OnLoaded;
+                _holoNETEntry.OnCollectionLoaded += Avatar_OnCollectionLoaded;
+                _holoNETEntry.OnCollectionUpdated += Avatar_OnCollectionUpdated;
+                _holoNETEntry.OnClosed += Avatar_OnClosed;
+                _holoNETEntry.OnSaved += Avatar_OnSaved;
+                _holoNETEntry.OnDeleted += Avatar_OnDeleted;
+                _holoNETEntry.OnError += Avatar_OnError;
             }
             else
-                _avatar.HoloNETClient = client;
+                _holoNETEntry.HoloNETClient = client;
         }
 
         private void ConnectAdmin()
@@ -290,11 +290,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
 
         private void SaveHoloNETEntry()
         {
-            if (_avatar != null)
+            if (_holoNETEntry != null)
             {
                 //Non async way.
                 //If you use Load or Save non-async versions you will need to wait for the OnInitialized event to fire before calling.
-                //_avatar.Save(); //For this OnSaved event handler above is required (only if you want to see what the result was!) //TODO: Check if this works without waiting for OnInitialized event!
+                //_holoNETEntry.Save(); //For this OnSaved event handler above is required (only if you want to see what the result was!) //TODO: Check if this works without waiting for OnInitialized event!
 
                 //Async way.
                 Dispatcher.InvokeAsync(async () =>
@@ -303,7 +303,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
                     LogMessage($"APP: Saving HoloNET Data Entry...");
 
                     //SaveAsync (as well as LoadAsync) will automatically wait for the client to finish connecting and retreiving agentPubKey (if needed) and raising the OnInitialized event.
-                    ZomeFunctionCallBackEventArgs result = await _avatar.SaveAsync(); //No event handlers are needed.
+                    ZomeFunctionCallBackEventArgs result = await _holoNETEntry.SaveAsync(); //No event handlers are needed.
                     HandleHoloNETEntrySaved(result);
                 });
             }
@@ -311,6 +311,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
 
         private void HandleHoloNETEntrySaved(ZomeFunctionCallBackEventArgs result)
         {
+            //HoloNETEntries.Add(result.Entry.EntryDataObject);
+
+            HoloNETEntries.Add(_holoNETEntry);
+
             if (result.IsCallSuccessful && !result.IsError)
                 HoloNETEntries.Add(result.Entry.EntryDataObject);
             else
@@ -1106,9 +1110,18 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
         private void tbnViewDataEntries_Click(object sender, RoutedEventArgs e)
         {
             popupDataEntries.Visibility = Visibility.Visible;
+            ConnectToAppAgentClientResult result = ConnectToAppAgentClient();
 
-            //Avatar avatar = new Avatar();
-            //avatar.Load();
+            if (result.ResponseType == ConnectToAppAgentClientResponseType.Connected)
+            {
+                //If we intend to re-use an object then we can store it globally so we only need to init once...
+                if (_holoNETEntry == null)
+                    InitHoloNETEntry(result.AppAgentClient);
+
+                _holoNETEntry.LoadCollection();
+            }
+            else
+                _clientOperation = ClientOperation.InitHoloNETEntry;
 
         }
 
@@ -1143,18 +1156,20 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
             }
             else
             {
-                ConnectToAppAgentClientResult result = ConnectToAppAgentClient();
+                SaveHoloNETEntry();
 
-                if (result.ResponseType == ConnectToAppAgentClientResponseType.Connected)
-                {
-                    //If we intend to re-use an object then we can store it globally so we only need to init once...
-                    if (_avatar == null)
-                        InitHoloNETEntry(result.AppAgentClient);
+                //ConnectToAppAgentClientResult result = ConnectToAppAgentClient();
 
-                    SaveHoloNETEntry();
-                }
-                else
-                    _clientOperation = ClientOperation.InitHoloNETEntry;
+                //if (result.ResponseType == ConnectToAppAgentClientResponseType.Connected)
+                //{
+                //    //If we intend to re-use an object then we can store it globally so we only need to init once...
+                //    if (_holoNETEntry == null)
+                //        InitHoloNETEntry(result.AppAgentClient);
+
+                //    SaveHoloNETEntry();
+                //}
+                //else
+                //    _clientOperation = ClientOperation.InitHoloNETEntry;
             }
         }
 

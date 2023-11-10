@@ -36,10 +36,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         private bool _automaticallyAttemptToGetFromSandboxIfConductorFails;
         private bool _updateDnaHashAndAgentPubKey = true;
         private List<string> _pendingRequests = new List<string>();
+        private Dictionary<string, HoloNETRequestType> _requestTypeLookup = new Dictionary<string, HoloNETRequestType>();
         private Dictionary<string, string> _disablingAppLookup = new Dictionary<string, string>();
         private Dictionary<string, string> _uninstallingAppLookup = new Dictionary<string, string>();
         private Dictionary<string, string> _zomeLookup = new Dictionary<string, string>();
         private Dictionary<string, string> _funcLookup = new Dictionary<string, string>();
+        //private Dictionary<string, bool> _responseMustHaveMatchingRequestLookup = new Dictionary<string, bool>();
         private Dictionary<string, Type> _entryDataObjectTypeLookup = new Dictionary<string, Type>();
         private Dictionary<string, dynamic> _entryDataObjectLookup = new Dictionary<string, dynamic>();
         private Dictionary<string, ZomeFunctionCallBack> _callbackLookup = new Dictionary<string, ZomeFunctionCallBack>();
@@ -1278,7 +1280,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     }
                 };
 
-                await SendHoloNETRequestAsync(holoNETData);
+                await SendHoloNETRequestAsync(holoNETData, HoloNETRequestType.AppInfo);
 
                 if (retrieveAgentPubKeyAndDnaHashMode == RetrieveAgentPubKeyAndDnaHashMode.Wait)
                     return await _taskCompletionAgentPubKeyAndDnaHashRetrieved.Task;
@@ -1308,9 +1310,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="id">The id of the request to send to the Holochain Conductor. This will be matched to the id in the response received from the Holochain Conductor.</param>
         /// <param name="holoNETData">The raw data packet you wish to send to the Holochain conductor.</param>
         /// <returns></returns>
-        public async Task SendHoloNETRequestAsync(HoloNETData holoNETData, string id = "")
+        public async Task SendHoloNETRequestAsync(HoloNETData holoNETData, HoloNETRequestType requestType, string id = "")
         {
-            await SendHoloNETRequestAsync(MessagePackSerializer.Serialize(holoNETData), id);
+            await SendHoloNETRequestAsync(MessagePackSerializer.Serialize(holoNETData), requestType, id);
         }
 
         /// <summary>
@@ -1318,9 +1320,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// </summary>
         /// <param name="id">The id of the request to send to the Holochain Conductor. This will be matched to the id in the response received from the Holochain Conductor.</param>
         /// <param name="holoNETData">The raw data packet you wish to send to the Holochain conductor.</param>
-        public void SendHoloNETRequest(HoloNETData holoNETData, string id = "")
+        public void SendHoloNETRequest(HoloNETData holoNETData, HoloNETRequestType requestType, string id = "")
         {
-            SendHoloNETRequestAsync(holoNETData, id);
+            SendHoloNETRequestAsync(holoNETData, requestType, id);
         }
 
         /// <summary>
@@ -1328,7 +1330,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// </summary>
         /// <param name="id">The id of the request to send to the Holochain Conductor. This will be matched to the id in the response received from the Holochain Conductor.</param>
         /// <param name="holoNETData">The raw data packet you wish to send to the Holochain conductor.</param>
-        public async Task SendHoloNETRequestAsync(byte[] data, string id = "")
+        public async Task SendHoloNETRequestAsync(byte[] data, HoloNETRequestType requestType, string id = "")
         {
             try
             {
@@ -1344,6 +1346,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                 if (HoloNETDNA.EnforceRequestToResponseIdMatchingBehaviour != EnforceRequestToResponseIdMatchingBehaviour.Ignore)
                     _pendingRequests.Add(id);
+
+                _requestTypeLookup[id] = requestType;
 
                 if (WebSocket.State == WebSocketState.Open)
                 {
@@ -1364,9 +1368,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// </summary>
         /// <param name="id">The id of the request to send to the Holochain Conductor. This will be matched to the id in the response received from the Holochain Conductor.</param>
         /// <param name="holoNETData">The raw data packet you wish to send to the Holochain conductor.</param>
-        public void SendHoloNETRequest(byte[] data, string id = "")
+        public void SendHoloNETRequest(byte[] data, HoloNETRequestType requestType, string id = "")
         {
-            SendHoloNETRequestAsync(data, id);
+            SendHoloNETRequestAsync(data, requestType, id);
         }
 
         /// <summary>
@@ -1737,6 +1741,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 if (callback != null)
                     _callbackLookup[id] = callback;
 
+                //_responseMustHaveMatchingRequestLookup[id] = responseMustHaveMatchingRequest;
+
                 try
                 {
                     if (paramsObject != null && paramsObject.GetType() == typeof(string))
@@ -1800,7 +1806,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                         data = signedPayload
                     };
 
-                    await SendHoloNETRequestAsync(holoNETData, id);
+                    await SendHoloNETRequestAsync(holoNETData, HoloNETRequestType.ZomeCall, id);
 
                     if (zomeResultCallBackMode == ConductorResponseCallBackMode.WaitForHolochainConductorResponse)
                     {
@@ -2138,7 +2144,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             if (!args.IsError)
             {
-                return await CallAdminFunctionAsync("grant_zome_call_capability", CreateGrantZomeCallCapabilityRequest(cellId, capGrantAccessType, grantedFunctions, signingKey),
+                return await CallAdminFunctionAsync(HoloNETRequestType.AdminGrantZomeCallCapability, "grant_zome_call_capability", CreateGrantZomeCallCapabilityRequest(cellId, capGrantAccessType, grantedFunctions, signingKey),
                 _taskCompletionAdminZomeCapabilityGrantedCallBack, "OnAdminZomeCallCapabilityGranted", conductorResponseCallBackMode, id);
             }
             else
@@ -2262,7 +2268,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public async Task<AdminAgentPubKeyGeneratedCallBackEventArgs> AdminGenerateAgentPubKeyAsync(ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, bool updateAgentPubKeyInHoloNETDNA = true, string id = "")
         {
             _updateDnaHashAndAgentPubKey = updateAgentPubKeyInHoloNETDNA;
-            return await CallAdminFunctionAsync("generate_agent_pub_key", null, _taskCompletionAdminAgentPubKeyGeneratedCallBack, "OnAdminAgentPubKeyGeneratedCallBack", conductorResponseCallBackMode, id);
+            return await CallAdminFunctionAsync(HoloNETRequestType.AdminGrantZomeCallCapability, "generate_agent_pub_key", null, _taskCompletionAdminAgentPubKeyGeneratedCallBack, "OnAdminAgentPubKeyGeneratedCallBack", conductorResponseCallBackMode, id);
         }
 
         public AdminAgentPubKeyGeneratedCallBackEventArgs AdminGenerateAgentPubKey(bool updateAgentPubKeyInHoloNETDNA = true, string id = "")
@@ -2292,7 +2298,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         public async Task<AdminAppEnabledCallBackEventArgs> AdminEnableAppAsync(string installedAppId, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
-            return await CallAdminFunctionAsync("enable_app", new EnableAppRequest()
+            return await CallAdminFunctionAsync(HoloNETRequestType.AdminEnableApp, "enable_app", new EnableAppRequest()
             {
                 installed_app_id = installedAppId
             }, _taskCompletionAdminAppEnabledCallBack, "OnAdminAppEnabledCallBack", conductorResponseCallBackMode, id);
@@ -2310,7 +2316,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             _disablingAppLookup[id] = installedAppId;
 
-            return await CallAdminFunctionAsync("disable_app", new EnableAppRequest()
+            return await CallAdminFunctionAsync(HoloNETRequestType.AdminDisableApp, "disable_app", new EnableAppRequest()
             {
                 installed_app_id = installedAppId
             }, _taskCompletionAdminAppDisabledCallBack, "OnAdminAppDisabledCallBack", conductorResponseCallBackMode, id);
@@ -2328,7 +2334,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             _uninstallingAppLookup[id] = installedAppId;
 
-            return await CallAdminFunctionAsync("uninstall_app", new UninstallAppRequest()
+            return await CallAdminFunctionAsync(HoloNETRequestType.AdminUninstallApp, "uninstall_app", new UninstallAppRequest()
             {
                 installed_app_id = installedAppId
             }, _taskCompletionAdminAppUninstalledCallBack, "OnAdminAppUninstalledCallBack", conductorResponseCallBackMode, id);
@@ -2341,7 +2347,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         public async Task<AdminAppInterfaceAttachedCallBackEventArgs> AdminAttachAppInterfaceAsync(UInt16? port = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
-            return await CallAdminFunctionAsync("attach_app_interface", new AttachAppInterfaceRequest()
+            return await CallAdminFunctionAsync(HoloNETRequestType.AdminAttachAppInterface, "attach_app_interface", new AttachAppInterfaceRequest()
             {
                 port = port
             }, _taskCompletionAdminAppInterfaceAttachedCallBack, "OnAdminAppInterfaceAttachedCallBack", conductorResponseCallBackMode, id);
@@ -2386,7 +2392,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         {
             _updateDnaHashAndAgentPubKey = false;
 
-            return await CallAdminFunctionAsync("list_apps", new ListAppsRequest()
+            return await CallAdminFunctionAsync(HoloNETRequestType.AdminListApps, "list_apps", new ListAppsRequest()
             {
                 status_filter = appStatusFilter != AppStatusFilter.All ? appStatusFilter : null
             }, _taskCompletionAdminAppsListedCallBack, "OnAdminListAppsCallBack", conductorResponseCallBackMode, id);
@@ -2399,7 +2405,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         public async Task<AdminListDnasCallBackEventArgs> AdminListDnasAsync(ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
-            return await CallAdminFunctionAsync("list_dnas", null, _taskCompletionAdminListDnasCallBack, "OnAdminListDnasCallBack", conductorResponseCallBackMode, id);
+            return await CallAdminFunctionAsync(HoloNETRequestType.AdminListDnas, "list_dnas", null, _taskCompletionAdminListDnasCallBack, "OnAdminListDnasCallBack", conductorResponseCallBackMode, id);
         }
 
         public AdminListDnasCallBackEventArgs AdminListDnas(string id = null)
@@ -2409,7 +2415,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         public async Task<AdminListCellIdsCallBackEventArgs> AdminListCellIdsAsync(ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
-            return await CallAdminFunctionAsync("list_cell_ids", null, _taskCompletionAdminListCellIdsCallBack, "OnAdminListCellIds", conductorResponseCallBackMode, id);
+            return await CallAdminFunctionAsync(HoloNETRequestType.AdminListCellIds, "list_cell_ids", null, _taskCompletionAdminListCellIdsCallBack, "OnAdminListCellIds", conductorResponseCallBackMode, id);
         }
 
         public AdminListCellIdsCallBackEventArgs AdminListCellIds(string id = null)
@@ -2419,7 +2425,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         public async Task<AdminListAppInterfacesCallBackEventArgs> AdminListInterfacesAsync(ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
-            return await CallAdminFunctionAsync("list_app_interfaces", null, _taskCompletionAdminListAppInterfacesCallBack, "OnAdminListAppInterfacesCallBack", conductorResponseCallBackMode, id);
+            return await CallAdminFunctionAsync(HoloNETRequestType.AdminListAppInterfaces, "list_app_interfaces", null, _taskCompletionAdminListAppInterfacesCallBack, "OnAdminListAppInterfacesCallBack", conductorResponseCallBackMode, id);
         }
 
         public AdminListAppInterfacesCallBackEventArgs AdminListInterfaces(string id = null)
@@ -2437,7 +2443,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public async Task<AdminDumpFullStateCallBackEventArgs> AdminDumpFullStateAsync(byte[][] cellId, int? dHTOpsCursor = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
-            return await CallAdminFunctionAsync("dump_full_state", new DumpFullStateRequest()
+            return await CallAdminFunctionAsync(HoloNETRequestType.AdminDumpFullState, "dump_full_state", new DumpFullStateRequest()
             {
                 cell_id = cellId,
                 dht_ops_cursor = dHTOpsCursor
@@ -2516,7 +2522,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public async Task<AdminDumpStateCallBackEventArgs> AdminDumpStateAsync(byte[][] cellId, int? dHTOpsCursor = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
-            return await CallAdminFunctionAsync("dump_state", new DumpStateRequest()
+            return await CallAdminFunctionAsync(HoloNETRequestType.AdminDumpState, "dump_state", new DumpStateRequest()
             {
                 cell_id = cellId
             }, _taskCompletionAdminDumpStateCallBack, "OnAdminDumpStateCallBack", conductorResponseCallBackMode, id);
@@ -2594,7 +2600,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public async Task<AdminGetDnaDefinitionCallBackEventArgs> AdminGetDnaDefinitionAsync(byte[] dnaHash, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
-            return await CallAdminFunctionAsync("get_dna_definition", new UpdateCoordinatorsRequest()
+            return await CallAdminFunctionAsync(HoloNETRequestType.AdminGetDnaDefinition, "get_dna_definition", new UpdateCoordinatorsRequest()
             {
                 dnaHash = dnaHash
             }, _taskCompletionAdminGetDnaDefinitionCallBack, "OnAdminGetDnaDefinitionCallBack", conductorResponseCallBackMode, id);
@@ -2731,7 +2737,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public async Task<AdminGetAgentInfoCallBackEventArgs> AdminGetAgentInfoAsync(byte[][] cellId, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
-            return await CallAdminFunctionAsync("agent_info", new GetAgentInfoRequest()
+            return await CallAdminFunctionAsync(HoloNETRequestType.AdminAgentInfo, "agent_info", new GetAgentInfoRequest()
             {
                 cell_id = cellId
             }, _taskCompletionAdminGetAgentInfoCallBack, "OnAdminGetAgentInfoCallBack", conductorResponseCallBackMode, id);
@@ -2803,7 +2809,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public async Task<AdminAddAgentInfoCallBackEventArgs> AdminAddAgentInfoAsync(AgentInfo[] agentInfos, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
-            return await CallAdminFunctionAsync("add_agent_info", new AddAgentInfoRequest()
+            return await CallAdminFunctionAsync(HoloNETRequestType.AdminAddAgentInfo, "add_agent_info", new AddAgentInfoRequest()
             {
                 agent_infos = agentInfos
             }, _taskCompletionAdminAddAgentInfoCallBack, "OnAdminAddAgentInfoCallBack", conductorResponseCallBackMode, id);
@@ -2860,7 +2866,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public async Task<AdminDeleteCloneCellCallBackEventArgs> AdminDeleteCloneCellAsync(string appId, string roleName, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
-            return await CallAdminFunctionAsync("delete_clone_cell", new DeleteCloneCellRequest()
+            return await CallAdminFunctionAsync(HoloNETRequestType.AdminDeleteClonedCell, "delete_clone_cell", new DeleteCloneCellRequest()
             {
                 app_id = appId,
                 clone_cell_id = roleName
@@ -2889,7 +2895,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public async Task<AdminDeleteCloneCellCallBackEventArgs> AdminDeleteCloneCellAsync(string appId, byte[][] cellId, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
-            return await CallAdminFunctionAsync("delete_clone_cell", new DeleteCloneCellRequest()
+            return await CallAdminFunctionAsync(HoloNETRequestType.AdminDeleteClonedCell, "delete_clone_cell", new DeleteCloneCellRequest()
             {
                 app_id = appId,
                 clone_cell_id = cellId
@@ -2966,7 +2972,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public async Task<AdminGetStorageInfoCallBackEventArgs> AdminGetStorageInfoAsync(ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
-            return await CallAdminFunctionAsync("storage_info", null, _taskCompletionAdminGetStorageInfoCallBack, "OnAdminGetStorageInfoCallBack", conductorResponseCallBackMode, id);
+            return await CallAdminFunctionAsync(HoloNETRequestType.AdminStorageInfo, "storage_info", null, _taskCompletionAdminGetStorageInfoCallBack, "OnAdminGetStorageInfoCallBack", conductorResponseCallBackMode, id);
         }
 
         /// <summary>
@@ -2989,7 +2995,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public async Task<AdminDumpNetworkStatsCallBackEventArgs> AdminDumpNetworkStatsAsync(ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
-            return await CallAdminFunctionAsync("dump_network_stats", null, _taskCompletionAdminDumpNetworkStatsCallBack, "OnAdminDumpNetworkStatsCallBack", conductorResponseCallBackMode, id);
+            return await CallAdminFunctionAsync(HoloNETRequestType.AdminDumpNetworkStats, "dump_network_stats", null, _taskCompletionAdminDumpNetworkStatsCallBack, "OnAdminDumpNetworkStatsCallBack", conductorResponseCallBackMode, id);
         }
 
         /// <summary>
@@ -3449,7 +3455,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             return _currentId.ToString();
         }
 
-        private async Task<T> CallAdminFunctionAsync<T>(string holochainConductorFunctionName, dynamic holoNETDataDetailed, Dictionary<string, TaskCompletionSource<T>> _taskCompletionCallBack, string eventCallBackName, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null) where T : HoloNETDataReceivedBaseEventArgs, new()
+        private async Task<T> CallAdminFunctionAsync<T>(HoloNETRequestType requestType, string holochainConductorFunctionName, dynamic holoNETDataDetailed, Dictionary<string, TaskCompletionSource<T>> _taskCompletionCallBack, string eventCallBackName, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null) where T : HoloNETDataReceivedBaseEventArgs, new()
         {
             HoloNETData holoNETData = new HoloNETData()
             {
@@ -3461,7 +3467,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 id = GetRequestId();
 
             _taskCompletionCallBack[id] = new TaskCompletionSource<T> { };
-            await SendHoloNETRequestAsync(holoNETData, id);
+            await SendHoloNETRequestAsync(holoNETData, requestType, id);
 
             if (conductorResponseCallBackMode == ConductorResponseCallBackMode.WaitForHolochainConductorResponse)
             {
@@ -3483,7 +3489,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             if (string.IsNullOrEmpty(id))
                 id = GetRequestId();
 
-            SendHoloNETRequest(holoNETData, id);
+            SendHoloNETRequest(holoNETData, HoloNETRequestType.ZomeCall, id);
             //return new T() { EndPoint = EndPoint, Id = id, Message = $"conductorResponseCallBackMode is set to UseCallBackEvents so please wait for {eventCallBackName} event for the result." };
         }
 
@@ -3500,7 +3506,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             if (membraneProofs == null)
                 membraneProofs = new Dictionary<string, byte[]>();
 
-            return await CallAdminFunctionAsync("install_app", new InstallAppRequest()
+            return await CallAdminFunctionAsync(HoloNETRequestType.AdminInstallApp, "install_app", new InstallAppRequest()
             {
                 path = hAppPath,
                 bundle = appBundle,
@@ -3556,7 +3562,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         private async Task<AdminRegisterDnaCallBackEventArgs> AdminRegisterDnaAsync(string path, DnaBundle bundle, byte[] hash, string network_seed = null, object properties = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
-            return await CallAdminFunctionAsync("register_dna", new RegisterDnaRequest()
+            return await CallAdminFunctionAsync(HoloNETRequestType.AdminRegisterDna, "register_dna", new RegisterDnaRequest()
             {
                 path = path,
                 bundle = bundle,
@@ -3577,7 +3583,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         private async Task<AdminUpdateCoordinatorsCallBackEventArgs> AdminUpdateCoordinatorsAsync(byte[] dnaHash, string path, CoordinatorBundle bundle, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
-            return await CallAdminFunctionAsync("update_coordinators", new UpdateCoordinatorsRequest()
+            return await CallAdminFunctionAsync(HoloNETRequestType.AdminUpdateCoordinators, "update_coordinators", new UpdateCoordinatorsRequest()
             {
                 dnaHash = dnaHash,
                 path = path,
@@ -3859,47 +3865,73 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             HandleError(msg, null);
 
-            if (dataReceivedEventArgs.RawBinaryDataDecoded.Contains("app_info"))
+            if (response != null && response.type != null && response.type.ToUpper() == "SIGNAL")
+                RaiseSignalReceivedEvent(ProcessResponeError<SignalCallBackEventArgs>(response, dataReceivedEventArgs, "Signal", msg));
+
+            if (response != null && response.id > 0 && _requestTypeLookup != null && _requestTypeLookup.ContainsKey(response.id.ToString()))
             {
-                Logger.Log("APPINFO ERROR", LogType.Error);
-                AppInfoCallBackEventArgs args = CreateHoloNETArgs<AppInfoCallBackEventArgs>(response, dataReceivedEventArgs);
-                args.IsError = true;
-                args.IsCallSuccessful = false;
-                args.Message = msg;
-                RaiseAppInfoReceivedEvent(args);
-            }
-            else if (response != null)
-            {
-                if (response.type.ToUpper() == "SIGNAL")
+                switch (_requestTypeLookup[response.id.ToString()])
                 {
-                    Logger.Log("SIGNAL ERROR", LogType.Error);
-                    SignalCallBackEventArgs signalCallBackEventArgs = CreateHoloNETArgs<SignalCallBackEventArgs>(response, dataReceivedEventArgs);
-                    signalCallBackEventArgs.IsError = true;
-                    signalCallBackEventArgs.IsCallSuccessful = false;
-                    signalCallBackEventArgs.Message = msg;
-                    RaiseSignalReceivedEvent(signalCallBackEventArgs);
-                }
-                else if (dataReceivedEventArgs.RawBinaryDataDecoded.ToUpper().Contains("APPALREADYINSTALLED")) //TODO: Improve all error handling code and other areas so can remove this string parsing code, need to decode the conductor response into proper objects asap! ;-)
-                {
-                    Logger.Log("APPALREADYINSTALLED ERROR", LogType.Error);
-                    AdminAppInstalledCallBackEventArgs adminAppInstalledCallBackEventArgs = CreateHoloNETArgs<AdminAppInstalledCallBackEventArgs>(response, dataReceivedEventArgs);
-                    adminAppInstalledCallBackEventArgs.IsError = true;
-                    adminAppInstalledCallBackEventArgs.IsCallSuccessful = false;
-                    adminAppInstalledCallBackEventArgs.Message = msg;
-                    RaiseAdminAppInstalledEvent(adminAppInstalledCallBackEventArgs);
+                    case HoloNETRequestType.ZomeCall:
+                        {
+                            ZomeFunctionCallBackEventArgs args = ProcessResponeError<ZomeFunctionCallBackEventArgs>(response, dataReceivedEventArgs, "ZomeCall", msg);
+                            args.Zome = GetItemFromCache(response != null ? response.id.ToString() : "", _zomeLookup);
+                            args.ZomeFunction = GetItemFromCache(response != null ? response.id.ToString() : "", _funcLookup);
+                            RaiseZomeDataReceivedEvent(args);
+                        }
+                        break;
+
+                    case HoloNETRequestType.AppInfo:
+                        RaiseAppInfoReceivedEvent(ProcessResponeError<AppInfoCallBackEventArgs>(response, dataReceivedEventArgs, "AppInfo", msg));
+                        break;
+
+                    case HoloNETRequestType.Signal:
+                        RaiseSignalReceivedEvent(ProcessResponeError<SignalCallBackEventArgs>(response, dataReceivedEventArgs, "Signal", msg));
+                        break;
+
+                    case HoloNETRequestType.AdminGenerateAgentPubKey:
+                        RaiseAdminAgentPubKeyGeneratedEvent(ProcessResponeError<AdminAgentPubKeyGeneratedCallBackEventArgs>(response, dataReceivedEventArgs, "AdminGenerateAgentPubKey", msg));
+                        break;
+
+                    case HoloNETRequestType.AdminInstallApp:
+                        RaiseAdminAppInstalledEvent(ProcessResponeError<AdminAppInstalledCallBackEventArgs>(response, dataReceivedEventArgs, "AdminInstallApp", msg));
+                        break;
+
+                    case HoloNETRequestType.AdminUninstallApp:
+                        RaiseAdminAppUninstalledEvent(ProcessResponeError<AdminAppUninstalledCallBackEventArgs>(response, dataReceivedEventArgs, "AdminUninstallApp", msg));
+                        break;
+
+                    case HoloNETRequestType.AdminEnableApp:
+                        RaiseAdminAppEnabledEvent(ProcessResponeError<AdminAppEnabledCallBackEventArgs>(response, dataReceivedEventArgs, "AdminEnableApp", msg));
+                        break;
+
+                    case HoloNETRequestType.AdminDisableApp:
+                        RaiseAdminAppDisabledEvent(ProcessResponeError<AdminAppDisabledCallBackEventArgs>(response, dataReceivedEventArgs, "AdminDisableApp", msg));
+                        break;
+
+                    case HoloNETRequestType.AdminGrantZomeCallCapability:
+                        RaiseAdminZomeCallCapabilityGrantedEvent(ProcessResponeError<AdminZomeCallCapabilityGrantedCallBackEventArgs>(response, dataReceivedEventArgs, "AdminGrantZomeCallCapability", msg));
+                        break;
+
+                    case HoloNETRequestType.AdminAttachAppInterface:
+                        RaiseAdminAppInterfaceAttachedEvent(ProcessResponeError<AdminAppInterfaceAttachedCallBackEventArgs>(response, dataReceivedEventArgs, "AdminGrantZomeCallCapability", msg));
+                        break;
+
+                    case HoloNETRequestType.AdminListApps:
+                        RaiseAdminAppsListedEvent(ProcessResponeError<AdminAppsListedCallBackEventArgs>(response, dataReceivedEventArgs, "AdminListApps", msg));
+                        break;
                 }
             }
-            else
-            {
-                Logger.Log("ZOME CALL ERROR", LogType.Error);
-                ZomeFunctionCallBackEventArgs zomeFunctionCallBackArgs = CreateHoloNETArgs<ZomeFunctionCallBackEventArgs>(response, dataReceivedEventArgs);
-                zomeFunctionCallBackArgs.IsError = true;
-                zomeFunctionCallBackArgs.IsCallSuccessful = false;
-                zomeFunctionCallBackArgs.Message = msg;
-                zomeFunctionCallBackArgs.Zome = GetItemFromCache(response != null ? response.id.ToString() : "", _zomeLookup);
-                zomeFunctionCallBackArgs.ZomeFunction = GetItemFromCache(response != null ? response.id.ToString() : "", _funcLookup);
-                RaiseZomeDataReceivedEvent(zomeFunctionCallBackArgs);
-            }
+        }
+
+        private T ProcessResponeError<T>(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs, string responseErrorType, string msg) where T : HoloNETDataReceivedBaseEventArgs, new()
+        {
+            Logger.Log($"{responseErrorType} ERROR", LogType.Error);
+            T args = CreateHoloNETArgs<T>(response, dataReceivedEventArgs);
+            args.IsError = true;
+            args.IsCallSuccessful = false;
+            args.Message = msg;
+            return args;
         }
 
         private HoloNETResponse DecodeDataReceived(byte[] rawBinaryData, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
@@ -4867,3 +4899,4 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         }
     }
 }
+
