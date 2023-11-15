@@ -17,12 +17,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         string ZomeName { get; set; }
         string ZomeUpdateEntryFunction { get; set; }
 
-        event HoloNETEntryBaseClass.Closed OnClosed;
-        event HoloNETEntryBaseClass.Deleted OnDeleted;
-        event HoloNETEntryBaseClass.Error OnError;
-        event HoloNETEntryBaseClass.Initialized OnInitialized;
-        event HoloNETEntryBaseClass.Loaded OnLoaded;
-        event HoloNETEntryBaseClass.Saved OnSaved;
+        event HoloNETEntryBase.Closed OnClosed;
+        event HoloNETEntryBase.Deleted OnDeleted;
+        event HoloNETEntryBase.Error OnError;
+        event HoloNETEntryBase.Initialized OnInitialized;
+        event HoloNETEntryBase.Loaded OnLoaded;
+        event HoloNETEntryBase.Saved OnSaved;
 
         HoloNETShutdownEventArgs Close(ShutdownHolochainConductorsMode shutdownHolochainConductorsMode = ShutdownHolochainConductorsMode.UseHoloNETDNASettings);
         Task<HoloNETShutdownEventArgs> CloseAsync(DisconnectedCallBackMode disconnectedCallBackMode = DisconnectedCallBackMode.WaitForHolochainConductorToDisconnect, ShutdownHolochainConductorsMode shutdownHolochainConductorsMode = ShutdownHolochainConductorsMode.UseHoloNETDNASettings);

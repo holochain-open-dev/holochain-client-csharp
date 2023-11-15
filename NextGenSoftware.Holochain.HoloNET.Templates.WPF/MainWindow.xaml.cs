@@ -50,8 +50,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
         private bool _removeClientConnectionFromPoolAfterDisconnect = true;
 
         public ObservableCollection<InstalledApp> InstalledApps { get; set; } = new ObservableCollection<InstalledApp>();
-        public ObservableCollection<AvatarMultiple> HoloNETEntries { get; set; } = new ObservableCollection<AvatarMultiple>();
-        
+        //public ObservableCollection<AvatarMultiple> HoloNETEntries { get; set; } = new ObservableCollection<AvatarMultiple>();
+        //public AvatarCollection HoloNETEntries { get; set; } = new AvatarCollection();
+        public HoloNETCollection<AvatarMultiple> HoloNETEntries { get; set; }
+
         public InstalledApp CurrentApp { get; set; }
 
         public MainWindow()
@@ -68,6 +70,27 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
 
         private void MainWindow_Unloaded(object sender, RoutedEventArgs e)
         {
+            if (HoloNETEntries != null)
+            {
+                HoloNETEntries.OnInitialized -= HoloNETEntries_OnInitialized;
+                HoloNETEntries.OnCollectionLoaded -= HoloNETEntries_OnCollectionLoaded;
+                HoloNETEntries.OnHoloNETEntriesUpdated -= HoloNETEntries_OnHoloNETEntriesUpdated;
+                HoloNETEntries.OnHoloNETEntryAddedToCollection -= HoloNETEntries_OnHoloNETEntryAddedToCollection;
+                HoloNETEntries.OnHoloNETEntryRemovedFromCollection -= HoloNETEntries_OnHoloNETEntryRemovedFromCollection;
+                HoloNETEntries.OnClosed -= HoloNETEntries_OnClosed;
+                HoloNETEntries.OnError -= HoloNETEntries_OnError;
+            }
+
+            if (_holoNETEntry != null)
+            {
+                _holoNETEntry.OnInitialized -= Avatar_OnInitialized;
+                _holoNETEntry.OnLoaded -= Avatar_OnLoaded;
+                _holoNETEntry.OnSaved -= Avatar_OnSaved;
+                _holoNETEntry.OnDeleted -= Avatar_OnDeleted;
+                _holoNETEntry.OnClosed -= Avatar_OnClosed;
+                _holoNETEntry.OnError -= Avatar_OnError;
+            }
+
             CloseAllConnections();
         }
 
@@ -116,8 +139,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
                 //If we are using SaveAsync (or LoadAsync) we do not need to worry about any events such as OnSaved if you don't need them.
                 _holoNETEntry.OnInitialized += Avatar_OnInitialized;
                 _holoNETEntry.OnLoaded += Avatar_OnLoaded;
-                _holoNETEntry.OnCollectionLoaded += Avatar_OnCollectionLoaded;
-                _holoNETEntry.OnCollectionUpdated += Avatar_OnCollectionUpdated;
                 _holoNETEntry.OnClosed += Avatar_OnClosed;
                 _holoNETEntry.OnSaved += Avatar_OnSaved;
                 _holoNETEntry.OnDeleted += Avatar_OnDeleted;
@@ -313,10 +334,15 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
         {
             //HoloNETEntries.Add(result.Entry.EntryDataObject);
 
-            HoloNETEntries.Add(_holoNETEntry);
+            //TEMP to test!
+            HoloNETEntries.AddHoloNETEntryToCollectionAndSave(_holoNETEntry); //Will add the entry to the collection and then persist the change to the hc/rust/happ code.
 
+            //Allows you to batch add/remove multiple entries to the collection and then persist the changes to the hc/rust/happ code in one go.
+            //HoloNETEntries.Add(_holoNETEntry); //Will only add the entry to the collection in memory (it will NOT persist to hc/rust/happ code until SaveCollection is called.
+            //HoloNETEntries.SaveCollection(); //Will look for any changes since the last time this method was called (includes entries added/removed from the collection as well as any changes made to entries themselves). This can invoke multiple events including OnHoloNETEntryAddedToCollection, OnHoloNETEntryRemovedFromCollection & OnHoloNETEntriesUpdated (if any changes were made to the entries themselves))/
+    
             if (result.IsCallSuccessful && !result.IsError)
-                HoloNETEntries.Add(result.Entry.EntryDataObject);
+                HoloNETEntries.Add(result.Entries[0].EntryDataObject);
             else
             {
                 lblNewEntryValidationErrors.Text = result.Message;
@@ -327,7 +353,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
 
         private string GetEntryInfo(ZomeFunctionCallBackEventArgs e)
         {
-            return $"DateTime: {e.Entry.DateTime}, Author: {e.Entry.Author}, ActionSequence: {e.Entry.ActionSequence}, Signature: {e.Entry.Signature}, Type: {e.Entry.Type}, Hash: {e.Entry.Hash}, Previous Hash: {e.Entry.PreviousHash}, OriginalActionAddress: {e.Entry.OriginalActionAddress}, OriginalEntryAddress: {e.Entry.OriginalEntryAddress}";
+            return $"DateTime: {e.Entries[0].DateTime}, Author: {e.Entries[0].Author}, ActionSequence: {e.Entries[0].ActionSequence}, Signature: {e.Entries[0].Signature}, Type: {e.Entries[0].Type}, Hash: {e.Entries[0].Hash}, Previous Hash: {e.Entries[0].PreviousHash}, OriginalActionAddress: {e.Entries[0].OriginalActionAddress}, OriginalEntryAddress: {e.Entries[0].OriginalEntryAddress}";
         }
 
         private void ShowStatusMessage(string message, StatusMessageType type = StatusMessageType.Information, bool showSpinner = false)
@@ -1118,11 +1144,65 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
                 if (_holoNETEntry == null)
                     InitHoloNETEntry(result.AppAgentClient);
 
-                _holoNETEntry.LoadCollection();
+                if (!HoloNETEntries.IsInitialized)
+                {
+                    HoloNETEntries.OnInitialized += HoloNETEntries_OnInitialized;
+                    HoloNETEntries.OnCollectionLoaded += HoloNETEntries_OnCollectionLoaded;
+                    HoloNETEntries.OnHoloNETEntriesUpdated += HoloNETEntries_OnHoloNETEntriesUpdated;
+                    HoloNETEntries.OnHoloNETEntryAddedToCollection += HoloNETEntries_OnHoloNETEntryAddedToCollection;
+                    HoloNETEntries.OnHoloNETEntryRemovedFromCollection += HoloNETEntries_OnHoloNETEntryRemovedFromCollection;
+                    HoloNETEntries.OnClosed += HoloNETEntries_OnClosed;
+                    HoloNETEntries.OnError += HoloNETEntries_OnError;
+
+                    HoloNETEntries.Initialize();
+                }
+
+                HoloNETEntries.LoadCollection();
             }
             else
                 _clientOperation = ClientOperation.InitHoloNETEntry;
+        }
 
+        private void HoloNETEntries_OnError(object sender, HoloNETErrorEventArgs e)
+        {
+            ShowStatusMessage($"APP: HoloNET Data Entry Collection Error", StatusMessageType.Error);
+            LogMessage($"APP: HoloNET Data Entry Collection Error: {e.Reason}");
+        }
+
+        private void HoloNETEntries_OnClosed(object sender, HoloNETShutdownEventArgs e)
+        {
+            ShowStatusMessage($"APP: HoloNET Data Entry Collection Closed", StatusMessageType.Success);
+            LogMessage($"APP: HoloNET Data Entry Collection Closed.");
+        }
+
+        private void HoloNETEntries_OnInitialized(object sender, ReadyForZomeCallsEventArgs e)
+        {
+            ShowStatusMessage($"APP: HoloNET Data Entry Initialized", StatusMessageType.Success);
+            LogMessage($"APP: HoloNET Data Entry Initialized.");
+        }
+
+        private void HoloNETEntries_OnHoloNETEntryRemovedFromCollection(object sender, ZomeFunctionCallBackEventArgs e)
+        {
+            ShowStatusMessage($"APP: HoloNET Data Entry Removed From Collection", StatusMessageType.Success);
+            LogMessage($"APP: HoloNET Data Entry Removed From Collection: {GetEntryInfo(e)}");
+        }
+
+        private void HoloNETEntries_OnHoloNETEntryAddedToCollection(object sender, ZomeFunctionCallBackEventArgs e)
+        {
+            ShowStatusMessage($"APP: HoloNET Data Entry Added To Collection", StatusMessageType.Success);
+            LogMessage($"APP: HoloNET Data Entry Added To Collection: {GetEntryInfo(e)}");
+        }
+
+        private void HoloNETEntries_OnHoloNETEntriesUpdated(object sender, ZomeFunctionCallBackEventArgs e)
+        {
+            ShowStatusMessage($"APP: HoloNET Data Entries Updated (Collection Updated)", StatusMessageType.Success);
+            LogMessage($"APP: HoloNET Data Entries Updated (Collection Updated).");
+        }
+
+        private void HoloNETEntries_OnCollectionLoaded(object sender, ZomeFunctionCallBackEventArgs e)
+        {
+            ShowStatusMessage($"APP: HoloNET Data Entry Collection Loaded", StatusMessageType.Success);
+            LogMessage($"APP: HoloNET Data EntryCollection Loaded: {GetEntryInfo(e)}");
         }
 
         private void btnDataEntriesPopupOk_Click(object sender, RoutedEventArgs e)
@@ -1251,6 +1331,21 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
                     client.Disconnect();
                 }
             }
+        }
+
+        private void btnHoloNETEntry_Click(object sender, RoutedEventArgs e)
+        {
+            popupHoloNETEntry.Visibility = Visibility.Visible;
+        }
+
+        private void btnHoloNETEntryPopupOk_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void btnHoloNETEntryPopupCancel_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }
