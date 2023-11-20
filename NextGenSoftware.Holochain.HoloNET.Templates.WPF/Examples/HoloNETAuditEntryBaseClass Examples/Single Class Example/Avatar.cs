@@ -9,13 +9,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
     /// <summary>
     /// This example creates its own internal instance of the HoloNETClient, you should only use this if you will be extending only one HoloNETAuditEntryBaseClass/HoloNETEntryBaseClass otherwise use the Multiple Class Example.
     /// </summary>
-    public class Avatar : HoloNETAuditEntryBaseClass
+    public class Avatar : HoloNETAuditEntryBase
     {
         // Example of how you can disable the 3 different audit options (you can of course only disable one of two of them).
         //public Avatar() : base("oasis", "get_entry_avatar", "create_entry_avatar", "update_entry_avatar", "delete_entry_avatar", false, false, false) { }
         //public Avatar(HoloNETConfig holoNETConfig) : base("oasis", "get_entry_avatar", "create_entry_avatar", "update_entry_avatar", "delete_entry_avatar", holoNETConfig, false, false, false) { }
         public Avatar() : base("oasis", "get_entry_avatar", "create_entry_avatar", "update_entry_avatar", "delete_entry_avatar") { }
-        public Avatar(HoloNETDNA holoNETDNA) : base("oasis", "get_entry_avatar", "create_entry_avatar", "update_entry_avatar", "delete_entry_avatar", holoNETDNA) { }
+        public Avatar(HoloNETDNA holoNETDNA) : base("oasis", "get_entry_avatar", "create_entry_avatar", "update_entry_avatar", "delete_entry_avatar", true, holoNETDNA) { }
 
 
         [HolochainFieldName("first_name")]

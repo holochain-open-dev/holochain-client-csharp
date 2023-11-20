@@ -9,6 +9,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
     /// </summary>
     public class AvatarMultiple : HoloNETAuditEntryBase
     {
+        public AvatarMultiple() : base("oasis", "get_entry_avatar", "create_entry_avatar", "update_entry_avatar", "delete_entry_avatar", false) { }
         public AvatarMultiple(HoloNETClient holoNETclient) : base("oasis", "get_entry_avatar", "create_entry_avatar", "update_entry_avatar", "delete_entry_avatar", holoNETclient) { }
 
         [HolochainFieldName("first_name")]

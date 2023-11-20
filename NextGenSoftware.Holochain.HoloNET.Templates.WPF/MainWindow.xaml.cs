@@ -127,6 +127,27 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
             _holoNETClientAdmin.OnAdminAppsListedCallBack += _holoNETClientAdmin_OnAdminAppsListedCallBack;
         }
 
+        private HoloNETClient CreateNewAppAgentClientConnection(ushort port)
+        {
+            HoloNETClient newClient = new HoloNETClient($"ws://127.0.0.1:{port}");
+            newClient.OnConnected += _holoNETClientApp_OnConnected;
+            newClient.OnReadyForZomeCalls += _holoNETClientApp_OnReadyForZomeCalls;
+            newClient.OnZomeFunctionCallBack += _holoNETClientApp_OnZomeFunctionCallBack;
+            newClient.OnDisconnected += _holoNETClientApp_OnDisconnected;
+            newClient.OnDataReceived += _holoNETClientApp_OnDataReceived;
+            newClient.OnDataSent += _holoNETClientApp_OnDataSent;
+            newClient.OnError += _holoNETClientApp_OnError;
+
+            newClient.HoloNETDNA.AutoStartHolochainConductor = false;
+            newClient.HoloNETDNA.AutoShutdownHolochainConductor = false;
+
+            newClient.HoloNETDNA.AgentPubKey = CurrentApp.AgentPubKey;
+            newClient.HoloNETDNA.DnaHash = CurrentApp.DnaHash;
+            newClient.HoloNETDNA.InstalledAppId = CurrentApp.Name;
+
+            return newClient;
+        }
+
         private void InitHoloNETEntry(HoloNETClient client)
         {
             LogMessage("APP: Initializing HoloNET Entry...");
@@ -148,6 +169,26 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
                 _holoNETEntry.HoloNETClient = client;
         }
 
+        private void InitHoloNETCollection(HoloNETClient client)
+        {
+            LogMessage("APP: Initializing HoloNET Collection...");
+            ShowStatusMessage("Initializing HoloNET Collection...", StatusMessageType.Information, true);
+
+            if (HoloNETEntries == null)
+            {
+                HoloNETEntries = new HoloNETCollection<AvatarMultiple>("oasis", "load_avatars", "add_avatar", "remove_avatar", client, "update_avatars");
+                HoloNETEntries.OnInitialized += HoloNETEntries_OnInitialized;
+                HoloNETEntries.OnCollectionLoaded += HoloNETEntries_OnCollectionLoaded;
+                HoloNETEntries.OnHoloNETEntriesUpdated += HoloNETEntries_OnHoloNETEntriesUpdated;
+                HoloNETEntries.OnHoloNETEntryAddedToCollection += HoloNETEntries_OnHoloNETEntryAddedToCollection;
+                HoloNETEntries.OnHoloNETEntryRemovedFromCollection += HoloNETEntries_OnHoloNETEntryRemovedFromCollection;
+                HoloNETEntries.OnClosed += HoloNETEntries_OnClosed;
+                HoloNETEntries.OnError += HoloNETEntries_OnError;
+            }
+            else
+                HoloNETEntries.HoloNETClient = client;
+        }
+
         private void ConnectAdmin()
         {
             _clientsDisconnected = 0;
@@ -162,27 +203,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
             }
 
             _holoNETClientAdmin.ConnectAdmin(_holoNETClientAdmin.HoloNETDNA.HolochainConductorAdminURI);
-        }
-
-        private HoloNETClient CreateNewAppAgentClientConnection(ushort port)
-        {
-            HoloNETClient newClient = new HoloNETClient($"ws://127.0.0.1:{port}");
-            newClient.OnConnected += _holoNETClientApp_OnConnected;
-            newClient.OnReadyForZomeCalls += _holoNETClientApp_OnReadyForZomeCalls;
-            newClient.OnZomeFunctionCallBack += _holoNETClientApp_OnZomeFunctionCallBack;
-            newClient.OnDisconnected += _holoNETClientApp_OnDisconnected;
-            newClient.OnDataReceived += _holoNETClientApp_OnDataReceived;
-            newClient.OnDataSent += _holoNETClientApp_OnDataSent;
-            newClient.OnError += _holoNETClientApp_OnError;
-
-            newClient.HoloNETDNA.AutoStartHolochainConductor = false;
-            newClient.HoloNETDNA.AutoShutdownHolochainConductor = false;
-
-            newClient.HoloNETDNA.AgentPubKey = CurrentApp.AgentPubKey;
-            newClient.HoloNETDNA.DnaHash = CurrentApp.DnaHash;
-            newClient.HoloNETDNA.InstalledAppId = CurrentApp.Name;
-
-            return newClient;
         }
 
         private void ListHapps()
@@ -275,6 +295,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
             return result;
         }
 
+        /// <summary>
+        /// Process the client operation which was queued before the HoloNET AppAgent was connected. This is only needed in non-async code, async code is much simplier and less! ;-)
+        /// </summary>
+        /// <param name="client"></param>
         private void ProcessClientOperation(HoloNETClient client)
         {
             switch (_clientOperation)
@@ -299,31 +323,151 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
                     }
                     break;
 
-                case ClientOperation.InitHoloNETEntry:
+                case ClientOperation.SaveHoloNETEntry:
                     {
-                        InitHoloNETEntry(client);
-                        SaveHoloNETEntry();
+                        SaveHoloNETEntry(client, txtFirstName.Text, txtLastName.Text, txtDOB.Text, txtEmail.Text);
+                        _clientOperation = ClientOperation.None;
+                    }
+                    break;
+
+                case ClientOperation.LoadHoloNETCollection:
+                    {
+                        LoadCollection(client);
+                        _clientOperation = ClientOperation.None;
+                    }
+                    break;
+
+                case ClientOperation.AddHoloNETEntryToCollection:
+                    {
+                        AddHoloNETEntryToCollection(client, txtFirstName.Text, txtLastName.Text, txtDOB.Text, txtEmail.Text);
                         _clientOperation = ClientOperation.None;
                     }
                     break;
             }
         }
 
-        private void SaveHoloNETEntry()
+        private void LoadCollection(HoloNETClient client)
         {
-            if (_holoNETEntry != null)
+            if (HoloNETEntries == null || (HoloNETEntries != null && !HoloNETEntries.IsInitialized))
+                InitHoloNETCollection(client);
+
+            else if (HoloNETEntries.HoloNETClient.EndPoint != client.EndPoint)
+                HoloNETEntries.HoloNETClient = client;
+
+            if (HoloNETEntries != null && HoloNETEntries.IsInitialized)
             {
+                //ShowStatusMessage($"APP: Loading HoloNET Collection...", StatusMessageType.Information, true);
+                //LogMessage($"APP: Loading HoloNET Collection...");
+
+                //Non-async way (you need to use the OnCollectionLoaded event to know when the collection has loaded and receive the data/collection.
+                //For non-async methods you will need to wait till the OnInitialized event to raise before calling any other methods such as the one below...
+                //HoloNETEntries.LoadCollection(); 
+
+                //Async way.
+                Dispatcher.InvokeAsync(async () =>
+                {
+                    ShowStatusMessage($"APP: Loading HoloNET Collection...", StatusMessageType.Information, true);
+                    LogMessage($"APP: Loading HoloNET Collection...");
+
+                    //LoadCollectionAsync (as well as all other async methods) will automatically init and wait for the client to finish connecting and retreiving agentPubKey (if needed) and raising the OnInitialized event.
+                    ZomeFunctionCallBackEventArgs result = await HoloNETEntries.LoadCollectionAsync(); //No event handlers are needed but you can still use if you like.
+                    HandleHoloNETCollectionLoaded(result);
+                });
+            }
+        }
+
+        private void AddHoloNETEntryToCollection(HoloNETClient client, string firstName, string lastName, string dob, string email)
+        {
+            if (HoloNETEntries == null || (HoloNETEntries != null && !HoloNETEntries.IsInitialized))
+                InitHoloNETCollection(client);
+
+            else if (HoloNETEntries.HoloNETClient.EndPoint != client.EndPoint)
+                HoloNETEntries.HoloNETClient = client;
+
+            string[] parts = dob.Split('/');
+
+            if (HoloNETEntries != null && HoloNETEntries.IsInitialized)
+            {
+                //ShowStatusMessage($"APP: Adding HoloNET Entry To Collection...", StatusMessageType.Information, true);
+                //LogMessage($"APP: Adding HoloNET Entry To Collection...");
+
+                //Non-async way (you need to use the OnCollectionLoaded event to know when the collection has loaded and receive the data/collection.
+                //For non-async methods you will need to wait till the OnInitialized event to raise before calling any other methods such as the one below...
+                //HoloNETEntries.AddHoloNETEntryToCollectionAndSave(new AvatarMultiple()
+                //{
+                //    FirstName = firstName,
+                //    LastName = lastName,
+                //    DOB = new DateTime(Convert.ToInt32(parts[2]), Convert.ToInt32(parts[1]), Convert.ToInt32(parts[0])),
+                //    Email = email
+                //});
+
+                //Async way.
+                Dispatcher.InvokeAsync(async () =>
+                {
+                    ShowStatusMessage($"APP: Adding HoloNET Entry To Collection...", StatusMessageType.Information, true);
+                    LogMessage($"APP: Adding HoloNET Entry To Collection...");
+
+                    //Will add the entry to the collection and then persist the change to the hc/rust/happ code.
+                    //We don't need to call Save() on the entry before calling this method because this method will automatically save the entry and then add it to the collection. It can also of course add an existing entry to the collection. The same applies to the SaveCollection method below.
+                    ZomeFunctionCallBackEventArgs result = await HoloNETEntries.AddHoloNETEntryToCollectionAndSaveAsync(new AvatarMultiple()
+                    {
+                        FirstName = firstName,
+                        LastName = lastName,
+                        DOB = new DateTime(Convert.ToInt32(parts[2]), Convert.ToInt32(parts[1]), Convert.ToInt32(parts[0])),
+                        Email = email
+                    });
+
+                    HandleHoloNETEntryAddedToCollection(result);
+
+                    //Allows you to batch add/remove multiple entries to the collection and then persist the changes to the hc/rust/happ code in one go.
+                    //Will only add the entry to the collection in memory (it will NOT persist to hc/rust/happ code until SaveCollection is called.
+                    //HoloNETEntries.Add(new AvatarMultiple()
+                    //{
+                    //    FirstName = firstName,
+                    //    LastName = lastName,
+                    //    DOB = new DateTime(Convert.ToInt32(parts[2]), Convert.ToInt32(parts[1]), Convert.ToInt32(parts[0])),
+                    //    Email = email
+                    //});
+
+                    //Will look for any changes since the last time this method was called (includes entries added/removed from the collection as well as any changes made to entries themselves). This can invoke multiple events including OnHoloNETEntryAddedToCollection, OnHoloNETEntryRemovedFromCollection & OnHoloNETEntriesUpdated (if any changes were made to the entries themselves))/
+                    //HoloNETEntries.SaveCollection(); 
+                });
+            }
+        }
+
+        private void SaveHoloNETEntry(HoloNETClient client, string firstName, string lastName, string dob, string email)
+        {
+            //If we intend to re-use an object then we can store it globally so we only need to init once...
+            if (_holoNETEntry == null || (_holoNETEntry != null && !_holoNETEntry.IsInitialized))
+                InitHoloNETEntry(client);
+
+            else if (_holoNETEntry.HoloNETClient.EndPoint != client.EndPoint)
+                _holoNETEntry.HoloNETClient = client;
+
+            if (_holoNETEntry != null && _holoNETEntry.IsInitialized)
+            {
+                //ShowStatusMessage($"APP: Saving HoloNET Data Entry...", StatusMessageType.Information, true);
+                //LogMessage($"APP: Saving HoloNET Data Entry...");
+
+                string[] parts = dob.Split('/');
+
+                _holoNETEntry.FirstName = firstName;
+                _holoNETEntry.LastName = lastName;
+                _holoNETEntry.DOB = new DateTime(Convert.ToInt32(parts[2]), Convert.ToInt32(parts[1]), Convert.ToInt32(parts[0]));
+                _holoNETEntry.Email = email;
+
                 //Non async way.
                 //If you use Load or Save non-async versions you will need to wait for the OnInitialized event to fire before calling.
+                //For non-async methods you will need to wait till the OnInitialized event to raise before calling any other methods such as the one below...
                 //_holoNETEntry.Save(); //For this OnSaved event handler above is required (only if you want to see what the result was!) //TODO: Check if this works without waiting for OnInitialized event!
 
                 //Async way.
                 Dispatcher.InvokeAsync(async () =>
                 {
-                    ShowStatusMessage($"APP: Saving HoloNET Data Entry...", StatusMessageType.Information);
+                    ShowStatusMessage($"APP: Saving HoloNET Data Entry...", StatusMessageType.Information, true);
                     LogMessage($"APP: Saving HoloNET Data Entry...");
 
-                    //SaveAsync (as well as LoadAsync) will automatically wait for the client to finish connecting and retreiving agentPubKey (if needed) and raising the OnInitialized event.
+                    //SaveAsync (as well as LoadAsync) will automatically init and wait for the client to finish connecting and retreiving agentPubKey (if needed) and raising the OnInitialized event.
                     ZomeFunctionCallBackEventArgs result = await _holoNETEntry.SaveAsync(); //No event handlers are needed.
                     HandleHoloNETEntrySaved(result);
                 });
@@ -332,22 +476,59 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
 
         private void HandleHoloNETEntrySaved(ZomeFunctionCallBackEventArgs result)
         {
-            //HoloNETEntries.Add(result.Entry.EntryDataObject);
-
             //TEMP to test!
-            HoloNETEntries.AddHoloNETEntryToCollectionAndSave(_holoNETEntry); //Will add the entry to the collection and then persist the change to the hc/rust/happ code.
+            //HoloNETEntries.AddHoloNETEntryToCollectionAndSave(_holoNETEntry);
 
-            //Allows you to batch add/remove multiple entries to the collection and then persist the changes to the hc/rust/happ code in one go.
-            //HoloNETEntries.Add(_holoNETEntry); //Will only add the entry to the collection in memory (it will NOT persist to hc/rust/happ code until SaveCollection is called.
-            //HoloNETEntries.SaveCollection(); //Will look for any changes since the last time this method was called (includes entries added/removed from the collection as well as any changes made to entries themselves). This can invoke multiple events including OnHoloNETEntryAddedToCollection, OnHoloNETEntryRemovedFromCollection & OnHoloNETEntriesUpdated (if any changes were made to the entries themselves))/
-    
             if (result.IsCallSuccessful && !result.IsError)
-                HoloNETEntries.Add(result.Entries[0].EntryDataObject);
+            {
+                ShowStatusMessage($"APP: HoloNET Entry Saved.", StatusMessageType.Success);
+                LogMessage($"APP: HoloNET Entry Saved.");
+                popupHoloNETEntry.Visibility = Visibility.Hidden;
+
+                //Will add the entry to the collection and then persist the change to the hc/rust/happ code.
+                //TODO: Dont think we need to call Save() on the entry before calling this method because this method will automatically save the entry and then add it to the collection. It can also of course add an existing entry to the collection. The same applies to the SaveCollection method below.
+                //HoloNETEntries.AddHoloNETEntryToCollectionAndSave(result.Entries[0].EntryDataObject); 
+
+                //Allows you to batch add/remove multiple entries to the collection and then persist the changes to the hc/rust/happ code in one go.
+                //HoloNETEntries.Add(_holoNETEntry); //Will only add the entry to the collection in memory (it will NOT persist to hc/rust/happ code until SaveCollection is called.
+                //HoloNETEntries.SaveCollection(); //Will look for any changes since the last time this method was called (includes entries added/removed from the collection as well as any changes made to entries themselves). This can invoke multiple events including OnHoloNETEntryAddedToCollection, OnHoloNETEntryRemovedFromCollection & OnHoloNETEntriesUpdated (if any changes were made to the entries themselves))/
+            }
+            else
+            {
+                lblHoloNETEntryValidationErrors.Text = result.Message;
+                ShowStatusMessage($"APP: Error occured saving entry: {result.Message}", StatusMessageType.Error);
+                LogMessage($"APP: Error occured saving entry: {result.Message}");
+            }
+        }
+
+        private void HandleHoloNETCollectionLoaded(ZomeFunctionCallBackEventArgs result)
+        {
+            if (result.IsCallSuccessful && !result.IsError)
+            {
+                ShowStatusMessage($"APP: HoloNET Collection Loaded.", StatusMessageType.Error);
+                LogMessage($"APP: HoloNET Collection Loaded.");
+                gridDataEntries.ItemsSource = result.Entries;
+            }
             else
             {
                 lblNewEntryValidationErrors.Text = result.Message;
-                ShowStatusMessage($"Error occured saving entry: {result.Message}", StatusMessageType.Error);
-                LogMessage($"Error occured saving entry: {result.Message}");
+                ShowStatusMessage($"APP: Error Occured Loading HoloNET Collection.", StatusMessageType.Error);
+                LogMessage($"APP: Error Occured Loading HoloNET Collection. Reason: {result.Message}");
+            }
+        }
+
+        private void HandleHoloNETEntryAddedToCollection(ZomeFunctionCallBackEventArgs result)
+        {
+            if (result.IsCallSuccessful && !result.IsError)
+            {
+                ShowStatusMessage($"APP: HoloNET Entry Added To Collection.", StatusMessageType.Error);
+                LogMessage($"APP: HoloNET Entry Added To Collection.");
+            }
+            else
+            {
+                lblNewEntryValidationErrors.Text = result.Message;
+                ShowStatusMessage($"APP: Error Occured Adding HoloNET Entry To Collection.", StatusMessageType.Error);
+                LogMessage($"APP: Error Occured Adding HoloNET Entry To Collection. Reason: {result.Message}");
             }
         }
 
@@ -1133,35 +1314,17 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
                 txtSecondsToWaitForConductorToStartError.Visibility = Visibility.Hidden;
         }
 
-        private void tbnViewDataEntries_Click(object sender, RoutedEventArgs e)
+        private void btnViewDataEntries_Click(object sender, RoutedEventArgs e)
         {
             popupDataEntries.Visibility = Visibility.Visible;
             ConnectToAppAgentClientResult result = ConnectToAppAgentClient();
 
             if (result.ResponseType == ConnectToAppAgentClientResponseType.Connected)
-            {
-                //If we intend to re-use an object then we can store it globally so we only need to init once...
-                if (_holoNETEntry == null)
-                    InitHoloNETEntry(result.AppAgentClient);
-
-                if (!HoloNETEntries.IsInitialized)
-                {
-                    HoloNETEntries.OnInitialized += HoloNETEntries_OnInitialized;
-                    HoloNETEntries.OnCollectionLoaded += HoloNETEntries_OnCollectionLoaded;
-                    HoloNETEntries.OnHoloNETEntriesUpdated += HoloNETEntries_OnHoloNETEntriesUpdated;
-                    HoloNETEntries.OnHoloNETEntryAddedToCollection += HoloNETEntries_OnHoloNETEntryAddedToCollection;
-                    HoloNETEntries.OnHoloNETEntryRemovedFromCollection += HoloNETEntries_OnHoloNETEntryRemovedFromCollection;
-                    HoloNETEntries.OnClosed += HoloNETEntries_OnClosed;
-                    HoloNETEntries.OnError += HoloNETEntries_OnError;
-
-                    HoloNETEntries.Initialize();
-                }
-
-                HoloNETEntries.LoadCollection();
-            }
+                LoadCollection(result.AppAgentClient);
             else
-                _clientOperation = ClientOperation.InitHoloNETEntry;
+                _clientOperation = ClientOperation.LoadHoloNETCollection;
         }
+        
 
         private void HoloNETEntries_OnError(object sender, HoloNETErrorEventArgs e)
         {
@@ -1207,6 +1370,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
 
         private void btnDataEntriesPopupOk_Click(object sender, RoutedEventArgs e)
         {
+            DateTime dob;
+
             if (string.IsNullOrEmpty(txtFirstName.Text))
             {
                 lblNewEntryValidationErrors.Text = "Enter the first name.";
@@ -1228,6 +1393,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
                 txtDOB.Focus();
             }
 
+            //else if (!DateTime.TryParse(txtDOB.Text, out dob))
+            //{
+            //    lblNewEntryValidationErrors.Text = "Enter a valid DOB.";
+            //    lblNewEntryValidationErrors.Visibility = Visibility.Visible;
+            //    txtDOB.Focus();
+            //}
+
             else if (string.IsNullOrEmpty(txtEmail.Text))
             {
                 lblNewEntryValidationErrors.Text = "Enter the Email.";
@@ -1236,20 +1408,18 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
             }
             else
             {
-                SaveHoloNETEntry();
+                lblNewEntryValidationErrors.Visibility = Visibility.Hidden;
+                ConnectToAppAgentClientResult result = ConnectToAppAgentClient();
 
-                //ConnectToAppAgentClientResult result = ConnectToAppAgentClient();
+                if (result.ResponseType == ConnectToAppAgentClientResponseType.Connected)
+                {
+                    AddHoloNETEntryToCollection(result.AppAgentClient, txtFirstName.Text, txtLastName.Text, txtDOB.Text, txtEmail.Text);
 
-                //if (result.ResponseType == ConnectToAppAgentClientResponseType.Connected)
-                //{
-                //    //If we intend to re-use an object then we can store it globally so we only need to init once...
-                //    if (_holoNETEntry == null)
-                //        InitHoloNETEntry(result.AppAgentClient);
-
-                //    SaveHoloNETEntry();
-                //}
-                //else
-                //    _clientOperation = ClientOperation.InitHoloNETEntry;
+                    //We could alternatively save the entry first and then add it to the collection afterwards but this is 2 round trips to the conductor whereas AddHoloNETEntryToCollectionAndSave is only 1 and will automatically save the entry before adding it to the collection.
+                    //SaveHoloNETEntry(result.AppAgentClient, txtFirstName.Text, txtLastName.Text, txtDOB.Text, txtEmail.Text);
+                }
+                else
+                    _clientOperation = ClientOperation.AddHoloNETEntryToCollection;  
             }
         }
 
@@ -1303,6 +1473,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
 
         private void btnDataEntriesPopupCancel_Click(object sender, RoutedEventArgs e)
         {
+            lblNewEntryValidationErrors.Visibility = Visibility.Hidden;
             popupDataEntries.Visibility = Visibility.Collapsed;
         }
 
@@ -1340,12 +1511,58 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
 
         private void btnHoloNETEntryPopupOk_Click(object sender, RoutedEventArgs e)
         {
+            DateTime dob;
 
+            if (string.IsNullOrEmpty(txtEntryFirstName.Text))
+            {
+                lblHoloNETEntryValidationErrors.Text = "Enter the first name.";
+                lblHoloNETEntryValidationErrors.Visibility = Visibility.Visible;
+                txtEntryFirstName.Focus();
+            }
+
+            else if (string.IsNullOrEmpty(txtEntryLastName.Text))
+            {
+                lblHoloNETEntryValidationErrors.Text = "Enter the last name.";
+                lblHoloNETEntryValidationErrors.Visibility = Visibility.Visible;
+                txtEntryLastName.Focus();
+            }
+
+            else if (string.IsNullOrEmpty(txtEntryDOB.Text))
+            {
+                lblHoloNETEntryValidationErrors.Text = "Enter the DOB.";
+                lblHoloNETEntryValidationErrors.Visibility = Visibility.Visible;
+                txtEntryDOB.Focus();
+            }
+
+            //else if (!DateTime.TryParse(txtDOB.Text, out dob))
+            //{
+            //    lblHoloNETEntryValidationErrors.Text = "Enter a valid DOB.";
+            //    lblHoloNETEntryValidationErrors.Visibility = Visibility.Visible;
+            //    txtDOB.Focus();
+            //}
+
+            else if (string.IsNullOrEmpty(txtEntryEmail.Text))
+            {
+                lblHoloNETEntryValidationErrors.Text = "Enter the Email.";
+                lblHoloNETEntryValidationErrors.Visibility = Visibility.Visible;
+                txtEntryEmail.Focus();
+            }
+            else
+            {
+                lblHoloNETEntryValidationErrors.Visibility = Visibility.Hidden;
+                ConnectToAppAgentClientResult result = ConnectToAppAgentClient();
+
+                if (result.ResponseType == ConnectToAppAgentClientResponseType.Connected)
+                    SaveHoloNETEntry(result.AppAgentClient, txtFirstName.Text, txtLastName.Text, txtDOB.Text, txtEmail.Text);
+                else
+                    _clientOperation = ClientOperation.SaveHoloNETEntry;
+            }
         }
 
         private void btnHoloNETEntryPopupCancel_Click(object sender, RoutedEventArgs e)
         {
-
+            lblHoloNETEntryValidationErrors.Visibility = Visibility.Hidden;
+            popupHoloNETEntry.Visibility = Visibility.Hidden;
         }
     }
 }

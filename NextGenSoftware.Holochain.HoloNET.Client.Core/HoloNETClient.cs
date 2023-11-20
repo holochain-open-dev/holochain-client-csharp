@@ -4455,7 +4455,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 zomeFunctionCallBackArgs.RawZomeReturnData = rawAppResponseData;
                 zomeFunctionCallBackArgs.KeyValuePair = keyValuePairs;
                 zomeFunctionCallBackArgs.KeyValuePairAsString = keyValuePairsAsString;
-                zomeFunctionCallBackArgs.Entry = entryData;
+                zomeFunctionCallBackArgs.Entries[0] = entryData; //TODO: Need to add support for multiple entries ASAP!
             }
             catch (Exception ex)
             {

@@ -3,7 +3,9 @@
     public enum ClientOperation
     {
         CallZomeFunction,
-        InitHoloNETEntry,
+        LoadHoloNETCollection,
+        SaveHoloNETEntry,
+        AddHoloNETEntryToCollection,
         None
     }
 }
