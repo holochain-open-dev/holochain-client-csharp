@@ -1,13 +1,25 @@
 ﻿
-using NextGenSoftware.Logging;
 using System;
+using NextGenSoftware.Logging;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
     public class HoloNETDNA
     {
+        /// <summary>
+        /// The Holochain Conductor config path. This defaults to AppData\Roaming\holochain\holochain\config\conductor-config.yml (this is where the conductor will as default install the config file).
+        /// </summary>
         public string HolochainConductorConfigPath { get; set; } = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\holochain\\holochain\\config\\conductor-config.yml";
-        public string HolochainConductorAdminURI { get; set; } = "ws://localhost:77777";
+
+        /// <summary>
+        /// The default URI for the Admin port on the Holochain Conductor. Defaults to ws://localhost:7777.
+        /// </summary>
+        public string HolochainConductorAdminURI { get; set; } = "ws://localhost:7777";
+
+        /// <summary>
+        /// The default URI for the AppAgent port on the Holochain Conductor. Defaults to ws://localhost:8888.
+        /// </summary>
+        public string HolochainConductorAppAgentURI { get; set; } = "ws://localhost:8888";
 
         /// <summary>
         /// The AgentPubKey to use for Zome calls. If this is not set then HoloNET will automatically retrieve this along with the DnaHash after it connects (if the Connect method defaults are not overriden).
@@ -19,8 +31,14 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// </summary>
         public string DnaHash { get; set; } = "";
 
+        /// <summary>
+        /// THe CellId to use for Zome calls (this contains the DnaHash and AgentPubKey). If this is not set then HoloNET will automatically retrieve this along with the AgentPubKey after it connects (if the Connect method defaults are not overriden).
+        /// </summary>
         public byte[][] CellId { get; set; }
 
+        /// <summary>
+        /// The Installed AppId that the AppAgent WebSocket will connect to (optional). If this is blank then it will be a generic App WebSocket and can connect to any hApp.
+        /// </summary>
         public string InstalledAppId { get; set; }
 
         /// <summary>
@@ -76,9 +94,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public bool ShutDownALLHolochainConductors { get; set; } = false;
 
         /// <summary>
-        /// This is the Holochain Conductor to use for the auto-start Holochain Conductor feature. It can be either `Holochain` or `Hc`.
+        /// This is the Holochain Conductor to use for the auto-start Holochain Conductor feature. It can be either `HolochainProductionConductor` or `HcDevTool`.
         /// </summary>
-        public HolochainConductorEnum HolochainConductorToUse { get; set; } = HolochainConductorEnum.HcDevTool; //Will soon default to HolochainProductionConductor once figured out how to pass a hApp to it! ;-)
+        public HolochainConductorEnum HolochainConductorToUse { get; set; } = HolochainConductorEnum.HolochainProductionConductor;
 
         /// <summary>
         /// Set this to true if you wish HoloNET to allow only ONE Holochain Conductor to run at a time. The default is false.
@@ -106,18 +124,80 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         }
 
         /// <summary>
+        /// Set this to true to log to the console.
+        /// </summary>
+        public bool LogToConsole { get; set; } = true;
+
+        /// <summary>
+        /// Set this to true to use colour in the console logging.
+        /// </summary>
+        public bool ShowColouredLogs { get; set; } = true;
+
+        /// <summary>
+        /// The colour to use for Debug types in console logging.
+        /// </summary>
+        public ConsoleColor DebugColour { get; set; } = ConsoleColor.White;
+
+        /// <summary>
+        /// The colour to use for Info types in console logging.
+        /// </summary>
+        public ConsoleColor InfoColour { get; set; } = ConsoleColor.Green;
+
+        /// <summary>
+        /// The colour to use for Warning types in console logging.
+        /// </summary>
+        public ConsoleColor WarningColour { get; set; } = ConsoleColor.Yellow;
+
+        /// <summary>
+        /// The colour to use for Error types in console logging.
+        /// </summary>
+        public ConsoleColor ErrorColour { get; set; } = ConsoleColor.Red;
+
+        /// <summary>
+        /// Set this to true to log to files. Will log to LogPath.
+        /// </summary>
+        public bool LogToFile { get; set; } = true;
+
+        /// <summary>
+        /// The logging path (will defualt to AppData\Roaming\NextGenSoftware\HoloNET\Logs\HoloNET.log)
+        /// </summary>
+        public string LogPath { get; set; } = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\NextGenSoftware\\HoloNET\\Logs";
+
+        /// <summary>
+        /// The log file name (default is HoloNET.log).
+        /// </summary>
+        public string LogFileName { get; set; } = "HoloNET.log";
+
+        /// <summary>
+        /// The number of attempts to attempt to log to the file if the first attempt fails.
+        /// </summary>
+        public int NumberOfRetriesToLogToFile { get; set; } = 3;
+
+        /// <summary>
+        /// The amount of time to wait in seconds between each attempt to log to the file.
+        /// </summary>
+        public int RetryLoggingToFileEverySeconds { get; set; } = 1;
+
+        /// <summary>
+        /// Set this to true to add additional space after the end of each log entry.
+        /// </summary>
+        public bool AddAdditionalSpaceAfterEachLogEntry { get; set; } = false;
+
+        /// <summary>
         /// An enum that specifies what to do when anm error occurs. The options are: `AlwaysThrowExceptionOnError`, `OnlyThrowExceptionIfNoErrorHandlerSubscribedToOnErrorEvent` & `NeverThrowExceptions`). The default is `OnlyThrowExceptionIfNoErrorHandlerSubscribedToOnErrorEvent` meaning it will only throw an error if the `OnError` event has not been subscribed to. This delegates error handling to the caller. If no event has been subscribed then HoloNETClient will throw an error. `AlwaysThrowExceptionOnError` will always throw an error even if the `OnError` event has been subscribed to. The `NeverThrowException` enum option will never throw an error even if the `OnError` event has not been subscribed to. Regardless of what enum is selected, the error will always be logged using whatever ILogger`s have been injected into the constructor or set on the static Logging.Loggers property.
         /// </summary>
         public ErrorHandlingBehaviour ErrorHandlingBehaviour { get; set; } = ErrorHandlingBehaviour.OnlyThrowExceptionIfNoErrorHandlerSubscribedToOnErrorEvent;
 
-        //public HoloNETDNA LoadDNA()
-        //{
-        //    return _holoNETDNAManager.LoadDNA();
-        //}
+        //34 settings :)
 
-        //public bool SaveDNA() 
-        //{
-        //    return _holoNETDNAManager.SaveDNA();
-        //}
+        //TODO: Possibly add these as defaults (used for the Connect methods).
+        //retrieveAgentPubKeyAndDnaHashMode
+        //retrieveAgentPubKeyAndDnaHashFromConductor
+        //retrieveAgentPubKeyAndDnaHashFromSandbox
+        //automaticallyAttemptToRetrieveFromConductorIfSandBoxFails
+        //automaticallyAttemptToRetrieveFromSandBoxIfConductorFails
+        //updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved
+
+        //with these 40 settings! :)
     }
 }
