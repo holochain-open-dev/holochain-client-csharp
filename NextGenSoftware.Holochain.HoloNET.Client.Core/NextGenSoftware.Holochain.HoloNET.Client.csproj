@@ -129,6 +129,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="HolochainBinaries\beta\holochain.exe" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="HolochainBinaries\beta\holochain.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="..\Logos\hc logo.png">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>

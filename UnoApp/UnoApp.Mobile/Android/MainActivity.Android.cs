@@ -12,4 +12,5 @@ namespace UnoApp.Droid;
 )]
 public class MainActivity : Microsoft.UI.Xaml.ApplicationActivity
 {
+
 }

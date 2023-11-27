@@ -936,11 +936,19 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                 IsInitializing = true;
 
-                HoloNETClient.OnError += HoloNETClient_OnError;
-                HoloNETClient.OnReadyForZomeCalls += HoloNETClient_OnReadyForZomeCalls;
-
-                if (HoloNETClient.WebSocket.State != System.Net.WebSockets.WebSocketState.Connecting || HoloNETClient.WebSocket.State != System.Net.WebSockets.WebSocketState.Open)
-                    await HoloNETClient.ConnectAsync(HoloNETClient.EndPoint, connectedCallBackMode, retrieveAgentPubKeyAndDnaHashMode, retrieveAgentPubKeyAndDnaHashFromConductor, retrieveAgentPubKeyAndDnaHashFromSandbox, automaticallyAttemptToRetrieveFromConductorIfSandBoxFails, automaticallyAttemptToRetrieveFromSandBoxIfConductorFails, updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved);
+                if (HoloNETClient != null)
+                {
+                    HoloNETClient.OnError += HoloNETClient_OnError;
+                    HoloNETClient.OnReadyForZomeCalls += HoloNETClient_OnReadyForZomeCalls;
+                
+                    if (HoloNETClient.WebSocket.State != System.Net.WebSockets.WebSocketState.Connecting || HoloNETClient.WebSocket.State != System.Net.WebSockets.WebSocketState.Open)
+                        await HoloNETClient.ConnectAsync(HoloNETClient.EndPoint, connectedCallBackMode, retrieveAgentPubKeyAndDnaHashMode, retrieveAgentPubKeyAndDnaHashFromConductor, retrieveAgentPubKeyAndDnaHashFromSandbox, automaticallyAttemptToRetrieveFromConductorIfSandBoxFails, automaticallyAttemptToRetrieveFromSandBoxIfConductorFails, updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved);
+                }
+                else
+                {
+                    //IsInitialized = true;
+                    IsInitializing = false;
+                }
             }
             catch (Exception ex)
             {

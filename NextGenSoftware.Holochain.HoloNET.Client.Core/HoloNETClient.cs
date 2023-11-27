@@ -967,6 +967,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                                 //_conductorProcess.StartInfo.FileName = fullPathToEmbeddedHolochainConductorBinary;
 
                                 fullPathToHolochainExe = Path.Combine(Directory.GetCurrentDirectory(), "holochain.exe");
+                                //fullPathToHolochainExe = Path.Combine(Directory.GetCurrentDirectory(), "HolochainBinaries/beta/holochain.exe");
 
                                 if (!File.Exists(fullPathToHolochainExe))
                                 {
@@ -993,7 +994,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     if (HoloNETDNA.HolochainConductorToUse == HolochainConductorEnum.HcDevTool)
                     {
                         _conductorProcess.StartInfo.WorkingDirectory = HoloNETDNA.FullPathToRootHappFolder;
-                        _conductorProcess.StartInfo.Arguments = $"-NoExit -Command \"'' | {fullPathToHcExe} s  generate {HoloNETDNA.FullPathToCompiledHappFolder} --piped -f={EndPoint.Port}\"";
+                        //_conductorProcess.StartInfo.Arguments = $"-NoExit -Command \"'' | {fullPathToHcExe} s  generate {HoloNETDNA.FullPathToCompiledHappFolder} --piped -f={EndPoint.Port}\"";
+                        _conductorProcess.StartInfo.Arguments = $"-NoExit -Command \"'' | {fullPathToHcExe} s --piped  generate {HoloNETDNA.FullPathToCompiledHappFolder} --run={EndPoint.Port}\"";
                     }
 
                     if (HoloNETDNA.ShowHolochainConductorWindow)
@@ -1009,17 +1011,21 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
 
                     _conductorProcess.StartInfo.FileName = "PowerShell.exe";
+                    //_conductorProcess.StartInfo.FileName = fullPathToHolochainExe;
+                    //_conductorProcess.StartInfo.WorkingDirectory = fullPathToHolochainExe;
+
                     _conductorProcess.StartInfo.UseShellExecute = true;
                     _conductorProcess.StartInfo.RedirectStandardOutput = false;
                     // _conductorProcess.Start();
 
                     if (HoloNETDNA.HolochainConductorToUse == HolochainConductorEnum.HcDevTool)
                     {
+                        //_conductorProcess.Start();
                         //await Task.Delay(3000);
-                        // _conductorProcess.Close();
+                        //_conductorProcess.Close();
 
-                        _conductorProcess.StartInfo.Arguments = $"-NoExit -Command \"'' | {fullPathToHcExe} s --piped -f={EndPoint.Port} run 0\"";
-                        //TrueProcessStart("PowerShell.exe -NoExit -Command \"'' | {fullPathToHcExe} s --piped -f={EndPoint.Port} run 0\"");
+                        //_conductorProcess.StartInfo.Arguments = $"-NoExit -Command \"'' | {fullPathToHcExe} s --piped -f={EndPoint.Port} run 0\"";
+                        ////TrueProcessStart("PowerShell.exe -NoExit -Command \"'' | {fullPathToHcExe} s --piped -f={EndPoint.Port} run 0\"");
                     }
                     else
                     {
@@ -1042,10 +1048,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                              //TrueProcessStart("PowerShell.exe -NoExit -Command \"'' | {fullPathToHolochainExe} --piped\"");
                             _conductorProcess.StartInfo.Arguments = $"-NoExit -Command \"'' | {fullPathToHolochainExe} --piped\"";
-                            _conductorProcess.Start();
-                            _conductorProcessSessionId = _conductorProcess.Id;
                         }
                     }
+
+                    _conductorProcess.Start();
+                    _conductorProcessSessionId = _conductorProcess.Id;
 
                     await Task.Delay(HoloNETDNA.SecondsToWaitForHolochainConductorToStart * 1000); // Give the conductor 5 (default) seconds to start up...
                     OnHolochainConductorStarted?.Invoke(this, new HolochainConductorStartedEventArgs());

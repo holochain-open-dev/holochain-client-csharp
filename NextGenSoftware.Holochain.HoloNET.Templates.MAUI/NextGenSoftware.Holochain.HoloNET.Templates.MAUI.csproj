@@ -58,6 +58,20 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <MauiAsset Remove="Resources\Raw\holochain.exe" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Remove="Resources\Raw\holochain.exe" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Include="Resources\Raw\holochain.exe">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />

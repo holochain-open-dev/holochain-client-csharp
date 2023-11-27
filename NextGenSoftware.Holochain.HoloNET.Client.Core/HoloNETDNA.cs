@@ -52,7 +52,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public string FullPathToCompiledHappFolder { get; set; }
 
         /// <summary>
-        /// Tells HoloNET how to auto-start the Holochain Conductor. It can be one of the following values: `UseExternal` - Will use the hc.exe specified in the `FullPathToExternalHCToolBinary` property if `HolochainConductorToUse` property is set to `Hc`. It will use the holochain.exe specified in the `FullPathToExternalHolochainConductorBinary` property if `HolochainConductorToUse` property is set to `Holochain`. If `HolochainConductorMode` is set to `UseEmbedded` then it will use the embdedded/integrated hc.exe/holochain.exe if the app is using the [NextGenSoftware.Holochain.HoloNET.Client.Embedded](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.Client.Embedded) package, otherwise it will throw an exception. Finally, if `HolochainConductorMode` is set to `UseSystemGlobal` (default), then it will automatically use the installed version of hc.exe & holochain.exe on the target machine.
+        /// Tells HoloNET how to auto-start the Holochain Conductor. See the documentation at https://github.com/holochain-open-dev/holochain-client-csharp for more info.
         /// </summary>
         public HolochainConductorModeEnum HolochainConductorMode { get; set; } = HolochainConductorModeEnum.UseSystemGlobal;
 

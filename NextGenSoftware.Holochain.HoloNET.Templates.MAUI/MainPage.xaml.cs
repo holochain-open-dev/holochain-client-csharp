@@ -17,6 +17,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.MAUI
             _client.OnDataSent += _client_OnDataSent;
 
             _client.HoloNETDNA.ShowHolochainConductorWindow = true;
+            _client.HoloNETDNA.HolochainConductorMode = HolochainConductorModeEnum.UseEmbedded;
         }
 
         private void _client_OnDataSent(object sender, HoloNETDataSentEventArgs e)
@@ -53,6 +54,17 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.MAUI
 
         private void btnConnect_Clicked(object sender, EventArgs e)
         {
+            Dispatcher.DispatchAsync (async () =>
+            {
+                string appData = FileSystem.Current.AppDataDirectory;
+
+                using var stream = await FileSystem.OpenAppPackageFileAsync("holochain.exe");
+               // using var reader = new StreamReader(stream);
+
+                //var contents = reader.ReadToEnd();
+                
+            });
+
             _client.ConnectAdmin();
         }
     }

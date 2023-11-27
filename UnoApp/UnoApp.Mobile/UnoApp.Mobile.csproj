@@ -21,6 +21,14 @@
     <UseInterpreter Condition="'$(Configuration)' == 'Debug' and $([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) != 'maccatalyst'">True</UseInterpreter>
     <IsUnoHead>true</IsUnoHead>
   </PropertyGroup>
+  <ItemGroup>
+    <None Remove="Android\Resources\holochain.exe" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Android\Resources\holochain.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </AndroidResource>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Uno.WinUI" />

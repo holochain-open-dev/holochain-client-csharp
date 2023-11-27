@@ -1091,138 +1091,255 @@ BlurRadius="10"/>
         BorderThickness="1" 
         CornerRadius="0,55,0,55" 
         HorizontalAlignment="Center" 
-        VerticalAlignment="Center"> 
-                <StackPanel>
-                    <TextBlock Margin="10,10,10,20" Text="Data Entries" HorizontalAlignment="Center" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
+        VerticalAlignment="Center">
 
-                    <DataGrid Grid.Row="1" x:Name="gridDataEntries" ItemsSource="{Binding Source=HoloNETEntries}" HeadersVisibility="Column" Margin="10" AutoGenerateColumns="True" IsReadOnly="true"  RowBackground="DarkBlue" AlternatingRowBackground="Blue"  Background="Transparent"  Foreground="White">
-                        <DataGrid.Resources>
-                            <Style BasedOn="{StaticResource {x:Type DataGridColumnHeader}}" TargetType="{x:Type DataGridColumnHeader}">
-                                <Setter Property="Background" Value="Blue" />
-                            </Style>
+                <StackPanel Orientation="Vertical">
+                    <!--<TabControl Background="Transparent">
+                        <TabItem Background="Transparent">
+                            <TabItem.Header>
+                                <TextBlock Text="HoloNET Entry" Foreground="WhiteSmoke" Background="Transparent" />
+                            </TabItem.Header>-->
+                            <StackPanel Orientation="Vertical">
+                                <TextBlock Margin="10,10,10,20" Text="HoloNET Data Entry" HorizontalAlignment="Center" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
 
-                            <ResourceDictionary x:Key="gridResources">
-                                <Style x:Key="{x:Type DataGridCell}" TargetType="{x:Type DataGridCell}">
-                                    <Setter Property="Background" Value="{x:Null}" />
-                                    <Setter Property="BorderBrush" Value="{x:Null}" />
-                                    <Style.Triggers>
-                                        <Trigger Property="IsSelected" Value="True">
-                                            <Setter Property="Background" Value="{x:Null}" />
-                                            <Setter Property="BorderBrush" Value="{x:Null}" />
-                                        </Trigger>
-                                    </Style.Triggers>
-                                </Style>
-                                <Style TargetType="{x:Type DataGridRow}">
-                                    <Setter Property="Background" Value="{x:Null}" />
-                                    <Setter Property="BorderBrush" Value="{x:Null}" />
-                                    <Style.Triggers>
-                                        <Trigger Property="IsSelected" Value="True">
-                                            <Setter Property="Background" Value="{x:Null}" />
-                                            <Setter Property="BorderBrush" Value="{x:Null}" />
-                                        </Trigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </ResourceDictionary>
-                        </DataGrid.Resources>
-                    </DataGrid>
+                                <Grid Margin="20">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition></RowDefinition>
+                                        <RowDefinition></RowDefinition>
+                                        <RowDefinition></RowDefinition>
+                                        <RowDefinition></RowDefinition>
+                                    </Grid.RowDefinitions>
 
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition></ColumnDefinition>
+                                        <ColumnDefinition></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
 
-                    <Grid Margin="20">
-                        <Grid.RowDefinitions>
-                            <RowDefinition></RowDefinition>
-                            <RowDefinition></RowDefinition>
-                            <RowDefinition></RowDefinition>
-                            <RowDefinition></RowDefinition>
-                        </Grid.RowDefinitions>
+                                    <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="0" Grid.Column="0" Text="First Name" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
+                                    <TextBox MinWidth="150" Grid.Row="0" Grid.Column="1" Margin="10" FontSize="14" x:Name="txtEntryFirstName"/>
 
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition></ColumnDefinition>
-                            <ColumnDefinition></ColumnDefinition>
-                        </Grid.ColumnDefinitions>
+                                    <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="1" Grid.Column="0"  Text="Last Name:" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
+                                    <TextBox MinWidth="150"  Grid.Row="1" Grid.Column="1"  Margin="10" FontSize="14" x:Name="txtEntryLastName"/>
 
-                        <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="0" Grid.Column="0" Text="First Name" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
-                        <TextBox MinWidth="150" Grid.Row="0" Grid.Column="1" Margin="10" FontSize="14" x:Name="txtFirstName"/>
+                                    <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="2" Grid.Column="0"  Text="DOB:" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
+                                    <TextBox MinWidth="150" Grid.Row="2" Grid.Column="1" Margin="10" FontSize="14" Text="" x:Name="txtEntryDOB"/>
 
-                        <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="1" Grid.Column="0"  Text="Last Name:" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
-                        <TextBox MinWidth="150"  Grid.Row="1" Grid.Column="1"  Margin="10" FontSize="14" x:Name="txtLastName"/>
+                                    <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="3" Grid.Column="0"  Text="Email:" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
+                                    <TextBox MinWidth="150" Grid.Row="3" Grid.Column="1" Margin="10" FontSize="14" Text="" x:Name="txtEntryEmail"/>
+                                </Grid>
 
-                        <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="2" Grid.Column="0"  Text="DOB:" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
-                        <TextBox MinWidth="150" Grid.Row="2" Grid.Column="1" Margin="10" FontSize="14" Text="" x:Name="txtDOB"/>
+                                <TextBlock Name="lblEntryValidationErrors" Width="200" HorizontalAlignment="Center" TextWrapping="Wrap" Margin="10"  Visibility="Hidden"  FontSize="14"  Text="" Foreground="Red" FontWeight="Bold"  />
 
-                        <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="3" Grid.Column="0"  Text="Email:" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
-                        <TextBox MinWidth="150" Grid.Row="3" Grid.Column="1" Margin="10" FontSize="14" Text="" x:Name="txtEmail"/>
-                    </Grid>
+                                <StackPanel Orientation="Horizontal" Margin="0,10,0,10" HorizontalAlignment="Center">
+                                    <!--<Button x:Name="btnHoloNETEntryPopupCancel" Style="{StaticResource ButtonStyle}" Cursor="Hand" Margin="5" Foreground="WhiteSmoke" Width="50" FontSize="14" Content="Cancel" Background="{x:Null}" Click="btnHoloNETEntryPopupCancel_Click">
+                                    <Button.Effect>
+                                        <DropShadowEffect x:Name="btnHoloNETEntryPopupCancellGlowEffect" ShadowDepth="0"
+    Color="White"
+    Opacity="0"
+    BlurRadius="10"/>
+                                    </Button.Effect>
 
-                    <TextBlock Name="lblNewEntryValidationErrors" Width="200" HorizontalAlignment="Center" TextWrapping="Wrap" Margin="10"  Visibility="Collapsed"  FontSize="14"  Text="" Foreground="Red" FontWeight="Bold"  />
+                                    <Button.Triggers>
+                                        <EventTrigger RoutedEvent="Button.MouseEnter">
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <DoubleAnimation
+          Storyboard.TargetName="btnHoloNETEntryPopupCancellGlowEffect" 
+          Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+          From="0.0" To="1.0" Duration="0:0:0.5" 
+          AutoReverse="False" RepeatBehavior="1x" />
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </EventTrigger>
+                                        <EventTrigger RoutedEvent="Button.MouseLeave">
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <DoubleAnimation
+          Storyboard.TargetName="btnHoloNETEntryPopupCancellGlowEffect" 
+          Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+          From="1" To="0" Duration="0:0:0.5" 
+          AutoReverse="False" RepeatBehavior="1x" />
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </EventTrigger>
+                                    </Button.Triggers>
+                                </Button>-->
+                                    <Button x:Name="btnHoloNETEntrySharedPopupOk" Margin="5" Style="{StaticResource ButtonStyle}" Cursor="Hand" Foreground="WhiteSmoke" Width="200" FontSize="14" Content="Save Entry" Background="{x:Null}" Click="btnHoloNETEntrySharedPopupOk_Click">
+                                        <Button.Effect>
+                                            <DropShadowEffect x:Name="btnDataEntriesPopupOkEffect" ShadowDepth="0"
+Color="White"
+Opacity="0"
+BlurRadius="10"/>
+                                        </Button.Effect>
 
-                    <StackPanel Orientation="Horizontal" Margin="0,10,0,10" HorizontalAlignment="Center">
-                        <Button x:Name="btnDataEntriesPopupCancel" Style="{StaticResource ButtonStyle}" Cursor="Hand" Margin="5" Foreground="WhiteSmoke" Width="50" FontSize="14" Content="Cancel" Background="{x:Null}" Click="btnDataEntriesPopupCancel_Click">
-                            <Button.Effect>
-                                <DropShadowEffect x:Name="btnDataEntriesPopupCancelGlowEffect" ShadowDepth="0"
-                  Color="White"
-                  Opacity="0"
-                  BlurRadius="10"/>
-                            </Button.Effect>
+                                        <Button.Triggers>
+                                            <EventTrigger RoutedEvent="Button.MouseEnter">
+                                                <BeginStoryboard>
+                                                    <Storyboard>
+                                                        <DoubleAnimation
+          Storyboard.TargetName="btnDataEntriesPopupOkEffect" 
+          Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+          From="0.0" To="1.0" Duration="0:0:0.5" 
+          AutoReverse="False" RepeatBehavior="1x" />
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </EventTrigger>
+                                            <EventTrigger RoutedEvent="Button.MouseLeave">
+                                                <BeginStoryboard>
+                                                    <Storyboard>
+                                                        <DoubleAnimation
+          Storyboard.TargetName="btnDataEntriesPopupOkEffect" 
+          Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+          From="1" To="0" Duration="0:0:0.5" 
+          AutoReverse="False" RepeatBehavior="1x" />
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </EventTrigger>
+                                        </Button.Triggers>
+                                    </Button>
+                                </StackPanel>
 
-                            <Button.Triggers>
-                                <EventTrigger RoutedEvent="Button.MouseEnter">
-                                    <BeginStoryboard>
-                                        <Storyboard>
-                                            <DoubleAnimation
-                            Storyboard.TargetName="btnDataEntriesPopupCancelGlowEffect" 
-                            Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
-                            From="0.0" To="1.0" Duration="0:0:0.5" 
-                            AutoReverse="False" RepeatBehavior="1x" />
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                </EventTrigger>
-                                <EventTrigger RoutedEvent="Button.MouseLeave">
-                                    <BeginStoryboard>
-                                        <Storyboard>
-                                            <DoubleAnimation
-                            Storyboard.TargetName="btnDataEntriesPopupCancelGlowEffect" 
-                            Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
-                            From="1" To="0" Duration="0:0:0.5" 
-                            AutoReverse="False" RepeatBehavior="1x" />
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                </EventTrigger>
-                            </Button.Triggers>
-                        </Button>
-                        <Button x:Name="btnDataEntriesPopupOk" Margin="5" Style="{StaticResource ButtonStyle}" Cursor="Hand" Foreground="WhiteSmoke" Width="50" FontSize="14" Content="Add" Background="{x:Null}" Click="btnDataEntriesPopupOk_Click">
-                            <Button.Effect>
-                                <DropShadowEffect x:Name="btnDataEntriesPopupCancelEffect" ShadowDepth="0"
-                  Color="White"
-                  Opacity="0"
-                  BlurRadius="10"/>
-                            </Button.Effect>
+                            </StackPanel>
+                        <!--</TabItem>
+                        <TabItem Background="Transparent">
+                            <TabItem.Header>
+                                <TextBlock Text="HoloNET Collection" Foreground="WhiteSmoke" Background="Transparent" />
+                            </TabItem.Header>-->
+                            <StackPanel Orientation="Vertical">
+                                <TextBlock Margin="10,10,10,20" Text="HoloNET Collection" HorizontalAlignment="Center" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
 
-                            <Button.Triggers>
-                                <EventTrigger RoutedEvent="Button.MouseEnter">
-                                    <BeginStoryboard>
-                                        <Storyboard>
-                                            <DoubleAnimation
-                            Storyboard.TargetName="btnDataEntriesPopupCancelEffect" 
-                            Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
-                            From="0.0" To="1.0" Duration="0:0:0.5" 
-                            AutoReverse="False" RepeatBehavior="1x" />
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                </EventTrigger>
-                                <EventTrigger RoutedEvent="Button.MouseLeave">
-                                    <BeginStoryboard>
-                                        <Storyboard>
-                                            <DoubleAnimation
-                            Storyboard.TargetName="btnDataEntriesPopupCancelEffect" 
-                            Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
-                            From="1" To="0" Duration="0:0:0.5" 
-                            AutoReverse="False" RepeatBehavior="1x" />
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                </EventTrigger>
-                            </Button.Triggers>
-                        </Button>
-                    </StackPanel>
+                                <DataGrid Grid.Row="1" x:Name="gridDataEntries" ItemsSource="{Binding Source=HoloNETEntries}" HeadersVisibility="Column" Margin="10" AutoGenerateColumns="True" IsReadOnly="true"  RowBackground="DarkBlue" AlternatingRowBackground="Blue"  Background="Transparent"  Foreground="White">
+                                    <DataGrid.Resources>
+                                        <Style BasedOn="{StaticResource {x:Type DataGridColumnHeader}}" TargetType="{x:Type DataGridColumnHeader}">
+                                            <Setter Property="Background" Value="Blue" />
+                                        </Style>
+
+                                        <ResourceDictionary x:Key="gridResources">
+                                            <Style x:Key="{x:Type DataGridCell}" TargetType="{x:Type DataGridCell}">
+                                                <Setter Property="Background" Value="{x:Null}" />
+                                                <Setter Property="BorderBrush" Value="{x:Null}" />
+                                                <Style.Triggers>
+                                                    <Trigger Property="IsSelected" Value="True">
+                                                        <Setter Property="Background" Value="{x:Null}" />
+                                                        <Setter Property="BorderBrush" Value="{x:Null}" />
+                                                    </Trigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                            <Style TargetType="{x:Type DataGridRow}">
+                                                <Setter Property="Background" Value="{x:Null}" />
+                                                <Setter Property="BorderBrush" Value="{x:Null}" />
+                                                <Style.Triggers>
+                                                    <Trigger Property="IsSelected" Value="True">
+                                                        <Setter Property="Background" Value="{x:Null}" />
+                                                        <Setter Property="BorderBrush" Value="{x:Null}" />
+                                                    </Trigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </ResourceDictionary>
+                                    </DataGrid.Resources>
+                                </DataGrid>
+
+                                <Grid Margin="20">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition></RowDefinition>
+                                        <RowDefinition></RowDefinition>
+                                        <RowDefinition></RowDefinition>
+                                        <RowDefinition></RowDefinition>
+                                    </Grid.RowDefinitions>
+
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition></ColumnDefinition>
+                                        <ColumnDefinition></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="0" Grid.Column="0" Text="First Name" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
+                                    <TextBox MinWidth="150" Grid.Row="0" Grid.Column="1" Margin="10" FontSize="14" x:Name="txtFirstName"/>
+
+                                    <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="1" Grid.Column="0"  Text="Last Name:" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
+                                    <TextBox MinWidth="150"  Grid.Row="1" Grid.Column="1"  Margin="10" FontSize="14" x:Name="txtLastName"/>
+
+                                    <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="2" Grid.Column="0"  Text="DOB:" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
+                                    <TextBox MinWidth="150" Grid.Row="2" Grid.Column="1" Margin="10" FontSize="14" Text="" x:Name="txtDOB"/>
+
+                                    <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="3" Grid.Column="0"  Text="Email:" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
+                                    <TextBox MinWidth="150" Grid.Row="3" Grid.Column="1" Margin="10" FontSize="14" Text="" x:Name="txtEmail"/>
+                                </Grid>
+
+                                <TextBlock Name="lblNewEntryValidationErrors" Width="200" HorizontalAlignment="Center" TextWrapping="Wrap" Margin="10"  Visibility="Collapsed"  FontSize="14"  Text="" Foreground="Red" FontWeight="Bold"  />
+
+                                <StackPanel Orientation="Horizontal" Margin="0,10,0,10" HorizontalAlignment="Center">
+                                    <Button x:Name="btnDataEntriesPopupOk" Margin="5" Style="{StaticResource ButtonStyle}" Cursor="Hand" Foreground="WhiteSmoke" Width="200" FontSize="14" Content="Add Entry To Collection" Background="{x:Null}" Click="btnDataEntriesPopupOk_Click">
+                                        <Button.Effect>
+                                            <DropShadowEffect x:Name="btnDataEntriesPopupCancelEffect" ShadowDepth="0"
+Color="White"
+Opacity="0"
+BlurRadius="10"/>
+                                        </Button.Effect>
+
+                                        <Button.Triggers>
+                                            <EventTrigger RoutedEvent="Button.MouseEnter">
+                                                <BeginStoryboard>
+                                                    <Storyboard>
+                                                        <DoubleAnimation
+          Storyboard.TargetName="btnDataEntriesPopupCancelEffect" 
+          Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+          From="0.0" To="1.0" Duration="0:0:0.5" 
+          AutoReverse="False" RepeatBehavior="1x" />
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </EventTrigger>
+                                            <EventTrigger RoutedEvent="Button.MouseLeave">
+                                                <BeginStoryboard>
+                                                    <Storyboard>
+                                                        <DoubleAnimation
+          Storyboard.TargetName="btnDataEntriesPopupCancelEffect" 
+          Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+          From="1" To="0" Duration="0:0:0.5" 
+          AutoReverse="False" RepeatBehavior="1x" />
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </EventTrigger>
+                                        </Button.Triggers>
+                                    </Button>
+
+                                </StackPanel>
+                            </StackPanel>
+                        <!--</TabItem>
+                    </TabControl>-->
+
+                    <Button x:Name="btnDataEntriesPopupCancel" Style="{StaticResource ButtonStyle}" Cursor="Hand" Margin="5" Foreground="WhiteSmoke" HorizontalAlignment="Center" Width="200" FontSize="14" Content="Close" Background="{x:Null}" Click="btnDataEntriesPopupCancel_Click">
+                        <Button.Effect>
+                            <DropShadowEffect x:Name="btnDataEntriesPopupCancelGlowEffect" ShadowDepth="0"
+Color="White"
+Opacity="0"
+BlurRadius="10"/>
+                        </Button.Effect>
+
+                        <Button.Triggers>
+                            <EventTrigger RoutedEvent="Button.MouseEnter">
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation
+          Storyboard.TargetName="btnDataEntriesPopupCancelGlowEffect" 
+          Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+          From="0.0" To="1.0" Duration="0:0:0.5" 
+          AutoReverse="False" RepeatBehavior="1x" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger>
+                            <EventTrigger RoutedEvent="Button.MouseLeave">
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation
+          Storyboard.TargetName="btnDataEntriesPopupCancelGlowEffect" 
+          Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+          From="1" To="0" Duration="0:0:0.5" 
+          AutoReverse="False" RepeatBehavior="1x" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger>
+                        </Button.Triggers>
+                    </Button>
                 </StackPanel>
             </Border>
         </Grid>
@@ -1255,16 +1372,16 @@ BlurRadius="10"/>
                         </Grid.ColumnDefinitions>
 
                         <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="0" Grid.Column="0" Text="First Name" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
-                        <TextBox MinWidth="150" Grid.Row="0" Grid.Column="1" Margin="10" FontSize="14" x:Name="txtEntryFirstName"/>
+                        <TextBox MinWidth="150" Grid.Row="0" Grid.Column="1" Margin="10" Text="David" FontSize="14" x:Name="txtHoloNETEntryFirstName"/>
 
                         <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="1" Grid.Column="0"  Text="Last Name:" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
-                        <TextBox MinWidth="150"  Grid.Row="1" Grid.Column="1"  Margin="10" FontSize="14" x:Name="txtEntryLastName"/>
+                        <TextBox MinWidth="150"  Grid.Row="1" Grid.Column="1"  Margin="10" Text="Ellams" FontSize="14" x:Name="txtHoloNETEntryLastName"/>
 
                         <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="2" Grid.Column="0"  Text="DOB:" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
-                        <TextBox MinWidth="150" Grid.Row="2" Grid.Column="1" Margin="10" FontSize="14" Text="" x:Name="txtEntryDOB"/>
+                        <TextBox MinWidth="150" Grid.Row="2" Grid.Column="1" Margin="10" FontSize="14" Text="11/04/1980" Name="txtHoloNETEntryDOB"/>
 
                         <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="3" Grid.Column="0"  Text="Email:" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
-                        <TextBox MinWidth="150" Grid.Row="3" Grid.Column="1" Margin="10" FontSize="14" Text="" x:Name="txtEntryEmail"/>
+                        <TextBox MinWidth="150" Grid.Row="3" Grid.Column="1" Margin="10" FontSize="14" Text="david@nextgensoftware.co.uk" x:Name="txtHoloNETEntryEmail"/>
                     </Grid>
 
                     <TextBlock Name="lblHoloNETEntryValidationErrors" Width="200" HorizontalAlignment="Center" TextWrapping="Wrap" Margin="10"  Visibility="Hidden"  FontSize="14"  Text="" Foreground="Red" FontWeight="Bold"  />
@@ -1275,7 +1392,7 @@ BlurRadius="10"/>
                                 <DropShadowEffect x:Name="btnHoloNETEntryPopupCancellGlowEffect" ShadowDepth="0"
               Color="White"
               Opacity="0"
-              BlurRadius="10"/>         
+              BlurRadius="10"/>
                             </Button.Effect>
 
                             <Button.Triggers>
@@ -1305,7 +1422,7 @@ BlurRadius="10"/>
                         </Button>
                         <Button x:Name="btnHoloNETEntryPopupOk" Margin="5" Style="{StaticResource ButtonStyle}" Cursor="Hand" Foreground="WhiteSmoke" Width="50" FontSize="14" Content="Save" Background="{x:Null}" Click="btnHoloNETEntryPopupOk_Click">
                             <Button.Effect>
-                                <DropShadowEffect x:Name="btnDataEntriesPopupOkEffect" ShadowDepth="0"
+                                <DropShadowEffect x:Name="btnHoloNETEntryPopupOkEffect" ShadowDepth="0"
           Color="White"
           Opacity="0"
           BlurRadius="10"/>
@@ -1316,7 +1433,7 @@ BlurRadius="10"/>
                                     <BeginStoryboard>
                                         <Storyboard>
                                             <DoubleAnimation
-                    Storyboard.TargetName="btnDataEntriesPopupOkEffect" 
+                    Storyboard.TargetName="btnHoloNETEntryPopupOkEffect" 
                     Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
                     From="0.0" To="1.0" Duration="0:0:0.5" 
                     AutoReverse="False" RepeatBehavior="1x" />
@@ -1327,7 +1444,7 @@ BlurRadius="10"/>
                                     <BeginStoryboard>
                                         <Storyboard>
                                             <DoubleAnimation
-                    Storyboard.TargetName="btnDataEntriesPopupOkEffect" 
+                    Storyboard.TargetName="btnHoloNETEntryPopupOkEffect" 
                     Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
                     From="1" To="0" Duration="0:0:0.5" 
                     AutoReverse="False" RepeatBehavior="1x" />
@@ -1340,7 +1457,5 @@ BlurRadius="10"/>
                 </StackPanel>
             </Border>
         </Grid>
-
-
     </Grid>
 </Window>
