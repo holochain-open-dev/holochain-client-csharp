@@ -4828,7 +4828,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             LogEvent("AdminAppUninstalledCallBack", adminAppUninstalledCallBackEventArgs);
             OnAdminAppUninstalledCallBack?.Invoke(this, adminAppUninstalledCallBackEventArgs);
 
-            if (_taskCompletionAdminAppUninstalledCallBack != null && !string.IsNullOrEmpty(adminAppUninstalledCallBackEventArgs.Id) && _taskCompletionAdminAppInstalledCallBack.ContainsKey(adminAppUninstalledCallBackEventArgs.Id))
+            if (_taskCompletionAdminAppUninstalledCallBack != null && !string.IsNullOrEmpty(adminAppUninstalledCallBackEventArgs.Id) && _taskCompletionAdminAppUninstalledCallBack.ContainsKey(adminAppUninstalledCallBackEventArgs.Id))
                 _taskCompletionAdminAppUninstalledCallBack[adminAppUninstalledCallBackEventArgs.Id].SetResult(adminAppUninstalledCallBackEventArgs);
         }
 
@@ -4855,7 +4855,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             LogEvent("AdminZomeCallCapabilityGranted", adminZomeCallCapabilityGrantedCallBackEventArgs);
             OnAdminZomeCallCapabilityGrantedCallBack?.Invoke(this, adminZomeCallCapabilityGrantedCallBackEventArgs);
 
-            if (_taskCompletionAdminZomeCapabilityGrantedCallBack != null && !string.IsNullOrEmpty(adminZomeCallCapabilityGrantedCallBackEventArgs.Id) && _taskCompletionAdminAppEnabledCallBack.ContainsKey(adminZomeCallCapabilityGrantedCallBackEventArgs.Id))
+            if (_taskCompletionAdminZomeCapabilityGrantedCallBack != null && !string.IsNullOrEmpty(adminZomeCallCapabilityGrantedCallBackEventArgs.Id) && _taskCompletionAdminZomeCapabilityGrantedCallBack.ContainsKey(adminZomeCallCapabilityGrantedCallBackEventArgs.Id))
                 _taskCompletionAdminZomeCapabilityGrantedCallBack[adminZomeCallCapabilityGrantedCallBackEventArgs.Id].SetResult(adminZomeCallCapabilityGrantedCallBackEventArgs);
         }
 
@@ -4864,7 +4864,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             LogEvent("AdminAppInterfaceAttached", adminAppInterfaceAttachedCallBackEventArgs);
             OnAdminAppInterfaceAttachedCallBack?.Invoke(this, adminAppInterfaceAttachedCallBackEventArgs);
 
-            if (_taskCompletionAdminAppInterfaceAttachedCallBack != null && !string.IsNullOrEmpty(adminAppInterfaceAttachedCallBackEventArgs.Id) && _taskCompletionAdminAppEnabledCallBack.ContainsKey(adminAppInterfaceAttachedCallBackEventArgs.Id))
+            if (_taskCompletionAdminAppInterfaceAttachedCallBack != null && !string.IsNullOrEmpty(adminAppInterfaceAttachedCallBackEventArgs.Id) && _taskCompletionAdminAppInterfaceAttachedCallBack.ContainsKey(adminAppInterfaceAttachedCallBackEventArgs.Id))
                 _taskCompletionAdminAppInterfaceAttachedCallBack[adminAppInterfaceAttachedCallBackEventArgs.Id].SetResult(adminAppInterfaceAttachedCallBackEventArgs);
         }
 
