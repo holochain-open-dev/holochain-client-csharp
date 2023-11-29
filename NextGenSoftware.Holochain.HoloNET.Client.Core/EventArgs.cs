@@ -112,6 +112,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public List<AppInfo> Apps { get; set; } = new List<AppInfo>();
     }
 
+    public class AdminGetAppInfoCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
+    {
+        public AppInfo AppInfo { get; set; }
+    }
+
     public class AdminListDnasCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
         public AppResponse AppResponse { get; set; }

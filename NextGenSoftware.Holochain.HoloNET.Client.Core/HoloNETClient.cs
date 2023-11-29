@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography;
+using System.Dynamic;
 using MessagePack;
 using Blake2Fast;
 using NextGenSoftware.WebSocket;
@@ -20,7 +21,8 @@ using NextGenSoftware.Holochain.HoloNET.Client.Properties;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 using YamlDotNet.Core;
-using System.Dynamic;
+using YamlDotNet.Core.Tokens;
+
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
@@ -80,7 +82,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         private int _conductorProcessSessionId = 0;
         private ShutdownHolochainConductorsMode _shutdownHolochainConductorsMode = ShutdownHolochainConductorsMode.UseHoloNETDNASettings;
         private MessagePackSerializerOptions messagePackSerializerOptions = MessagePackSerializerOptions.Standard.WithSecurity(MessagePackSecurity.UntrustedData);
-        private HoloNETDNAManager _holoNETDNAManager = new HoloNETDNAManager();
+        //private HoloNETDNAManager _holoNETDNAManager = new HoloNETDNAManager();
 
         //[DllImport("Shlwapi.dll", SetLastError = true, CharSet = CharSet.Auto)]
         //static extern uint AssocQueryString(AssocF flags, AssocStr str, string pszAssoc, string pszExtra, [Out] StringBuilder pszOut, ref uint pcchOut);
@@ -373,14 +375,20 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         {
             get
             {
-                if (!_holoNETDNAManager.IsLoaded)
-                    _holoNETDNAManager.LoadDNA();
+                if (!HoloNETDNAManager.IsLoaded)
+                    HoloNETDNAManager.LoadDNA();
 
-                return _holoNETDNAManager.HoloNETDNA;
+                return HoloNETDNAManager.HoloNETDNA;
+
+                //if (!_holoNETDNAManager.IsLoaded)
+                //    _holoNETDNAManager.LoadDNA();
+
+                //return _holoNETDNAManager.HoloNETDNA;
             }
             set
             {
-                _holoNETDNAManager.HoloNETDNA = value;
+                //_holoNETDNAManager.HoloNETDNA = value;
+                HoloNETDNAManager.HoloNETDNA = value;
             }
         }
 
@@ -388,7 +396,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         {
             get
             {
-                return _holoNETDNAManager.IsLoaded;
+                return HoloNETDNAManager.IsLoaded;
+                //return _holoNETDNAManager.IsLoaded;
+                //return _holoNETDNAManager.IsLoaded;
             }
         }
 
@@ -437,41 +447,49 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <summary>
         /// This constructor uses the built-in DefaultLogger and the settings contained in the HoloNETDNA.
         /// </summary>
-        public HoloNETClient()
+        /// <param name="holoNETDNA">The HoloNETDNA you wish to use for this connection (optional). If this is not passed in then it will use the default HoloNETDNA defined in the HoloNETDNA property.</param>
+        public HoloNETClient(HoloNETDNA holoNETDNA = null)
         {
+            if (holoNETDNA != null)
+                HoloNETDNA = holoNETDNA;
+
             Logger.Loggers.Add(new DefaultLogger(HoloNETDNA.LogToConsole, HoloNETDNA.LogToFile, HoloNETDNA.LogPath, HoloNETDNA.LogFileName, HoloNETDNA.AddAdditionalSpaceAfterEachLogEntry, HoloNETDNA.ShowColouredLogs, HoloNETDNA.DebugColour, HoloNETDNA.InfoColour, HoloNETDNA.WarningColour, HoloNETDNA.ErrorColour, HoloNETDNA.NumberOfRetriesToLogToFile, HoloNETDNA.RetryLoggingToFileEverySeconds));
             Init(new Uri(HoloNETDNA.HolochainConductorAppAgentURI));
         }
 
-        /// <summary>
-        /// This constructor uses the built-in DefaultLogger and allows various options to be configured for it (these will override what is in the HoloNETDNA for this instance).
-        /// </summary>
-        /// <param name="holochainConductorURI">The URI of the Holochain Conductor to connect to. Will default to 'ws://localhost:8888'.</param>
-        /// <param name="logToConsole">Set this to true (default) if you wish HoloNET to log to the console. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
-        /// <param name="logToFile">Set this to true (default) if you wish HoloNET to log a log file. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
-        /// <param name="releativePathToLogFolder">The relative path to the log folder to log to. Will default to a sub-directory called `Logs` within the current working directory. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
-        /// <param name="logFileName">The name of the file to log to. Will default to `HoloNET.log`. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
-        /// <param name="addAdditionalSpaceAfterEachLogEntry">Set this to true to add additional space after each log entry. The default is false. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
-        /// <param name="showColouredLogs">Set this to true to enable coloured logs in the console. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
-        /// <param name="debugColour">The colour to use for `Debug` log entries to the console NOTE: This is only relevant if the built-in DefaultLogger is used..</param>
-        /// <param name="infoColour">The colour to use for `Info` log entries to the console. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
-        /// <param name="warningColour">The colour to use for `Warning` log entries to the console. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
-        /// <param name="errorColour">The colour to use for `Error` log entries to the console. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
-        public HoloNETClient(string holochainConductorURI = "ws://localhost:8888", bool logToConsole = true, bool logToFile = true, string releativePathToLogFolder = "Logs", string logFileName = "HoloNET.log", bool addAdditionalSpaceAfterEachLogEntry = false, bool showColouredLogs = true, ConsoleColor debugColour = ConsoleColor.White, ConsoleColor infoColour = ConsoleColor.Green, ConsoleColor warningColour = ConsoleColor.Yellow, ConsoleColor errorColour = ConsoleColor.Red, int numberOfRetriesToLogToFile = 3, int retryLoggingToFileEverySeconds = 1)
-        {
-            Logger.Loggers.Add(new DefaultLogger(logToConsole, logToFile, releativePathToLogFolder, logFileName, addAdditionalSpaceAfterEachLogEntry, showColouredLogs, debugColour, infoColour, warningColour, errorColour, numberOfRetriesToLogToFile, retryLoggingToFileEverySeconds));
-            Init(new Uri(holochainConductorURI));
-        }
+        ///// <summary>
+        ///// This constructor uses the built-in DefaultLogger and allows various options to be configured for it (these will override what is in the HoloNETDNA for this instance).
+        ///// </summary>
+        ///// <param name="holochainConductorURI">The URI of the Holochain Conductor to connect to. Will default to 'ws://localhost:8888'.</param>
+        ///// <param name="logToConsole">Set this to true (default) if you wish HoloNET to log to the console. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
+        ///// <param name="logToFile">Set this to true (default) if you wish HoloNET to log a log file. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
+        ///// <param name="releativePathToLogFolder">The relative path to the log folder to log to. Will default to a sub-directory called `Logs` within the current working directory. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
+        ///// <param name="logFileName">The name of the file to log to. Will default to `HoloNET.log`. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
+        ///// <param name="addAdditionalSpaceAfterEachLogEntry">Set this to true to add additional space after each log entry. The default is false. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
+        ///// <param name="showColouredLogs">Set this to true to enable coloured logs in the console. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
+        ///// <param name="debugColour">The colour to use for `Debug` log entries to the console NOTE: This is only relevant if the built-in DefaultLogger is used..</param>
+        ///// <param name="infoColour">The colour to use for `Info` log entries to the console. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
+        ///// <param name="warningColour">The colour to use for `Warning` log entries to the console. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
+        ///// <param name="errorColour">The colour to use for `Error` log entries to the console. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
+        //public HoloNETClient(string holochainConductorURI, bool logToConsole = true, bool logToFile = true, string releativePathToLogFolder = "Logs", string logFileName = "HoloNET.log", bool addAdditionalSpaceAfterEachLogEntry = false, bool showColouredLogs = true, ConsoleColor debugColour = ConsoleColor.White, ConsoleColor infoColour = ConsoleColor.Green, ConsoleColor warningColour = ConsoleColor.Yellow, ConsoleColor errorColour = ConsoleColor.Red, int numberOfRetriesToLogToFile = 3, int retryLoggingToFileEverySeconds = 1)
+        //{
+        //    Logger.Loggers.Add(new DefaultLogger(logToConsole, logToFile, releativePathToLogFolder, logFileName, addAdditionalSpaceAfterEachLogEntry, showColouredLogs, debugColour, infoColour, warningColour, errorColour, numberOfRetriesToLogToFile, retryLoggingToFileEverySeconds));
+        //    Init(new Uri(holochainConductorURI));
+        //}
 
         /// <summary>
         /// This constructor allows you to inject in (DI) your own implementation (logger) of the ILogger interface. It will also use the settings contained in the HoloNETDNA.
         /// </summary>
         /// <param name="logger">The implementation of the ILogger interface (custom logger).</param>
         /// <param name="alsoUseDefaultLogger">Set this to true if you wish HoloNET to also log to the DefaultLogger as well as any custom logger injected in.</param>
+        /// <param name="holoNETDNA">The HoloNETDNA you wish to use for this connection (optional). If this is not passed in then it will use the default HoloNETDNA defined in the HoloNETDNA property.</param>
         ///// <param name="holochainConductorURI">The URI of the Holochain Conductor to connect to. Will default to 'ws://localhost:8888'.</param>
         //public HoloNETClient(ILogger logger, bool alsoUseDefaultLogger = false, string holochainConductorURI = "ws://localhost:8888")
-        public HoloNETClient(ILogger logger, bool alsoUseDefaultLogger = false)
+        public HoloNETClient(ILogger logger, bool alsoUseDefaultLogger = false, HoloNETDNA holoNETDNA = null)
         {
+            if (holoNETDNA != null)
+                HoloNETDNA = holoNETDNA;
+
             Logger.Loggers.Add(logger);
 
             if (alsoUseDefaultLogger)
@@ -481,41 +499,45 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             Init(new Uri(HoloNETDNA.HolochainConductorAppAgentURI));
         }
 
-        /// <summary>
-        /// This constructor allows you to inject in (DI) your own implementation (logger) of the ILogger interface.
-        /// </summary>
-        /// <param name="logger">The implementation of the ILogger interface (custom logger).</param>
-        /// <param name="alsoUseDefaultLogger">Set this to true if you wish HoloNET to also log to the DefaultLogger as well as any custom logger injected in.</param>
-        /// <param name="holochainConductorURI">The URI of the Holochain Conductor to connect to. Will default to 'ws://localhost:8888'.</param>
-        /// <param name="logToConsole">Set this to true (default) if you wish HoloNET to log to the console. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
-        /// <param name="logToFile">Set this to true (default) if you wish HoloNET to log a log file. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
-        /// <param name="releativePathToLogFolder">The relative path to the log folder to log to. Will default to a sub-directory called `Logs` within the current working directory. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
-        /// <param name="logFileName">The name of the file to log to. Will default to `HoloNET.log`. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
-        /// <param name="addAdditionalSpaceAfterEachLogEntry">Set this to true to add additional space after each log entry. The default is false. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
-        /// <param name="showColouredLogs">Set this to true to enable coloured logs in the console. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
-        /// <param name="debugColour">The colour to use for `Debug` log entries to the console NOTE: This is only relevant if the built-in DefaultLogger is used..</param>
-        /// <param name="infoColour">The colour to use for `Info` log entries to the console. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
-        /// <param name="warningColour">The colour to use for `Warning` log entries to the console. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
-        /// <param name="errorColour">The colour to use for `Error` log entries to the console. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
-        public HoloNETClient(ILogger logger, bool alsoUseDefaultLogger = false, string holochainConductorURI = "ws://localhost:8888", bool logToConsole = true, bool logToFile = true, string releativePathToLogFolder = "Logs", string logFileName = "HoloNET.log", bool addAdditionalSpaceAfterEachLogEntry = false, bool showColouredLogs = true, ConsoleColor debugColour = ConsoleColor.White, ConsoleColor infoColour = ConsoleColor.Green, ConsoleColor warningColour = ConsoleColor.Yellow, ConsoleColor errorColour = ConsoleColor.Red, int numberOfRetriesToLogToFile = 3, int retryLoggingToFileEverySeconds = 1)
-        {
-            Logger.Loggers.Add(logger);
+        ///// <summary>
+        ///// This constructor allows you to inject in (DI) your own implementation (logger) of the ILogger interface.
+        ///// </summary>
+        ///// <param name="logger">The implementation of the ILogger interface (custom logger).</param>
+        ///// <param name="alsoUseDefaultLogger">Set this to true if you wish HoloNET to also log to the DefaultLogger as well as any custom logger injected in.</param>
+        ///// <param name="holochainConductorURI">The URI of the Holochain Conductor to connect to. Will default to 'ws://localhost:8888'.</param>
+        ///// <param name="logToConsole">Set this to true (default) if you wish HoloNET to log to the console. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
+        ///// <param name="logToFile">Set this to true (default) if you wish HoloNET to log a log file. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
+        ///// <param name="releativePathToLogFolder">The relative path to the log folder to log to. Will default to a sub-directory called `Logs` within the current working directory. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
+        ///// <param name="logFileName">The name of the file to log to. Will default to `HoloNET.log`. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
+        ///// <param name="addAdditionalSpaceAfterEachLogEntry">Set this to true to add additional space after each log entry. The default is false. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
+        ///// <param name="showColouredLogs">Set this to true to enable coloured logs in the console. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
+        ///// <param name="debugColour">The colour to use for `Debug` log entries to the console NOTE: This is only relevant if the built-in DefaultLogger is used..</param>
+        ///// <param name="infoColour">The colour to use for `Info` log entries to the console. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
+        ///// <param name="warningColour">The colour to use for `Warning` log entries to the console. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
+        ///// <param name="errorColour">The colour to use for `Error` log entries to the console. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
+        //public HoloNETClient(ILogger logger, bool alsoUseDefaultLogger = false, string holochainConductorURI = "ws://localhost:8888", bool logToConsole = true, bool logToFile = true, string releativePathToLogFolder = "Logs", string logFileName = "HoloNET.log", bool addAdditionalSpaceAfterEachLogEntry = false, bool showColouredLogs = true, ConsoleColor debugColour = ConsoleColor.White, ConsoleColor infoColour = ConsoleColor.Green, ConsoleColor warningColour = ConsoleColor.Yellow, ConsoleColor errorColour = ConsoleColor.Red, int numberOfRetriesToLogToFile = 3, int retryLoggingToFileEverySeconds = 1)
+        //{
+        //    Logger.Loggers.Add(logger);
 
-            if (alsoUseDefaultLogger)
-                Logger.Loggers.Add(new DefaultLogger(logToConsole, logToFile, releativePathToLogFolder, logFileName, addAdditionalSpaceAfterEachLogEntry, showColouredLogs, debugColour, infoColour, warningColour, errorColour, numberOfRetriesToLogToFile, retryLoggingToFileEverySeconds));
+        //    if (alsoUseDefaultLogger)
+        //        Logger.Loggers.Add(new DefaultLogger(logToConsole, logToFile, releativePathToLogFolder, logFileName, addAdditionalSpaceAfterEachLogEntry, showColouredLogs, debugColour, infoColour, warningColour, errorColour, numberOfRetriesToLogToFile, retryLoggingToFileEverySeconds));
 
-            Init(new Uri(holochainConductorURI));
-        }
+        //    Init(new Uri(holochainConductorURI));
+        //}
 
         /// <summary>
         /// This constructor allows you to inject in (DI) multiple implementations (logger) of the ILogger interface. HoloNET will then log to each of these loggers. It will also use the settings contained in the HoloNETDNA.
         /// </summary>
         /// <param name="loggers">The implementations of the ILogger interface (custom loggers).</param>
         /// <param name="alsoUseDefaultLogger">Set this to true if you wish HoloNET to also log to the DefaultLogger as well as any custom loggers injected in.</param>
+        /// <param name="holoNETDNA">The HoloNETDNA you wish to use for this connection (optional). If this is not passed in then it will use the default HoloNETDNA defined in the HoloNETDNA property.</param>
         ///// <param name="holochainConductorURI">The URI of the Holochain Conductor to connect to. Will default to 'ws://localhost:8888'.</param>
         //public HoloNETClient(IEnumerable<ILogger> loggers, bool alsoUseDefaultLogger = false, string holochainConductorURI = "ws://localhost:8888")
-        public HoloNETClient(IEnumerable<ILogger> loggers, bool alsoUseDefaultLogger = false)
+        public HoloNETClient(IEnumerable<ILogger> loggers, bool alsoUseDefaultLogger = false, HoloNETDNA holoNETDNA = null)
         {
+            if (holoNETDNA != null)
+                HoloNETDNA = holoNETDNA;
+
             Logger.Loggers = new List<ILogger>(loggers);
 
             if (alsoUseDefaultLogger)
@@ -525,31 +547,31 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             Init(new Uri(HoloNETDNA.HolochainConductorAppAgentURI));
         }
 
-        /// <summary>
-        /// This constructor allows you to inject in (DI) multiple implementations (logger) of the ILogger interface. HoloNET will then log to each of these loggers.
-        /// </summary>
-        /// <param name="loggers">The implementations of the ILogger interface (custom loggers).</param>
-        /// <param name="alsoUseDefaultLogger">Set this to true if you wish HoloNET to also log to the DefaultLogger as well as any custom loggers injected in.</param>
-        /// <param name="holochainConductorURI">The URI of the Holochain Conductor to connect to. Will default to 'ws://localhost:8888'.</param>
-        /// <param name="logToConsole">Set this to true (default) if you wish HoloNET to log to the console. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
-        /// <param name="logToFile">Set this to true (default) if you wish HoloNET to log a log file. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
-        /// <param name="releativePathToLogFolder">The relative path to the log folder to log to. Will default to a sub-directory called `Logs` within the current working directory. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
-        /// <param name="logFileName">The name of the file to log to. Will default to `HoloNET.log`. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
-        /// <param name="addAdditionalSpaceAfterEachLogEntry">Set this to true to add additional space after each log entry. The default is false. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
-        /// <param name="showColouredLogs">Set this to true to enable coloured logs in the console. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
-        /// <param name="debugColour">The colour to use for `Debug` log entries to the console NOTE: This is only relevant if the built-in DefaultLogger is used..</param>
-        /// <param name="infoColour">The colour to use for `Info` log entries to the console. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
-        /// <param name="warningColour">The colour to use for `Warning` log entries to the console. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
-        /// <param name="errorColour">The colour to use for `Error` log entries to the console. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
-        public HoloNETClient(IEnumerable<ILogger> loggers, bool alsoUseDefaultLogger = false, string holochainConductorURI = "ws://localhost:8888", bool logToConsole = true, bool logToFile = true, string releativePathToLogFolder = "Logs", string logFileName = "HoloNET.log", bool addAdditionalSpaceAfterEachLogEntry = false, bool showColouredLogs = true, ConsoleColor debugColour = ConsoleColor.White, ConsoleColor infoColour = ConsoleColor.Green, ConsoleColor warningColour = ConsoleColor.Yellow, ConsoleColor errorColour = ConsoleColor.Red, int numberOfRetriesToLogToFile = 3, int retryLoggingToFileEverySeconds = 1)
-        {
-            Logger.Loggers = new List<ILogger>(loggers);
+        ///// <summary>
+        ///// This constructor allows you to inject in (DI) multiple implementations (logger) of the ILogger interface. HoloNET will then log to each of these loggers.
+        ///// </summary>
+        ///// <param name="loggers">The implementations of the ILogger interface (custom loggers).</param>
+        ///// <param name="alsoUseDefaultLogger">Set this to true if you wish HoloNET to also log to the DefaultLogger as well as any custom loggers injected in.</param>
+        ///// <param name="holochainConductorURI">The URI of the Holochain Conductor to connect to. Will default to 'ws://localhost:8888'.</param>
+        ///// <param name="logToConsole">Set this to true (default) if you wish HoloNET to log to the console. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
+        ///// <param name="logToFile">Set this to true (default) if you wish HoloNET to log a log file. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
+        ///// <param name="releativePathToLogFolder">The relative path to the log folder to log to. Will default to a sub-directory called `Logs` within the current working directory. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
+        ///// <param name="logFileName">The name of the file to log to. Will default to `HoloNET.log`. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
+        ///// <param name="addAdditionalSpaceAfterEachLogEntry">Set this to true to add additional space after each log entry. The default is false. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
+        ///// <param name="showColouredLogs">Set this to true to enable coloured logs in the console. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
+        ///// <param name="debugColour">The colour to use for `Debug` log entries to the console NOTE: This is only relevant if the built-in DefaultLogger is used..</param>
+        ///// <param name="infoColour">The colour to use for `Info` log entries to the console. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
+        ///// <param name="warningColour">The colour to use for `Warning` log entries to the console. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
+        ///// <param name="errorColour">The colour to use for `Error` log entries to the console. NOTE: This is only relevant if the built-in DefaultLogger is used.</param>
+        //public HoloNETClient(IEnumerable<ILogger> loggers, bool alsoUseDefaultLogger = false, string holochainConductorURI = "ws://localhost:8888", bool logToConsole = true, bool logToFile = true, string releativePathToLogFolder = "Logs", string logFileName = "HoloNET.log", bool addAdditionalSpaceAfterEachLogEntry = false, bool showColouredLogs = true, ConsoleColor debugColour = ConsoleColor.White, ConsoleColor infoColour = ConsoleColor.Green, ConsoleColor warningColour = ConsoleColor.Yellow, ConsoleColor errorColour = ConsoleColor.Red, int numberOfRetriesToLogToFile = 3, int retryLoggingToFileEverySeconds = 1)
+        //{
+        //    Logger.Loggers = new List<ILogger>(loggers);
 
-            if (alsoUseDefaultLogger)
-                Logger.Loggers.Add(new DefaultLogger(logToConsole, logToFile, releativePathToLogFolder, logFileName, addAdditionalSpaceAfterEachLogEntry, showColouredLogs, debugColour, infoColour, warningColour, errorColour, numberOfRetriesToLogToFile, retryLoggingToFileEverySeconds));
+        //    if (alsoUseDefaultLogger)
+        //        Logger.Loggers.Add(new DefaultLogger(logToConsole, logToFile, releativePathToLogFolder, logFileName, addAdditionalSpaceAfterEachLogEntry, showColouredLogs, debugColour, infoColour, warningColour, errorColour, numberOfRetriesToLogToFile, retryLoggingToFileEverySeconds));
 
-            Init(new Uri(holochainConductorURI));
-        }
+        //    Init(new Uri(holochainConductorURI));
+        //}
 
         /// <summary>
         /// This method will wait (non blocking) until HoloNET is ready to make zome calls after it has connected to the Holochain Conductor and retrived the AgentPubKey & DnaHash. It will then return to the caller with the AgentPubKey & DnaHash. This method will return the same time the OnReadyForZomeCalls event is raised. Unlike all the other methods, this one only contains an async version because the non async version would block all other threads including any UI ones etc.
@@ -562,12 +584,14 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         public HoloNETDNA LoadDNA()
         {
-            return _holoNETDNAManager.LoadDNA();
+            //return _holoNETDNAManager.LoadDNA();
+            return HoloNETDNAManager.LoadDNA();
         }
 
         public bool SaveDNA()
         {
-            return _holoNETDNAManager.SaveDNA();
+            //return _holoNETDNAManager.SaveDNA();
+            return HoloNETDNAManager.SaveDNA();
         }
 
 
@@ -2410,6 +2434,37 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public AdminRegisterDnaCallBackEventArgs AdminRegisterDna(DnaBundle bundle, string network_seed = null, object properties = null, string id = null)
         {
             return AdminRegisterDnaAsync(bundle, network_seed, properties, ConductorResponseCallBackMode.UseCallBackEvents, id).Result;
+        }
+
+        public async Task<AdminGetAppInfoCallBackEventArgs> AdminGetAppInfoAsync(string installedAppId, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
+        {
+            AdminGetAppInfoCallBackEventArgs result = new AdminGetAppInfoCallBackEventArgs();
+            AdminAppsListedCallBackEventArgs listAppsResult = await AdminListAppsAsync(AppStatusFilter.All);
+
+            if (listAppsResult != null && !listAppsResult.IsError)
+            {
+                foreach (AppInfo app in listAppsResult.Apps)
+                {
+                    if (app.installed_app_id == installedAppId)
+                    {
+                        result.AppInfo = app;
+                        break;
+                    }
+                }
+            }
+
+            if (result.AppInfo == null)
+            {
+                result.IsError = true;
+                result.Message = "App Not Found";
+            }    
+
+            return result;
+        }
+
+        public AdminGetAppInfoCallBackEventArgs AdminGetAppInfo(string installedAppId, string id = null)
+        {
+            return AdminGetAppInfoAsync(installedAppId, ConductorResponseCallBackMode.UseCallBackEvents, id).Result;
         }
 
         public async Task<AdminAppsListedCallBackEventArgs> AdminListAppsAsync(AppStatusFilter appStatusFilter, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)

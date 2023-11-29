@@ -4,17 +4,17 @@ using System.IO;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
-    public class HoloNETDNAManager
+    public static class HoloNETDNAManager
     {
-        public string HoloNETDNAPath = "HoloNET_DNA.json";
-        public HoloNETDNA HoloNETDNA { get; set; } = new HoloNETDNA();
+        public static string HoloNETDNAPath = "HoloNET_DNA.json";
+        public static HoloNETDNA HoloNETDNA { get; set; } = new HoloNETDNA();
 
-        public HoloNETDNA LoadDNA()
+        public static HoloNETDNA LoadDNA()
         {
             return LoadDNA(HoloNETDNAPath);
         }
 
-        public HoloNETDNA LoadDNA(string holoNETDNAPath)
+        public static HoloNETDNA LoadDNA(string holoNETDNAPath)
         {
             try
             {
@@ -37,14 +37,14 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
         }
 
-        public bool IsLoaded { get; private set; }
+        public static bool IsLoaded { get; private set; }
 
-        public bool SaveDNA()
+        public static bool SaveDNA()
         {
             return SaveDNA(HoloNETDNAPath, HoloNETDNA);
         }
 
-        public bool SaveDNA(string holoNETDNAPath, HoloNETDNA holoNETDNA)
+        public static bool SaveDNA(string holoNETDNAPath, HoloNETDNA holoNETDNA)
         {
             try
             {

@@ -124,62 +124,62 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         }
 
         /// <summary>
-        /// Set this to true to log to the console.
+        /// Set this to true (default) if you wish HoloNET to log to the console. NOTE: This is only relevant if the built-in DefaultLogger is used.
         /// </summary>
         public bool LogToConsole { get; set; } = true;
 
         /// <summary>
-        /// Set this to true to use colour in the console logging.
+        /// Set this to true to enable coloured logs in the console. NOTE: This is only relevant if the built-in DefaultLogger is used.
         /// </summary>
         public bool ShowColouredLogs { get; set; } = true;
 
         /// <summary>
-        /// The colour to use for Debug types in console logging.
+        /// The colour to use for `Debug` log entries to the console NOTE: This is only relevant if the built-in DefaultLogger is used.
         /// </summary>
         public ConsoleColor DebugColour { get; set; } = ConsoleColor.White;
 
         /// <summary>
-        /// The colour to use for Info types in console logging.
+        /// The colour to use for `Info` log entries to the console. NOTE: This is only relevant if the built-in DefaultLogger is used.
         /// </summary>
         public ConsoleColor InfoColour { get; set; } = ConsoleColor.Green;
 
         /// <summary>
-        /// The colour to use for Warning types in console logging.
+        /// The colour to use for `Warning` log entries to the console. NOTE: This is only relevant if the built-in DefaultLogger is used.
         /// </summary>
         public ConsoleColor WarningColour { get; set; } = ConsoleColor.Yellow;
 
         /// <summary>
-        /// The colour to use for Error types in console logging.
+        /// The colour to use for `Error` log entries to the console. NOTE: This is only relevant if the built-in DefaultLogger is used.
         /// </summary>
         public ConsoleColor ErrorColour { get; set; } = ConsoleColor.Red;
 
         /// <summary>
-        /// Set this to true to log to files. Will log to LogPath.
+        /// Set this to true (default) if you wish HoloNET to log a log file. NOTE: This is only relevant if the built-in DefaultLogger is used.
         /// </summary>
         public bool LogToFile { get; set; } = true;
 
         /// <summary>
-        /// The logging path (will defualt to AppData\Roaming\NextGenSoftware\HoloNET\Logs\HoloNET.log)
+        /// The logging path (will defualt to AppData\Roaming\NextGenSoftware\HoloNET\Logs). NOTE: This is only relevant if the built-in DefaultLogger is used.
         /// </summary>
         public string LogPath { get; set; } = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\NextGenSoftware\\HoloNET\\Logs";
 
         /// <summary>
-        /// The log file name (default is HoloNET.log).
+        /// The log file name (default is HoloNET.log). NOTE: This is only relevant if the built-in DefaultLogger is used.
         /// </summary>
         public string LogFileName { get; set; } = "HoloNET.log";
 
         /// <summary>
-        /// The number of attempts to attempt to log to the file if the first attempt fails.
+        /// The number of attempts to attempt to log to the file if the first attempt fails. NOTE: This is only relevant if the built-in DefaultLogger is used.
         /// </summary>
         public int NumberOfRetriesToLogToFile { get; set; } = 3;
 
         /// <summary>
-        /// The amount of time to wait in seconds between each attempt to log to the file.
+        /// The amount of time to wait in seconds between each attempt to log to the file. NOTE: This is only relevant if the built-in DefaultLogger is used.
         /// </summary>
         public int RetryLoggingToFileEverySeconds { get; set; } = 1;
 
         /// <summary>
-        /// Set this to true to add additional space after the end of each log entry.
+        /// Set this to true to add additional space after the end of each log entry. NOTE: This is only relevant if the built-in DefaultLogger is used.
         /// </summary>
         public bool AddAdditionalSpaceAfterEachLogEntry { get; set; } = false;
 
