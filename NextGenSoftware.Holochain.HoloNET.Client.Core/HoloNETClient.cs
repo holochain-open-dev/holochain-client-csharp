@@ -937,11 +937,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 //if (!File.Exists(fullPathToEmbeddedHCToolBinary) && HoloNETDNA.HolochainConductorMode == HolochainConductorModeEnum.UseEmbedded && HoloNETDNA.HolochainConductorToUse == HolochainConductorEnum.HcDevTool)
                 //    throw new FileNotFoundException($"When HolochainConductorMode is set to 'UseEmbedded' and HolochainConductorToUse is set to 'HcDevTool', you must ensure the hc.exe is found here: {fullPathToEmbeddedHCToolBinary}.");
 
-                //if (!Directory.Exists(HoloNETDNA.FullPathToRootHappFolder))
-                //    throw new DirectoryNotFoundException($"The path for HoloNETDNA.FullPathToRootHappFolder ({HoloNETDNA.FullPathToRootHappFolder}) was not found.");
+                if (!string.IsNullOrEmpty(HoloNETDNA.FullPathToRootHappFolder) && !Directory.Exists(HoloNETDNA.FullPathToRootHappFolder) && HoloNETDNA.HolochainConductorToUse == HolochainConductorEnum.HcDevTool)
+                    throw new DirectoryNotFoundException($"The path for HoloNETDNA.FullPathToRootHappFolder ({HoloNETDNA.FullPathToRootHappFolder}) was not found.");
 
-                //if (!Directory.Exists(HoloNETDNA.FullPathToCompiledHappFolder) && HoloNETDNA.HolochainConductorToUse == HolochainConductorEnum.HcDevTool)
-                //    throw new DirectoryNotFoundException($"The path for HoloNETDNA.FullPathToCompiledHappFolder ({HoloNETDNA.FullPathToCompiledHappFolder}) was not found.");
+                if (!string.IsNullOrEmpty(HoloNETDNA.FullPathToCompiledHappFolder) && !Directory.Exists(HoloNETDNA.FullPathToCompiledHappFolder) && HoloNETDNA.HolochainConductorToUse == HolochainConductorEnum.HcDevTool)
+                    throw new DirectoryNotFoundException($"The path for HoloNETDNA.FullPathToCompiledHappFolder ({HoloNETDNA.FullPathToCompiledHappFolder}) was not found.");
 
 
                 if (HoloNETDNA.HolochainConductorToUse == HolochainConductorEnum.HcDevTool)
@@ -2310,6 +2310,16 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             };
 
             return (new AdminZomeCallCapabilityGrantedCallBackEventArgs(), grantedFunctions, signingKey);
+        }
+
+        public byte[] GetCapGrantSecret(byte[][] cellId)
+        {
+            return _signingCredentialsForCell[$"{ConvertHoloHashToString(cellId[1])}:{ConvertHoloHashToString(cellId[0])}"].CapSecret;
+        }
+
+        public byte[] GetCapGrantSecret(string agentPubKey, string dnaHash)
+        {
+            return _signingCredentialsForCell[$"{agentPubKey}:{dnaHash}"].CapSecret;
         }
 
 
