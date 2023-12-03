@@ -7,7 +7,7 @@ using NextGenSoftware.Utilities.ExtentionMethods;
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
     //NOTE: To use this class you will need to make sure your corresponding rust hApp zome functions/structs have the corresponding properties (such as created_date etc) below defined.
-    public abstract class HoloNETAuditEntryBase : HoloNETEntryBase, IHoloNETAuditEntryBaseClass
+    public abstract class HoloNETAuditEntryBase : HoloNETEntryBase, IHoloNETAuditEntryBase
     {
         ///// <summary>
         ///// This is a new abstract class introduced in HoloNET 2 that wraps around the HoloNETClient so you do not need to interact with the client directly. Instead it allows very simple CRUD operations (Load, Save & Delete) to be performed on your custom data object that extends this class. Your custom data object represents the data (Holochain Entry) returned from a zome call and HoloNET will handle the mapping onto your data object automatically.
@@ -67,6 +67,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="isVersionTrackingEnabled">Set this to true if you wish to enable Version Tracking (you will need to make sure your hApp rust code has the version field added to your entry struct).</param>
         /// <param name="isAuditTrackingEnabled">Set this to true if you wish to enable Audit Tracking (the AuditEntries property will be updated every time the entry/object is saved or deleted).</param>
         /// <param name="isAuditAgentCreateModifyDeleteFieldsEnabled">Set this to true if you wish to update the CreatedDate, CreatedBy, ModifiedDate, ModifiedBy, DeletedData & DeletedBy properties each time the entry/object is saved or deleted (you will need to make sure your hApp rust code has the created_date, created_by, modified_date, modified_by, deleted_date & deleted_by fields in your entry struct).</param>
+        /// <param name="isGenerateUniqueGuidIdEnabled">Set this to true if you wish to automatically generate a unique guid id which persists across multiple versions of this HoloNETEntry (the EntryHash will change for each version after you save).</param>
+        /// <param name="isActiveFlagEnabled">Set this to true if you wish to enable the IsActive flag (you will need to make sure your hApp rust code has the is_active flag added to your entry struct).</param>
         /// <param name="autoCallInitialize">Set this to true if you wish HoloNETAuditEntryBase to auto-call the Initialize method when a new instance is created. Set this to false if you do not wish it to do this, you may want to do this manually if you want to initialize (will call the Connect method on the HoloNET Client) at a later stage.</param>
         /// <param name="holoNETDNA">This is the HoloNETDNA object that controls how HoloNET operates. This will be passed into the internally created instance of the HoloNET Client.</param>
         /// <param name="connectedCallBackMode">If set to `WaitForHolochainConductorToConnect` (default) it will await until it is connected before returning, otherwise it will return immediately and then call the OnConnected event once it has finished connecting.</param>
@@ -76,11 +78,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="automaticallyAttemptToRetrieveFromConductorIfSandBoxFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the Holochain Conductor if it fails to get them from the HC Sandbox command. This defaults to true.</param>
         /// <param name="automaticallyAttemptToRetrieveFromSandBoxIfConductorFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the HC Sandbox command if it fails to get them from the Holochain Conductor. This defaults to true.</param>
         /// <param name="updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved">Set this to true (default) to automatically update the HoloNETDNA once it has retrieved the DnaHash & AgentPubKey.</param>
-        public HoloNETAuditEntryBase(string zomeName, string zomeLoadEntryFunction, string zomeCreateEntryFunction, string zomeUpdateEntryFunction, string zomeDeleteEntryFunction, bool createHoloNETClientConnection = true, HoloNETDNA holoNETDNA = null, bool isVersionTrackingEnabled = true, bool isAuditTrackingEnabled = true, bool isAuditAgentCreateModifyDeleteFieldsEnabled = true, bool autoCallInitialize = true, ConnectedCallBackMode connectedCallBackMode = ConnectedCallBackMode.WaitForHolochainConductorToConnect, RetrieveAgentPubKeyAndDnaHashMode retrieveAgentPubKeyAndDnaHashMode = RetrieveAgentPubKeyAndDnaHashMode.Wait, bool retrieveAgentPubKeyAndDnaHashFromConductor = true, bool retrieveAgentPubKeyAndDnaHashFromSandbox = true, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true, bool updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved = true) : base(zomeName, zomeLoadEntryFunction, zomeCreateEntryFunction, zomeUpdateEntryFunction, zomeDeleteEntryFunction, createHoloNETClientConnection, holoNETDNA, autoCallInitialize, connectedCallBackMode, retrieveAgentPubKeyAndDnaHashMode, retrieveAgentPubKeyAndDnaHashFromConductor, retrieveAgentPubKeyAndDnaHashFromSandbox, automaticallyAttemptToRetrieveFromConductorIfSandBoxFails, automaticallyAttemptToRetrieveFromSandBoxIfConductorFails, updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved)
+        public HoloNETAuditEntryBase(string zomeName, string zomeLoadEntryFunction, string zomeCreateEntryFunction, string zomeUpdateEntryFunction, string zomeDeleteEntryFunction, bool createHoloNETClientConnection = true, HoloNETDNA holoNETDNA = null, bool isVersionTrackingEnabled = true, bool isAuditTrackingEnabled = true, bool isAuditAgentCreateModifyDeleteFieldsEnabled = true, bool isGenerateUniqueGuidIdEnabled = true, bool isActiveFlagEnabled = true, bool autoCallInitialize = true, ConnectedCallBackMode connectedCallBackMode = ConnectedCallBackMode.WaitForHolochainConductorToConnect, RetrieveAgentPubKeyAndDnaHashMode retrieveAgentPubKeyAndDnaHashMode = RetrieveAgentPubKeyAndDnaHashMode.Wait, bool retrieveAgentPubKeyAndDnaHashFromConductor = true, bool retrieveAgentPubKeyAndDnaHashFromSandbox = true, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true, bool updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved = true) : base(zomeName, zomeLoadEntryFunction, zomeCreateEntryFunction, zomeUpdateEntryFunction, zomeDeleteEntryFunction, createHoloNETClientConnection, holoNETDNA, autoCallInitialize, connectedCallBackMode, retrieveAgentPubKeyAndDnaHashMode, retrieveAgentPubKeyAndDnaHashFromConductor, retrieveAgentPubKeyAndDnaHashFromSandbox, automaticallyAttemptToRetrieveFromConductorIfSandBoxFails, automaticallyAttemptToRetrieveFromSandBoxIfConductorFails, updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved)
         {
             IsVersionTrackingEnabled = isVersionTrackingEnabled;
             IsAuditTrackingEnabled = isAuditTrackingEnabled;
             IsAuditAgentCreateModifyDeleteFieldsEnabled = isAuditAgentCreateModifyDeleteFieldsEnabled;
+            IsGenerateUniqueGuidIdEnabled = isGenerateUniqueGuidIdEnabled;
+            IsActiveFlagEnabled = isActiveFlagEnabled;
         }
 
         ///// <summary>
@@ -145,6 +149,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="isVersionTrackingEnabled">Set this to true if you wish to enable Version Tracking (you will need to make sure your hApp rust code has the version field added to your entry struct).</param>
         /// <param name="isAuditTrackingEnabled">Set this to true if you wish to enable Audit Tracking (the AuditEntries property will be updated every time the entry/object is saved or deleted).</param>
         /// <param name="isAuditAgentCreateModifyDeleteFieldsEnabled">Set this to true if you wish to update the CreatedDate, CreatedBy, ModifiedDate, ModifiedBy, DeletedData & DeletedBy properties each time the entry/object is saved or deleted (you will need to make sure your hApp rust code has the created_date, created_by, modified_date, modified_by, deleted_date & deleted_by fields in your entry struct).</param>
+        /// <param name="isGenerateUniqueGuidIdEnabled">Set this to true if you wish to automatically generate a unique guid id which persists across multiple versions of this HoloNETEntry (the EntryHash will change for each version after you save).</param>
+        /// <param name="isActiveFlagEnabled">Set this to true if you wish to enable the IsActive flag (you will need to make sure your hApp rust code has the is_active flag added to your entry struct).</param>
         /// <param name="autoCallInitialize">Set this to true if you wish [HoloNETEntryBaseClass](#HoloNETEntryBaseClass) to auto-call the [Initialize](#Initialize) method when a new instance is created. Set this to false if you do not wish it to do this, you may want to do this manually if you want to initialize (will call the [Connect](#connect) method on the HoloNET Client) at a later stage.</param>
         /// <param name="holoNETDNA">This is the HoloNETDNA object that controls how HoloNET operates. This will be passed into the internally created instance of the HoloNET Client.</param>
         /// <param name="connectedCallBackMode">If set to `WaitForHolochainConductorToConnect` (default) it will await until it is connected before returning, otherwise it will return immediately and then call the OnConnected event once it has finished connecting.</param>
@@ -154,11 +160,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="automaticallyAttemptToRetrieveFromConductorIfSandBoxFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the Holochain Conductor if it fails to get them from the HC Sandbox command. This defaults to true.</param>
         /// <param name="automaticallyAttemptToRetrieveFromSandBoxIfConductorFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the HC Sandbox command if it fails to get them from the Holochain Conductor. This defaults to true.</param>
         /// <param name="updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved">Set this to true (default) to automatically update the HoloNETDNA once it has retrieved the DnaHash & AgentPubKey.</param>
-        public HoloNETAuditEntryBase(string zomeName, string zomeLoadEntryFunction, string zomeCreateEntryFunction, string zomeUpdateEntryFunction, string zomeDeleteEntryFunction, ILogger logger, bool alsoUseDefaultLogger = false, bool createHoloNETClientConnection = true, HoloNETDNA holoNETDNA = null, bool isVersionTrackingEnabled = true, bool isAuditTrackingEnabled = true, bool isAuditAgentCreateModifyDeleteFieldsEnabled = true, bool autoCallInitialize = true, ConnectedCallBackMode connectedCallBackMode = ConnectedCallBackMode.WaitForHolochainConductorToConnect, RetrieveAgentPubKeyAndDnaHashMode retrieveAgentPubKeyAndDnaHashMode = RetrieveAgentPubKeyAndDnaHashMode.Wait, bool retrieveAgentPubKeyAndDnaHashFromConductor = true, bool retrieveAgentPubKeyAndDnaHashFromSandbox = true, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true, bool updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved = true) : base(zomeName, zomeLoadEntryFunction, zomeCreateEntryFunction, zomeUpdateEntryFunction, zomeDeleteEntryFunction, logger, alsoUseDefaultLogger, createHoloNETClientConnection, holoNETDNA, autoCallInitialize, connectedCallBackMode, retrieveAgentPubKeyAndDnaHashMode, retrieveAgentPubKeyAndDnaHashFromConductor, retrieveAgentPubKeyAndDnaHashFromSandbox, automaticallyAttemptToRetrieveFromConductorIfSandBoxFails, automaticallyAttemptToRetrieveFromSandBoxIfConductorFails, updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved)
+        public HoloNETAuditEntryBase(string zomeName, string zomeLoadEntryFunction, string zomeCreateEntryFunction, string zomeUpdateEntryFunction, string zomeDeleteEntryFunction, ILogger logger, bool alsoUseDefaultLogger = false, bool createHoloNETClientConnection = true, HoloNETDNA holoNETDNA = null, bool isVersionTrackingEnabled = true, bool isAuditTrackingEnabled = true, bool isAuditAgentCreateModifyDeleteFieldsEnabled = true, bool isGenerateUniqueGuidIdEnabled = true, bool isActiveFlagEnabled = true, bool autoCallInitialize = true, ConnectedCallBackMode connectedCallBackMode = ConnectedCallBackMode.WaitForHolochainConductorToConnect, RetrieveAgentPubKeyAndDnaHashMode retrieveAgentPubKeyAndDnaHashMode = RetrieveAgentPubKeyAndDnaHashMode.Wait, bool retrieveAgentPubKeyAndDnaHashFromConductor = true, bool retrieveAgentPubKeyAndDnaHashFromSandbox = true, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true, bool updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved = true) : base(zomeName, zomeLoadEntryFunction, zomeCreateEntryFunction, zomeUpdateEntryFunction, zomeDeleteEntryFunction, logger, alsoUseDefaultLogger, createHoloNETClientConnection, holoNETDNA, autoCallInitialize, connectedCallBackMode, retrieveAgentPubKeyAndDnaHashMode, retrieveAgentPubKeyAndDnaHashFromConductor, retrieveAgentPubKeyAndDnaHashFromSandbox, automaticallyAttemptToRetrieveFromConductorIfSandBoxFails, automaticallyAttemptToRetrieveFromSandBoxIfConductorFails, updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved)
         {
             IsVersionTrackingEnabled = isVersionTrackingEnabled;
             IsAuditTrackingEnabled = isAuditTrackingEnabled;
             IsAuditAgentCreateModifyDeleteFieldsEnabled = isAuditAgentCreateModifyDeleteFieldsEnabled;
+            IsGenerateUniqueGuidIdEnabled = isGenerateUniqueGuidIdEnabled;
+            IsActiveFlagEnabled = isActiveFlagEnabled;
         }
 
         ///// <summary>
@@ -223,6 +231,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="isVersionTrackingEnabled">Set this to true if you wish to enable Version Tracking (you will need to make sure your hApp rust code has the version field added to your entry struct).</param>
         /// <param name="isAuditTrackingEnabled">Set this to true if you wish to enable Audit Tracking (the AuditEntries property will be updated every time the entry/object is saved or deleted).</param>
         /// <param name="isAuditAgentCreateModifyDeleteFieldsEnabled">Set this to true if you wish to update the CreatedDate, CreatedBy, ModifiedDate, ModifiedBy, DeletedData & DeletedBy properties each time the entry/object is saved or deleted (you will need to make sure your hApp rust code has the created_date, created_by, modified_date, modified_by, deleted_date & deleted_by fields in your entry struct).</param>
+        /// <param name="isGenerateUniqueGuidIdEnabled">Set this to true if you wish to automatically generate a unique guid id which persists across multiple versions of this HoloNETEntry (the EntryHash will change for each version after you save).</param>
+        /// <param name="isActiveFlagEnabled">Set this to true if you wish to enable the IsActive flag (you will need to make sure your hApp rust code has the is_active flag added to your entry struct).</param>
         /// <param name="autoCallInitialize">Set this to true if you wish [HoloNETEntryBaseClass](#HoloNETEntryBaseClass) to auto-call the [Initialize](#Initialize) method when a new instance is created. Set this to false if you do not wish it to do this, you may want to do this manually if you want to initialize (will call the [Connect](#connect) method on the HoloNET Client) at a later stage.</param>
         /// <param name="holoNETDNA">This is the HoloNETDNA object that controls how HoloNET operates. This will be passed into the internally created instance of the HoloNET Client.</param>
         /// <param name="connectedCallBackMode">If set to `WaitForHolochainConductorToConnect` (default) it will await until it is connected before returning, otherwise it will return immediately and then call the OnConnected event once it has finished connecting.</param>
@@ -232,11 +242,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="automaticallyAttemptToRetrieveFromConductorIfSandBoxFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the Holochain Conductor if it fails to get them from the HC Sandbox command. This defaults to true.</param>
         /// <param name="automaticallyAttemptToRetrieveFromSandBoxIfConductorFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the HC Sandbox command if it fails to get them from the Holochain Conductor. This defaults to true.</param>
         /// <param name="updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved">Set this to true (default) to automatically update the HoloNETDNA once it has retrieved the DnaHash & AgentPubKey.</param>
-        public HoloNETAuditEntryBase(string zomeName, string zomeLoadEntryFunction, string zomeCreateEntryFunction, string zomeUpdateEntryFunction, string zomeDeleteEntryFunction, IEnumerable<ILogger> loggers, bool alsoUseDefaultLogger = false, bool createHoloNETClientConnection = true, HoloNETDNA holoNETDNA = null, bool isVersionTrackingEnabled = true, bool isAuditTrackingEnabled = true, bool isAuditAgentCreateModifyDeleteFieldsEnabled = true, bool autoCallInitialize = true, ConnectedCallBackMode connectedCallBackMode = ConnectedCallBackMode.WaitForHolochainConductorToConnect, RetrieveAgentPubKeyAndDnaHashMode retrieveAgentPubKeyAndDnaHashMode = RetrieveAgentPubKeyAndDnaHashMode.Wait, bool retrieveAgentPubKeyAndDnaHashFromConductor = true, bool retrieveAgentPubKeyAndDnaHashFromSandbox = true, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true, bool updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved = true) : base(zomeName, zomeLoadEntryFunction, zomeCreateEntryFunction, zomeUpdateEntryFunction, zomeDeleteEntryFunction, loggers, alsoUseDefaultLogger, createHoloNETClientConnection, holoNETDNA, autoCallInitialize, connectedCallBackMode, retrieveAgentPubKeyAndDnaHashMode, retrieveAgentPubKeyAndDnaHashFromConductor, retrieveAgentPubKeyAndDnaHashFromSandbox, automaticallyAttemptToRetrieveFromConductorIfSandBoxFails, automaticallyAttemptToRetrieveFromSandBoxIfConductorFails, updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved)
+        public HoloNETAuditEntryBase(string zomeName, string zomeLoadEntryFunction, string zomeCreateEntryFunction, string zomeUpdateEntryFunction, string zomeDeleteEntryFunction, IEnumerable<ILogger> loggers, bool alsoUseDefaultLogger = false, bool createHoloNETClientConnection = true, HoloNETDNA holoNETDNA = null, bool isVersionTrackingEnabled = true, bool isAuditTrackingEnabled = true, bool isAuditAgentCreateModifyDeleteFieldsEnabled = true, bool isGenerateUniqueGuidIdEnabled = true, bool isActiveFlagEnabled = true, bool autoCallInitialize = true, ConnectedCallBackMode connectedCallBackMode = ConnectedCallBackMode.WaitForHolochainConductorToConnect, RetrieveAgentPubKeyAndDnaHashMode retrieveAgentPubKeyAndDnaHashMode = RetrieveAgentPubKeyAndDnaHashMode.Wait, bool retrieveAgentPubKeyAndDnaHashFromConductor = true, bool retrieveAgentPubKeyAndDnaHashFromSandbox = true, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true, bool updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved = true) : base(zomeName, zomeLoadEntryFunction, zomeCreateEntryFunction, zomeUpdateEntryFunction, zomeDeleteEntryFunction, loggers, alsoUseDefaultLogger, createHoloNETClientConnection, holoNETDNA, autoCallInitialize, connectedCallBackMode, retrieveAgentPubKeyAndDnaHashMode, retrieveAgentPubKeyAndDnaHashFromConductor, retrieveAgentPubKeyAndDnaHashFromSandbox, automaticallyAttemptToRetrieveFromConductorIfSandBoxFails, automaticallyAttemptToRetrieveFromSandBoxIfConductorFails, updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved)
         {
             IsVersionTrackingEnabled = isVersionTrackingEnabled;
             IsAuditTrackingEnabled = isAuditTrackingEnabled;
             IsAuditAgentCreateModifyDeleteFieldsEnabled = isAuditAgentCreateModifyDeleteFieldsEnabled;
+            IsGenerateUniqueGuidIdEnabled = isGenerateUniqueGuidIdEnabled;
+            IsActiveFlagEnabled = isActiveFlagEnabled;
         }
 
         /// <summary>
@@ -256,6 +268,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="isVersionTrackingEnabled">Set this to true if you wish to enable Version Tracking (you will need to make sure your hApp rust code has the version field added to your entry struct).</param>
         /// <param name="isAuditTrackingEnabled">Set this to true if you wish to enable Audit Tracking (the AuditEntries property will be updated every time the entry/object is saved or deleted).</param>
         /// <param name="isAuditAgentCreateModifyDeleteFieldsEnabled">Set this to true if you wish to update the CreatedDate, CreatedBy, ModifiedDate, ModifiedBy, DeletedData & DeletedBy properties each time the entry/object is saved or deleted (you will need to make sure your hApp rust code has the created_date, created_by, modified_date, modified_by, deleted_date & deleted_by fields in your entry struct).</param>
+        /// <param name="isGenerateUniqueGuidIdEnabled">Set this to true if you wish to automatically generate a unique guid id which persists across multiple versions of this HoloNETEntry (the EntryHash will change for each version after you save).</param>
+        /// <param name="isActiveFlagEnabled">Set this to true if you wish to enable the IsActive flag (you will need to make sure your hApp rust code has the is_active flag added to your entry struct).</param>
         /// <param name="autoCallInitialize">Set this to true if you wish [HoloNETEntryBaseClass](#HoloNETEntryBaseClass) to auto-call the [Initialize](#Initialize) method when a new instance is created. Set this to false if you do not wish it to do this, you may want to do this manually if you want to initialize (will call the [Connect](#connect) method on the HoloNET Client) at a later stage.</param>
         /// <param name="connectedCallBackMode">If set to `WaitForHolochainConductorToConnect` (default) it will await until it is connected before returning, otherwise it will return immediately and then call the OnConnected event once it has finished connecting.</param>
         /// <param name="retrieveAgentPubKeyAndDnaHashMode">If set to `Wait` (default) it will await until it has finished retrieving the AgentPubKey & DnaHash before returning, otherwise it will return immediately and then call the OnReadyForZomeCalls event once it has finished retrieving the DnaHash & AgentPubKey.</param>
@@ -264,28 +278,40 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="automaticallyAttemptToRetrieveFromConductorIfSandBoxFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the Holochain Conductor if it fails to get them from the HC Sandbox command. This defaults to true.</param>
         /// <param name="automaticallyAttemptToRetrieveFromSandBoxIfConductorFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the HC Sandbox command if it fails to get them from the Holochain Conductor. This defaults to true.</param>
         /// <param name="updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved">Set this to true (default) to automatically update the HoloNETDNA once it has retrieved the DnaHash & AgentPubKey.</param>
-        public HoloNETAuditEntryBase(string zomeName, string zomeLoadEntryFunction, string zomeCreateEntryFunction, string zomeUpdateEntryFunction, string zomeDeleteEntryFunction, HoloNETClient holoNETClient, bool isVersionTrackingEnabled = true, bool isAuditTrackingEnabled = true, bool isAuditAgentCreateModifyDeleteFieldsEnabled = true, bool autoCallInitialize = true, ConnectedCallBackMode connectedCallBackMode = ConnectedCallBackMode.WaitForHolochainConductorToConnect, RetrieveAgentPubKeyAndDnaHashMode retrieveAgentPubKeyAndDnaHashMode = RetrieveAgentPubKeyAndDnaHashMode.Wait, bool retrieveAgentPubKeyAndDnaHashFromConductor = true, bool retrieveAgentPubKeyAndDnaHashFromSandbox = true, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true, bool updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved = true) : base(zomeName, zomeLoadEntryFunction, zomeCreateEntryFunction, zomeUpdateEntryFunction, zomeDeleteEntryFunction, holoNETClient, autoCallInitialize, connectedCallBackMode, retrieveAgentPubKeyAndDnaHashMode, retrieveAgentPubKeyAndDnaHashFromConductor, retrieveAgentPubKeyAndDnaHashFromSandbox, automaticallyAttemptToRetrieveFromConductorIfSandBoxFails, automaticallyAttemptToRetrieveFromSandBoxIfConductorFails, updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved)
+        public HoloNETAuditEntryBase(string zomeName, string zomeLoadEntryFunction, string zomeCreateEntryFunction, string zomeUpdateEntryFunction, string zomeDeleteEntryFunction, HoloNETClient holoNETClient, bool isVersionTrackingEnabled = true, bool isAuditTrackingEnabled = true, bool isAuditAgentCreateModifyDeleteFieldsEnabled = true, bool isGenerateUniqueGuidIdEnabled = true, bool isActiveFlagEnabled = true, bool autoCallInitialize = true, ConnectedCallBackMode connectedCallBackMode = ConnectedCallBackMode.WaitForHolochainConductorToConnect, RetrieveAgentPubKeyAndDnaHashMode retrieveAgentPubKeyAndDnaHashMode = RetrieveAgentPubKeyAndDnaHashMode.Wait, bool retrieveAgentPubKeyAndDnaHashFromConductor = true, bool retrieveAgentPubKeyAndDnaHashFromSandbox = true, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true, bool updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved = true) : base(zomeName, zomeLoadEntryFunction, zomeCreateEntryFunction, zomeUpdateEntryFunction, zomeDeleteEntryFunction, holoNETClient, autoCallInitialize, connectedCallBackMode, retrieveAgentPubKeyAndDnaHashMode, retrieveAgentPubKeyAndDnaHashFromConductor, retrieveAgentPubKeyAndDnaHashFromSandbox, automaticallyAttemptToRetrieveFromConductorIfSandBoxFails, automaticallyAttemptToRetrieveFromSandBoxIfConductorFails, updateConfigWithAgentPubKeyAndDnaHashOnceRetrieved)
         {
             IsVersionTrackingEnabled = isVersionTrackingEnabled;
             IsAuditTrackingEnabled = isAuditTrackingEnabled;
             IsAuditAgentCreateModifyDeleteFieldsEnabled = isAuditAgentCreateModifyDeleteFieldsEnabled;
+            IsGenerateUniqueGuidIdEnabled = isGenerateUniqueGuidIdEnabled;
+            IsActiveFlagEnabled = isActiveFlagEnabled;
         }
 
         /// <summary>
         /// Set this to true if you wish to enable Version Tracking (you will need to make sure your hApp rust code has the version field added to your entry struct).
         /// </summary>
-        public bool IsVersionTrackingEnabled { get; set; }
+        public bool IsVersionTrackingEnabled { get; set; } = true;
 
         /// Set this to true if you wish to enable Audit Tracking (the AuditEntries property will be updated every time the entry/object is saved or deleted).
-        public bool IsAuditTrackingEnabled { get; set; }
+        public bool IsAuditTrackingEnabled { get; set; } = true;
 
         /// <summary>
         /// Set this to true if you wish to update the CreatedDate, CreatedBy, ModifiedDate, ModifiedBy, DeletedData & DeletedBy properties each time the entry/object is saved or deleted (you will need to make sure your hApp rust code has the created_date, created_by, modified_date, modified_by, deleted_date & deleted_by fields in your entry struct).
         /// </summary>
-        public bool IsAuditAgentCreateModifyDeleteFieldsEnabled { get; set; }
+        public bool IsAuditAgentCreateModifyDeleteFieldsEnabled { get; set; } = true;
 
         /// <summary>
-        /// GUID Id that is consistent across multiple versions of the entry (each version has a different hash).
+        /// Set this to true if you wish to automatically generate a unique guid id which persists across multiple versions of this HoloNETEntry (the EntryHash will change for each version after you save). You will need to make sure your hApp rust code has the id field in your entry struct.
+        /// </summary>
+        public bool IsGenerateUniqueGuidIdEnabled { get; set; } = true;
+
+        /// <summary>
+        /// Set this to true if you wish to enable the IsActive flag (you will need to make sure your hApp rust code has the is_active flag added to your entry struct).
+        /// </summary>
+        public bool IsActiveFlagEnabled { get; set; } = true;
+
+        /// <summary>
+        /// GUID Id that is consistent across multiple versions of the entry (each version has a different EntryHash).
         /// </summary>
         [HolochainFieldName("id")]
         public Guid Id { get; set; }
@@ -422,13 +448,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="customDataKeyValuePairs">This is an optional param where a dictionary containing additional params (KeyValue Pairs) can be passed to the zome function. If this is passed in then the customFieldToLoadByValue will automatically be added to the new params with key customFieldToLoadByKey (make sure your hApp zome function is expecting this name).</param>
         /// <param name="useReflectionToMapKeyValuePairResponseOntoEntryDataObject">This is an optional param, set this to true (default) to map the data returned from the Holochain Conductor onto the Entry Data Object that extends this base class (HoloNETEntryBaseClass or HoloNETAuditEntryBase). This will have a very small performance overhead but means you do not need to do the mapping yourself from the ZomeFunctionCallBackEventArgs.KeyValuePair. </param>
         /// <returns></returns>
-        public virtual async Task<ZomeFunctionCallBackEventArgs> LoadAsync(string customFieldToLoadByValue, string customFieldToLoadByKey = "", int version = 0, Dictionary<string, string> customDataKeyValuePairs = null, bool useReflectionToMapKeyValuePairResponseOntoEntryDataObject = true)
+        public virtual async Task<ZomeFunctionCallBackEventArgs> LoadByCustomFieldAsync(string customFieldToLoadByValue, string customFieldToLoadByKey = "", int version = 0, Dictionary<string, string> customDataKeyValuePairs = null, bool useReflectionToMapKeyValuePairResponseOntoEntryDataObject = true)
         {
             if (customDataKeyValuePairs == null)
                 customDataKeyValuePairs = new Dictionary<string, string>();
 
             customDataKeyValuePairs["version"] = version.ToString();
-            return await base.LoadAsync(customFieldToLoadByValue, customFieldToLoadByKey, customDataKeyValuePairs, useReflectionToMapKeyValuePairResponseOntoEntryDataObject);
+            return await base.LoadByCustomFieldAsync(customFieldToLoadByValue, customFieldToLoadByKey, customDataKeyValuePairs, useReflectionToMapKeyValuePairResponseOntoEntryDataObject);
         }
 
         /// <summary>
@@ -441,13 +467,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="customDataKeyValuePairs">This is an optional param where a dictionary containing additional params (KeyValue Pairs) can be passed to the zome function. If this is passed in then the customFieldToLoadByValue will automatically be added to the new params with key customFieldToLoadByKey (make sure your hApp zome function is expecting this name).</param>
         /// <param name="useReflectionToMapKeyValuePairResponseOntoEntryDataObject">This is an optional param, set this to true (default) to map the data returned from the Holochain Conductor onto the Entry Data Object that extends this base class (HoloNETEntryBaseClass or HoloNETAuditEntryBase). This will have a very small performance overhead but means you do not need to do the mapping yourself from the ZomeFunctionCallBackEventArgs.KeyValuePair. </param>
         /// <returns></returns>
-        public virtual ZomeFunctionCallBackEventArgs Load(string customFieldToLoadByValue, string customFieldToLoadByKey = "", int version = 0, Dictionary<string, string> customDataKeyValuePairs = null, bool useReflectionToMapKeyValuePairResponseOntoEntryDataObject = true)
+        public virtual ZomeFunctionCallBackEventArgs LoadByCustomField(string customFieldToLoadByValue, string customFieldToLoadByKey = "", int version = 0, Dictionary<string, string> customDataKeyValuePairs = null, bool useReflectionToMapKeyValuePairResponseOntoEntryDataObject = true)
         {
             if (customDataKeyValuePairs == null)
                 customDataKeyValuePairs = new Dictionary<string, string>();
 
             customDataKeyValuePairs["version"] = version.ToString();
-            return base.Load(customFieldToLoadByValue, customFieldToLoadByKey, customDataKeyValuePairs, useReflectionToMapKeyValuePairResponseOntoEntryDataObject);
+            return base.LoadByCustomField(customFieldToLoadByValue, customFieldToLoadByKey, customDataKeyValuePairs, useReflectionToMapKeyValuePairResponseOntoEntryDataObject);
         }
 
         /*
@@ -510,6 +536,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             if (!IsVersionTrackingEnabled)
                 holochainFieldsIsEnabledKeyValuePair["Version"] = false;
 
+            if (!IsGenerateUniqueGuidIdEnabled)
+                holochainFieldsIsEnabledKeyValuePair["Id"] = false;
+
+            if (!IsActiveFlagEnabled)
+                holochainFieldsIsEnabledKeyValuePair["IsActive"] = false;
+
             if (!IsAuditAgentCreateModifyDeleteFieldsEnabled)
             {
                 holochainFieldsIsEnabledKeyValuePair["CreatedBy"] = false;
@@ -544,21 +576,25 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="autoGeneratUpdatedEntryObjectAndOriginalEntryHashRustParams">Set this to true if you want HoloNET to auto-generate the updatedEntry object and originalEntryHash params that are passed to the update zome function in your hApp rust code. If this is false then only the paramsObject will be passed to the zome update function and you will need to manually set these object/params yourself. This is an optional param that defaults to true. NOTE: This is set to true for the Save overloads that do not take a paramsobject (use reflection).</param>
         /// <param name="updatedEntryRustParamName">This is the name of the updated entry object param that is in your rust hApp zome update function. This defaults to 'updated_entry'. NOTE: Whatever name that is given here needs to match the same name in your zome update function. NOTE: This param is ignored if the autoGeneratUpdatedEntryObjectAndOriginalEntryHashRustParams param is false.</param>
         /// <param name="originalEntryHashRustParamName">This is the name of the original entry/action hash param that is in your rust hApp zome update function. This defaults to 'original_action_hash'. NOTE: Whatever name that is given here needs to match the same name in your zome update function. NOTE: This param is ignored if the autoGeneratUpdatedEntryObjectAndOriginalEntryHashRustParams param is false.</param>
-        /// <param name="addAuditInfoToParams">Set this to true (default) to automatically add the additional audit data such as created_date, created_by, modifed_date, modified_by, deleted_date & deleted_by to the paramsObject passed in. This is an optional param.</param>
-        /// <param name="addVersionToParams">Set this to true (default) to automatically add the version number to the paramsObject passed in. This is an optional param.</param>
+        /// <param name="addAuditInfoToParams">Set this to true to automatically add the audit fields (CreatedDate, CreatedBy, ModifiedDate, ModifiedBy, DeletedDate & DeletedBy) fields to the params object that is passed to the zome update function.</param>
+        /// <param name="addVersionToParams">Set this to true to automatically add the Version field to the params object that is passed to the zome update function.</param>
+        /// <param name="addUniqueGuidIdToParams">Set this to true to automatically add the Id field to the params object that is passed to the zome update function.</param>
+        /// <param name="addIsActiveFlagToParams">Set this to true to automatically add the IsActive field to the params object that is passed to the zome update function.</param>
         /// <param name="createdDateRustParamName">Set this to the name of the rust param in your hApp zome update function for the audit param CreatedBy (default is created_by). This is an optional param. NOTE: Whatever name that is given here needs to match the same name in your zome update function. NOTE: This param is ignored if the addAuditInfoToParams param is false.</param>
         /// <param name="createdByRustParamName">Set this to the name of the rust param in your hApp zome update function for the audit param CreatedDate (default is created_date). This is an optional param. NOTE: Whatever name that is given here needs to match the same name in your zome update function. NOTE: This param is ignored if the addAuditInfoToParams param is false.</param>
         /// <param name="modifiedDateRustParamName">Set this to the name of the rust param in your hApp zome update function for the audit param ModifedBy (default is modified_by). This is an optional param. NOTE: Whatever name that is given here needs to match the same name in your zome update function. NOTE: This param is ignored if the addAuditInfoToParams param is false.</param>
         /// <param name="modifiedByRustParamName">Set this to the name of the rust param in your hApp zome update function for the audit param ModifiedDate (default is modified_date). This is an optional param. NOTE: Whatever name that is given here needs to match the same name in your zome update function. NOTE: This param is ignored if the addAuditInfoToParams param is false.</param>
-        /// <param name="deletedDateRustParamName">Set this to the name of the rust param in your hApp zome update function for the audit param DeletedBy (default is deleted_by). This is an optional param. NOTE: Whatever name that is given here needs to match the same name in your zome update function. NOTE: This param is ignored if the addAuditInfoToParams param is false.</param>
+        /// <param name="deletedDateRustParamName">et this to the name of the rust param in your hApp zome update function for the audit param DeletedBy (default is deleted_by). This is an optional param. NOTE: Whatever name that is given here needs to match the same name in your zome update function. NOTE: This param is ignored if the addAuditInfoToParams param is false.</param>
         /// <param name="deletedByRustParamName">Set this to the name of the rust param in your hApp zome update function for the audit param DeletedDate (default is deleted_date). This is an optional param. NOTE: Whatever name that is given here needs to match the same name in your zome update function. NOTE: This param is ignored if the addAuditInfoToParams param is false.</param>
-        /// <param name="versionRustParamName"><Set this to the name of the rust param in your hApp zome update function for the audit param Version (default is version). This is an optional param. NOTE: Whatever name that is given here needs to match the same name in your zome update function. NOTE: This param is ignored if the addVersionToParams param is false.</param>
+        /// <param name="versionRustParamName">Set this to the name of the rust param in your hApp zome update function for the audit param Version (default is version). This is an optional param. NOTE: Whatever name that is given here needs to match the same name in your zome update function. NOTE: This param is ignored if the addVersionToParams param is false.</param>
+        /// <param name="idRustParamName">Set this to the name of the rust param in your hApp zome update function for the param Id (default is id). This is an optional param. NOTE: Whatever name that is given here needs to match the same name in your zome update function. NOTE: This param is ignored if the addUniqueGuidIdToParams param is false.</param>
+        /// <param name="isActiveRustParamName">Set this to the name of the rust param in your hApp zome update function for the param IsActive (default is is_active). This is an optional param. NOTE: Whatever name that is given here needs to match the same name in your zome update function. NOTE: This param is ignored if the addIsActiveFlagToParams param is false.</param>
         /// <param name="useReflectionToMapKeyValuePairResponseOntoEntryDataObject">This is an optional param, set this to true (default) to map the data returned from the Holochain Conductor onto the Entry Data Object that extends this base class (HoloNETEntryBaseClass or HoloNETAuditEntryBase). This will have a very small performance overhead but means you do not need to do the mapping yourself from the ZomeFunctionCallBackEventArgs.KeyValuePair. </param>
         /// <returns></returns>
-        public virtual async Task<ZomeFunctionCallBackEventArgs> SaveAsync(dynamic paramsObject, bool autoGeneratUpdatedEntryObjectAndOriginalEntryHashRustParams = true, string updatedEntryRustParamName = "updated_entry", string originalEntryHashRustParamName = "original_action_hash", bool addAuditInfoToParams = true, bool addVersionToParams = true, string createdDateRustParamName = "created_date", string createdByRustParamName = "created_by", string modifiedDateRustParamName = "modified_date", string modifiedByRustParamName = "modified_by", string deletedDateRustParamName = "deleted_date", string deletedByRustParamName = "deleted_by", string versionRustParamName = "version", bool useReflectionToMapKeyValuePairResponseOntoEntryDataObject = true)
+        public async virtual Task<ZomeFunctionCallBackEventArgs> SaveAsync(dynamic paramsObject, bool autoGeneratUpdatedEntryObjectAndOriginalEntryHashRustParams = true, string updatedEntryRustParamName = "updated_entry", string originalEntryHashRustParamName = "original_action_hash", bool addAuditInfoToParams = true, bool addVersionToParams = true, bool addUniqueGuidIdToParams = true, bool addIsActiveFlagToParams = true, string createdDateRustParamName = "created_date", string createdByRustParamName = "created_by", string modifiedDateRustParamName = "modified_date", string modifiedByRustParamName = "modified_by", string deletedDateRustParamName = "deleted_date", string deletedByRustParamName = "deleted_by", string versionRustParamName = "version", string idRustParamName = "id", string isActiveRustParamName = "is_active", bool useReflectionToMapKeyValuePairResponseOntoEntryDataObject = true)
         {
             await ProcessAuditDataAsync();
-            ProcessAuditRustParams(paramsObject, addAuditInfoToParams, addVersionToParams, createdDateRustParamName, createdByRustParamName, modifiedDateRustParamName, modifiedByRustParamName, deletedDateRustParamName, deletedByRustParamName, versionRustParamName);
+            ProcessAuditRustParams(paramsObject, addAuditInfoToParams, addVersionToParams, addUniqueGuidIdToParams, addIsActiveFlagToParams, createdDateRustParamName, createdByRustParamName, modifiedDateRustParamName, modifiedByRustParamName, deletedDateRustParamName, deletedByRustParamName, versionRustParamName, idRustParamName, isActiveRustParamName);
 
             return await base.SaveAsync((object)paramsObject, autoGeneratUpdatedEntryObjectAndOriginalEntryHashRustParams, updatedEntryRustParamName, originalEntryHashRustParamName, useReflectionToMapKeyValuePairResponseOntoEntryDataObject);
         }
@@ -570,19 +606,25 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="autoGeneratUpdatedEntryObjectAndOriginalEntryHashRustParams">Set this to true if you want HoloNET to auto-generate the updatedEntry object and originalEntryHash params that are passed to the update zome function in your hApp rust code. If this is false then only the paramsObject will be passed to the zome update function and you will need to manually set these object/params yourself. This is an optional param that defaults to true. NOTE: This is set to true for the Save overloads that do not take a paramsobject (use reflection).</param>
         /// <param name="updatedEntryRustParamName">This is the name of the updated entry object param that is in your rust hApp zome update function. This defaults to 'updated_entry'. NOTE: Whatever name that is given here needs to match the same name in your zome update function. NOTE: This param is ignored if the autoGeneratUpdatedEntryObjectAndOriginalEntryHashRustParams param is false.</param>
         /// <param name="originalEntryHashRustParamName">This is the name of the original entry/action hash param that is in your rust hApp zome update function. This defaults to 'original_action_hash'. NOTE: Whatever name that is given here needs to match the same name in your zome update function. NOTE: This param is ignored if the autoGeneratUpdatedEntryObjectAndOriginalEntryHashRustParams param is false.</param>
+        /// <param name="addAuditInfoToParams">Set this to true to automatically add the audit fields (CreatedDate, CreatedBy, ModifiedDate, ModifiedBy, DeletedDate & DeletedBy) fields to the params object that is passed to the zome update function.</param>
+        /// <param name="addVersionToParams">Set this to true to automatically add the Version field to the params object that is passed to the zome update function.</param>
+        /// <param name="addUniqueGuidIdToParams">Set this to true to automatically add the Id field to the params object that is passed to the zome update function.</param>
+        /// <param name="addIsActiveFlagToParams">Set this to true to automatically add the IsActive field to the params object that is passed to the zome update function.</param>
         /// <param name="createdDateRustParamName">Set this to the name of the rust param in your hApp zome update function for the audit param CreatedBy (default is created_by). This is an optional param. NOTE: Whatever name that is given here needs to match the same name in your zome update function. NOTE: This param is ignored if the addAuditInfoToParams param is false.</param>
         /// <param name="createdByRustParamName">Set this to the name of the rust param in your hApp zome update function for the audit param CreatedDate (default is created_date). This is an optional param. NOTE: Whatever name that is given here needs to match the same name in your zome update function. NOTE: This param is ignored if the addAuditInfoToParams param is false.</param>
         /// <param name="modifiedDateRustParamName">Set this to the name of the rust param in your hApp zome update function for the audit param ModifedBy (default is modified_by). This is an optional param. NOTE: Whatever name that is given here needs to match the same name in your zome update function. NOTE: This param is ignored if the addAuditInfoToParams param is false.</param>
         /// <param name="modifiedByRustParamName">Set this to the name of the rust param in your hApp zome update function for the audit param ModifiedDate (default is modified_date). This is an optional param. NOTE: Whatever name that is given here needs to match the same name in your zome update function. NOTE: This param is ignored if the addAuditInfoToParams param is false.</param>
         /// <param name="deletedDateRustParamName">et this to the name of the rust param in your hApp zome update function for the audit param DeletedBy (default is deleted_by). This is an optional param. NOTE: Whatever name that is given here needs to match the same name in your zome update function. NOTE: This param is ignored if the addAuditInfoToParams param is false.</param>
         /// <param name="deletedByRustParamName">Set this to the name of the rust param in your hApp zome update function for the audit param DeletedDate (default is deleted_date). This is an optional param. NOTE: Whatever name that is given here needs to match the same name in your zome update function. NOTE: This param is ignored if the addAuditInfoToParams param is false.</param>
-        /// <param name="versionRustParamName"><Set this to the name of the rust param in your hApp zome update function for the audit param Version (default is version). This is an optional param. NOTE: Whatever name that is given here needs to match the same name in your zome update function. NOTE: This param is ignored if the addVersionToParams param is false.</param>
+        /// <param name="versionRustParamName">Set this to the name of the rust param in your hApp zome update function for the audit param Version (default is version). This is an optional param. NOTE: Whatever name that is given here needs to match the same name in your zome update function. NOTE: This param is ignored if the addVersionToParams param is false.</param>
+        /// <param name="idRustParamName">Set this to the name of the rust param in your hApp zome update function for the param Id (default is id). This is an optional param. NOTE: Whatever name that is given here needs to match the same name in your zome update function. NOTE: This param is ignored if the addUniqueGuidIdToParams param is false.</param>
+        /// <param name="isActiveRustParamName">Set this to the name of the rust param in your hApp zome update function for the param IsActive (default is is_active). This is an optional param. NOTE: Whatever name that is given here needs to match the same name in your zome update function. NOTE: This param is ignored if the addIsActiveFlagToParams param is false.</param>
         /// <param name="useReflectionToMapKeyValuePairResponseOntoEntryDataObject">This is an optional param, set this to true (default) to map the data returned from the Holochain Conductor onto the Entry Data Object that extends this base class (HoloNETEntryBaseClass or HoloNETAuditEntryBase). This will have a very small performance overhead but means you do not need to do the mapping yourself from the ZomeFunctionCallBackEventArgs.KeyValuePair. </param>
         /// <returns></returns>
-        public virtual ZomeFunctionCallBackEventArgs Save(dynamic paramsObject, bool autoGeneratUpdatedEntryObjectAndOriginalEntryHashRustParams = true, string updatedEntryRustParamName = "updated_entry", string originalEntryHashRustParamName = "original_action_hash", bool addAuditInfoToParams = true, bool addVersionToParams = true, string createdDateRustParamName = "created_date", string createdByRustParamName = "created_by", string modifiedDateRustParamName = "modified_date", string modifiedByRustParamName = "modified_by", string deletedDateRustParamName = "deleted_date", string deletedByRustParamName = "deleted_by", string versionRustParamName = "version", bool useReflectionToMapKeyValuePairResponseOntoEntryDataObject = true)
+        public virtual ZomeFunctionCallBackEventArgs Save(dynamic paramsObject, bool autoGeneratUpdatedEntryObjectAndOriginalEntryHashRustParams = true, string updatedEntryRustParamName = "updated_entry", string originalEntryHashRustParamName = "original_action_hash", bool addAuditInfoToParams = true, bool addVersionToParams = true, bool addUniqueGuidIdToParams = true, bool addIsActiveFlagToParams = true, string createdDateRustParamName = "created_date", string createdByRustParamName = "created_by", string modifiedDateRustParamName = "modified_date", string modifiedByRustParamName = "modified_by", string deletedDateRustParamName = "deleted_date", string deletedByRustParamName = "deleted_by", string versionRustParamName = "version", string idRustParamName = "id", string isActiveRustParamName = "is_active", bool useReflectionToMapKeyValuePairResponseOntoEntryDataObject = true)
         {
             ProcessAuditDataAsync().Wait();
-            ProcessAuditRustParams(paramsObject, addAuditInfoToParams, addVersionToParams, createdDateRustParamName, createdByRustParamName, modifiedDateRustParamName, modifiedByRustParamName, deletedDateRustParamName, deletedByRustParamName, versionRustParamName);
+            ProcessAuditRustParams(paramsObject, addAuditInfoToParams, addVersionToParams, addUniqueGuidIdToParams, addIsActiveFlagToParams, createdDateRustParamName, createdByRustParamName, modifiedDateRustParamName, modifiedByRustParamName, deletedDateRustParamName, deletedByRustParamName, versionRustParamName, idRustParamName, isActiveRustParamName);
 
             return base.Save((object)paramsObject, autoGeneratUpdatedEntryObjectAndOriginalEntryHashRustParams, updatedEntryRustParamName, originalEntryHashRustParamName, useReflectionToMapKeyValuePairResponseOntoEntryDataObject);
         }
@@ -728,32 +770,41 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         private async Task ProcessAuditDataAsync()
         {
-            if (string.IsNullOrEmpty(EntryHash))
+            if (IsAuditAgentCreateModifyDeleteFieldsEnabled)
             {
-                if (CreatedDate == DateTime.MinValue)
+                if (string.IsNullOrEmpty(EntryHash))
                 {
-                    CreatedDate = DateTime.Now;
+                    if (CreatedDate == DateTime.MinValue)
+                    {
+                        CreatedDate = DateTime.Now;
 
-                    await WaitTillHoloNETInitializedAsync();
-                    CreatedBy = this.HoloNETClient.HoloNETDNA.AgentPubKey;
+                        await WaitTillHoloNETInitializedAsync();
+                        CreatedBy = this.HoloNETClient.HoloNETDNA.AgentPubKey;
+                    }
                 }
-            }
-            else
-            {
-                if (ModifiedDate == DateTime.MinValue)
+                else
                 {
-                    ModifiedDate = DateTime.Now;
+                    if (ModifiedDate == DateTime.MinValue)
+                    {
+                        ModifiedDate = DateTime.Now;
 
-                    await WaitTillHoloNETInitializedAsync();
-                    ModifiedBy = this.HoloNETClient.HoloNETDNA.AgentPubKey;
+                        await WaitTillHoloNETInitializedAsync();
+                        ModifiedBy = this.HoloNETClient.HoloNETDNA.AgentPubKey;
+                    }
                 }
             }
 
             if (IsVersionTrackingEnabled)
                 this.Version++;
+
+            if (IsGenerateUniqueGuidIdEnabled)
+                this.Id = Guid.NewGuid();
+
+            if (IsActiveFlagEnabled)
+                this.IsActive = true;
         }
 
-        private dynamic ProcessAuditRustParams(dynamic paramsObject, bool addAuditInfoToParams = true, bool addVersionToParams = true, string createdDateRustParamName = "created_date", string createdByRustParamName = "created_by", string modifiedDateRustParamName = "modified_date", string modifiedByRustParamName = "modified_by", string deletedDateRustParamName = "deleted_date", string deletedByRustParamName = "deleted_by", string versionRustParamName = "version")
+        private dynamic ProcessAuditRustParams(dynamic paramsObject, bool addAuditInfoToParams = true, bool addVersionToParams = true, bool addUniqueGuidIdToParams = true, bool addIsActiveFlagToParams = true, string createdDateRustParamName = "created_date", string createdByRustParamName = "created_by", string modifiedDateRustParamName = "modified_date", string modifiedByRustParamName = "modified_by", string deletedDateRustParamName = "deleted_date", string deletedByRustParamName = "deleted_by", string versionRustParamName = "version", string idRustParamName = "id", string isActiveRustParamName = "is_active")
         {
             if (addAuditInfoToParams)
             {
@@ -767,6 +818,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             if (addVersionToParams)
                 ExpandoObjectHelpers.AddProperty(paramsObject, versionRustParamName, Version);
+
+            if (addUniqueGuidIdToParams)
+                ExpandoObjectHelpers.AddProperty(paramsObject, idRustParamName, Id);
+
+            if (addIsActiveFlagToParams)
+                ExpandoObjectHelpers.AddProperty(paramsObject, isActiveRustParamName, IsActive);
 
             return paramsObject;
         }

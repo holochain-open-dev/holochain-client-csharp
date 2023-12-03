@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
-    public interface IHoloNETAuditEntryBaseClass : IHoloNETEntryBaseClass
+    public interface IHoloNETAuditEntryBase : IHoloNETEntryBase
     {
         List<HoloNETAuditEntry> AuditEntries { get; set; }
         string CreatedBy { get; set; }
