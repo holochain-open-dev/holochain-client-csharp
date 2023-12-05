@@ -4,7 +4,8 @@
     {
         CallZomeFunction,
         LoadHoloNETCollection,
-        SaveHoloNETEntry,
+        LoadHoloNETEntryShared,
+        SaveHoloNETEntryShared,
         AddHoloNETEntryToCollection,
         None
     }

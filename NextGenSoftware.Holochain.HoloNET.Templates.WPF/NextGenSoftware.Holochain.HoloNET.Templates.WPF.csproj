@@ -14,5 +14,11 @@
   <ItemGroup>
     <ProjectReference Include="..\NextGenSoftware.Holochain.HoloNET.Client.Core\NextGenSoftware.Holochain.HoloNET.Client.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="User Controls\ucHoloNETEntry.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
 	
 </Project>
