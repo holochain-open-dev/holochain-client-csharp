@@ -1394,7 +1394,9 @@ BlurRadius="10"/>
                         </Button>
                     </StackPanel>
 
-                  
+                    <uc:ucHoloNETEntry x:Name="ucHoloNETEntry" Width="500"></uc:ucHoloNETEntry>
+                    <uc:ucHoloNETEntryMetaData x:Name="ucHoloNETEntryMetaData" Height="220" Visibility="Collapsed"></uc:ucHoloNETEntryMetaData>
+
                     <StackPanel Orientation="Horizontal" Margin="0,10,0,10" HorizontalAlignment="Center">
                         <Button x:Name="btnHoloNETEntryPopupCancel" Style="{StaticResource ButtonStyle}" Cursor="Hand" Margin="5" Foreground="WhiteSmoke" Width="50" FontSize="14" Content="Cancel" Background="{x:Null}" Click="btnHoloNETEntryPopupCancel_Click">
                             <Button.Effect>
