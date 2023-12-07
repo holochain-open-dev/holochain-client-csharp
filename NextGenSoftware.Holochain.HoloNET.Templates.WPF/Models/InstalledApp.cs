@@ -5,7 +5,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Models
     public class InstalledApp
     {
         public string Name { get; set; }
-        //public string Description { get; set; }
         public string Status { get; set; }
         public string StatusReason { get; set; }
         public string Port { get; set; }
@@ -15,6 +14,25 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Models
         public bool IsEnabled { get; set; }
         public bool IsDisabled { get; set; }
         public bool IsConnected { get; set; }
+        public bool IsSharedConnection { get; set; }
+
+        public bool IsConnectionInternal
+        {
+            get
+            {
+                return !IsSharedConnection;
+            }
+        }
+
+        public bool IsCallZomeFunctionAndViewDataEntriesEnabled
+        {
+            get
+            {
+                return IsEnabled && !IsConnectionInternal;
+                //return IsEnabled && Name != "oasis-app";
+                //return IsEnabled && IsSharedConnection;
+            }
+        }
 
         public Brush EnabledButtonForegroundColour
         {
@@ -35,6 +53,17 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Models
                     return Brushes.DarkGray;
                 else
                     return Brushes.WhiteSmoke;
+            }
+        }
+
+        public Brush CallZomeAndViewDataEntriesButtonsForegroundColour
+        {
+            get
+            {
+                if (IsCallZomeFunctionAndViewDataEntriesEnabled)
+                    return Brushes.WhiteSmoke;
+                else
+                    return Brushes.DarkGray;
             }
         }
 

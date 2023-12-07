@@ -313,8 +313,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
                             {
                                 HolochainConductorAppAgentURI = $"ws://localhost:{attachedResult.Port}",
                                 InstalledAppId = _installed_app_id, //You need to set either the InstalledAppId or the AgentPubKey & DnaHash. You can set all 3 if you wish but only one or the other works fine too (if only the InstalledAppId is set it will look up the AgentPubKey & DnaHash from the conductor).
-                                //AgentPubKey = installedResult.AgentPubKey, //If you only set the AgentPubKey & DnaHash but not the InstalledAppId then it will still work fine.
-                                //DnaHash = installedResult.DnaHash
+                                AgentPubKey = installedResult.AgentPubKey, //If you only set the AgentPubKey & DnaHash but not the InstalledAppId then it will still work fine.
+                                DnaHash = installedResult.DnaHash,
                                 AutoStartHolochainConductor = false, //This defaults to true normally so make sure you set this to false because we can connect to the already running holochain.exe (the one admin is already using).
                                 AutoShutdownHolochainConductor = false, //This defaults to true normally so make sure you set this to false.
 
@@ -334,6 +334,16 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
                             _holoNETEntry.OnSaved += _holoNETEntry_OnSaved;
                             _holoNETEntry.OnDeleted += _holoNETEntry_OnDeleted;
                             _holoNETEntry.OnError += _holoNETEntry_OnError;
+
+                            //Will wait until the HoloNET Entry has init (non blocking).
+                            await _holoNETEntry.WaitTillHoloNETInitializedAsync();
+
+                            //Refresh the list of installed hApps.
+                            ProcessListedApps(await _holoNETClientAdmin.AdminListAppsAsync(AppStatusFilter.All));
+
+                            ////Set the status to connected in the list of installed apps (this is good example of how you can access the internal HoloNETClient inside the HoloNET Entry).
+                            //if (_holoNETEntry.HoloNETClient != null && _holoNETEntry.HoloNETClient.State == System.Net.WebSockets.WebSocketState.Open)
+                            //    SetAppToConnectedStatus(_installed_app_id, _holoNETEntry.HoloNETClient.EndPoint.Port, false);
 
                             _initHoloNETEntryDemo = false;
                             return true;
@@ -442,6 +452,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
                     client.Disconnect();
 
                 //client = null;
+            }
+
+            if (_holoNETEntry != null)
+            {
+                _holoNETEntry.Close();
+                _holoNETEntry = null;
             }
 
             LogMessage("ADMIN: Disconnecting...");
@@ -944,13 +960,14 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
         private void SetCurrentAppToConnectedStatus(int port)
         {
             CurrentApp = InstalledApps.FirstOrDefault(x => x.Name == CurrentApp.Name && x.DnaHash == CurrentApp.DnaHash && x.AgentPubKey == CurrentApp.AgentPubKey);
-            SetAppToConnectedStatus(CurrentApp, port);
+            SetAppToConnectedStatus(CurrentApp, port, true);
         }
 
-        private void SetAppToConnectedStatus(InstalledApp app, int port, bool refreshGrid = true)
+        private void SetAppToConnectedStatus(InstalledApp app, int port, bool isSharedConnection, bool refreshGrid = true)
         {
             if (app != null)
             {
+                app.IsSharedConnection = isSharedConnection;
                 app.IsConnected = true;
                 app.Status = "Running (Connected)";
                 app.StatusReason = "AppAgent Client Connected";
@@ -959,6 +976,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
                 if (refreshGrid)
                     gridHapps.ItemsSource = InstalledApps.OrderBy(x => x.Name);
             }
+        }
+
+        private void SetAppToConnectedStatus(string appName, int port, bool isSharedConnection, bool refreshGrid = true)
+        {
+            SetAppToConnectedStatus(InstalledApps.FirstOrDefault(x => x.Name == appName), port, isSharedConnection, refreshGrid);
         }
 
         private void _holoNETClientAdmin_OnHolochainConductorStarting(object sender, HolochainConductorStartingEventArgs e)
@@ -996,44 +1018,53 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
         private void _holoNETClientAdmin_OnAdminAppsListedCallBack(object sender, AdminAppsListedCallBackEventArgs e)
         {
             if (!_initHoloNETEntryDemo)
+                ProcessListedApps(e);
+        }
+
+        private void ProcessListedApps(AdminAppsListedCallBackEventArgs listedAppsResult)
+        {
+            string hApps = "";
+            InstalledApps.Clear();
+
+            foreach (AppInfo app in listedAppsResult.Apps)
             {
-                string hApps = "";
-                InstalledApps.Clear();
-
-                foreach (AppInfo app in e.Apps)
+                InstalledApp installedApp = new InstalledApp()
                 {
-                    InstalledApp installedApp = new InstalledApp()
-                    {
-                        AgentPubKey = app.AgentPubKey,
-                        DnaHash = app.DnaHash,
-                        Name = app.installed_app_id,
-                        Manifest = $"{app.manifest.name} v{app.manifest.manifest_version} {(!string.IsNullOrEmpty(app.manifest.description) ? string.Concat('(', app.manifest.description, ')') : "")}",
-                        Status = $"{Enum.GetName(typeof(AppInfoStatusEnum), app.AppStatus)}",
-                        StatusReason = app.AppStatusReason,
-                        IsEnabled = app.AppStatus == AppInfoStatusEnum.Disabled ? false : true,
-                        IsDisabled = app.AppStatus == AppInfoStatusEnum.Disabled ? true : false
-                    };
+                    AgentPubKey = app.AgentPubKey,
+                    DnaHash = app.DnaHash,
+                    Name = app.installed_app_id,
+                    Manifest = $"{app.manifest.name} v{app.manifest.manifest_version} {(!string.IsNullOrEmpty(app.manifest.description) ? string.Concat('(', app.manifest.description, ')') : "")}",
+                    Status = $"{Enum.GetName(typeof(AppInfoStatusEnum), app.AppStatus)}",
+                    StatusReason = app.AppStatusReason,
+                    IsEnabled = app.AppStatus == AppInfoStatusEnum.Disabled ? false : true,
+                    IsDisabled = app.AppStatus == AppInfoStatusEnum.Disabled ? true : false,
+                    IsSharedConnection = app.installed_app_id != _installed_app_id ? true: false
+                };
 
-                    if (app.AppStatus == AppInfoStatusEnum.Running)
-                    {
-                        HoloNETClient client = GetClient(installedApp.DnaHash, installedApp.AgentPubKey, installedApp.Name);
+                if (app.AppStatus == AppInfoStatusEnum.Running)
+                {
+                    HoloNETClient client = GetClient(installedApp.DnaHash, installedApp.AgentPubKey, installedApp.Name);
 
-                        if (client != null && client.State == System.Net.WebSockets.WebSocketState.Open)
-                            SetAppToConnectedStatus(installedApp, client.EndPoint.Port, false);
-                    }
-
-                    InstalledApps.Add(installedApp);
-
-                    if (hApps != "")
-                        hApps = $"{hApps}, ";
-
-                    hApps = $"{hApps}{app.installed_app_id}";
+                    if (client != null && client.State == System.Net.WebSockets.WebSocketState.Open)
+                        SetAppToConnectedStatus(installedApp, client.EndPoint.Port, true, false);
                 }
 
-                gridHapps.ItemsSource = InstalledApps.OrderBy(x => x.Name);
-                LogMessage($"ADMIN: hApps Listed: {hApps}");
-                ShowStatusMessage("hApps Listed.", StatusMessageType.Success);
+                InstalledApps.Add(installedApp);
+
+                if (hApps != "")
+                    hApps = $"{hApps}, ";
+
+                hApps = $"{hApps}{app.installed_app_id}";
             }
+
+            //Set the status to connected in the list of installed apps (this is good example of how you can access the internal HoloNETClient inside the HoloNET Entry).
+            //This HoloNETEntry uses its own internal HoloNETClient connection so it will not be shared with CallZomeFunction or View Data Entries popups (it is technically possible to share it if you wanted to but it is not recommended because it is controlled by the HoloNETEntry and when it is closed it will automatically close the connection too).
+            if (_holoNETEntry != null && _holoNETEntry.HoloNETClient != null && _holoNETEntry.HoloNETClient.State == System.Net.WebSockets.WebSocketState.Open)
+                SetAppToConnectedStatus(_installed_app_id, _holoNETEntry.HoloNETClient.EndPoint.Port, false);
+
+            gridHapps.ItemsSource = InstalledApps.OrderBy(x => x.Name);
+            LogMessage($"ADMIN: hApps Listed: {hApps}");
+            ShowStatusMessage("hApps Listed.", StatusMessageType.Success);
         }
 
         private void _holoNETClient_OnAdminAppInterfaceAttachedCallBack(object sender, AdminAppInterfaceAttachedCallBackEventArgs e)
@@ -1862,6 +1893,20 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
 
             if (app != null)
             {
+                //If it is the HoloNETEntry (uses the oasis-app) then get the internal connection from the HoloNET Entry.
+                if (app.Name == _installed_app_id && _holoNETEntry != null && _holoNETEntry.HoloNETClient != null)
+                {
+                    Dispatcher.InvokeAsync(async () =>
+                    {
+                        //We can either use async or non-async version.
+                        await _holoNETEntry.HoloNETClient.DisconnectAsync();
+
+                        //The async version will wait till it has disconnected so we can refresh the hApp list now without needing to use the OnDisconencted callback.
+                        ListHapps();
+                    });
+                }
+
+                //Get the client from the client pool (shared connections).
                 HoloNETClient client = GetClient(app.DnaHash, app.AgentPubKey, app.Name);
 
                 if (client != null && client.State == System.Net.WebSockets.WebSocketState.Open)
@@ -1872,7 +1917,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
                         btnDisconnectClient.IsEnabled = false;
 
                     _removeClientConnectionFromPoolAfterDisconnect = false;
-                    client.Disconnect();
+                    client.Disconnect(); //Non async version (will use OnDisconnected callback to refresh the hApp list (will call ListHapps).
                 }
             }
         }
@@ -1883,8 +1928,122 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
 
             Dispatcher.InvokeAsync(async () =>
             {
-                //If we intend to re-use an object then we can store it globally so we only need to init once...
-                if (_holoNETEntry == null)
+                //This extra check here will not normally be needed in a normal hApp (because you will not have the admin UI allowing you to uninstall, disable or disconnect).
+                //But for extra defencive coding to be on the safe side you can of course double check! ;-)
+                bool showAlreadyInitMessage = true;
+
+                if (_holoNETEntry != null)
+                {
+                    showAlreadyInitMessage = false;
+                    LogMessage($"APP: HoloNET Entry Already Initialized.");
+                    ShowStatusMessage("HoloNET Entry Already Initialized.", StatusMessageType.Information, false);
+
+                    LogMessage($"APP: Checking If Test App {_installed_app_id} Is Still Installed...");
+                    ShowStatusMessage($"Checking If Test App {_installed_app_id} Is Still Installed...", StatusMessageType.Information, true);
+
+                    AdminGetAppInfoCallBackEventArgs appInfoResult = await _holoNETClientAdmin.AdminGetAppInfoAsync(_installed_app_id);
+
+                    //If the test app was manually uninstalled by the user then we need to re-init the HoloNET Entry now...
+                    if (appInfoResult != null && appInfoResult.AppInfo == null || appInfoResult.IsError)
+                    {
+                        LogMessage($"APP: Test App {_installed_app_id} Is NOT Installed.");
+                        ShowStatusMessage($"Test App {_installed_app_id} Is NOT Installed.", StatusMessageType.Error, false);
+
+                        LogMessage($"APP: Closing HoloNET Entry (And Closing Internal HoloNETClient Connection)...");
+                        ShowStatusMessage($"Closing HoloNET Entry (And Closing Internal HoloNETClient Connection)...", StatusMessageType.Information, true);
+
+                        await _holoNETEntry.CloseAsync(); //Will close the internal HoloNETClient connection.
+                        _holoNETEntry = null;
+                    }
+                    else
+                    {
+                        LogMessage($"APP: Test App {_installed_app_id} Still Installed.");
+                        ShowStatusMessage($"Test App {_installed_app_id} Still Installed.", StatusMessageType.Information, false);
+
+                        LogMessage($"APP: Checking If Test App {_installed_app_id} Is Still Running (Enabled)...");
+                        ShowStatusMessage($"Checking If Test App {_installed_app_id} Is Still Running (Enabled)...", StatusMessageType.Information, true);
+
+                        if (appInfoResult.AppInfo.AppStatus == AppInfoStatusEnum.Running)
+                        {
+                            LogMessage($"APP: Test App {_installed_app_id} Still Running (Enabled).");
+                            ShowStatusMessage($"Test App {_installed_app_id} Still Running (Enabled).", StatusMessageType.Information, false);
+                        }
+                        else
+                        {
+                            LogMessage($"APP: Test App {_installed_app_id} NOT Running (Disabled).");
+                            ShowStatusMessage($"Test App {_installed_app_id} NOT Running (Disabled).", StatusMessageType.Error, false);
+
+                            LogMessage($"APP: Enabling Test App {_installed_app_id}...");
+                            ShowStatusMessage($"Enabling Test App {_installed_app_id}...", StatusMessageType.Information, true);
+
+                            AdminAppEnabledCallBackEventArgs enabledResult = await _holoNETClientAdmin.AdminEnableAppAsync(_installed_app_id);
+
+                            if (enabledResult != null && !enabledResult.IsError)
+                            {
+                                LogMessage($"APP: Test App {_installed_app_id} Enabled.");
+                                ShowStatusMessage($"Test App {_installed_app_id} Enabled.", StatusMessageType.Information, false);
+                            }
+                            else
+                            {
+                                LogMessage($"APP: Error Occured Enabling Test App {_installed_app_id}. Reason: {enabledResult.Message}");
+                                ShowStatusMessage($"Error Occured Enabling Test App {_installed_app_id}. Reason: {enabledResult.Message}", StatusMessageType.Error, false);
+
+                                LogMessage($"APP: Closing HoloNET Entry (And Closing Internal HoloNETClient Connection)...");
+                                ShowStatusMessage($"Closing HoloNET Entry (And Closing Internal HoloNETClient Connection)...", StatusMessageType.Information, true);
+
+                                await _holoNETEntry.CloseAsync(); //Will close the internal HoloNETClient connection.
+                                _holoNETEntry = null;
+                            }
+                        }
+
+                        LogMessage($"APP: Checking If Test App {_installed_app_id} HoloNETClient WebSocket Connection Is Open...");
+                        ShowStatusMessage($"Checking If Test App {_installed_app_id} HoloNETClient WebSocket Connection Is Open...", StatusMessageType.Information, true);
+
+                        if (_holoNETEntry != null && _holoNETEntry.HoloNETClient != null && _holoNETEntry.HoloNETClient.State != System.Net.WebSockets.WebSocketState.Open)
+                        {
+                            LogMessage($"APP: Test App {_installed_app_id} HoloNETClient WebSocket Connection Is Not Open!");
+                            ShowStatusMessage($"Test App {_installed_app_id} HoloNETClient WebSocket Connection Is Not Open!", StatusMessageType.Error, false);
+
+                            LogMessage($"APP: Opening Test App {_installed_app_id} HoloNETClient WebSocket Connection On Port {_holoNETEntry.HoloNETClient.EndPoint.Port}...");
+                            ShowStatusMessage($"Opening Test App {_installed_app_id} HoloNETClient WebSocket Connection On Port {_holoNETEntry.HoloNETClient.EndPoint.Port}...", StatusMessageType.Information, false);
+
+                            await _holoNETEntry.HoloNETClient.ConnectAsync();
+
+                            if (_holoNETEntry != null && _holoNETEntry.HoloNETClient != null && _holoNETEntry.HoloNETClient.State != System.Net.WebSockets.WebSocketState.Open)
+                            {
+                                LogMessage($"APP: Failed To Open Connection!");
+                                ShowStatusMessage($"Failed To Open Connection!", StatusMessageType.Error, false);
+
+                                LogMessage($"APP: Closing HoloNET Entry (And Closing Internal HoloNETClient Connection)...");
+                                ShowStatusMessage($"Closing HoloNET Entry (And Closing Internal HoloNETClient Connection)...", StatusMessageType.Information, true);
+
+                                await _holoNETEntry.CloseAsync(); //Will close the internal HoloNETClient connection.
+                                _holoNETEntry = null;
+                            }
+                            else
+                            {
+                                LogMessage($"APP: HoloNETClient WebSocket Connection Opened On Port {_holoNETEntry.HoloNETClient.EndPoint.Port}.");
+                                ShowStatusMessage($"HoloNETClient WebSocket Connection Opened On Port {_holoNETEntry.HoloNETClient.EndPoint.Port}.", StatusMessageType.Information, false);
+                                //ListHapps();
+
+                                //Will wait until the HoloNET Entry has init (non blocking).
+                                await _holoNETEntry.WaitTillHoloNETInitializedAsync();
+
+                                //Refresh the list of installed hApps.
+                                ProcessListedApps(await _holoNETClientAdmin.AdminListAppsAsync(AppStatusFilter.All));
+                            }
+                        }
+                        else
+                        {
+                            LogMessage($"APP: HoloNETClient WebSocket Connection Is Open On Port {_holoNETEntry.HoloNETClient.EndPoint.Port}.");
+                            ShowStatusMessage($"HoloNETClient WebSocket Connection Is Open On Port {_holoNETEntry.HoloNETClient.EndPoint.Port}.", StatusMessageType.Information, false);
+                        }
+                    }
+                }
+                //End Check.
+
+               //If we intend to re-use an object then we can store it globally so we only need to init once...
+               if (_holoNETEntry == null)
                 {
                     LogMessage("APP: Initializing HoloNET Entry...");
                     ShowStatusMessage("Initializing HoloNET Entry...", StatusMessageType.Information, true);
@@ -1893,9 +2052,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
                     // Will init the HoloNET Entry which includes installing and enabling the app, signing credentials, attaching the app interface, then finally creating and connecting to the internal instance of the HoloNETClient.
                     await InitHoloNETEntry();
                 }
-                else
+                else if (showAlreadyInitMessage)
                 {
-                    ShowStatusMessage($"APP: HoloNET Entry Already Initialized.", StatusMessageType.Information, true);
+                    ShowStatusMessage($"APP: HoloNET Entry Already Initialized.", StatusMessageType.Information, false);
                     LogMessage($"HoloNET Entry Already Initialized..");
                 }
 

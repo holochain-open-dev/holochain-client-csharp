@@ -492,6 +492,7 @@
                 <DataGridTextColumn Width="*" Header="Status" Binding="{Binding Path=Status}" CanUserSort="True" ></DataGridTextColumn>
                 <DataGridTextColumn Width="*" Header="Status Reason" Binding="{Binding Path=StatusReason}" CanUserSort="True" ></DataGridTextColumn>
                 <DataGridTextColumn Width="*" Header="Port" Binding="{Binding Path=Port}" CanUserSort="True" ></DataGridTextColumn>
+                <DataGridTextColumn Width="*" Header="Shared Connection" Binding="{Binding Path=IsSharedConnection}" CanUserSort="True" ></DataGridTextColumn>
                 <DataGridTextColumn Width="*" Header="Manifest" Binding="{Binding Path=Manifest}" CanUserSort="True" ></DataGridTextColumn>
                 <DataGridTextColumn Width="4*" MinWidth="200" Header="Agent Pub Key" Binding="{Binding Path=AgentPubKey}" CanUserSort="True" ></DataGridTextColumn>
                 <DataGridTextColumn Width="4*" MinWidth="200" Header="Dna Hash" Binding="{Binding Path=DnaHash}" CanUserSort="True" ></DataGridTextColumn>
@@ -633,7 +634,7 @@ BlurRadius="10"/>
                                         </EventTrigger>
                                     </Button.Triggers>
                                 </Button>
-                                <Button x:Name="btnCallZomeFunction" Style="{StaticResource ButtonStyle}" IsEnabled="{Binding Path=IsEnabled}" Foreground="{Binding Path=DisabledButtonForegroundColour}" FontSize="12"  Cursor="Hand" Background="Black" Margin="10,0,10,10"  Padding="5,5,5,5" Content="Call Zome Function" Click="btnCallZomeFunction_Click">
+                                <Button x:Name="btnCallZomeFunction" Style="{StaticResource ButtonStyle}" IsEnabled="{Binding Path=IsCallZomeFunctionAndViewDataEntriesEnabled}" Foreground="{Binding Path=DisabledButtonForegroundColour}" FontSize="12"  Cursor="Hand" Background="Black" Margin="10,0,10,10"  Padding="5,5,5,5" Content="Call Zome Function" Click="btnCallZomeFunction_Click">
                                     <Button.Effect>
                                         <DropShadowEffect x:Name="btnCallZomeFunctionGlowEffect" ShadowDepth="0"
                           Color="White"
@@ -667,7 +668,7 @@ BlurRadius="10"/>
                                     </Button.Triggers>
                                 </Button>
 
-                                <Button x:Name="btnViewDataEntries" Style="{StaticResource ButtonStyle}" IsEnabled="{Binding Path=IsEnabled}" Foreground="{Binding Path=DisabledButtonForegroundColour}" FontSize="12"  Cursor="Hand" Background="Black" Margin="10,0,10,10"  Padding="5,5,5,5" Content="View Data Entries" Click="btnViewDataEntries_Click">
+                                <Button x:Name="btnViewDataEntries" Style="{StaticResource ButtonStyle}" IsEnabled="{Binding Path=IsCallZomeFunctionAndViewDataEntriesEnabled}" Foreground="{Binding Path=DisabledButtonForegroundColour}" FontSize="12"  Cursor="Hand" Background="Black" Margin="10,0,10,10"  Padding="5,5,5,5" Content="View Data Entries" Click="btnViewDataEntries_Click">
                                     <Button.Effect>
                                         <DropShadowEffect x:Name="tbnViewDataEntriesGlowEffect" ShadowDepth="0"
                                             Color="White"
