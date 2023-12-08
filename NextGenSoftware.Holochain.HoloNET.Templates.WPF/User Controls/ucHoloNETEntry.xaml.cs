@@ -1,6 +1,8 @@
-﻿using System;
+﻿using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Enums;
+using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 
 namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls
 {
@@ -57,43 +59,71 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls
             get
             {
                 string[] parts = DOB.Split('/');
-                return new DateTime(Convert.ToInt32(parts[2]), Convert.ToInt32(parts[1]), Convert.ToInt32(parts[0]));
+                
+                try
+                {
+                    return new DateTime(Convert.ToInt32(parts[2]), Convert.ToInt32(parts[1]), Convert.ToInt32(parts[0]));
+                }
+                catch
+                {
+                    return DateTime.MinValue;
+                }
             }
         }
 
-        public void ShowErrorMessage(string message)
+        public void HideStatusMessage()
         {
-            lblHoloNETEntryValidationErrors.Text = message;
-            lblHoloNETEntryValidationErrors.Visibility = Visibility.Visible;
+            txtMessage.Visibility = Visibility.Hidden;
+            spinner.Visibility = Visibility.Hidden;
         }
 
-        public void HideErrorMessage()
+        public void ShowStatusMessage(string message, StatusMessageType type = StatusMessageType.Information, bool showSpinner = false)
         {
-            lblHoloNETEntryValidationErrors.Visibility = Visibility.Hidden;
+            txtMessage.Text = $"{message}";
+
+            switch (type)
+            {
+                case StatusMessageType.Success:
+                    txtMessage.Foreground = Brushes.LightGreen;
+                    break;
+
+                case StatusMessageType.Information:
+                    txtMessage.Foreground = Brushes.White;
+                    break;
+
+                case StatusMessageType.Error:
+                    txtMessage.Foreground = Brushes.Red;
+                    break;
+            }
+
+            if (showSpinner)
+                spinner.Visibility = Visibility.Visible;
+            else
+                spinner.Visibility = Visibility.Hidden;
+
+            txtMessage.Visibility = Visibility.Visible;
+            sbAnimateMessage.Begin();
         }
 
         public bool Validate()
         {
             if (string.IsNullOrEmpty(txtHoloNETEntryFirstName.Text))
             {
-                lblHoloNETEntryValidationErrors.Text = "Enter the first name.";
-                lblHoloNETEntryValidationErrors.Visibility = Visibility.Visible;
+                ShowStatusMessage("Enter the first name.", StatusMessageType.Error);
                 txtHoloNETEntryFirstName.Focus();
                 return false;
             }
 
             else if (string.IsNullOrEmpty(txtHoloNETEntryLastName.Text))
             {
-                lblHoloNETEntryValidationErrors.Text = "Enter the last name.";
-                lblHoloNETEntryValidationErrors.Visibility = Visibility.Visible;
+                ShowStatusMessage("Enter the last name.", StatusMessageType.Error);
                 txtHoloNETEntryLastName.Focus();
                 return false;
             }
 
             else if (string.IsNullOrEmpty(txtHoloNETEntryDOB.Text))
             {
-                lblHoloNETEntryValidationErrors.Text = "Enter the DOB.";
-                lblHoloNETEntryValidationErrors.Visibility = Visibility.Visible;
+                ShowStatusMessage("Enter the DOB.", StatusMessageType.Error);
                 txtHoloNETEntryDOB.Focus();
                 return false;
             }
@@ -107,16 +137,20 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls
 
             else if (string.IsNullOrEmpty(txtHoloNETEntryEmail.Text))
             {
-                lblHoloNETEntryValidationErrors.Text = "Enter the Email.";
-                lblHoloNETEntryValidationErrors.Visibility = Visibility.Visible;
+                ShowStatusMessage("Enter the Email.", StatusMessageType.Error);
                 txtHoloNETEntryEmail.Focus();
                 return false;
             }
             else
             {
-                HideErrorMessage();
+                HideStatusMessage();
                 return true;
             }
+        }
+
+        private void gridHoloNETEntry_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            txtMessage.MaxWidth = e.NewSize.Width - 20;
         }
     }
 }
