@@ -28,6 +28,16 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
     }
 
+    public class HoloNETCollectionSaveResult : CallBackBaseEventArgs
+    {
+        public List<HoloNETEntryBase> HoloNETEntiesSaved { get; set; } = new List<HoloNETEntryBase>();
+        public List<HoloNETEntryBase> HoloNETEntiesAdded { get; set; } = new List<HoloNETEntryBase>();
+        public List<HoloNETEntryBase> HoloNETEntiesRemoved { get; set; } = new List<HoloNETEntryBase>();
+        public List<HoloNETEntryBase> HoloNETEntiesSaveErrors { get; set; } = new List<HoloNETEntryBase>();
+        public List<ZomeFunctionCallBackEventArgs> ConductorResponses { get; set; } = new List<ZomeFunctionCallBackEventArgs>();
+        public List<string> ErrorMessages = new List<string>();
+    }
+
     public class ZomeFunctionCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
         public ZomeFunctionCallBackEventArgs() : base()

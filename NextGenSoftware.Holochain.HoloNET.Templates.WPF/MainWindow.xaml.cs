@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Dynamic;
 using System.IO;
@@ -51,7 +52,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
         private bool _showAppsListedInLog = true;
 
         public ObservableCollection<InstalledApp> InstalledApps { get; set; } = new ObservableCollection<InstalledApp>();
-        public Dictionary<string, HoloNETCollection<AvatarShared>> HoloNETEntries { get; set; } = new Dictionary<string, HoloNETCollection<AvatarShared>>();
+        //public Dictionary<string, HoloNETCollection<AvatarShared>> HoloNETEntries { get; set; } = new Dictionary<string, HoloNETCollection<AvatarShared>>();
+        public Dictionary<string, HoloNETObservableCollection<AvatarShared>> HoloNETEntries { get; set; } = new Dictionary<string, HoloNETObservableCollection<AvatarShared>>();
 
         public InstalledApp CurrentApp { get; set; }
 
@@ -111,7 +113,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
 
         private void Init()
         {
-            
+
+            ucHoloNETCollectionEntry.txtHoloNETEntryFirstName.TextChanged += TxtHoloNETEntryFirstName_TextChanged;
+            ucHoloNETCollectionEntry.txtHoloNETEntryFirstName.LostFocus += TxtHoloNETEntryFirstName_LostFocus;
+
             HoloNETEntryDNAManager.LoadDNA();
 
             _holoNETClientAdmin = new HoloNETClient();
@@ -143,6 +148,16 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
             _holoNETClientAdmin.OnAdminZomeCallCapabilityGrantedCallBack += _holoNETClient_OnAdminZomeCallCapabilityGrantedCallBack;
             _holoNETClientAdmin.OnAdminAppInterfaceAttachedCallBack += _holoNETClient_OnAdminAppInterfaceAttachedCallBack;
             _holoNETClientAdmin.OnAdminAppsListedCallBack += _holoNETClientAdmin_OnAdminAppsListedCallBack;
+        }
+
+        private void TxtHoloNETEntryFirstName_LostFocus(object sender, RoutedEventArgs e)
+        {
+            
+        }
+
+        private void TxtHoloNETEntryFirstName_TextChanged(object sender, TextChangedEventArgs e)
+        {
+           
         }
 
         private HoloNETClient CreateNewAppAgentClientConnection(ushort port)
@@ -410,7 +425,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
 
             if (!HoloNETEntries.ContainsKey(CurrentApp.Name) || (HoloNETEntries.ContainsKey(CurrentApp.Name) && HoloNETEntries[CurrentApp.Name] == null))
             {
-                HoloNETEntries[CurrentApp.Name] = new HoloNETCollection<AvatarShared>("oasis", "load_avatars", "add_avatar", "remove_avatar", client, "update_avatars");
+                HoloNETEntries[CurrentApp.Name] = new HoloNETObservableCollection<AvatarShared>("oasis", "load_avatars", "add_avatar", "remove_avatar", client, "update_avatars");
                 HoloNETEntries[CurrentApp.Name].OnInitialized += HoloNETEntries_OnInitialized;
                 HoloNETEntries[CurrentApp.Name].OnCollectionLoaded += HoloNETEntries_OnCollectionLoaded;
                 HoloNETEntries[CurrentApp.Name].OnHoloNETEntriesUpdated += HoloNETEntries_OnHoloNETEntriesUpdated;
@@ -418,9 +433,16 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
                 HoloNETEntries[CurrentApp.Name].OnHoloNETEntryRemovedFromCollection += HoloNETEntries_OnHoloNETEntryRemovedFromCollection;
                 HoloNETEntries[CurrentApp.Name].OnClosed += HoloNETEntries_OnClosed;
                 HoloNETEntries[CurrentApp.Name].OnError += HoloNETEntries_OnError;
+                HoloNETEntries[CurrentApp.Name].CollectionChanged += HoloNETEntries_CollectionChanged;
             }
             else
                 HoloNETEntries[CurrentApp.Name].HoloNETClient = client;
+        }
+
+        private void HoloNETEntries_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            LogMessage($"APP: HoloNET Collection Changed. Action: {Enum.GetName(typeof(NotifyCollectionChangedAction), e.Action)}, New Items: {e.NewItems.Count}, Old Items: {e.OldItems.Count}");
+            ShowStatusMessage($"APP: HoloNET Collection Changed. Action: {Enum.GetName(typeof(NotifyCollectionChangedAction), e.Action)}, New Items: {e.NewItems.Count}, Old Items: {e.OldItems.Count}", StatusMessageType.Information, true);
         }
 
         private void ConnectAdmin()
@@ -824,6 +846,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
                     {
                         HoloNETEntries[CurrentApp.Name].Add(new AvatarShared()
                         {
+                            Id = Guid.NewGuid(),
                             FirstName = "David",
                             LastName = "Ellams",
                             Email = "davidellams@hotmail.com",
@@ -833,6 +856,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
 
                     HoloNETEntries[CurrentApp.Name].Add(new AvatarShared()
                     {
+                        Id = Guid.NewGuid(),
                         FirstName = "James",
                         LastName = "Ellams",
                         Email = "davidellams@hotmail.com",
@@ -841,6 +865,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
 
                     HoloNETEntries[CurrentApp.Name].Add(new AvatarShared()
                     {
+                        Id = Guid.NewGuid(),
                         FirstName = "Noah",
                         LastName = "Ellams",
                         Email = "davidellams@hotmail.com",
@@ -853,6 +878,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
                     {
                         HoloNETEntries[CurrentApp.Name].Add(new AvatarShared()
                         {
+                            Id = Guid.NewGuid(),
                             FirstName = "Elba",
                             LastName = "Ellams",
                             Email = "elba@hotmail.com",
@@ -861,6 +887,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
 
                         HoloNETEntries[CurrentApp.Name].Add(new AvatarShared()
                         {
+                            Id = Guid.NewGuid(),
                             FirstName = "James",
                             LastName = "Ellams",
                             Email = "davidellams@hotmail.com",
@@ -869,6 +896,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
 
                         HoloNETEntries[CurrentApp.Name].Add(new AvatarShared()
                         {
+                            Id = Guid.NewGuid(),
                             FirstName = "Noah",
                             LastName = "Ellams",
                             Email = "davidellams@hotmail.com",
@@ -1829,7 +1857,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
             }
         }
 
-        private void HoloNETEntries_OnHoloNETEntriesUpdated(object sender, ZomeFunctionCallBackEventArgs e)
+        private void HoloNETEntries_OnHoloNETEntriesUpdated(object sender, HoloNETCollectionSaveResult e)
         {
             if (!e.IsError)
             {
@@ -2483,10 +2511,30 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
 
             if (avatar != null)
             {
-                avatar.FirstName = ucHoloNETCollectionEntry.FirstName;
-                avatar.LastName = ucHoloNETCollectionEntry.LastName;
-                avatar.Email = ucHoloNETCollectionEntry.Email;
-                avatar.DOB = ucHoloNETCollectionEntry.DOBDateTime;
+                Dispatcher.InvokeAsync(async () =>
+                {
+                    //avatar.FirstName = ucHoloNETCollectionEntry.FirstName;
+                    //avatar.LastName = ucHoloNETCollectionEntry.LastName;
+                    //avatar.Email = ucHoloNETCollectionEntry.Email;
+                    //avatar.DOB = ucHoloNETCollectionEntry.DOBDateTime;
+
+                    ShowStatusMessage($"Updating HoloNETEntry In Collection...", StatusMessageType.Information, true);
+                    LogMessage($"APP: Updating HoloNETEntry In Collection...");
+
+                    ZomeFunctionCallBackEventArgs result = await HoloNETEntries[CurrentApp.Name].SaveAllChangesAsync();
+
+                    if (result != null && !result.IsError)
+                    {
+                        ShowStatusMessage($"HoloNETEntry Updated In Collection.", StatusMessageType.Success, false);
+                        LogMessage($"APP: HoloNETEntry Updated In Collection."); 
+                    }
+                    else
+                    {
+                        ucHoloNETCollectionEntry.ShowStatusMessage(result.Message, StatusMessageType.Error);
+                        ShowStatusMessage($"Error Occured Updating HoloNETEntry In Collection: {result.Message}", StatusMessageType.Error);
+                        LogMessage($"APP: Error Occured Updating HoloNETEntry In Collection: {result.Message}");
+                    }
+                }); 
             }
         }
 
@@ -2496,29 +2544,69 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
 
             if (avatar != null)
             {
-                HoloNETEntries[CurrentApp.Name].Remove(avatar);
+                Dispatcher.InvokeAsync(async () =>
+                {
+                    ShowStatusMessage($"Removing HoloNETEntry From Collection...", StatusMessageType.Information, true);
+                    LogMessage($"APP: Removing HoloNETEntry From Collection...");
+
+                    ZomeFunctionCallBackEventArgs result = await HoloNETEntries[CurrentApp.Name].RemoveHoloNETEntryFromCollectionAndSaveAsync(avatar);
+
+                    if (result != null && !result.IsError)
+                    {
+                        ShowStatusMessage($"HoloNETEntry Removed From Collection.", StatusMessageType.Success, false);
+                        LogMessage($"APP: HoloNETEntry Removed From Collection.");
+
+                        //Remove the item from the list (we could re-load the list from hc here but it is more efficient to just remove it from the in-memory collection).
+                        int index = -1;
+                        for (int i = 0; i < HoloNETEntries[CurrentApp.Name].Count; i++)
+                        {
+                            if (HoloNETEntries[CurrentApp.Name][i] != null && HoloNETEntries[CurrentApp.Name][i].Id == avatar.Id)
+                            {
+                                index = i;
+                                break;
+                            }
+                        }
+
+                        if (index > -1)
+                        {
+                            HoloNETEntries[CurrentApp.Name].RemoveAt(index);
+                            gridDataEntries.ItemsSource = null;
+                            gridDataEntries.ItemsSource = HoloNETEntries[CurrentApp.Name];
+                            btnDataEntriesPopupRemoveEntryFromCollection.IsEnabled = false;
+                            btnDataEntriesPopupUpdateEntryInCollection.IsEnabled = false;
+                        }
+                    }
+                    else
+                    {
+                        ucHoloNETCollectionEntry.ShowStatusMessage(result.Message, StatusMessageType.Error);
+                        ShowStatusMessage($"Error Occured Removing HoloNETEntry From Collection: {result.Message}", StatusMessageType.Error);
+                        LogMessage($"APP: Error Occured Removing HoloNETEntry From Collection: {result.Message}");
+                    }
+                });
             }
         }
 
-        private void gridDataEntries_Selected(object sender, RoutedEventArgs e)
-        {
-            btnDataEntriesPopupRemoveEntryFromCollection.IsEnabled = true;
-            btnDataEntriesPopupUpdateEntryInCollection.IsEnabled = true;
-
-            AvatarShared avatar = gridDataEntries.SelectedItem as AvatarShared;
-
-            if (avatar != null)
-            {
-                ucHoloNETCollectionEntry.FirstName = avatar.FirstName;
-                ucHoloNETCollectionEntry.LastName = avatar.LastName;
-                ucHoloNETCollectionEntry.Email = avatar.Email;
-                ucHoloNETCollectionEntry.DOB = avatar.DOB.ToShortDateString();
-            }
-        }
+        private AvatarShared _currentAvatar;
 
         private void gridDataEntries_SelectedCellsChanged(object sender, SelectedCellsChangedEventArgs e)
         {
+            btnDataEntriesPopupRemoveEntryFromCollection.IsEnabled = true;
+            //btnDataEntriesPopupUpdateEntryInCollection.IsEnabled = true;
 
+           AvatarShared newAvatar = gridDataEntries.SelectedItem as AvatarShared;
+
+            if (newAvatar.Id != _currentAvatar.Id)
+            {
+                
+            }
+        }
+
+        private void gridDataEntries_CurrentCellChanged(object sender, EventArgs e)
+        {
+            AvatarShared avatar = gridDataEntries.SelectedItem as AvatarShared;
+
+
+            
         }
     }
 }

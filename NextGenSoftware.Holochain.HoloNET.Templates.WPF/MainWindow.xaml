@@ -1206,7 +1206,7 @@ AutoReverse="False" RepeatBehavior="1x" />
                     <StackPanel Orientation="Vertical" x:Name="stkpnlHoloNETCollection" Visibility="Collapsed" Height="500">
                         <TextBlock Margin="10,10,10,20" Text="HoloNET Collection (Shared Connection)" HorizontalAlignment="Center" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
 
-                        <DataGrid Grid.Row="1" x:Name="gridDataEntries" Height="200" SelectedCellsChanged="gridDataEntries_SelectedCellsChanged"  HeadersVisibility="Column" Margin="10" AutoGenerateColumns="True" IsReadOnly="true"  RowBackground="DarkBlue" AlternatingRowBackground="Blue"  Background="Transparent"  Foreground="White">
+                        <DataGrid Grid.Row="1" x:Name="gridDataEntries" Height="200" SelectionMode="Single" CurrentCellChanged="gridDataEntries_CurrentCellChanged" SelectedCellsChanged="gridDataEntries_SelectedCellsChanged"  HeadersVisibility="Column" Margin="10" AutoGenerateColumns="True" IsReadOnly="true"  RowBackground="DarkBlue" AlternatingRowBackground="Blue"  Background="Transparent"  Foreground="White">
                             <DataGrid.Resources>
                                 <Style BasedOn="{StaticResource {x:Type DataGridColumnHeader}}" TargetType="{x:Type DataGridColumnHeader}">
                                     <Setter Property="Background" Value="Blue" />

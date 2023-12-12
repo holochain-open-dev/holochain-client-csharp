@@ -152,5 +152,25 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls
         {
             txtMessage.MaxWidth = e.NewSize.Width - 20;
         }
+
+        private void txtHoloNETEntryFirstName_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
+        }
+
+        private void txtHoloNETEntryLastName_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
+        }
+
+        private void txtHoloNETEntryDOB_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
+        }
+
+        private void txtHoloNETEntryEmail_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
+        }
     }
 }
