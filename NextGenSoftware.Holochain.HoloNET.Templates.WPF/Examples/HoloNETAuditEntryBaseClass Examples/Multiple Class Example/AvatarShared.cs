@@ -1,5 +1,6 @@
 ﻿
 using NextGenSoftware.Holochain.HoloNET.Client;
+using NextGenSoftware.Holochain.HoloNET.ORM;
 using System;
 
 namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF

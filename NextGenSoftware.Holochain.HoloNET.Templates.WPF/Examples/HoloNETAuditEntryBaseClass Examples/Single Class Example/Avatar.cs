@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using NextGenSoftware.Holochain.HoloNET.Client;
+using NextGenSoftware.Holochain.HoloNET.ORM;
 
 namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
 {

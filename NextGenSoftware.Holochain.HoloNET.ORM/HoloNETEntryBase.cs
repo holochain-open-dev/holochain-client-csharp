@@ -1,16 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Dynamic;
+﻿using System.Dynamic;
 using System.Reflection;
-using System.Threading.Tasks;
-using NextGenSoftware.Holochain.HoloNET.Client.Enums;
+using NextGenSoftware.Holochain.HoloNET.Client;
+using NextGenSoftware.Holochain.HoloNET.ORM.Enums;
+using NextGenSoftware.Holochain.HoloNET.ORM.Interfaces;
 using NextGenSoftware.Logging;
 using NextGenSoftware.Utilities.ExtentionMethods;
 using NextGenSoftware.WebSocket;
 
-namespace NextGenSoftware.Holochain.HoloNET.Client
+namespace NextGenSoftware.Holochain.HoloNET.ORM
 {
     public abstract class HoloNETEntryBase : IHoloNETEntryBase
+
     //, IDisposable
     {
         private bool _isChanged = false;
@@ -296,7 +296,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// The original HoloNETEntry returned from the HoloNETClient after it is loaded or saved.
         /// </summary>
         public HoloNETEntryBase OrginalEntry { get; private set; }
-        
+
         /// <summary>
         /// The original KeyValue pairs returned from the HoloNETClient that the HoloNETEntry is constructed out of.
         /// </summary>
@@ -333,7 +333,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                             break;
 
                         case HoloNETEntryState.RemovedFromCollection:
-                            State = HoloNETEntryState.UpdatedAndRemovedFromCollections; 
+                            State = HoloNETEntryState.UpdatedAndRemovedFromCollections;
                             break;
                     }
                 }
@@ -481,7 +481,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             {
                 ZomeFunctionCallBackEventArgs result = await CallZomeFunction(ZomeDeleteEntryFunction, "entry_hash", entryHash, "entry_hash", "EntryHash", customDataKeyValuePairs, useReflectionToMapKeyValuePairResponseOntoEntryDataObject);
                 UpdateChangeTracking(result);
-               
+
                 OnLoaded?.Invoke(this, result);
                 return result;
             }
@@ -951,7 +951,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 {
                     HoloNETClient.OnError += HoloNETClient_OnError;
                     HoloNETClient.OnReadyForZomeCalls += HoloNETClient_OnReadyForZomeCalls;
-                
+
                     if (HoloNETClient.WebSocket.State != System.Net.WebSockets.WebSocketState.Connecting || HoloNETClient.WebSocket.State != System.Net.WebSockets.WebSocketState.Open)
                         await HoloNETClient.ConnectAsync(HoloNETClient.EndPoint, connectedCallBackMode, retrieveAgentPubKeyAndDnaHashMode, retrieveAgentPubKeyAndDnaHashFromConductor, retrieveAgentPubKeyAndDnaHashFromSandbox, automaticallyAttemptToRetrieveFromConductorIfSandBoxFails, automaticallyAttemptToRetrieveFromSandBoxIfConductorFails, updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved);
                 }
@@ -1046,10 +1046,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             switch (HoloNETClient.HoloNETDNA.ErrorHandlingBehaviour)
             {
-                case ErrorHandlingBehaviour.AlwaysThrowExceptionOnError:
+                case Client.ErrorHandlingBehaviour.AlwaysThrowExceptionOnError:
                     throw new HoloNETException(message, exception, HoloNETClient.WebSocket.EndPoint);
 
-                case ErrorHandlingBehaviour.OnlyThrowExceptionIfNoErrorHandlerSubscribedToOnErrorEvent:
+                case Client.ErrorHandlingBehaviour.OnlyThrowExceptionIfNoErrorHandlerSubscribedToOnErrorEvent:
                     {
                         if (OnError == null)
                             throw new HoloNETException(message, exception, HoloNETClient.WebSocket.EndPoint);

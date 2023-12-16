@@ -14,6 +14,7 @@ using System.Windows.Media;
 using Microsoft.Win32;
 using NextGenSoftware.Holochain.HoloNET.Client;
 using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects;
+using NextGenSoftware.Holochain.HoloNET.ORM;
 using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Enums;
 using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Models;
 using NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls;
@@ -77,7 +78,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
                 {
                     HoloNETEntries[key].OnInitialized -= HoloNETEntries_OnInitialized;
                     HoloNETEntries[key].OnCollectionLoaded -= HoloNETEntries_OnCollectionLoaded;
-                    HoloNETEntries[key].OnHoloNETEntriesUpdated -= HoloNETEntries_OnHoloNETEntriesUpdated;
+                    HoloNETEntries[key].OnCollectionSaved -= HoloNETEntries_OnCollectionSaved;
                     HoloNETEntries[key].OnHoloNETEntryAddedToCollection -= HoloNETEntries_OnHoloNETEntryAddedToCollection;
                     HoloNETEntries[key].OnHoloNETEntryRemovedFromCollection -= HoloNETEntries_OnHoloNETEntryRemovedFromCollection;
                     HoloNETEntries[key].OnClosed -= HoloNETEntries_OnClosed;
@@ -428,7 +429,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
                 HoloNETEntries[CurrentApp.Name] = new HoloNETObservableCollection<AvatarShared>("oasis", "load_avatars", "add_avatar", "remove_avatar", client, "update_avatars");
                 HoloNETEntries[CurrentApp.Name].OnInitialized += HoloNETEntries_OnInitialized;
                 HoloNETEntries[CurrentApp.Name].OnCollectionLoaded += HoloNETEntries_OnCollectionLoaded;
-                HoloNETEntries[CurrentApp.Name].OnHoloNETEntriesUpdated += HoloNETEntries_OnHoloNETEntriesUpdated;
+                HoloNETEntries[CurrentApp.Name].OnCollectionSaved += HoloNETEntries_OnCollectionSaved;
                 HoloNETEntries[CurrentApp.Name].OnHoloNETEntryAddedToCollection += HoloNETEntries_OnHoloNETEntryAddedToCollection;
                 HoloNETEntries[CurrentApp.Name].OnHoloNETEntryRemovedFromCollection += HoloNETEntries_OnHoloNETEntryRemovedFromCollection;
                 HoloNETEntries[CurrentApp.Name].OnClosed += HoloNETEntries_OnClosed;
@@ -441,8 +442,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
 
         private void HoloNETEntries_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            LogMessage($"APP: HoloNET Collection Changed. Action: {Enum.GetName(typeof(NotifyCollectionChangedAction), e.Action)}, New Items: {e.NewItems.Count}, Old Items: {e.OldItems.Count}");
-            ShowStatusMessage($"APP: HoloNET Collection Changed. Action: {Enum.GetName(typeof(NotifyCollectionChangedAction), e.Action)}, New Items: {e.NewItems.Count}, Old Items: {e.OldItems.Count}", StatusMessageType.Information, true);
+            string msg = $"HoloNET Collection Changed. Action: {Enum.GetName(typeof(NotifyCollectionChangedAction), e.Action)}, New Items: {(e.NewItems != null ? e.NewItems.Count : 0)}, Old Items: {(e.OldItems != null ? e.OldItems.Count : 0)}";
+            LogMessage($"APP: {msg}");
+            ShowStatusMessage(msg, StatusMessageType.Information, true);
         }
 
         private void ConnectAdmin()
@@ -650,7 +652,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
                     LogMessage($"APP: Loading HoloNET Collection...");
 
                     //LoadCollectionAsync (as well as all other async methods) will automatically init and wait for the client to finish connecting and retreiving agentPubKey (if needed) and raising the OnInitialized event.
-                    ZomeFunctionCallBackEventArgs result = await HoloNETEntries[CurrentApp.Name].LoadCollectionAsync(); //No event handlers are needed but you can still use if you like.
+                    HoloNETCollectionLoadedResult<AvatarShared> result = await HoloNETEntries[CurrentApp.Name].LoadCollectionAsync(); //No event handlers are needed but you can still use if you like.
                     HandleHoloNETCollectionLoaded(result);
                 });
             }
@@ -835,7 +837,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
             }
         }
 
-        private void HandleHoloNETCollectionLoaded(ZomeFunctionCallBackEventArgs result)
+        private void HandleHoloNETCollectionLoaded(HoloNETCollectionLoadedResult<AvatarShared> result)
         {
             //TODO: TEMP UNTIL REAL DATA IS RETURNED! REMOVE AFTER!
             if (HoloNETEntries[CurrentApp.Name] != null && HoloNETEntries[CurrentApp.Name].Count == 0) 
@@ -908,7 +910,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
 
             gridDataEntries.ItemsSource = HoloNETEntries[CurrentApp.Name];
 
-            if (result.IsCallSuccessful && !result.IsError)
+            if (!result.IsError)
             {
                 ShowStatusMessage($"HoloNET Collection Loaded.", StatusMessageType.Error);
                 LogMessage($"APP: HoloNET Collection Loaded.");
@@ -968,7 +970,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
 
         private string GetEntryInfo(ZomeFunctionCallBackEventArgs e)
         {
-            if (e.Entries.Count > 0)
+            if (e != null && e.Entries.Count > 0)
                 return $"DateTime: {e.Entries[0].DateTime}, Author: {e.Entries[0].Author}, ActionSequence: {e.Entries[0].ActionSequence}, Signature: {e.Entries[0].Signature}, Type: {e.Entries[0].Type}, Hash: {e.Entries[0].Hash}, Previous Hash: {e.Entries[0].PreviousHash}, OriginalActionAddress: {e.Entries[0].OriginalActionAddress}, OriginalEntryAddress: {e.Entries[0].OriginalEntryAddress}";
             else
                 return "";
@@ -1857,7 +1859,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
             }
         }
 
-        private void HoloNETEntries_OnHoloNETEntriesUpdated(object sender, HoloNETCollectionSaveResult e)
+        private void HoloNETEntries_OnCollectionSaved(object sender, HoloNETCollectionSavedResult e)
         {
             if (!e.IsError)
             {
@@ -1866,12 +1868,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
             }
         }
 
-        private void HoloNETEntries_OnCollectionLoaded(object sender, ZomeFunctionCallBackEventArgs e)
+        private void HoloNETEntries_OnCollectionLoaded(object sender, HoloNETCollectionLoadedResult<AvatarShared> e)
         {
             if (!e.IsError)
             {
                 ShowStatusMessage($"HoloNET Collection Loaded", StatusMessageType.Success);
-                LogMessage($"APP: HoloNET Collection Loaded: {GetEntryInfo(e)}");
+                LogMessage($"APP: HoloNET Collection Loaded: {GetEntryInfo(e.ZomeFunctionCallBackEventArgs)}");
             }
         }
 

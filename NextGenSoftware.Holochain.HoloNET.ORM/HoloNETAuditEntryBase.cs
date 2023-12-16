@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using NextGenSoftware.Holochain.HoloNET.Client;
+using NextGenSoftware.Holochain.HoloNET.ORM.Interfaces;
 using NextGenSoftware.Logging;
 using NextGenSoftware.Utilities.ExtentionMethods;
 
-namespace NextGenSoftware.Holochain.HoloNET.Client
+namespace NextGenSoftware.Holochain.HoloNET.ORM
 {
     //NOTE: To use this class you will need to make sure your corresponding rust hApp zome functions/structs have the corresponding properties (such as created_date etc) below defined.
     public abstract class HoloNETAuditEntryBase : HoloNETEntryBase, IHoloNETAuditEntryBase
