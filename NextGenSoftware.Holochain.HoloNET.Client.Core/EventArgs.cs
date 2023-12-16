@@ -28,14 +28,20 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
     }
 
-    public class HoloNETCollectionSaveResult : CallBackBaseEventArgs
+    public class HoloNETCollectionSavedResult : CallBackBaseEventArgs
     {
-        public List<HoloNETEntryBase> HoloNETEntiesSaved { get; set; } = new List<HoloNETEntryBase>();
-        public List<HoloNETEntryBase> HoloNETEntiesAdded { get; set; } = new List<HoloNETEntryBase>();
-        public List<HoloNETEntryBase> HoloNETEntiesRemoved { get; set; } = new List<HoloNETEntryBase>();
-        public List<HoloNETEntryBase> HoloNETEntiesSaveErrors { get; set; } = new List<HoloNETEntryBase>();
+        public List<HoloNETEntryBase> EntiesSaved { get; set; } = new List<HoloNETEntryBase>();
+        public List<HoloNETEntryBase> EntiesAdded { get; set; } = new List<HoloNETEntryBase>();
+        public List<HoloNETEntryBase> EntiesRemoved { get; set; } = new List<HoloNETEntryBase>();
+        public List<HoloNETEntryBase> EntiesSaveErrors { get; set; } = new List<HoloNETEntryBase>();
         public List<ZomeFunctionCallBackEventArgs> ConductorResponses { get; set; } = new List<ZomeFunctionCallBackEventArgs>();
         public List<string> ErrorMessages = new List<string>();
+    }
+
+    public class HoloNETCollectionLoadedResult<T> : CallBackBaseEventArgs where T : HoloNETEntryBase
+    {
+        public List<T> EntriesLoaded {  get; set; }
+        public ZomeFunctionCallBackEventArgs ZomeFunctionCallBackEventArgs { get; set; }
     }
 
     public class ZomeFunctionCallBackEventArgs : HoloNETDataReceivedBaseEventArgs

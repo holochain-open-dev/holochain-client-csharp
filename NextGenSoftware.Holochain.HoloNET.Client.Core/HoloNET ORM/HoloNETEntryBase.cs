@@ -13,6 +13,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
     public abstract class HoloNETEntryBase : IHoloNETEntryBase
     //, IDisposable
     {
+        private bool _isChanged = false;
         private Dictionary<string, string> _holochainProperties = new Dictionary<string, string>();
         private bool _disposeOfHoloNETClient = false;
         //private PropertyInfo[] _propInfoCache = null;
@@ -269,6 +270,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         //public bool StoreEntryHashInEntry { get; set; } = true;
 
+        /// <summary>
+        /// The state of the HoloNETEntry (NoChanges, Added, Removed, Updated, UpdatedAndAddedToCollection & UpdatedAndRemovedFromCollections) since it was last loaded or saved.
+        /// </summary>
         [HolochainRustFieldName("state")]
         public HoloNETEntryState State { get; set; }
 
@@ -288,11 +292,53 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
         }
 
-        public HoloNETEntryBase OrginalDataObject { get; private set; }
-        public Dictionary<string, object> OrginalDataKeyValueItems { get; private set; }
-        public Dictionary<string, string> OrginalKeyValueItems { get; private set; }
+        /// <summary>
+        /// The original HoloNETEntry returned from the HoloNETClient after it is loaded or saved.
+        /// </summary>
+        public HoloNETEntryBase OrginalEntry { get; private set; }
+        
+        /// <summary>
+        /// The original KeyValue pairs returned from the HoloNETClient that the HoloNETEntry is constructed out of.
+        /// </summary>
+        public Dictionary<string, object> OrginalDataKeyValuePairs { get; private set; }
 
-        public bool IsChanged { get; set; }
+        /// <summary>
+        /// The raw original KeyValue pairs returned from the Holochain Conductor/Zome Call.
+        /// </summary>
+        public Dictionary<string, string> OrginalKeyValuePairs { get; private set; }
+
+        /// <summary>
+        /// This can be mnaually set to true to mark this entry as changed (will update 'State' property to 'Updated'). If this is still false when SaveAllChangesAsync/SaveAllChanges is called on HoloNETCollection or HoloNETObservableCollection then these methods will call internally the 'HasEntryChanged' method on this entry, which will then check each property for changes and set the 'IsChanged' flag to true and 'State' property to Updated if it finds any.
+        /// </summary>
+        public bool IsChanged
+        {
+            get
+            {
+                return _isChanged;
+            }
+            set
+            {
+                _isChanged = value;
+
+                if (_isChanged)
+                {
+                    switch (State)
+                    {
+                        case HoloNETEntryState.NoChanges:
+                            State = HoloNETEntryState.Updated;
+                            break;
+
+                        case HoloNETEntryState.AddedToCollection:
+                            State = HoloNETEntryState.UpdatedAndAddedToCollection;
+                            break;
+
+                        case HoloNETEntryState.RemovedFromCollection:
+                            State = HoloNETEntryState.UpdatedAndRemovedFromCollections; 
+                            break;
+                    }
+                }
+            }
+        }
 
         /// <summary>
         /// Metadata for the Entry.
@@ -349,6 +395,78 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         ///// </summary>
         //public List<HoloNETAuditEntry> AuditEntries { get; set; } = new List<HoloNETAuditEntry>();
 
+
+
+        /// <summary>
+        /// This method will use reflection to see if any of the properties have been changed since the last time this entry was saved or loaded. If it finds any changes it will set the IsChanged property to true.
+        /// You can choose to manually track if any changes have been made by setting the IsChanged flag yourself.
+        /// NOTE: This method will be called internally by either HoloNETCollection or HoloNETObservableCollection when the SaveAllChangesAsync/SaveAllChanges methods are called if the IsChanged flag has not been manually set on the entry.
+        /// </summary>
+        /// <param name="holochainFieldsIsEnabledKeyValuePairs">This is a optional dictionary containing keyvalue pairs to allow properties that contain the HolochainFieldName to be omitted from the properties that this function checks for changes. The key (case senstive) needs to match a property that has the HolochainFieldName attribute.</param>
+        /// <param name="cachePropertyInfos">Set this to true if you want HoloNET to cache the property info's for the Entry Data Object (this can reduce the slight overhead used by reflection).</param>
+        /// <returns></returns>
+        public bool HasEntryChanged(Dictionary<string, bool> holochainFieldsIsEnabledKeyValuePairs = null, bool cachePropertyInfos = true)
+        {
+            bool isChanged = false;
+            dynamic paramsObject = new ExpandoObject();
+            PropertyInfo[] props = null;
+            Dictionary<string, object> zomeCallProps = new Dictionary<string, object>();
+            Type type = GetType();
+            string typeKey = $"{type.AssemblyQualifiedName}.{type.FullName}";
+
+            if (cachePropertyInfos && _dictPropertyInfos.ContainsKey(typeKey))
+                props = _dictPropertyInfos[typeKey];
+            else
+            {
+                //Cache the props to reduce overhead of reflection.
+                props = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+
+                if (cachePropertyInfos)
+                    _dictPropertyInfos[typeKey] = props;
+            }
+
+            foreach (PropertyInfo propInfo in props)
+            {
+                if (isChanged)
+                    break;
+
+                foreach (CustomAttributeData data in propInfo.CustomAttributes)
+                {
+                    if (data.AttributeType == (typeof(HolochainRustFieldName)))
+                    {
+                        try
+                        {
+                            if (data.ConstructorArguments.Count > 0 && data.ConstructorArguments[0].Value != null)
+                            {
+                                string key = data.ConstructorArguments[0].Value.ToString();
+                                bool? isEnabled = data.ConstructorArguments[1].Value as bool?;
+                                object value = propInfo.GetValue(this);
+
+                                if ((isEnabled.HasValue && !isEnabled.Value) || (holochainFieldsIsEnabledKeyValuePairs != null && holochainFieldsIsEnabledKeyValuePairs.ContainsKey(propInfo.Name) && !holochainFieldsIsEnabledKeyValuePairs[propInfo.Name]))
+                                    break;
+
+                                if (key != "entry_hash")
+                                {
+                                    if (value != OrginalDataKeyValuePairs[key])
+                                    {
+                                        isChanged = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+
+                        }
+                    }
+                }
+            }
+
+            IsChanged = isChanged;
+            return isChanged;
+        }
+
         /// <summary>
         /// This method will load the Holochain entry from the Holochain Conductor. This calls the CallZomeFunction on the HoloNET client passing in the zome function name specified in the constructor param `zomeLoadEntryFunction` or property `ZomeLoadEntryFunction` and then maps the data returned from the zome call onto your data object. It will then raise the OnLoaded event.
         /// NOTE: The corresponding rust Holochain Entry in your hApp wil need to have the same properties contained in your class and have the correct mappings using the HolochainFieldName attribute. Please see HoloNETEntryBase in the documentation/README on the GitHub repo https://github.com/NextGenSoftwareUK/holochain-client-csharp for more info...
@@ -362,11 +480,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             try
             {
                 ZomeFunctionCallBackEventArgs result = await CallZomeFunction(ZomeDeleteEntryFunction, "entry_hash", entryHash, "entry_hash", "EntryHash", customDataKeyValuePairs, useReflectionToMapKeyValuePairResponseOntoEntryDataObject);
-
-                OrginalDataObject = result.Entries[0].EntryDataObject;
-                OrginalKeyValueItems = result.KeyValuePair;
-                OrginalDataKeyValueItems = result.Entries[0].Entry;
-
+                UpdateChangeTracking(result);
+               
                 OnLoaded?.Invoke(this, result);
                 return result;
             }
@@ -451,8 +566,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         }
 
         /// <summary>
-        /// This method will save the Holochain entry to the Holochain Conductor. This calls the CallZomeFunction on the HoloNET client passing in the zome function name specified in the constructor param `zomeCreateEntryFunction` or property ZomeCreateEntryFunction if it is a new entry (empty object) or the `zomeUpdateEntryFunction` param and ZomeUpdateEntryFunction property if it's an existing entry (previously saved object containing a valid value for the EntryHash property). Once it has saved the entry it will then update the EntryHash property with the entry hash returned from the zome call/conductor. The PreviousVersionEntryHash property is also set to the previous EntryHash (if there is one). Once it has finished saving and got a response from the Holochain Conductor it will raise the OnSaved event.
-        /// NOTE: This will automatically extrct the properties that need saving (contain the HolochainFieldName attribute). This method uses reflection so has a tiny performance overhead (negligbale), but if you need the extra nanoseconds use the other Save overload passing in your own params object.
+        /// This method will dynamically build up the params object for this entry ready to be passed into one of the Save/SaveAsync function overloads or into one of the CallZomeFunction overloads on the HoloNETClient itself.
+        /// NOTE: This will automatically extrct the properties that need saving (contain the HolochainFieldName attribute). This method uses reflection so has a tiny performance overhead (negligbale).
         /// NOTE: The corresponding rust Holochain Entry in your hApp will need to have the same properties contained in your class and have the correct mappings using the HolochainFieldName attribute. Please see HoloNETEntryBase in the documentation/README on the GitHub repo https://github.com/NextGenSoftwareUK/holochain-client-csharp for more info...
         /// </summary>
         /// <param name="customDataKeyValuePairs">This is a optional dictionary containing keyvalue pairs of custom data you wish to inject into the params that are sent to the zome function.</param>
@@ -484,7 +599,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 {
                     foreach (CustomAttributeData data in propInfo.CustomAttributes)
                     {
-                        if (data.AttributeType == (typeof(HolochainFieldName)))
+                        if (data.AttributeType == (typeof(HolochainRustFieldName)))
                         {
                             try
                             {
@@ -612,6 +727,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                         result = await HoloNETClient.CallZomeFunctionAsync(ZomeName, ZomeUpdateEntryFunction, paramsObject);
                 }
 
+                UpdateChangeTracking(result);
                 ProcessZomeReturnCall(result, useReflectionToMapKeyValuePairResponseOntoEntryDataObject);
                 OnSaved?.Invoke(this, result);
             }
@@ -921,23 +1037,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
         }
 
-        private void UnsubscribeEvents()
-        {
-            HoloNETClient.OnError -= HoloNETClient_OnError;
-            HoloNETClient.OnReadyForZomeCalls -= HoloNETClient_OnReadyForZomeCalls;
-        }
-
-        private void HoloNETClient_OnError(object sender, HoloNETErrorEventArgs e)
-        {
-            OnError?.Invoke(this, e);
-        }
-
-        private void HoloNETClient_OnReadyForZomeCalls(object sender, ReadyForZomeCallsEventArgs e)
-        {
-            IsInitializing = false;
-            OnInitialized?.Invoke(this, e);
-        }
-
         protected void HandleError(string message, Exception exception)
         {
             message = string.Concat(message, exception != null ? $". Error Details: {exception}" : "");
@@ -957,6 +1056,39 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     }
                     break;
             }
+        }
+
+        private void UpdateChangeTracking(ZomeFunctionCallBackEventArgs zomeFunctionCallBackEventArgs)
+        {
+            OrginalEntry = zomeFunctionCallBackEventArgs.Entries[0].EntryDataObject;
+            OrginalKeyValuePairs = zomeFunctionCallBackEventArgs.KeyValuePair;
+            OrginalDataKeyValuePairs = zomeFunctionCallBackEventArgs.Entries[0].Entry;
+
+            if (State == HoloNETEntryState.Updated)
+                State = HoloNETEntryState.NoChanges;
+
+            else if (State == HoloNETEntryState.UpdatedAndAddedToCollection)
+                State = HoloNETEntryState.AddedToCollection;
+
+            else if (State == HoloNETEntryState.UpdatedAndRemovedFromCollections)
+                State = HoloNETEntryState.RemovedFromCollection;
+        }
+
+        private void UnsubscribeEvents()
+        {
+            HoloNETClient.OnError -= HoloNETClient_OnError;
+            HoloNETClient.OnReadyForZomeCalls -= HoloNETClient_OnReadyForZomeCalls;
+        }
+
+        private void HoloNETClient_OnError(object sender, HoloNETErrorEventArgs e)
+        {
+            OnError?.Invoke(this, e);
+        }
+
+        private void HoloNETClient_OnReadyForZomeCalls(object sender, ReadyForZomeCallsEventArgs e)
+        {
+            IsInitializing = false;
+            OnInitialized?.Invoke(this, e);
         }
 
         private async Task<ZomeFunctionCallBackEventArgs> CallZomeFunction(string zomeFunctionName, string key, string value, string keyDisplayName, string valueDisplayName, Dictionary<string, string> customDataKeyValuePairs = null, bool useReflectionToMapKeyValuePairResponseOntoEntryDataObject = true)

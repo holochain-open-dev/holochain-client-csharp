@@ -2521,7 +2521,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
                     ShowStatusMessage($"Updating HoloNETEntry In Collection...", StatusMessageType.Information, true);
                     LogMessage($"APP: Updating HoloNETEntry In Collection...");
 
-                    ZomeFunctionCallBackEventArgs result = await HoloNETEntries[CurrentApp.Name].SaveAllChangesAsync();
+                    HoloNETCollectionSavedResult result = await HoloNETEntries[CurrentApp.Name].SaveAllChangesAsync();
 
                     if (result != null && !result.IsError)
                     {

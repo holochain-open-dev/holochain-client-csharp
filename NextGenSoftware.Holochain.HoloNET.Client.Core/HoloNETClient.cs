@@ -3216,7 +3216,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     {
                         foreach (CustomAttributeData data in propInfo.CustomAttributes)
                         {
-                            if (data.AttributeType == (typeof(HolochainFieldName)))
+                            if (data.AttributeType == (typeof(HolochainRustFieldName)))
                             {
                                 try
                                 {

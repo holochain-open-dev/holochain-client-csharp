@@ -11,16 +11,16 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
     {
         public Holon(HoloNETClient holoNETDNA) : base("oasis", "get_holon_entry", "create_holon_entry", "update_holon_entry", "delete_holon_entry", holoNETDNA) { }
 
-        [HolochainFieldName("parent_id")]
+        [HolochainRustFieldName("parent_id")]
         public Guid ParentId { get; set; }
 
-        [HolochainFieldName("name")]
+        [HolochainRustFieldName("name")]
         public string Name { get; set; }
 
-        [HolochainFieldName("description")]
+        [HolochainRustFieldName("description")]
         public string Description { get; set; }
 
-        [HolochainFieldName("type")]
+        [HolochainRustFieldName("type")]
         public string Type { get; set; }
     }
 }

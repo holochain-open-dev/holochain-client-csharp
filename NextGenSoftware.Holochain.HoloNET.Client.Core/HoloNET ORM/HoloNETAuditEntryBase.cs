@@ -220,55 +220,55 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <summary>
         /// GUID Id that is consistent across multiple versions of the entry (each version has a different EntryHash).
         /// </summary>
-        [HolochainFieldName("id")]
+        [HolochainRustFieldName("id")]
         public Guid Id { get; set; }
 
         /// <summary>
         /// The date the entry was created.
         /// </summary>
-        [HolochainFieldName("created_date")]
+        [HolochainRustFieldName("created_date")]
         public DateTime CreatedDate { get; set; }
 
         /// <summary>
         /// The AgentId who created the entry.
         /// </summary>
-        [HolochainFieldName("created_by")]
+        [HolochainRustFieldName("created_by")]
         public string CreatedBy { get; set; }
 
         /// <summary>
         /// The date the entry was last modified.
         /// </summary>
-        [HolochainFieldName("modified_date")]
+        [HolochainRustFieldName("modified_date")]
         public DateTime ModifiedDate { get; set; }
 
         /// <summary>
         /// The AgentId who modifed the entry.
         /// </summary>
-        [HolochainFieldName("modified_by")]
+        [HolochainRustFieldName("modified_by")]
         public string ModifiedBy { get; set; }
 
         /// <summary>
         /// The date the entry was soft deleted.
         /// </summary>
-        [HolochainFieldName("deleted_date")]
+        [HolochainRustFieldName("deleted_date")]
         public DateTime DeletedDate { get; set; }
 
         /// <summary>
         /// The AgentId who deleted the entry.
         /// </summary>
-        [HolochainFieldName("deleted_by")]
+        [HolochainRustFieldName("deleted_by")]
         public string DeletedBy { get; set; }
 
         /// <summary>
         /// Flag showing the whether this entry is active or not.
         /// </summary>
-        [HolochainFieldName("is_active")]
+        [HolochainRustFieldName("is_active")]
         public bool IsActive { get; set; }
 
         /// <summary>
         /// The current version of the entry.
         /// </summary>
-        [HolochainFieldName("version")]
+        [HolochainRustFieldName("version")]
         public int Version { get; set; }
 
         /// List of all previous hashes along with the type and datetime.

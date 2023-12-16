@@ -2,8 +2,11 @@
 {
     public enum HoloNETEntryState
     {
-        Added,
-        Removed,
-        Updated
+        NoChanges,
+        AddedToCollection,
+        RemovedFromCollection,
+        Updated,
+        UpdatedAndAddedToCollection,
+        UpdatedAndRemovedFromCollections
     }
 }
