@@ -1,6 +1,5 @@
 ﻿using NextGenSoftware.Holochain.HoloNET.Client;
-
-namespace NextGenSoftware.Holochain.HoloNET.ORM
+namespace NextGenSoftware.Holochain.HoloNET.ORM.Entries
 {
     /// <summary>
     /// Contains audit information for a Holochain Entry.

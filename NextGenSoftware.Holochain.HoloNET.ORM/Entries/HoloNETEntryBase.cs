@@ -7,7 +7,7 @@ using NextGenSoftware.Logging;
 using NextGenSoftware.Utilities.ExtentionMethods;
 using NextGenSoftware.WebSocket;
 
-namespace NextGenSoftware.Holochain.HoloNET.ORM
+namespace NextGenSoftware.Holochain.HoloNET.ORM.Entries
 {
     public abstract class HoloNETEntryBase : IHoloNETEntryBase
 
@@ -295,17 +295,17 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM
         /// <summary>
         /// The original HoloNETEntry returned from the HoloNETClient after it is loaded or saved.
         /// </summary>
-        public HoloNETEntryBase OrginalEntry { get; private set; }
+        public HoloNETEntryBase OrginalEntry { get; set; }  //private set //TODO: Ideally want to get the setter private if possible...
 
         /// <summary>
         /// The original KeyValue pairs returned from the HoloNETClient that the HoloNETEntry is constructed out of.
         /// </summary>
-        public Dictionary<string, object> OrginalDataKeyValuePairs { get; private set; }
+        public Dictionary<string, object> OrginalDataKeyValuePairs { get; set; } = new Dictionary<string, object>(); //private set //TODO: Ideally want to get the setter private if possible...
 
         /// <summary>
         /// The raw original KeyValue pairs returned from the Holochain Conductor/Zome Call.
         /// </summary>
-        public Dictionary<string, string> OrginalKeyValuePairs { get; private set; }
+        public Dictionary<string, string> OrginalKeyValuePairs { get; private set; } = new Dictionary<string, string>();
 
         /// <summary>
         /// This can be mnaually set to true to mark this entry as changed (will update 'State' property to 'Updated'). If this is still false when SaveAllChangesAsync/SaveAllChanges is called on HoloNETCollection or HoloNETObservableCollection then these methods will call internally the 'HasEntryChanged' method on this entry, which will then check each property for changes and set the 'IsChanged' flag to true and 'State' property to Updated if it finds any.
@@ -432,7 +432,7 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM
 
                 foreach (CustomAttributeData data in propInfo.CustomAttributes)
                 {
-                    if (data.AttributeType == (typeof(HolochainRustFieldName)))
+                    if (data.AttributeType == typeof(HolochainRustFieldName))
                     {
                         try
                         {
@@ -442,12 +442,13 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM
                                 bool? isEnabled = data.ConstructorArguments[1].Value as bool?;
                                 object value = propInfo.GetValue(this);
 
-                                if ((isEnabled.HasValue && !isEnabled.Value) || (holochainFieldsIsEnabledKeyValuePairs != null && holochainFieldsIsEnabledKeyValuePairs.ContainsKey(propInfo.Name) && !holochainFieldsIsEnabledKeyValuePairs[propInfo.Name]))
+                                if (isEnabled.HasValue && !isEnabled.Value || holochainFieldsIsEnabledKeyValuePairs != null && holochainFieldsIsEnabledKeyValuePairs.ContainsKey(propInfo.Name) && !holochainFieldsIsEnabledKeyValuePairs[propInfo.Name])
                                     break;
 
-                                if (key != "entry_hash")
+                                if (key != "entry_hash" && !string.IsNullOrEmpty(key) && value != null) 
                                 {
-                                    if (value != OrginalDataKeyValuePairs[key])
+                                    //if (OrginalDataKeyValuePairs != null && value != OrginalDataKeyValuePairs[key])
+                                    if (OrginalDataKeyValuePairs != null && OrginalDataKeyValuePairs.ContainsKey(key) && value.ToString() != OrginalDataKeyValuePairs[key].ToString())
                                     {
                                         isChanged = true;
                                         break;
@@ -599,7 +600,7 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM
                 {
                     foreach (CustomAttributeData data in propInfo.CustomAttributes)
                     {
-                        if (data.AttributeType == (typeof(HolochainRustFieldName)))
+                        if (data.AttributeType == typeof(HolochainRustFieldName))
                         {
                             try
                             {
@@ -609,7 +610,7 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM
                                     bool? isEnabled = data.ConstructorArguments[1].Value as bool?;
                                     object value = propInfo.GetValue(this);
 
-                                    if ((isEnabled.HasValue && !isEnabled.Value) || (holochainFieldsIsEnabledKeyValuePairs != null && holochainFieldsIsEnabledKeyValuePairs.ContainsKey(propInfo.Name) && !holochainFieldsIsEnabledKeyValuePairs[propInfo.Name]))
+                                    if (isEnabled.HasValue && !isEnabled.Value || holochainFieldsIsEnabledKeyValuePairs != null && holochainFieldsIsEnabledKeyValuePairs.ContainsKey(propInfo.Name) && !holochainFieldsIsEnabledKeyValuePairs[propInfo.Name])
                                         break;
 
                                     if (key != "entry_hash")
@@ -727,8 +728,12 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM
                         result = await HoloNETClient.CallZomeFunctionAsync(ZomeName, ZomeUpdateEntryFunction, paramsObject);
                 }
 
-                UpdateChangeTracking(result);
-                ProcessZomeReturnCall(result, useReflectionToMapKeyValuePairResponseOntoEntryDataObject);
+                if (result != null && !result.IsError)
+                {
+                    UpdateChangeTracking(result);
+                    ProcessZomeReturnCall(result, useReflectionToMapKeyValuePairResponseOntoEntryDataObject);
+                }
+
                 OnSaved?.Invoke(this, result);
             }
             catch (Exception ex)
@@ -764,7 +769,7 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM
         /// <returns></returns>
         public virtual async Task<ZomeFunctionCallBackEventArgs> DeleteAsync(Dictionary<string, string> customDataKeyValuePairs = null, bool useReflectionToMapKeyValuePairResponseOntoEntryDataObject = true)
         {
-            return await DeleteAsync(this.EntryHash, customDataKeyValuePairs, useReflectionToMapKeyValuePairResponseOntoEntryDataObject);
+            return await DeleteAsync(EntryHash, customDataKeyValuePairs, useReflectionToMapKeyValuePairResponseOntoEntryDataObject);
         }
 
         /// <summary>
@@ -1001,13 +1006,13 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM
                     //Load
                     if (result.Entries != null && result.Entries.Count > 0)
                     {
-                        this.EntryData = result.Entries[0];
+                        EntryData = result.Entries[0];
 
                         if (!string.IsNullOrEmpty(result.Entries[0].EntryHash))
-                            this.EntryHash = result.Entries[0].EntryHash;
+                            EntryHash = result.Entries[0].EntryHash;
 
                         if (!string.IsNullOrEmpty(result.Entries[0].PreviousHash))
-                            this.PreviousVersionEntryHash = result.Entries[0].PreviousHash;
+                            PreviousVersionEntryHash = result.Entries[0].PreviousHash;
 
                         //if (!string.IsNullOrEmpty(result.Entry.Author))
                         //    this.Author = result.Entry.Author;
@@ -1016,10 +1021,10 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM
                     //Create/Updates/Delete
                     if (!string.IsNullOrEmpty(result.ZomeReturnHash))
                     {
-                        if (!string.IsNullOrEmpty(this.EntryHash))
-                            this.PreviousVersionEntryHash = this.EntryHash;
+                        if (!string.IsNullOrEmpty(EntryHash))
+                            PreviousVersionEntryHash = EntryHash;
 
-                        this.EntryHash = result.ZomeReturnHash;
+                        EntryHash = result.ZomeReturnHash;
                     }
 
                     if (result.KeyValuePair != null && useReflectionToMapKeyValuePairResponseOntoEntryDataObject)
@@ -1060,9 +1065,17 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM
 
         private void UpdateChangeTracking(ZomeFunctionCallBackEventArgs zomeFunctionCallBackEventArgs)
         {
-            OrginalEntry = zomeFunctionCallBackEventArgs.Entries[0].EntryDataObject;
-            OrginalKeyValuePairs = zomeFunctionCallBackEventArgs.KeyValuePair;
-            OrginalDataKeyValuePairs = zomeFunctionCallBackEventArgs.Entries[0].Entry;
+            if (zomeFunctionCallBackEventArgs != null && zomeFunctionCallBackEventArgs.Entries != null && zomeFunctionCallBackEventArgs.Entries.Count > 0 && zomeFunctionCallBackEventArgs.Entries[0] != null && zomeFunctionCallBackEventArgs.Entries[0].EntryDataObject != null)
+                OrginalEntry = zomeFunctionCallBackEventArgs.Entries[0].EntryDataObject;
+
+            if (zomeFunctionCallBackEventArgs != null && zomeFunctionCallBackEventArgs.KeyValuePair != null)
+                OrginalKeyValuePairs = zomeFunctionCallBackEventArgs.KeyValuePair;
+
+            if (zomeFunctionCallBackEventArgs != null && zomeFunctionCallBackEventArgs.Entries != null && zomeFunctionCallBackEventArgs.Entries.Count > 0 && zomeFunctionCallBackEventArgs.Entries[0] != null && zomeFunctionCallBackEventArgs.Entries[0].EntryKeyValuePairs != null)
+                OrginalDataKeyValuePairs = zomeFunctionCallBackEventArgs.Entries[0].EntryKeyValuePairs;
+
+            //TODO: REMOVE AFTER, TEMP TILL GET ZOMECALLS WORKING AGAIN!
+            MockData();
 
             if (State == HoloNETEntryState.Updated)
                 State = HoloNETEntryState.NoChanges;
@@ -1131,6 +1144,57 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM
         {
             HandleError(message, exception);
             return new T() { IsError = true, Message = string.Concat(message, exception != null ? $". Error Details: {exception}" : "") };
+        }
+
+
+        //TODO: REMOVE AFTER, TEMP TILL GET ZOMECALLS WORKING AGAIN!
+        public void MockData(Dictionary<string, bool> holochainFieldsIsEnabledKeyValuePairs = null, bool cachePropertyInfos = true)
+        {
+            dynamic paramsObject = new ExpandoObject();
+            PropertyInfo[] props = null;
+            Dictionary<string, object> zomeCallProps = new Dictionary<string, object>();
+            Type type = GetType();
+            string typeKey = $"{type.AssemblyQualifiedName}.{type.FullName}";
+
+            if (cachePropertyInfos && _dictPropertyInfos.ContainsKey(typeKey))
+                props = _dictPropertyInfos[typeKey];
+            else
+            {
+                //Cache the props to reduce overhead of reflection.
+                props = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+
+                if (cachePropertyInfos)
+                    _dictPropertyInfos[typeKey] = props;
+            }
+
+            foreach (PropertyInfo propInfo in props)
+            {
+                foreach (CustomAttributeData data in propInfo.CustomAttributes)
+                {
+                    if (data.AttributeType == typeof(HolochainRustFieldName))
+                    {
+                        try
+                        {
+                            if (data.ConstructorArguments.Count > 0 && data.ConstructorArguments[0].Value != null)
+                            {
+                                string key = data.ConstructorArguments[0].Value.ToString();
+                                bool? isEnabled = data.ConstructorArguments[1].Value as bool?;
+                                object value = propInfo.GetValue(this);
+
+                                if (isEnabled.HasValue && !isEnabled.Value || holochainFieldsIsEnabledKeyValuePairs != null && holochainFieldsIsEnabledKeyValuePairs.ContainsKey(propInfo.Name) && !holochainFieldsIsEnabledKeyValuePairs[propInfo.Name])
+                                    break;
+
+                                if (key != "entry_hash")
+                                    OrginalDataKeyValuePairs[key] = value;
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+
+                        }
+                    }
+                }
+            }
         }
     }
 }

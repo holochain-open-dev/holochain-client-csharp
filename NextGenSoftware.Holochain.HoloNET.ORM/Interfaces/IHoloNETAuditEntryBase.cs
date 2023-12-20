@@ -1,4 +1,5 @@
 ﻿using NextGenSoftware.Holochain.HoloNET.Client;
+using NextGenSoftware.Holochain.HoloNET.ORM.Entries;
 
 namespace NextGenSoftware.Holochain.HoloNET.ORM.Interfaces
 {

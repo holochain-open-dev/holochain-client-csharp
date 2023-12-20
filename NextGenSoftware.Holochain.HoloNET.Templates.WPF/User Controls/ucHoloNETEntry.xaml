@@ -35,7 +35,7 @@
         <TextBox MinWidth="150" Grid.Row="3" Grid.Column="1" Margin="10" FontSize="14" Text="{Binding Path=Email}" TextChanged="txtHoloNETEntryEmail_TextChanged" x:Name="txtHoloNETEntryEmail"/>
 
         <StackPanel Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal">
-            <TextBlock Name="txtMessage" MaxHeight="300" MaxWidth="440" VerticalAlignment="Top" HorizontalAlignment="Center" Text="" TextWrapping="Wrap"  Margin="0,10,10,10"  Visibility="Hidden"  FontSize="14"  Foreground="Red" FontWeight="Bold">
+            <TextBlock Name="txtMessage" MaxHeight="300" MaxWidth="440" VerticalAlignment="Top" HorizontalAlignment="Center" Text="" TextWrapping="Wrap"  Margin="0,10,10,10"  Visibility="Collapsed"  FontSize="14"  Foreground="Red" FontWeight="Bold">
                 <TextBlock.Effect>
                     <DropShadowEffect x:Name="glowEffect" ShadowDepth="0"
       Color="White"

@@ -1,4 +1,4 @@
-﻿using NextGenSoftware.Holochain.HoloNET.ORM;
+﻿using NextGenSoftware.Holochain.HoloNET.ORM.Entries;
 using NextGenSoftware.WebSocket;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client

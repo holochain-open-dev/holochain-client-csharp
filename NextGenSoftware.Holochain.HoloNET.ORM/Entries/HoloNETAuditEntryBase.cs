@@ -3,7 +3,7 @@ using NextGenSoftware.Holochain.HoloNET.ORM.Interfaces;
 using NextGenSoftware.Logging;
 using NextGenSoftware.Utilities.ExtentionMethods;
 
-namespace NextGenSoftware.Holochain.HoloNET.ORM
+namespace NextGenSoftware.Holochain.HoloNET.ORM.Entries
 {
     //NOTE: To use this class you will need to make sure your corresponding rust hApp zome functions/structs have the corresponding properties (such as created_date etc) below defined.
     public abstract class HoloNETAuditEntryBase : HoloNETEntryBase, IHoloNETAuditEntryBase
@@ -545,7 +545,7 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM
         /// <returns></returns>
         public override async Task<ZomeFunctionCallBackEventArgs> DeleteAsync(Dictionary<string, string> customDataKeyValuePairs = null, bool useReflectionToMapKeyValuePairResponseOntoEntryDataObject = true)
         {
-            return await DeleteAsync(this.EntryHash, customDataKeyValuePairs, useReflectionToMapKeyValuePairResponseOntoEntryDataObject);
+            return await DeleteAsync(EntryHash, customDataKeyValuePairs, useReflectionToMapKeyValuePairResponseOntoEntryDataObject);
         }
 
         /// <summary>
@@ -576,7 +576,7 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM
                 DeletedDate = DateTime.Now;
 
                 await WaitTillHoloNETInitializedAsync();
-                DeletedBy = this.HoloNETClient.HoloNETDNA.AgentPubKey;
+                DeletedBy = HoloNETClient.HoloNETDNA.AgentPubKey;
             }
 
             return await base.DeleteAsync(entryHash, customDataKeyValuePairs, useReflectionToMapKeyValuePairResponseOntoEntryDataObject);
@@ -611,7 +611,7 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM
                 DeletedDate = DateTime.Now;
 
                 await WaitTillHoloNETInitializedAsync();
-                DeletedBy = this.HoloNETClient.HoloNETDNA.AgentPubKey;
+                DeletedBy = HoloNETClient.HoloNETDNA.AgentPubKey;
             }
 
             return await base.DeleteAsync(customFieldToDeleteByValue, customFieldToDeleteByKey, customDataKeyValuePairs, useReflectionToMapKeyValuePairResponseOntoEntryDataObject);
@@ -660,7 +660,7 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM
                         else if (result.ZomeFunction == ZomeDeleteEntryFunction)
                             auditEntry.Type = HoloNETAuditEntryType.Delete;
 
-                        this.AuditEntries.Add(auditEntry);
+                        AuditEntries.Add(auditEntry);
 
                         //TODO: Need to persist audit entries to the Rust hApp in it's own audit struct...
                     }
@@ -685,7 +685,7 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM
                         CreatedDate = DateTime.Now;
 
                         await WaitTillHoloNETInitializedAsync();
-                        CreatedBy = this.HoloNETClient.HoloNETDNA.AgentPubKey;
+                        CreatedBy = HoloNETClient.HoloNETDNA.AgentPubKey;
                     }
                 }
                 else
@@ -695,19 +695,19 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM
                         ModifiedDate = DateTime.Now;
 
                         await WaitTillHoloNETInitializedAsync();
-                        ModifiedBy = this.HoloNETClient.HoloNETDNA.AgentPubKey;
+                        ModifiedBy = HoloNETClient.HoloNETDNA.AgentPubKey;
                     }
                 }
             }
 
             if (IsVersionTrackingEnabled)
-                this.Version++;
+                Version++;
 
             if (IsGenerateUniqueGuidIdEnabled)
-                this.Id = Guid.NewGuid();
+                Id = Guid.NewGuid();
 
             if (IsActiveFlagEnabled)
-                this.IsActive = true;
+                IsActive = true;
         }
 
         private dynamic ProcessAuditRustParams(dynamic paramsObject, bool addAuditInfoToParams = true, bool addVersionToParams = true, bool addUniqueGuidIdToParams = true, bool addIsActiveFlagToParams = true, string createdDateRustParamName = "created_date", string createdByRustParamName = "created_by", string modifiedDateRustParamName = "modified_date", string modifiedByRustParamName = "modified_by", string deletedDateRustParamName = "deleted_date", string deletedByRustParamName = "deleted_by", string versionRustParamName = "version", string idRustParamName = "id", string isActiveRustParamName = "is_active")

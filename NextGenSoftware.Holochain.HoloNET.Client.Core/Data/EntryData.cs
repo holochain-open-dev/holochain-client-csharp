@@ -79,7 +79,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <summary>
         /// A key/value pair/dictionary containing the entry data itself.
         /// </summary>
-        public Dictionary<string, object> Entry { get; set; }
+        public Dictionary<string, object> EntryKeyValuePairs { get; set; }
 
         /// <summary>
         /// A dynamic object constructed from the entry data.

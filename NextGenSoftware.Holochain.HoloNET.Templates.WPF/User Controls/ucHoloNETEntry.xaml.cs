@@ -29,6 +29,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls
         public static readonly DependencyProperty DOBProperty =
           DependencyProperty.Register("DOB", typeof(string), typeof(ucHoloNETEntry), new UIPropertyMetadata(""));
 
+        public static readonly DependencyProperty IsChangedProperty =
+          DependencyProperty.Register("IsChanged", typeof(bool), typeof(ucHoloNETEntry), new UIPropertyMetadata(false));
+
 
         public string FirstName
         {
@@ -52,6 +55,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls
         {
             get { return (string)GetValue(DOBProperty); }
             set { SetValue(DOBProperty, value); }
+        }
+
+        public bool IsChanged
+        {
+            get { return (bool)GetValue(IsChangedProperty); }
+            set { SetValue(IsChangedProperty, value); }
         }
 
         public DateTime DOBDateTime
@@ -155,22 +164,22 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls
 
         private void txtHoloNETEntryFirstName_TextChanged(object sender, TextChangedEventArgs e)
         {
-
+            IsChanged = true;
         }
 
         private void txtHoloNETEntryLastName_TextChanged(object sender, TextChangedEventArgs e)
         {
-
+            IsChanged = true;
         }
 
         private void txtHoloNETEntryDOB_TextChanged(object sender, TextChangedEventArgs e)
         {
-
+            IsChanged = true;
         }
 
         private void txtHoloNETEntryEmail_TextChanged(object sender, TextChangedEventArgs e)
         {
-
+            IsChanged = true;
         }
     }
 }

@@ -1,13 +1,13 @@
-﻿using System.Collections.ObjectModel;
-using System.Dynamic;
+﻿using System.Dynamic;
 using NextGenSoftware.Holochain.HoloNET.Client;
+using NextGenSoftware.Holochain.HoloNET.ORM.Entries;
 using NextGenSoftware.Logging;
 using NextGenSoftware.Utilities.ExtentionMethods;
 using NextGenSoftware.WebSocket;
 
-namespace NextGenSoftware.Holochain.HoloNET.ORM
+namespace NextGenSoftware.Holochain.HoloNET.ORM.Collections
 {
-    public class HoloNETObservableCollection<T> : ObservableCollection<T> where T : HoloNETEntryBase
+    public class HoloNETCollection<T> : List<T> where T : HoloNETEntryBase
     {
         private bool _disposeOfHoloNETClient = false;
 
@@ -84,7 +84,7 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM
         /// <param name="automaticallyAttemptToRetrieveFromConductorIfSandBoxFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the Holochain Conductor if it fails to get them from the HC Sandbox command. This defaults to true.</param>
         /// <param name="automaticallyAttemptToRetrieveFromSandBoxIfConductorFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the HC Sandbox command if it fails to get them from the Holochain Conductor. This defaults to true.</param>
         /// <param name="updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved">Set this to true (default) to automatically update the HoloNETDNA once it has retrieved the DnaHash & AgentPubKey.</param>
-        public HoloNETObservableCollection(string zomeName, string zomeLoadCollectionFunction, string zomeAddEntryToCollectionFunction, string zomeRemoveEntryFromCollectionFunction, string zomeBatchUpdateCollectionFunction = "", bool autoCallInitialize = true, HoloNETDNA holoNETDNA = null, ConnectedCallBackMode connectedCallBackMode = ConnectedCallBackMode.WaitForHolochainConductorToConnect, RetrieveAgentPubKeyAndDnaHashMode retrieveAgentPubKeyAndDnaHashMode = RetrieveAgentPubKeyAndDnaHashMode.Wait, bool retrieveAgentPubKeyAndDnaHashFromConductor = true, bool retrieveAgentPubKeyAndDnaHashFromSandbox = true, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true, bool updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved = true)
+        public HoloNETCollection(string zomeName, string zomeLoadCollectionFunction, string zomeAddEntryToCollectionFunction, string zomeRemoveEntryFromCollectionFunction, string zomeBatchUpdateCollectionFunction = "", bool autoCallInitialize = true, HoloNETDNA holoNETDNA = null, ConnectedCallBackMode connectedCallBackMode = ConnectedCallBackMode.WaitForHolochainConductorToConnect, RetrieveAgentPubKeyAndDnaHashMode retrieveAgentPubKeyAndDnaHashMode = RetrieveAgentPubKeyAndDnaHashMode.Wait, bool retrieveAgentPubKeyAndDnaHashFromConductor = true, bool retrieveAgentPubKeyAndDnaHashFromSandbox = true, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true, bool updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved = true)
         {
             HoloNETClient = new HoloNETClient(holoNETDNA);
             _disposeOfHoloNETClient = true;
@@ -123,7 +123,7 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM
         /// <param name="automaticallyAttemptToRetrieveFromConductorIfSandBoxFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the Holochain Conductor if it fails to get them from the HC Sandbox command. This defaults to true.</param>
         /// <param name="automaticallyAttemptToRetrieveFromSandBoxIfConductorFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the HC Sandbox command if it fails to get them from the Holochain Conductor. This defaults to true.</param>
         /// <param name="updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved">Set this to true (default) to automatically update the HoloNETDNA once it has retrieved the DnaHash & AgentPubKey.</param>
-        public HoloNETObservableCollection(string zomeName, string zomeLoadCollectionFunction, string zomeAddEntryToCollectionFunction, string zomeRemoveEntryFromCollectionFunction, ILogProvider logProvider, bool alsoUseDefaultLogger = false, string zomeBatchUpdateCollectionFunction = "", bool autoCallInitialize = true, string holochainConductorURI = "ws://localhost:8888", HoloNETDNA holoNETDNA = null, ConnectedCallBackMode connectedCallBackMode = ConnectedCallBackMode.WaitForHolochainConductorToConnect, RetrieveAgentPubKeyAndDnaHashMode retrieveAgentPubKeyAndDnaHashMode = RetrieveAgentPubKeyAndDnaHashMode.Wait, bool retrieveAgentPubKeyAndDnaHashFromConductor = true, bool retrieveAgentPubKeyAndDnaHashFromSandbox = true, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true, bool updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved = true, bool logToConsole = true, bool logToFile = true, string releativePathToLogFolder = "Logs", string logFileName = "HoloNET.log", bool addAdditionalSpaceAfterEachLogEntry = false, bool showColouredLogs = true, ConsoleColor debugColour = ConsoleColor.White, ConsoleColor infoColour = ConsoleColor.Green, ConsoleColor warningColour = ConsoleColor.Yellow, ConsoleColor errorColour = ConsoleColor.Red)
+        public HoloNETCollection(string zomeName, string zomeLoadCollectionFunction, string zomeAddEntryToCollectionFunction, string zomeRemoveEntryFromCollectionFunction, ILogProvider logProvider, bool alsoUseDefaultLogger = false, string zomeBatchUpdateCollectionFunction = "", bool autoCallInitialize = true, string holochainConductorURI = "ws://localhost:8888", HoloNETDNA holoNETDNA = null, ConnectedCallBackMode connectedCallBackMode = ConnectedCallBackMode.WaitForHolochainConductorToConnect, RetrieveAgentPubKeyAndDnaHashMode retrieveAgentPubKeyAndDnaHashMode = RetrieveAgentPubKeyAndDnaHashMode.Wait, bool retrieveAgentPubKeyAndDnaHashFromConductor = true, bool retrieveAgentPubKeyAndDnaHashFromSandbox = true, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true, bool updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved = true, bool logToConsole = true, bool logToFile = true, string releativePathToLogFolder = "Logs", string logFileName = "HoloNET.log", bool addAdditionalSpaceAfterEachLogEntry = false, bool showColouredLogs = true, ConsoleColor debugColour = ConsoleColor.White, ConsoleColor infoColour = ConsoleColor.Green, ConsoleColor warningColour = ConsoleColor.Yellow, ConsoleColor errorColour = ConsoleColor.Red)
         {
             HoloNETClient = new HoloNETClient(logProvider, alsoUseDefaultLogger, holoNETDNA);
             _disposeOfHoloNETClient = true;
@@ -162,7 +162,7 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM
         /// <param name="automaticallyAttemptToRetrieveFromConductorIfSandBoxFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the Holochain Conductor if it fails to get them from the HC Sandbox command. This defaults to true.</param>
         /// <param name="automaticallyAttemptToRetrieveFromSandBoxIfConductorFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the HC Sandbox command if it fails to get them from the Holochain Conductor. This defaults to true.</param>
         /// <param name="updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved">Set this to true (default) to automatically update the HoloNETDNA once it has retrieved the DnaHash & AgentPubKey.</param>
-        public HoloNETObservableCollection(string zomeName, string zomeLoadCollectionFunction, string zomeAddEntryToCollectionFunction, string zomeRemoveEntryFromCollectionFunction, IEnumerable<ILogProvider> logProviders, string zomeBatchUpdateCollectionFunction = "", bool alsoUseDefaultLogger = false, bool autoCallInitialize = true, HoloNETDNA holoNETDNA = null, ConnectedCallBackMode connectedCallBackMode = ConnectedCallBackMode.WaitForHolochainConductorToConnect, RetrieveAgentPubKeyAndDnaHashMode retrieveAgentPubKeyAndDnaHashMode = RetrieveAgentPubKeyAndDnaHashMode.Wait, bool retrieveAgentPubKeyAndDnaHashFromConductor = true, bool retrieveAgentPubKeyAndDnaHashFromSandbox = true, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true, bool updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved = true)
+        public HoloNETCollection(string zomeName, string zomeLoadCollectionFunction, string zomeAddEntryToCollectionFunction, string zomeRemoveEntryFromCollectionFunction, IEnumerable<ILogProvider> logProviders, string zomeBatchUpdateCollectionFunction = "", bool alsoUseDefaultLogger = false, bool autoCallInitialize = true, HoloNETDNA holoNETDNA = null, ConnectedCallBackMode connectedCallBackMode = ConnectedCallBackMode.WaitForHolochainConductorToConnect, RetrieveAgentPubKeyAndDnaHashMode retrieveAgentPubKeyAndDnaHashMode = RetrieveAgentPubKeyAndDnaHashMode.Wait, bool retrieveAgentPubKeyAndDnaHashFromConductor = true, bool retrieveAgentPubKeyAndDnaHashFromSandbox = true, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true, bool updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved = true)
         {
             HoloNETClient = new HoloNETClient(logProviders, alsoUseDefaultLogger, holoNETDNA);
             _disposeOfHoloNETClient = true;
@@ -197,7 +197,7 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM
         /// <param name="automaticallyAttemptToRetrieveFromConductorIfSandBoxFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the Holochain Conductor if it fails to get them from the HC Sandbox command. This defaults to true.</param>
         /// <param name="automaticallyAttemptToRetrieveFromSandBoxIfConductorFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the HC Sandbox command if it fails to get them from the Holochain Conductor. This defaults to true.</param>
         /// <param name="updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved">Set this to true (default) to automatically update the HoloNETDNA once it has retrieved the DnaHash & AgentPubKey.</param>
-        public HoloNETObservableCollection(string zomeName, string zomeLoadCollectionFunction, string zomeAddEntryToCollectionFunction, string zomeRemoveEntryFromCollectionFunction, Logger logger, string zomeBatchUpdateCollectionFunction = "", bool autoCallInitialize = true, HoloNETDNA holoNETDNA = null, ConnectedCallBackMode connectedCallBackMode = ConnectedCallBackMode.WaitForHolochainConductorToConnect, RetrieveAgentPubKeyAndDnaHashMode retrieveAgentPubKeyAndDnaHashMode = RetrieveAgentPubKeyAndDnaHashMode.Wait, bool retrieveAgentPubKeyAndDnaHashFromConductor = true, bool retrieveAgentPubKeyAndDnaHashFromSandbox = true, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true, bool updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved = true)
+        public HoloNETCollection(string zomeName, string zomeLoadCollectionFunction, string zomeAddEntryToCollectionFunction, string zomeRemoveEntryFromCollectionFunction, Logger logger, string zomeBatchUpdateCollectionFunction = "", bool autoCallInitialize = true, HoloNETDNA holoNETDNA = null, ConnectedCallBackMode connectedCallBackMode = ConnectedCallBackMode.WaitForHolochainConductorToConnect, RetrieveAgentPubKeyAndDnaHashMode retrieveAgentPubKeyAndDnaHashMode = RetrieveAgentPubKeyAndDnaHashMode.Wait, bool retrieveAgentPubKeyAndDnaHashFromConductor = true, bool retrieveAgentPubKeyAndDnaHashFromSandbox = true, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true, bool updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved = true)
         {
             HoloNETClient = new HoloNETClient(logger, holoNETDNA);
             _disposeOfHoloNETClient = true;
@@ -231,7 +231,7 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM
         /// <param name="automaticallyAttemptToRetrieveFromConductorIfSandBoxFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the Holochain Conductor if it fails to get them from the HC Sandbox command. This defaults to true.</param>
         /// <param name="automaticallyAttemptToRetrieveFromSandBoxIfConductorFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the HC Sandbox command if it fails to get them from the Holochain Conductor. This defaults to true.</param>
         /// <param name="updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved">Set this to true (default) to automatically update the HoloNETDNA once it has retrieved the DnaHash & AgentPubKey.</param>
-        public HoloNETObservableCollection(string zomeName, string zomeLoadCollectionFunction, string zomeAddEntryToCollectionFunction, string zomeRemoveEntryFromCollectionFunction, HoloNETClient holoNETClient, string zomeBatchUpdateCollectionFunction = "", bool autoCallInitialize = true, ConnectedCallBackMode connectedCallBackMode = ConnectedCallBackMode.WaitForHolochainConductorToConnect, RetrieveAgentPubKeyAndDnaHashMode retrieveAgentPubKeyAndDnaHashMode = RetrieveAgentPubKeyAndDnaHashMode.Wait, bool retrieveAgentPubKeyAndDnaHashFromConductor = true, bool retrieveAgentPubKeyAndDnaHashFromSandbox = true, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true, bool updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved = true)
+        public HoloNETCollection(string zomeName, string zomeLoadCollectionFunction, string zomeAddEntryToCollectionFunction, string zomeRemoveEntryFromCollectionFunction, HoloNETClient holoNETClient, string zomeBatchUpdateCollectionFunction = "", bool autoCallInitialize = true, ConnectedCallBackMode connectedCallBackMode = ConnectedCallBackMode.WaitForHolochainConductorToConnect, RetrieveAgentPubKeyAndDnaHashMode retrieveAgentPubKeyAndDnaHashMode = RetrieveAgentPubKeyAndDnaHashMode.Wait, bool retrieveAgentPubKeyAndDnaHashFromConductor = true, bool retrieveAgentPubKeyAndDnaHashFromSandbox = true, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true, bool updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved = true)
         {
             HoloNETClient = holoNETClient;
             //StoreEntryHashInEntry = storeEntryHashInEntry;
@@ -350,7 +350,7 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM
 
                 HoloNETClient.OnError += HoloNETClient_OnError;
                 HoloNETClient.OnReadyForZomeCalls += HoloNETClient_OnReadyForZomeCalls;
-                this.CollectionChanged += HoloNETObservableCollection_CollectionChanged;
+                // this.CollectionChanged += HoloNETObservableCollection_CollectionChanged;
 
                 if (HoloNETClient.WebSocket.State != System.Net.WebSockets.WebSocketState.Connecting || HoloNETClient.WebSocket.State != System.Net.WebSockets.WebSocketState.Open)
                     await HoloNETClient.ConnectAsync(HoloNETClient.EndPoint, connectedCallBackMode, retrieveAgentPubKeyAndDnaHashMode, retrieveAgentPubKeyAndDnaHashFromConductor, retrieveAgentPubKeyAndDnaHashFromSandbox, automaticallyAttemptToRetrieveFromConductorIfSandBoxFails, automaticallyAttemptToRetrieveFromSandBoxIfConductorFails, updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved);
@@ -361,41 +361,84 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM
             }
         }
 
-        private void HoloNETObservableCollection_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        public void ReCalculateEntriesAddedOrRemovedSinceLastSaved()
         {
-            switch (e.Action)
+            bool found = false;
+            EntriesAddedSinceLastSaved.Clear();
+            EntriesRemovedSinceLastSaved.Clear();
+            IsChanges = false;
+
+            //Check for entries Added.
+            foreach (T entry in this)
             {
-                case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
+                foreach (T originalEntry in OriginalEntries)
+                {
+                    if (originalEntry.EntryHash == entry.EntryHash)
                     {
-                        foreach (T entry in e.NewItems)
-                        {
-                            if (entry.State == Enums.HoloNETEntryState.Updated)
-                                entry.State = Enums.HoloNETEntryState.UpdatedAndAddedToCollection;
-                            else
-                                entry.State = Enums.HoloNETEntryState.AddedToCollection;
-
-                            EntriesAddedSinceLastSaved.Add(entry);
-                        }
+                        found = true;
+                        break;
                     }
-                    break;
+                }
 
-                case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
-                    {
-                        foreach (T entry in e.OldItems)
-                        {
-                            if (entry.State == Enums.HoloNETEntryState.Updated)
-                                entry.State = Enums.HoloNETEntryState.UpdatedAndRemovedFromCollections;
-                            else
-                                entry.State = Enums.HoloNETEntryState.RemovedFromCollection;
+                if (!found)
+                {
+                    if (entry.State == Enums.HoloNETEntryState.Updated)
+                        entry.State = Enums.HoloNETEntryState.UpdatedAndAddedToCollection;
+                    else
+                        entry.State = Enums.HoloNETEntryState.AddedToCollection;
 
-                            EntriesRemovedSinceLastSaved.Add(entry);
-                        }
-                    }
-                    break;
+                    EntriesAddedSinceLastSaved.Add(entry);
+                    IsChanges = true;
+                }
             }
 
-            IsChanges = true;
+            //Check for entries Removed.
+            found = false;
+            foreach (T originalEntry in OriginalEntries)
+            {
+                foreach (T entry in this)
+                {
+                    if (originalEntry.EntryHash == entry.EntryHash)
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (!found)
+                {
+                    if (originalEntry.State == Enums.HoloNETEntryState.Updated)
+                        originalEntry.State = Enums.HoloNETEntryState.UpdatedAndRemovedFromCollections;
+                    else
+                        originalEntry.State = Enums.HoloNETEntryState.RemovedFromCollection;
+
+                    EntriesRemovedSinceLastSaved.Add(originalEntry);
+                    IsChanges = true;
+                }
+            }
         }
+
+        //private void HoloNETObservableCollection_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        //{
+        //    switch (e.Action)
+        //    {
+        //        case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
+        //            {
+        //                foreach (T entry in e.NewItems)
+        //                    EntriesAddedSinceLastSaved.Add(entry);
+        //            }
+        //            break;
+
+        //        case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
+        //            {
+        //                foreach (T entry in e.OldItems)
+        //                    EntriesRemovedSinceLastSaved.Add(entry);
+        //            }
+        //            break;
+        //    }
+
+        //    IsChanges = true;
+        //}
 
         /// <summary>
         /// This mehod will call the WaitTillReadyForZomeCallsAsync method on the HoloNET Client. 
@@ -429,9 +472,35 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM
                 if (zomeResult != null && !zomeResult.IsError)
                 {
                     foreach (EntryData entryData in zomeResult.Entries)
-                        this.Add(entryData.EntryDataObject);
+                    {
+                        HoloNETEntryBase entry = entryData.EntryDataObject as HoloNETEntryBase;
+
+                        if (entry != null)
+                        {
+                            entry.HoloNETClient = HoloNETClient; //The entries will share the same clinet/connection as the collection.
+                            entry.OrginalDataKeyValuePairs = entryData.EntryKeyValuePairs;
+                            entry.OrginalEntry = entryData.EntryDataObject;
+                            //entry.OrginalKeyValuePairs = entryData.
+
+                            //TODO: REMOVE AFTER, TEMP TILL GET ZOMECALLS WORKING AGAIN!
+                            //entry.MockData();
+
+                            Add(entryData.EntryDataObject);
+                            //Add((T)entry);
+                        }
+
+                        //Add(entryData.EntryDataObject);
+                    }
+                }
+                else
+                {
+                    result.IsError = true;
+
+                    if (zomeResult != null)
+                        result.Message = zomeResult.Message;
                 }
 
+                result.ZomeFunctionCallBackEventArgs = zomeResult;
                 result.EntriesLoaded = this.ToList();
                 ResetChangeTracking();
 
@@ -472,12 +541,15 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM
 
                 if (saveHoloNETEntry)
                 {
+                    if (holoNETEntry.HoloNETClient == null)
+                        holoNETEntry.HoloNETClient = HoloNETClient;
+
                     ZomeFunctionCallBackEventArgs saveResult = await holoNETEntry.SaveAsync();
 
                     if (saveResult.IsError)
                     {
                         result.IsError = true;
-                        result.Message = $"Error occured in AddHoloNETEntryToCollectionAndSaveAsync in HoloNETObservableCollection saving the HoloNETEntry. Reason: {saveResult.Message}";
+                        result.Message = $"Error occured in AddHoloNETEntryToCollectionAndSaveAsync in HoloNETCollection saving the HoloNETEntry. Reason: {saveResult.Message}";
                     }
                 }
 
@@ -486,7 +558,10 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM
                     result = await HoloNETClient.CallZomeFunctionAsync(ZomeName, ZomeAddEntryToCollectionFunction, collectionAnchor);
 
                     if (result != null && !result.IsError)
-                        this.Add(holoNETEntry);
+                    {
+                        Add(holoNETEntry);
+                        OriginalEntries.Add(holoNETEntry);
+                    }
                 }
 
                 OnHoloNETEntryAddedToCollection?.Invoke(this, result);
@@ -494,7 +569,7 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM
             }
             catch (Exception ex)
             {
-                return HandleError<ZomeFunctionCallBackEventArgs>("Unknown error occurred in AddHoloNETEntryToCollectionAndSaveAsync method in HoloNETObservableCollection", ex);
+                return HandleError<ZomeFunctionCallBackEventArgs>("Unknown error occurred in AddHoloNETEntryToCollectionAndSaveAsync method in HoloNETCollection", ex);
             }
         }
 
@@ -524,16 +599,19 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM
                     await InitializeAsync();
 
                 ZomeFunctionCallBackEventArgs result = await HoloNETClient.CallZomeFunctionAsync(ZomeName, ZomeRemoveEntryFromCollectionFunction, collectionAnchor);
-                
+
                 if (result != null && !result.IsError)
-                    this.Remove(holoNETEntry);
+                {
+                    Remove(holoNETEntry);
+                    OriginalEntries.Remove(holoNETEntry);
+                }
 
                 OnHoloNETEntryRemovedFromCollection?.Invoke(this, result);
                 return result;
             }
             catch (Exception ex)
             {
-                return HandleError<ZomeFunctionCallBackEventArgs>("Unknown error occurred in RemoveHoloNETEntryFromCollectionAndSaveAsync method in HoloNETObservableCollection", ex);
+                return HandleError<ZomeFunctionCallBackEventArgs>("Unknown error occurred in RemoveHoloNETEntryFromCollectionAndSaveAsync method in HoloNETCollection", ex);
             }
         }
 
@@ -570,6 +648,8 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM
                 if (!IsInitialized && !IsInitializing)
                     await InitializeAsync();
 
+                ReCalculateEntriesAddedOrRemovedSinceLastSaved();
+
                 if (!saveAsOneBatchOperation)
                 {
                     foreach (T entry in EntriesAddedSinceLastSaved)
@@ -581,7 +661,7 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM
                         else
                         {
                             result.EntiesSaveErrors.Add(entry);
-                            result.ErrorMessages.Add($"Error occured in SaveAllChangesAsync method in HoloNETObservableCollection adding a new HoloNETEntry to the HoloNET Collection. Reason: {saveResult.Message}");
+                            result.ErrorMessages.Add($"Error occured in SaveAllChangesAsync method in HoloNETCollection adding a new HoloNETEntry to the HoloNET Collection. Reason: {saveResult.Message}");
                             result.IsError = true;
 
                             if (!continueOnError)
@@ -600,7 +680,7 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM
                             else
                             {
                                 result.EntiesSaveErrors.Add(entry);
-                                result.ErrorMessages.Add($"Error occured in SaveAllChangesAsync method in HoloNETObservableCollection removing a HoloNETEntry from the HoloNET Collection. Reason: {saveResult.Message}");
+                                result.ErrorMessages.Add($"Error occured in SaveAllChangesAsync method in HoloNETCollection removing a HoloNETEntry from the HoloNET Collection. Reason: {saveResult.Message}");
                                 result.IsError = true;
 
                                 if (!continueOnError)
@@ -611,7 +691,7 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM
 
                     if (!result.IsError && saveChangesMadeToEntries)
                     {
-                        for (int i = 0; i < this.Count; i++)
+                        for (int i = 0; i < Count; i++)
                         {
                             //If the user has not manually set the IsChanged property then we can calculate it now using reflection.
                             if (!this[i].IsChanged)
@@ -619,6 +699,7 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM
 
                             if (this[i].IsChanged)
                             {
+                                this[i].State = Enums.HoloNETEntryState.Updated;
                                 ZomeFunctionCallBackEventArgs saveResult = await this[i].SaveAsync(customDataKeyValuePairs, holochainFieldsIsEnabledKeyValuePairs, cachePropertyInfos);
 
                                 if (saveResult != null && !saveResult.IsError)
@@ -626,7 +707,7 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM
                                 else
                                 {
                                     result.EntiesSaveErrors.Add(this[i]);
-                                    result.ErrorMessages.Add($"Error occured in SaveAllChangesAsync method in HoloNETObservableCollection saving HoloNETEntry with entryHash {this[i].EntryHash}. Reason: {saveResult.Message}");
+                                    result.ErrorMessages.Add($"Error occured in SaveAllChangesAsync method in HoloNETCollection saving HoloNETEntry with entryHash {this[i].EntryHash}. Reason: {saveResult.Message}");
                                     result.IsError = true;
 
                                     if (!continueOnError)
@@ -660,7 +741,7 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM
 
                     if (saveChangesMadeToEntries)
                     {
-                        for (int i = 0; i < this.Count; i++)
+                        for (int i = 0; i < Count; i++)
                         {
                             //If the user has not manually set the IsChanged property then we can calculate it now using reflection.
                             if (!this[i].IsChanged)
@@ -686,7 +767,7 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM
                     else
                     {
                         result.EntiesSaveErrors.AddRange(savingsEntries);
-                        result.Message = $"Error occured in SaveAllChangesAsync method in HoloNETObservableCollection calling the batch update zome function {ZomeBatchUpdateCollectionFunction}. Reason: {batchResult.Message}";
+                        result.Message = $"Error occured in SaveAllChangesAsync method in HoloNETCollection calling the batch update zome function {ZomeBatchUpdateCollectionFunction}. Reason: {batchResult.Message}";
                         result.IsError = true;
                     }
                 }
@@ -726,8 +807,10 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM
         /// <param name="cachePropertyInfos">Set this to true (default) if you want HoloNET to cache the property info's for the Entry (this can reduce the slight overhead used by reflection).</param>
         public void UpdateEnriesState(Dictionary<string, bool> holochainFieldsIsEnabledKeyValuePairs = null, bool cachePropertyInfos = true)
         {
+            ReCalculateEntriesAddedOrRemovedSinceLastSaved();
+
             //Check for entries Updated.
-            for (int i = 0; i < this.Count; i++)
+            for (int i = 0; i < Count; i++)
             {
                 //If the user has not manually set the IsChanged property then we can calculate it now using reflection.
                 if (!this[i].IsChanged)

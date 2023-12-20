@@ -4485,6 +4485,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 else if (_entryDataObjectLookup.ContainsKey(id) && _entryDataObjectLookup[id] != null)
                     entryData.EntryDataObject = MapEntryDataObject(_entryDataObjectLookup[id], keyValuePairs);
 
+                //if (entryData.EntryDataObject.GetType() == typeof(HoloNETEntryBase))
+                //{
+                //    entryData.EntryDataObject.OrginalEntry = entryData.EntryDataObject;
+                //    entryData.EntryDataObject.OrginalDataKeyValuePairs = entryData.EntryKeyValuePairs;
+                //    entryData.EntryDataObject.OrginalKeyValuePairs = keyValuePairs;
+                //}
 
                 Logger.Log($"Decoded Data:\n{keyValuePairsAsString}", LogType.Info);
 
@@ -4682,7 +4688,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                                     entryData.Bytes = bytes;
                                     entryData.BytesString = byteString;
-                                    entryData.Entry = decodedEntry;
+                                    entryData.EntryKeyValuePairs = decodedEntry;
                                     appResponseData[key] = entryData;
                                 }
                             }

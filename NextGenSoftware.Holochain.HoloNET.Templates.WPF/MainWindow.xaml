@@ -1206,7 +1206,23 @@ AutoReverse="False" RepeatBehavior="1x" />
                     <StackPanel Orientation="Vertical" x:Name="stkpnlHoloNETCollection" Visibility="Collapsed" Height="500">
                         <TextBlock Margin="10,10,10,20" Text="HoloNET Collection (Shared Connection)" HorizontalAlignment="Center" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
 
-                        <DataGrid Grid.Row="1" x:Name="gridDataEntries" Height="200" SelectionMode="Single" CurrentCellChanged="gridDataEntries_CurrentCellChanged" SelectedCellsChanged="gridDataEntries_SelectedCellsChanged"  HeadersVisibility="Column" Margin="10" AutoGenerateColumns="True" IsReadOnly="true"  RowBackground="DarkBlue" AlternatingRowBackground="Blue"  Background="Transparent"  Foreground="White">
+                        <DataGrid Grid.Row="1" x:Name="gridDataEntries" AutoGenerateColumns="False" Height="200" SelectionMode="Single" CurrentCellChanged="gridDataEntries_CurrentCellChanged" SelectedCellsChanged="gridDataEntries_SelectedCellsChanged"  HeadersVisibility="Column" Margin="10" IsReadOnly="true"  RowBackground="DarkBlue" AlternatingRowBackground="Blue"  Background="Transparent"  Foreground="White">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Width="80" Header="First Name" Binding="{Binding Path=FirstName}" CanUserSort="True" ></DataGridTextColumn>
+                                <DataGridTextColumn Width="80" Header="Last Name" Binding="{Binding Path=LastName}" CanUserSort="True" ></DataGridTextColumn>
+                                <DataGridTextColumn Width="70" Header="DOB" Binding="{Binding Path=DOB}" CanUserSort="True" ></DataGridTextColumn>
+                                <DataGridTextColumn Width="150" Header="Email" Binding="{Binding Path=Email}" CanUserSort="True" ></DataGridTextColumn>
+                                <DataGridTextColumn Width="80" Header="State" Binding="{Binding Path=State}" CanUserSort="True" ></DataGridTextColumn>
+                                <DataGridTextColumn Width="100" Header="Id" Binding="{Binding Path=Id}" CanUserSort="True" ></DataGridTextColumn>
+                                <DataGridTextColumn Width="100" Header="Entry Hash" Binding="{Binding Path=EntryHash}" CanUserSort="True" ></DataGridTextColumn>
+                                <DataGridTextColumn Width="100" Header="Created Date" Binding="{Binding Path=CreatedDate}" CanUserSort="True" ></DataGridTextColumn>
+                                <DataGridTextColumn Width="100" Header="Created By" Binding="{Binding Path=CreatedBy}" CanUserSort="True" ></DataGridTextColumn>
+                                <DataGridTextColumn Width="100" Header="Modified Date" Binding="{Binding Path=ModifiedDate}" CanUserSort="True" ></DataGridTextColumn>
+                                <DataGridTextColumn Width="100" Header="Modified By" Binding="{Binding Path=ModifiedBy}" CanUserSort="True" ></DataGridTextColumn>
+                                <DataGridTextColumn Width="100" Header="Deleted Date" Binding="{Binding Path=DeletedDate}" CanUserSort="True" ></DataGridTextColumn>
+                                <DataGridTextColumn Width="100" Header="Deleted By" Binding="{Binding Path=DeletedBy}" CanUserSort="True" ></DataGridTextColumn>
+                                <DataGridTextColumn Width="100" Header="Active" Binding="{Binding Path=IsActive}" CanUserSort="True" ></DataGridTextColumn>
+                            </DataGrid.Columns>
                             <DataGrid.Resources>
                                 <Style BasedOn="{StaticResource {x:Type DataGridColumnHeader}}" TargetType="{x:Type DataGridColumnHeader}">
                                     <Setter Property="Background" Value="Blue" />
@@ -1237,7 +1253,8 @@ AutoReverse="False" RepeatBehavior="1x" />
                             </DataGrid.Resources>
                         </DataGrid>
 
-                        <uc:ucHoloNETEntry x:Name="ucHoloNETCollectionEntry" DataContext="{Binding ElementName=gridDataEntries, Path=SelectedItem, Mode=OneWay}"></uc:ucHoloNETEntry>
+                        <uc:ucHoloNETEntry x:Name="ucHoloNETCollectionEntry"></uc:ucHoloNETEntry>
+                        <!--<uc:ucHoloNETEntry x:Name="ucHoloNETCollectionEntry" DataContext="{Binding ElementName=gridDataEntries, Path=SelectedItem, Mode=OneWay}"></uc:ucHoloNETEntry>-->
                     </StackPanel>
 
                     <StackPanel Orientation="Vertical" x:Name="stkpnlInfoHoloNETEntryShared" Visibility="Collapsed">
@@ -1351,6 +1368,7 @@ BlurRadius="10"/>
                             </Button.Triggers>
                         </Button>
 
+                        <!--<Button x:Name="btnDataEntriesPopupUpdateEntryInCollection" IsEnabled="{Binding Path=IsChanged, ElementName=ucHoloNETCollectionEntry}" Visibility="Collapsed" Margin="5" Style="{StaticResource ButtonStyle}" Cursor="Hand" Foreground="WhiteSmoke" Width="170" FontSize="14" Content="Update Entry" Background="{x:Null}" Click="btnDataEntriesPopupUpdateEntryInCollection_Click">-->
                         <Button x:Name="btnDataEntriesPopupUpdateEntryInCollection" IsEnabled="False" Visibility="Collapsed" Margin="5" Style="{StaticResource ButtonStyle}" Cursor="Hand" Foreground="WhiteSmoke" Width="170" FontSize="14" Content="Update Entry" Background="{x:Null}" Click="btnDataEntriesPopupUpdateEntryInCollection_Click">
                             <Button.Effect>
                                 <DropShadowEffect x:Name="btnDataEntriesPopupUpdateEntryInCollectionEffect" ShadowDepth="0"

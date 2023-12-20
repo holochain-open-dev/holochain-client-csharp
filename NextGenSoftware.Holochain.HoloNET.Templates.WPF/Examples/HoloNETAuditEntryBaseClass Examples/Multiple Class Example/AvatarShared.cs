@@ -1,6 +1,6 @@
 ﻿
 using NextGenSoftware.Holochain.HoloNET.Client;
-using NextGenSoftware.Holochain.HoloNET.ORM;
+using NextGenSoftware.Holochain.HoloNET.ORM.Entries;
 using System;
 
 namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
@@ -33,7 +33,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
             {
                 if (_firstName != value) 
                 {
-                    IsChanged = true;
+                   // IsChanged = true;
                     _firstName = value;
                 }
             }
