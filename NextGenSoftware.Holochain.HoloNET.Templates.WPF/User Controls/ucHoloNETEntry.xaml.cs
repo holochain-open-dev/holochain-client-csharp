@@ -67,8 +67,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls
         {
             get
             {
-                string[] parts = DOB.Split('/');
-                
+                //string[] parts = DOB.Split('/');
+                string[] parts = txtHoloNETEntryDOB.Text.Split('/');
+
                 try
                 {
                     return new DateTime(Convert.ToInt32(parts[2]), Convert.ToInt32(parts[1]), Convert.ToInt32(parts[0]));
