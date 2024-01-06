@@ -17,112 +17,21 @@
 	  <Authors>David Ellams (NextGen Software Ltd)</Authors>
 	  <PackageTags>holochain;net;unity</PackageTags>
 	  <PackageReleaseNotes>
-		  This release includes multiple bug fixes and improvements such as now being able to pass in additional custom params (that will be passed to your zome functions in your hApp rust code) to all Load/LoadAsync and Delete/DeleteAsync methods in HoloNETEntryBassClass and HoloNETAuditEntryBassClass derived classes.
-
-		  It also allows the version to be specified in all Load/LoadAsync methods in HoloNETAuditEntryBassClass derived classes. If version is 0 (default), it will load the latest.
-
-		  The non reflective Save/SaveAsync methods (you pass in your own paramsObject) in HoloNETAuditEntryBassClass derived classes now have the same auditing capabilities as their reflective cousins (auto generates the dynamic paramsObject from the properties (that have the HolochainFieldName attribute defined) defined in the derived classes). This upgrade is also fully customisable so for instance the audit param names defined in your rust zome function in your hApp can be overridden if you desire.
-
-		  There is also a BIG performance improvement in this release with the upgrade to the latest .NET version (7) which features many improvements such as security and performance. This is the fastest .NET yet! Check out these links for more info:
-
-		  https://learn.microsoft.com/en-us/dotnet/core/whats-new/dotnet-7
-		  https://devblogs.microsoft.com/dotnet/performance_improvements_in_net_7/
-		  https://devblogs.microsoft.com/dotnet/dotnet-7-networking-improvements/
-		  https://devclass.com/2022/09/01/faster-net-in-version-7-500-performance-improvements-detailed/
-
-		  Finally, the README/documentation has been updated and fixes have been made to the links/TOC and more...
+		  This release is a MAJOR release and milestone, HoloNET has been re-written from the ground up with many improvements, bug fixes etc. Part of this includes making it compatible with the latest beta version of Holochain.
 
 		  *Full Changes Below:*
 
-		  https://github.com/holochain-open-dev/holochain-client-csharp/commit/83bc3beb71eb714805b02c1250ba600049372f2b
+		  *Full Changelog:* https://github.com/holochain-open-dev/holochain-client-csharp/compare/v2.2.0...v3.0.0
 
-		  - Added useReflectionToMapKeyValuePairResponseOntoEntryDataObject param to SaveAsync and Save override methods in Avatar class in HoloNET Test Harness.
-
-		  https://github.com/holochain-open-dev/holochain-client-csharp/commit/d8e97847bfce40d8b7a53162bfd77960c89093ed
-
-		  - Added new additionalParams &amp; customFieldToLoadByName params to LoadAsync method overloads in HoloNETEntryBaseClass.
-
-		  - Added new additionalParams &amp; customFieldToLoadByName params to Load method overloads in HoloNETEntryBaseClass.
-
-		  - Added new additionalParams &amp; customFieldToDeleteByName params to DeleteAsync method in HoloNETEntryBaseClass.
-
-		  - Added new additionalParams &amp; customFieldToDeleteByName params to Delete method in HoloNETEntryBaseClass.
-
-		  - Updated IHoloNETEntryBaseClass interface to reflect the latest changes above.
-
-		  https://github.com/holochain-open-dev/holochain-client-csharp/commit/1efb044cb9a1a5fd84f31754f6de137de44ca1dd
-
-		  - Added new overloads to Load and LoadAsync methods to HoloNETAuditEntryBaseClass that add an optional version param allowing the version of the Holochain Entry to be passed in. If 0 is passed (default) it will load the latest version.
-
-		  - Added intelisense documentation to HoloNETAuditEntryBaseClass to reflect the above changes.
-
-		  - Updated the README.md documentation to reflect the above changes.
-
-		  https://github.com/holochain-open-dev/holochain-client-csharp/commit/73100761371ba0a7950abc1be1af409c8c38fec2
-
-		  Lots done upgrading the audit capabilities of HoloNET via the HoloNETAutditEntryBaseClass!
-
-		  - Updated SaveAsync and Save methods in HoloNETAuditEntryBaseClass.
-
-		  - Added new SaveAsync and Save method overloads to HoloNETAuditEntryBaseClass that take the paramsObject and allow the audit data to be auto-generated and fully customised etc.
-
-		  - Added new generic function ProcessAuditDataAsync to HoloNETAuditEntryBaseClass.
-
-		  - Added new generic function ProcessAuditRustParams to HoloNETAuditEntryBaseClass.
-
-		  - Renamed holochainFieldsIsEnabledKeyValuePair to holochainFieldsIsEnabledKeyValuePairs in HoloNETEntyBaseClass.
-
-		  - Updated SaveAsync method in HoloNETEntyBaseClass so the update logic is now done in the updated SaveAsync overloads that takes a paramObject.
-
-		  - Updated the SaveAsync/Save methods that do not use reflection (uses paramsObject) to now fully support update param auto field generation. Added autoGeneratUpdatedEntryObjectAndOriginalEntryHashRustParams, updatedEntryRustParamName &amp; originalEntryHashRustParamName params along with summay/intelisense documentation.
-
-		  - Updated IHoloNETEntryBaseClass interface to reflect above changes.
-
-		  - Started upgrading HoloNET to the latest .NET 7 which brings many improvements especially around performance.
-
-		  - Added missing useReflectionToMapKeyValuePairResponseOntoEntryDataObject param to SaveAsync/Save methods in Avatar test object in HoloNET Test Harness.
-
-		  - Updated README.md/documentation to reflect some of the changes above.
-
-		  https://github.com/holochain-open-dev/holochain-client-csharp/commit/e9b97633537efeffbb7deec2e955f46d69a44564
-
-		  - Added NextGenSoftware.CLI.Engine to the HoloNET solution so all dependencies can be worked on at the same time as well as allow full stack debugging etc.
-
-		  - Updated README.md/documentation to now include the additional improvements made to the Save and SaveAsync methods.
-
-		  - Upgraded NextGenSoftware.CLI.Engine to .NET 7.
-
-		  - Updated NextGenSoftware.CLI.Engine Release Notes.
-
-		  - Bumped NextGenSoftware.CLI.Engine to v 1.2.0.
-
-		  https://github.com/holochain-open-dev/holochain-client-csharp/commit/05eebdcb3e4b4e4a5cb49706c2236ac7ea825cf6
-
-		  - Updated HoloNET Release Notes.
-
-		  - Bumped HoloNET to v 2.2.0
-
-		  - Updated HoloNET Test Harness Release Notes.
-
-		  - Bumped HoloNET Test Harness to v2.2.0.
-
-		  https://github.com/holochain-open-dev/holochain-client-csharp/commit/2c087ca9c2fdc21110c8ce60259d61c9c293c26b
-
-		  - Improved summary/intelisense documentation for Save/SaveAsync methods in HoloNETEntryBaseClass &amp; HoloNETAuditEntryBaseClass.
-
-		  - Updated README.md/documentation with many changes including fixes to TOC, links and more.
-
-		  *Full Changelog:* https://github.com/holochain-open-dev/holochain-client-csharp/compare/v2.1.4...v2.2.0
-		  
 	  </PackageReleaseNotes>
 	  <RepositoryType>git</RepositoryType>
 	  <RepositoryUrl>https://github.com/holochain-open-dev/holochain-client-csharp</RepositoryUrl>
-	  <Copyright>Copyright © NextGen Software Ltd 2023</Copyright>
+	  <Copyright>Copyright © NextGen Software Ltd 2024</Copyright>
 	  <PackageReadmeFile>README.md</PackageReadmeFile>
 	  <!--<PackageLicenseExpression>GNU GPLv3</PackageLicenseExpression>-->
 	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
 	  <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-	  <Version>2.2.0</Version>
+	  <Version>3.0.0</Version>
 	  <!--<PackageLicenseFile>..\LICENSE</PackageLicenseFile>-->
 
 	  <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>

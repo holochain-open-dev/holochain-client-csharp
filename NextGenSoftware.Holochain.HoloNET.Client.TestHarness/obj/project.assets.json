@@ -736,7 +736,7 @@
           "bin/placeholder/NextGenSoftware.CLI.Engine.dll": {}
         }
       },
-      "NextGenSoftware.Holochain.HoloNET.Client/2.2.0": {
+      "NextGenSoftware.Holochain.HoloNET.Client/3.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v8.0",
         "dependencies": {
@@ -3032,7 +3032,7 @@
       "path": "../../NextGenSoftware-Libraries/NextGenSoftware Libraries/NextGenSoftware.CLI.Engine/NextGenSoftware.CLI.Engine.csproj",
       "msbuildProject": "../../NextGenSoftware-Libraries/NextGenSoftware Libraries/NextGenSoftware.CLI.Engine/NextGenSoftware.CLI.Engine.csproj"
     },
-    "NextGenSoftware.Holochain.HoloNET.Client/2.2.0": {
+    "NextGenSoftware.Holochain.HoloNET.Client/3.0.0": {
       "type": "project",
       "path": "../NextGenSoftware.Holochain.HoloNET.Client.Core/NextGenSoftware.Holochain.HoloNET.Client.csproj",
       "msbuildProject": "../NextGenSoftware.Holochain.HoloNET.Client.Core/NextGenSoftware.Holochain.HoloNET.Client.csproj"
@@ -3055,7 +3055,7 @@
   },
   "projectFileDependencyGroups": {
     "net8.0": [
-      "NextGenSoftware.Holochain.HoloNET.Client >= 2.2.0"
+      "NextGenSoftware.Holochain.HoloNET.Client >= 3.0.0"
     ]
   },
   "packageFolders": {
