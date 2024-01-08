@@ -414,6 +414,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
         }
 
+        public bool IsConnecting { get; set; }
+        public bool IsDisconnecting { get; set; }
+
         /// <summary>
         /// This property is a shortcut to the EndPoint property on the WebSocket property.
         /// </summary>
@@ -585,6 +588,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         {
             try
             {
+                if (IsConnecting)
+                    return;
+
+                IsConnecting = true;
+
                 _getAgentPubKeyAndDnaHashFromConductor = retrieveAgentPubKeyAndDnaHashFromConductor;
                 _taskCompletionReadyForZomeCalls = new TaskCompletionSource<ReadyForZomeCallsEventArgs>();
                 _taskCompletionAgentPubKeyAndDnaHashRetrieved = new TaskCompletionSource<AgentPubKeyDnaHash>(); //TODO: Need to init all of these in the code base for each call! ;-)
@@ -1369,6 +1377,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public async Task DisconnectAsync(DisconnectedCallBackMode disconnectedCallBackMode = DisconnectedCallBackMode.WaitForHolochainConductorToDisconnect, ShutdownHolochainConductorsMode shutdownHolochainConductorsMode = ShutdownHolochainConductorsMode.UseHoloNETDNASettings)
         {
+            if (IsDisconnecting)
+                return;
+
+            IsDisconnecting = true;
             _taskCompletionDisconnected = new TaskCompletionSource<DisconnectedEventArgs>();
 
             _shutdownHolochainConductorsMode = shutdownHolochainConductorsMode;
@@ -1677,15 +1689,16 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             {
                 _taskCompletionZomeCallBack[id] = new TaskCompletionSource<ZomeFunctionCallBackEventArgs>();
 
-                if (WebSocket.State == WebSocketState.Closed || WebSocket.State == WebSocketState.None)
+                //if (WebSocket.State == WebSocketState.Closed || WebSocket.State == WebSocketState.None)
+                if (WebSocket.State != WebSocketState.Open && WebSocket.State != WebSocketState.Connecting)
                     await ConnectAsync();
 
                 if (!IsReadyForZomesCalls)
                 {
                     if (zomeResultCallBackMode == ConductorResponseCallBackMode.WaitForHolochainConductorResponse)
-                        await _taskCompletionReadyForZomeCalls.Task;
+                        await WaitTillReadyForZomeCallsAsync();
                     else
-                        return new ZomeFunctionCallBackEventArgs() { EndPoint = EndPoint, Id = id, Zome = zome, ZomeFunction = function, IsError = true, Message = "HoloNET is not ready to make zome calls yet, please wait till the ReadyForZomeCalls event is fired before attempting to make a zome call." };
+                       return new ZomeFunctionCallBackEventArgs() { EndPoint = EndPoint, Id = id, Zome = zome, ZomeFunction = function, IsError = true, Message = "HoloNET is not ready to make zome calls yet, please wait till the ReadyForZomeCalls event is fired before attempting to make a zome call." };
                 }
 
                 if (string.IsNullOrEmpty(HoloNETDNA.DnaHash))
@@ -3733,6 +3746,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         {
             try
             {
+                IsConnecting = false;
                 OnConnected?.Invoke(this, new ConnectedEventArgs { EndPoint = e.EndPoint });
 
                 //If the AgentPubKey & DnaHash have already been retrieved from the hc sandbox command then raise the OnReadyForZomeCalls event.
@@ -3787,6 +3801,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     WebSocket.ClientWebSocket = null;
                 }
 
+                IsDisconnecting = false;
                 OnDisconnected?.Invoke(this, e);
                 ShutDownHolochainConductorsAsync(_shutdownHolochainConductorsMode);
             }

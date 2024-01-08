@@ -957,7 +957,8 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM.Entries
                     HoloNETClient.OnError += HoloNETClient_OnError;
                     HoloNETClient.OnReadyForZomeCalls += HoloNETClient_OnReadyForZomeCalls;
 
-                    if (HoloNETClient.WebSocket.State != System.Net.WebSockets.WebSocketState.Connecting || HoloNETClient.WebSocket.State != System.Net.WebSockets.WebSocketState.Open)
+                    //if (!HoloNETClient.IsConnecting && (HoloNETClient.WebSocket.State != System.Net.WebSockets.WebSocketState.Connecting || HoloNETClient.WebSocket.State != System.Net.WebSockets.WebSocketState.Open))
+                    if (!HoloNETClient.IsConnecting)
                         await HoloNETClient.ConnectAsync(HoloNETClient.EndPoint, connectedCallBackMode, retrieveAgentPubKeyAndDnaHashMode, retrieveAgentPubKeyAndDnaHashFromConductor, retrieveAgentPubKeyAndDnaHashFromSandbox, automaticallyAttemptToRetrieveFromConductorIfSandBoxFails, automaticallyAttemptToRetrieveFromSandBoxIfConductorFails, updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved);
                 }
                 else
