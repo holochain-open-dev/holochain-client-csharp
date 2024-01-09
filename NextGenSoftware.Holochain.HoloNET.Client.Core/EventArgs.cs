@@ -11,6 +11,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public HoloNETResponseType HoloNETResponseType { get; set; }
     }
 
+    public class HoloNETConnectEventArgs : CallBackBaseEventArgs
+    {
+        public bool IsConnected { get; set; }
+    }
+
     public class HoloNETErrorEventArgs : EventArgs
     {
         public Uri EndPoint { get; set; }
