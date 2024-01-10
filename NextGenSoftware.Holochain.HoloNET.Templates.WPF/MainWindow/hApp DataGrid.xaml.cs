@@ -7,7 +7,7 @@ using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Models;
 namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// //NOTE: EVERY method on HoloNETClient can be called either async or non-async, in these examples we are using a mixture of async and non-async. Normally you would use async because it is less code and easier to follow but we wanted to test and demo both versions (and show how you would use non async as well as async versions)...
     /// </summary>
     public partial class MainWindow : Window
     {

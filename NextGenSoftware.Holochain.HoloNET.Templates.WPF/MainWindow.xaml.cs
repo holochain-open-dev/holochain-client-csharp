@@ -4,11 +4,14 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
 using Microsoft.Win32;
 using NextGenSoftware.Holochain.HoloNET.Client;
 using NextGenSoftware.Holochain.HoloNET.ORM.Collections;
 using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Enums;
 using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Models;
+using NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls;
 
 namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
 {
@@ -57,7 +60,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            Init();
+            InitUI();
+            InitHoloNETClientAdmin();
         }
 
         private void MainWindow_Unloaded(object sender, RoutedEventArgs e)
@@ -190,6 +194,61 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
         {
             if (gridLog.ActualHeight - 60 > 0)
                 lstOutput.Height = gridLog.ActualHeight - 60;
+        }
+
+        private void InitUI()
+        {
+            ucHoloNETCollectionEntry.txtHoloNETEntryFirstName.TextChanged += TxtHoloNETEntryFirstName_TextChanged;
+            ucHoloNETCollectionEntry.txtHoloNETEntryLastName.TextChanged += TxtHoloNETEntryLastName_TextChanged;
+            ucHoloNETCollectionEntry.txtHoloNETEntryDOB.TextChanged += TxtHoloNETEntryDOB_TextChanged;
+            ucHoloNETCollectionEntry.txtHoloNETEntryEmail.TextChanged += TxtHoloNETEntryEmail_TextChanged;
+
+            ucHoloNETCollectionEntryInternal.txtHoloNETEntryFirstName.TextChanged += TxtHoloNETEntryInternalFirstName_TextChanged;
+            ucHoloNETCollectionEntryInternal.txtHoloNETEntryLastName.TextChanged += TxtHoloNETEntryInternalLastName_TextChanged;
+            ucHoloNETCollectionEntryInternal.txtHoloNETEntryDOB.TextChanged += TxtHoloNETEntryInternalDOB_TextChanged;
+            ucHoloNETCollectionEntryInternal.txtHoloNETEntryEmail.TextChanged += TxtHoloNETEntryInternalEmail_TextChanged;
+        }
+
+        private void ShowStatusMessage(string message, StatusMessageType type = StatusMessageType.Information, bool showSpinner = false, ucHoloNETEntry ucHoloNETEntry = null)
+        {
+            txtStatus.Text = $"{message}";
+
+            switch (type)
+            {
+                case StatusMessageType.Success:
+                    txtStatus.Foreground = Brushes.LightGreen;
+                    break;
+
+                case StatusMessageType.Information:
+                    txtStatus.Foreground = Brushes.White;
+                    break;
+
+                case StatusMessageType.Error:
+                    txtStatus.Foreground = Brushes.LightSalmon;
+                    break;
+            }
+
+            if (showSpinner)
+                spinner.Visibility = Visibility.Visible;
+            else
+                spinner.Visibility = Visibility.Hidden;
+
+            if (ucHoloNETEntry != null)
+                ucHoloNETEntry.ShowStatusMessage(message, type, showSpinner);
+
+            sbAnimateStatus.Begin();
+        }
+
+        private void LogMessage(string message)
+        {
+            lstOutput.Items.Add(message);
+
+            if (VisualTreeHelper.GetChildrenCount(lstOutput) > 0)
+            {
+                Border border = (Border)VisualTreeHelper.GetChild(lstOutput, 0);
+                ScrollViewer scrollViewer = (ScrollViewer)VisualTreeHelper.GetChild(border, 0);
+                scrollViewer.ScrollToBottom();
+            }
         }
     }
 }

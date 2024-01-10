@@ -7,7 +7,7 @@ using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Enums;
 namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// //NOTE: EVERY method on HoloNETClient can be called either async or non-async, in these examples we are using a mixture of async and non-async. Normally you would use async because it is less code and easier to follow but we wanted to test and demo both versions (and show how you would use non async as well as async versions)...
     /// </summary>
     public partial class MainWindow : Window
     {
@@ -23,9 +23,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
                 //If we are using SaveAsync (or LoadAsync) we do not need to worry about any events such as OnSaved if you don't need them.
                 _holoNETEntryShared[CurrentApp.Name].OnInitialized += _holoNETEntryShared_OnInitialized;
                 _holoNETEntryShared[CurrentApp.Name].OnLoaded += _holoNETEntryShared_OnLoaded;
-                _holoNETEntryShared[CurrentApp.Name].OnClosed += _holoNETEntryShared_OnClosed;
                 _holoNETEntryShared[CurrentApp.Name].OnSaved += _holoNETEntryShared_OnSaved;
                 _holoNETEntryShared[CurrentApp.Name].OnDeleted += _holoNETEntryShared_OnDeleted;
+                _holoNETEntryShared[CurrentApp.Name].OnClosed += _holoNETEntryShared_OnClosed;
                 _holoNETEntryShared[CurrentApp.Name].OnError += _holoNETEntryShared_OnError;
             }
             else
@@ -261,6 +261,46 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
             //lblNewEntryValidationErrors.Visibility = Visibility.Hidden;
             ucHoloNETCollectionEntry.HideStatusMessage();
             popupDataEntries.Visibility = Visibility.Collapsed;
+        }
+
+        private void _holoNETEntryShared_OnInitialized(object sender, ReadyForZomeCallsEventArgs e)
+        {
+            ShowStatusMessage($"HoloNET Data Entry (Shared) Initialized", StatusMessageType.Success);
+            LogMessage($"APP: HoloNET Data Entry (Shared) Initialized.");
+        }
+
+        private void _holoNETEntryShared_OnLoaded(object sender, ZomeFunctionCallBackEventArgs e)
+        {
+            ShowStatusMessage($"HoloNET Data Entry (Shared) Loaded", StatusMessageType.Success);
+            LogMessage($"APP: HoloNET Data Entry (Shared) Loaded: {GetEntryInfo(e)}");
+        }
+
+        private void _holoNETEntryShared_OnSaved(object sender, ZomeFunctionCallBackEventArgs e)
+        {
+            ShowStatusMessage($"HoloNET Data Entry (Shared) Saved", StatusMessageType.Success);
+            LogMessage($"APP: HoloNET Data Entry (Shared) Saved: {GetEntryInfo(e)}");
+        }
+
+        private void _holoNETEntryShared_OnDeleted(object sender, ZomeFunctionCallBackEventArgs e)
+        {
+            ShowStatusMessage($"HoloNET Data Entry (Shared) Deleted", StatusMessageType.Success);
+            LogMessage($"APP: HoloNET Data Entry (Shared) Deleted: {GetEntryInfo(e)}");
+        }
+
+        private void _holoNETEntryShared_OnClosed(object sender, HoloNETShutdownEventArgs e)
+        {
+            ShowStatusMessage($"HoloNET Data Entry (Shared) Closed", StatusMessageType.Success);
+
+            if (e.HolochainConductorsShutdownEventArgs != null)
+                LogMessage($"APP: HoloNET Data Entry (Shared) Closed: Number Of Holochain Exe Instances Shutdown: {e.HolochainConductorsShutdownEventArgs.NumberOfHolochainExeInstancesShutdown}, Number Of Hc Exe Instances Shutdown: {e.HolochainConductorsShutdownEventArgs.NumberOfHcExeInstancesShutdown}, Number Of Rustc Exe Instances Shutdown: {e.HolochainConductorsShutdownEventArgs.NumberOfRustcExeInstancesShutdown}");
+            else
+                LogMessage($"APP: HoloNET Data Entry (Shared) Closed: Number Of Holochain Exe Instances Shutdown: 0, Number Of Hc Exe Instances Shutdown: 0, Number Of Rustc Exe Instances Shutdown: 0");
+        }
+
+        private void _holoNETEntryShared_OnError(object sender, HoloNETErrorEventArgs e)
+        {
+            ShowStatusMessage($"HoloNET Data Entry (Shared) Error", StatusMessageType.Error);
+            LogMessage($"APP: HoloNET Data Entry (Shared) Error: {e.Reason}");
         }
     }
 }
