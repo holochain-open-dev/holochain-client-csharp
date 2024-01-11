@@ -9,91 +9,11 @@
         Title="NextGen Software HoloNET WPF Test Harness v1.0" Height="770" Width="1650">
 
     <Window.Resources>
-        <!-- This style is used for buttons, to remove the WPF default 'animated' mouse over effect -->
-        <Style x:Key="MyButtonStyle" TargetType="Button">
-            <Setter Property="OverridesDefaultStyle" Value="True"/>
-            <Setter Property="Margin" Value="5"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border Name="border" 
-                        BorderThickness="1"
-                        Padding="4,2" 
-                        BorderBrush="DarkGray" 
-                        CornerRadius="3" 
-                        Background="{TemplateBinding Background}">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="border" Property="BorderBrush" Value="Black" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <Style x:Key="ButtonFocusVisual">
-            <Setter Property="Control.Template">
-                <Setter.Value>
-                    <ControlTemplate>
-                        <Border>
-                            <Rectangle Margin="2"
-                     StrokeThickness="1"
-                     Stroke="#60000000"
-                     StrokeDashArray="1 2" />
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-
-        <Style x:Key="ButtonStyle" TargetType="Button">
-            <Setter Property="SnapsToDevicePixels"
-          Value="true" />
-            <Setter Property="OverridesDefaultStyle"
-          Value="true" />
-            <Setter Property="FocusVisualStyle"
-          Value="{StaticResource ButtonFocusVisual}" />
-            <Setter Property="MinHeight"
-          Value="23" />
-            <Setter Property="MinWidth"
-          Value="75" />
-            <Setter Property="BorderBrush">
-                <Setter.Value>
-                    <SolidColorBrush Color="White"/>
-                </Setter.Value>
-            </Setter>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Grid Cursor="Hand">
-                            <Border x:Name="border" Background="Transparent" BorderBrush="{TemplateBinding BorderBrush}" Cursor="Hand" BorderThickness="0.8" CornerRadius="5">
-                                <Border.Effect>
-                                    <DropShadowEffect x:Name="buttonGlowEffect" Opacity="1" Color="LightBlue" BlurRadius="20"/>
-                                </Border.Effect>
-
-                                <TextBlock Margin="10" x:Name="text" Cursor="Hand" Foreground="{TemplateBinding BorderBrush}" FontSize="{TemplateBinding FontSize}" Text="{TemplateBinding Content}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            </Border>
-                        </Grid>
-
-
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsEnabled" Value="false">
-                                <Setter Property="Background" TargetName="border" Value="Gray"/>
-                            </Trigger>
-                            <Trigger Property="IsMouseOver" Value="true">
-                                <Setter Property="Foreground" TargetName="text" Value="White"/>
-                                <Setter Property="BorderBrush" TargetName="border" Value="White"/>
-                            </Trigger>
-
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/NextGenSoftware.Holochain.HoloNET.Templates.WPF;component/Resources/Resources.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Window.Resources>
 
     <Grid>
@@ -121,7 +41,7 @@
                 </Label.Effect>
             </Label>
             <StackPanel Orientation="Horizontal">
-                <CheckBox x:Name="chkShowDetailedMessages" Content="Show Detailed Logs" Margin="20" Foreground="White"></CheckBox>
+                <CheckBox x:Name="chkShowDetailedMessages" Content="Show Detailed Logs" Margin="20" Foreground="White" Checked="chkShowDetailedMessages_Checked" Unchecked="chkShowDetailedMessages_Unchecked"></CheckBox>
                 <!--<Button x:Name="btnStartDemo" Cursor="Hand" FontSize="12" Style="{StaticResource ButtonStyle}"  Content="Start Demo" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnStartDemo_Click">
                     <Button.Effect>
                         <DropShadowEffect x:Name="btnStartDemoGlowEffect" ShadowDepth="0"
@@ -492,7 +412,7 @@
 
         </StackPanel>
 
-        <DataGrid Grid.Row="1" x:Name="gridHapps"  HeadersVisibility="Column" Margin="10" AutoGenerateColumns="False" IsReadOnly="true"  RowBackground="DarkBlue" AlternatingRowBackground="Blue"  Background="Transparent"  Foreground="White">
+        <DataGrid Grid.Row="1" x:Name="gridHapps" SelectedCellsChanged="gridHapps_SelectedCellsChanged" HeadersVisibility="Column" Margin="10" AutoGenerateColumns="False" IsReadOnly="true"  RowBackground="DarkBlue" AlternatingRowBackground="Blue"  Background="Transparent"  Foreground="White">
             <DataGrid.Resources>
                 <Style BasedOn="{StaticResource {x:Type DataGridColumnHeader}}" TargetType="{x:Type DataGridColumnHeader}">
                     <Setter Property="Background" Value="Blue" />
@@ -812,7 +732,10 @@ BlurRadius="10"/>
             </TextBlock>
         </Grid>
 
-        <Grid x:Name="popupAdminURI" Grid.Row="0" Opacity="0.9" Grid.RowSpan="6" Visibility="Visible">
+
+        <uc:ucConductorSettingsPopup x:Name="ucConductorSettingsPopup" Grid.Row="0" Opacity="0.9" Grid.RowSpan="6" Visibility="Visible"></uc:ucConductorSettingsPopup>
+        
+        <!--<Grid x:Name="popupAdminURI" Grid.Row="0" Opacity="0.9" Grid.RowSpan="6" Visibility="Visible">
             <Grid Background="Transparent" Opacity="0.5"/>
             <Border
             MinWidth="350"
@@ -838,11 +761,11 @@ BlurRadius="10"/>
                         <TextBox MinWidth="25" HorizontalAlignment="Center" VerticalAlignment="Center" Text="5" Margin="10" FontSize="14" x:Name="txtSecondsToWaitForConductorToStart"/>
                         <TextBlock x:Name="txtSecondsToWaitForConductorToStartError" FontWeight="Bold" FontSize="14" HorizontalAlignment="Center" Visibility="Hidden" Background="Transparent" Text="Enter a valid number." Foreground="Red"></TextBlock>
 
-                        <!--<Popup x:Name="popupSecondsToWaitForConductorToStart" HorizontalAlignment="Center"  IsOpen="False">
+                        --><!--<Popup x:Name="popupSecondsToWaitForConductorToStart" HorizontalAlignment="Center"  IsOpen="False">
                             <Border HorizontalAlignment="Center" >
                                 <TextBlock x:Name="txtSecondsToWaitForConductorToStart" HorizontalAlignment="Center" Background="Transparent" Text="Enter a valid number." Foreground="Red"></TextBlock>
                             </Border>
-                        </Popup>-->
+                        </Popup>--><!--
                     </StackPanel>
 
                     <StackPanel Margin="10" Orientation="Horizontal" HorizontalAlignment="Center">
@@ -915,7 +838,7 @@ BlurRadius="10"/>
                     </StackPanel>
                 </StackPanel>
             </Border>
-        </Grid>
+        </Grid>-->
 
         <!-- It's important that this is in the end of the XAML as it needs to be on top of everything else! -->
         <Grid x:Name="popupInstallhApp" Grid.Row="0" Opacity="0.9" Grid.RowSpan="6" Visibility="Collapsed" >

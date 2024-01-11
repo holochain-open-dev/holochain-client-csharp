@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
@@ -8,7 +6,6 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using Microsoft.Win32;
 using NextGenSoftware.Holochain.HoloNET.Client;
-using NextGenSoftware.Holochain.HoloNET.ORM.Collections;
 using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Enums;
 using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Models;
 using NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls;
@@ -20,36 +17,36 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
     /// </summary>
     public partial class MainWindow : Window
     {
-        private const string _holoNETEntryDemoHappPath = @"E:\hc\holochain-holochain-0.1.5\happs\oasis\BUILD\happ\oasis.happ";
-        //private const string _holoNETCollectionDemoHappPath = @"E:\hc\holochain-holochain-0.1.5\happs\oasis-holonet-collection\BUILD\happ\oasis.happ";
-        private const string _holoNETCollectionDemoHappPath = @"E:\hc\holochain-holochain-0.1.5\happs\oasis\BUILD\happ\oasis.happ";
-        private const string _holoNETEntryDemoAppId = "oasis-holonet-entry-demo-app";
-        private const string _holoNETCollectionDemoAppId = "oasis-holonet-collection-demo-app";
-        private const string _role_name = "oasis";
-        private HoloNETClient? _holoNETClientAdmin;
-        private List<HoloNETClient> _holoNETappClients = new List<HoloNETClient>();
-        private bool _rebooting = false;
-        private bool _adminDisconnected = false;
-       // private bool _appDisconnected = false;
-        private string _installinghAppName = "";
-        private string _installinghAppPath = "";
-        private byte[][] _installingAppCellId = null;
-        dynamic _paramsObject = null;
-        private int _clientsToDisconnect = 0;
-        private int _clientsDisconnected = 0;
-        private Avatar _holoNETEntry;
-        private Dictionary<string, AvatarShared> _holoNETEntryShared = new Dictionary<string, AvatarShared>();
-        private ClientOperation _clientOperation;
-        private ushort _appAgentClientPort = 0;
-        private bool _removeClientConnectionFromPoolAfterDisconnect = true;
-        private bool _initHoloNETEntryDemo = false;
-        private bool _showAppsListedInLog = true;
-        private AvatarShared _currentAvatar;
+        // private const string _holoNETEntryDemoHappPath = @"E:\hc\holochain-holochain-0.1.5\happs\oasis\BUILD\happ\oasis.happ";
+        // //private const string _holoNETCollectionDemoHappPath = @"E:\hc\holochain-holochain-0.1.5\happs\oasis-holonet-collection\BUILD\happ\oasis.happ";
+        // private const string _holoNETCollectionDemoHappPath = @"E:\hc\holochain-holochain-0.1.5\happs\oasis\BUILD\happ\oasis.happ";
+        // private const string _holoNETEntryDemoAppId = "oasis-holonet-entry-demo-app";
+        // private const string _holoNETCollectionDemoAppId = "oasis-holonet-collection-demo-app";
+        // private const string _role_name = "oasis";
+        // private HoloNETClient? _holoNETClientAdmin;
+        // private List<HoloNETClient> _holoNETappClients = new List<HoloNETClient>();
+        // private bool _rebooting = false;
+        // private bool _adminDisconnected = false;
+        //// private bool _appDisconnected = false;
+        // private string _installinghAppName = "";
+        // private string _installinghAppPath = "";
+        // private byte[][] _installingAppCellId = null;
+        // dynamic _paramsObject = null;
+        // private int _clientsToDisconnect = 0;
+        // private int _clientsDisconnected = 0;
+        // private Avatar _holoNETEntry;
+        // private Dictionary<string, AvatarShared> _holoNETEntryShared = new Dictionary<string, AvatarShared>();
+        // private ClientOperation _clientOperation;
+        // private ushort _appAgentClientPort = 0;
+        // private bool _removeClientConnectionFromPoolAfterDisconnect = true;
+        // private bool _initHoloNETEntryDemo = false;
+        // private bool _showAppsListedInLog = true;
+        //private AvatarShared _currentAvatar;
 
-        public ObservableCollection<InstalledApp> InstalledApps { get; set; } = new ObservableCollection<InstalledApp>();
-        public Dictionary<string, HoloNETObservableCollection<AvatarShared>> HoloNETEntriesShared { get; set; } = new Dictionary<string, HoloNETObservableCollection<AvatarShared>>();
-        public HoloNETObservableCollection<Avatar> HoloNETEntries { get; set; }
-        public InstalledApp CurrentApp { get; set; }
+        //public ObservableCollection<InstalledApp> InstalledApps { get; set; } = new ObservableCollection<InstalledApp>();
+        //public Dictionary<string, HoloNETObservableCollection<AvatarShared>> HoloNETEntriesShared { get; set; } = new Dictionary<string, HoloNETObservableCollection<AvatarShared>>();
+        //public HoloNETObservableCollection<Avatar> HoloNETEntries { get; set; }
+        //public InstalledApp CurrentApp { get; set; }
 
         public MainWindow()
         {
@@ -61,56 +58,19 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             InitUI();
-            InitHoloNETClientAdmin();
+            HoloNETManager.Instance.BootHoloNETManager();
         }
 
         private void MainWindow_Unloaded(object sender, RoutedEventArgs e)
         {
-            if (HoloNETEntries != null)
-            {
-                HoloNETEntries.OnClosed -= HoloNETEntries_OnClosed;
-                HoloNETEntries.OnCollectionLoaded -= HoloNETEntries_OnCollectionLoaded;
-                HoloNETEntries.OnCollectionSaved -= HoloNETEntries_OnCollectionSaved;
-                HoloNETEntries.OnError -= HoloNETEntries_OnError;
-                HoloNETEntries.OnHoloNETEntryAddedToCollection -= HoloNETEntries_OnHoloNETEntryAddedToCollection;
-                HoloNETEntries.OnHoloNETEntryRemovedFromCollection -= HoloNETEntries_OnHoloNETEntryRemovedFromCollection;
-            }
+            HoloNETManager.Instance.ShutdownHoloNETManager();
 
-            if (HoloNETEntriesShared != null)
+            if (ucHoloNETCollectionEntryInternal != null)
             {
-                foreach (string key in HoloNETEntriesShared.Keys)
-                {
-                    HoloNETEntriesShared[key].OnInitialized -= HoloNETEntriesShared_OnInitialized;
-                    HoloNETEntriesShared[key].OnCollectionLoaded -= HoloNETEntriesShared_OnCollectionLoaded;
-                    HoloNETEntriesShared[key].OnCollectionSaved -= HoloNETEntriesShared_OnCollectionSaved;
-                    HoloNETEntriesShared[key].OnHoloNETEntryAddedToCollection -= HoloNETEntriesShared_OnHoloNETEntryAddedToCollection;
-                    HoloNETEntriesShared[key].OnHoloNETEntryRemovedFromCollection -= HoloNETEntriesShared_OnHoloNETEntryRemovedFromCollection;
-                    HoloNETEntriesShared[key].OnClosed -= HoloNETEntriesShared_OnClosed;
-                    HoloNETEntriesShared[key].OnError -= HoloNETEntriesShared_OnError;
-                }
-            }
-
-            if (_holoNETEntryShared != null)
-            {
-                foreach (string key in _holoNETEntryShared.Keys)
-                {
-                    _holoNETEntryShared[key].OnInitialized += _holoNETEntryShared_OnInitialized;
-                    _holoNETEntryShared[key].OnLoaded += _holoNETEntryShared_OnLoaded;
-                    _holoNETEntryShared[key].OnClosed += _holoNETEntryShared_OnClosed;
-                    _holoNETEntryShared[key].OnSaved += _holoNETEntryShared_OnSaved;
-                    _holoNETEntryShared[key].OnDeleted += _holoNETEntryShared_OnDeleted;
-                    _holoNETEntryShared[key].OnError += _holoNETEntryShared_OnError;
-                }
-            }
-
-            if (_holoNETEntry != null)
-            {
-                _holoNETEntry.OnInitialized -= _holoNETEntry_OnInitialized;
-                _holoNETEntry.OnLoaded -= _holoNETEntry_OnLoaded;
-                _holoNETEntry.OnSaved -= _holoNETEntry_OnSaved;
-                _holoNETEntry.OnDeleted -= _holoNETEntry_OnDeleted;
-                _holoNETEntry.OnClosed -= _holoNETEntry_OnClosed;
-                _holoNETEntry.OnError -= _holoNETEntry_OnError;
+                ucHoloNETCollectionEntryInternal.txtHoloNETEntryFirstName.TextChanged -= TxtHoloNETEntryInternalFirstName_TextChanged;
+                ucHoloNETCollectionEntryInternal.txtHoloNETEntryLastName.TextChanged -= TxtHoloNETEntryInternalLastName_TextChanged;
+                ucHoloNETCollectionEntryInternal.txtHoloNETEntryDOB.TextChanged -= TxtHoloNETEntryInternalDOB_TextChanged;
+                ucHoloNETCollectionEntryInternal.txtHoloNETEntryEmail.TextChanged -= TxtHoloNETEntryInternalEmail_TextChanged;
             }
 
             if (ucHoloNETCollectionEntry != null)
@@ -120,8 +80,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
                 ucHoloNETCollectionEntry.txtHoloNETEntryDOB.TextChanged -= TxtHoloNETEntryDOB_TextChanged;
                 ucHoloNETCollectionEntry.txtHoloNETEntryEmail.TextChanged -= TxtHoloNETEntryEmail_TextChanged;
             }
-            
-            CloseAllConnections();
         }
 
         private void btnInstall_Click(object sender, RoutedEventArgs e)
@@ -133,11 +91,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
             {
                 if (!string.IsNullOrEmpty(openFileDialog.FileName)) 
                 {
-                    _installinghAppPath = openFileDialog.FileName;
+                    HoloNETManager.Instance.InstallinghAppPath = openFileDialog.FileName;
                     FileInfo fileInfo = new FileInfo(openFileDialog.FileName);
                     string[] parts = fileInfo.Name.Split('.');
-                    _installinghAppName = parts[0];
-                    InputTextBox.Text = _installinghAppName;
+                    HoloNETManager.Instance.InstallinghAppName = parts[0];
+                    InputTextBox.Text = HoloNETManager.Instance.InstallinghAppName;
                     popupInstallhApp.Visibility = Visibility.Visible;
                 }
             }
@@ -145,28 +103,28 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
 
         private void btnRefreshInstalledhApps_Click(object sender, RoutedEventArgs e)
         {
-            ListHapps();
+            HoloNETManager.Instance.ListHapps();
         }
 
         private void btnListDNAs_Click(object sender, RoutedEventArgs e)
         {
             LogMessage("ADMIN: Listing DNAs...");
             ShowStatusMessage($"Listing DNAs...");
-            _holoNETClientAdmin.AdminListApps(AppStatusFilter.All);
+            HoloNETManager.Instance.HoloNETClientAdmin.AdminListApps(AppStatusFilter.All);
         }
 
         private void btnListCellIds_Click(object sender, RoutedEventArgs e)
         {
             LogMessage("ADMIN: Listing Cell Ids...");
             ShowStatusMessage($"Listing Cell Ids...", StatusMessageType.Information, true);
-            _holoNETClientAdmin.AdminListCellIds();
+            HoloNETManager.Instance.HoloNETClientAdmin.AdminListCellIds();
         }
 
         private void btnListAttachedInterfaces_Click(object sender, RoutedEventArgs e)
         {
             LogMessage("ADMIN: Listing Attached Interfaces...");
             ShowStatusMessage($"Listing Attached Interfaces...", StatusMessageType.Information, true);
-            _holoNETClientAdmin.AdminListInterfaces();
+            HoloNETManager.Instance.HoloNETClientAdmin.AdminListInterfaces();
         }
 
         private void btnShowLog_Click(object sender, RoutedEventArgs e)
@@ -184,10 +142,86 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
         {
             LogMessage("Rebooting...");
             ShowStatusMessage($"Rebooting...");
+            HoloNETManager.Instance.Reboot();
+        }
 
-            _clientsToDisconnect = _holoNETappClients.Count;
-            _rebooting = true;
-            CloseAllConnections();
+        private void btnEnableApp_Click(object sender, RoutedEventArgs e)
+        {
+            if (e.Source != null)
+            {
+                Button? button = e.Source as Button;
+
+                if (button != null)
+                {
+                    InstalledApp? app = button.DataContext as InstalledApp;
+
+                    if (app != null)
+                    {
+                        LogMessage($"ADMIN: Enabling {app.Name} hApp...");
+                        ShowStatusMessage($"Enabling {app.Name} hApp...", StatusMessageType.Information, true);
+                        HoloNETManager.Instance.HoloNETClientAdmin.AdminEnablelApp(app.Name);
+                    }
+                }
+            }
+        }
+
+        private void btnDisableApp_Click(object sender, RoutedEventArgs e)
+        {
+            if (e.Source != null)
+            {
+                Button? button = e.Source as Button;
+
+                if (button != null)
+                {
+                    InstalledApp? app = button.DataContext as InstalledApp;
+
+                    if (app != null)
+                    {
+                        LogMessage($"ADMIN: Disabling {app.Name} hApp...");
+                        ShowStatusMessage($"Disabling {app.Name} hApp...", StatusMessageType.Information, true);
+                        HoloNETManager.Instance.HoloNETClientAdmin.AdminDisableApp(app.Name);
+                    }
+                }
+            }
+        }
+
+        private void btnUninstallApp_Click(object sender, RoutedEventArgs e)
+        {
+            if (e.Source != null)
+            {
+                Button? button = e.Source as Button;
+
+                if (button != null)
+                {
+                    InstalledApp? app = button.DataContext as InstalledApp;
+
+                    if (app != null)
+                    {
+                        LogMessage($"ADMIN: Uninstalling {app.Name} hApp...");
+                        ShowStatusMessage($"Uninstalling {app.Name} hApp...", StatusMessageType.Information, true);
+                        HoloNETManager.Instance.HoloNETClientAdmin.AdminUninstallApp(app.Name);
+                    }
+                }
+            }
+        }
+
+        private void btnDisconnectClient_Click(object sender, RoutedEventArgs e)
+        {
+            InstalledApp app = gridHapps.SelectedItem as InstalledApp;
+
+            if (app != null)
+            {
+                Dispatcher.InvokeAsync(async () =>
+                {
+                    if (await HoloNETManager.Instance.DisconnectAsync(app))
+                    {
+                        Button btnDisconnectClient = sender as Button;
+
+                        if (btnDisconnectClient != null)
+                            btnDisconnectClient.IsEnabled = false;
+                    }
+                });
+            }
         }
 
         private void gridLog_LayoutUpdated(object sender, EventArgs e)
@@ -207,12 +241,18 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
             ucHoloNETCollectionEntryInternal.txtHoloNETEntryLastName.TextChanged += TxtHoloNETEntryInternalLastName_TextChanged;
             ucHoloNETCollectionEntryInternal.txtHoloNETEntryDOB.TextChanged += TxtHoloNETEntryInternalDOB_TextChanged;
             ucHoloNETCollectionEntryInternal.txtHoloNETEntryEmail.TextChanged += TxtHoloNETEntryInternalEmail_TextChanged;
+
+            ucConductorSettingsPopup.txtAdminURI.Text = HoloNETManager.Instance.HoloNETClientAdmin.HoloNETDNA.HolochainConductorAdminURI;
+            ucConductorSettingsPopup.chkAutoStartConductor.IsChecked = HoloNETManager.Instance.HoloNETClientAdmin.HoloNETDNA.AutoStartHolochainConductor;
+            ucConductorSettingsPopup.chkAutoShutdownConductor.IsChecked = HoloNETManager.Instance.HoloNETClientAdmin.HoloNETDNA.AutoShutdownHolochainConductor;
+            ucConductorSettingsPopup.chkShowConductorWindow.IsChecked = HoloNETManager.Instance.HoloNETClientAdmin.HoloNETDNA.ShowHolochainConductorWindow;
+            ucConductorSettingsPopup.txtSecondsToWaitForConductorToStart.Text = HoloNETManager.Instance.HoloNETClientAdmin.HoloNETDNA.SecondsToWaitForHolochainConductorToStart.ToString();
         }
 
         private void ShowStatusMessage(string message, StatusMessageType type = StatusMessageType.Information, bool showSpinner = false, ucHoloNETEntry ucHoloNETEntry = null)
         {
             txtStatus.Text = $"{message}";
-
+            
             switch (type)
             {
                 case StatusMessageType.Success:
@@ -249,6 +289,21 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
                 ScrollViewer scrollViewer = (ScrollViewer)VisualTreeHelper.GetChild(border, 0);
                 scrollViewer.ScrollToBottom();
             }
+        }
+
+        private void chkShowDetailedMessages_Checked(object sender, RoutedEventArgs e)
+        {
+            HoloNETManager.Instance.ShowDetailedLogMessages = true;
+        }
+
+        private void chkShowDetailedMessages_Unchecked(object sender, RoutedEventArgs e)
+        {
+            HoloNETManager.Instance.ShowDetailedLogMessages = false;
+        }
+
+        private void gridHapps_SelectedCellsChanged(object sender, SelectedCellsChangedEventArgs e)
+        {
+            HoloNETManager.Instance.CurrentApp = gridHapps.SelectedItem as InstalledApp;
         }
     }
 }
