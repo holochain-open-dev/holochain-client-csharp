@@ -25,6 +25,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="User Controls\ucHoloNETEntryAndCollectionSharedPopup.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="User Controls\ucInstallAppPopup.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="User Controls\ucCallZomePopup.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="User Controls\ucConductorSettingsPopup.xaml.cs">
       <SubType>Code</SubType>
     </Compile>

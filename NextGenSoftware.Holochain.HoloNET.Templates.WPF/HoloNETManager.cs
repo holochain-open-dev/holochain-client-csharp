@@ -21,20 +21,20 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
         private const string _holoNETEntryDemoHappPath = @"E:\hc\holochain-holochain-0.1.5\happs\oasis\BUILD\happ\oasis.happ";
         //private const string _holoNETCollectionDemoHappPath = @"E:\hc\holochain-holochain-0.1.5\happs\oasis-holonet-collection\BUILD\happ\oasis.happ";
         public const string _holoNETCollectionDemoHappPath = @"E:\hc\holochain-holochain-0.1.5\happs\oasis\BUILD\happ\oasis.happ";
-        public const string _holoNETEntryDemoAppId = "oasis-holonet-entry-demo-app";
-        public const string _holoNETCollectionDemoAppId = "oasis-holonet-collection-demo-app";
+        
         private const string _role_name = "oasis";
         private bool _rebooting = false;
         private bool _adminDisconnected = false;
         // private bool _appDisconnected = false;
         public string InstallinghAppName = "";
-        public string InstallinghAppPath = "";
+        
         private byte[][] _installingAppCellId = null;
-        private dynamic _paramsObject = null;
+        private Avatar _holoNETEntry;
+        //private Dictionary<string, AvatarShared> _holoNETEntryShared = new Dictionary<string, AvatarShared>();
         private int _clientsToDisconnect = 0;
         private int _clientsDisconnected = 0;
         
-        private ClientOperation _clientOperation;
+       
         private ushort _appAgentClientPort = 0;
         private bool _removeClientConnectionFromPoolAfterDisconnect = true;
         private bool _initHoloNETEntryDemo = false;
@@ -42,26 +42,28 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
 
         public HoloNETClient? HoloNETClientAdmin { get; set; }
         public List<HoloNETClient> HoloNETClientAppAgentClients { get; set; } = new List<HoloNETClient>();
-        
         public ObservableCollection<InstalledApp> InstalledApps { get; set; } = new ObservableCollection<InstalledApp>();
-        public Dictionary<string, HoloNETObservableCollection<AvatarShared>> HoloNETEntriesShared { get; set; } = new Dictionary<string, HoloNETObservableCollection<AvatarShared>>();
+        
+        //public Dictionary<string, HoloNETObservableCollection<AvatarShared>> HoloNETEntriesShared { get; set; } = new Dictionary<string, HoloNETObservableCollection<AvatarShared>>();
         public HoloNETObservableCollection<Avatar> HoloNETEntries { get; set; }
         
         public InstalledApp CurrentApp { get; set; }
         public AvatarShared CurrentAvatar;
-
-        private Avatar _holoNETEntry;
-        private Dictionary<string, AvatarShared> _holoNETEntryShared = new Dictionary<string, AvatarShared>();
-
         public bool ShowDetailedLogMessages { get; set; } = false;
-
+        
+        //non async state control properties (async version will not need these)
+        public dynamic ParamsObjectForZomeCall { get; set; }
+        public ClientOperation ClientOperation { get; set; }
+        public string HoloNETEntryDemoAppId { get; private set; } = "oasis-holonet-entry-demo-app";
+        public string HoloNETCollectionDemoAppId { get; private set; } = "oasis-holonet-collection-demo-app";
+        public string InstallinghAppPath { get; private set; } = "";
 
         public class StatusMessageEventArgs : EventArgs
         {
             public string Message { get; set; }
             public StatusMessageType Type { get; set; } = StatusMessageType.Information;
             public bool ShowSpinner { get; set; } = false;
-            public ucHoloNETEntry HoloNETEntryUI { get; set; }
+            public ucHoloNETEntry ucHoloNETEntry { get; set; }
         }
 
         public class LogMessageEventArgs : EventArgs
@@ -93,12 +95,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
 
         public void ShowStatusMessage(string message, StatusMessageType type = StatusMessageType.Information, bool showSpinner = false, ucHoloNETEntry ucHoloNETEntry = null)
         {
-            OnStatusMessage?.Invoke(this, new StatusMessageEventArgs { Message = message, Type = type, ShowSpinner = showSpinner, HoloNETEntryUI = ucHoloNETEntry });
+            OnStatusMessage?.Invoke(this, new StatusMessageEventArgs { Message = message, Type = type, ShowSpinner = showSpinner, ucHoloNETEntry = ucHoloNETEntry });
         }
 
         public void LogMessage(string message)
         {
-            OnLogMessage?.Invoke(this, new StatusMessageEventArgs { Message = message);
+            OnLogMessage?.Invoke(this, new LogMessageEventArgs { Message = message });
         }
 
         public  void Reboot()
@@ -137,7 +139,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
             ShowStatusMessage($"HoloNET {item} Already Initialized.", StatusMessageType.Information, false);
 
             LogMessage($"ADMIN: Checking If Test App {appId} Is Still Installed...");
-            ShowStatusMessage($"Checking If Test App {appId} Is Still Installed...", StatusMessageType.Success, true, ucHoloNETEntry);
+            ShowStatusMessage($"Checking If Test App {appId} Is Still Installed...", StatusMessageType.Success, true, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
             //ucHoloNETEntry.ShowStatusMessage($"Checking If Test App {appId} Is Still Installed...", StatusMessageType.Information, true);
 
             AdminGetAppInfoCallBackEventArgs appInfoResult = await HoloNETClientAdmin.AdminGetAppInfoAsync(appId);
@@ -146,10 +148,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
             if (appInfoResult != null && appInfoResult.AppInfo == null || appInfoResult.IsError)
             {
                 LogMessage($"ADMIN: Test App {appId} Is NOT Installed.");
-                ShowStatusMessage($"ADMIN App {appId} Is NOT Installed.", StatusMessageType.Error, false, ucHoloNETEntry);
+                ShowStatusMessage($"ADMIN App {appId} Is NOT Installed.", StatusMessageType.Error, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
 
                 LogMessage($"APP: Closing HoloNET {item} (And Closing Internal HoloNETClient Connection)...");
-                ShowStatusMessage($"Closing HoloNET {item} (And Closing Internal HoloNETClient Connection)...", StatusMessageType.Information, true, ucHoloNETEntry);
+                ShowStatusMessage($"Closing HoloNET {item} (And Closing Internal HoloNETClient Connection)...", StatusMessageType.Information, true, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
                 //ucHoloNETEntry.ShowStatusMessage($"Closing HoloNET Entry (And Closing Internal HoloNETClient Connection)...", StatusMessageType.Information, true);
 
                 await CloseConnection(isEntry);
@@ -160,21 +162,21 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
                 ShowStatusMessage($"ADMIN App {appId} Still Installed.", StatusMessageType.Information, false);
 
                 LogMessage($"ADMIN: Checking If Test App {appId} Is Still Running (Enabled)...");
-                ShowStatusMessage($"Checking If Test App {appId} Is Still Running (Enabled)...", StatusMessageType.Information, true, ucHoloNETEntry);
+                ShowStatusMessage($"Checking If Test App {appId} Is Still Running (Enabled)...", StatusMessageType.Information, true, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
                 //ucHoloNETEntry.ShowStatusMessage($"Checking If Test App {appId} Is Still Running (Enabled)...", StatusMessageType.Information, true);
 
                 if (appInfoResult.AppInfo.AppStatus == AppInfoStatusEnum.Running)
                 {
                     LogMessage($"ADMIN: Test App {appId} Still Running (Enabled).");
-                    ShowStatusMessage($"Test App {appId} Still Running (Enabled).", StatusMessageType.Success, false, ucHoloNETEntry);
+                    ShowStatusMessage($"Test App {appId} Still Running (Enabled).", StatusMessageType.Success, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
                 }
                 else
                 {
                     LogMessage($"ADMIN Test App {appId} NOT Running (Disabled).");
-                    ShowStatusMessage($"Test App {appId} NOT Running (Disabled).", StatusMessageType.Error, false, ucHoloNETEntry);
+                    ShowStatusMessage($"Test App {appId} NOT Running (Disabled).", StatusMessageType.Error, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
 
                     LogMessage($"ADMIN: Enabling Test App {appId}...");
-                    ShowStatusMessage($"Enabling Test App {appId}...", StatusMessageType.Information, true, ucHoloNETEntry);
+                    ShowStatusMessage($"Enabling Test App {appId}...", StatusMessageType.Information, true, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
 
                     AdminAppEnabledCallBackEventArgs enabledResult = await HoloNETClientAdmin.AdminEnableAppAsync(appId);
 
@@ -187,10 +189,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
                     else
                     {
                         LogMessage($"ADMIN: Error Occured Enabling Test App {appId}. Reason: {enabledResult.Message}");
-                        ShowStatusMessage($"Error Occured Enabling Test App {appId}. Reason: {enabledResult.Message}", StatusMessageType.Error, false, ucHoloNETEntry);
+                        ShowStatusMessage($"Error Occured Enabling Test App {appId}. Reason: {enabledResult.Message}", StatusMessageType.Error, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
 
                         LogMessage($"APP: Closing HoloNET {item} (And Closing Internal HoloNETClient Connection)...");
-                        ShowStatusMessage($"Closing HoloNET {item} (And Closing Internal HoloNETClient Connection)...", StatusMessageType.Information, true, ucHoloNETEntry);
+                        ShowStatusMessage($"Closing HoloNET {item} (And Closing Internal HoloNETClient Connection)...", StatusMessageType.Information, true, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
 
                         await CloseConnection(isEntry);
                     }

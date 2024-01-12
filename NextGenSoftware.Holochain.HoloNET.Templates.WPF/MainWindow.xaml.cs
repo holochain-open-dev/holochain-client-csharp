@@ -58,12 +58,16 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             InitUI();
+            HoloNETManager.Instance.OnLogMessage += HoloNETManager_OnLogMessage;
+            HoloNETManager.Instance.OnStatusMessage += HoloNETManager_OnStatusMessage;
             HoloNETManager.Instance.BootHoloNETManager();
         }
 
         private void MainWindow_Unloaded(object sender, RoutedEventArgs e)
         {
             HoloNETManager.Instance.ShutdownHoloNETManager();
+            HoloNETManager.Instance.OnLogMessage -= HoloNETManager_OnLogMessage;
+            HoloNETManager.Instance.OnStatusMessage -= HoloNETManager_OnStatusMessage;
 
             if (ucHoloNETCollectionEntryInternal != null)
             {
@@ -80,6 +84,16 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
                 ucHoloNETCollectionEntry.txtHoloNETEntryDOB.TextChanged -= TxtHoloNETEntryDOB_TextChanged;
                 ucHoloNETCollectionEntry.txtHoloNETEntryEmail.TextChanged -= TxtHoloNETEntryEmail_TextChanged;
             }
+        }
+
+        private void HoloNETManager_OnStatusMessage(object sender, HoloNETManager.StatusMessageEventArgs e)
+        {
+            ShowStatusMessage(e.Message, e.Type, e.ShowSpinner, e.ucHoloNETEntry);
+        }
+
+        private void HoloNETManager_OnLogMessage(object sender, HoloNETManager.LogMessageEventArgs e)
+        {
+            LogMessage(e.Message);
         }
 
         private void btnInstall_Click(object sender, RoutedEventArgs e)
