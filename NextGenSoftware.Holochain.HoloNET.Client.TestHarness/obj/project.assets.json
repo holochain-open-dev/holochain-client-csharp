@@ -178,6 +178,54 @@
           }
         }
       },
+      "Nito.AsyncEx.Context/5.1.2": {
+        "type": "package",
+        "dependencies": {
+          "Nito.AsyncEx.Tasks": "5.1.2"
+        },
+        "compile": {
+          "lib/netstandard2.0/Nito.AsyncEx.Context.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard2.0/Nito.AsyncEx.Context.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "Nito.AsyncEx.Tasks/5.1.2": {
+        "type": "package",
+        "dependencies": {
+          "Nito.Disposables": "2.2.1"
+        },
+        "compile": {
+          "lib/netstandard2.0/Nito.AsyncEx.Tasks.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard2.0/Nito.AsyncEx.Tasks.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "Nito.Disposables/2.2.1": {
+        "type": "package",
+        "dependencies": {
+          "System.Collections.Immutable": "1.7.1"
+        },
+        "compile": {
+          "lib/netstandard2.1/Nito.Disposables.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard2.1/Nito.Disposables.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "SauceControl.Blake2Fast/2.0.0": {
         "type": "package",
         "compile": {
@@ -241,6 +289,19 @@
         },
         "runtime": {
           "lib/netstandard1.3/System.Collections.Concurrent.dll": {}
+        }
+      },
+      "System.Collections.Immutable/1.7.1": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard2.0/System.Collections.Immutable.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard2.0/System.Collections.Immutable.dll": {
+            "related": ".xml"
+          }
         }
       },
       "System.Console/4.0.0": {
@@ -744,6 +805,7 @@
           "Newtonsoft.Json": "13.0.2",
           "NextGenSoftware.Utilities": "1.1.0",
           "NextGenSoftware.WebSocket": "1.2.0",
+          "Nito.AsyncEx.Context": "5.1.2",
           "SauceControl.Blake2Fast": "2.0.0",
           "Sodium.Core": "1.3.4",
           "System.Threading.Tasks.Extensions": "4.5.4",
@@ -1022,6 +1084,62 @@
         "packageIcon.png"
       ]
     },
+    "Nito.AsyncEx.Context/5.1.2": {
+      "sha512": "rMwL7Nj3oNyvFu/jxUzQ/YBobEkM2RQHe+5mpCDRyq6mfD7vCj7Z3rjB6XgpM6Mqcx1CA2xGv0ascU/2Xk8IIg==",
+      "type": "package",
+      "path": "nito.asyncex.context/5.1.2",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "icon.png",
+        "lib/net461/Nito.AsyncEx.Context.dll",
+        "lib/net461/Nito.AsyncEx.Context.xml",
+        "lib/netstandard1.3/Nito.AsyncEx.Context.dll",
+        "lib/netstandard1.3/Nito.AsyncEx.Context.xml",
+        "lib/netstandard2.0/Nito.AsyncEx.Context.dll",
+        "lib/netstandard2.0/Nito.AsyncEx.Context.xml",
+        "nito.asyncex.context.5.1.2.nupkg.sha512",
+        "nito.asyncex.context.nuspec"
+      ]
+    },
+    "Nito.AsyncEx.Tasks/5.1.2": {
+      "sha512": "jEkCfR2/M26OK/U4G7SEN063EU/F4LiVA06TtpZILMdX/quIHCg+wn31Zerl2LC+u1cyFancjTY3cNAr2/89PA==",
+      "type": "package",
+      "path": "nito.asyncex.tasks/5.1.2",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "icon.png",
+        "lib/net461/Nito.AsyncEx.Tasks.dll",
+        "lib/net461/Nito.AsyncEx.Tasks.xml",
+        "lib/netstandard1.3/Nito.AsyncEx.Tasks.dll",
+        "lib/netstandard1.3/Nito.AsyncEx.Tasks.xml",
+        "lib/netstandard2.0/Nito.AsyncEx.Tasks.dll",
+        "lib/netstandard2.0/Nito.AsyncEx.Tasks.xml",
+        "nito.asyncex.tasks.5.1.2.nupkg.sha512",
+        "nito.asyncex.tasks.nuspec"
+      ]
+    },
+    "Nito.Disposables/2.2.1": {
+      "sha512": "6sZ5uynQeAE9dPWBQGKebNmxbY4xsvcc5VplB5WkYEESUS7oy4AwnFp0FhqxTSKm/PaFrFqLrYr696CYN8cugg==",
+      "type": "package",
+      "path": "nito.disposables/2.2.1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "icon.png",
+        "lib/net461/Nito.Disposables.dll",
+        "lib/net461/Nito.Disposables.xml",
+        "lib/netstandard1.0/Nito.Disposables.dll",
+        "lib/netstandard1.0/Nito.Disposables.xml",
+        "lib/netstandard2.0/Nito.Disposables.dll",
+        "lib/netstandard2.0/Nito.Disposables.xml",
+        "lib/netstandard2.1/Nito.Disposables.dll",
+        "lib/netstandard2.1/Nito.Disposables.xml",
+        "nito.disposables.2.2.1.nupkg.sha512",
+        "nito.disposables.nuspec"
+      ]
+    },
     "SauceControl.Blake2Fast/2.0.0": {
       "sha512": "8BHH1BGyrLykFrjayIUiKj6G7Xjad0+AygpIePZeYIQTXtIs1axC608uKYyYnsvYdvxmQV9igcEsvAAIkrUF6w==",
       "type": "package",
@@ -1200,6 +1318,32 @@
         "ref/xamarinwatchos10/_._",
         "system.collections.concurrent.4.0.12.nupkg.sha512",
         "system.collections.concurrent.nuspec"
+      ]
+    },
+    "System.Collections.Immutable/1.7.1": {
+      "sha512": "B43Zsz5EfMwyEbnObwRxW5u85fzJma3lrDeGcSAV1qkhSRTNY5uXAByTn9h9ddNdhM+4/YoLc/CI43umjwIl9Q==",
+      "type": "package",
+      "path": "system.collections.immutable/1.7.1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "LICENSE.TXT",
+        "THIRD-PARTY-NOTICES.TXT",
+        "lib/net461/System.Collections.Immutable.dll",
+        "lib/net461/System.Collections.Immutable.xml",
+        "lib/netstandard1.0/System.Collections.Immutable.dll",
+        "lib/netstandard1.0/System.Collections.Immutable.xml",
+        "lib/netstandard1.3/System.Collections.Immutable.dll",
+        "lib/netstandard1.3/System.Collections.Immutable.xml",
+        "lib/netstandard2.0/System.Collections.Immutable.dll",
+        "lib/netstandard2.0/System.Collections.Immutable.xml",
+        "lib/portable-net45+win8+wp8+wpa81/System.Collections.Immutable.dll",
+        "lib/portable-net45+win8+wp8+wpa81/System.Collections.Immutable.xml",
+        "system.collections.immutable.1.7.1.nupkg.sha512",
+        "system.collections.immutable.nuspec",
+        "useSharedDesignerContext.txt",
+        "version.txt"
       ]
     },
     "System.Console/4.0.0": {

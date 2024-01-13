@@ -68,9 +68,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NextGenSoftware.Holochain.H
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NextGenSoftware.Holochain.HoloNET.ORM", "NextGenSoftware.Holochain.HoloNET.ORM\NextGenSoftware.Holochain.HoloNET.ORM.csproj", "{2E03EE11-49F6-410C-91D3-E81ACF750688}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NextGenSoftware.Holochain.HoloNET.HDK", "NextGenSoftware.Holochain.HoloNET.HDK\NextGenSoftware.Holochain.HoloNET.HDK.csproj", "{14FB4D6C-2A71-47DB-8C5C-9FFE23B953B8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NextGenSoftware.Holochain.HoloNET.HDK", "NextGenSoftware.Holochain.HoloNET.HDK\NextGenSoftware.Holochain.HoloNET.HDK.csproj", "{14FB4D6C-2A71-47DB-8C5C-9FFE23B953B8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NextGenSoftware.Holochain.HoloNET.HyperNET", "NextGenSoftware.Holochain.HoloNET.HyperNET\NextGenSoftware.Holochain.HoloNET.HyperNET.csproj", "{3E841DA7-D4C3-48E9-9549-1DFD7B2BBE5F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NextGenSoftware.Holochain.HoloNET.HyperNET", "NextGenSoftware.Holochain.HoloNET.HyperNET\NextGenSoftware.Holochain.HoloNET.HyperNET.csproj", "{3E841DA7-D4C3-48E9-9549-1DFD7B2BBE5F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NextGenSoftware.Holochain.HoloNET.Templates.WPF (non async)", "NextGenSoftware.Holochain.HoloNET.Templates.WPF (non async)\NextGenSoftware.Holochain.HoloNET.Templates.WPF (non async).csproj", "{ED830ADF-F01B-474B-8BC4-FF9CE030ED34}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -636,6 +638,22 @@ Global
 		{3E841DA7-D4C3-48E9-9549-1DFD7B2BBE5F}.Release|x64.Build.0 = Release|Any CPU
 		{3E841DA7-D4C3-48E9-9549-1DFD7B2BBE5F}.Release|x86.ActiveCfg = Release|Any CPU
 		{3E841DA7-D4C3-48E9-9549-1DFD7B2BBE5F}.Release|x86.Build.0 = Release|Any CPU
+		{ED830ADF-F01B-474B-8BC4-FF9CE030ED34}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED830ADF-F01B-474B-8BC4-FF9CE030ED34}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED830ADF-F01B-474B-8BC4-FF9CE030ED34}.Debug|arm64.ActiveCfg = Debug|Any CPU
+		{ED830ADF-F01B-474B-8BC4-FF9CE030ED34}.Debug|arm64.Build.0 = Debug|Any CPU
+		{ED830ADF-F01B-474B-8BC4-FF9CE030ED34}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{ED830ADF-F01B-474B-8BC4-FF9CE030ED34}.Debug|x64.Build.0 = Debug|Any CPU
+		{ED830ADF-F01B-474B-8BC4-FF9CE030ED34}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{ED830ADF-F01B-474B-8BC4-FF9CE030ED34}.Debug|x86.Build.0 = Debug|Any CPU
+		{ED830ADF-F01B-474B-8BC4-FF9CE030ED34}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED830ADF-F01B-474B-8BC4-FF9CE030ED34}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ED830ADF-F01B-474B-8BC4-FF9CE030ED34}.Release|arm64.ActiveCfg = Release|Any CPU
+		{ED830ADF-F01B-474B-8BC4-FF9CE030ED34}.Release|arm64.Build.0 = Release|Any CPU
+		{ED830ADF-F01B-474B-8BC4-FF9CE030ED34}.Release|x64.ActiveCfg = Release|Any CPU
+		{ED830ADF-F01B-474B-8BC4-FF9CE030ED34}.Release|x64.Build.0 = Release|Any CPU
+		{ED830ADF-F01B-474B-8BC4-FF9CE030ED34}.Release|x86.ActiveCfg = Release|Any CPU
+		{ED830ADF-F01B-474B-8BC4-FF9CE030ED34}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -665,6 +683,7 @@ Global
 		{3BE2087A-AB63-41CF-A031-4856F695A5EC} = {6A6A8C26-11FE-4F40-B401-F95C7A672F4D}
 		{569EA812-525D-4FCE-8BC9-904F968F93E3} = {6A6A8C26-11FE-4F40-B401-F95C7A672F4D}
 		{88471353-7A97-4C3A-8CD2-D13F2F0FA458} = {6A6A8C26-11FE-4F40-B401-F95C7A672F4D}
+		{ED830ADF-F01B-474B-8BC4-FF9CE030ED34} = {6A6A8C26-11FE-4F40-B401-F95C7A672F4D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {597DC6F9-2ECC-4F79-BDFB-086320E2CF0F}

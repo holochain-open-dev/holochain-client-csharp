@@ -1,0 +1,123 @@
+﻿<UserControl x:Class="NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls.ucConductorSettingsPopup"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:fa="http://schemas.fontawesome.io/icons/"
+             xmlns:local="clr-namespace:NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/NextGenSoftware.Holochain.HoloNET.Templates.WPF;component/Resources/Resources.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid x:Name="popupAdminURI" Grid.Row="0" Opacity="0.9" Grid.RowSpan="6" Visibility="Visible">
+        <Grid Background="Transparent" Opacity="0.5"/>
+        <Border
+    MinWidth="350"
+    Background="DarkBlue" 
+    Opacity="50"
+    BorderBrush="Black" 
+    BorderThickness="1" 
+    CornerRadius="0,55,0,55" 
+    HorizontalAlignment="Center" 
+    VerticalAlignment="Center">
+            <StackPanel>
+                <TextBlock Margin="10,10,10,20" Text="Enter Holochain Conductor Admin URI" HorizontalAlignment="Center" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
+                <TextBox MinWidth="250" HorizontalAlignment="Center" VerticalAlignment="Center" Text="ws://localhost:77777" Margin="10" FontSize="14" x:Name="txtAdminURI"/>
+                <TextBlock Margin="5" x:Name="lblAdminURIError" Visibility="Collapsed" HorizontalAlignment="Center" FontSize="12"  Text="Please enter a valid Holochain Conductor Admin URI" Foreground="Red" FontWeight="Bold"  />
+                <StackPanel HorizontalAlignment="Center" Orientation="Vertical">
+                    <CheckBox x:Name="chkAutoStartConductor" Margin="5" HorizontalAlignment="Left" Foreground="WhiteSmoke" Content="Auto Start Holochain Conductor" IsChecked="True" Checked="chkAutoStartConductor_Checked" Unchecked="chkAutoStartConductor_Unchecked"></CheckBox>
+                    <CheckBox x:Name="chkShowConductorWindow" Margin="5" HorizontalAlignment="Left" Foreground="WhiteSmoke" Content="Show Holochain Conductor Window" IsChecked="False"></CheckBox>
+                    <CheckBox x:Name="chkAutoShutdownConductor" Margin="5" HorizontalAlignment="Left" Foreground="WhiteSmoke" Content="Auto Shutdown Holochain Conductor" IsChecked="True"></CheckBox>
+                </StackPanel>
+
+                <StackPanel HorizontalAlignment="Center" Margin="10" Orientation="Vertical">
+                    <Label x:Name="lblSecondsToWaitForConductorToStart" Content="Seconds To Wait For Holochain Conductor To Start:" VerticalAlignment="Center"  Foreground="WhiteSmoke"></Label>
+                    <TextBox MinWidth="25" HorizontalAlignment="Center" VerticalAlignment="Center" Text="5" Margin="10" FontSize="14" x:Name="txtSecondsToWaitForConductorToStart"/>
+                    <TextBlock x:Name="txtSecondsToWaitForConductorToStartError" FontWeight="Bold" FontSize="14" HorizontalAlignment="Center" Visibility="Hidden" Background="Transparent" Text="Enter a valid number." Foreground="Red"></TextBlock>
+
+                    <!--<Popup x:Name="popupSecondsToWaitForConductorToStart" HorizontalAlignment="Center"  IsOpen="False">
+                    <Border HorizontalAlignment="Center" >
+                        <TextBlock x:Name="txtSecondsToWaitForConductorToStart" HorizontalAlignment="Center" Background="Transparent" Text="Enter a valid number." Foreground="Red"></TextBlock>
+                    </Border>
+                </Popup>-->
+                </StackPanel>
+
+                <StackPanel Margin="10" Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Button x:Name="btnAdminURIPopupCancel"  Cursor="Hand" Style="{StaticResource ButtonStyle}" Margin="10" Foreground="WhiteSmoke" Width="100" FontSize="14" Content="Cancel" Background="{x:Null}" Click="btnAdminURIPopupCancel_Click">
+                        <Button.Effect>
+                            <DropShadowEffect x:Name="btnAdminURIPopupCancelGlowEffect" ShadowDepth="0"
+                  Color="White"
+                  Opacity="0"
+                  BlurRadius="10"/>
+                        </Button.Effect>
+
+                        <Button.Triggers>
+                            <EventTrigger RoutedEvent="Button.MouseEnter">
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation
+                            Storyboard.TargetName="btnAdminURIPopupCancelGlowEffect" 
+                            Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+                            From="0.0" To="1.0" Duration="0:0:0.5" 
+                            AutoReverse="False" RepeatBehavior="1x" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger>
+                            <EventTrigger RoutedEvent="Button.MouseLeave">
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation
+                            Storyboard.TargetName="btnAdminURIPopupCancelGlowEffect" 
+                            Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+                            From="1" To="0" Duration="0:0:0.5" 
+                            AutoReverse="False" RepeatBehavior="1x" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger>
+                        </Button.Triggers>
+                    </Button>
+                    <Button x:Name="btnAdminURIPopupOK" Cursor="Hand" Style="{StaticResource ButtonStyle}" Margin="10" Foreground="WhiteSmoke" Width="100" FontSize="14" Content="OK" Background="{x:Null}" Click="btnAdminURIPopupOK_Click">
+                        <Button.Effect>
+                            <DropShadowEffect x:Name="btnAdminURIPopupOKGlowEffect" ShadowDepth="0"
+                  Color="White"
+                  Opacity="0"
+                  BlurRadius="10"/>
+                        </Button.Effect>
+
+                        <Button.Triggers>
+                            <EventTrigger RoutedEvent="Button.MouseEnter">
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation
+                            Storyboard.TargetName="btnAdminURIPopupOKGlowEffect" 
+                            Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+                            From="0.0" To="1.0" Duration="0:0:0.5" 
+                            AutoReverse="False" RepeatBehavior="1x" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger>
+                            <EventTrigger RoutedEvent="Button.MouseLeave">
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation
+                            Storyboard.TargetName="btnAdminURIPopupOKGlowEffect" 
+                            Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+                            From="1" To="0" Duration="0:0:0.5" 
+                            AutoReverse="False" RepeatBehavior="1x" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger>
+                        </Button.Triggers>
+                    </Button>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

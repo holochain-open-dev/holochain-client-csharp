@@ -22,6 +22,8 @@ using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 using YamlDotNet.Core;
 using YamlDotNet.Core.Tokens;
+using Nito.AsyncEx;
+using Nito.AsyncEx.Synchronous;
 
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
@@ -2174,7 +2176,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             if (!args.IsError)
             {
-                CallAdminFunction("grant_zome_call_capability", CreateGrantZomeCallCapabilityRequest(cellId, capGrantAccessType, grantedFunctions, signingKey), id);
+                CallAdminFunction(HoloNETRequestType.AdminGrantZomeCallCapability, "grant_zome_call_capability", CreateGrantZomeCallCapabilityRequest(cellId, capGrantAccessType, grantedFunctions, signingKey), id);
                 return new AdminZomeCallCapabilityGrantedCallBackEventArgs() { IsCallSuccessful = true, EndPoint = EndPoint, Id = id, Message = "The call has been sent to the conductor.  Please wait for the event 'OnAdminZomeCallCapabilityGranted' to view the response." };
             }
             else
@@ -2298,9 +2300,21 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             return await CallAdminFunctionAsync(HoloNETRequestType.AdminGrantZomeCallCapability, "generate_agent_pub_key", null, _taskCompletionAdminAgentPubKeyGeneratedCallBack, "OnAdminAgentPubKeyGeneratedCallBack", conductorResponseCallBackMode, id);
         }
 
-        public AdminAgentPubKeyGeneratedCallBackEventArgs AdminGenerateAgentPubKey(bool updateAgentPubKeyInHoloNETDNA = true, string id = "")
+        //public void AdminGenerateAgentPubKey(bool updateAgentPubKeyInHoloNETDNA = true, string id = "")
+        //{
+        //    _updateDnaHashAndAgentPubKey = updateAgentPubKeyInHoloNETDNA;
+        //    CallAdminFunction(HoloNETRequestType.AdminGenerateAgentPubKey, "generate_agent_pub_key", null, id);
+        //}
+
+        public void AdminGenerateAgentPubKey(bool updateAgentPubKeyInHoloNETDNA = true, string id = "")
         {
-            return AdminGenerateAgentPubKeyAsync(ConductorResponseCallBackMode.UseCallBackEvents, updateAgentPubKeyInHoloNETDNA, id).Result;
+            //var result = AsyncContext.Run(() => AdminGenerateAgentPubKeyAsync(ConductorResponseCallBackMode.UseCallBackEvents, updateAgentPubKeyInHoloNETDNA, id));
+            //AdminGenerateAgentPubKeyAsync(ConductorResponseCallBackMode.UseCallBackEvents, updateAgentPubKeyInHoloNETDNA, id).Wait();
+            //AdminGenerateAgentPubKeyAsync(ConductorResponseCallBackMode.UseCallBackEvents, updateAgentPubKeyInHoloNETDNA, id).WaitAsync(new TimeSpan(0, 0, 3));
+            //var task = Task.Run(async () => await AdminGenerateAgentPubKeyAsync(ConductorResponseCallBackMode.UseCallBackEvents, updateAgentPubKeyInHoloNETDNA, id));
+
+            //AdminGenerateAgentPubKeyAsync(ConductorResponseCallBackMode.UseCallBackEvents, updateAgentPubKeyInHoloNETDNA, id).RunSynchronously();
+            AdminGenerateAgentPubKeyAsync(ConductorResponseCallBackMode.UseCallBackEvents, updateAgentPubKeyInHoloNETDNA, id).WaitAndUnwrapException();
         }
 
         public async Task<AdminAppInstalledCallBackEventArgs> AdminInstallAppAsync(string installedAppId, string hAppPath, string agentKey = null, Dictionary<string, byte[]> membraneProofs = null, string network_seed = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
@@ -3536,7 +3550,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 return new T() { EndPoint = EndPoint, Id = id, Message = $"conductorResponseCallBackMode is set to UseCallBackEvents so please wait for {eventCallBackName} event for the result." };
         }
 
-        private void CallAdminFunction(string holochainConductorFunctionName, dynamic holoNETDataDetailed, string id = null)
+        private void CallAdminFunction(HoloNETRequestType requestType, string holochainConductorFunctionName, dynamic holoNETDataDetailed, string id = null) 
         {
             HoloNETData holoNETData = new HoloNETData()
             {
@@ -3547,7 +3561,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             if (string.IsNullOrEmpty(id))
                 id = GetRequestId();
 
-            SendHoloNETRequest(holoNETData, HoloNETRequestType.ZomeCall, id);
+            //SendHoloNETRequest(holoNETData, HoloNETRequestType.ZomeCall, id);
+            SendHoloNETRequest(holoNETData, requestType, id);
             //return new T() { EndPoint = EndPoint, Id = id, Message = $"conductorResponseCallBackMode is set to UseCallBackEvents so please wait for {eventCallBackName} event for the result." };
         }
 
@@ -3606,7 +3621,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 if (membraneProofs == null)
                     membraneProofs = new Dictionary<string, byte[]>();
 
-                CallAdminFunction("install_app", new InstallAppRequest()
+                CallAdminFunction(HoloNETRequestType.AdminInstallApp, "install_app", new InstallAppRequest()
                 {
                     path = hAppPath,
                     bundle = appBundle,
