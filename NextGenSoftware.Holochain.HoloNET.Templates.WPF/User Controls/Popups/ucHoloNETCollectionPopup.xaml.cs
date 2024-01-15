@@ -19,7 +19,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls
             InitializeComponent();
             DataContext = this;
             this.Loaded += UcHoloNETCollectionPopup_Loaded;
-            this.Initialized += UcHoloNETCollectionPopup_Initialized;
             this.IsVisibleChanged += UcHoloNETCollectionPopup_IsVisibleChanged;
             this.Unloaded += UcHoloNETCollectionPopup_Unloaded;
         }
@@ -30,13 +29,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls
                 Dispatcher.InvokeAsync(async () => { await InitPopupAsync(); });
         }
 
-        private void UcHoloNETCollectionPopup_Initialized(object? sender, EventArgs e)
-        {
-            
-        }
-
         private async Task InitPopupAsync()
         {
+            ShowHoloNETCollectionTab();
+            HoloNETEntryUIManager.CurrentHoloNETEntryUI = ucHoloNETCollectionEntryInternal;
+
             //This extra check here will not normally be needed in a normal hApp (because you will not have the admin UI allowing you to uninstall, disable or disconnect).
             //But for extra defencive coding to be on the safe side you can of course double check! ;-)
             bool showAlreadyInitMessage = true;
@@ -91,6 +88,30 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls
             }
         }
 
+        private void ShowHoloNETCollectionTab()
+        {
+            btnViewHoloNETCollection.IsEnabled = false;
+            btnViewHoloNETCollectionInfo.IsEnabled = true;
+            stkpnlHoloNETCollectionInternal.Visibility = Visibility.Visible;
+            stkpnlInfoHoloNETCollection.Visibility = Visibility.Collapsed;
+        }
+
+        private void ShowInfoTab()
+        {
+            btnViewHoloNETCollection.IsEnabled = true;
+            btnViewHoloNETCollectionInfo.IsEnabled = false;
+            stkpnlHoloNETCollectionInternal.Visibility = Visibility.Collapsed;
+            stkpnlInfoHoloNETCollection.Visibility = Visibility.Visible;
+        }
+
+        private void CheckForChangesInHoloNETCollection()
+        {
+            if (HoloNETManager.Instance.HoloNETEntries != null && HoloNETManager.Instance.HoloNETEntries.IsChanges)
+                btnHoloNETCollectionPopupSaveChanges.IsEnabled = true;
+            else
+                btnHoloNETCollectionPopupSaveChanges.IsEnabled = false;
+        }
+
         private void UcHoloNETCollectionPopup_Loaded(object sender, RoutedEventArgs e)
         {
             ucHoloNETCollectionEntryInternal.txtHoloNETEntryFirstName.TextChanged += TxtHoloNETEntryInternalFirstName_TextChanged;
@@ -107,34 +128,20 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls
             ucHoloNETCollectionEntryInternal.txtHoloNETEntryEmail.TextChanged -= TxtHoloNETEntryInternalEmail_TextChanged;
         }
 
-        private void CheckForChangesInHoloNETCollection()
-        {
-            if (HoloNETManager.Instance.HoloNETEntries != null && HoloNETManager.Instance.HoloNETEntries.IsChanges)
-                btnHoloNETCollectionPopupSaveChanges.IsEnabled = true;
-            else
-                btnHoloNETCollectionPopupSaveChanges.IsEnabled = false;
-        }
-
         private void btnViewHoloNETCollection_Click(object sender, RoutedEventArgs e)
         {
-            btnViewHoloNETCollection.IsEnabled = false;
-            btnViewHoloNETCollectionInfo.IsEnabled = true;
-            stkpnlHoloNETCollectionInternal.Visibility = Visibility.Visible;
-            stkpnlInfoHoloNETCollection.Visibility = Visibility.Collapsed;
-
+            ShowHoloNETCollectionTab();
         }
 
         private void btnViewHoloNETCollectionInfo_Click(object sender, RoutedEventArgs e)
         {
-            btnViewHoloNETCollection.IsEnabled = true;
-            btnViewHoloNETCollectionInfo.IsEnabled = false;
-            stkpnlHoloNETCollectionInternal.Visibility = Visibility.Collapsed;
-            stkpnlInfoHoloNETCollection.Visibility = Visibility.Visible;
+            ShowInfoTab();
         }
 
         private void btnHoloNETCollectionPopupClose_Click(object sender, RoutedEventArgs e)
         {
-            popupHoloNETCollection.Visibility = Visibility.Collapsed;
+            this.Visibility = Visibility.Collapsed;
+            PopupManager.CurrentPopup = null;
         }
 
         private void btnHoloNETCollectionPopupRemoveEntryFromCollection_Click(object sender, RoutedEventArgs e)
@@ -164,7 +171,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls
                     gridDataEntriesInternal.ItemsSource = HoloNETManager.Instance.HoloNETEntries;
                     btnHoloNETCollectionPopupRemoveEntryFromCollection.IsEnabled = false;
 
-                    CheckForChangesInHoloNETCollection();
+                    //This would normally be needed if the UI did not support binding like WPF/XAML does.
+                    //CheckForChangesInHoloNETCollection();
                 }
             }
         }
@@ -185,6 +193,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls
                 gridDataEntriesInternal.ItemsSource = HoloNETManager.Instance.HoloNETEntries;
                 btnHoloNETCollectionPopupSaveChanges.IsEnabled = true;
             }
+            else
+                ShowHoloNETCollectionTab();
         }
 
         private void btnHoloNETCollectionPopupSaveChanges_Click(object sender, RoutedEventArgs e)
@@ -241,21 +251,25 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls
 
         private void TxtHoloNETEntryInternalEmail_TextChanged(object sender, TextChangedEventArgs e)
         {
+            //This would normally be needed if the UI did not support binding like WPF/XAML does.
             CheckForChangesInHoloNETCollection();
         }
 
         private void TxtHoloNETEntryInternalDOB_TextChanged(object sender, TextChangedEventArgs e)
         {
+            //This would normally be needed if the UI did not support binding like WPF/XAML does.
             CheckForChangesInHoloNETCollection();
         }
 
         private void TxtHoloNETEntryInternalLastName_TextChanged(object sender, TextChangedEventArgs e)
         {
+            //This would normally be needed if the UI did not support binding like WPF/XAML does.
             CheckForChangesInHoloNETCollection();
         }
 
         private void TxtHoloNETEntryInternalFirstName_TextChanged(object sender, TextChangedEventArgs e)
         {
+            //This would normally be needed if the UI did not support binding like WPF/XAML does.
             CheckForChangesInHoloNETCollection();
         }
     }

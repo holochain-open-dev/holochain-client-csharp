@@ -23,7 +23,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls
         private void btnCallZomeFunctionPopupCancel_Click(object sender, RoutedEventArgs e)
         {
             PopupManager.CurrentPopup = null;
-            popupMakeZomeCall.Visibility = Visibility.Collapsed;
+            this.Visibility = Visibility.Collapsed;
             lblCallZomeFunctionErrors.Visibility = Visibility.Collapsed;
         }
 
@@ -84,7 +84,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls
                     }
 
                     PopupManager.CurrentPopup = null;
-                    popupMakeZomeCall.Visibility = Visibility.Collapsed;
+                    this.Visibility = Visibility.Collapsed;
                 }
                 catch (Exception ex)
                 {

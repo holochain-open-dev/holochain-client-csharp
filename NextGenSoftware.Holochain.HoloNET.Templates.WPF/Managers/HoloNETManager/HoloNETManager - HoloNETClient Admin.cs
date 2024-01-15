@@ -60,8 +60,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
             //HoloNETClientAdmin.ConnectAdmin(HoloNETClientAdmin.HoloNETDNA.HolochainConductorAdminURI);
 
             //If you do not pass a connection string in it will default to HoloNETDNA.HolochainConductorAdminURI
-            //HoloNETClientAdmin.ConnectAdmin();
-
             await HoloNETClientAdmin.ConnectAdminAsync();
         }
 
@@ -192,7 +190,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
             return (false, 0, "", "");
         }
 
-        public  void ListHapps()
+        public void ListHapps()
         {
             if (ShowAppsListedInLog)
             {
@@ -203,7 +201,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
             HoloNETClientAdmin.AdminListApps(AppStatusFilter.All);
         }
 
-        public  void _holoNETClientAdmin_OnConnected(object sender, WebSocket.ConnectedEventArgs e)
+        public void _holoNETClientAdmin_OnConnected(object sender, WebSocket.ConnectedEventArgs e)
         {
             LogMessage("ADMIN: Connected");
             ShowStatusMessage($"Admin WebSocket Connected.", StatusMessageType.Success);
@@ -214,15 +212,16 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
             ShowStatusMessage($"Generating AgentPubKey For hApp...");
 
             HoloNETClientAdmin.AdminGenerateAgentPubKey();
+            //Dispatcher.CurrentDispatcher.InvokeAsync(async () => await HoloNETClientAdmin.AdminGenerateAgentPubKeyAsync());
         }
 
-        public  void _holoNETClientAdmin_OnHolochainConductorStarting(object sender, HolochainConductorStartingEventArgs e)
+        public void _holoNETClientAdmin_OnHolochainConductorStarting(object sender, HolochainConductorStartingEventArgs e)
         {
             LogMessage($"ADMIN: Starting Holochain Conductor...");
             ShowStatusMessage("Starting Holochain Conductor...", StatusMessageType.Information, true);
         }
 
-        public  void _holoNETClientAdmin_OnHolochainConductorStarted(object sender, HolochainConductorStartedEventArgs e)
+        public void _holoNETClientAdmin_OnHolochainConductorStarted(object sender, HolochainConductorStartedEventArgs e)
         {
             LogMessage($"ADMIN: Holochain Conductor Started.");
             ShowStatusMessage("Holochain Conductor Started.", StatusMessageType.Success);
@@ -231,21 +230,21 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
             ShowStatusMessage($"Admin WebSocket Connecting To Endpoint {HoloNETClientAdmin.EndPoint.AbsoluteUri}...", StatusMessageType.Information, true);
         }
 
-        private  void _holoNETClientAdmin_OnDataSent(object sender, HoloNETDataSentEventArgs e)
+        private void _holoNETClientAdmin_OnDataSent(object sender, HoloNETDataSentEventArgs e)
         {
             if (ShowDetailedLogMessages)
                 LogMessage($"ADMIN: Data Sent to EndPoint {e.EndPoint}: {e.RawBinaryDataDecoded} ({e.RawBinaryDataAsString})");
         }
 
-        private  void _holoNETClientAdmin_OnDataReceived(object sender, HoloNETDataReceivedEventArgs e)
+        private void _holoNETClientAdmin_OnDataReceived(object sender, HoloNETDataReceivedEventArgs e)
         {
             if (ShowDetailedLogMessages)
                 LogMessage(string.Concat("ADMIN: Data Received for EndPoint: ", e.EndPoint, ": ", e.RawBinaryDataDecoded, "(", e.RawBinaryDataAsString, ")"));
         }
 
-        private  void _holoNETClientAdmin_OnAdminAgentPubKeyGeneratedCallBack(object sender, AdminAgentPubKeyGeneratedCallBackEventArgs e)
+        private void _holoNETClientAdmin_OnAdminAgentPubKeyGeneratedCallBack(object sender, AdminAgentPubKeyGeneratedCallBackEventArgs e)
         {
-            if (InitHoloNETEntryDemo)
+            if (!InitHoloNETEntryDemo)
             {
                 LogMessage($"ADMIN: AgentPubKey Generated for EndPoint: {e.EndPoint} and Id: {e.Id}: AgentPubKey: {e.AgentPubKey}");
                 ShowStatusMessage($"AgentPubKey Generated.", StatusMessageType.Success);
@@ -256,13 +255,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
             }
         }
 
-        public  void _holoNETClientAdmin_OnAdminAppsListedCallBack(object sender, AdminAppsListedCallBackEventArgs e)
+        public void _holoNETClientAdmin_OnAdminAppsListedCallBack(object sender, AdminAppsListedCallBackEventArgs e)
         {
             //if (_showAppsListedInLog)
             ProcessListedApps(e);
         }
 
-        private  void _holoNETClientAdmin_OnAdminAppInstalledCallBack(object sender, AdminAppInstalledCallBackEventArgs e)
+        private void _holoNETClientAdmin_OnAdminAppInstalledCallBack(object sender, AdminAppInstalledCallBackEventArgs e)
         {
             if (!InitHoloNETEntryDemo)
             {
@@ -296,7 +295,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
             }
         }
 
-        private  void _holoNETClientAdmin_OnAdminAppUninstalledCallBack(object sender, AdminAppUninstalledCallBackEventArgs e)
+        private void _holoNETClientAdmin_OnAdminAppUninstalledCallBack(object sender, AdminAppUninstalledCallBackEventArgs e)
         {
             if (!InitHoloNETEntryDemo)
             {
@@ -306,7 +305,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
             }
         }
 
-        private  void _holoNETClientAdmin_OnAdminAppEnabledCallBack(object sender, AdminAppEnabledCallBackEventArgs e)
+        private void _holoNETClientAdmin_OnAdminAppEnabledCallBack(object sender, AdminAppEnabledCallBackEventArgs e)
         {
             if (!InitHoloNETEntryDemo)
             {
@@ -317,14 +316,14 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
             }
         }
 
-        public  void _holoNETClientAdmin_OnAdminAppDisabledCallBack(object sender, AdminAppDisabledCallBackEventArgs e)
+        public void _holoNETClientAdmin_OnAdminAppDisabledCallBack(object sender, AdminAppDisabledCallBackEventArgs e)
         {
             LogMessage($"ADMIN: hApp {e.InstalledAppId} Disabled.");
             ShowStatusMessage($"hApp {e.InstalledAppId} Disabled.", StatusMessageType.Success);
             ListHapps();
         }
 
-        private  void _holoNETClientAdmin_OnAdminZomeCallCapabilityGrantedCallBack(object sender, AdminZomeCallCapabilityGrantedCallBackEventArgs e)
+        private void _holoNETClientAdmin_OnAdminZomeCallCapabilityGrantedCallBack(object sender, AdminZomeCallCapabilityGrantedCallBackEventArgs e)
         {
             if (!InitHoloNETEntryDemo)
             {
@@ -340,7 +339,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
             }
         }
 
-        private  void _holoNETClientAdmin_OnAdminAppInterfaceAttachedCallBack(object sender, AdminAppInterfaceAttachedCallBackEventArgs e)
+        private void _holoNETClientAdmin_OnAdminAppInterfaceAttachedCallBack(object sender, AdminAppInterfaceAttachedCallBackEventArgs e)
         {
             if (!InitHoloNETEntryDemo)
             {
@@ -463,7 +462,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
             }
         }
 
-        public  void _holoNETClientAdmin_OnError(object sender, HoloNETErrorEventArgs e)
+        public void _holoNETClientAdmin_OnError(object sender, HoloNETErrorEventArgs e)
         {
             LogMessage($"ADMIN: Error occured. Reason: {e.Reason}");
 

@@ -21,6 +21,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls
             DataContext = this;
             this.Loaded += UcHoloNETEntryAndCollectionSharedPopup_Loaded;
             this.Unloaded += UcHoloNETEntryAndCollectionSharedPopup_Unloaded;
+            this.IsVisibleChanged += UcHoloNETEntryAndCollectionSharedPopup_IsVisibleChanged;
+        }
+
+        private void UcHoloNETEntryAndCollectionSharedPopup_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if (this.Visibility == Visibility.Visible)
+               InitPopup();
         }
 
         private void UcHoloNETEntryAndCollectionSharedPopup_Loaded(object sender, RoutedEventArgs e)
@@ -37,6 +44,20 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls
             ucHoloNETCollectionEntryShared.txtHoloNETEntryLastName.TextChanged -= TxtHoloNETEntryLastName_TextChanged;
             ucHoloNETCollectionEntryShared.txtHoloNETEntryDOB.TextChanged -= TxtHoloNETEntryDOB_TextChanged;
             ucHoloNETCollectionEntryShared.txtHoloNETEntryEmail.TextChanged -= TxtHoloNETEntryEmail_TextChanged;
+        }
+
+        private void InitPopup()
+        {
+            ShowHoloNETEntrySharedTab();
+            ucHoloNETEntryShared.HideStatusMessage();
+            ucHoloNETCollectionEntryShared.HideStatusMessage();
+
+            ConnectToAppAgentClientResult result = HoloNETManager.Instance.ConnectToAppAgentClient();
+
+            if (result.ResponseType == ConnectToAppAgentClientResponseType.Connected)
+                HoloNETManager.Instance.LoadHoloNETEntryShared(result.AppAgentClient);
+            else
+                HoloNETManager.Instance.ClientOperation = ClientOperation.LoadHoloNETEntryShared;
         }
 
         public void ShowHoloNETEntrySharedTab()
@@ -140,15 +161,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls
 
         private void btnDataEntriesPopupClose_Click(object sender, RoutedEventArgs e)
         {
-            //lblNewEntryValidationErrors.Visibility = Visibility.Hidden;
             ucHoloNETCollectionEntryShared.HideStatusMessage();
-            popupDataEntries.Visibility = Visibility.Collapsed;
+            this.Visibility = Visibility.Collapsed;
+            PopupManager.CurrentPopup = null;
         }
 
         private void btnDataEntriesPopupUpdateEntryInCollection_Click(object sender, RoutedEventArgs e)
         {
-            //AvatarShared avatar = gridDataEntries.SelectedItem as AvatarShared;
-
             if (HoloNETManager.Instance.CurrentAvatar != null)
             {
                 Dispatcher.InvokeAsync(async () =>

@@ -17,7 +17,7 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <Grid x:Name="popupDataEntries" Opacity="0.9" Grid.Row="0" Grid.RowSpan="6" Visibility="Collapsed">
+    <Grid Opacity="0.9" Grid.Row="0" Grid.RowSpan="6">
         <Grid Background="Transparent" Opacity="0.5" />
         <Border Width="770" Height="650"
         Background="DarkBlue" 

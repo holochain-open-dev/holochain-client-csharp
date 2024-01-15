@@ -211,6 +211,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
 
                             //Refresh the list of installed hApps.
                             ProcessListedApps(await HoloNETClientAdmin.AdminListAppsAsync(AppStatusFilter.All));
+                            
+                            //Update number of connections UI.
+                            UpdateNumerOfClientConnections();
                         }
                     }
                     else
@@ -251,6 +254,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
 
                             //Refresh the list of installed hApps.
                             ProcessListedApps(await HoloNETClientAdmin.AdminListAppsAsync(AppStatusFilter.All));
+
+                            //Update number of connections UI.
+                            UpdateNumerOfClientConnections();
                         }
                     }
                     else

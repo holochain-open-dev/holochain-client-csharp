@@ -282,7 +282,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
             string hApps = "";
             InstalledApps.Clear();
 
-            foreach (AppInfo app in listedAppsResult.Apps)
+            foreach (AppInfo app in listedAppsResult.Apps.OrderBy(x => x.installed_app_id))
             {
                 InstalledApp installedApp = new InstalledApp()
                 {
@@ -371,7 +371,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
                 if (app.Name == _holoNETEntryDemoAppId && HoloNETEntry != null && HoloNETEntry.HoloNETClient != null)
                 {
                     await HoloNETEntry.HoloNETClient.DisconnectAsync();
-
+                    UpdateNumerOfClientConnections();
+                    
                     //The async version will wait till it has disconnected so we can refresh the hApp list now without needing to use the OnDisconencted callback.
                     ListHapps();
                 }
@@ -381,6 +382,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
                 {
                     //We can either use async or non-async version.
                     await HoloNETEntries.HoloNETClient.DisconnectAsync();
+                    UpdateNumerOfClientConnections();
 
                     //The async version will wait till it has disconnected so we can refresh the hApp list now without needing to use the OnDisconencted callback.
                     ListHapps();
@@ -407,6 +409,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
             SetCurrentAppToConnectedStatus(e.EndPoint.Port);
 
             UpdateNumerOfClientConnections();
+            ListHapps();
+
             HoloNETClient client = sender as HoloNETClient;
 
             if (client != null)

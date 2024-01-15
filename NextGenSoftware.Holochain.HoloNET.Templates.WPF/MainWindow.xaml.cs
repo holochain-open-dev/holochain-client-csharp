@@ -9,7 +9,6 @@ using NextGenSoftware.Holochain.HoloNET.Client;
 using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Enums;
 using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers;
 using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Models;
-using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Objects;
 using NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls;
 
 namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
@@ -99,7 +98,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
 
         private void HoloNETManager_OnInstalledAppsChanged(object sender, InstalledAppsEventArgs e)
         {
-            //TODO: Check if the Binding works first?
+            //If the UI used does not support binding like WPF/XAML does then you will need to un-comment the line below to manually refresh the grid.
             //gridHapps.ItemsSource = e.InstalledApps;
         }
 
@@ -186,16 +185,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
         private void btnHoloNETEntry_Click(object sender, RoutedEventArgs e)
         {
             PopupManager.CurrentPopup = ucHoloNETEntryPopup;
-            HoloNETEntryUIManager.CurrentHoloNETEntryUI = ucHoloNETEntryPopup.ucHoloNETEntry;
             ucHoloNETEntryPopup.Visibility = Visibility.Visible;
         }
 
         private void btnHoloNETCollection_Click(object sender, RoutedEventArgs e)
         {
             PopupManager.CurrentPopup = ucHoloNETCollectionPopup;
-            HoloNETEntryUIManager.CurrentHoloNETEntryUI = ucHoloNETCollectionPopup.ucHoloNETCollectionEntryInternal;
             ucHoloNETCollectionPopup.Visibility = Visibility.Visible;
-            //Dispatcher.InvokeAsync(async () => { await ucHoloNETCollectionPopup.InitPopupAsync(); });
         }
 
         private void btnEnableApp_Click(object sender, RoutedEventArgs e)
@@ -285,19 +281,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
 
         private void btnViewDataEntries_Click(object sender, RoutedEventArgs e)
         {
-            ucHoloNETEntryAndCollectionSharedPopup.ShowHoloNETEntrySharedTab();
-            ucHoloNETEntryAndCollectionSharedPopup.ucHoloNETEntryShared.HideStatusMessage();
-            ucHoloNETEntryAndCollectionSharedPopup.ucHoloNETCollectionEntryShared.HideStatusMessage();
-            
             PopupManager.CurrentPopup = ucHoloNETEntryAndCollectionSharedPopup;
             ucHoloNETEntryAndCollectionSharedPopup.Visibility = Visibility.Visible;
-
-            ConnectToAppAgentClientResult result = HoloNETManager.Instance.ConnectToAppAgentClient();
-
-            if (result.ResponseType == ConnectToAppAgentClientResponseType.Connected)
-                HoloNETManager.Instance.LoadHoloNETEntryShared(result.AppAgentClient);
-            else
-                HoloNETManager.Instance.ClientOperation = ClientOperation.LoadHoloNETEntryShared;
         }
 
         private void gridLog_LayoutUpdated(object sender, EventArgs e)
@@ -318,7 +303,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
 
         private void gridHapps_SelectedCellsChanged(object sender, SelectedCellsChangedEventArgs e)
         {
-            HoloNETManager.Instance.CurrentApp = gridHapps.SelectedItem as InstalledApp;
+            if (PopupManager.CurrentPopup == null)
+                HoloNETManager.Instance.CurrentApp = gridHapps.SelectedItem as InstalledApp;
         }
     }
 }

@@ -6,6 +6,7 @@
              xmlns:fa="http://schemas.fontawesome.io/icons/"
              xmlns:local="clr-namespace:NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls"
              xmlns:uc="clr-namespace:NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls"
+             xmlns:managers="clr-namespace:NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
 
@@ -17,7 +18,11 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <Grid x:Name="popupHoloNETCollection" Opacity="0.9" Grid.Row="0" Grid.RowSpan="6" Visibility="Hidden">
+    <UserControl.DataContext>
+        <managers:HoloNETManager />
+    </UserControl.DataContext>
+
+    <Grid Opacity="0.9" Grid.Row="0" Grid.RowSpan="6">
         <Grid Background="Transparent" Opacity="0.5"/>
         <Border Width="770" Height="720"
                 Background="DarkBlue" 
@@ -260,6 +265,7 @@ BlurRadius="10"/>
                         </Button.Triggers>
                     </Button>
 
+                    <!--<Button x:Name="btnHoloNETCollectionPopupSaveChanges" IsEnabled="{Binding Instance.HoloNETEntries.IsChanges}" Margin="5" Style="{StaticResource ButtonStyle}" Cursor="Hand" Foreground="WhiteSmoke" Width="170" FontSize="14" Content="Save Changes" Background="{x:Null}" Click="btnHoloNETCollectionPopupSaveChanges_Click">-->
                     <Button x:Name="btnHoloNETCollectionPopupSaveChanges" IsEnabled="False" Margin="5" Style="{StaticResource ButtonStyle}" Cursor="Hand" Foreground="WhiteSmoke" Width="170" FontSize="14" Content="Save Changes" Background="{x:Null}" Click="btnHoloNETCollectionPopupSaveChanges_Click">
                         <Button.Effect>
                             <DropShadowEffect x:Name="btnHoloNETCollectionPopupSaveChangesEffect" ShadowDepth="0"

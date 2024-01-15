@@ -16,7 +16,7 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <Grid x:Name="popupAdminURI" Grid.Row="0" Opacity="0.9" Grid.RowSpan="6" Visibility="Visible">
+    <Grid Grid.Row="0" Opacity="0.9" Grid.RowSpan="6">
         <Grid Background="Transparent" Opacity="0.5"/>
         <Border
     MinWidth="350"

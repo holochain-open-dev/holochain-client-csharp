@@ -17,7 +17,7 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <Grid x:Name="popupHoloNETEntry" Opacity="0.9" Grid.Row="0" Grid.RowSpan="6" Width="570" Visibility="Hidden">
+    <Grid Opacity="0.9" Grid.Row="0" Grid.RowSpan="6" Width="570">
         <Grid Background="Transparent" Opacity="0.5"/>
         <Border Width="570"
                     Height="440"

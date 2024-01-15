@@ -28,6 +28,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls
 
         private async Task InitPopupAsync()
         {
+            ShowHoloNETEntryTab();
+            HoloNETEntryUIManager.CurrentHoloNETEntryUI = ucHoloNETEntry;
+
             //This extra check here will not normally be needed in a normal hApp (because you will not have the admin UI allowing you to uninstall, disable or disconnect).
             //But for extra defencive coding to be on the safe side you can of course double check! ;-)
             bool showAlreadyInitMessage = true;
@@ -238,7 +241,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls
 
                             HoloNETManager.Instance.ShowStatusMessage($"APP: HoloNET Entry Saved.", StatusMessageType.Success);
                             HoloNETManager.Instance.LogMessage($"APP: HoloNET Entry Saved. {GetHoloNETEntryMetaData(HoloNETManager.Instance.HoloNETEntry)}");
-                            popupHoloNETEntry.Visibility = Visibility.Hidden;
+                            this.Visibility = Visibility.Hidden;
                         }
                         else
                         {
@@ -249,6 +252,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls
                     }
                 });
             }
+            else
+                ShowHoloNETEntryTab();
         }
 
         private void btnHoloNETEntryPopupDelete_Click(object sender, RoutedEventArgs e)
@@ -297,7 +302,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls
 
                         HoloNETManager.Instance.ShowStatusMessage($"APP: HoloNET Entry Deleted.", StatusMessageType.Success);
                         HoloNETManager.Instance.LogMessage($"APP: HoloNET Entry Deleted. {GetHoloNETEntryMetaData(HoloNETManager.Instance.HoloNETEntry)}");
-                        popupHoloNETEntry.Visibility = Visibility.Hidden;
+                        this.Visibility = Visibility.Hidden;
                     }
                     else
                     {
@@ -312,7 +317,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls
         private void btnHoloNETEntryPopupCancel_Click(object sender, RoutedEventArgs e)
         {
             ucHoloNETEntry.HideStatusMessage();
-            popupHoloNETEntry.Visibility = Visibility.Hidden;
+            this.Visibility = Visibility.Hidden;
+            PopupManager.CurrentPopup = null;
         }
     }
 }

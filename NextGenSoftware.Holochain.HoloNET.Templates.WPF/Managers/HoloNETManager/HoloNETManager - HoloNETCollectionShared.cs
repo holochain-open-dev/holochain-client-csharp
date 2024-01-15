@@ -13,68 +13,68 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
     {
         public void InitHoloNETCollection(HoloNETClient client)
         {
-            HoloNETManager.Instance.LogMessage("APP: Initializing HoloNET Collection...");
-            HoloNETManager.Instance.ShowStatusMessage("Initializing HoloNET Collection...", StatusMessageType.Information, true);
+            LogMessage("APP: Initializing HoloNET Collection...");
+            ShowStatusMessage("Initializing HoloNET Collection...", StatusMessageType.Information, true);
 
-            if (!HoloNETManager.Instance.HoloNETEntriesShared.ContainsKey(HoloNETManager.Instance.CurrentApp.Name) || (HoloNETManager.Instance.HoloNETEntriesShared.ContainsKey(HoloNETManager.Instance.CurrentApp.Name) && HoloNETManager.Instance.HoloNETEntriesShared[HoloNETManager.Instance.CurrentApp.Name] == null))
+            if (!HoloNETEntriesShared.ContainsKey(CurrentApp.Name) || (HoloNETEntriesShared.ContainsKey(CurrentApp.Name) && HoloNETEntriesShared[CurrentApp.Name] == null))
             {
-                HoloNETManager.Instance.HoloNETEntriesShared[HoloNETManager.Instance.CurrentApp.Name] = new HoloNETObservableCollection<AvatarShared>("oasis", "load_avatars", "add_avatar", "remove_avatar", client, "update_avatars");
-                HoloNETManager.Instance.HoloNETEntriesShared[HoloNETManager.Instance.CurrentApp.Name].OnInitialized += HoloNETEntriesShared_OnInitialized;
-                HoloNETManager.Instance.HoloNETEntriesShared[HoloNETManager.Instance.CurrentApp.Name].OnCollectionLoaded += HoloNETEntriesShared_OnCollectionLoaded;
-                HoloNETManager.Instance.HoloNETEntriesShared[HoloNETManager.Instance.CurrentApp.Name].OnCollectionSaved += HoloNETEntriesShared_OnCollectionSaved;
-                HoloNETManager.Instance.HoloNETEntriesShared[HoloNETManager.Instance.CurrentApp.Name].CollectionChanged += HoloNETEntriesShared_CollectionChanged;
-                HoloNETManager.Instance.HoloNETEntriesShared[HoloNETManager.Instance.CurrentApp.Name].OnHoloNETEntryAddedToCollection += HoloNETEntriesShared_OnHoloNETEntryAddedToCollection;
-                HoloNETManager.Instance.HoloNETEntriesShared[HoloNETManager.Instance.CurrentApp.Name].OnHoloNETEntryRemovedFromCollection += HoloNETEntriesShared_OnHoloNETEntryRemovedFromCollection;
-                HoloNETManager.Instance.HoloNETEntriesShared[HoloNETManager.Instance.CurrentApp.Name].OnClosed += HoloNETEntriesShared_OnClosed;
-                HoloNETManager.Instance.HoloNETEntriesShared[HoloNETManager.Instance.CurrentApp.Name].OnError += HoloNETEntriesShared_OnError;
+                HoloNETEntriesShared[CurrentApp.Name] = new HoloNETObservableCollection<AvatarShared>("oasis", "load_avatars", "add_avatar", "remove_avatar", client, "update_avatars");
+                HoloNETEntriesShared[CurrentApp.Name].OnInitialized += HoloNETEntriesShared_OnInitialized;
+                HoloNETEntriesShared[CurrentApp.Name].OnCollectionLoaded += HoloNETEntriesShared_OnCollectionLoaded;
+                HoloNETEntriesShared[CurrentApp.Name].OnCollectionSaved += HoloNETEntriesShared_OnCollectionSaved;
+                HoloNETEntriesShared[CurrentApp.Name].CollectionChanged += HoloNETEntriesShared_CollectionChanged;
+                HoloNETEntriesShared[CurrentApp.Name].OnHoloNETEntryAddedToCollection += HoloNETEntriesShared_OnHoloNETEntryAddedToCollection;
+                HoloNETEntriesShared[CurrentApp.Name].OnHoloNETEntryRemovedFromCollection += HoloNETEntriesShared_OnHoloNETEntryRemovedFromCollection;
+                HoloNETEntriesShared[CurrentApp.Name].OnClosed += HoloNETEntriesShared_OnClosed;
+                HoloNETEntriesShared[CurrentApp.Name].OnError += HoloNETEntriesShared_OnError;
             }
             else
-                HoloNETManager.Instance.HoloNETEntriesShared[HoloNETManager.Instance.CurrentApp.Name].HoloNETClient = client;
+                HoloNETEntriesShared[CurrentApp.Name].HoloNETClient = client;
         }
 
         public async Task LoadCollection(HoloNETClient client)
         {
-            if (!HoloNETManager.Instance.HoloNETEntriesShared.ContainsKey(HoloNETManager.Instance.CurrentApp.Name)
-                || (HoloNETManager.Instance.HoloNETEntriesShared.ContainsKey(HoloNETManager.Instance.CurrentApp.Name) && HoloNETManager.Instance.HoloNETEntriesShared[HoloNETManager.Instance.CurrentApp.Name] == null)
-                || (HoloNETManager.Instance.HoloNETEntriesShared.ContainsKey(HoloNETManager.Instance.CurrentApp.Name) && HoloNETManager.Instance.HoloNETEntriesShared[HoloNETManager.Instance.CurrentApp.Name] != null && !HoloNETManager.Instance.HoloNETEntriesShared[HoloNETManager.Instance.CurrentApp.Name].IsInitialized))
-                HoloNETManager.Instance.InitHoloNETCollection(client);
+            if (!HoloNETEntriesShared.ContainsKey(CurrentApp.Name)
+                || (HoloNETEntriesShared.ContainsKey(CurrentApp.Name) && HoloNETEntriesShared[CurrentApp.Name] == null)
+                || (HoloNETEntriesShared.ContainsKey(CurrentApp.Name) && HoloNETEntriesShared[CurrentApp.Name] != null && !HoloNETEntriesShared[CurrentApp.Name].IsInitialized))
+                InitHoloNETCollection(client);
 
-            else if (HoloNETManager.Instance.HoloNETEntriesShared[HoloNETManager.Instance.CurrentApp.Name].HoloNETClient.EndPoint != client.EndPoint)
-                HoloNETManager.Instance.HoloNETEntriesShared[HoloNETManager.Instance.CurrentApp.Name].HoloNETClient = client;
+            else if (HoloNETEntriesShared[CurrentApp.Name].HoloNETClient.EndPoint != client.EndPoint)
+                HoloNETEntriesShared[CurrentApp.Name].HoloNETClient = client;
 
             else
             {
-                HoloNETManager.Instance.ShowStatusMessage($"HoloNET Collection Already Initialized.", StatusMessageType.Success, false);
-                HoloNETManager.Instance.LogMessage($"APP: HoloNET Collection Already Initialized..");
+                ShowStatusMessage($"HoloNET Collection Already Initialized.", StatusMessageType.Success, false);
+                LogMessage($"APP: HoloNET Collection Already Initialized..");
             }
 
-            if (HoloNETManager.Instance.HoloNETEntriesShared.ContainsKey(HoloNETManager.Instance.CurrentApp.Name) && HoloNETManager.Instance.HoloNETEntriesShared[HoloNETManager.Instance.CurrentApp.Name] != null)
+            if (HoloNETEntriesShared.ContainsKey(CurrentApp.Name) && HoloNETEntriesShared[CurrentApp.Name] != null)
             {
-                HoloNETManager.Instance.ShowStatusMessage($"Loading HoloNET Collection...", StatusMessageType.Information, true, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
-                HoloNETManager.Instance.LogMessage($"APP: Loading HoloNET Collection...");
+                ShowStatusMessage($"Loading HoloNET Collection...", StatusMessageType.Information, true, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
+                LogMessage($"APP: Loading HoloNET Collection...");
 
                 //Non-async way (you need to use the OnCollectionLoaded event to know when the collection has loaded and receive the data/collection.
                 //For non-async methods you will need to wait till the OnInitialized event to raise before calling any other methods such as the one below...
                 //HoloNETEntries[CurrentApp.Name].LoadCollection(); 
 
                 //LoadCollectionAsync (as well as all other async methods) will automatically init and wait for the client to finish connecting and retreiving agentPubKey (if needed) and raising the OnInitialized event.
-                HoloNETCollectionLoadedResult<AvatarShared> result = await HoloNETManager.Instance.HoloNETEntriesShared[HoloNETManager.Instance.CurrentApp.Name].LoadCollectionAsync(); //No event handlers are needed but you can still use if you like.
+                HoloNETCollectionLoadedResult<AvatarShared> result = await HoloNETEntriesShared[CurrentApp.Name].LoadCollectionAsync(); //No event handlers are needed but you can still use if you like.
                 HandleHoloNETCollectionLoaded(result);
             }
         }
 
         public async Task AddHoloNETEntryToCollection(HoloNETClient client, string firstName, string lastName, DateTime dob, string email)
         {
-            if (HoloNETManager.Instance.HoloNETEntriesShared == null || (HoloNETManager.Instance.HoloNETEntriesShared != null && !HoloNETManager.Instance.HoloNETEntriesShared[HoloNETManager.Instance.CurrentApp.Name].IsInitialized))
-                HoloNETManager.Instance.InitHoloNETCollection(client);
+            if (HoloNETEntriesShared == null || (HoloNETEntriesShared != null && !HoloNETEntriesShared[CurrentApp.Name].IsInitialized))
+                InitHoloNETCollection(client);
 
-            else if (HoloNETManager.Instance.HoloNETEntriesShared[HoloNETManager.Instance.CurrentApp.Name].HoloNETClient.EndPoint != client.EndPoint)
-                HoloNETManager.Instance.HoloNETEntriesShared[HoloNETManager.Instance.CurrentApp.Name].HoloNETClient = client;
+            else if (HoloNETEntriesShared[CurrentApp.Name].HoloNETClient.EndPoint != client.EndPoint)
+                HoloNETEntriesShared[CurrentApp.Name].HoloNETClient = client;
 
-            if (HoloNETManager.Instance.HoloNETEntriesShared != null && HoloNETManager.Instance.HoloNETEntriesShared[HoloNETManager.Instance.CurrentApp.Name].IsInitialized)
+            if (HoloNETEntriesShared != null && HoloNETEntriesShared[CurrentApp.Name].IsInitialized)
             {
-                HoloNETManager.Instance.ShowStatusMessage($"Adding HoloNET Entry To Collection...", StatusMessageType.Information, true, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
-                HoloNETManager.Instance.LogMessage($"APP: Adding HoloNET Entry To Collection...");
+                ShowStatusMessage($"Adding HoloNET Entry To Collection...", StatusMessageType.Information, true, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
+                LogMessage($"APP: Adding HoloNET Entry To Collection...");
 
                 //Non-async way (you need to use the OnCollectionLoaded event to know when the collection has loaded and receive the data/collection.
                 //For non-async methods you will need to wait till the OnInitialized event to raise before calling any other methods such as the one below...
@@ -88,7 +88,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
 
                 //Will add the entry to the collection and then persist the change to the hc/rust/happ code.
                 //We don't need to call Save() on the entry before calling this method because this method will automatically save the entry and then add it to the collection. It can also of course add an existing entry to the collection. The same applies to the SaveCollection method below.
-                ZomeFunctionCallBackEventArgs result = await HoloNETManager.Instance.HoloNETEntriesShared[HoloNETManager.Instance.CurrentApp.Name].AddHoloNETEntryToCollectionAndSaveAsync(new AvatarShared()
+                ZomeFunctionCallBackEventArgs result = await HoloNETEntriesShared[CurrentApp.Name].AddHoloNETEntryToCollectionAndSaveAsync(new AvatarShared()
                 {
                     FirstName = firstName,
                     LastName = lastName,
@@ -116,9 +116,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
         private void HandleHoloNETCollectionLoaded(HoloNETCollectionLoadedResult<AvatarShared> result)
         {
             //TODO: TEMP UNTIL REAL DATA IS RETURNED! REMOVE AFTER!
-            if (HoloNETManager.Instance.HoloNETEntriesShared[HoloNETManager.Instance.CurrentApp.Name] != null && HoloNETManager.Instance.HoloNETEntriesShared[HoloNETManager.Instance.CurrentApp.Name].Count == 0)
+            if (HoloNETEntriesShared[CurrentApp.Name] != null && HoloNETEntriesShared[CurrentApp.Name].Count == 0)
             {
-                if (HoloNETManager.Instance.CurrentApp.Name == HoloNETManager.Instance.HoloNETCollectionDemoAppId)
+                if (CurrentApp.Name == HoloNETCollectionDemoAppId)
                 {
                     for (int i = 0; i < 5; i++)
                     {
@@ -133,7 +133,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
 
                         //TODO: REMOVE AFTER, TEMP TILL GET ZOMECALLS WORKING AGAIN!
                         avatar1.MockData();
-                        HoloNETManager.Instance.HoloNETEntriesShared[HoloNETManager.Instance.CurrentApp.Name].Add(avatar1);
+                        HoloNETEntriesShared[CurrentApp.Name].Add(avatar1);
                     }
 
                     AvatarShared avatar = new AvatarShared()
@@ -147,7 +147,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
 
                     //TODO: REMOVE AFTER, TEMP TILL GET ZOMECALLS WORKING AGAIN!
                     avatar.MockData();
-                    HoloNETManager.Instance.HoloNETEntriesShared[HoloNETManager.Instance.CurrentApp.Name].Add(avatar);
+                    HoloNETEntriesShared[CurrentApp.Name].Add(avatar);
 
                     avatar = new AvatarShared()
                     {
@@ -160,7 +160,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
 
                     //TODO: REMOVE AFTER, TEMP TILL GET ZOMECALLS WORKING AGAIN!
                     avatar.MockData();
-                    HoloNETManager.Instance.HoloNETEntriesShared[HoloNETManager.Instance.CurrentApp.Name].Add(avatar);
+                    HoloNETEntriesShared[CurrentApp.Name].Add(avatar);
                 }
                 else
                 {
@@ -177,7 +177,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
 
                         //TODO: REMOVE AFTER, TEMP TILL GET ZOMECALLS WORKING AGAIN!
                         avatar.MockData();
-                        HoloNETManager.Instance.HoloNETEntriesShared[HoloNETManager.Instance.CurrentApp.Name].Add(avatar);
+                        HoloNETEntriesShared[CurrentApp.Name].Add(avatar);
 
                         avatar = new AvatarShared()
                         {
@@ -190,7 +190,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
 
                         //TODO: REMOVE AFTER, TEMP TILL GET ZOMECALLS WORKING AGAIN!
                         avatar.MockData();
-                        HoloNETManager.Instance.HoloNETEntriesShared[HoloNETManager.Instance.CurrentApp.Name].Add(avatar);
+                        HoloNETEntriesShared[CurrentApp.Name].Add(avatar);
 
                         avatar = new AvatarShared()
                         {
@@ -203,7 +203,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
 
                         //TODO: REMOVE AFTER, TEMP TILL GET ZOMECALLS WORKING AGAIN!
                         avatar.MockData();
-                        HoloNETManager.Instance.HoloNETEntriesShared[HoloNETManager.Instance.CurrentApp.Name].Add(avatar);
+                        HoloNETEntriesShared[CurrentApp.Name].Add(avatar);
 
                         avatar = new AvatarShared()
                         {
@@ -216,7 +216,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
 
                         //TODO: REMOVE AFTER, TEMP TILL GET ZOMECALLS WORKING AGAIN!
                         avatar.MockData();
-                        HoloNETManager.Instance.HoloNETEntriesShared[HoloNETManager.Instance.CurrentApp.Name].Add(avatar);
+                        HoloNETEntriesShared[CurrentApp.Name].Add(avatar);
                     }
                 }
             }
@@ -225,18 +225,18 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
 
             if (!result.IsError)
             {
-                HoloNETManager.Instance.ShowStatusMessage($"HoloNET Collection Loaded.", StatusMessageType.Error);
-                HoloNETManager.Instance.LogMessage($"APP: HoloNET Collection Loaded.");
+                ShowStatusMessage($"HoloNET Collection Loaded.", StatusMessageType.Error);
+                LogMessage($"APP: HoloNET Collection Loaded.");
 
                 //gridDataEntries.ItemsSource = result.Entries; //Can set it using this or line below.
-                //gridDataEntries.ItemsSource = HoloNETManager.Instance.HoloNETEntriesShared[HoloNETManager.Instance.CurrentApp.Name];
+                //gridDataEntries.ItemsSource = HoloNETEntriesShared[CurrentApp.Name];
                 RefreshEntriesGrid();
             }
             else
             {
                 HoloNETEntryUIManager.CurrentHoloNETEntryUI.ShowStatusMessage(result.Message, StatusMessageType.Error);
-                HoloNETManager.Instance.ShowStatusMessage($"Error Occured Loading HoloNET Collection.", StatusMessageType.Error);
-                HoloNETManager.Instance.LogMessage($"APP: Error Occured Loading HoloNET Collection. Reason: {result.Message}");
+                ShowStatusMessage($"Error Occured Loading HoloNET Collection.", StatusMessageType.Error);
+                LogMessage($"APP: Error Occured Loading HoloNET Collection. Reason: {result.Message}");
             }
         }
 
@@ -251,8 +251,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
                 HoloNETEntryUIManager.CurrentHoloNETEntryUI.DOB = "";
                 HoloNETEntryUIManager.CurrentHoloNETEntryUI.Email = "";
 
-                HoloNETManager.Instance.ShowStatusMessage($"HoloNET Entry Added To Collection.", StatusMessageType.Success, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
-                HoloNETManager.Instance.LogMessage($"APP: HoloNET Entry Added To Collection.");
+                ShowStatusMessage($"HoloNET Entry Added To Collection.", StatusMessageType.Success, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
+                LogMessage($"APP: HoloNET Entry Added To Collection.");
             }
             else
             {
@@ -266,8 +266,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
                 HoloNETEntryUIManager.CurrentHoloNETEntryUI.Email = "";
 
                 HoloNETEntryUIManager.CurrentHoloNETEntryUI.ShowStatusMessage(result.Message, StatusMessageType.Error);
-                HoloNETManager.Instance.ShowStatusMessage($"Error Occured Adding HoloNET Entry To Collection.", StatusMessageType.Error);
-                HoloNETManager.Instance.LogMessage($"APP: Error Occured Adding HoloNET Entry To Collection. Reason: {result.Message}");
+                ShowStatusMessage($"Error Occured Adding HoloNET Entry To Collection.", StatusMessageType.Error);
+                LogMessage($"APP: Error Occured Adding HoloNET Entry To Collection. Reason: {result.Message}");
             }
         }
 
@@ -276,15 +276,15 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
             ucHoloNETEntryAndCollectionSharedPopup ucHoloNETEntryAndCollectionSharedPopup = PopupManager.CurrentPopup as ucHoloNETEntryAndCollectionSharedPopup;
 
             if (ucHoloNETEntryAndCollectionSharedPopup != null)
-                ucHoloNETEntryAndCollectionSharedPopup.gridDataEntries.ItemsSource = HoloNETManager.Instance.HoloNETEntriesShared[HoloNETManager.Instance.CurrentApp.Name];
+                ucHoloNETEntryAndCollectionSharedPopup.gridDataEntries.ItemsSource = HoloNETEntriesShared[CurrentApp.Name];
         }
 
         private void HoloNETEntriesShared_OnInitialized(object sender, ReadyForZomeCallsEventArgs e)
         {
             if (!e.IsError)
             {
-                HoloNETManager.Instance.ShowStatusMessage($"HoloNET Collection Initialized", StatusMessageType.Success);
-                HoloNETManager.Instance.LogMessage($"APP: HoloNET Collection Initialized.");
+                ShowStatusMessage($"HoloNET Collection Initialized", StatusMessageType.Success);
+                LogMessage($"APP: HoloNET Collection Initialized.");
             }
         }
 
@@ -292,8 +292,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
         {
             if (!e.IsError)
             {
-                HoloNETManager.Instance.ShowStatusMessage($"HoloNET Collection Loaded", StatusMessageType.Success);
-                HoloNETManager.Instance.LogMessage($"APP: HoloNET Collection Loaded: {HoloNETManager.Instance.GetEntryInfo(e.ZomeFunctionCallBackEventArgs)}");
+                ShowStatusMessage($"HoloNET Collection Loaded", StatusMessageType.Success);
+                LogMessage($"APP: HoloNET Collection Loaded: {GetEntryInfo(e.ZomeFunctionCallBackEventArgs)}");
             }
         }
 
@@ -301,24 +301,24 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
         {
             if (!e.IsError)
             {
-                HoloNETManager.Instance.ShowStatusMessage($"HoloNET Data Entries Updated (Collection Updated)", StatusMessageType.Success);
-                HoloNETManager.Instance.LogMessage($"APP: HoloNET Data Entries Updated (Collection Updated).");
+                ShowStatusMessage($"HoloNET Data Entries Updated (Collection Updated)", StatusMessageType.Success);
+                LogMessage($"APP: HoloNET Data Entries Updated (Collection Updated).");
             }
         }
 
         private void HoloNETEntriesShared_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             string msg = $"HoloNET Collection Changed. Action: {Enum.GetName(typeof(NotifyCollectionChangedAction), e.Action)}, New Items: {(e.NewItems != null ? e.NewItems.Count : 0)}, Old Items: {(e.OldItems != null ? e.OldItems.Count : 0)}";
-            HoloNETManager.Instance.LogMessage($"APP: {msg}");
-            HoloNETManager.Instance.ShowStatusMessage(msg, StatusMessageType.Information, true);
+            LogMessage($"APP: {msg}");
+            ShowStatusMessage(msg, StatusMessageType.Information, true);
         }
 
         private void HoloNETEntriesShared_OnHoloNETEntryAddedToCollection(object sender, ZomeFunctionCallBackEventArgs e)
         {
             if (!e.IsError)
             {
-                HoloNETManager.Instance.ShowStatusMessage($"HoloNET Data Entry Added To Collection", StatusMessageType.Success);
-                HoloNETManager.Instance.LogMessage($"APP: HoloNET Data Entry Added To Collection: {HoloNETManager.Instance.GetEntryInfo(e)}");
+                ShowStatusMessage($"HoloNET Data Entry Added To Collection", StatusMessageType.Success);
+                LogMessage($"APP: HoloNET Data Entry Added To Collection: {GetEntryInfo(e)}");
             }
         }
 
@@ -326,8 +326,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
         {
             if (!e.IsError)
             {
-                HoloNETManager.Instance.ShowStatusMessage($"HoloNET Data Entry Removed From Collection", StatusMessageType.Success);
-                HoloNETManager.Instance.LogMessage($"APP: HoloNET Data Entry Removed From Collection: {HoloNETManager.Instance.GetEntryInfo(e)}");
+                ShowStatusMessage($"HoloNET Data Entry Removed From Collection", StatusMessageType.Success);
+                LogMessage($"APP: HoloNET Data Entry Removed From Collection: {GetEntryInfo(e)}");
             }
         }
 
@@ -335,15 +335,15 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
         {
             if (!e.IsError)
             {
-                HoloNETManager.Instance.ShowStatusMessage($"HoloNET Collection Closed", StatusMessageType.Success);
-                HoloNETManager.Instance.LogMessage($"APP: HoloNET Collection Closed.");
+                ShowStatusMessage($"HoloNET Collection Closed", StatusMessageType.Success);
+                LogMessage($"APP: HoloNET Collection Closed.");
             }
         }
 
         private void HoloNETEntriesShared_OnError(object sender, HoloNETErrorEventArgs e)
         {
-            HoloNETManager.Instance.ShowStatusMessage($"HoloNET Collection Error", StatusMessageType.Error);
-            HoloNETManager.Instance.LogMessage($"APP: HoloNET Collection Error: {e.Reason}");
+            ShowStatusMessage($"HoloNET Collection Error", StatusMessageType.Error);
+            LogMessage($"APP: HoloNET Collection Error: {e.Reason}");
         }
     }
 }

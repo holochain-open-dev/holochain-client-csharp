@@ -19,8 +19,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls
 
         private void btnAdminURIPopupCancel_Click(object sender, RoutedEventArgs e)
         {
-            //popupAdminURI.Visibility = Visibility.Collapsed;
             this.Visibility = Visibility.Collapsed;
+            PopupManager.CurrentPopup = null;
             Application.Current.Shutdown();
         }
 
@@ -45,6 +45,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls
                     lblAdminURIError.Visibility = Visibility.Collapsed;
                     //popupAdminURI.Visibility = Visibility.Collapsed;
                     this.Visibility = Visibility.Collapsed;
+                    PopupManager.CurrentPopup = null;
 
                     HoloNETManager.Instance.HoloNETClientAdmin.HoloNETDNA.HolochainConductorAdminURI = txtAdminURI.Text;
                     HoloNETManager.Instance.HoloNETClientAdmin.HoloNETDNA.AutoStartHolochainConductor = chkAutoStartConductor.IsChecked.Value;

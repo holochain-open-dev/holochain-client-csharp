@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:fa="http://schemas.fontawesome.io/icons/"
         xmlns:uc="clr-namespace:NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls"
+        xmlns:managers="clr-namespace:NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers"
         mc:Ignorable="d"
         Title="NextGen Software HoloNET WPF Test Harness v1.0" Height="770" Width="1650">
 
@@ -15,6 +16,10 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
+
+    <Window.DataContext>
+        <managers:HoloNETManager />
+    </Window.DataContext>
 
     <Grid>
         <Grid.RowDefinitions>
@@ -377,7 +382,7 @@
             <Label  HorizontalAlignment="Left" Foreground="White" FontWeight="Bold" Margin="10" FontSize="12" Content="Installed hApps" VerticalAlignment="Center"/>
         </StackPanel>
 
-        <DataGrid Grid.Row="1" x:Name="gridHapps" ItemsSource="{Binding Path=HoloNETManager.Instance.InstalledApps}" SelectedCellsChanged="gridHapps_SelectedCellsChanged" HeadersVisibility="Column" Margin="10" AutoGenerateColumns="False" IsReadOnly="true"  RowBackground="DarkBlue" AlternatingRowBackground="Blue"  Background="Transparent"  Foreground="White">
+        <DataGrid Grid.Row="1" x:Name="gridHapps" ItemsSource="{Binding Path=Instance.InstalledApps}" SelectedCellsChanged="gridHapps_SelectedCellsChanged" HeadersVisibility="Column" Margin="10" AutoGenerateColumns="False" IsReadOnly="true"  RowBackground="DarkBlue" AlternatingRowBackground="Blue"  Background="Transparent"  Foreground="White">
             <DataGrid.Resources>
                 <Style BasedOn="{StaticResource {x:Type DataGridColumnHeader}}" TargetType="{x:Type DataGridColumnHeader}">
                     <Setter Property="Background" Value="Blue" />
@@ -670,13 +675,14 @@ BlurRadius="10"/>
                 </TextBlock>
                 <fa:ImageAwesome x:Name="spinner" Icon="Cog" Visibility="Hidden" Spin="True" Foreground="WhiteSmoke" VerticalAlignment="Center" Margin="5,0,0,4" Height="20" Width="20" />
             </StackPanel>
-            
-            <TextBlock x:Name="txtConnections" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right" FontWeight="Bold"  Text="{Binding Path=HoloNETManger.Instance.NumberOfClientConnections}" VerticalAlignment="Center" Margin="0,0,15,10" Foreground="WhiteSmoke">
+
+
+            <TextBlock x:Name="txtConnections" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right" FontWeight="Bold"  Text="Client Connections: 0" VerticalAlignment="Center" Margin="0,0,15,10" Foreground="WhiteSmoke">
                 <TextBlock.Effect>
                     <DropShadowEffect x:Name="glowEffectConnections" ShadowDepth="0"
-                          Color="White"
-                          Opacity="0"
-                          BlurRadius="10"/>
+                Color="White"
+                Opacity="0"
+                BlurRadius="10"/>
                 </TextBlock.Effect>
 
                 <TextBlock.Triggers>
@@ -684,15 +690,17 @@ BlurRadius="10"/>
                         <BeginStoryboard>
                             <Storyboard x:Name="sbAnimateConnections">
                                 <DoubleAnimation
-                                    Storyboard.TargetName="glowEffectConnections" 
-                                    Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
-                                    From="0.0" To="1.0" Duration="0:0:0.5" 
-                                    AutoReverse="True" RepeatBehavior="1x" />
+                    Storyboard.TargetName="glowEffectConnections" 
+                    Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+                    From="0.0" To="1.0" Duration="0:0:0.5" 
+                    AutoReverse="True" RepeatBehavior="1x" />
                             </Storyboard>
                         </BeginStoryboard>
                     </EventTrigger>
                 </TextBlock.Triggers>
             </TextBlock>
+
+
         </Grid>
 
         <uc:ucConductorSettingsPopup x:Name="ucConductorSettingsPopup" Grid.Row="0" Opacity="0.9" Grid.RowSpan="6" Visibility="Visible"></uc:ucConductorSettingsPopup>

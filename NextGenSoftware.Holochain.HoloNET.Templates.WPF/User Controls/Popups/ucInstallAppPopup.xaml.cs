@@ -37,7 +37,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls
             else
             {
                 lblInstallAppErrorMessage.Visibility = Visibility.Collapsed;
-                popupInstallhApp.Visibility = Visibility.Collapsed;
+                this.Visibility = Visibility.Collapsed;
 
                 HoloNETManager.Instance.LogMessage($"ADMIN: Generating New AgentPubKey...");
                 HoloNETManager.Instance.ShowStatusMessage($"Generating New AgentPubKey...", StatusMessageType.Information, true);
@@ -65,7 +65,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls
 
         private void btnPopupInstallhAppCancel_Click(object sender, RoutedEventArgs e)
         {
-            popupInstallhApp.Visibility = Visibility.Collapsed;
+            this.Visibility = Visibility.Collapsed;
             lblInstallAppErrorMessage.Visibility = Visibility.Collapsed;
         }
     }
