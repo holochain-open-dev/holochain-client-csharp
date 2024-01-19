@@ -67,7 +67,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
                 await HoloNETEntry.WaitTillHoloNETInitializedAsync();
 
                 //Refresh the list of installed hApps.
-                ProcessListedApps(await HoloNETClientAdmin.AdminListAppsAsync(AppStatusFilter.All));
+                ProcessListedApps(await HoloNETClientAdmin.ListAppsAsync(AppStatusFilter.All));
 
                 ////Set the status to connected in the list of installed apps (this is good example of how you can access the internal HoloNETClient inside the HoloNET Entry).
                 //if (HoloNETEntry.HoloNETClient != null && HoloNETEntry.HoloNETClient.State == System.Net.WebSockets.WebSocketState.Open)
@@ -83,6 +83,185 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
             InitHoloNETEntryDemo = false;
             ShowAppsListedInLog = true;
             return false;
+        }
+
+        public async Task<ZomeFunctionCallBackEventArgs> LoadHoloNETEntryAsync()
+        {
+            ZomeFunctionCallBackEventArgs result = new ZomeFunctionCallBackEventArgs();
+
+            //This extra check here will not normally be needed in a normal hApp (because you will not have the admin UI allowing you to uninstall, disable or disconnect).
+            //But for extra defencive coding to be on the safe side you can of course double check! ;-)
+            bool showAlreadyInitMessage = true;
+
+            if (HoloNETEntry != null)
+                showAlreadyInitMessage = await CheckIfDemoAppReadyAsync(true);
+
+            //If we intend to re-use an object then we can store it globally so we only need to init once...
+            if (HoloNETEntry == null || !HoloNETEntry.IsInitialized)
+            {
+                LogMessage("APP: Initializing HoloNET Entry...");
+                ShowStatusMessage("Initializing HoloNET Entry...", StatusMessageType.Information, true, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
+
+                // If the HoloNET Entry is null then we need to init it now...
+                // Will init the HoloNET Entry which includes installing and enabling the app, signing credentials, attaching the app interface, then finally creating and connecting to the internal instance of the HoloNETClient.
+                await InitHoloNETEntry();
+            }
+            else if (showAlreadyInitMessage)
+            {
+                ShowStatusMessage($"APP: HoloNET Entry Already Initialized.", StatusMessageType.Information, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
+                LogMessage($"HoloNET Entry Already Initialized..");
+            }
+
+            //Non async way.
+            //If you use Load, Save or Delete non-async versions you will need to wait for the OnInitialized event to fire before calling.
+            //For non-async methods you will need to wait till the OnInitialized event to raise before calling any other methods such as the one below...
+
+            //ShowStatusMessage($"APP: Loading HoloNET Data Entry...", StatusMessageType.Information, true);
+            //LogMessage($"APP: Loading HoloNET Data Entry...");
+
+            //HoloNETEntry.Load(HoloNETEntryDNAManager.HoloNETEntryDNA.AvatarEntryHash); //For this OnLoaded event handler above is required //TODO: Check if this works without waiting for OnInitialized event!
+
+            //Async way.
+            if (HoloNETEntry != null && HoloNETEntryDNAManager.HoloNETEntryDNA != null && !string.IsNullOrEmpty(HoloNETEntryDNAManager.HoloNETEntryDNA.AvatarEntryHash))
+            {
+                ShowStatusMessage($"APP: Loading HoloNET Data Entry...", StatusMessageType.Information, true, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
+                LogMessage($"APP: Loading HoloNET Data Entry...");
+
+                //LoadAsync (as well as SaveAsync & DeleteAsync) will automatically init and wait for the client to finish connecting and retreiving agentPubKey (if needed) and raising the OnInitialized event.
+                result = await HoloNETEntry.LoadAsync(HoloNETEntryDNAManager.HoloNETEntryDNA.AvatarEntryHash); //No event handlers are needed.
+            }
+            else
+            {
+                if (HoloNETEntry == null)
+                {
+                    result.Message = "HoloNETEntry Failed To Initialized";
+                    result.IsError = true;
+                }
+                else if (HoloNETEntryDNAManager.HoloNETEntryDNA == null)
+                {
+                    result.Message = "HoloNETEntryDNAManager.HoloNETEntryDNA is null. This is likely caused by a corrupt HoloNETEntryDNA.json file, please delete and retry.";
+                    result.IsError = true;
+                }
+                else
+                {
+                    result.Message = "AvatarEntryHash in HoloNETEntryDNA is null. The likely cause is that no previous data has been saved for this entry.";
+                    result.IsWarning = true;
+                }
+            }
+
+            return result;
+        }
+
+        public async Task<ZomeFunctionCallBackEventArgs> SaveHoloNETEntryAsync()
+        {
+            ZomeFunctionCallBackEventArgs result = new ZomeFunctionCallBackEventArgs();
+
+            ///In case it has not been init properly when the popup was opened (it should have been though!)
+            if (HoloNETEntry == null || !HoloNETEntry.IsInitialized)
+            {
+                LogMessage("APP: Initializing HoloNET Entry...");
+                ShowStatusMessage("Initializing HoloNET Entry...", StatusMessageType.Information, true);
+
+                // If the HoloNET Entry is null then we need to init it now...
+                // Will init the HoloNET Entry which includes installing and enabling the app, signing credentials, attaching the app interface, then finally creating and connecting to the internal instance of the HoloNETClient.
+                await InitHoloNETEntry();
+            }
+
+            //Non async way.
+            //If you use Load, Save or Delete non-async versions you will need to wait for the OnInitialized event to fire before calling.
+            //For non-async methods you will need to wait till the OnInitialized event to raise before calling any other methods such as the one below...
+
+            //ShowStatusMessage($"APP: Saving HoloNET Data Entry...", StatusMessageType.Information, true);
+            //LogMessage($"APP: Saving HoloNET Data Entry...");
+
+            //string[] parts = txtHoloNETEntryDOB.Text.Split('/');
+
+            //HoloNETEntry.FirstName = txtHoloNETEntryFirstName.Text;
+            //HoloNETEntry.LastName = txtHoloNETEntryLastName.Text;
+            //HoloNETEntry.DOB = new DateTime(Convert.ToInt32(parts[2]), Convert.ToInt32(parts[1]), Convert.ToInt32(parts[0]));
+            //HoloNETEntry.Email = txtHoloNETEntryEmail.Text;
+
+            //HoloNETEntry.Save(); //For this OnSaved event handler above is required (only if you want to see what the result was!) //TODO: Check if this works without waiting for OnInitialized event!
+
+            //Async way.
+            if (HoloNETEntry != null)
+            {
+                ShowStatusMessage($"APP: Saving HoloNET Data Entry...", StatusMessageType.Information, true);
+                LogMessage($"APP: Saving HoloNET Data Entry...");
+
+                HoloNETEntry.FirstName = HoloNETEntryUIManager.CurrentHoloNETEntryUI.FirstName;
+                HoloNETEntry.LastName = HoloNETEntryUIManager.CurrentHoloNETEntryUI.LastName;
+                HoloNETEntry.DOB = HoloNETEntryUIManager.CurrentHoloNETEntryUI.DOBDateTime;
+                HoloNETEntry.Email = HoloNETEntryUIManager.CurrentHoloNETEntryUI.Email;
+
+                //SaveAsync (as well as LoadAsync and DeleteAsync) will automatically init and wait for the client to finish connecting and retreiving agentPubKey (if needed) and raising the OnInitialized event.
+                result = await HoloNETEntry.SaveAsync(); //No event handlers are needed.
+
+                if (!result.IsError)
+                {
+                    //Persist the entryhash so the next time we start the app we can re-load the entry from the hash.
+                    HoloNETEntryDNAManager.HoloNETEntryDNA.AvatarEntryHash = HoloNETEntry.EntryHash;
+                    HoloNETEntryDNAManager.HoloNETEntryDNA.AvatarEntryHash = result.Entries[0].EntryHash; //We can also get the entryHash from the callback eventargs.
+                    HoloNETEntryDNAManager.SaveDNA();
+                }
+            }
+            else
+            {
+                result.IsError = true;
+                result.Message = "HoloNETEntry Failed To Initialized";
+            }
+
+            return result;
+        }
+        
+        public async Task<ZomeFunctionCallBackEventArgs> DeleteHoloNETEntryAsync()
+        {
+            ZomeFunctionCallBackEventArgs result = new ZomeFunctionCallBackEventArgs();
+
+            ///In case it has not been init properly when the popup was opened (it should have been though!)
+            if (HoloNETEntry == null || !HoloNETEntry.IsInitialized)
+            {
+                LogMessage("APP: Initializing HoloNET Entry...");
+                ShowStatusMessage("Initializing HoloNET Entry...", StatusMessageType.Information, true);
+
+                // If the HoloNET Entry is null then we need to init it now...
+                // Will init the HoloNET Entry which includes installing and enabling the app, signing credentials, attaching the app interface, then finally creating and connecting to the internal instance of the HoloNETClient.
+                await InitHoloNETEntry();
+            }
+
+            //Non async way.
+            //If you use Load, Save or Delete non-async versions you will need to wait for the OnInitialized event to fire before calling.
+            //For non-async methods you will need to wait till the OnInitialized event to raise before calling any other methods such as the one below...
+
+            //ShowStatusMessage($"APP: Deleting HoloNET Data Entry...", StatusMessageType.Information, true);
+            //LogMessage($"APP: Deleting HoloNET Data Entry...");
+
+            //HoloNETEntry.Delete(); //For this OnDeleted event handler above is required (only if you want to see what the result was!) //TODO: Check if this works without waiting for OnInitialized event!
+
+            //Async way.
+            if (HoloNETEntry != null)
+            {
+                ShowStatusMessage($"APP: Deleting HoloNET Data Entry...", StatusMessageType.Information, true);
+                LogMessage($"APP: Deleting HoloNET Data Entry...");
+
+                //DeleteAsync (as well as LoadAsync and SaveAsync) will automatically init and wait for the client to finish connecting and retreiving agentPubKey (if needed) and raising the OnInitialized event.
+                result = await HoloNETEntry.DeleteAsync(); //No event handlers are needed.
+
+                if (!result.IsError)
+                {
+                    //Persist the entryhash so the next time we start the app we can re-load the entry from the hash.
+                    HoloNETEntryDNAManager.HoloNETEntryDNA.AvatarEntryHash = HoloNETEntry.EntryHash;
+                    HoloNETEntryDNAManager.HoloNETEntryDNA.AvatarEntryHash = result.Entries[0].EntryHash; //We can also get the entryHash from the callback eventargs.
+                    HoloNETEntryDNAManager.SaveDNA(); 
+                }
+            }
+            else
+            {
+                result.IsError = true;
+                result.Message = "HoloNETEntry Failed To Initialized";
+            }
+
+            return result;
         }
 
         private void _holoNETEntry_OnInitialized(object sender, ReadyForZomeCallsEventArgs e)

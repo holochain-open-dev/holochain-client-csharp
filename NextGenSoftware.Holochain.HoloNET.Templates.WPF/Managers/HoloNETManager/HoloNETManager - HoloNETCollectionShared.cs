@@ -11,7 +11,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
 {
     public partial class HoloNETManager
     {
-        public void InitHoloNETCollection(HoloNETClient client)
+        public void InitHoloNETCollection(HoloNETClientAppAgent client)
         {
             LogMessage("APP: Initializing HoloNET Collection...");
             ShowStatusMessage("Initializing HoloNET Collection...", StatusMessageType.Information, true);
@@ -32,7 +32,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
                 HoloNETEntriesShared[CurrentApp.Name].HoloNETClient = client;
         }
 
-        public async Task LoadCollection(HoloNETClient client)
+        public async Task LoadCollection(HoloNETClientAppAgent client)
         {
             if (!HoloNETEntriesShared.ContainsKey(CurrentApp.Name)
                 || (HoloNETEntriesShared.ContainsKey(CurrentApp.Name) && HoloNETEntriesShared[CurrentApp.Name] == null)
@@ -63,7 +63,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
             }
         }
 
-        public async Task AddHoloNETEntryToCollection(HoloNETClient client, string firstName, string lastName, DateTime dob, string email)
+        public async Task AddHoloNETEntryToCollection(HoloNETClientAppAgent client, string firstName, string lastName, DateTime dob, string email)
         {
             if (HoloNETEntriesShared == null || (HoloNETEntriesShared != null && !HoloNETEntriesShared[CurrentApp.Name].IsInitialized))
                 InitHoloNETCollection(client);
@@ -242,7 +242,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
 
         private void HandleHoloNETEntryAddedToCollection(ZomeFunctionCallBackEventArgs result)
         {
-            if (result.IsCallSuccessful && !result.IsError)
+            if (!result.IsError)
             {
                 RefreshEntriesGrid();
 

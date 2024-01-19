@@ -69,7 +69,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
                 await HoloNETEntries.WaitTillHoloNETInitializedAsync();
 
                 //Refresh the list of installed hApps.
-                ProcessListedApps(await HoloNETClientAdmin.AdminListAppsAsync(AppStatusFilter.All));
+                ProcessListedApps(await HoloNETClientAdmin.ListAppsAsync(AppStatusFilter.All));
 
                 ////Set the status to connected in the list of installed apps (this is good example of how you can access the internal HoloNETClient inside the HoloNET Entry).
                 //if (_holoNETEntry.HoloNETClient != null && _holoNETEntry.HoloNETClient.State == System.Net.WebSockets.WebSocketState.Open)

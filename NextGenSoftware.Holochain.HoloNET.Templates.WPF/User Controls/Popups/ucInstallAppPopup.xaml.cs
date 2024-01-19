@@ -46,7 +46,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls
                 {
                     //We don't normally need to generate a new agentpubkey for each hApp installed if each hApp has a unique DnaHash.
                     //But in this case it allows us to install the same hApp multiple times under different agentPubKeys (AgentPubKey & DnaHash combo must be unique, this is called the cellId).
-                    AdminAgentPubKeyGeneratedCallBackEventArgs agentPubKeyResult = await HoloNETManager.Instance.HoloNETClientAdmin.AdminGenerateAgentPubKeyAsync();
+                    AgentPubKeyGeneratedCallBackEventArgs agentPubKeyResult = await HoloNETManager.Instance.HoloNETClientAdmin.GenerateAgentPubKeyAsync();
 
                     if (agentPubKeyResult != null && !agentPubKeyResult.IsError)
                     {
@@ -57,7 +57,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls
                         HoloNETManager.Instance.ShowStatusMessage($"Installing hApp {txthAppName.Text}...", StatusMessageType.Information, true);
 
                         //We can use async or non-async versions for every function.
-                        HoloNETManager.Instance.HoloNETClientAdmin.AdminInstallApp(HoloNETManager.Instance.HoloNETClientAdmin.HoloNETDNA.AgentPubKey, txthAppName.Text, HoloNETManager.Instance.InstallingAppParams.InstallinghAppPath);
+                        HoloNETManager.Instance.HoloNETClientAdmin.InstallApp(HoloNETManager.Instance.HoloNETClientAdmin.HoloNETDNA.AgentPubKey, txthAppName.Text, HoloNETManager.Instance.InstallingAppParams.InstallinghAppPath);
                     }
                 });
             }

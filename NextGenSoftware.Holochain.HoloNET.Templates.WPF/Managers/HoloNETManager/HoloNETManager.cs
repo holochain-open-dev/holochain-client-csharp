@@ -38,8 +38,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
         public delegate void InstalledAppsChanged(object sender, InstalledAppsEventArgs e);
         public event InstalledAppsChanged OnInstalledAppsChanged;
 
-        public HoloNETClient? HoloNETClientAdmin { get; set; }
-        public List<HoloNETClient> HoloNETClientAppAgentClients { get; set; } = new List<HoloNETClient>();
+        public HoloNETClientAdmin? HoloNETClientAdmin { get; set; }
+        public List<HoloNETClientAppAgent> HoloNETClientAppAgentClients { get; set; } = new List<HoloNETClientAppAgent>();
         public ObservableCollection<InstalledApp> InstalledApps { get; set; } = new ObservableCollection<InstalledApp>();
 
         //This HoloNETEntry and HoloNETCollection use their own interal HoloNETClient (AppAgent) connection.
@@ -120,7 +120,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
             ShowStatusMessage($"Checking If Test App {appId} Is Still Installed...", StatusMessageType.Success, true, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
             //ucHoloNETEntry.ShowStatusMessage($"Checking If Test App {appId} Is Still Installed...", StatusMessageType.Information, true);
 
-            AdminGetAppInfoCallBackEventArgs appInfoResult = await HoloNETClientAdmin.AdminGetAppInfoAsync(appId);
+            GetAppInfoCallBackEventArgs appInfoResult = await HoloNETClientAdmin.GetAppInfoAsync(appId);
 
             //If the test app was manually uninstalled by the user then we need to re-init the HoloNET Entry/Collection now...
             if (appInfoResult != null && appInfoResult.AppInfo == null || appInfoResult.IsError)
@@ -156,7 +156,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
                     LogMessage($"ADMIN: Enabling Test App {appId}...");
                     ShowStatusMessage($"Enabling Test App {appId}...", StatusMessageType.Information, true, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
 
-                    AdminAppEnabledCallBackEventArgs enabledResult = await HoloNETClientAdmin.AdminEnableAppAsync(appId);
+                    AppEnabledCallBackEventArgs enabledResult = await HoloNETClientAdmin.EnableAppAsync(appId);
 
                     if (enabledResult != null && !enabledResult.IsError)
                     {
@@ -210,7 +210,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
                             await HoloNETEntry.WaitTillHoloNETInitializedAsync();
 
                             //Refresh the list of installed hApps.
-                            ProcessListedApps(await HoloNETClientAdmin.AdminListAppsAsync(AppStatusFilter.All));
+                            ProcessListedApps(await HoloNETClientAdmin.ListAppsAsync(AppStatusFilter.All));
                             
                             //Update number of connections UI.
                             UpdateNumerOfClientConnections();
@@ -253,7 +253,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
                             await HoloNETEntries.WaitTillHoloNETInitializedAsync();
 
                             //Refresh the list of installed hApps.
-                            ProcessListedApps(await HoloNETClientAdmin.AdminListAppsAsync(AppStatusFilter.All));
+                            ProcessListedApps(await HoloNETClientAdmin.ListAppsAsync(AppStatusFilter.All));
 
                             //Update number of connections UI.
                             UpdateNumerOfClientConnections();
@@ -280,7 +280,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
 
             _removeClientConnectionFromPoolAfterDisconnect = true;
 
-            foreach (HoloNETClient client in HoloNETClientAppAgentClients)
+            foreach (HoloNETClientAppAgent client in HoloNETClientAppAgentClients)
             {
                 if (client.State == System.Net.WebSockets.WebSocketState.Open)
                     client.Disconnect();

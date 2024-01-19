@@ -104,6 +104,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls
                 case StatusMessageType.Error:
                     txtMessage.Foreground = Brushes.Red;
                     break;
+
+                case StatusMessageType.Warning:
+                    txtMessage.Foreground = Brushes.Yellow;
+                    break;
             }
 
             if (showSpinner)

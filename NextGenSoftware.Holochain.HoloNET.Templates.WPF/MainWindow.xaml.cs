@@ -51,6 +51,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
                 case StatusMessageType.Error:
                     txtStatus.Foreground = Brushes.LightSalmon;
                     break;
+
+                case StatusMessageType.Warning:
+                    txtStatus.Foreground = Brushes.Yellow;
+                    break;
             }
 
             if (showSpinner)
@@ -147,21 +151,21 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
         {
             LogMessage("ADMIN: Listing DNAs...");
             ShowStatusMessage($"Listing DNAs...");
-            HoloNETManager.Instance.HoloNETClientAdmin.AdminListApps(AppStatusFilter.All);
+            HoloNETManager.Instance.HoloNETClientAdmin.ListApps(AppStatusFilter.All);
         }
 
         private void btnListCellIds_Click(object sender, RoutedEventArgs e)
         {
             LogMessage("ADMIN: Listing Cell Ids...");
             ShowStatusMessage($"Listing Cell Ids...", StatusMessageType.Information, true);
-            HoloNETManager.Instance.HoloNETClientAdmin.AdminListCellIds();
+            HoloNETManager.Instance.HoloNETClientAdmin.ListCellIds();
         }
 
         private void btnListAttachedInterfaces_Click(object sender, RoutedEventArgs e)
         {
             LogMessage("ADMIN: Listing Attached Interfaces...");
             ShowStatusMessage($"Listing Attached Interfaces...", StatusMessageType.Information, true);
-            HoloNETManager.Instance.HoloNETClientAdmin.AdminListInterfaces();
+            HoloNETManager.Instance.HoloNETClientAdmin.ListInterfaces();
         }
 
         private void btnShowLog_Click(object sender, RoutedEventArgs e)
@@ -208,7 +212,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
                     {
                         LogMessage($"ADMIN: Enabling {app.Name} hApp...");
                         ShowStatusMessage($"Enabling {app.Name} hApp...", StatusMessageType.Information, true);
-                        HoloNETManager.Instance.HoloNETClientAdmin.AdminEnablelApp(app.Name);
+                        HoloNETManager.Instance.HoloNETClientAdmin.EnablelApp(app.Name);
                     }
                 }
             }
@@ -228,7 +232,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
                     {
                         LogMessage($"ADMIN: Disabling {app.Name} hApp...");
                         ShowStatusMessage($"Disabling {app.Name} hApp...", StatusMessageType.Information, true);
-                        HoloNETManager.Instance.HoloNETClientAdmin.AdminDisableApp(app.Name);
+                        HoloNETManager.Instance.HoloNETClientAdmin.DisableApp(app.Name);
                     }
                 }
             }
@@ -248,7 +252,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
                     {
                         LogMessage($"ADMIN: Uninstalling {app.Name} hApp...");
                         ShowStatusMessage($"Uninstalling {app.Name} hApp...", StatusMessageType.Information, true);
-                        HoloNETManager.Instance.HoloNETClientAdmin.AdminUninstallApp(app.Name);
+                        HoloNETManager.Instance.HoloNETClientAdmin.UninstallApp(app.Name);
                     }
                 }
             }

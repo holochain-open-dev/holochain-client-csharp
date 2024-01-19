@@ -63,8 +63,8 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM.Entries
         public event Closed OnClosed;
 
         /// <summary>
-        /// This is a new abstract class introduced in HoloNET 2 that wraps around the HoloNETClient so you do not need to interact with the client directly. Instead it allows very simple CRUD operations (Load, Save & Delete) to be performed on your custom data object that extends this class. Your custom data object represents the data (Holochain Entry) returned from a zome call and HoloNET will handle the mapping onto your data object automatically.
-        /// It has two main types of constructors, one that allows you to pass in a HoloNETClient instance (which can be shared with other classes that extend the HoloNETEntryBase or HoloNETEntryBase) or if you do not pass a HoloNETClient instance in using the other constructor it will create its own internal instance to use just for this class. 
+        /// This is a new abstract class introduced in HoloNET 2 that wraps around the HoloNETClientAppAgent so you do not need to interact with the client directly. Instead it allows very simple CRUD operations (Load, Save & Delete) to be performed on your custom data object that extends this class. Your custom data object represents the data (Holochain Entry) returned from a zome call and HoloNET will handle the mapping onto your data object automatically.
+        /// It has two main types of constructors, one that allows you to pass in a HoloNETClientAppAgent instance (which can be shared with other classes that extend the HoloNETEntryBase or HoloNETEntryBase) or if you do not pass a HoloNETClientAppAgent instance in using the other constructor it will create its own internal instance to use just for this class. 
         /// NOTE: This is very similar to HoloNETEntryBase because it extends it by adding auditing capabilities.
         /// NOTE: Each property that you wish to have mapped to a property/field in your rust code needs to have the HolochainFieldName attribute applied to it specifying the name of the field in your rust struct that is to be mapped to this c# property. See the documentation on GitHub for more info...
         /// NOTE: To use this class you will need to make sure your corresponding rust hApp zome functions/structs have the corresponding properties(such as created_date etc) defined. See the documentation on GitHub for more info...
@@ -88,7 +88,7 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM.Entries
         {
             if (createHoloNETClientConnection)
             {
-                HoloNETClient = new HoloNETClient(holoNETDNA);
+                HoloNETClient = new HoloNETClientAppAgent(holoNETDNA);
                 _disposeOfHoloNETClient = true;
             }
 
@@ -103,8 +103,8 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM.Entries
         }
 
         /// <summary>
-        /// This is a new abstract class introduced in HoloNET 2 that wraps around the HoloNETClient so you do not need to interact with the client directly. Instead it allows very simple CRUD operations (Load, Save & Delete) to be performed on your custom data object that extends this class. Your custom data object represents the data (Holochain Entry) returned from a zome call and HoloNET will handle the mapping onto your data object automatically.
-        /// It has two main types of constructors, one that allows you to pass in a HoloNETClient instance (which can be shared with other classes that extend the HoloNETEntryBase or HoloNETEntryBase) or if you do not pass a HoloNETClient instance in using the other constructor it will create its own internal instance to use just for this class. 
+        /// This is a new abstract class introduced in HoloNET 2 that wraps around the HoloNETClientAppAgent so you do not need to interact with the client directly. Instead it allows very simple CRUD operations (Load, Save & Delete) to be performed on your custom data object that extends this class. Your custom data object represents the data (Holochain Entry) returned from a zome call and HoloNET will handle the mapping onto your data object automatically.
+        /// It has two main types of constructors, one that allows you to pass in a HoloNETClientAppAgent instance (which can be shared with other classes that extend the HoloNETEntryBase or HoloNETEntryBase) or if you do not pass a HoloNETClientAppAgent instance in using the other constructor it will create its own internal instance to use just for this class. 
         /// NOTE: This is very similar to HoloNETEntryBase because it extends it by adding auditing capabilities.
         /// NOTE: Each property that you wish to have mapped to a property/field in your rust code needs to have the HolochainFieldName attribute applied to it specifying the name of the field in your rust struct that is to be mapped to this c# property. See the documentation on GitHub for more info...
         /// NOTE: To use this class you will need to make sure your corresponding rust hApp zome functions/structs have the corresponding properties(such as created_date etc) defined. See the documentation on GitHub for more info...
@@ -130,7 +130,7 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM.Entries
         {
             if (createHoloNETClientConnection)
             {
-                HoloNETClient = new HoloNETClient(logProvider, alsoUseDefaultLogger, holoNETDNA);
+                HoloNETClient = new HoloNETClientAppAgent(logProvider, alsoUseDefaultLogger, holoNETDNA);
                 _disposeOfHoloNETClient = true;
             }
 
@@ -145,8 +145,8 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM.Entries
         }
 
         /// <summary>
-        /// This is a new abstract class introduced in HoloNET 2 that wraps around the HoloNETClient so you do not need to interact with the client directly. Instead it allows very simple CRUD operations (Load, Save & Delete) to be performed on your custom data object that extends this class. Your custom data object represents the data (Holochain Entry) returned from a zome call and HoloNET will handle the mapping onto your data object automatically.
-        /// It has two main types of constructors, one that allows you to pass in a HoloNETClient instance (which can be shared with other classes that extend the HoloNETEntryBase or HoloNETEntryBase) or if you do not pass a HoloNETClient instance in using the other constructor it will create its own internal instance to use just for this class. 
+        /// This is a new abstract class introduced in HoloNET 2 that wraps around the HoloNETClientAppAgent so you do not need to interact with the client directly. Instead it allows very simple CRUD operations (Load, Save & Delete) to be performed on your custom data object that extends this class. Your custom data object represents the data (Holochain Entry) returned from a zome call and HoloNET will handle the mapping onto your data object automatically.
+        /// It has two main types of constructors, one that allows you to pass in a HoloNETClientAppAgent instance (which can be shared with other classes that extend the HoloNETEntryBase or HoloNETEntryBase) or if you do not pass a HoloNETClientAppAgent instance in using the other constructor it will create its own internal instance to use just for this class. 
         /// NOTE: This is very similar to HoloNETEntryBase because it extends it by adding auditing capabilities.
         /// NOTE: Each property that you wish to have mapped to a property/field in your rust code needs to have the HolochainFieldName attribute applied to it specifying the name of the field in your rust struct that is to be mapped to this c# property. See the documentation on GitHub for more info...
         /// NOTE: To use this class you will need to make sure your corresponding rust hApp zome functions/structs have the corresponding properties(such as created_date etc) defined. See the documentation on GitHub for more info...
@@ -172,7 +172,7 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM.Entries
         {
             if (createHoloNETClientConnection)
             {
-                HoloNETClient = new HoloNETClient(logProviders, alsoUseDefaultLogger, holoNETDNA);
+                HoloNETClient = new HoloNETClientAppAgent(logProviders, alsoUseDefaultLogger, holoNETDNA);
                 _disposeOfHoloNETClient = true;
             }
 
@@ -187,8 +187,8 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM.Entries
         }
 
         /// <summary>
-        /// This is a new abstract class introduced in HoloNET 2 that wraps around the HoloNETClient so you do not need to interact with the client directly. Instead it allows very simple CRUD operations (Load, Save & Delete) to be performed on your custom data object that extends this class. Your custom data object represents the data (Holochain Entry) returned from a zome call and HoloNET will handle the mapping onto your data object automatically.
-        /// It has two main types of constructors, one that allows you to pass in a HoloNETClient instance (which can be shared with other classes that extend the HoloNETEntryBase or HoloNETEntryBase) or if you do not pass a HoloNETClient instance in using the other constructor it will create its own internal instance to use just for this class. 
+        /// This is a new abstract class introduced in HoloNET 2 that wraps around the HoloNETClientAppAgent so you do not need to interact with the client directly. Instead it allows very simple CRUD operations (Load, Save & Delete) to be performed on your custom data object that extends this class. Your custom data object represents the data (Holochain Entry) returned from a zome call and HoloNET will handle the mapping onto your data object automatically.
+        /// It has two main types of constructors, one that allows you to pass in a HoloNETClientAppAgent instance (which can be shared with other classes that extend the HoloNETEntryBase or HoloNETEntryBase) or if you do not pass a HoloNETClientAppAgent instance in using the other constructor it will create its own internal instance to use just for this class. 
         /// NOTE: This is very similar to HoloNETEntryBase because it extends it by adding auditing capabilities.
         /// NOTE: Each property that you wish to have mapped to a property/field in your rust code needs to have the HolochainFieldName attribute applied to it specifying the name of the field in your rust struct that is to be mapped to this c# property. See the documentation on GitHub for more info...
         /// NOTE: To use this class you will need to make sure your corresponding rust hApp zome functions/structs have the corresponding properties(such as created_date etc) defined. See the documentation on GitHub for more info...
@@ -199,7 +199,7 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM.Entries
         /// <param name="zomeCreateEntryFunction">This is the name of the rust zome function in your hApp that will be used to save new Holochain enties that this instance of the HoloNETEntryBase maps onto. This will be used by the Save method. This also updates the ZomeCreateEntryFunction property.</param>
         /// <param name="zomeUpdateEntryFunction">This is the name of the rust zome function in your hApp that will be used to save existing Holochain enties that this instance of the HoloNETEntryBase maps onto. This will be used by the Save method. This also updates the ZomeUpdateEntryFunction property.</param>
         /// <param name="zomeDeleteEntryFunction">This is the name of the rust zome function in your hApp that will be used to delete existing Holochain enties that this instance of the HoloNETEntryBase maps onto. This will be used by the Delete method. This also updates the ZomeDeleteEntryFunction property.</param>
-        /// <param name="logger">Allows you to inject in (DI) a Logger instance (which could contain multiple logProviders). This will then override the default Logger found on the HoloNETClient.Logger property. This Logger instance is also passed to the WebSocket library. HoloNET will then log to each of these logProviders contained within the Logger.</param>
+        /// <param name="logger">Allows you to inject in (DI) a Logger instance (which could contain multiple logProviders). This will then override the default Logger found on the HoloNETClientAppAgent.Logger property. This Logger instance is also passed to the WebSocket library. HoloNET will then log to each of these logProviders contained within the Logger.</param>
         /// <param name="autoCallInitialize">Set this to true if you wish [HoloNETEntryBase](#HoloNETEntryBase) to auto-call the [Initialize](#Initialize) method when a new instance is created. Set this to false if you do not wish it to do this, you may want to do this manually if you want to initialize (will call the [Connect](#connect) method on the HoloNET Client) at a later stage.</param>
         /// <param name="holoNETDNA">This is the HoloNETDNA object that controls how HoloNET operates. This will be passed into the internally created instance of the HoloNET Client.</param>
         /// <param name="connectedCallBackMode">If set to `WaitForHolochainConductorToConnect` (default) it will await until it is connected before returning, otherwise it will return immediately and then call the OnConnected event once it has finished connecting.</param>
@@ -213,7 +213,7 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM.Entries
         {
             if (createHoloNETClientConnection)
             {
-                HoloNETClient = new HoloNETClient(logger, holoNETDNA);
+                HoloNETClient = new HoloNETClientAppAgent(logger, holoNETDNA);
                 _disposeOfHoloNETClient = true;
             }
 
@@ -228,8 +228,8 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM.Entries
         }
 
         /// <summary>
-        /// This is a new abstract class introduced in HoloNET 2 that wraps around the HoloNETClient so you do not need to interact with the client directly. Instead it allows very simple CRUD operations (Load, Save & Delete) to be performed on your custom data object that extends this class. Your custom data object represents the data (Holochain Entry) returned from a zome call and HoloNET will handle the mapping onto your data object automatically.
-        /// It has two main types of constructors, one that allows you to pass in a HoloNETClient instance (which can be shared with other classes that extend the HoloNETEntryBase or HoloNETEntryBase) or if you do not pass a HoloNETClient instance in using the other constructor it will create its own internal instance to use just for this class. 
+        /// This is a new abstract class introduced in HoloNET 2 that wraps around the HoloNETClientAppAgent so you do not need to interact with the client directly. Instead it allows very simple CRUD operations (Load, Save & Delete) to be performed on your custom data object that extends this class. Your custom data object represents the data (Holochain Entry) returned from a zome call and HoloNET will handle the mapping onto your data object automatically.
+        /// It has two main types of constructors, one that allows you to pass in a HoloNETClientAppAgent instance (which can be shared with other classes that extend the HoloNETEntryBase or HoloNETEntryBase) or if you do not pass a HoloNETClientAppAgent instance in using the other constructor it will create its own internal instance to use just for this class. 
         /// NOTE: This is very similar to HoloNETEntryBase because it extends it by adding auditing capabilities.
         /// NOTE: Each property that you wish to have mapped to a property/field in your rust code needs to have the HolochainFieldName attribute applied to it specifying the name of the field in your rust struct that is to be mapped to this c# property. See the documentation on GitHub for more info...
         /// NOTE: To use this class you will need to make sure your corresponding rust hApp zome functions/structs have the corresponding properties(such as created_date etc) defined. See the documentation on GitHub for more info...
@@ -249,7 +249,7 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM.Entries
         /// <param name="automaticallyAttemptToRetrieveFromConductorIfSandBoxFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the Holochain Conductor if it fails to get them from the HC Sandbox command. This defaults to true.</param>
         /// <param name="automaticallyAttemptToRetrieveFromSandBoxIfConductorFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the HC Sandbox command if it fails to get them from the Holochain Conductor. This defaults to true.</param>
         /// <param name="updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved">Set this to true (default) to automatically update the HoloNETDNA once it has retrieved the DnaHash & AgentPubKey.</param>
-        public HoloNETEntryBase(string zomeName, string zomeLoadEntryFunction, string zomeCreateEntryFunction, string zomeUpdateEntryFunction, string zomeDeleteEntryFunction, HoloNETClient holoNETClient, bool autoCallInitialize = true, ConnectedCallBackMode connectedCallBackMode = ConnectedCallBackMode.WaitForHolochainConductorToConnect, RetrieveAgentPubKeyAndDnaHashMode retrieveAgentPubKeyAndDnaHashMode = RetrieveAgentPubKeyAndDnaHashMode.Wait, bool retrieveAgentPubKeyAndDnaHashFromConductor = true, bool retrieveAgentPubKeyAndDnaHashFromSandbox = true, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true, bool updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved = true)
+        public HoloNETEntryBase(string zomeName, string zomeLoadEntryFunction, string zomeCreateEntryFunction, string zomeUpdateEntryFunction, string zomeDeleteEntryFunction, HoloNETClientAppAgent holoNETClient, bool autoCallInitialize = true, ConnectedCallBackMode connectedCallBackMode = ConnectedCallBackMode.WaitForHolochainConductorToConnect, RetrieveAgentPubKeyAndDnaHashMode retrieveAgentPubKeyAndDnaHashMode = RetrieveAgentPubKeyAndDnaHashMode.Wait, bool retrieveAgentPubKeyAndDnaHashFromConductor = true, bool retrieveAgentPubKeyAndDnaHashFromSandbox = true, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true, bool updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved = true)
         {
             HoloNETClient = holoNETClient;
             //StoreEntryHashInEntry = storeEntryHashInEntry;
@@ -266,7 +266,7 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM.Entries
         /// <summary>
         /// This is a reference to the internal instance of the HoloNET Client (either the one passed in through a constructor or one created internally.)
         /// </summary>
-        public HoloNETClient HoloNETClient { get; set; }
+        public HoloNETClientAppAgent HoloNETClient { get; set; }
 
         //public bool StoreEntryHashInEntry { get; set; } = true;
 
@@ -293,12 +293,12 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM.Entries
         }
 
         /// <summary>
-        /// The original HoloNETEntry returned from the HoloNETClient after it is loaded or saved.
+        /// The original HoloNETEntry returned from the HoloNETClientAppAgent after it is loaded or saved.
         /// </summary>
         public HoloNETEntryBase OrginalEntry { get; set; }  //private set //TODO: Ideally want to get the setter private if possible...
 
         /// <summary>
-        /// The original KeyValue pairs returned from the HoloNETClient that the HoloNETEntry is constructed out of.
+        /// The original KeyValue pairs returned from the HoloNETClientAppAgent that the HoloNETEntry is constructed out of.
         /// </summary>
         public Dictionary<string, object> OrginalDataKeyValuePairs { get; set; } = new Dictionary<string, object>(); //private set //TODO: Ideally want to get the setter private if possible...
 
@@ -567,7 +567,7 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM.Entries
         }
 
         /// <summary>
-        /// This method will dynamically build up the params object for this entry ready to be passed into one of the Save/SaveAsync function overloads or into one of the CallZomeFunction overloads on the HoloNETClient itself.
+        /// This method will dynamically build up the params object for this entry ready to be passed into one of the Save/SaveAsync function overloads or into one of the CallZomeFunction overloads on the HoloNETClientAppAgent itself.
         /// NOTE: This will automatically extrct the properties that need saving (contain the HolochainFieldName attribute). This method uses reflection so has a tiny performance overhead (negligbale).
         /// NOTE: The corresponding rust Holochain Entry in your hApp will need to have the same properties contained in your class and have the correct mappings using the HolochainFieldName attribute. Please see HoloNETEntryBase in the documentation/README on the GitHub repo https://github.com/NextGenSoftwareUK/holochain-client-csharp for more info...
         /// </summary>
@@ -957,7 +957,7 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM.Entries
                     HoloNETClient.OnError += HoloNETClient_OnError;
                     HoloNETClient.OnReadyForZomeCalls += HoloNETClient_OnReadyForZomeCalls;
 
-                    //if (!HoloNETClient.IsConnecting && (HoloNETClient.WebSocket.State != System.Net.WebSockets.WebSocketState.Connecting || HoloNETClient.WebSocket.State != System.Net.WebSockets.WebSocketState.Open))
+                    //if (!HoloNETClientAppAgent.IsConnecting && (HoloNETClientAppAgent.WebSocket.State != System.Net.WebSockets.WebSocketState.Connecting || HoloNETClientAppAgent.WebSocket.State != System.Net.WebSockets.WebSocketState.Open))
                     if (!HoloNETClient.IsConnecting)
                         await HoloNETClient.ConnectAsync(HoloNETClient.EndPoint, connectedCallBackMode, retrieveAgentPubKeyAndDnaHashMode, retrieveAgentPubKeyAndDnaHashFromConductor, retrieveAgentPubKeyAndDnaHashFromSandbox, automaticallyAttemptToRetrieveFromConductorIfSandBoxFails, automaticallyAttemptToRetrieveFromSandBoxIfConductorFails, updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved);
                 }
@@ -1002,7 +1002,7 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM.Entries
         {
             try
             {
-                if (!result.IsError && result.IsCallSuccessful)
+                if (!result.IsError)
                 {
                     //Load
                     if (result.Entries != null && result.Entries.Count > 0)

@@ -5,7 +5,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Objects
 {
     public class ConnectToAppAgentClientResult
     {
-        public HoloNETClient AppAgentClient { get; set; }
+        public HoloNETClientAppAgent AppAgentClient { get; set; }
         public ConnectToAppAgentClientResponseType ResponseType { get; set; }
     }
 }

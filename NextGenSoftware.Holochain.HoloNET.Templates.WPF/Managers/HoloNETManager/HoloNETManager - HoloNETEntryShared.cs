@@ -10,7 +10,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
 {
     public partial class HoloNETManager
     {
-        public void InitHoloNETEntryShared(HoloNETClient client)
+        public void InitHoloNETEntryShared(HoloNETClientAppAgent client)
         {
             LogMessage("APP: Initializing HoloNET Entry (Shared)...");
             ShowStatusMessage("Initializing HoloNET Entry (Shared)...", StatusMessageType.Information, true);
@@ -31,7 +31,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
                 HoloNETEntryShared[CurrentApp.Name].HoloNETClient = client;
         }
 
-        public async Task LoadHoloNETEntryShared(HoloNETClient client)
+        public async Task LoadHoloNETEntryShared(HoloNETClientAppAgent client)
         {
             if (!HoloNETEntryShared.ContainsKey(CurrentApp.Name)
                 || (HoloNETEntryShared.ContainsKey(CurrentApp.Name) && HoloNETEntryShared[CurrentApp.Name] == null)
@@ -64,7 +64,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
             }
         }
 
-        public async Task SaveHoloNETEntryShared(HoloNETClient client, string firstName, string lastName, DateTime dob, string email)
+        public async Task SaveHoloNETEntryShared(HoloNETClientAppAgent client, string firstName, string lastName, DateTime dob, string email)
         {
             //If we intend to re-use an object then we can store it globally so we only need to init once...
             if (HoloNETEntryShared[CurrentApp.Name] == null || (HoloNETEntryShared[CurrentApp.Name] != null && !HoloNETEntryShared[CurrentApp.Name].IsInitialized))
@@ -103,7 +103,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
             //HoloNETEntryShared[CurrentApp.Name].EntryHash = Guid.NewGuid().ToString();
             //HoloNETEntryShared[CurrentApp.Name].PreviousVersionEntryHash = Guid.NewGuid().ToString();
 
-            if (result.IsCallSuccessful && !result.IsError)
+            if (!result.IsError)
             {
                 ShowStatusMessage($"HoloNET Entry Shared Loaded.", StatusMessageType.Success, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
                 LogMessage($"APP: HoloNET Entry Shared Loaded.");
@@ -123,7 +123,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
 
         private void HandleHoloNETEntrySharedSaved(ZomeFunctionCallBackEventArgs result)
         {
-            if (result.IsCallSuccessful && !result.IsError)
+            if (!result.IsError)
             {
                 ShowStatusMessage($"HoloNET Entry (Shared) Saved.", StatusMessageType.Success, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
                 LogMessage($"APP: HoloNET Entry (Shared) Saved.");

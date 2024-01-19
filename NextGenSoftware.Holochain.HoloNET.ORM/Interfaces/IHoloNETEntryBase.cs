@@ -8,7 +8,7 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM.Interfaces
     {
         EntryData EntryData { get; set; }
         string EntryHash { get; set; }
-        HoloNETClient HoloNETClient { get; set; }
+        HoloNETClientAppAgent HoloNETClient { get; set; }
         bool IsChanged { get; set; }
         bool IsInitialized { get; }
         bool IsInitializing { get; }

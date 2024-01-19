@@ -13,9 +13,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
 {
     public partial class HoloNETManager
     {
-        public HoloNETClient CreateNewAppAgentClientConnection(ushort port)
+        public HoloNETClientAppAgent CreateNewAppAgentClientConnection(ushort port)
         {
-            //_test[CurrentApp.Name] = new HoloNETClient(new HoloNETDNA()
+            //_test[CurrentApp.Name] = new HoloNETClientAppAgent(new HoloNETDNA()
             //{
             //    HolochainConductorAppAgentURI = $"ws://127.0.0.1:{port}",
             //    AgentPubKey = CurrentApp.AgentPubKey,
@@ -36,7 +36,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
             //return _test[CurrentApp.Name];
 
 
-            //_holoNETappClients.Add(new HoloNETClient(new HoloNETDNA()
+            //_holoNETappClients.Add(new HoloNETClientAppAgent(new HoloNETDNA()
             //{
             //    HolochainConductorAppAgentURI = $"ws://127.0.0.1:{port}",
             //    AgentPubKey = CurrentApp.AgentPubKey,
@@ -57,7 +57,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
             //return _holoNETappClients[_holoNETappClients.Count - 1];
 
             //If you do not pass a HoloNETDNA in then it will use the one persisted to disk from the previous run if SaveDNA was called(if there is no saved DNA then it will use the defaults).
-            HoloNETClient newClient = new HoloNETClient(new HoloNETDNA()
+            HoloNETClientAppAgent newClient = new HoloNETClientAppAgent(new HoloNETDNA()
             {
                 HolochainConductorAppAgentURI = $"ws://127.0.0.1:{port}"
             });
@@ -98,18 +98,18 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
                 //If we find an existing client then that means it has already been authorized, attached and connected.
                 if (result.AppAgentClient != null)
                 {
-                    LogMessage($"APP: Found Existing HoloNETClient AppAgent WebSocket For AgentPubKey {result.AppAgentClient.HoloNETDNA.AgentPubKey}, DnaHash {result.AppAgentClient.HoloNETDNA.DnaHash} And InstalledAppId {result.AppAgentClient.HoloNETDNA.InstalledAppId} Running On Port {result.AppAgentClient.EndPoint.Port}.");
+                    LogMessage($"APP: Found Existing HoloNETClientAppAgent AppAgent WebSocket For AgentPubKey {result.AppAgentClient.HoloNETDNA.AgentPubKey}, DnaHash {result.AppAgentClient.HoloNETDNA.DnaHash} And InstalledAppId {result.AppAgentClient.HoloNETDNA.InstalledAppId} Running On Port {result.AppAgentClient.EndPoint.Port}.");
 
                     if (result.AppAgentClient.State == System.Net.WebSockets.WebSocketState.Open)
                     {
-                        LogMessage($"APP: Existing HoloNETClient AppAgent WebSocket On Port {result.AppAgentClient.EndPoint.Port} Is Open.");
+                        LogMessage($"APP: Existing HoloNETClientAppAgent AppAgent WebSocket On Port {result.AppAgentClient.EndPoint.Port} Is Open.");
                         result.ResponseType = ConnectToAppAgentClientResponseType.Connected;
                     }
                     else
                     {
-                        LogMessage($"APP: Existing HoloNETClient AppAgent WebSocket On Port {result.AppAgentClient.EndPoint.Port} Is NOT Open!");
-                        ShowStatusMessage($"Re-Connecting To HoloNETClient AppAgent WebSocket On Port {result.AppAgentClient.EndPoint.Port}...", StatusMessageType.Information, true);
-                        LogMessage($"APP: Re-Connecting To HoloNETClient AppAgent WebSocket On Port {result.AppAgentClient.EndPoint.Port}...");
+                        LogMessage($"APP: Existing HoloNETClientAppAgent AppAgent WebSocket On Port {result.AppAgentClient.EndPoint.Port} Is NOT Open!");
+                        ShowStatusMessage($"Re-Connecting To HoloNETClientAppAgent AppAgent WebSocket On Port {result.AppAgentClient.EndPoint.Port}...", StatusMessageType.Information, true);
+                        LogMessage($"APP: Re-Connecting To HoloNETClientAppAgent AppAgent WebSocket On Port {result.AppAgentClient.EndPoint.Port}...");
 
                         result.AppAgentClient.Connect();
                         result.ResponseType = ConnectToAppAgentClientResponseType.Connecting;
@@ -117,7 +117,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
                 }
                 else
                 {
-                    LogMessage($"ADMIN: No Existing HoloNETClient AppAgent WebSocket Found For AgentPubKey {CurrentApp.AgentPubKey}, DnaHash {CurrentApp.DnaHash} And InstalledAppId {CurrentApp.Name} So New Connection Needs To Be Made...");
+                    LogMessage($"ADMIN: No Existing HoloNETClientAppAgent AppAgent WebSocket Found For AgentPubKey {CurrentApp.AgentPubKey}, DnaHash {CurrentApp.DnaHash} And InstalledAppId {CurrentApp.Name} So New Connection Needs To Be Made...");
                     LogMessage($"ADMIN: Authorizing Signing Credentials For {CurrentApp.Name} hApp...");
                     ShowStatusMessage($"Authorizing Signing Credentials For {CurrentApp.Name} hApp...", StatusMessageType.Information, true);
 
@@ -128,8 +128,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
                     //    ("oasis", "update_avatar")
                     //});
 
-                    //NOTE: EVERY method on HoloNETClient can be called either async or non-async, in these examples we are using non-async. Normally you would use async because it is less code and easier to follow but we wanted to test and demo both versions (and show how you would use non async as well as async versions)...
-                    HoloNETClientAdmin.AdminAuthorizeSigningCredentialsAndGrantZomeCallCapability(HoloNETClientAdmin.GetCellId(CurrentApp.DnaHash, CurrentApp.AgentPubKey), CapGrantAccessType.Unrestricted, GrantedFunctionsType.All, null);
+                    //NOTE: EVERY method on HoloNETClientAppAgent can be called either async or non-async, in these examples we are using non-async. Normally you would use async because it is less code and easier to follow but we wanted to test and demo both versions (and show how you would use non async as well as async versions)...
+                    HoloNETClientAdmin.AuthorizeSigningCredentialsAndGrantZomeCallCapability(HoloNETClientAdmin.GetCellId(CurrentApp.DnaHash, CurrentApp.AgentPubKey), CapGrantAccessType.Unrestricted, GrantedFunctionsType.All, null);
                     result.ResponseType = ConnectToAppAgentClientResponseType.GrantingZomeCapabilities;
                 }
             }
@@ -143,7 +143,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
             return result;
         }
 
-        public HoloNETClient GetClient(string dnaHash, string agentPubKey, string installedAppId)
+        public HoloNETClientAppAgent GetClient(string dnaHash, string agentPubKey, string installedAppId)
         {
             return HoloNETClientAppAgentClients.FirstOrDefault(x => x.HoloNETDNA.DnaHash == dnaHash && x.HoloNETDNA.AgentPubKey == agentPubKey && x.HoloNETDNA.InstalledAppId == installedAppId);
         }
@@ -152,7 +152,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
         /// Process the client operation which was queued before the HoloNET AppAgent was connected. This is only needed in non-async code, async code is much simplier and less! ;-)
         /// </summary>
         /// <param name="client"></param>
-        public void ProcessClientOperation(HoloNETClient client)
+        public void ProcessClientOperation(HoloNETClientAppAgent client)
         {
             switch (ClientOperation)
             {
@@ -230,7 +230,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
             //First count the number of shared connections in the connection pool.
             NumberOfClientConnections = 0;
 
-            foreach (HoloNETClient client in HoloNETClientAppAgentClients)
+            foreach (HoloNETClientAppAgent client in HoloNETClientAppAgentClients)
             {
                 if (client.State == System.Net.WebSockets.WebSocketState.Open)
                     NumberOfClientConnections++;
@@ -277,7 +277,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
             SetAppToConnectedStatus(InstalledApps.FirstOrDefault(x => x.Name == appName), port, isSharedConnection, refreshGrid);
         }
 
-        public void ProcessListedApps(AdminAppsListedCallBackEventArgs listedAppsResult)
+        public void ProcessListedApps(AppsListedCallBackEventArgs listedAppsResult)
         {
             string hApps = "";
             InstalledApps.Clear();
@@ -299,7 +299,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
 
                 if (app.AppStatus == AppInfoStatusEnum.Running)
                 {
-                    HoloNETClient client = GetClient(installedApp.DnaHash, installedApp.AgentPubKey, installedApp.Name);
+                    HoloNETClientAppAgent client = GetClient(installedApp.DnaHash, installedApp.AgentPubKey, installedApp.Name);
 
                     if (client != null && client.State == System.Net.WebSockets.WebSocketState.Open)
                         SetAppToConnectedStatus(installedApp, client.EndPoint.Port, true, false);
@@ -313,8 +313,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
                 hApps = $"{hApps}{app.installed_app_id}";
             }
 
-            //Set the status to connected in the list of installed apps (this is good example of how you can access the internal HoloNETClient inside the HoloNET Entry).
-            //This HoloNETEntry uses its own internal HoloNETClient connection so it will not be shared with CallZomeFunction or View Data Entries popups (it is technically possible to share it if you wanted to but it is not recommended because it is controlled by the HoloNETEntry and when it is closed it will automatically close the connection too).
+            //Set the status to connected in the list of installed apps (this is good example of how you can access the internal HoloNETClientAppAgent inside the HoloNET Entry).
+            //This HoloNETEntry uses its own internal HoloNETClientAppAgent connection so it will not be shared with CallZomeFunction or View Data Entries popups (it is technically possible to share it if you wanted to but it is not recommended because it is controlled by the HoloNETEntry and when it is closed it will automatically close the connection too).
             if (HoloNETEntry != null && HoloNETEntry.HoloNETClient != null && HoloNETEntry.HoloNETClient.State == System.Net.WebSockets.WebSocketState.Open)
                 SetAppToConnectedStatus(_holoNETEntryDemoAppId, HoloNETEntry.HoloNETClient.EndPoint.Port, false);
 
@@ -333,7 +333,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
 
         public static string ProcessZomeFunctionCallBackEventArgs(ZomeFunctionCallBackEventArgs args)
         {
-            string result = string.Concat("EndPoint: ", args.EndPoint, ", Id: ", args.Id, ", Zome: ", args.Zome, ", ZomeFunction: ", args.ZomeFunction, ", ZomeReturnData: ", args.ZomeReturnData, ", ZomeReturnHash: ", args.ZomeReturnHash, ", Raw Zome Return Data: ", args.RawZomeReturnData, ", Raw Binary Data: ", args.RawBinaryDataDecoded, "(", args.RawBinaryDataAsString, "), IsCallSuccessful: ", args.IsCallSuccessful ? "true" : "false", ", IsError: ", args.IsError ? "true" : "false", ", Message: ", args.Message);
+            string result = string.Concat("EndPoint: ", args.EndPoint, ", Id: ", args.Id, ", Zome: ", args.Zome, ", ZomeFunction: ", args.ZomeFunction, ", ZomeReturnData: ", args.ZomeReturnData, ", ZomeReturnHash: ", args.ZomeReturnHash, ", Raw Zome Return Data: ", args.RawZomeReturnData, ", Raw Binary Data: ", args.RawBinaryDataDecoded, "(", args.RawBinaryDataAsString, "), IsError: ", args.IsError ? "true" : "false", ", Message: ", args.Message);
 
             if (!string.IsNullOrEmpty(args.KeyValuePairAsString))
                 result = string.Concat(result, ", Processed Zome Return Data: ", args.KeyValuePairAsString);
@@ -353,12 +353,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
         {
             if (isEntry)
             {
-                await HoloNETEntry.CloseAsync(); //Will close the internal HoloNETClient connection.
+                await HoloNETEntry.CloseAsync(); //Will close the internal HoloNETClientAppAgent connection.
                 HoloNETEntry = null;
             }
             else
             {
-                await HoloNETEntries.CloseAsync(); //Will close the internal HoloNETClient connection.
+                await HoloNETEntries.CloseAsync(); //Will close the internal HoloNETClientAppAgent connection.
                 HoloNETEntries = null;
             }
         }
@@ -389,7 +389,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
                 }
 
                 //Get the client from the client pool (shared connections).
-                HoloNETClient client = GetClient(app.DnaHash, app.AgentPubKey, app.Name);
+                HoloNETClientAppAgent client = GetClient(app.DnaHash, app.AgentPubKey, app.Name);
 
                 if (client != null && client.State == System.Net.WebSockets.WebSocketState.Open)
                 {
@@ -411,7 +411,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
             UpdateNumerOfClientConnections();
             ListHapps();
 
-            HoloNETClient client = sender as HoloNETClient;
+            HoloNETClientAppAgent client = sender as HoloNETClientAppAgent;
 
             if (client != null)
                 ProcessClientOperation(client);
@@ -441,7 +441,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
             LogMessage("APP: Ready For Zome Calls.");
             ShowStatusMessage("Ready For Zome Calls.", StatusMessageType.Success);
 
-            HoloNETClient client = GetClient(CurrentApp.DnaHash, CurrentApp.AgentPubKey, CurrentApp.Name);
+            HoloNETClientAppAgent client = GetClient(CurrentApp.DnaHash, CurrentApp.AgentPubKey, CurrentApp.Name);
 
             //For the async version we wouldn't need to do any of this so would be a lot less code and be much simplier! ;-)
             if (client != null)
@@ -466,7 +466,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
             LogMessage("APP: Disconnected");
             ShowStatusMessage("App WebSocket Disconnected.");
 
-            HoloNETClient client = sender as HoloNETClient;
+            HoloNETClientAppAgent client = sender as HoloNETClientAppAgent;
 
             if (client != null)
             {
