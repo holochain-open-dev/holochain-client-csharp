@@ -13,13 +13,16 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
         /// </summary>
         public async Task<bool> InitHoloNETCollectionAsync()
         {
-            InitHoloNETEntryDemo = true;
-            ShowAppsListedInLog = false;
-
             bool initOk = false;
             int port;
             string dnaHash = "";
             string agentPubKey = "";
+
+            InitHoloNETEntryDemo = true;
+            ShowAppsListedInLog = false;
+
+            LogMessage("APP: Initializing HoloNET Collection...");
+            ShowStatusMessage("Initializing HoloNET Collection...", StatusMessageType.Information, true, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
 
             (initOk, port, dnaHash, agentPubKey) = await InitDemoApp(HoloNETCollectionDemoAppId, HoloNETEntryDemoHappPath);
 
@@ -85,6 +88,83 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
             InitHoloNETEntryDemo = false;
             ShowAppsListedInLog = true;
             return false;
+        }
+
+        public async Task<HoloNETCollectionLoadedResult<Avatar>> LoadCollectionAsync()
+        {
+            HoloNETCollectionLoadedResult<Avatar> result = new HoloNETCollectionLoadedResult<Avatar>();
+
+            // This extra check here will not normally be needed in a normal hApp (because you will not have the admin UI allowing you to uninstall, disable or disconnect).
+            // But for extra defencive coding to be on the safe side you can of course double check! ;-)
+            bool showAlreadyInitMessage = true;
+
+            if (HoloNETEntries != null)
+                showAlreadyInitMessage = await CheckIfDemoAppReadyAsync(false);
+
+            // If we intend to re-use an object then we can store it globally so we only need to init once...
+            // If the HoloNET Collection is null then we need to init it now...
+            // Will init the HoloNET Collection which includes installing and enabling the app, signing credentials, attaching the app interface, then finally creating and connecting to the internal instance of the HoloNETClient.
+            if (HoloNETEntries == null || (HoloNETEntries != null && !HoloNETEntries.IsInitialized))
+                await InitHoloNETCollectionAsync();
+
+            else if (showAlreadyInitMessage)
+            {
+                ShowStatusMessage($"HoloNET Collection Already Initialized.", StatusMessageType.Information, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
+                LogMessage($"HoloNET Collection Already Initialized..");
+            }
+
+            if (HoloNETEntries != null)
+            {
+                ShowStatusMessage($"Loading HoloNET Collection...", StatusMessageType.Information, true, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
+                LogMessage($"APP: Loading HoloNET Collection...");
+
+                // Non async way.
+                // If you use LoadCollection or SaveAllChanges non-async versions you will need to wait for the OnInitialized event to fire before calling.
+                // HoloNETEntries.LoadCollection(); //For this OnCollectionLoaded event handler above is required.
+
+                // Async way.
+                // LoadCollectionAsync will automatically init and wait for the client to finish connecting and retreiving agentPubKey (if needed) and raising the OnInitialized event.
+                result = await HoloNETEntries.LoadCollectionAsync(); //No event handlers are needed.
+            }
+            else
+            {
+                result.IsError = true;
+                result.Message = "HoloNETCollection Failed To Initialize";
+            }
+
+            return result;
+        }
+
+        public async Task<HoloNETCollectionSavedResult> SaveCollectionAsync()
+        {
+            HoloNETCollectionSavedResult result = new HoloNETCollectionSavedResult();
+
+            // In case it has not been init properly when the popup was opened (it should have been though!)
+            if (HoloNETEntries == null || (HoloNETEntries != null && !HoloNETEntries.IsInitialized))
+                await InitHoloNETCollectionAsync();
+           
+            if (HoloNETEntries != null)
+            {
+                ShowStatusMessage($"Saving Changes For Collection...", StatusMessageType.Information, true, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
+                LogMessage($"APP: Saving Changes For Collection...");
+
+                // Non async way.
+                // If you use LoadCollection or SaveAllChanges non-async versions you will need to wait for the OnInitialized event to fire before calling.
+                // HoloNETEntries.SaveAllChanges(); //For this OnCollectionSaved event handler above is required.
+
+                // Async way.
+                // Will save all changes made to the collection (add, remove and updates). Will automatically init and wait for the client to finish connecting and retreiving agentPubKey (if needed) and raising the OnInitialized event.
+                // Allows you to batch add/remove multiple entries to the collection and then persist the changes to the hc/rust/happ code in one go.
+                // Will look for any changes since the last time this method was called (includes entries added/removed from the collection as well as any changes made to entries themselves).
+                result = await HoloNETEntries.SaveAllChangesAsync();
+            }
+            else
+            {
+                result.IsError = true;
+                result.Message = "HoloNETCollection Failed To Initialize";
+            }
+
+            return result;
         }
 
         private void HoloNETEntries_OnInitialized(object sender, ReadyForZomeCallsEventArgs e)

@@ -3,10 +3,12 @@
     public enum ClientOperation
     {
         CallZomeFunction,
-        LoadHoloNETCollection,
         LoadHoloNETEntryShared,
         SaveHoloNETEntryShared,
-        AddHoloNETEntryToCollection,
+        LoadHoloNETCollectionShared,
+        AddHoloNETEntryToCollectionShared,
+        RemoveHoloNETEntryFromCollectionShared,
+        UpdateHoloNETEntryInCollectionShared,
         None
     }
 }

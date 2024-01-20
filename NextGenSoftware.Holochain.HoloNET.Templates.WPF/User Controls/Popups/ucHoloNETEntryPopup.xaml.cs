@@ -62,7 +62,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls
             HoloNETEntryUIManager.CurrentHoloNETEntryUI = ucHoloNETEntry;
             ZomeFunctionCallBackEventArgs result = await HoloNETManager.Instance.LoadHoloNETEntryAsync();
 
-            if (result != null && !result.IsError)
+            if (!result.IsError)
             {
                 if (!result.IsWarning)
                 {
@@ -75,13 +75,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls
                 }
                 else
                 {
-                    HoloNETManager.Instance.ShowStatusMessage($"HoloNET Entry Not Loaded.", StatusMessageType.Warning, false);
+                    HoloNETManager.Instance.ShowStatusMessage($"HoloNET Entry Not Loaded.", StatusMessageType.Warning, false, ucHoloNETEntry);
                     HoloNETManager.Instance.LogMessage($"APP: HoloNET Entry Not Loaded. Reason: {result.Message}");
                 }
             }
             else
             {
-                ucHoloNETEntry.ShowStatusMessage(result.Message, StatusMessageType.Error);
                 HoloNETManager.Instance.ShowStatusMessage($"Error Occured Loading Entry: {result}", StatusMessageType.Error, false, ucHoloNETEntry);
                 HoloNETManager.Instance.LogMessage($"APP: Error Occured Loading Entry: {result.Message}");
             }
@@ -164,14 +163,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls
                     {
                         RefreshHoloNETEntryMetaData(HoloNETManager.Instance.HoloNETEntry, ucHoloNETEntryMetaData);
 
-                        HoloNETManager.Instance.ShowStatusMessage($"APP: HoloNET Entry Saved.", StatusMessageType.Success);
+                        HoloNETManager.Instance.ShowStatusMessage($"APP: HoloNET Entry Saved.", StatusMessageType.Success, false, ucHoloNETEntry);
                         HoloNETManager.Instance.LogMessage($"APP: HoloNET Entry Saved. {GetHoloNETEntryMetaData(HoloNETManager.Instance.HoloNETEntry)}");
                         this.Visibility = Visibility.Hidden;
                     }
                     else
                     {
-                        ucHoloNETEntry.ShowStatusMessage(result.Message, StatusMessageType.Error);
-                        HoloNETManager.Instance.ShowStatusMessage($"APP: Error Occured Saving Entry: {result.Message}", StatusMessageType.Error);
+                        HoloNETManager.Instance.ShowStatusMessage($"APP: Error Occured Saving Entry: {result.Message}", StatusMessageType.Error, false, ucHoloNETEntry);
                         HoloNETManager.Instance.LogMessage($"APP: Error Occured Saving Entry: {result.Message}");
                     }
                 });
@@ -192,14 +190,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls
                 {
                     RefreshHoloNETEntryMetaData(HoloNETManager.Instance.HoloNETEntry, ucHoloNETEntryMetaData);
 
-                    HoloNETManager.Instance.ShowStatusMessage($"APP: HoloNET Entry Deleted.", StatusMessageType.Success);
+                    HoloNETManager.Instance.ShowStatusMessage($"APP: HoloNET Entry Deleted.", StatusMessageType.Success, false, ucHoloNETEntry);
                     HoloNETManager.Instance.LogMessage($"APP: HoloNET Entry Deleted. {GetHoloNETEntryMetaData(HoloNETManager.Instance.HoloNETEntry)}");
                     this.Visibility = Visibility.Hidden;
                 }
                 else
                 {
-                    ucHoloNETEntry.ShowStatusMessage(result.Message, StatusMessageType.Error);
-                    HoloNETManager.Instance.ShowStatusMessage($"APP: Error Occured Deleting Entry: {result.Message}", StatusMessageType.Error);
+                    HoloNETManager.Instance.ShowStatusMessage($"APP: Error Occured Deleting Entry: {result.Message}", StatusMessageType.Error, false, ucHoloNETEntry);
                     HoloNETManager.Instance.LogMessage($"APP: Error Occured Deleting Entry: {result.Message}");
                 }
             });

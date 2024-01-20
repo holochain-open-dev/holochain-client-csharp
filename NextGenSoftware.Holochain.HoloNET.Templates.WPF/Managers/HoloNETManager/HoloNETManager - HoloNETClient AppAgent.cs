@@ -56,7 +56,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
 
             //return _holoNETappClients[_holoNETappClients.Count - 1];
 
-            //If you do not pass a HoloNETDNA in then it will use the one persisted to disk from the previous run if SaveDNA was called(if there is no saved DNA then it will use the defaults).
+            // If you do not pass a HoloNETDNA in then it will use the one persisted to disk from the previous run if SaveDNA was called(if there is no saved DNA then it will use the defaults).
             HoloNETClientAppAgent newClient = new HoloNETClientAppAgent(new HoloNETDNA()
             {
                 HolochainConductorAppAgentURI = $"ws://127.0.0.1:{port}"
@@ -70,11 +70,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
             newClient.OnDisconnected += _holoNETClientApp_OnDisconnected;
             newClient.OnError += _holoNETClientApp_OnError;
 
-            //You can pass the HoloNETDNA in via the constructor as we have above or you can set it via the property below:
+            // You can pass the HoloNETDNA in via the constructor as we have above or you can set it via the property below:
             newClient.HoloNETDNA.AutoStartHolochainConductor = false;
             newClient.HoloNETDNA.AutoShutdownHolochainConductor = false;
 
-            //You need to set either the InstalledAppId or the AgentPubKey & DnaHash. You can set all 3 if you wish but only one or the other works fine too (if only the InstalledAppId is set it will look up the AgentPubKey & DnaHash from the conductor). 
+            // You need to set either the InstalledAppId or the AgentPubKey & DnaHash. You can set all 3 if you wish but only one or the other works fine too (if only the InstalledAppId is set it will look up the AgentPubKey & DnaHash from the conductor). 
             newClient.HoloNETDNA.AgentPubKey = CurrentApp.AgentPubKey; //If you only set the AgentPubKey & DnaHash but not the InstalledAppId then it will still work fine.
             newClient.HoloNETDNA.DnaHash = CurrentApp.DnaHash;
             newClient.HoloNETDNA.InstalledAppId = CurrentApp.Name;
@@ -89,13 +89,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
         public ConnectToAppAgentClientResult ConnectToAppAgentClient()
         {
             ConnectToAppAgentClientResult result = new ConnectToAppAgentClientResult();
-            //CurrentApp = gridHapps.SelectedItem as InstalledApp;
 
             if (CurrentApp != null)
             {
                 result.AppAgentClient = GetClient(CurrentApp.DnaHash, CurrentApp.AgentPubKey, CurrentApp.Name);
 
-                //If we find an existing client then that means it has already been authorized, attached and connected.
+                // If we find an existing client then that means it has already been authorized, attached and connected.
                 if (result.AppAgentClient != null)
                 {
                     LogMessage($"APP: Found Existing HoloNETClientAppAgent AppAgent WebSocket For AgentPubKey {result.AppAgentClient.HoloNETDNA.AgentPubKey}, DnaHash {result.AppAgentClient.HoloNETDNA.DnaHash} And InstalledAppId {result.AppAgentClient.HoloNETDNA.InstalledAppId} Running On Port {result.AppAgentClient.EndPoint.Port}.");
@@ -128,7 +127,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
                     //    ("oasis", "update_avatar")
                     //});
 
-                    //NOTE: EVERY method on HoloNETClientAppAgent can be called either async or non-async, in these examples we are using non-async. Normally you would use async because it is less code and easier to follow but we wanted to test and demo both versions (and show how you would use non async as well as async versions)...
+                    // NOTE: EVERY method on HoloNETClientAppAgent can be called either async or non-async, in these examples we are using non-async. Normally you would use async because it is less code and easier to follow but we wanted to test and demo both versions (and show how you would use non async as well as async versions)...
                     HoloNETClientAdmin.AuthorizeSigningCredentialsAndGrantZomeCallCapability(HoloNETClientAdmin.GetCellId(CurrentApp.DnaHash, CurrentApp.AgentPubKey), CapGrantAccessType.Unrestricted, GrantedFunctionsType.All, null);
                     result.ResponseType = ConnectToAppAgentClientResponseType.GrantingZomeCapabilities;
                 }
@@ -152,7 +151,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
         /// Process the client operation which was queued before the HoloNET AppAgent was connected. This is only needed in non-async code, async code is much simplier and less! ;-)
         /// </summary>
         /// <param name="client"></param>
-        public void ProcessClientOperation(HoloNETClientAppAgent client)
+        public async Task ProcessClientOperationAsync(HoloNETClientAppAgent client)
         {
             switch (ClientOperation)
             {
@@ -177,48 +176,42 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
 
                 case ClientOperation.LoadHoloNETEntryShared:
                     {
-                        //ucHoloNETEntryAndCollectionSharedPopup ucHoloNETEntryAndCollectionSharedPopup = PopupManager.CurrentPopup as ucHoloNETEntryAndCollectionSharedPopup;
-
-                        //if (ucHoloNETEntryAndCollectionSharedPopup != null)
-                        //    ucHoloNETEntryAndCollectionSharedPopup.LoadHoloNETEntryShared(client);
-
-                        LoadHoloNETEntryShared(client);
+                        await LoadHoloNETEntrySharedAsync(client);
                         ClientOperation = ClientOperation.None;
                     }
                     break;
 
                 case ClientOperation.SaveHoloNETEntryShared:
                     {
-                        //ucHoloNETEntryAndCollectionSharedPopup ucHoloNETEntryAndCollectionSharedPopup = PopupManager.CurrentPopup as ucHoloNETEntryAndCollectionSharedPopup;
-
-                        //if (ucHoloNETEntryAndCollectionSharedPopup != null)
-                        //    ucHoloNETEntryAndCollectionSharedPopup.SaveHoloNETEntryShared(client, HoloNETEntryUIManager.CurrentHoloNETEntryUI.FirstName, HoloNETEntryUIManager.CurrentHoloNETEntryUI.LastName, HoloNETEntryUIManager.CurrentHoloNETEntryUI.DOBDateTime, HoloNETEntryUIManager.CurrentHoloNETEntryUI.Email);
-
-                        SaveHoloNETEntryShared(client, HoloNETEntryUIManager.CurrentHoloNETEntryUI.FirstName, HoloNETEntryUIManager.CurrentHoloNETEntryUI.LastName, HoloNETEntryUIManager.CurrentHoloNETEntryUI.DOBDateTime, HoloNETEntryUIManager.CurrentHoloNETEntryUI.Email);
+                        await SaveHoloNETEntrySharedAsync(client, HoloNETEntryUIManager.CurrentHoloNETEntryUI.FirstName, HoloNETEntryUIManager.CurrentHoloNETEntryUI.LastName, HoloNETEntryUIManager.CurrentHoloNETEntryUI.DOBDateTime, HoloNETEntryUIManager.CurrentHoloNETEntryUI.Email);
                         ClientOperation = ClientOperation.None;
                     }
                     break;
 
-                case ClientOperation.LoadHoloNETCollection:
+                case ClientOperation.LoadHoloNETCollectionShared:
                     {
-                        //ucHoloNETEntryAndCollectionSharedPopup ucHoloNETEntryAndCollectionSharedPopup = PopupManager.CurrentPopup as ucHoloNETEntryAndCollectionSharedPopup;
-
-                        //if (ucHoloNETEntryAndCollectionSharedPopup != null)
-                        //    ucHoloNETEntryAndCollectionSharedPopup.LoadCollection(client);
-
-                        LoadCollection(client);
+                        await LoadCollectionAsync(client);
                         ClientOperation = ClientOperation.None;
                     }
                     break;
 
-                case ClientOperation.AddHoloNETEntryToCollection:
+                case ClientOperation.AddHoloNETEntryToCollectionShared:
                     {
-                        //ucHoloNETEntryAndCollectionSharedPopup ucHoloNETEntryAndCollectionSharedPopup = PopupManager.CurrentPopup as ucHoloNETEntryAndCollectionSharedPopup;
+                        await AddHoloNETEntryToCollectionAsync(client, HoloNETEntryUIManager.CurrentHoloNETEntryUI.FirstName, HoloNETEntryUIManager.CurrentHoloNETEntryUI.LastName, HoloNETEntryUIManager.CurrentHoloNETEntryUI.DOBDateTime, HoloNETEntryUIManager.CurrentHoloNETEntryUI.Email);
+                        ClientOperation = ClientOperation.None;
+                    }
+                    break;
 
-                        //if (ucHoloNETEntryAndCollectionSharedPopup != null)
-                        //    ucHoloNETEntryAndCollectionSharedPopup.AddHoloNETEntryToCollection(client, HoloNETEntryUIManager.CurrentHoloNETEntryUI.FirstName, HoloNETEntryUIManager.CurrentHoloNETEntryUI.LastName, HoloNETEntryUIManager.CurrentHoloNETEntryUI.DOBDateTime, HoloNETEntryUIManager.CurrentHoloNETEntryUI.Email);
+                case ClientOperation.RemoveHoloNETEntryFromCollectionShared:
+                    {
+                        await RemoveHoloNETEntryFromCollectionAsync(client, CurrentAvatar);
+                        ClientOperation = ClientOperation.None;
+                    }
+                    break;
 
-                        AddHoloNETEntryToCollection(client, HoloNETEntryUIManager.CurrentHoloNETEntryUI.FirstName, HoloNETEntryUIManager.CurrentHoloNETEntryUI.LastName, HoloNETEntryUIManager.CurrentHoloNETEntryUI.DOBDateTime, HoloNETEntryUIManager.CurrentHoloNETEntryUI.Email);
+                case ClientOperation.UpdateHoloNETEntryInCollectionShared:
+                    {
+                        await UpdateHoloNETEntryInCollectionAsync(client);
                         ClientOperation = ClientOperation.None;
                     }
                     break;
@@ -414,7 +407,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
             HoloNETClientAppAgent client = sender as HoloNETClientAppAgent;
 
             if (client != null)
-                ProcessClientOperation(client);
+                Dispatcher.CurrentDispatcher.InvokeAsync(async () => await ProcessClientOperationAsync(client));
         }
 
 

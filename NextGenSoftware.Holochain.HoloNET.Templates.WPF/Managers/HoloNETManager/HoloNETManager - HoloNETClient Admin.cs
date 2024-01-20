@@ -201,6 +201,28 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
             HoloNETClientAdmin.ListApps(AppStatusFilter.All);
         }
 
+        public async Task InstallApp(string hAppName, string hAppPath)
+        {
+            LogMessage($"ADMIN: Generating New AgentPubKey...");
+            ShowStatusMessage($"Generating New AgentPubKey...", StatusMessageType.Information, true);
+
+            //We don't normally need to generate a new agentpubkey for each hApp installed if each hApp has a unique DnaHash.
+            //But in this case it allows us to install the same hApp multiple times under different agentPubKeys (AgentPubKey & DnaHash combo must be unique, this is called the cellId).
+            AgentPubKeyGeneratedCallBackEventArgs agentPubKeyResult = await HoloNETClientAdmin.GenerateAgentPubKeyAsync();
+
+            if (agentPubKeyResult != null && !agentPubKeyResult.IsError)
+            {
+                LogMessage($"ADMIN: AgentPubKey Generated Successfully. AgentPubKey: {agentPubKeyResult.AgentPubKey}");
+                ShowStatusMessage($"AgentPubKey Generated Successfully. AgentPubKey: {agentPubKeyResult.AgentPubKey}", StatusMessageType.Success, false);
+
+                LogMessage($"ADMIN: Installing hApp {hAppName} ({hAppPath})...");
+                ShowStatusMessage($"Installing hApp {hAppName}...", StatusMessageType.Information, true);
+
+                //We can use async or non-async versions for every function.
+                HoloNETClientAdmin.InstallApp(HoloNETClientAdmin.HoloNETDNA.AgentPubKey, hAppName, hAppPath);
+            }
+        }
+
         public void _holoNETClientAdmin_OnConnected(object sender, WebSocket.ConnectedEventArgs e)
         {
             LogMessage("ADMIN: Connected");
@@ -360,7 +382,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
                             if (client.EndPoint.Port == e.Port)
                             {
                                 LogMessage($"APP: Existing HoloNETClient AppAgent WebSocket Connected On Port {client.EndPoint.Port} So Matched Admin Attached Port.");
-                                ProcessClientOperation(client);
+                                Dispatcher.CurrentDispatcher.InvokeAsync(async () => await ProcessClientOperationAsync(client));
                             }
                             else
                             {
