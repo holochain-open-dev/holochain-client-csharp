@@ -110,7 +110,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
             else if (showAlreadyInitMessage)
             {
                 ShowStatusMessage($"HoloNET Collection Already Initialized.", StatusMessageType.Information, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
-                LogMessage($"HoloNET Collection Already Initialized..");
+                LogMessage($"APP: HoloNET Collection Already Initialized..");
             }
 
             if (HoloNETEntries != null)

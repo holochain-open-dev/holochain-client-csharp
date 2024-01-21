@@ -65,13 +65,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// </summary>
         public event ReadyForZomeCalls OnReadyForZomeCalls;
 
-        public delegate void Error(object sender, HoloNETErrorEventArgs e);
-
-        /// <summary>
-        /// Fired when an error occurs, check the params for the cause of the error.
-        /// </summary>
-        public event Error OnError;
-
         // Properties
 
         /// <summary>

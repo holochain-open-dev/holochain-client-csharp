@@ -398,7 +398,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
         private void _holoNETClientApp_OnConnected(object sender, WebSocket.ConnectedEventArgs e)
         {
             LogMessage($"APP: AppAgent Client WebSocket Connected To {e.EndPoint.AbsoluteUri}");
-            ShowStatusMessage($"APP: AppAgent Client WebSocket Connected To {e.EndPoint.AbsoluteUri}", StatusMessageType.Success);
+            ShowStatusMessage($"AppAgent Client WebSocket Connected To {e.EndPoint.AbsoluteUri}", StatusMessageType.Success);
             SetCurrentAppToConnectedStatus(e.EndPoint.Port);
 
             UpdateNumerOfClientConnections();
@@ -456,7 +456,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
 
         private void _holoNETClientApp_OnDisconnected(object sender, WebSocket.DisconnectedEventArgs e)
         {
-            LogMessage("APP: Disconnected");
+            LogMessage("APP: WebSocket Disconnected");
             ShowStatusMessage("App WebSocket Disconnected.");
 
             HoloNETClientAppAgent client = sender as HoloNETClientAppAgent;

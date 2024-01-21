@@ -12,12 +12,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
 {
     public partial class HoloNETManager
     {
+        private static HoloNETManager _instance = null;
         private const string _holoNETEntryDemoAppId = "oasis-holonet-entry-demo-app";
         private const string _holoNETCollectionDemoAppId = "oasis-holonet-collection-demo-app";
         private const string _holoNETEntryDemoHappPath = @"E:\hc\holochain-holochain-0.1.5\happs\oasis\BUILD\happ\oasis.happ";
         private const string _holoNETCollectionDemoHappPath = @"E:\hc\holochain-holochain-0.1.5\happs\oasis\BUILD\happ\oasis.happ";
         private const string _role_name = "oasis";
-        private static HoloNETManager _instance = null;
         private bool _rebooting = false;
         private bool _adminDisconnected = false;
         private byte[][] _installingAppCellId = null;

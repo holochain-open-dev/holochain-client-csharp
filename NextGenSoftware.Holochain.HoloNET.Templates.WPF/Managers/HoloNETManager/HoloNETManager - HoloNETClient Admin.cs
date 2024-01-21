@@ -39,7 +39,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
             HoloNETClientAdmin.OnAppDisabledCallBack += _holoNETClientAdmin_OnAppDisabledCallBack;
             HoloNETClientAdmin.OnZomeCallCapabilityGrantedCallBack += _holoNETClientAdmin_OnZomeCallCapabilityGrantedCallBack;
             HoloNETClientAdmin.OnAppInterfaceAttachedCallBack += _holoNETClientAdmin_OnAppInterfaceAttachedCallBack;
-            HoloNETClientAdmin.OnAppsListedCallBack += _holoNETClientAdmin_OnAdminAppsListedCallBack;
+            HoloNETClientAdmin.OnAppsListedCallBack += _holoNETClientAdmin_OnAppsListedCallBack;
             HoloNETClientAdmin.OnDisconnected += _holoNETClientAdmin_OnDisconnected;
             HoloNETClientAdmin.OnError += _holoNETClientAdmin_OnError;
         }
@@ -160,25 +160,25 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
                             else
                             {
                                 LogMessage($"ADMIN: Error Attaching App Interface For App {appId}. Reason: {attachedResult.Message}");
-                                ShowStatusMessage($"ADMIN: Error Attaching App Interface For App {appId}. Reason: {attachedResult.Message}", StatusMessageType.Error, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
+                                ShowStatusMessage($"Error Attaching App Interface For App {appId}. Reason: {attachedResult.Message}", StatusMessageType.Error, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
                             }
                         }
                         else
                         {
                             LogMessage($"ADMIN: Error Signing Credentials For App {appId}. Reason: {signingResult.Message}");
-                            ShowStatusMessage($"ADMIN: Error Signing Credentials For App {appId}. Reason: {signingResult.Message}", StatusMessageType.Error, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
+                            ShowStatusMessage($"Error Signing Credentials For App {appId}. Reason: {signingResult.Message}", StatusMessageType.Error, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
                         }
                     }
                     else
                     {
                         LogMessage($"ADMIN: Error Enabling App {appId}. Reason: {enabledResult.Message}.");
-                        ShowStatusMessage($"ADMIN: Error Enabling App {appId}. Reason: {enabledResult.Message}.", StatusMessageType.Error, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
+                        ShowStatusMessage($"Error Enabling App {appId}. Reason: {enabledResult.Message}.", StatusMessageType.Error, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
                     }
                 }
                 else
                 {
                     LogMessage($"ADMIN: Error Installing App {appId}. Reason: {installedResult.Message}.");
-                    ShowStatusMessage($"ADMIN: Error Installing App {appId}. Reason: {installedResult.Message}.", StatusMessageType.Error, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
+                    ShowStatusMessage($"Error Installing App {appId}. Reason: {installedResult.Message}.", StatusMessageType.Error, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
                 }
             }
             else
@@ -230,8 +230,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
 
             //ListHapps();
 
-            LogMessage("ADMIN: Generating AgentPubKey For hApp...");
-            ShowStatusMessage($"Generating AgentPubKey For hApp...");
+            LogMessage("ADMIN: Generating AgentPubKey...");
+            ShowStatusMessage($"Generating AgentPubKey...");
 
             HoloNETClientAdmin.GenerateAgentPubKey();
             //Dispatcher.CurrentDispatcher.InvokeAsync(async () => await HoloNETClientAdmin.AdminGenerateAgentPubKeyAsync());
@@ -277,7 +277,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
             }
         }
 
-        public void _holoNETClientAdmin_OnAdminAppsListedCallBack(object sender, AppsListedCallBackEventArgs e)
+        public void _holoNETClientAdmin_OnAppsListedCallBack(object sender, AppsListedCallBackEventArgs e)
         {
             ProcessListedApps(e);
         }
@@ -466,7 +466,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
                     HoloNETClientAdmin.OnDataSent -= _holoNETClientAdmin_OnDataSent;
                     HoloNETClientAdmin.OnDataReceived -= _holoNETClientAdmin_OnDataReceived;
                     HoloNETClientAdmin.OnAgentPubKeyGeneratedCallBack -= _holoNETClientAdmin_OnAgentPubKeyGeneratedCallBack;
-                    HoloNETClientAdmin.OnAppsListedCallBack -= _holoNETClientAdmin_OnAdminAppsListedCallBack;
+                    HoloNETClientAdmin.OnAppsListedCallBack -= _holoNETClientAdmin_OnAppsListedCallBack;
                     HoloNETClientAdmin.OnAppInstalledCallBack -= _holoNETClientAdmin_OnAppInstalledCallBack;
                     HoloNETClientAdmin.OnAppUninstalledCallBack -= _holoNETClientAdmin_OnAppUninstalledCallBack;
                     HoloNETClientAdmin.OnAppEnabledCallBack -= _holoNETClientAdmin_OnAppEnabledCallBack;

@@ -12,8 +12,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
     {
         public void InitHoloNETCollection(HoloNETClientAppAgent client)
         {
-            LogMessage("APP: Initializing HoloNET Collection...");
-            ShowStatusMessage("Initializing HoloNET Collection...", StatusMessageType.Information, true);
+            LogMessage("APP: Initializing HoloNET Collection (Shared Connection)...");
+            ShowStatusMessage("Initializing HoloNET Collection (Shared Connection)...", StatusMessageType.Information, true, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
 
             if (!HoloNETEntriesShared.ContainsKey(CurrentApp.Name) || (HoloNETEntriesShared.ContainsKey(CurrentApp.Name) && HoloNETEntriesShared[CurrentApp.Name] == null))
             {
@@ -29,6 +29,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
             }
             else
                 HoloNETEntriesShared[CurrentApp.Name].HoloNETClient = client;
+
+            LogMessage("APP: HoloNET Collection (Shared Connection) Initialized.");
+            ShowStatusMessage("HoloNET Collection (Shared Connection) Initialized.", StatusMessageType.Success, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
         }
 
         public async Task<HoloNETCollectionLoadedResult<AvatarShared>> LoadCollectionAsync(HoloNETClientAppAgent client)
@@ -156,7 +159,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
 
         private void CheckIfHoloNETCollectionSharedInitOK(HoloNETClientAppAgent client)
         {
-            ShowStatusMessage($"Checking If HoloNET Collection (Shared Connection) Already Initialized...", StatusMessageType.Success, false);
+            ShowStatusMessage($"Checking If HoloNET Collection (Shared Connection) Already Initialized...", StatusMessageType.Information, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
             LogMessage($"APP: Checking If HoloNET Collection (Shared Connection) Already Initialized...");
 
             // In case it has not been init properly when the popup was opened (it should have been though!)
@@ -175,7 +178,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
 
             else
             {
-                ShowStatusMessage($"HoloNET Collection (Shared Connection) Already Initialized.", StatusMessageType.Success, false);
+                ShowStatusMessage($"HoloNET Collection (Shared Connection) Already Initialized.", StatusMessageType.Success, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
                 LogMessage($"APP: HoloNET Collection (Shared Connection) Already Initialized..");
             }
         }

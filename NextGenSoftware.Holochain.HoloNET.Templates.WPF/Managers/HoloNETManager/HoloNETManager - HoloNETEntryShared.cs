@@ -11,7 +11,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
         public void InitHoloNETEntryShared(HoloNETClientAppAgent client)
         {
             LogMessage("APP: Initializing HoloNET Entry (Shared Connection)...");
-            ShowStatusMessage("Initializing HoloNET Entry (Shared Connection)...", StatusMessageType.Information, true);
+            ShowStatusMessage("Initializing HoloNET Entry (Shared Connection)...", StatusMessageType.Information, true, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
 
             if (!HoloNETEntryShared.ContainsKey(CurrentApp.Name) || (HoloNETEntryShared.ContainsKey(CurrentApp.Name) && HoloNETEntryShared[CurrentApp.Name] == null))
             {
@@ -27,6 +27,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
             }
             else
                 HoloNETEntryShared[CurrentApp.Name].HoloNETClient = client;
+
+            LogMessage("APP: HoloNET Entry (Shared Connection) Initialized.");
+            ShowStatusMessage("HoloNET Entry (Shared Connection) Initialized.", StatusMessageType.Success, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
         }
 
         public async Task<ZomeFunctionCallBackEventArgs> LoadHoloNETEntrySharedAsync(HoloNETClientAppAgent client)
@@ -38,8 +41,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
             {
                 if (!string.IsNullOrEmpty(HoloNETEntryDNAManager.HoloNETEntryDNA.AvatarSharedEntryHash))
                 {
-                    ShowStatusMessage($"APP: Loading HoloNET Entry (Shared Connection)...", StatusMessageType.Information, true, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
-                    LogMessage($"Loading HoloNET Entry (Shared Connection)...");
+                    ShowStatusMessage($"Loading HoloNET Entry (Shared Connection)...", StatusMessageType.Information, true, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
+                    LogMessage($"APP: Loading HoloNET Entry (Shared Connection)...");
 
                     // Non-async way (you need to use the OnLoaded event to know when the entry has loaded.
                     // For non-async methods you will need to wait till the OnInitialized event to raise before calling any other methods such as the one below...
@@ -96,14 +99,14 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
 
         private void CheckIfHoloNETEntrySharedInitOK(HoloNETClientAppAgent client)
         {
-            ShowStatusMessage($"Checking If HoloNET Entry (Shared Connection) Already Initialized...", StatusMessageType.Success, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
+            ShowStatusMessage($"Checking If HoloNET Entry (Shared Connection) Already Initialized...", StatusMessageType.Information, true, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
             LogMessage($"APP: Checking If HoloNET Entry (Shared Connection) Already Initialized...");
 
             // In case it has not been init properly when the popup was opened (it should have been though!)
             if (HoloNETEntryShared == null ||
                 (HoloNETEntryShared != null && !HoloNETEntryShared.ContainsKey(CurrentApp.Name)) ||
                 (HoloNETEntryShared != null && HoloNETEntryShared.ContainsKey(CurrentApp.Name) && !HoloNETEntryShared[CurrentApp.Name].IsInitialized))
-                InitHoloNETCollection(client);
+                    InitHoloNETEntryShared(client);
 
             // Otherwise if the Endpoint does not match then set the correct internal HoloNETClient now.
             else if (HoloNETEntryShared != null

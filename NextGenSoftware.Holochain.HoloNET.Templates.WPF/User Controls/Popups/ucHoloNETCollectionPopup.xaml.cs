@@ -37,14 +37,15 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls
 
             if (!result.IsError)
             {
-                HoloNETManager.Instance.ShowStatusMessage($"HoloNET Collection Loaded.", StatusMessageType.Success, false, ucHoloNETCollectionEntryInternal);
-                HoloNETManager.Instance.LogMessage($"APP: HoloNET Collection Loaded.");
+                HoloNETManager.Instance.ShowStatusMessage($"HoloNET Collection Loaded (Internal Connection).", StatusMessageType.Success, false, ucHoloNETCollectionEntryInternal);
+                HoloNETManager.Instance.LogMessage($"APP: HoloNET Collection Loaded (Internal Connection).");
                 gridDataEntriesInternal.ItemsSource = HoloNETManager.Instance.HoloNETEntries;
             }
             else
             {
-                HoloNETManager.Instance.ShowStatusMessage($"APP: Error Occured Loading HoloNET Collection: {result.Message}", StatusMessageType.Error, false, ucHoloNETCollectionEntryInternal);
-                HoloNETManager.Instance.LogMessage($"APP: Error Occured Loading HoloNET Collection: {result.Message}");
+                ucHoloNETCollectionEntryInternal.ShowStatusMessage("Error Occured Loading HoloNET Collection (Internal Connection).", StatusMessageType.Error);
+                HoloNETManager.Instance.ShowStatusMessage($"Error Occured Loading HoloNET Collection (Internal Connection): {result.Message}", StatusMessageType.Error, false);
+                HoloNETManager.Instance.LogMessage($"APP: Error Occured Loading HoloNET Collection (Internal Connection): {result.Message}");
             }
         }
 
@@ -166,8 +167,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls
 
                 if (result != null && !result.IsError)
                 {
-                    HoloNETManager.Instance.ShowStatusMessage($"Changes Saved For Collection.", StatusMessageType.Success, false, ucHoloNETCollectionEntryInternal);
-                    HoloNETManager.Instance.LogMessage($"APP: Changes Saved For Collection.");
+                    HoloNETManager.Instance.ShowStatusMessage($"Changes Saved For HoloNET Collection (Internal Connection).", StatusMessageType.Success, false, ucHoloNETCollectionEntryInternal);
+                    HoloNETManager.Instance.LogMessage($"APP: Changes Saved For HoloNET Collection (Internal Connection).");
                     btnHoloNETCollectionPopupSaveChanges.IsEnabled = false;
 
                     gridDataEntriesInternal.ItemsSource = null;
@@ -180,8 +181,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls
                 }
                 else
                 {
-                    HoloNETManager.Instance.ShowStatusMessage($"Error Occured Saving Changes For Collection: {result.Message}", StatusMessageType.Error, false, ucHoloNETCollectionEntryInternal);
-                    HoloNETManager.Instance.LogMessage($"APP: Error Occured Saving Changes For Collection: {result.Message}");
+                    ucHoloNETCollectionEntryInternal.ShowStatusMessage("Error Occured Saving Changes For HoloNET Collection (Internal Connection).", StatusMessageType.Error);
+                    HoloNETManager.Instance.ShowStatusMessage($"Error Occured Saving Changes For HoloNET Collection (Internal Connection): {result.Message}", StatusMessageType.Error, false);
+                    HoloNETManager.Instance.LogMessage($"APP: Error Occured Saving Changes For HoloNET Collection (Internal Connection): {result.Message}");
 
                     //TODO:TEMP, REMOVE AFTER!
                     gridDataEntriesInternal.ItemsSource = null;

@@ -102,18 +102,18 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
             // If we intend to re-use an object then we can store it globally so we only need to init once...
             // If the HoloNET Entry is null then we need to init it now...
             // Will init the HoloNET Entry which includes installing and enabling the app, signing credentials, attaching the app interface, then finally creating and connecting to the internal instance of the HoloNETClient.
-            if (HoloNETEntries == null || (HoloNETEntries != null && !HoloNETEntries.IsInitialized))
+            if (HoloNETEntry == null || (HoloNETEntry != null && !HoloNETEntry.IsInitialized))
                 await InitHoloNETEntryAsync();
 
             else if (showAlreadyInitMessage)
             {
-                ShowStatusMessage($"APP: HoloNET Entry Already Initialized.", StatusMessageType.Information, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
-                LogMessage($"HoloNET Entry Already Initialized..");
+                ShowStatusMessage($"HoloNET Entry Already Initialized.", StatusMessageType.Information, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
+                LogMessage($"APP: HoloNET Entry Already Initialized..");
             }
 
             if (HoloNETEntry != null && HoloNETEntryDNAManager.HoloNETEntryDNA != null && !string.IsNullOrEmpty(HoloNETEntryDNAManager.HoloNETEntryDNA.AvatarEntryHash))
             {
-                ShowStatusMessage($"APP: Loading HoloNET Data Entry...", StatusMessageType.Information, true, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
+                ShowStatusMessage($"Loading HoloNET Data Entry...", StatusMessageType.Information, true, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
                 LogMessage($"APP: Loading HoloNET Data Entry...");
 
                 //Non async way.
@@ -151,12 +151,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
             ZomeFunctionCallBackEventArgs result = new ZomeFunctionCallBackEventArgs();
 
             // In case it has not been init properly when the popup was opened (it should have been though!)
-            if (HoloNETEntries == null || (HoloNETEntries != null && !HoloNETEntries.IsInitialized))
+            if (HoloNETEntry == null || (HoloNETEntry != null && !HoloNETEntry.IsInitialized))
                 await InitHoloNETEntryAsync();
 
             if (HoloNETEntry != null)
             {
-                ShowStatusMessage($"APP: Saving HoloNET Data Entry...", StatusMessageType.Information, true, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
+                ShowStatusMessage($"Saving HoloNET Data Entry...", StatusMessageType.Information, true, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
                 LogMessage($"APP: Saving HoloNET Data Entry...");
 
                 HoloNETEntry.FirstName = HoloNETEntryUIManager.CurrentHoloNETEntryUI.FirstName;
@@ -194,12 +194,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
             ZomeFunctionCallBackEventArgs result = new ZomeFunctionCallBackEventArgs();
 
             // In case it has not been init properly when the popup was opened (it should have been though!)
-            if (HoloNETEntries == null || (HoloNETEntries != null && !HoloNETEntries.IsInitialized))
+            if (HoloNETEntry == null || (HoloNETEntry != null && !HoloNETEntry.IsInitialized))
                 await InitHoloNETEntryAsync();
 
             if (HoloNETEntry != null)
             {
-                ShowStatusMessage($"APP: Deleting HoloNET Data Entry...", StatusMessageType.Information, true, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
+                ShowStatusMessage($"Deleting HoloNET Data Entry...", StatusMessageType.Information, true, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
                 LogMessage($"APP: Deleting HoloNET Data Entry...");
 
                 // Non async way.

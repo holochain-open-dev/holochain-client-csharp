@@ -75,7 +75,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls
                 }
                 else
                 {
-                    HoloNETManager.Instance.ShowStatusMessage($"Error Occured Loading HoloNET Entry (Shared Connection). Reason: {result.Message}", StatusMessageType.Error, false, ucHoloNETEntryShared);
+                    ucHoloNETEntryShared.ShowStatusMessage("Error Occured Loading HoloNET Entry (Shared Connection).", StatusMessageType.Error);
+                    HoloNETManager.Instance.ShowStatusMessage($"Error Occured Loading HoloNET Entry (Shared Connection). Reason: {result.Message}", StatusMessageType.Error, false);
                     HoloNETManager.Instance.LogMessage($"APP: Error Occured Loading HoloNET Entry (Shared Connection). Reason: {result.Message}");
                 }
             }
@@ -93,8 +94,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls
 
                 if (!result.IsError)
                 {
-                    HoloNETManager.Instance.ShowStatusMessage($"HoloNET Collection Loaded.", StatusMessageType.Error, false, ucHoloNETCollectionEntryShared);
-                    HoloNETManager.Instance.LogMessage($"APP: HoloNET Collection Loaded.");
+                    HoloNETManager.Instance.ShowStatusMessage($"HoloNET Collection (Shared Connection) Loaded .", StatusMessageType.Error, false, ucHoloNETCollectionEntryShared);
+                    HoloNETManager.Instance.LogMessage($"APP: HoloNET Collection (Shared Connection) Loaded.");
 
                     //gridDataEntries.ItemsSource = result.Entries; //Can set it using this or line below.
                     gridDataEntries.ItemsSource = HoloNETManager.Instance.HoloNETEntriesShared[HoloNETManager.Instance.CurrentApp.Name];
@@ -103,8 +104,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls
                 {
                     MockData();
 
-                    HoloNETManager.Instance.ShowStatusMessage($"Error Occured Loading HoloNET Collection.", StatusMessageType.Error, false, ucHoloNETCollectionEntryShared);
-                    HoloNETManager.Instance.LogMessage($"APP: Error Occured Loading HoloNET Collection. Reason: {result.Message}");
+                    ucHoloNETCollectionEntryShared.ShowStatusMessage("Error Occured Loading HoloNET Collection (Shared Connection).", StatusMessageType.Error);
+                    HoloNETManager.Instance.ShowStatusMessage($"Error Occured Loading HoloNET Collection (Shared Connection).", StatusMessageType.Error, false);
+                    HoloNETManager.Instance.LogMessage($"APP: Error Occured Loading HoloNET Collection (Shared Connection). Reason: {result.Message}");
                 }
 
                 _initCollection = true;
@@ -212,8 +214,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls
                     }
                     else
                     {
-                        HoloNETManager.Instance.ShowStatusMessage($"Error Occured Saving HoloNET Entry (Shared Connection): {result.Message}", StatusMessageType.Error, false, ucHoloNETEntryShared);
+                        ucHoloNETEntryShared.ShowStatusMessage("Error Occured Saving HoloNET Entry (Shared Connection).", StatusMessageType.Error);
+                        HoloNETManager.Instance.ShowStatusMessage($"Error Occured Saving HoloNET Entry (Shared Connection): {result.Message}", StatusMessageType.Error, false);
                         HoloNETManager.Instance.LogMessage($"APP: Error Occured Saving HoloNET Entry (Shared Connection): {result.Message}");
+
                     }
                 }
                 else
@@ -243,8 +247,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls
 
                         if (result != null && !result.IsError)
                         {
-                            HoloNETManager.Instance.ShowStatusMessage($"HoloNETEntry Updated In Collection.", StatusMessageType.Success, false, ucHoloNETCollectionEntryShared);
-                            HoloNETManager.Instance.LogMessage($"APP: HoloNETEntry Updated In Collection.");
+                            HoloNETManager.Instance.ShowStatusMessage($"HoloNETEntry Updated In Collection (Shared Connection).", StatusMessageType.Success, false, ucHoloNETCollectionEntryShared);
+                            HoloNETManager.Instance.LogMessage($"APP: HoloNETEntry Updated In Collection (Shared Connection).");
 
                             gridDataEntries.ItemsSource = null;
                             gridDataEntries.ItemsSource = HoloNETManager.Instance.HoloNETEntriesShared[HoloNETManager.Instance.CurrentApp.Name];
@@ -256,9 +260,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls
                         }
                         else
                         {
-                            HoloNETManager.Instance.ShowStatusMessage($"Error Occured Updating HoloNETEntry In Collection: {result.Message}", StatusMessageType.Error, false, ucHoloNETCollectionEntryShared);
-                            HoloNETManager.Instance.LogMessage($"APP: Error Occured Updating HoloNETEntry In Collection: {result.Message}");
-
+                            ucHoloNETCollectionEntryShared.ShowStatusMessage("Error Occured Updating HoloNETEntry In Collection (Shared Connection).", StatusMessageType.Error, false);
+                            HoloNETManager.Instance.ShowStatusMessage($"Error Occured Updating HoloNETEntry In Collection (Shared Connection): {result.Message}", StatusMessageType.Error, false);
+                            HoloNETManager.Instance.LogMessage($"APP: Error Occured Updating HoloNETEntry In Collection (Shared Connection): {result.Message}");
+                            
                             //TODO:TEMP, REMOVE AFTER!
                             gridDataEntries.ItemsSource = null;
                             gridDataEntries.ItemsSource = HoloNETManager.Instance.HoloNETEntriesShared[HoloNETManager.Instance.CurrentApp.Name];
@@ -299,8 +304,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls
                             HoloNETEntryUIManager.CurrentHoloNETEntryUI.DOB = "";
                             HoloNETEntryUIManager.CurrentHoloNETEntryUI.Email = "";
 
-                            HoloNETManager.Instance.ShowStatusMessage($"HoloNET Entry Added To Collection.", StatusMessageType.Success, false, ucHoloNETCollectionEntryShared);
-                            HoloNETManager.Instance.LogMessage($"APP: HoloNET Entry Added To Collection.");
+                            HoloNETManager.Instance.ShowStatusMessage($"HoloNET Entry Added To Collection (Shared Connection).", StatusMessageType.Success, false, ucHoloNETCollectionEntryShared);
+                            HoloNETManager.Instance.LogMessage($"APP: HoloNET Entry Added To Collection (Shared Connection).");
                         }
                         else
                         {
@@ -313,8 +318,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls
                             HoloNETEntryUIManager.CurrentHoloNETEntryUI.DOB = "";
                             HoloNETEntryUIManager.CurrentHoloNETEntryUI.Email = "";
 
-                            HoloNETManager.Instance.ShowStatusMessage($"Error Occured Adding HoloNET Entry To Collection.", StatusMessageType.Error, false, ucHoloNETCollectionEntryShared);
-                            HoloNETManager.Instance.LogMessage($"APP: Error Occured Adding HoloNET Entry To Collection. Reason: {result.Message}");
+                            ucHoloNETCollectionEntryShared.ShowStatusMessage("Error Occured Adding HoloNETEntry To Collection (Shared Connection).", StatusMessageType.Error, false);
+                            HoloNETManager.Instance.ShowStatusMessage($"Error Occured Adding HoloNET Entry To Collection (Shared Connection).", StatusMessageType.Error, false);
+                            HoloNETManager.Instance.LogMessage($"APP: Error Occured Adding HoloNET Entry To Collection (Shared Connection). Reason: {result.Message}");
                         }
                     }
                     else
@@ -342,8 +348,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls
     
                         if (result != null && !result.IsError)
                         {
-                            HoloNETManager.Instance.ShowStatusMessage($"HoloNETEntry Removed From Collection.", StatusMessageType.Success, false, ucHoloNETCollectionEntryShared);
-                            HoloNETManager.Instance.LogMessage($"APP: HoloNETEntry Removed From Collection.");
+                            HoloNETManager.Instance.ShowStatusMessage($"HoloNETEntry Removed From Collection (Shared Connection).", StatusMessageType.Success, false, ucHoloNETCollectionEntryShared);
+                            HoloNETManager.Instance.LogMessage($"APP: HoloNETEntry Removed From Collection (Shared Connection).");
 
                             ucHoloNETCollectionEntryShared.FirstName = "";
                             ucHoloNETCollectionEntryShared.LastName = "";
@@ -377,8 +383,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls
                             ucHoloNETCollectionEntryShared.DOB = "";
                             ucHoloNETCollectionEntryShared.Email = "";
 
-                            HoloNETManager.Instance.ShowStatusMessage($"Error Occured Removing HoloNETEntry From Collection: {result.Message}", StatusMessageType.Error, false, ucHoloNETCollectionEntryShared);
-                            HoloNETManager.Instance.LogMessage($"APP: Error Occured Removing HoloNETEntry From Collection: {result.Message}");
+                            ucHoloNETCollectionEntryShared.ShowStatusMessage("Error Occured Removing HoloNETEntry From Collection (Shared Connection).", StatusMessageType.Error, false);
+                            HoloNETManager.Instance.ShowStatusMessage($"Error Occured Removing HoloNETEntry From Collection (Shared Connection): {result.Message}", StatusMessageType.Error, false);
+                            HoloNETManager.Instance.LogMessage($"APP: Error Occured Removing HoloNETEntry From Collection (Shared Connection): {result.Message}");
                         }
                     }
                 }

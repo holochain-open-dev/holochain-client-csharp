@@ -24,7 +24,7 @@
 
     <Grid Opacity="0.9" Grid.Row="0" Grid.RowSpan="6">
         <Grid Background="Transparent" Opacity="0.5"/>
-        <Border Width="770" Height="720"
+        <Border Width="770" Height="670"
                 Background="DarkBlue" 
                 Opacity="50"
                 BorderBrush="Black" 
@@ -104,7 +104,7 @@ BlurRadius="10"/>
                     </Button>
                 </StackPanel>
 
-                <StackPanel Orientation="Vertical" x:Name="stkpnlHoloNETCollectionInternal" Height="500">
+                <StackPanel Orientation="Vertical" x:Name="stkpnlHoloNETCollectionInternal">
                     <DataGrid Grid.Row="1" x:Name="gridDataEntriesInternal" AutoGenerateColumns="False" Height="200" SelectionMode="Single" SelectedCellsChanged="gridDataEntriesInternal_SelectedCellsChanged"  HeadersVisibility="Column" Margin="10" IsReadOnly="true"  RowBackground="DarkBlue" AlternatingRowBackground="Blue"  Background="Transparent"  Foreground="White">
                         <DataGrid.Columns>
                             <DataGridTextColumn Width="80" Header="First Name" Binding="{Binding Path=FirstName}" CanUserSort="True" ></DataGridTextColumn>
@@ -151,10 +151,10 @@ BlurRadius="10"/>
                             </ResourceDictionary>
                         </DataGrid.Resources>
                     </DataGrid>
-                    <uc:ucHoloNETEntry x:Name="ucHoloNETCollectionEntryInternal" DataContext="{Binding ElementName=gridDataEntriesInternal, Path=SelectedItem, Mode=OneWay}"></uc:ucHoloNETEntry>
+                    <uc:ucHoloNETEntry Height="230" x:Name="ucHoloNETCollectionEntryInternal" DataContext="{Binding ElementName=gridDataEntriesInternal, Path=SelectedItem, Mode=OneWay}"></uc:ucHoloNETEntry>
                 </StackPanel>
 
-                <StackPanel Orientation="Vertical" x:Name="stkpnlInfoHoloNETCollection" Visibility="Collapsed" Height="500">
+                <StackPanel Orientation="Vertical" x:Name="stkpnlInfoHoloNETCollection" Visibility="Collapsed" Height="450">
                     <ScrollViewer Margin="10" Height="500">
                         <StackPanel Orientation="Vertical">
                             <TextBlock Foreground="WhiteSmoke" Text="fd f33333333333333333 fd f "></TextBlock>
