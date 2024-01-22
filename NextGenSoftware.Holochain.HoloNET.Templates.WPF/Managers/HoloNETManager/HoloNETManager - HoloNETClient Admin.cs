@@ -4,6 +4,7 @@ using System.Windows.Threading;
 using NextGenSoftware.Holochain.HoloNET.Client;
 using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects;
 using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Enums;
+using NextGenSoftware.Logging;
 
 namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
 {
@@ -66,128 +67,27 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
         /// <summary>
         /// Will init the demo hApp (used by HoloNET Entry and HoloNET Collection), which includes installing and enabling the app, signing credentials & attaching the app interface.
         /// </summary>
-        public async Task<(bool, int, string, string)> InitDemoApp(string appId, string hAppInstallPath)
+        public async Task<InstallEnableSignAndAttachHappEventArgs> InitDemoApp(string hAppId, string hAppInstallPath)
         {
-            LogMessage($"ADMIN: Checking If App {appId} Is Already Installed...");
-            ShowStatusMessage($"Checking If App {appId} Is Already Installed...", StatusMessageType.Information, true, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
-
-            GetAppInfoCallBackEventArgs appInfoResult = await HoloNETClientAdmin.GetAppInfoAsync(appId);
-
-            if (appInfoResult != null && appInfoResult.AppInfo != null)
+            return await HoloNETClientAdmin.InstallEnableSignAndAttachHappAsync(hAppId, hAppInstallPath, CapGrantAccessType.Unrestricted, GrantedFunctionsType.All, null, true, true, (string logMsg, LogType logType) =>
             {
-                ShowStatusMessage($"App {appId} Is Already Installed So Uninstalling Now...", StatusMessageType.Information, true, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
-                LogMessage($"ADMIN: App {appId} Is Already Installed So Uninstalling Now...");
+                LogMessage(logMsg);
 
-                AppUninstalledCallBackEventArgs uninstallResult = await HoloNETClientAdmin.UninstallAppAsync(appId);
-
-                if (uninstallResult != null && uninstallResult.IsError)
+                switch (logType)
                 {
-                    LogMessage($"ADMIN: Error Uninstalling App {appId}. Reason: {uninstallResult.Message}");
-                    ShowStatusMessage($"Error Uninstalling App {appId}. Reason: {uninstallResult.Message}", StatusMessageType.Error, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
+                    case LogType.Info:
+                        ShowStatusMessage(logMsg, StatusMessageType.Information, true);
+                        break;
+
+                    case LogType.Warning:
+                        ShowStatusMessage(logMsg, StatusMessageType.Warning, true);
+                        break;
+
+                    case LogType.Error:
+                        ShowStatusMessage(logMsg, StatusMessageType.Error, true);
+                        break;
                 }
-                else
-                {
-                    LogMessage($"ADMIN: Uninstalled App {appId}.");
-                    ShowStatusMessage($"Uninstalled App {appId}.", StatusMessageType.Error, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
-                }
-            }
-            else
-            {
-                LogMessage($"ADMIN: {appId} App Not Found.");
-                ShowStatusMessage($"{appId} App Not Found.", StatusMessageType.Information, true, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
-            }
-
-
-            LogMessage($"ADMIN: Generating New AgentPubKey...");
-            ShowStatusMessage($"Generating New AgentPubKey...", StatusMessageType.Information, true, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
-
-            AgentPubKeyGeneratedCallBackEventArgs agentPubKeyResult = await HoloNETClientAdmin.GenerateAgentPubKeyAsync();
-
-            if (agentPubKeyResult != null && !agentPubKeyResult.IsError)
-            {
-                LogMessage($"ADMIN: AgentPubKey Generated Successfully. AgentPubKey: {agentPubKeyResult.AgentPubKey}");
-                ShowStatusMessage($"AgentPubKey Generated Successfully. AgentPubKey: {agentPubKeyResult.AgentPubKey}", StatusMessageType.Success, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
-
-                LogMessage($"ADMIN: Installing App {appId}...");
-                ShowStatusMessage($"Installing App {appId}...", StatusMessageType.Information, true, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
-
-                AppInstalledCallBackEventArgs installedResult = await HoloNETClientAdmin.InstallAppAsync(appId, hAppInstallPath);
-
-                if (installedResult != null && !installedResult.IsError)
-                {
-                    LogMessage($"ADMIN: {appId} App Installed.");
-                    ShowStatusMessage($"{appId} App Installed.", StatusMessageType.Success, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
-
-                    LogMessage($"ADMIN: Enabling App {appId}...");
-                    ShowStatusMessage($"Enabling App {appId}...", StatusMessageType.Information, true, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
-
-                    AppEnabledCallBackEventArgs enabledResult = await HoloNETClientAdmin.EnableAppAsync(appId);
-
-                    if (enabledResult != null && !enabledResult.IsError)
-                    {
-                        LogMessage($"ADMIN: {appId} App Enabled.");
-                        ShowStatusMessage($"{appId} App Enabled.", StatusMessageType.Success, false);
-
-                        LogMessage($"ADMIN: Signing Credentials (Zome Call Capabilities) For App {appId}...");
-                        ShowStatusMessage($"Signing Credentials (Zome Call Capabilities) For App {appId}...", StatusMessageType.Information, true, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
-
-                        ZomeCallCapabilityGrantedCallBackEventArgs signingResult = await HoloNETClientAdmin.AuthorizeSigningCredentialsAndGrantZomeCallCapabilityAsync(installedResult.CellId, CapGrantAccessType.Unrestricted, GrantedFunctionsType.All);
-
-                        //Un-comment this line and comment the above one to grant only specefic zome functions.
-                        //HoloNETClientAdmin.AdminAuthorizeSigningCredentialsAndGrantZomeCallCapability(installedResult.CellId, CapGrantAccessType.Assigned, GrantedFunctionsType.Listed, new List<(string, string)>()
-                        //{
-                        //    ("oasis", "create_avatar"),
-                        //    ("oasis", "get_avatar"),
-                        //    ("oasis", "update_avatar")
-                        //});
-
-                        if (signingResult != null && !signingResult.IsError)
-                        {
-                            LogMessage($"ADMIN: {appId} App Signing Credentials Authorized.");
-                            ShowStatusMessage($"{appId} App Signing Credentials Authorized.", StatusMessageType.Success, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
-
-                            LogMessage($"ADMIN: Attaching App Interface For App {appId}...");
-                            ShowStatusMessage($"Attaching App Interface For App {appId}...", StatusMessageType.Information, true, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
-
-                            AppInterfaceAttachedCallBackEventArgs attachedResult = await HoloNETClientAdmin.AttachAppInterfaceAsync();
-
-                            if (attachedResult != null && !attachedResult.IsError)
-                            {
-                                LogMessage($"ADMIN: {appId} App Interface Attached On Port {attachedResult.Port}.");
-                                ShowStatusMessage($"{appId} App Interface Attached On Port {attachedResult.Port}.", StatusMessageType.Success, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
-                                return (true, attachedResult.Port.Value, installedResult.DnaHash, installedResult.AgentPubKey);
-                            }
-                            else
-                            {
-                                LogMessage($"ADMIN: Error Attaching App Interface For App {appId}. Reason: {attachedResult.Message}");
-                                ShowStatusMessage($"Error Attaching App Interface For App {appId}. Reason: {attachedResult.Message}", StatusMessageType.Error, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
-                            }
-                        }
-                        else
-                        {
-                            LogMessage($"ADMIN: Error Signing Credentials For App {appId}. Reason: {signingResult.Message}");
-                            ShowStatusMessage($"Error Signing Credentials For App {appId}. Reason: {signingResult.Message}", StatusMessageType.Error, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
-                        }
-                    }
-                    else
-                    {
-                        LogMessage($"ADMIN: Error Enabling App {appId}. Reason: {enabledResult.Message}.");
-                        ShowStatusMessage($"Error Enabling App {appId}. Reason: {enabledResult.Message}.", StatusMessageType.Error, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
-                    }
-                }
-                else
-                {
-                    LogMessage($"ADMIN: Error Installing App {appId}. Reason: {installedResult.Message}.");
-                    ShowStatusMessage($"Error Installing App {appId}. Reason: {installedResult.Message}.", StatusMessageType.Error, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
-                }
-            }
-            else
-            {
-                LogMessage($"ADMIN: Error Generating AgentPubKey. Reason: {agentPubKeyResult.Message}");
-                ShowStatusMessage($"Error Generating AgentPubKey. Reason: {agentPubKeyResult.Message}", StatusMessageType.Error, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
-            }
-
-            return (false, 0, "", "");
+            });
         }
 
         public void ListHapps()

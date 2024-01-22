@@ -318,6 +318,146 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             return ConnectAsync(holochainConductorURI, ConnectedCallBackMode.UseCallBackEvents, RetrieveAgentPubKeyAndDnaHashMode.UseCallBackEvents, retrieveAgentPubKeyAndDnaHashFromConductor, retrieveAgentPubKeyAndDnaHashFromSandbox, automaticallyAttemptToRetrieveFromConductorIfSandBoxFails, automaticallyAttemptToRetrieveFromSandBoxIfConductorFails, updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved).Result;
         }
 
+        /// <summary>
+        /// Will init the hApp, which includes installing and enabling the app, signing credentials & attaching the app interface.
+        /// </summary>
+        public async Task<InstallEnableSignAndAttachHappEventArgs> InstallEnableSignAndAttachHappAsync(string hAppId, string hAppInstallPath, CapGrantAccessType capGrantAccessType = CapGrantAccessType.Unrestricted, GrantedFunctionsType grantedFunctionsType = GrantedFunctionsType.All, List<(string, string)> grantedFunctions = null, bool uninstallhAppIfAlreadyInstalled = true, bool log = true, Action<string, LogType> loggingFunction = null)
+        {
+            InstallEnableSignAndAttachHappEventArgs result = new InstallEnableSignAndAttachHappEventArgs();
+
+            if (log)
+                Log($"ADMIN: Checking If App {hAppId} Is Already Installed...", LogType.Info, loggingFunction);
+
+            GetAppInfoCallBackEventArgs appInfoResult = await GetAppInfoAsync(hAppId);
+
+            if (appInfoResult != null && appInfoResult.AppInfo != null && uninstallhAppIfAlreadyInstalled)
+            {
+                if (log)
+                    Log($"ADMIN: App {hAppId} Is Already Installed So Uninstalling Now...", LogType.Info);
+
+                AppUninstalledCallBackEventArgs uninstallResult = await UninstallAppAsync(hAppId);
+
+                if (uninstallResult != null && uninstallResult.IsError)
+                {
+                    if (log)
+                        Log($"ADMIN: Error Uninstalling App {hAppId}. Reason: {uninstallResult.Message}", LogType.Info, loggingFunction);
+                }
+                else
+                {
+                    if (log)
+                        Log($"ADMIN: Uninstalled App {hAppId}.", LogType.Info, loggingFunction);
+                }
+            }
+
+            if (log)
+                Log($"ADMIN: Generating New AgentPubKey...", LogType.Info, loggingFunction);
+
+            result.AgentPubKeyGeneratedCallBackEventArgs = await GenerateAgentPubKeyAsync();
+
+            if (result.AgentPubKeyGeneratedCallBackEventArgs != null && !result.AgentPubKeyGeneratedCallBackEventArgs.IsError)
+            {
+                if (log)
+                {
+                    Log($"ADMIN: AgentPubKey Generated Successfully. AgentPubKey: {result.AgentPubKeyGeneratedCallBackEventArgs.AgentPubKey}", LogType.Info, loggingFunction);
+                    Log($"ADMIN: Installing App {{appId}}...", LogType.Info, loggingFunction);
+                }
+
+                result.IsAgentPubKeyGenerated = true;
+                result.AppInstalledCallBackEventArgs = await InstallAppAsync(hAppId, hAppInstallPath, null);
+
+                if (result.AppInstalledCallBackEventArgs != null && !result.AppInstalledCallBackEventArgs.IsError)
+                {
+                    if (log)
+                    {
+                        Log($"ADMIN: {hAppId} App Installed.", LogType.Info, loggingFunction);
+                        Log($"ADMIN: Enabling App {hAppId}...", LogType.Info, loggingFunction);
+                    }
+
+                    result.IsAppInstalled = true;
+                    result.AgentPubKey = result.AppInstalledCallBackEventArgs.DnaHash;
+                    result.DnaHash = result.AppInstalledCallBackEventArgs.DnaHash;
+                    result.CellId = result.AppInstalledCallBackEventArgs.CellId;
+                    result.AppStatus = result.AppInstalledCallBackEventArgs.AppInfoResponse.data.AppStatus;
+                    result.AppStatusReason = result.AppInstalledCallBackEventArgs.AppInfoResponse.data.AppStatusReason;
+                    result.AppManifest = result.AppInstalledCallBackEventArgs.AppInfoResponse.data.manifest;
+
+                    result.AppEnabledCallBackEventArgs = await EnableAppAsync(hAppId);
+
+                    if (result.AppEnabledCallBackEventArgs != null && !result.AppEnabledCallBackEventArgs.IsError)
+                    {
+                        if (log)
+                        {
+                            Log($"ADMIN: {hAppId} App Enabled.", LogType.Info, loggingFunction);
+                            Log($"ADMIN: Signing Credentials (Zome Call Capabilities) For App {hAppId}...", LogType.Info, loggingFunction);
+                        }
+
+                        result.IsAppEnabled = true;
+                        result.ZomeCallCapabilityGrantedCallBackEventArgs = await AuthorizeSigningCredentialsAndGrantZomeCallCapabilityAsync(result.AppInstalledCallBackEventArgs.CellId, capGrantAccessType, grantedFunctionsType, grantedFunctions);
+
+                        if (result.ZomeCallCapabilityGrantedCallBackEventArgs != null && !result.ZomeCallCapabilityGrantedCallBackEventArgs.IsError)
+                        {
+                            if (log)
+                            {
+                                Log($"ADMIN: {hAppId} App Signing Credentials Authorized.", LogType.Info, loggingFunction);
+                                Log($"ADMIN: Attaching App Interface For App {hAppId}...", LogType.Info, loggingFunction);
+                            }
+
+                            result.IsAppSigned = true;
+                            result.AppInterfaceAttachedCallBackEventArgs = await AttachAppInterfaceAsync();
+
+                            if (result.AppInterfaceAttachedCallBackEventArgs != null && !result.AppInterfaceAttachedCallBackEventArgs.IsError)
+                            {
+                                result.IsAppAttached = true;
+                                result.IsSuccess = true;
+                                result.AttachedOnPort = result.AppInterfaceAttachedCallBackEventArgs.Port;
+
+                                if (log)
+                                    Log($"ADMIN: {hAppId} App Interface Attached On Port {result.AppInterfaceAttachedCallBackEventArgs.Port}.", LogType.Info, loggingFunction);
+                            }
+                            else
+                            {
+                                result.Message = $"ADMIN: Error Attaching App Interface For App {hAppId}. Reason: {result.AppInterfaceAttachedCallBackEventArgs.Message}";
+                                result.IsError = true;
+                            }
+                        }
+                        else
+                        {
+                            result.Message = $"ADMIN: Error Signing Credentials For App {hAppId}. Reason: {result.ZomeCallCapabilityGrantedCallBackEventArgs.Message}";
+                            result.IsError = true;
+                        }
+                    }
+                    else
+                    {
+                        result.Message = $"ADMIN: Error Enabling App {hAppId}. Reason: {result.AppEnabledCallBackEventArgs.Message}";
+                        result.IsError = true;
+                    }
+                }
+                else
+                {
+                    result.Message = $"ADMIN: Error Installing App {hAppId}. Reason: {result.AppInstalledCallBackEventArgs.Message}";
+                    result.IsError = true;
+                }
+            }
+            else
+            {
+                result.Message = $"ADMIN: Error Generating AgentPubKey. Reason: {result.AgentPubKeyGeneratedCallBackEventArgs.Message}";
+                result.IsError = true;
+            }
+
+            if (log && result.IsError)
+                Log(result.Message, LogType.Error, loggingFunction);
+
+            return result;
+        }
+
+        /// <summary>
+        /// Will init the hApp, which includes installing and enabling the app, signing credentials & attaching the app interface.
+        /// </summary>
+        public InstallEnableSignAndAttachHappEventArgs InstallEnableSignAndAttachHapp(string hAppId, string hAppInstallPath, CapGrantAccessType capGrantAccessType = CapGrantAccessType.Unrestricted, GrantedFunctionsType grantedFunctionsType = GrantedFunctionsType.All, List<(string, string)> grantedFunctions = null, bool uninstallhAppIfAlreadyInstalled = true, bool log = true)
+        {
+            return InstallEnableSignAndAttachHappAsync(hAppId, hAppInstallPath, capGrantAccessType, grantedFunctionsType, grantedFunctions, uninstallhAppIfAlreadyInstalled, log).Result;
+        }
+
         public async Task<AgentPubKeyGeneratedCallBackEventArgs> GenerateAgentPubKeyAsync(ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, bool updateAgentPubKeyInHoloNETDNA = true, string id = "")
         {
             _updateDnaHashAndAgentPubKey = updateAgentPubKeyInHoloNETDNA;
@@ -343,22 +483,22 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         public async Task<AppInstalledCallBackEventArgs> InstallAppAsync(string installedAppId, string hAppPath, string agentKey = null, Dictionary<string, byte[]> membraneProofs = null, string network_seed = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
-            return await InstallAppAsync(installedAppId, hAppPath, null, agentKey, membraneProofs, network_seed, conductorResponseCallBackMode, id);
+            return await InstallAppInternalAsync(installedAppId, hAppPath, null, agentKey, membraneProofs, network_seed, conductorResponseCallBackMode, id);
         }
 
         public void InstallApp(string agentKey, string installedAppId, string hAppPath, Dictionary<string, byte[]> membraneProofs = null, string network_seed = null, string id = null)
         {
-            InstallApp(agentKey, installedAppId, hAppPath, null, membraneProofs, network_seed, id);
+            InstallAppInternal(agentKey, installedAppId, hAppPath, null, membraneProofs, network_seed, id);
         }
 
         public async Task<AppInstalledCallBackEventArgs> InstallAppAsync(string installedAppId, AppBundle appBundle, string agentKey = null, Dictionary<string, byte[]> membraneProofs = null, string network_seed = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
-            return await InstallAppAsync(installedAppId, null, appBundle, agentKey, membraneProofs, network_seed, conductorResponseCallBackMode, id);
+            return await InstallAppInternalAsync(installedAppId, null, appBundle, agentKey, membraneProofs, network_seed, conductorResponseCallBackMode, id);
         }
 
         public AppInstalledCallBackEventArgs InstallApp(string installedAppId, AppBundle appBundle, string agentKey = null, Dictionary<string, byte[]> membraneProofs = null, string network_seed = null, string id = null)
         {
-            return InstallAppAsync(installedAppId, null, appBundle, agentKey, membraneProofs, network_seed, ConductorResponseCallBackMode.UseCallBackEvents, id).Result;
+            return InstallAppInternalAsync(installedAppId, null, appBundle, agentKey, membraneProofs, network_seed, ConductorResponseCallBackMode.UseCallBackEvents, id).Result;
         }
 
         public async Task<AppUninstalledCallBackEventArgs> UninstallAppAsync(string installedAppId, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
@@ -1140,7 +1280,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             return await base.GetCellIdAsync();
         }
 
-        private async Task<AppInstalledCallBackEventArgs> InstallAppAsync(string installedAppId, string hAppPath = null, AppBundle appBundle = null, string agentKey = null, Dictionary<string, byte[]> membraneProofs = null, string network_seed = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
+        private async Task<AppInstalledCallBackEventArgs> InstallAppInternalAsync(string installedAppId, string hAppPath = null, AppBundle appBundle = null, string agentKey = null, Dictionary<string, byte[]> membraneProofs = null, string network_seed = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
             if (string.IsNullOrEmpty(agentKey))
             {
@@ -1166,7 +1306,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         Dictionary<string, string> _installingAppId = new Dictionary<string, string>();
 
-        private void InstallApp(string agentKey, string installedAppId, string hAppPath = null, AppBundle appBundle = null, Dictionary<string, byte[]> membraneProofs = null, string network_seed = null, string id = null)
+        private void InstallAppInternal(string agentKey, string installedAppId, string hAppPath = null, AppBundle appBundle = null, Dictionary<string, byte[]> membraneProofs = null, string network_seed = null, string id = null)
         {
             if (string.IsNullOrEmpty(agentKey))
             {

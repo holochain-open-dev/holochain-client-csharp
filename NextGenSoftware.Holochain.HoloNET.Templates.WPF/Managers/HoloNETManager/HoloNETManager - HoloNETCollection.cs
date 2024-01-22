@@ -13,24 +13,19 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
         /// </summary>
         public async Task<bool> InitHoloNETCollectionAsync()
         {
-            bool initOk = false;
-            int port;
-            string dnaHash = "";
-            string agentPubKey = "";
-
             InitHoloNETEntryDemo = true;
             ShowAppsListedInLog = false;
 
-            LogMessage("APP: Initializing HoloNET Collection...");
-            ShowStatusMessage("Initializing HoloNET Collection...", StatusMessageType.Information, true, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
+            LogMessage("APP: Initializing HoloNET Collection (Internal Connection)...");
+            ShowStatusMessage("Initializing HoloNET Collection (Internal Connection)...", StatusMessageType.Information, true, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
 
-            (initOk, port, dnaHash, agentPubKey) = await InitDemoApp(HoloNETCollectionDemoAppId, HoloNETEntryDemoHappPath);
+            InstallEnableSignAndAttachHappEventArgs initDemoResult = await InitDemoApp(HoloNETCollectionDemoAppId, HoloNETEntryDemoHappPath);
 
-            if (initOk)
+            if (initDemoResult != null && !initDemoResult.IsError && initDemoResult.IsSuccess)
             {
-                LogMessage($"APP: Creating HoloNET Collection (Creating Internal HoloNETClient & Connecting To Port {port})...");
-                ShowStatusMessage($"Creating HoloNET Collection (Creating Internal HoloNETClient & Connecting To Port {port})...", StatusMessageType.Information, true);
-                HoloNETEntryUIManager.CurrentHoloNETEntryUI.ShowStatusMessage($"Creating Internal HoloNETClient & Connecting To Port {port}...", StatusMessageType.Information, true);
+                LogMessage($"APP: Creating HoloNET Collection (Internal Connection) (Creating Internal HoloNETClient & Connecting To Port {initDemoResult.AttachedOnPort})...");
+                ShowStatusMessage($"Creating HoloNET Collection (Internal Connection) (Creating Internal HoloNETClient & Connecting To Port {initDemoResult.AttachedOnPort})...", StatusMessageType.Information, true);
+                HoloNETEntryUIManager.CurrentHoloNETEntryUI.ShowStatusMessage($"Creating Internal HoloNETClient & Connecting To Port {initDemoResult.AttachedOnPort}...", StatusMessageType.Information, true);
 
                 //If you wanted to load a persisted DNA from disk and then make ammendments to it you would do this:
                 //HoloNETDNA dna = HoloNETDNAManager.LoadDNA();
@@ -43,10 +38,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
                 //If we do not pass in a HoloNETClient it will create it's own internal connection/client
                 HoloNETEntries = new HoloNETObservableCollection<Avatar>("oasis", "load_avatars", "add_avatar", "remove_avatar", "bacth_update_collection", true, new HoloNETDNA()
                 {
-                    HolochainConductorAppAgentURI = $"ws://localhost:{port}",
+                    HolochainConductorAppAgentURI = $"ws://localhost:{initDemoResult.AttachedOnPort}",
                     InstalledAppId = HoloNETCollectionDemoAppId, //You need to set either the InstalledAppId or the AgentPubKey & DnaHash. You can set all 3 if you wish but only one or the other works fine too (if only the InstalledAppId is set it will look up the AgentPubKey & DnaHash from the conductor).
-                    AgentPubKey = agentPubKey, //If you only set the AgentPubKey & DnaHash but not the InstalledAppId then it will still work fine.
-                    DnaHash = dnaHash,
+                    AgentPubKey = initDemoResult.AgentPubKey, //If you only set the AgentPubKey & DnaHash but not the InstalledAppId then it will still work fine.
+                    DnaHash = initDemoResult.DnaHash,
                     AutoStartHolochainConductor = false, //This defaults to true normally so make sure you set this to false because we can connect to the already running holochain.exe (the one admin is already using).
                     AutoShutdownHolochainConductor = false, //This defaults to true normally so make sure you set this to false.
 
@@ -109,14 +104,14 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
 
             else if (showAlreadyInitMessage)
             {
-                ShowStatusMessage($"HoloNET Collection Already Initialized.", StatusMessageType.Information, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
-                LogMessage($"APP: HoloNET Collection Already Initialized..");
+                ShowStatusMessage($"HoloNET Collection (Internal Connection) Already Initialized.", StatusMessageType.Information, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
+                LogMessage($"APP: HoloNET Collection (Internal Connection) Already Initialized..");
             }
 
             if (HoloNETEntries != null)
             {
-                ShowStatusMessage($"Loading HoloNET Collection...", StatusMessageType.Information, true, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
-                LogMessage($"APP: Loading HoloNET Collection...");
+                ShowStatusMessage($"Loading HoloNET Collection (Internal Connection)...", StatusMessageType.Information, true, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
+                LogMessage($"APP: Loading HoloNET Collection (Internal Connection)...");
 
                 // Non async way.
                 // If you use LoadCollection or SaveAllChanges non-async versions you will need to wait for the OnInitialized event to fire before calling.
@@ -129,7 +124,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
             else
             {
                 result.IsError = true;
-                result.Message = "HoloNETCollection Failed To Initialize";
+                result.Message = "HoloNETCollection (Internal Connection) Failed To Initialize";
             }
 
             return result;
@@ -145,8 +140,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
            
             if (HoloNETEntries != null)
             {
-                ShowStatusMessage($"Saving Changes For Collection...", StatusMessageType.Information, true, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
-                LogMessage($"APP: Saving Changes For Collection...");
+                ShowStatusMessage($"Saving Changes For Collection (Internal Connection)...", StatusMessageType.Information, true, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
+                LogMessage($"APP: Saving Changes For Collection (Internal Connection)...");
 
                 // Non async way.
                 // If you use LoadCollection or SaveAllChanges non-async versions you will need to wait for the OnInitialized event to fire before calling.
@@ -161,7 +156,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
             else
             {
                 result.IsError = true;
-                result.Message = "HoloNETCollection Failed To Initialize";
+                result.Message = "HoloNETCollection (Internal Connection) Failed To Initialize";
             }
 
             return result;
@@ -171,8 +166,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
         {
             if (!e.IsError)
             {
-                ShowStatusMessage($"HoloNET Collection Initialized", StatusMessageType.Success, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
-                LogMessage($"APP: HoloNET Collection Initialized: AgentPubKey: {e.AgentPubKey}, DnaHash: {e.DnaHash}");
+                ShowStatusMessage($"HoloNET Collection (Internal Connection) Initialized", StatusMessageType.Success, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
+                LogMessage($"APP: HoloNET Collection (Internal Connection) Initialized: AgentPubKey: {e.AgentPubKey}, DnaHash: {e.DnaHash}");
             }
         }
 
@@ -180,8 +175,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
         {
             if (!e.IsError)
             {
-                ShowStatusMessage($"HoloNET Entry Added To Collection.", StatusMessageType.Success, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
-                LogMessage($"APP: HoloNET Entry Added To Collection.");
+                ShowStatusMessage($"HoloNET Entry Added To Collection (Internal Connection).", StatusMessageType.Success, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
+                LogMessage($"APP: HoloNET Entry Added To Collection (Internal Connection).");
             }
         }
 
@@ -189,8 +184,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
         {
             if (!e.IsError)
             {
-                ShowStatusMessage($"HoloNET Entry Removed From Collection.", StatusMessageType.Success, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
-                LogMessage($"APP: HoloNET Entry Removed From Collection.");
+                ShowStatusMessage($"HoloNET Entry Removed From Collection (Internal Connection).", StatusMessageType.Success, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
+                LogMessage($"APP: HoloNET Entry Removed From Collection (Internal Connection).");
             }
         }
 
@@ -198,8 +193,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
         {
             if (!e.IsError)
             {
-                ShowStatusMessage($"HoloNET Collection Loaded.", StatusMessageType.Success, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
-                LogMessage($"APP: HoloNET Collection Loaded.");
+                ShowStatusMessage($"HoloNET Collection (Internal Connection) Loaded.", StatusMessageType.Success, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
+                LogMessage($"APP: HoloNET Collection (Internal Connection) Loaded.");
             }
         }
 
@@ -207,8 +202,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
         {
             if (!e.IsError)
             {
-                ShowStatusMessage($"HoloNET Collection Saved.", StatusMessageType.Success, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
-                LogMessage($"APP: HoloNET Collection Saved.");
+                ShowStatusMessage($"HoloNET Collection (Internal Connection) Saved.", StatusMessageType.Success, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
+                LogMessage($"APP: HoloNET Collection (Internal Connection) Saved.");
             }
         }
 
@@ -216,19 +211,19 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
         {
             if (!e.IsError)
             {
-                ShowStatusMessage($"HoloNET Collection Closed.", StatusMessageType.Success, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
+                ShowStatusMessage($"HoloNET Collection (Internal Connection) Closed.", StatusMessageType.Success, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
 
                 if (e.HolochainConductorsShutdownEventArgs != null)
-                    LogMessage($"APP: HoloNET Collection Closed: Number Of Holochain Exe Instances Shutdown: {e.HolochainConductorsShutdownEventArgs.NumberOfHolochainExeInstancesShutdown}, Number Of Hc Exe Instances Shutdown: {e.HolochainConductorsShutdownEventArgs.NumberOfHcExeInstancesShutdown}, Number Of Rustc Exe Instances Shutdown: {e.HolochainConductorsShutdownEventArgs.NumberOfRustcExeInstancesShutdown}");
+                    LogMessage($"APP: HoloNET Collection (Internal Connection) Closed: Number Of Holochain Exe Instances Shutdown: {e.HolochainConductorsShutdownEventArgs.NumberOfHolochainExeInstancesShutdown}, Number Of Hc Exe Instances Shutdown: {e.HolochainConductorsShutdownEventArgs.NumberOfHcExeInstancesShutdown}, Number Of Rustc Exe Instances Shutdown: {e.HolochainConductorsShutdownEventArgs.NumberOfRustcExeInstancesShutdown}");
                 else
-                    LogMessage($"APP: HoloNET Collection Closed: Number Of Holochain Exe Instances Shutdown: 0, Number Of Hc Exe Instances Shutdown: 0, Number Of Rustc Exe Instances Shutdown: 0");
+                    LogMessage($"APP: HoloNET Collection (Internal Connection) Closed: Number Of Holochain Exe Instances Shutdown: 0, Number Of Hc Exe Instances Shutdown: 0, Number Of Rustc Exe Instances Shutdown: 0");
             }
         }
 
         private void HoloNETEntries_OnError(object sender, HoloNETErrorEventArgs e)
         {
-            ShowStatusMessage($"Error Occured For HoloNET Collection. Reason: {e.Reason}", StatusMessageType.Error, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
-            LogMessage($"APP: Error Occured For HoloNET Collection. Reason: {e.Reason}");
+            ShowStatusMessage($"Error Occured For HoloNET Collection (Internal Connection). Reason: {e.Reason}", StatusMessageType.Error, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
+            LogMessage($"APP: Error Occured For HoloNET Collection (Internal Connection). Reason: {e.Reason}");
         }
     }
 }

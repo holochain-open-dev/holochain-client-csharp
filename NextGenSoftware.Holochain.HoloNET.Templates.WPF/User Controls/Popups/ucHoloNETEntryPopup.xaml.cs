@@ -66,8 +66,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls
             {
                 if (!result.IsWarning)
                 {
-                    HoloNETManager.Instance.ShowStatusMessage($"HoloNET Entry Loaded (Internal Connection).", StatusMessageType.Success, false, ucHoloNETEntry);
-                    HoloNETManager.Instance.LogMessage($"APP: HoloNET Entry Loaded (Internal Connection). {GetHoloNETEntryMetaData(HoloNETManager.Instance.HoloNETEntry)}");
+                    HoloNETManager.Instance.ShowStatusMessage($"HoloNET Entry (Internal Connection) Loaded.", StatusMessageType.Success, false, ucHoloNETEntry);
+                    HoloNETManager.Instance.LogMessage($"APP: HoloNET Entry (Internal Connection) Loaded. {GetHoloNETEntryMetaData(HoloNETManager.Instance.HoloNETEntry)}");
 
                     ucHoloNETEntry.DataContext = HoloNETManager.Instance.HoloNETEntry;
                     ucHoloNETEntryMetaData.DataContext = HoloNETManager.Instance.HoloNETEntry;
@@ -75,8 +75,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls
                 }
                 else
                 {
-                    HoloNETManager.Instance.ShowStatusMessage($"HoloNET Entry Not Loaded (Internal Connection).", StatusMessageType.Warning, false, ucHoloNETEntry);
-                    HoloNETManager.Instance.LogMessage($"APP: HoloNET Entry Not Loaded (Internal Connection). Reason: {result.Message}");
+                    HoloNETManager.Instance.ShowStatusMessage($"HoloNET Entry (Internal Connection) Not Loaded.", StatusMessageType.Warning, false, ucHoloNETEntry);
+                    HoloNETManager.Instance.LogMessage($"APP: HoloNET Entry (Internal Connection) Not Loaded. Reason: {result.Message}");
                 }
             }
             else
@@ -164,8 +164,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls
                     {
                         RefreshHoloNETEntryMetaData(HoloNETManager.Instance.HoloNETEntry, ucHoloNETEntryMetaData);
 
-                        HoloNETManager.Instance.ShowStatusMessage($"HoloNET Entry Saved (Internal Connection).", StatusMessageType.Success, false, ucHoloNETEntry);
-                        HoloNETManager.Instance.LogMessage($"APP: HoloNET Entry Saved (Internal Connection). {GetHoloNETEntryMetaData(HoloNETManager.Instance.HoloNETEntry)}");
+                        HoloNETManager.Instance.ShowStatusMessage($"HoloNET Entry (Internal Connection) Saved.", StatusMessageType.Success, false, ucHoloNETEntry);
+                        HoloNETManager.Instance.LogMessage($"APP: HoloNET Entry (Internal Connection) Saved. {GetHoloNETEntryMetaData(HoloNETManager.Instance.HoloNETEntry)}");
                         this.Visibility = Visibility.Hidden;
                     }
                     else
@@ -192,8 +192,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls
                 {
                     RefreshHoloNETEntryMetaData(HoloNETManager.Instance.HoloNETEntry, ucHoloNETEntryMetaData);
 
-                    HoloNETManager.Instance.ShowStatusMessage($"HoloNET Entry Deleted (Internal Connection).", StatusMessageType.Success, false, ucHoloNETEntry);
-                    HoloNETManager.Instance.LogMessage($"APP: HoloNET Entry Deleted (Internal Connection). {GetHoloNETEntryMetaData(HoloNETManager.Instance.HoloNETEntry)}");
+                    HoloNETManager.Instance.ShowStatusMessage($"HoloNET Entry (Internal Connection) Deleted.", StatusMessageType.Success, false, ucHoloNETEntry);
+                    HoloNETManager.Instance.LogMessage($"APP: HoloNET Entry (Internal Connection) Deleted. {GetHoloNETEntryMetaData(HoloNETManager.Instance.HoloNETEntry)}");
                     this.Visibility = Visibility.Hidden;
                 }
                 else

@@ -1,8 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
+using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.AppManifest;
+using NextGenSoftware.WebSocket;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
+    public class InstallEnableSignAndAttachHappEventArgs : CallBackBaseEventArgs
+    {
+        public bool IsSuccess { get; set; }
+        public bool IsAgentPubKeyGenerated { get; set; }
+        public bool IsAppInstalled { get; set; }
+        public bool IsAppEnabled { get; set; }
+        public bool IsAppSigned { get; set; }
+        public bool IsAppAttached { get; set; }
+
+        public string AgentPubKey { get; set; }
+        public string DnaHash { get; set; }
+        public byte[][] CellId { get; set; }
+        public AppInfoStatusEnum AppStatus { get; set; }
+        public string AppStatusReason { get; set; }
+        public AppManifest AppManifest { get; set; }
+        public UInt16? AttachedOnPort { get; set; }
+
+        public AgentPubKeyGeneratedCallBackEventArgs AgentPubKeyGeneratedCallBackEventArgs { get; set; }
+        public AppInstalledCallBackEventArgs AppInstalledCallBackEventArgs { get; set; }
+        public AppEnabledCallBackEventArgs AppEnabledCallBackEventArgs { get; set; }
+        public ZomeCallCapabilityGrantedCallBackEventArgs ZomeCallCapabilityGrantedCallBackEventArgs { get; set; }
+        public AppInterfaceAttachedCallBackEventArgs AppInterfaceAttachedCallBackEventArgs { get; set; }
+    }
+
     public class AppInstalledCallBackEventArgs : AppInfoCallBackEventArgs
     {
 

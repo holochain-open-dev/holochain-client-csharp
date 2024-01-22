@@ -811,7 +811,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             catch (Exception ex)
             {
                 HandleError("Error occurred in HoloNETClient.CallZomeFunctionAsync method.", ex);
-                return new ZomeFunctionCallBackEventArgs() { EndPoint = EndPoint, Id = id, Zome = zome, ZomeFunction = function, IsError = true, Message = $"Error occurred in HoloNETClient.CallZomeFunctionAsync method. Details: {ex}", Excception = ex };
+                return new ZomeFunctionCallBackEventArgs() { EndPoint = EndPoint, Id = id, Zome = zome, ZomeFunction = function, IsError = true, Message = $"Error occurred in HoloNETClient.CallZomeFunctionAsync method. Details: {ex}", Exception = ex };
             }
         }
 

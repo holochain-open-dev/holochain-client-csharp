@@ -1318,7 +1318,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         protected virtual T1 CopyHoloNETArgs<T1>(T1 sourceArgs, T1 targetArgs) where T1 : HoloNETDataReceivedBaseEventArgs
         {
             targetArgs.EndPoint = sourceArgs.EndPoint;
-            targetArgs.Excception = sourceArgs.Excception;
+            targetArgs.Exception = sourceArgs.Exception;
             targetArgs.Id = sourceArgs.Id;
             //targetArgs.IsCallSuccessful = sourceArgs.IsCallSuccessful;
             targetArgs.IsError = sourceArgs.IsError;
@@ -1427,6 +1427,14 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             Logger.Log(string.Concat("EVENT RAISED: ", eventName, ": Id: ", holoNETEvent.Id, ", Is Call Successful: ", optionalAdditionalLogDetails, ", Raw Binary Data: ", holoNETEvent.RawBinaryDataDecoded, "(", holoNETEvent.RawBinaryDataAsString, ")"), LogType.Info);
             //Logger.Log(string.Concat("EVENT RAISED: ", eventName, ": Id: ", holoNETEvent.Id, ", Is Call Successful: ", holoNETEvent.IsCallSuccessful ? "True" : "False", optionalAdditionalLogDetails, ", Raw Binary Data: ", holoNETEvent.RawBinaryDataDecoded, "(", holoNETEvent.RawBinaryDataAsString, ")"), LogType.Info);
+        }
+
+        protected virtual void Log(string msg, LogType logType, Action<string, LogType> loggingFunction = null)
+        {
+            if (loggingFunction != null)
+                loggingFunction(msg, logType);
+
+            Logger.Log(msg, logType);
         }
 
         protected virtual void HandleError(string message, Exception exception = null)

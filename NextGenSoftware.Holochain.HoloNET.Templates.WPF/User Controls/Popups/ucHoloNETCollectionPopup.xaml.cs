@@ -37,8 +37,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls
 
             if (!result.IsError)
             {
-                HoloNETManager.Instance.ShowStatusMessage($"HoloNET Collection Loaded (Internal Connection).", StatusMessageType.Success, false, ucHoloNETCollectionEntryInternal);
-                HoloNETManager.Instance.LogMessage($"APP: HoloNET Collection Loaded (Internal Connection).");
+                HoloNETManager.Instance.ShowStatusMessage($"HoloNET Collection (Internal Connection) Loaded.", StatusMessageType.Success, false, ucHoloNETCollectionEntryInternal);
+                HoloNETManager.Instance.LogMessage($"APP: HoloNET Collection (Internal Connection) Loaded.");
                 gridDataEntriesInternal.ItemsSource = HoloNETManager.Instance.HoloNETEntries;
             }
             else

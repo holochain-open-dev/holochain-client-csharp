@@ -12,24 +12,19 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
         /// </summary>
         public async Task<bool> InitHoloNETEntryAsync()
         {
-            bool initOk = false;
-            int port;
-            string dnaHash = "";
-            string agentPubKey = "";
-
             InitHoloNETEntryDemo = true;
             ShowAppsListedInLog = false;
 
-            LogMessage("APP: Initializing HoloNET Entry...");
-            ShowStatusMessage("Initializing HoloNET Entry...", StatusMessageType.Information, true, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
+            LogMessage("APP: Initializing HoloNET Entry (Internal Connection)...");
+            ShowStatusMessage("Initializing HoloNET Entry (Internal Connection)...", StatusMessageType.Information, true, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
 
-            (initOk, port, dnaHash, agentPubKey) = await InitDemoApp(HoloNETEntryDemoAppId, HoloNETEntryDemoHappPath);
+            InstallEnableSignAndAttachHappEventArgs initDemoResult = await InitDemoApp(HoloNETEntryDemoAppId, HoloNETEntryDemoHappPath);
 
-            if (initOk)
+            if (initDemoResult != null && initDemoResult.IsSuccess && !initDemoResult.IsError)
             {
-                LogMessage($"APP: Creating HoloNET Entry (Creating Internal HoloNETClient & Connecting To Port {port})...");
-                ShowStatusMessage($"Creating HoloNET Entry (Creating Internal HoloNETClient & Connecting To Port {port})...", StatusMessageType.Information, true);
-                HoloNETEntryUIManager.CurrentHoloNETEntryUI.ShowStatusMessage($"Creating Internal HoloNETClient & Connecting To Port {port}...", StatusMessageType.Information, true);
+                LogMessage($"APP: Creating HoloNET Entry (Internal Connection) (Creating Internal HoloNETClient & Connecting To Port {initDemoResult.AttachedOnPort})...");
+                ShowStatusMessage($"Creating HoloNET Entry (Internal Connection) (Creating Internal HoloNETClient & Connecting To Port {initDemoResult.AttachedOnPort})...", StatusMessageType.Information, true);
+                HoloNETEntryUIManager.CurrentHoloNETEntryUI.ShowStatusMessage($"Creating Internal HoloNETClient & Connecting To Port {initDemoResult.AttachedOnPort}...", StatusMessageType.Information, true);
 
                 // If you wanted to load a persisted DNA from disk and then make ammendments to it you would do this:
                 //HoloNETDNA dna = HoloNETDNAManager.LoadDNA();
@@ -42,10 +37,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
                 // If we do not pass in a HoloNETClient it will create it's own internal connection/client
                 HoloNETEntry = new Avatar(new HoloNETDNA()
                 {
-                    HolochainConductorAppAgentURI = $"ws://localhost:{port}",
+                    HolochainConductorAppAgentURI = $"ws://localhost:{initDemoResult.AttachedOnPort}",
                     InstalledAppId = HoloNETEntryDemoAppId, // You need to set either the InstalledAppId or the AgentPubKey & DnaHash. You can set all 3 if you wish but only one or the other works fine too (if only the InstalledAppId is set it will look up the AgentPubKey & DnaHash from the conductor).
-                    AgentPubKey = agentPubKey, // If you only set the AgentPubKey & DnaHash but not the InstalledAppId then it will still work fine.
-                    DnaHash = dnaHash,
+                    AgentPubKey = initDemoResult.AgentPubKey, // If you only set the AgentPubKey & DnaHash but not the InstalledAppId then it will still work fine.
+                    DnaHash = initDemoResult.DnaHash,
                     AutoStartHolochainConductor = false, // This defaults to true normally so make sure you set this to false because we can connect to the already running holochain.exe (the one admin is already using).
                     AutoShutdownHolochainConductor = false, // This defaults to true normally so make sure you set this to false.
 
@@ -107,14 +102,14 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
 
             else if (showAlreadyInitMessage)
             {
-                ShowStatusMessage($"HoloNET Entry Already Initialized.", StatusMessageType.Information, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
-                LogMessage($"APP: HoloNET Entry Already Initialized..");
+                ShowStatusMessage($"HoloNET Entry (Internal Connection) Already Initialized.", StatusMessageType.Information, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
+                LogMessage($"APP: HoloNET Entry (Internal Connection) Already Initialized..");
             }
 
             if (HoloNETEntry != null && HoloNETEntryDNAManager.HoloNETEntryDNA != null && !string.IsNullOrEmpty(HoloNETEntryDNAManager.HoloNETEntryDNA.AvatarEntryHash))
             {
-                ShowStatusMessage($"Loading HoloNET Data Entry...", StatusMessageType.Information, true, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
-                LogMessage($"APP: Loading HoloNET Data Entry...");
+                ShowStatusMessage($"Loading HoloNET Entry (Internal Connection)...", StatusMessageType.Information, true, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
+                LogMessage($"APP: Loading HoloNET Entry (Internal Connection)...");
 
                 //Non async way.
                 // If you use Load, Save or Delete non-async versions you will need to wait for the OnInitialized event to fire before calling.
@@ -128,7 +123,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
             {
                 if (HoloNETEntry == null)
                 {
-                    result.Message = "HoloNETEntry Failed To Initialize";
+                    result.Message = "HoloNET Entry (Internal Connection) Failed To Initialize";
                     result.IsError = true;
                 }
                 else if (HoloNETEntryDNAManager.HoloNETEntryDNA == null)
@@ -156,8 +151,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
 
             if (HoloNETEntry != null)
             {
-                ShowStatusMessage($"Saving HoloNET Data Entry...", StatusMessageType.Information, true, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
-                LogMessage($"APP: Saving HoloNET Data Entry...");
+                ShowStatusMessage($"Saving HoloNET Entry (Internal Connection)...", StatusMessageType.Information, true, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
+                LogMessage($"APP: Saving HoloNET Entry (Internal Connection)...");
 
                 HoloNETEntry.FirstName = HoloNETEntryUIManager.CurrentHoloNETEntryUI.FirstName;
                 HoloNETEntry.LastName = HoloNETEntryUIManager.CurrentHoloNETEntryUI.LastName;
@@ -183,7 +178,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
             else
             {
                 result.IsError = true;
-                result.Message = "HoloNETEntry Failed To Initialize";
+                result.Message = "HoloNET Entry (Internal Connection) Failed To Initialize";
             }
 
             return result;
@@ -199,8 +194,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
 
             if (HoloNETEntry != null)
             {
-                ShowStatusMessage($"Deleting HoloNET Data Entry...", StatusMessageType.Information, true, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
-                LogMessage($"APP: Deleting HoloNET Data Entry...");
+                ShowStatusMessage($"Deleting HoloNET Entry (Internal Connection)...", StatusMessageType.Information, true, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
+                LogMessage($"APP: Deleting HoloNET Entry (Internal Connection)...");
 
                 // Non async way.
                 // If you use Load, Save or Delete non-async versions you will need to wait for the OnInitialized event to fire before calling.
@@ -221,7 +216,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
             else
             {
                 result.IsError = true;
-                result.Message = "HoloNETEntry Failed To Initialize";
+                result.Message = "HoloNET Entry (Internal Connection) Failed To Initialize";
             }
 
             return result;
@@ -229,14 +224,14 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
 
         private void _holoNETEntry_OnInitialized(object sender, ReadyForZomeCallsEventArgs e)
         {
-            ShowStatusMessage($"HoloNET Data Entry Initialized", StatusMessageType.Success, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
-            LogMessage($"APP: HoloNET Data Entry Initialized: AgentPubKey: {e.AgentPubKey}, DnaHash: {e.DnaHash}");
+            ShowStatusMessage($"HoloNET Entry (Internal Connection) Initialized", StatusMessageType.Success, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
+            LogMessage($"APP: HoloNET Entry (Internal Connection) Initialized: AgentPubKey: {e.AgentPubKey}, DnaHash: {e.DnaHash}");
         }
 
         private void _holoNETEntry_OnLoaded(object sender, ZomeFunctionCallBackEventArgs e)
         {
-            ShowStatusMessage($"HoloNET Data Entry Loaded", StatusMessageType.Success, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
-            LogMessage($"APP: HoloNET Data Entry Loaded: {GetEntryInfo(e)}");
+            ShowStatusMessage($"HoloNET Entry (Internal Connection) Loaded ", StatusMessageType.Success, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
+            LogMessage($"APP: HoloNET Entry (Internal Connection) Loaded: {GetEntryInfo(e)}");
         }
 
         private void _holoNETEntry_OnSaved(object sender, ZomeFunctionCallBackEventArgs e)
@@ -254,19 +249,19 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
 
         private void _holoNETEntry_OnClosed(object sender, HoloNETShutdownEventArgs e)
         {
-            ShowStatusMessage($"HoloNET Data Entry Closed", StatusMessageType.Success, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
+            ShowStatusMessage($"HoloNET Entry (Internal Connection) Closed", StatusMessageType.Success, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
             //LogMessage($"APP: HoloNET Data Entry Closed: Number Of Holochain Exe Instances Shutdown: {e.HolochainConductorsShutdownEventArgs != null ? e.HolochainConductorsShutdownEventArgs.NumberOfHolochainExeInstancesShutdown : 0}, Number Of Hc Exe Instances Shutdown: {e.HolochainConductorsShutdownEventArgs.NumberOfHcExeInstancesShutdown}, Number Of Rustc Exe Instances Shutdown: {e.HolochainConductorsShutdownEventArgs.NumberOfRustcExeInstancesShutdown}");
 
             if (e.HolochainConductorsShutdownEventArgs != null)
-                LogMessage($"APP: HoloNET Data Entry Closed: Number Of Holochain Exe Instances Shutdown: {e.HolochainConductorsShutdownEventArgs.NumberOfHolochainExeInstancesShutdown}, Number Of Hc Exe Instances Shutdown: {e.HolochainConductorsShutdownEventArgs.NumberOfHcExeInstancesShutdown}, Number Of Rustc Exe Instances Shutdown: {e.HolochainConductorsShutdownEventArgs.NumberOfRustcExeInstancesShutdown}");
+                LogMessage($"APP: HoloNET Entry (Internal Connection) Closed: Number Of Holochain Exe Instances Shutdown: {e.HolochainConductorsShutdownEventArgs.NumberOfHolochainExeInstancesShutdown}, Number Of Hc Exe Instances Shutdown: {e.HolochainConductorsShutdownEventArgs.NumberOfHcExeInstancesShutdown}, Number Of Rustc Exe Instances Shutdown: {e.HolochainConductorsShutdownEventArgs.NumberOfRustcExeInstancesShutdown}");
             else
-                LogMessage($"APP: HoloNET Data Entry Closed: Number Of Holochain Exe Instances Shutdown: 0, Number Of Hc Exe Instances Shutdown: 0, Number Of Rustc Exe Instances Shutdown: 0");
+                LogMessage($"APP: HoloNET Entry (Internal Connection) Closed: Number Of Holochain Exe Instances Shutdown: 0, Number Of Hc Exe Instances Shutdown: 0, Number Of Rustc Exe Instances Shutdown: 0");
         }
 
         private void _holoNETEntry_OnError(object sender, HoloNETErrorEventArgs e)
         {
-            ShowStatusMessage($"HoloNET Data Entry Error", StatusMessageType.Error, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
-            LogMessage($"APP: HoloNET Data Entry Error: {e.Reason}");
+            ShowStatusMessage($"HoloNET Entry (Internal Connection) Error", StatusMessageType.Error, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
+            LogMessage($"APP: HoloNET Entry (Internal Connection) Error: {e.Reason}");
         }
     }
 }

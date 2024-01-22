@@ -74,8 +74,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
                 HoloNETEntryShared[CurrentApp.Name].DOB = dob;
                 HoloNETEntryShared[CurrentApp.Name].Email = email;
 
-                ShowStatusMessage($"Saving HoloNET Data Entry (Shared Connection)...", StatusMessageType.Information, true, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
-                LogMessage($"APP: Saving HoloNET Data Entry (Shared Connection)...");
+                ShowStatusMessage($"Saving HoloNET Entry (Shared Connection)...", StatusMessageType.Information, true, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
+                LogMessage($"APP: Saving HoloNET Entry (Shared Connection)...");
 
                 // Non async way.
                 // If you use Load or Save non-async versions you will need to wait for the OnInitialized event to fire before calling.
@@ -125,42 +125,42 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
 
         private void _holoNETEntryShared_OnInitialized(object sender, ReadyForZomeCallsEventArgs e)
         {
-            ShowStatusMessage($"HoloNET Data Entry (Shared) Initialized", StatusMessageType.Success, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
-            LogMessage($"APP: HoloNET Data Entry (Shared) Initialized.");
+            ShowStatusMessage($"HoloNET Entry (Shared Connection) Initialized", StatusMessageType.Success, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
+            LogMessage($"APP: HoloNET Entry (Shared Connection) Initialized.");
         }
 
         private void _holoNETEntryShared_OnLoaded(object sender, ZomeFunctionCallBackEventArgs e)
         {
-            ShowStatusMessage($"HoloNET Data Entry (Shared) Loaded", StatusMessageType.Success, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
-            LogMessage($"APP: HoloNET Data Entry (Shared) Loaded: {GetEntryInfo(e)}");
+            ShowStatusMessage($"HoloNET Entry (Shared Connection) Loaded", StatusMessageType.Success, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
+            LogMessage($"APP: HoloNET Entry (Shared Connection) Loaded: {GetEntryInfo(e)}");
         }
 
         private void _holoNETEntryShared_OnSaved(object sender, ZomeFunctionCallBackEventArgs e)
         {
-            ShowStatusMessage($"HoloNET Data Entry (Shared) Saved", StatusMessageType.Success, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
-            LogMessage($"APP: HoloNET Data Entry (Shared) Saved: {GetEntryInfo(e)}");
+            ShowStatusMessage($"HoloNET Entry (Shared Connection) Saved", StatusMessageType.Success, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
+            LogMessage($"APP: HoloNET Entry (Shared Connection) Saved: {GetEntryInfo(e)}");
         }
 
         private void _holoNETEntryShared_OnDeleted(object sender, ZomeFunctionCallBackEventArgs e)
         {
-            ShowStatusMessage($"HoloNET Data Entry (Shared) Deleted", StatusMessageType.Success, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
-            LogMessage($"APP: HoloNET Data Entry (Shared) Deleted: {GetEntryInfo(e)}");
+            ShowStatusMessage($"HoloNET Entry (Shared Connection) Deleted", StatusMessageType.Success, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
+            LogMessage($"APP: HoloNET Entry (Shared Connection) Deleted: {GetEntryInfo(e)}");
         }
 
         private void _holoNETEntryShared_OnClosed(object sender, HoloNETShutdownEventArgs e)
         {
-            ShowStatusMessage($"HoloNET Data Entry (Shared) Closed", StatusMessageType.Success, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
+            ShowStatusMessage($"HoloNET Entry (Shared Connection) Closed", StatusMessageType.Success, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
 
             if (e.HolochainConductorsShutdownEventArgs != null)
-                LogMessage($"APP: HoloNET Data Entry (Shared) Closed: Number Of Holochain Exe Instances Shutdown: {e.HolochainConductorsShutdownEventArgs.NumberOfHolochainExeInstancesShutdown}, Number Of Hc Exe Instances Shutdown: {e.HolochainConductorsShutdownEventArgs.NumberOfHcExeInstancesShutdown}, Number Of Rustc Exe Instances Shutdown: {e.HolochainConductorsShutdownEventArgs.NumberOfRustcExeInstancesShutdown}");
+                LogMessage($"APP: HoloNET Entry (Shared Connection) Closed: Number Of Holochain Exe Instances Shutdown: {e.HolochainConductorsShutdownEventArgs.NumberOfHolochainExeInstancesShutdown}, Number Of Hc Exe Instances Shutdown: {e.HolochainConductorsShutdownEventArgs.NumberOfHcExeInstancesShutdown}, Number Of Rustc Exe Instances Shutdown: {e.HolochainConductorsShutdownEventArgs.NumberOfRustcExeInstancesShutdown}");
             else
-                LogMessage($"APP: HoloNET Data Entry (Shared) Closed: Number Of Holochain Exe Instances Shutdown: 0, Number Of Hc Exe Instances Shutdown: 0, Number Of Rustc Exe Instances Shutdown: 0");
+                LogMessage($"APP: HoloNET Entry (Shared Connection) Closed: Number Of Holochain Exe Instances Shutdown: 0, Number Of Hc Exe Instances Shutdown: 0, Number Of Rustc Exe Instances Shutdown: 0");
         }
 
         private void _holoNETEntryShared_OnError(object sender, HoloNETErrorEventArgs e)
         {
-            ShowStatusMessage($"HoloNET Data Entry (Shared) Error", StatusMessageType.Error, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
-            LogMessage($"APP: HoloNET Data Entry (Shared) Error: {e.Reason}");
+            ShowStatusMessage($"HoloNET Entry (Shared Connection) Error", StatusMessageType.Error, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
+            LogMessage($"APP: HoloNET Entry (Shared Connection) Error: {e.Reason}");
         }
     }
 }
