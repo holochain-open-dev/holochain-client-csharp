@@ -40,6 +40,14 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         private Dictionary<string, TaskCompletionSource<DumpNetworkStatsCallBackEventArgs>> _taskCompletionDumpNetworkStatsCallBack = new Dictionary<string, TaskCompletionSource<DumpNetworkStatsCallBackEventArgs>>();
 
         //Events
+
+        public delegate void InstallEnableSignAndAttachHappCallBack(object sender, InstallEnableSignAndAttachHappEventArgs e);
+
+        /// <summary>
+        /// Fired when the hApp has been installed, enabled, signed and attached.
+        /// </summary>
+        public event InstallEnableSignAndAttachHappCallBack OnInstallEnableSignAndAttachHappCallBack;
+
         public delegate void AgentPubKeyGeneratedCallBack(object sender, AgentPubKeyGeneratedCallBackEventArgs e);
 
         /// <summary>
@@ -321,6 +329,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <summary>
         /// Will init the hApp, which includes installing and enabling the app, signing credentials & attaching the app interface.
         /// </summary>
+        //public async Task<InstallEnableSignAndAttachHappEventArgs> InstallEnableSignAndAttachHappAsync(string hAppId, string hAppInstallPath, CapGrantAccessType capGrantAccessType = CapGrantAccessType.Unrestricted, GrantedFunctionsType grantedFunctionsType = GrantedFunctionsType.All, List<(string, string)> grantedFunctions = null, bool uninstallhAppIfAlreadyInstalled = true, bool log = true, Action<string, LogType> loggingFunction = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse)
         public async Task<InstallEnableSignAndAttachHappEventArgs> InstallEnableSignAndAttachHappAsync(string hAppId, string hAppInstallPath, CapGrantAccessType capGrantAccessType = CapGrantAccessType.Unrestricted, GrantedFunctionsType grantedFunctionsType = GrantedFunctionsType.All, List<(string, string)> grantedFunctions = null, bool uninstallhAppIfAlreadyInstalled = true, bool log = true, Action<string, LogType> loggingFunction = null)
         {
             InstallEnableSignAndAttachHappEventArgs result = new InstallEnableSignAndAttachHappEventArgs();
@@ -447,15 +456,149 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             if (log && result.IsError)
                 Log(result.Message, LogType.Error, loggingFunction);
 
+            OnInstallEnableSignAndAttachHappCallBack?.Invoke(this, result);
             return result;
         }
+
+        ///// <summary>
+        ///// Will init the hApp, which includes installing and enabling the app, signing credentials & attaching the app interface.
+        ///// </summary>
+        //public InstallEnableSignAndAttachHappEventArgs InstallEnableSignAndAttachHapp(string hAppId, string hAppInstallPath, CapGrantAccessType capGrantAccessType = CapGrantAccessType.Unrestricted, GrantedFunctionsType grantedFunctionsType = GrantedFunctionsType.All, List<(string, string)> grantedFunctions = null, bool uninstallhAppIfAlreadyInstalled = true, bool log = true, Action<string, LogType> loggingFunction = null)
+        //{
+        //    InstallEnableSignAndAttachHappEventArgs result = new InstallEnableSignAndAttachHappEventArgs();
+
+        //    if (log)
+        //        Log($"ADMIN: Checking If App {hAppId} Is Already Installed...", LogType.Info, loggingFunction);
+
+        //    GetAppInfoCallBackEventArgs appInfoResult = GetAppInfo(hAppId);
+
+        //    if (appInfoResult != null && appInfoResult.AppInfo != null && uninstallhAppIfAlreadyInstalled)
+        //    {
+        //        if (log)
+        //            Log($"ADMIN: App {hAppId} Is Already Installed So Uninstalling Now...", LogType.Info);
+
+        //        AppUninstalledCallBackEventArgs uninstallResult = UninstallApp(hAppId);
+
+        //        if (uninstallResult != null && uninstallResult.IsError)
+        //        {
+        //            if (log)
+        //                Log($"ADMIN: Error Uninstalling App {hAppId}. Reason: {uninstallResult.Message}", LogType.Info, loggingFunction);
+        //        }
+        //        else
+        //        {
+        //            if (log)
+        //                Log($"ADMIN: Uninstalled App {hAppId}.", LogType.Info, loggingFunction);
+        //        }
+        //    }
+
+        //    if (log)
+        //        Log($"ADMIN: Generating New AgentPubKey...", LogType.Info, loggingFunction);
+
+        //    result.AgentPubKeyGeneratedCallBackEventArgs = await GenerateAgentPubKeyAsync();
+
+        //    if (result.AgentPubKeyGeneratedCallBackEventArgs != null && !result.AgentPubKeyGeneratedCallBackEventArgs.IsError)
+        //    {
+        //        if (log)
+        //        {
+        //            Log($"ADMIN: AgentPubKey Generated Successfully. AgentPubKey: {result.AgentPubKeyGeneratedCallBackEventArgs.AgentPubKey}", LogType.Info, loggingFunction);
+        //            Log($"ADMIN: Installing App {{appId}}...", LogType.Info, loggingFunction);
+        //        }
+
+        //        result.IsAgentPubKeyGenerated = true;
+        //        result.AppInstalledCallBackEventArgs = await InstallAppAsync(hAppId, hAppInstallPath, null);
+
+        //        if (result.AppInstalledCallBackEventArgs != null && !result.AppInstalledCallBackEventArgs.IsError)
+        //        {
+        //            if (log)
+        //            {
+        //                Log($"ADMIN: {hAppId} App Installed.", LogType.Info, loggingFunction);
+        //                Log($"ADMIN: Enabling App {hAppId}...", LogType.Info, loggingFunction);
+        //            }
+
+        //            result.IsAppInstalled = true;
+        //            result.AgentPubKey = result.AppInstalledCallBackEventArgs.DnaHash;
+        //            result.DnaHash = result.AppInstalledCallBackEventArgs.DnaHash;
+        //            result.CellId = result.AppInstalledCallBackEventArgs.CellId;
+        //            result.AppStatus = result.AppInstalledCallBackEventArgs.AppInfoResponse.data.AppStatus;
+        //            result.AppStatusReason = result.AppInstalledCallBackEventArgs.AppInfoResponse.data.AppStatusReason;
+        //            result.AppManifest = result.AppInstalledCallBackEventArgs.AppInfoResponse.data.manifest;
+
+        //            result.AppEnabledCallBackEventArgs = await EnableAppAsync(hAppId);
+
+        //            if (result.AppEnabledCallBackEventArgs != null && !result.AppEnabledCallBackEventArgs.IsError)
+        //            {
+        //                if (log)
+        //                {
+        //                    Log($"ADMIN: {hAppId} App Enabled.", LogType.Info, loggingFunction);
+        //                    Log($"ADMIN: Signing Credentials (Zome Call Capabilities) For App {hAppId}...", LogType.Info, loggingFunction);
+        //                }
+
+        //                result.IsAppEnabled = true;
+        //                result.ZomeCallCapabilityGrantedCallBackEventArgs = await AuthorizeSigningCredentialsAndGrantZomeCallCapabilityAsync(result.AppInstalledCallBackEventArgs.CellId, capGrantAccessType, grantedFunctionsType, grantedFunctions);
+
+        //                if (result.ZomeCallCapabilityGrantedCallBackEventArgs != null && !result.ZomeCallCapabilityGrantedCallBackEventArgs.IsError)
+        //                {
+        //                    if (log)
+        //                    {
+        //                        Log($"ADMIN: {hAppId} App Signing Credentials Authorized.", LogType.Info, loggingFunction);
+        //                        Log($"ADMIN: Attaching App Interface For App {hAppId}...", LogType.Info, loggingFunction);
+        //                    }
+
+        //                    result.IsAppSigned = true;
+        //                    result.AppInterfaceAttachedCallBackEventArgs = await AttachAppInterfaceAsync();
+
+        //                    if (result.AppInterfaceAttachedCallBackEventArgs != null && !result.AppInterfaceAttachedCallBackEventArgs.IsError)
+        //                    {
+        //                        result.IsAppAttached = true;
+        //                        result.IsSuccess = true;
+        //                        result.AttachedOnPort = result.AppInterfaceAttachedCallBackEventArgs.Port;
+
+        //                        if (log)
+        //                            Log($"ADMIN: {hAppId} App Interface Attached On Port {result.AppInterfaceAttachedCallBackEventArgs.Port}.", LogType.Info, loggingFunction);
+        //                    }
+        //                    else
+        //                    {
+        //                        result.Message = $"ADMIN: Error Attaching App Interface For App {hAppId}. Reason: {result.AppInterfaceAttachedCallBackEventArgs.Message}";
+        //                        result.IsError = true;
+        //                    }
+        //                }
+        //                else
+        //                {
+        //                    result.Message = $"ADMIN: Error Signing Credentials For App {hAppId}. Reason: {result.ZomeCallCapabilityGrantedCallBackEventArgs.Message}";
+        //                    result.IsError = true;
+        //                }
+        //            }
+        //            else
+        //            {
+        //                result.Message = $"ADMIN: Error Enabling App {hAppId}. Reason: {result.AppEnabledCallBackEventArgs.Message}";
+        //                result.IsError = true;
+        //            }
+        //        }
+        //        else
+        //        {
+        //            result.Message = $"ADMIN: Error Installing App {hAppId}. Reason: {result.AppInstalledCallBackEventArgs.Message}";
+        //            result.IsError = true;
+        //        }
+        //    }
+        //    else
+        //    {
+        //        result.Message = $"ADMIN: Error Generating AgentPubKey. Reason: {result.AgentPubKeyGeneratedCallBackEventArgs.Message}";
+        //        result.IsError = true;
+        //    }
+
+        //    if (log && result.IsError)
+        //        Log(result.Message, LogType.Error, loggingFunction);
+
+        //    OnInstallEnableSignAndAttachHappCallBack?.Invoke(this, result);
+        //    return result;
+        //}
 
         /// <summary>
         /// Will init the hApp, which includes installing and enabling the app, signing credentials & attaching the app interface.
         /// </summary>
-        public InstallEnableSignAndAttachHappEventArgs InstallEnableSignAndAttachHapp(string hAppId, string hAppInstallPath, CapGrantAccessType capGrantAccessType = CapGrantAccessType.Unrestricted, GrantedFunctionsType grantedFunctionsType = GrantedFunctionsType.All, List<(string, string)> grantedFunctions = null, bool uninstallhAppIfAlreadyInstalled = true, bool log = true)
+        public InstallEnableSignAndAttachHappEventArgs InstallEnableSignAndAttachHapp(string hAppId, string hAppInstallPath, CapGrantAccessType capGrantAccessType = CapGrantAccessType.Unrestricted, GrantedFunctionsType grantedFunctionsType = GrantedFunctionsType.All, List<(string, string)> grantedFunctions = null, bool uninstallhAppIfAlreadyInstalled = true, bool log = true, Action<string, LogType> loggingFunction = null)
         {
-            return InstallEnableSignAndAttachHappAsync(hAppId, hAppInstallPath, capGrantAccessType, grantedFunctionsType, grantedFunctions, uninstallhAppIfAlreadyInstalled, log).Result;
+            return InstallEnableSignAndAttachHappAsync(hAppId, hAppInstallPath, capGrantAccessType, grantedFunctionsType, grantedFunctions, uninstallhAppIfAlreadyInstalled, log, loggingFunction).Result;
         }
 
         public async Task<AgentPubKeyGeneratedCallBackEventArgs> GenerateAgentPubKeyAsync(ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, bool updateAgentPubKeyInHoloNETDNA = true, string id = "")

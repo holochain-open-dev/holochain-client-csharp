@@ -84,7 +84,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="holoNETDNA">The HoloNETDNA you wish to use for this connection (optional). If this is not passed in then it will use the default HoloNETDNA defined in the HoloNETDNA property.</param>
         public HoloNETClientAppAgent(HoloNETDNA holoNETDNA = null) : base(holoNETDNA)
         {
-
+            if (holoNETDNA == null)
+                holoNETDNA = new HoloNETDNA() { AutoStartHolochainConductor = false, AutoShutdownHolochainConductor = false };
         }
 
         /// <summary>
@@ -95,7 +96,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="holoNETDNA">The HoloNETDNA you wish to use for this connection (optional). If this is not passed in then it will use the default HoloNETDNA defined in the HoloNETDNA property.</param>
         public HoloNETClientAppAgent(ILogProvider logProvider, bool alsoUseDefaultLogger = false, HoloNETDNA holoNETDNA = null) : base(logProvider, alsoUseDefaultLogger, holoNETDNA)
         {
-
+            if (holoNETDNA == null)
+                holoNETDNA = new HoloNETDNA() { AutoStartHolochainConductor = false, AutoShutdownHolochainConductor = false };
         }
 
         /// <summary>
@@ -106,7 +108,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="holoNETDNA">The HoloNETDNA you wish to use for this connection (optional). If this is not passed in then it will use the default HoloNETDNA defined in the HoloNETDNA property.</param>
         public HoloNETClientAppAgent(IEnumerable<ILogProvider> logProviders, bool alsoUseDefaultLogger = false, HoloNETDNA holoNETDNA = null) : base(logProviders, alsoUseDefaultLogger, holoNETDNA)
         {
-
+            if (holoNETDNA == null)
+                holoNETDNA = new HoloNETDNA() { AutoStartHolochainConductor = false, AutoShutdownHolochainConductor = false };
         }
 
         /// <summary>
@@ -116,7 +119,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="holoNETDNA">The HoloNETDNA you wish to use for this connection (optional). If this is not passed in then it will use the default HoloNETDNA defined in the HoloNETDNA property.</param>
         public HoloNETClientAppAgent(Logger logger, HoloNETDNA holoNETDNA = null) : base(logger, holoNETDNA)
         {
-
+            if (holoNETDNA == null)
+                holoNETDNA = new HoloNETDNA() { AutoStartHolochainConductor = false, AutoShutdownHolochainConductor = false };
         }
 
         /// <summary>
