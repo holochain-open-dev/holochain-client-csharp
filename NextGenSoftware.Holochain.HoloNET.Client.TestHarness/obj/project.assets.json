@@ -788,6 +788,7 @@
         "framework": ".NETCoreApp,Version=v8.0",
         "dependencies": {
           "Colorful.Console": "1.2.15",
+          "NextGenSoftware.ErrorHandling": "1.0.0",
           "NextGenSoftware.Utilities": "1.1.0"
         },
         "compile": {
@@ -795,6 +796,16 @@
         },
         "runtime": {
           "bin/placeholder/NextGenSoftware.CLI.Engine.dll": {}
+        }
+      },
+      "NextGenSoftware.ErrorHandling/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v8.0",
+        "compile": {
+          "bin/placeholder/NextGenSoftware.ErrorHandling.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/NextGenSoftware.ErrorHandling.dll": {}
         }
       },
       "NextGenSoftware.Holochain.HoloNET.Client/3.0.0": {
@@ -845,7 +856,9 @@
         "type": "project",
         "framework": ".NETCoreApp,Version=v8.0",
         "dependencies": {
-          "NextGenSoftware.Logging": "1.2.0"
+          "NextGenSoftware.ErrorHandling": "1.0.0",
+          "NextGenSoftware.Logging": "1.2.0",
+          "NextGenSoftware.Utilities": "1.1.0"
         },
         "compile": {
           "bin/placeholder/NextGenSoftware.WebSocket.dll": {}
@@ -3175,6 +3188,11 @@
       "type": "project",
       "path": "../../NextGenSoftware-Libraries/NextGenSoftware Libraries/NextGenSoftware.CLI.Engine/NextGenSoftware.CLI.Engine.csproj",
       "msbuildProject": "../../NextGenSoftware-Libraries/NextGenSoftware Libraries/NextGenSoftware.CLI.Engine/NextGenSoftware.CLI.Engine.csproj"
+    },
+    "NextGenSoftware.ErrorHandling/1.0.0": {
+      "type": "project",
+      "path": "../../NextGenSoftware-Libraries/NextGenSoftware Libraries/NextGenSoftware.ErrorHandling/NextGenSoftware.ErrorHandling.csproj",
+      "msbuildProject": "../../NextGenSoftware-Libraries/NextGenSoftware Libraries/NextGenSoftware.ErrorHandling/NextGenSoftware.ErrorHandling.csproj"
     },
     "NextGenSoftware.Holochain.HoloNET.Client/3.0.0": {
       "type": "project",

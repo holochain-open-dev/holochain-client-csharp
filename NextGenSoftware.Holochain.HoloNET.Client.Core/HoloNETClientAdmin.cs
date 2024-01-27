@@ -10,6 +10,7 @@ using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.AppManifest;
 using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests;
 using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects;
 using NextGenSoftware.Holochain.HoloNET.Client.Interfaces;
+using NextGenSoftware.WebSocket;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
@@ -41,6 +42,14 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         //Events
 
+        public delegate void InstallEnableSignAttachAndConnectToHappCallBack(object sender, InstallEnableSignAttachAndConnectToHappEventArgs e);
+
+        /// <summary>
+        /// Fired when the hApp has been installed, enabled, signed and attached.
+        /// </summary>
+        public event InstallEnableSignAttachAndConnectToHappCallBack OnInstallEnableSignAttachAndConnectToHappCallBack;
+
+
         public delegate void InstallEnableSignAndAttachHappCallBack(object sender, InstallEnableSignAndAttachHappEventArgs e);
 
         /// <summary>
@@ -48,12 +57,16 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// </summary>
         public event InstallEnableSignAndAttachHappCallBack OnInstallEnableSignAndAttachHappCallBack;
 
+
+
+
         public delegate void AgentPubKeyGeneratedCallBack(object sender, AgentPubKeyGeneratedCallBackEventArgs e);
 
         /// <summary>
         /// Fired when the client receives the generated AgentPubKey from the conductor.
         /// </summary>
         public event AgentPubKeyGeneratedCallBack OnAgentPubKeyGeneratedCallBack;
+
 
 
         public delegate void AppInstalledCallBack(object sender, AppInstalledCallBackEventArgs e);
@@ -268,7 +281,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="automaticallyAttemptToRetrieveFromSandBoxIfConductorFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the HC Sandbox command if it fails to get them from the Holochain Conductor. This defaults to true.</param>
         /// <param name="updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved">Set this to true (default) to automatically update the [HoloNETHoloNETDNA](#holonetconfig) once it has retrieved the DnaHash & AgentPubKey.</param>
         /// <returns></returns>
-        public override async Task<HoloNETConnectEventArgs> ConnectAsync(Uri holochainConductorURI, ConnectedCallBackMode connectedCallBackMode = ConnectedCallBackMode.WaitForHolochainConductorToConnect, RetrieveAgentPubKeyAndDnaHashMode retrieveAgentPubKeyAndDnaHashMode = RetrieveAgentPubKeyAndDnaHashMode.Wait, bool retrieveAgentPubKeyAndDnaHashFromConductor = true, bool retrieveAgentPubKeyAndDnaHashFromSandbox = true, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true, bool updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved = true)
+        public override async Task<HoloNETConnectedEventArgs> ConnectAsync(Uri holochainConductorURI, ConnectedCallBackMode connectedCallBackMode = ConnectedCallBackMode.WaitForHolochainConductorToConnect, RetrieveAgentPubKeyAndDnaHashMode retrieveAgentPubKeyAndDnaHashMode = RetrieveAgentPubKeyAndDnaHashMode.Wait, bool retrieveAgentPubKeyAndDnaHashFromConductor = true, bool retrieveAgentPubKeyAndDnaHashFromSandbox = true, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true, bool updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved = true)
         {
             return await ConnectAsync(holochainConductorURI.AbsoluteUri, connectedCallBackMode, retrieveAgentPubKeyAndDnaHashMode, retrieveAgentPubKeyAndDnaHashFromConductor, retrieveAgentPubKeyAndDnaHashFromSandbox, automaticallyAttemptToRetrieveFromConductorIfSandBoxFails, automaticallyAttemptToRetrieveFromSandBoxIfConductorFails, updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved);
         }
@@ -285,7 +298,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="automaticallyAttemptToRetrieveFromSandBoxIfConductorFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the HC Sandbox command if it fails to get them from the Holochain Conductor. This defaults to true.</param>
         /// <param name="updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved">Set this to true (default) to automatically update the [HoloNETHoloNETDNA](#holonetconfig) once it has retrieved the DnaHash & AgentPubKey.</param>
         /// <returns></returns>
-        public override HoloNETConnectEventArgs Connect(Uri holochainConductorURI, RetrieveAgentPubKeyAndDnaHashMode retrieveAgentPubKeyAndDnaHashMode = RetrieveAgentPubKeyAndDnaHashMode.Wait, bool retrieveAgentPubKeyAndDnaHashFromConductor = true, bool retrieveAgentPubKeyAndDnaHashFromSandbox = true, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true, bool updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved = true)
+        public override HoloNETConnectedEventArgs Connect(Uri holochainConductorURI, RetrieveAgentPubKeyAndDnaHashMode retrieveAgentPubKeyAndDnaHashMode = RetrieveAgentPubKeyAndDnaHashMode.Wait, bool retrieveAgentPubKeyAndDnaHashFromConductor = true, bool retrieveAgentPubKeyAndDnaHashFromSandbox = true, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true, bool updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved = true)
         {
             return ConnectAsync(holochainConductorURI, ConnectedCallBackMode.UseCallBackEvents, retrieveAgentPubKeyAndDnaHashMode, retrieveAgentPubKeyAndDnaHashFromConductor, retrieveAgentPubKeyAndDnaHashFromSandbox, automaticallyAttemptToRetrieveFromConductorIfSandBoxFails, automaticallyAttemptToRetrieveFromSandBoxIfConductorFails, updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved).Result;
         }
@@ -302,7 +315,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="automaticallyAttemptToRetrieveFromSandBoxIfConductorFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the HC Sandbox command if it fails to get them from the Holochain Conductor. This defaults to true.</param>
         /// <param name="updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved">Set this to true (default) to automatically update the [HoloNETHoloNETDNA](#holonetconfig) once it has retrieved the DnaHash & AgentPubKey.</param>
         /// <returns></returns>
-        public override async Task<HoloNETConnectEventArgs> ConnectAsync(string holochainConductorURI = "", ConnectedCallBackMode connectedCallBackMode = ConnectedCallBackMode.WaitForHolochainConductorToConnect, RetrieveAgentPubKeyAndDnaHashMode retrieveAgentPubKeyAndDnaHashMode = RetrieveAgentPubKeyAndDnaHashMode.Wait, bool retrieveAgentPubKeyAndDnaHashFromConductor = true, bool retrieveAgentPubKeyAndDnaHashFromSandbox = true, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true, bool updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved = true)
+        public override async Task<HoloNETConnectedEventArgs> ConnectAsync(string holochainConductorURI = "", ConnectedCallBackMode connectedCallBackMode = ConnectedCallBackMode.WaitForHolochainConductorToConnect, RetrieveAgentPubKeyAndDnaHashMode retrieveAgentPubKeyAndDnaHashMode = RetrieveAgentPubKeyAndDnaHashMode.Wait, bool retrieveAgentPubKeyAndDnaHashFromConductor = true, bool retrieveAgentPubKeyAndDnaHashFromSandbox = true, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true, bool updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved = true)
         {
             //Is = true;
 
@@ -321,7 +334,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="automaticallyAttemptToRetrieveFromConductorIfSandBoxFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the Holochain Conductor if it fails to get them from the HC Sandbox command. This defaults to true.</param>
         /// <param name="automaticallyAttemptToRetrieveFromSandBoxIfConductorFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the HC Sandbox command if it fails to get them from the Holochain Conductor. This defaults to true.</param>
         /// <param name="updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved">Set this to true (default) to automatically update the [HoloNETHoloNETDNA](#holonetconfig) once it has retrieved the DnaHash & AgentPubKey.</param>
-        public override HoloNETConnectEventArgs Connect(string holochainConductorURI = "", bool retrieveAgentPubKeyAndDnaHashFromConductor = true, bool retrieveAgentPubKeyAndDnaHashFromSandbox = false, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true, bool updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved = true)
+        public override HoloNETConnectedEventArgs Connect(string holochainConductorURI = "", bool retrieveAgentPubKeyAndDnaHashFromConductor = true, bool retrieveAgentPubKeyAndDnaHashFromSandbox = false, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true, bool updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved = true)
         {
             return ConnectAsync(holochainConductorURI, ConnectedCallBackMode.UseCallBackEvents, RetrieveAgentPubKeyAndDnaHashMode.UseCallBackEvents, retrieveAgentPubKeyAndDnaHashFromConductor, retrieveAgentPubKeyAndDnaHashFromSandbox, automaticallyAttemptToRetrieveFromConductorIfSandBoxFails, automaticallyAttemptToRetrieveFromSandBoxIfConductorFails, updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved).Result;
         }
@@ -329,276 +342,206 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <summary>
         /// Will init the hApp, which includes installing and enabling the app, signing credentials & attaching the app interface.
         /// </summary>
-        //public async Task<InstallEnableSignAndAttachHappEventArgs> InstallEnableSignAndAttachHappAsync(string hAppId, string hAppInstallPath, CapGrantAccessType capGrantAccessType = CapGrantAccessType.Unrestricted, GrantedFunctionsType grantedFunctionsType = GrantedFunctionsType.All, List<(string, string)> grantedFunctions = null, bool uninstallhAppIfAlreadyInstalled = true, bool log = true, Action<string, LogType> loggingFunction = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse)
-        public async Task<InstallEnableSignAndAttachHappEventArgs> InstallEnableSignAndAttachHappAsync(string hAppId, string hAppInstallPath, CapGrantAccessType capGrantAccessType = CapGrantAccessType.Unrestricted, GrantedFunctionsType grantedFunctionsType = GrantedFunctionsType.All, List<(string, string)> grantedFunctions = null, bool uninstallhAppIfAlreadyInstalled = true, bool log = true, Action<string, LogType> loggingFunction = null)
+        public async Task<InstallEnableSignAndAttachHappEventArgs> InstallEnableSignAndAttachHappAsync(string hAppId, string hAppInstallPath, string roleName, CapGrantAccessType capGrantAccessType = CapGrantAccessType.Unrestricted, GrantedFunctionsType grantedFunctionsType = GrantedFunctionsType.All, List<(string, string)> grantedFunctions = null, bool uninstallhAppIfAlreadyInstalled = true, bool log = true, Action<string, LogType> loggingFunction = null)
         {
             InstallEnableSignAndAttachHappEventArgs result = new InstallEnableSignAndAttachHappEventArgs();
 
-            if (log)
-                Log($"ADMIN: Checking If App {hAppId} Is Already Installed...", LogType.Info, loggingFunction);
-
-            GetAppInfoCallBackEventArgs appInfoResult = await GetAppInfoAsync(hAppId);
-
-            if (appInfoResult != null && appInfoResult.AppInfo != null && uninstallhAppIfAlreadyInstalled)
+            try
             {
                 if (log)
-                    Log($"ADMIN: App {hAppId} Is Already Installed So Uninstalling Now...", LogType.Info);
+                    Log($"ADMIN: Checking If App {hAppId} Is Already Installed...", LogType.Info, loggingFunction);
 
-                AppUninstalledCallBackEventArgs uninstallResult = await UninstallAppAsync(hAppId);
+                GetAppInfoCallBackEventArgs appInfoResult = await GetAppInfoAsync(hAppId);
 
-                if (uninstallResult != null && uninstallResult.IsError)
+                if (appInfoResult != null && appInfoResult.AppInfo != null && uninstallhAppIfAlreadyInstalled)
                 {
                     if (log)
-                        Log($"ADMIN: Error Uninstalling App {hAppId}. Reason: {uninstallResult.Message}", LogType.Info, loggingFunction);
-                }
-                else
-                {
-                    if (log)
-                        Log($"ADMIN: Uninstalled App {hAppId}.", LogType.Info, loggingFunction);
-                }
-            }
+                        Log($"ADMIN: App {hAppId} Is Already Installed So Uninstalling Now...", LogType.Info);
 
-            if (log)
-                Log($"ADMIN: Generating New AgentPubKey...", LogType.Info, loggingFunction);
+                    AppUninstalledCallBackEventArgs uninstallResult = await UninstallAppAsync(hAppId);
 
-            result.AgentPubKeyGeneratedCallBackEventArgs = await GenerateAgentPubKeyAsync();
-
-            if (result.AgentPubKeyGeneratedCallBackEventArgs != null && !result.AgentPubKeyGeneratedCallBackEventArgs.IsError)
-            {
-                if (log)
-                {
-                    Log($"ADMIN: AgentPubKey Generated Successfully. AgentPubKey: {result.AgentPubKeyGeneratedCallBackEventArgs.AgentPubKey}", LogType.Info, loggingFunction);
-                    Log($"ADMIN: Installing App {{appId}}...", LogType.Info, loggingFunction);
-                }
-
-                result.IsAgentPubKeyGenerated = true;
-                result.AppInstalledCallBackEventArgs = await InstallAppAsync(hAppId, hAppInstallPath, null);
-
-                if (result.AppInstalledCallBackEventArgs != null && !result.AppInstalledCallBackEventArgs.IsError)
-                {
-                    if (log)
-                    {
-                        Log($"ADMIN: {hAppId} App Installed.", LogType.Info, loggingFunction);
-                        Log($"ADMIN: Enabling App {hAppId}...", LogType.Info, loggingFunction);
-                    }
-
-                    result.IsAppInstalled = true;
-                    result.AgentPubKey = result.AppInstalledCallBackEventArgs.DnaHash;
-                    result.DnaHash = result.AppInstalledCallBackEventArgs.DnaHash;
-                    result.CellId = result.AppInstalledCallBackEventArgs.CellId;
-                    result.AppStatus = result.AppInstalledCallBackEventArgs.AppInfoResponse.data.AppStatus;
-                    result.AppStatusReason = result.AppInstalledCallBackEventArgs.AppInfoResponse.data.AppStatusReason;
-                    result.AppManifest = result.AppInstalledCallBackEventArgs.AppInfoResponse.data.manifest;
-
-                    result.AppEnabledCallBackEventArgs = await EnableAppAsync(hAppId);
-
-                    if (result.AppEnabledCallBackEventArgs != null && !result.AppEnabledCallBackEventArgs.IsError)
+                    if (uninstallResult != null && uninstallResult.IsError)
                     {
                         if (log)
-                        {
-                            Log($"ADMIN: {hAppId} App Enabled.", LogType.Info, loggingFunction);
-                            Log($"ADMIN: Signing Credentials (Zome Call Capabilities) For App {hAppId}...", LogType.Info, loggingFunction);
-                        }
-
-                        result.IsAppEnabled = true;
-                        result.ZomeCallCapabilityGrantedCallBackEventArgs = await AuthorizeSigningCredentialsAndGrantZomeCallCapabilityAsync(result.AppInstalledCallBackEventArgs.CellId, capGrantAccessType, grantedFunctionsType, grantedFunctions);
-
-                        if (result.ZomeCallCapabilityGrantedCallBackEventArgs != null && !result.ZomeCallCapabilityGrantedCallBackEventArgs.IsError)
-                        {
-                            if (log)
-                            {
-                                Log($"ADMIN: {hAppId} App Signing Credentials Authorized.", LogType.Info, loggingFunction);
-                                Log($"ADMIN: Attaching App Interface For App {hAppId}...", LogType.Info, loggingFunction);
-                            }
-
-                            result.IsAppSigned = true;
-                            result.AppInterfaceAttachedCallBackEventArgs = await AttachAppInterfaceAsync();
-
-                            if (result.AppInterfaceAttachedCallBackEventArgs != null && !result.AppInterfaceAttachedCallBackEventArgs.IsError)
-                            {
-                                result.IsAppAttached = true;
-                                result.IsSuccess = true;
-                                result.AttachedOnPort = result.AppInterfaceAttachedCallBackEventArgs.Port;
-
-                                if (log)
-                                    Log($"ADMIN: {hAppId} App Interface Attached On Port {result.AppInterfaceAttachedCallBackEventArgs.Port}.", LogType.Info, loggingFunction);
-                            }
-                            else
-                            {
-                                result.Message = $"ADMIN: Error Attaching App Interface For App {hAppId}. Reason: {result.AppInterfaceAttachedCallBackEventArgs.Message}";
-                                result.IsError = true;
-                            }
-                        }
-                        else
-                        {
-                            result.Message = $"ADMIN: Error Signing Credentials For App {hAppId}. Reason: {result.ZomeCallCapabilityGrantedCallBackEventArgs.Message}";
-                            result.IsError = true;
-                        }
+                            Log($"ADMIN: Error Uninstalling App {hAppId}. Reason: {uninstallResult.Message}", LogType.Info, loggingFunction);
                     }
                     else
                     {
-                        result.Message = $"ADMIN: Error Enabling App {hAppId}. Reason: {result.AppEnabledCallBackEventArgs.Message}";
-                        result.IsError = true;
+                        if (log)
+                            Log($"ADMIN: Uninstalled App {hAppId}.", LogType.Info, loggingFunction);
                     }
                 }
-                else
-                {
-                    result.Message = $"ADMIN: Error Installing App {hAppId}. Reason: {result.AppInstalledCallBackEventArgs.Message}";
-                    result.IsError = true;
-                }
-            }
-            else
-            {
-                result.Message = $"ADMIN: Error Generating AgentPubKey. Reason: {result.AgentPubKeyGeneratedCallBackEventArgs.Message}";
-                result.IsError = true;
-            }
 
-            if (log && result.IsError)
-                Log(result.Message, LogType.Error, loggingFunction);
+                if (log)
+                    Log($"ADMIN: Generating New AgentPubKey...", LogType.Info, loggingFunction);
+
+                result.AgentPubKeyGeneratedResult = await GenerateAgentPubKeyAsync();
+
+                if (result.AgentPubKeyGeneratedResult != null && !result.AgentPubKeyGeneratedResult.IsError)
+                {
+                    if (log)
+                    {
+                        Log($"ADMIN: AgentPubKey Generated Successfully. AgentPubKey: {result.AgentPubKeyGeneratedResult.AgentPubKey}", LogType.Info, loggingFunction);
+                        Log($"ADMIN: Installing App {{appId}}...", LogType.Info, loggingFunction);
+                    }
+
+                    result.IsAgentPubKeyGenerated = true;
+                    result.AppInstalledResult = await InstallAppAsync(hAppId, hAppInstallPath, null);
+
+                    if (result.AppInstalledResult != null && !result.AppInstalledResult.IsError)
+                    {
+                        result.IsAppInstalled = true;
+                        result.AgentPubKey = result.AppInstalledResult.AgentPubKey;
+                        result.DnaHash = result.AppInstalledResult.DnaHash;
+                        result.CellId = result.AppInstalledResult.CellId;
+                        result.AppStatus = result.AppInstalledResult.AppInfoResponse.data.AppStatus;
+                        result.AppStatusReason = result.AppInstalledResult.AppInfoResponse.data.AppStatusReason;
+                        result.AppManifest = result.AppInstalledResult.AppInfoResponse.data.manifest;
+
+                        if (!string.IsNullOrEmpty(roleName) && result.AppInstalledResult.AppInfoResponse != null && 
+                            result.AppInstalledResult.AppInfoResponse.data != null && 
+                            result.AppInstalledResult.AppInfoResponse.data.cell_info != null && 
+                            result.AppInstalledResult.AppInfoResponse.data.cell_info.ContainsKey(roleName) && 
+                            result.AppInstalledResult.AppInfoResponse.data.cell_info[roleName] != null && 
+                            result.AppInstalledResult.AppInfoResponse.data.cell_info[roleName].Count > 0 && 
+                            result.AppInstalledResult.AppInfoResponse.data.cell_info[roleName][0] != null)
+                                result.CellType = result.AppInstalledResult.AppInfoResponse.data.cell_info[roleName][0].CellInfoType;
+
+                        if (result.CellType == CellInfoType.Provisioned)
+                        {
+                            if (log)
+                            {
+                                Log($"ADMIN: {hAppId} App Installed. AgentPubKey: {result.AgentPubKey}, DnaHash: {result.DnaHash}, Manifest: {result.AppManifest.name}, CellType: {Enum.GetName(typeof(CellInfoType), result.CellType)}", LogType.Info, loggingFunction);
+                                Log($"ADMIN: Enabling App {hAppId}...", LogType.Info, loggingFunction);
+                            }
+
+                            result.AppEnabledResult = await EnableAppAsync(hAppId);
+
+                            if (result.AppEnabledResult != null && !result.AppEnabledResult.IsError)
+                            {
+                                if (log)
+                                {
+                                    Log($"ADMIN: {hAppId} App Enabled.", LogType.Info, loggingFunction);
+                                    Log($"ADMIN: Signing Credentials (Zome Call Capabilities) For App {hAppId}...", LogType.Info, loggingFunction);
+                                }
+
+                                result.IsAppEnabled = true;
+                                result.ZomeCallCapabilityGrantedResult = await AuthorizeSigningCredentialsAndGrantZomeCallCapabilityAsync(result.AppInstalledResult.CellId, capGrantAccessType, grantedFunctionsType, grantedFunctions);
+
+                                if (result.ZomeCallCapabilityGrantedResult != null && !result.ZomeCallCapabilityGrantedResult.IsError)
+                                {
+                                    if (log)
+                                    {
+                                        Log($"ADMIN: {hAppId} App Signing Credentials Authorized.", LogType.Info, loggingFunction);
+                                        Log($"ADMIN: Attaching App Interface For App {hAppId}...", LogType.Info, loggingFunction);
+                                    }
+
+                                    result.IsAppSigned = true;
+                                    result.AppInterfaceAttachedResult = await AttachAppInterfaceAsync();
+
+                                    if (result.AppInterfaceAttachedResult != null && !result.AppInterfaceAttachedResult.IsError)
+                                    {
+                                        result.IsAppAttached = true;
+                                        result.IsSuccess = true;
+                                        result.AttachedOnPort = result.AppInterfaceAttachedResult.Port;
+
+                                        if (log)
+                                            Log($"ADMIN: {hAppId} App Interface Attached On Port {result.AppInterfaceAttachedResult.Port}.", LogType.Info, loggingFunction);
+                                    }
+                                    else
+                                        HandleError(result, $"ADMIN: Error Attaching App Interface For App {hAppId}. Reason: {result.AppInterfaceAttachedResult.Message}", log, loggingFunction);
+                                }
+                                else
+                                    HandleError(result, $"ADMIN: Error Signing Credentials For App {hAppId}. Reason: {result.ZomeCallCapabilityGrantedResult.Message}", log, loggingFunction);
+                            }
+                            else
+                                HandleError(result, $"ADMIN: Error Enabling App {hAppId}. Reason: {result.AppEnabledResult.Message}", log, loggingFunction);
+                        }
+                        else
+                            HandleError(result, $"ADMIN: Error Installing App {hAppId}. Reason: CellType ({Enum.GetName(typeof(CellInfoType), result.CellType)}) Is Not Provisioned So Aborting.", log, loggingFunction);
+                    }
+                    else
+                        HandleError(result, $"ADMIN: Error Installing App {hAppId}. Reason: {result.AppInstalledResult.Message}", log, loggingFunction);
+                }
+                else
+                    HandleError(result, $"ADMIN: Error Generating AgentPubKey. Reason: {result.AgentPubKeyGeneratedResult.Message}", log, loggingFunction);
+            }
+            catch (Exception ex)
+            {
+                HandleError(result, $"ADMIN: Unknown Error occured in HoloNETClientAdmin.InstallEnableSignAndAttachHappAsync. Reason: {ex}", log, loggingFunction);
+            }
 
             OnInstallEnableSignAndAttachHappCallBack?.Invoke(this, result);
             return result;
         }
 
-        ///// <summary>
-        ///// Will init the hApp, which includes installing and enabling the app, signing credentials & attaching the app interface.
-        ///// </summary>
-        //public InstallEnableSignAndAttachHappEventArgs InstallEnableSignAndAttachHapp(string hAppId, string hAppInstallPath, CapGrantAccessType capGrantAccessType = CapGrantAccessType.Unrestricted, GrantedFunctionsType grantedFunctionsType = GrantedFunctionsType.All, List<(string, string)> grantedFunctions = null, bool uninstallhAppIfAlreadyInstalled = true, bool log = true, Action<string, LogType> loggingFunction = null)
-        //{
-        //    InstallEnableSignAndAttachHappEventArgs result = new InstallEnableSignAndAttachHappEventArgs();
+        /// <summary>
+        /// Will init the hApp, which includes installing and enabling the app, signing credentials & attaching the app interface. It will then connect to the hApp and return the HoloNETClientAppAgent connection.
+        /// </summary>
+        public async Task<InstallEnableSignAttachAndConnectToHappEventArgs> InstallEnableSignAttachAndConnectToHappAsync(string hAppId, string hAppInstallPath, string roleName, CapGrantAccessType capGrantAccessType = CapGrantAccessType.Unrestricted, GrantedFunctionsType grantedFunctionsType = GrantedFunctionsType.All, List<(string, string)> grantedFunctions = null, bool uninstallhAppIfAlreadyInstalled = true, bool log = true, Action<string, LogType> loggingFunction = null)
+        {
+            InstallEnableSignAttachAndConnectToHappEventArgs result = new InstallEnableSignAttachAndConnectToHappEventArgs();
 
-        //    if (log)
-        //        Log($"ADMIN: Checking If App {hAppId} Is Already Installed...", LogType.Info, loggingFunction);
+            try
+            {
+                InstallEnableSignAndAttachHappEventArgs installedResult = await InstallEnableSignAndAttachHappAsync(hAppId, hAppInstallPath, roleName, capGrantAccessType, grantedFunctionsType, grantedFunctions, uninstallhAppIfAlreadyInstalled, log, loggingFunction);
 
-        //    GetAppInfoCallBackEventArgs appInfoResult = GetAppInfo(hAppId);
+                if (installedResult != null && !installedResult.IsError && result.IsSuccess)
+                {
+                    if (log)
+                        Log($"APP: Connecting to HoloNETClientAppAgent 'ws://127.0.0.1:{installedResult.AttachedOnPort}' {hAppId}...", LogType.Info, loggingFunction);
 
-        //    if (appInfoResult != null && appInfoResult.AppInfo != null && uninstallhAppIfAlreadyInstalled)
-        //    {
-        //        if (log)
-        //            Log($"ADMIN: App {hAppId} Is Already Installed So Uninstalling Now...", LogType.Info);
+                    result.IsSuccess = true;
+                    result.IsAppInstalled = installedResult.IsAppInstalled;
+                    result.IsAppEnabled = installedResult.IsAppEnabled;
+                    result.IsAppSigned = installedResult.IsAppSigned;
+                    result.IsAppAttached = installedResult.IsAppAttached;
 
-        //        AppUninstalledCallBackEventArgs uninstallResult = UninstallApp(hAppId);
+                    result.AgentPubKey = installedResult.AgentPubKey;
+                    result.DnaHash = installedResult.DnaHash;
+                    result.CellId = installedResult.CellId;
+                    result.AppStatus = installedResult.AppStatus;
+                    result.AppStatusReason = installedResult.AppStatusReason;
+                    result.AppManifest = installedResult.AppManifest;
+                    result.AttachedOnPort = installedResult.AttachedOnPort;
 
-        //        if (uninstallResult != null && uninstallResult.IsError)
-        //        {
-        //            if (log)
-        //                Log($"ADMIN: Error Uninstalling App {hAppId}. Reason: {uninstallResult.Message}", LogType.Info, loggingFunction);
-        //        }
-        //        else
-        //        {
-        //            if (log)
-        //                Log($"ADMIN: Uninstalled App {hAppId}.", LogType.Info, loggingFunction);
-        //        }
-        //    }
+                    result.AgentPubKeyGeneratedResult = installedResult.AgentPubKeyGeneratedResult;
+                    result.AppInstalledResult = installedResult.AppInstalledResult;
+                    result.AppEnabledResult = installedResult.AppEnabledResult;
+                    result.ZomeCallCapabilityGrantedResult = installedResult.ZomeCallCapabilityGrantedResult;
+                    result.AppInterfaceAttachedResult = installedResult.AppInterfaceAttachedResult;
 
-        //    if (log)
-        //        Log($"ADMIN: Generating New AgentPubKey...", LogType.Info, loggingFunction);
+                    result.HoloNETClientAppAgent = new HoloNETClientAppAgent();
+                    result.HoloNETConnectedResult = await result.HoloNETClientAppAgent.ConnectAsync($"ws://127.0.0.1:{installedResult.AttachedOnPort}");
 
-        //    result.AgentPubKeyGeneratedCallBackEventArgs = await GenerateAgentPubKeyAsync();
+                    if (result.HoloNETConnectedResult != null && !result.HoloNETConnectedResult.IsError && result.HoloNETConnectedResult.IsConnected)
+                    {
+                        if (log)
+                            Log($"APP: Connected to HoloNETClientAppAgent 'ws://127.0.0.1:{installedResult.AttachedOnPort}' {hAppId}.", LogType.Info, loggingFunction);
 
-        //    if (result.AgentPubKeyGeneratedCallBackEventArgs != null && !result.AgentPubKeyGeneratedCallBackEventArgs.IsError)
-        //    {
-        //        if (log)
-        //        {
-        //            Log($"ADMIN: AgentPubKey Generated Successfully. AgentPubKey: {result.AgentPubKeyGeneratedCallBackEventArgs.AgentPubKey}", LogType.Info, loggingFunction);
-        //            Log($"ADMIN: Installing App {{appId}}...", LogType.Info, loggingFunction);
-        //        }
+                        result.IsAppConnected = true;
+                    }
+                    else
+                        HandleError(result, $"APP: Error occured in HoloNETClientAdmin.InstallEnableSignAttachAndConnectToHappAsync calling HoloNETClientAppAgent.ConnectAsync. Reason: {result.HoloNETConnectedResult.Message}", log, loggingFunction);
+                }
+                else
+                    HandleError(result, $"ADMIN: Error occured in HoloNETClientAdmin.InstallEnableSignAttachAndConnectToHappAsync calling InstallEnableSignAndAttachHappAsync. Reason: {installedResult.Message}", log, loggingFunction);
+            }
+            catch (Exception ex)
+            {
+                HandleError(result, $"ADMIN: Unknown Error occured in HoloNETClientAdmin.InstallEnableSignAttachAndConnectToHappAsync. Reason: {ex}", log, loggingFunction);
+            }
 
-        //        result.IsAgentPubKeyGenerated = true;
-        //        result.AppInstalledCallBackEventArgs = await InstallAppAsync(hAppId, hAppInstallPath, null);
-
-        //        if (result.AppInstalledCallBackEventArgs != null && !result.AppInstalledCallBackEventArgs.IsError)
-        //        {
-        //            if (log)
-        //            {
-        //                Log($"ADMIN: {hAppId} App Installed.", LogType.Info, loggingFunction);
-        //                Log($"ADMIN: Enabling App {hAppId}...", LogType.Info, loggingFunction);
-        //            }
-
-        //            result.IsAppInstalled = true;
-        //            result.AgentPubKey = result.AppInstalledCallBackEventArgs.DnaHash;
-        //            result.DnaHash = result.AppInstalledCallBackEventArgs.DnaHash;
-        //            result.CellId = result.AppInstalledCallBackEventArgs.CellId;
-        //            result.AppStatus = result.AppInstalledCallBackEventArgs.AppInfoResponse.data.AppStatus;
-        //            result.AppStatusReason = result.AppInstalledCallBackEventArgs.AppInfoResponse.data.AppStatusReason;
-        //            result.AppManifest = result.AppInstalledCallBackEventArgs.AppInfoResponse.data.manifest;
-
-        //            result.AppEnabledCallBackEventArgs = await EnableAppAsync(hAppId);
-
-        //            if (result.AppEnabledCallBackEventArgs != null && !result.AppEnabledCallBackEventArgs.IsError)
-        //            {
-        //                if (log)
-        //                {
-        //                    Log($"ADMIN: {hAppId} App Enabled.", LogType.Info, loggingFunction);
-        //                    Log($"ADMIN: Signing Credentials (Zome Call Capabilities) For App {hAppId}...", LogType.Info, loggingFunction);
-        //                }
-
-        //                result.IsAppEnabled = true;
-        //                result.ZomeCallCapabilityGrantedCallBackEventArgs = await AuthorizeSigningCredentialsAndGrantZomeCallCapabilityAsync(result.AppInstalledCallBackEventArgs.CellId, capGrantAccessType, grantedFunctionsType, grantedFunctions);
-
-        //                if (result.ZomeCallCapabilityGrantedCallBackEventArgs != null && !result.ZomeCallCapabilityGrantedCallBackEventArgs.IsError)
-        //                {
-        //                    if (log)
-        //                    {
-        //                        Log($"ADMIN: {hAppId} App Signing Credentials Authorized.", LogType.Info, loggingFunction);
-        //                        Log($"ADMIN: Attaching App Interface For App {hAppId}...", LogType.Info, loggingFunction);
-        //                    }
-
-        //                    result.IsAppSigned = true;
-        //                    result.AppInterfaceAttachedCallBackEventArgs = await AttachAppInterfaceAsync();
-
-        //                    if (result.AppInterfaceAttachedCallBackEventArgs != null && !result.AppInterfaceAttachedCallBackEventArgs.IsError)
-        //                    {
-        //                        result.IsAppAttached = true;
-        //                        result.IsSuccess = true;
-        //                        result.AttachedOnPort = result.AppInterfaceAttachedCallBackEventArgs.Port;
-
-        //                        if (log)
-        //                            Log($"ADMIN: {hAppId} App Interface Attached On Port {result.AppInterfaceAttachedCallBackEventArgs.Port}.", LogType.Info, loggingFunction);
-        //                    }
-        //                    else
-        //                    {
-        //                        result.Message = $"ADMIN: Error Attaching App Interface For App {hAppId}. Reason: {result.AppInterfaceAttachedCallBackEventArgs.Message}";
-        //                        result.IsError = true;
-        //                    }
-        //                }
-        //                else
-        //                {
-        //                    result.Message = $"ADMIN: Error Signing Credentials For App {hAppId}. Reason: {result.ZomeCallCapabilityGrantedCallBackEventArgs.Message}";
-        //                    result.IsError = true;
-        //                }
-        //            }
-        //            else
-        //            {
-        //                result.Message = $"ADMIN: Error Enabling App {hAppId}. Reason: {result.AppEnabledCallBackEventArgs.Message}";
-        //                result.IsError = true;
-        //            }
-        //        }
-        //        else
-        //        {
-        //            result.Message = $"ADMIN: Error Installing App {hAppId}. Reason: {result.AppInstalledCallBackEventArgs.Message}";
-        //            result.IsError = true;
-        //        }
-        //    }
-        //    else
-        //    {
-        //        result.Message = $"ADMIN: Error Generating AgentPubKey. Reason: {result.AgentPubKeyGeneratedCallBackEventArgs.Message}";
-        //        result.IsError = true;
-        //    }
-
-        //    if (log && result.IsError)
-        //        Log(result.Message, LogType.Error, loggingFunction);
-
-        //    OnInstallEnableSignAndAttachHappCallBack?.Invoke(this, result);
-        //    return result;
-        //}
+            OnInstallEnableSignAttachAndConnectToHappCallBack?.Invoke(this, result);
+            return result;
+        }
 
         /// <summary>
-        /// Will init the hApp, which includes installing and enabling the app, signing credentials & attaching the app interface.
+        /// Will init the hApp, which includes installing and enabling the app, signing credentials & attaching the app interface. It will then connect to the hApp and return the HoloNETClientAppAgent connection.
         /// </summary>
-        public InstallEnableSignAndAttachHappEventArgs InstallEnableSignAndAttachHapp(string hAppId, string hAppInstallPath, CapGrantAccessType capGrantAccessType = CapGrantAccessType.Unrestricted, GrantedFunctionsType grantedFunctionsType = GrantedFunctionsType.All, List<(string, string)> grantedFunctions = null, bool uninstallhAppIfAlreadyInstalled = true, bool log = true, Action<string, LogType> loggingFunction = null)
+        public InstallEnableSignAttachAndConnectToHappEventArgs InstallEnableSignAttachAndConnectToHapp(string hAppId, string hAppInstallPath, string roleName, CapGrantAccessType capGrantAccessType = CapGrantAccessType.Unrestricted, GrantedFunctionsType grantedFunctionsType = GrantedFunctionsType.All, List<(string, string)> grantedFunctions = null, bool uninstallhAppIfAlreadyInstalled = true, bool log = true, Action<string, LogType> loggingFunction = null)
         {
-            return InstallEnableSignAndAttachHappAsync(hAppId, hAppInstallPath, capGrantAccessType, grantedFunctionsType, grantedFunctions, uninstallhAppIfAlreadyInstalled, log, loggingFunction).Result;
+            return InstallEnableSignAttachAndConnectToHappAsync(hAppId, hAppInstallPath, roleName, capGrantAccessType, grantedFunctionsType, grantedFunctions, uninstallhAppIfAlreadyInstalled, log, loggingFunction).Result;
         }
 
         public async Task<AgentPubKeyGeneratedCallBackEventArgs> GenerateAgentPubKeyAsync(ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, bool updateAgentPubKeyInHoloNETDNA = true, string id = "")

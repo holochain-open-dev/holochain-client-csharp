@@ -17,16 +17,24 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public string AgentPubKey { get; set; }
         public string DnaHash { get; set; }
         public byte[][] CellId { get; set; }
+        public CellInfoType CellType { get; set; } = CellInfoType.None;
         public AppInfoStatusEnum AppStatus { get; set; }
         public string AppStatusReason { get; set; }
         public AppManifest AppManifest { get; set; }
         public UInt16? AttachedOnPort { get; set; }
 
-        public AgentPubKeyGeneratedCallBackEventArgs AgentPubKeyGeneratedCallBackEventArgs { get; set; }
-        public AppInstalledCallBackEventArgs AppInstalledCallBackEventArgs { get; set; }
-        public AppEnabledCallBackEventArgs AppEnabledCallBackEventArgs { get; set; }
-        public ZomeCallCapabilityGrantedCallBackEventArgs ZomeCallCapabilityGrantedCallBackEventArgs { get; set; }
-        public AppInterfaceAttachedCallBackEventArgs AppInterfaceAttachedCallBackEventArgs { get; set; }
+        public AgentPubKeyGeneratedCallBackEventArgs AgentPubKeyGeneratedResult { get; set; }
+        public AppInstalledCallBackEventArgs AppInstalledResult { get; set; }
+        public AppEnabledCallBackEventArgs AppEnabledResult { get; set; }
+        public ZomeCallCapabilityGrantedCallBackEventArgs ZomeCallCapabilityGrantedResult { get; set; }
+        public AppInterfaceAttachedCallBackEventArgs AppInterfaceAttachedResult { get; set; }
+    }
+
+    public class InstallEnableSignAttachAndConnectToHappEventArgs : InstallEnableSignAndAttachHappEventArgs
+    {
+        public bool IsAppConnected { get; set; }
+        public HoloNETClientAppAgent HoloNETClientAppAgent { get; set; }
+        public HoloNETConnectedEventArgs HoloNETConnectedResult { get; set; }
     }
 
     public class AppInstalledCallBackEventArgs : AppInfoCallBackEventArgs

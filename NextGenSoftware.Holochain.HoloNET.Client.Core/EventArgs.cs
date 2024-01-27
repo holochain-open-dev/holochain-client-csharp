@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.WebSockets;
+using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.AppManifest;
 using NextGenSoftware.WebSocket;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
@@ -11,7 +12,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public HoloNETResponseType HoloNETResponseType { get; set; }
     }
 
-    public class HoloNETConnectEventArgs : CallBackBaseEventArgs
+    public class HoloNETConnectedEventArgs : CallBackBaseEventArgs
     {
         public bool IsConnected { get; set; }
     }
@@ -65,10 +66,14 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
     public class AppInfoCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
         public AppInfoResponse AppInfoResponse { get; set; }
+        public AppInfoStatusEnum AppStatus { get; set; } //TODO: Set
+        public string AppStatusReason { get; set; } //TODO: Set
+        public AppManifest AppManifest { get; set; } //TODO: Set
         public string InstalledAppId { get; set; }
         public string DnaHash { get; set; }
         public string AgentPubKey { get; set; }
         public byte[][] CellId { get; set; }
+        public CellInfoType CellType { get; set; } //TODO: Set
     }
 
     public class ReadyForZomeCallsEventArgs : CallBackBaseEventArgs
