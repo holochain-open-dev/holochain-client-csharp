@@ -73,9 +73,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public UInt16? Port { get; set; }
     }
 
-    public class RegisterDnaCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
+    public class DnaRegisteredCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
-        public AppResponse AppResponse { get; set; }
+        public byte[] HoloHash { get; set; }
     }
 
     public class AppsListedCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
@@ -83,15 +83,17 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public List<AppInfo> Apps { get; set; } = new List<AppInfo>();
     }
 
+    public class DnasListedCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
+    {
+        public byte[][] Dnas { get; set; }
+    }
+
     public class GetAppInfoCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
         public AppInfo AppInfo { get; set; }
     }
 
-    public class ListDnasCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
-    {
-        public AppResponse AppResponse { get; set; }
-    }
+    
 
     public class ListCellIdsCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {

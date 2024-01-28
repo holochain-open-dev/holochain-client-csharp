@@ -24,8 +24,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Interfaces
         event HoloNETClientAdmin.GetStorageInfoCallBack OnGetStorageInfoCallBack;
         event HoloNETClientAdmin.ListAppInterfacesCallBack OnListAppInterfacesCallBack;
         event HoloNETClientAdmin.ListCellIdsCallBack OnListCellIdsCallBack;
-        event HoloNETClientAdmin.ListDnasCallBack OnListDnasCallBack;
-        event HoloNETClientAdmin.RegisterDnaCallBack OnRegisterDnaCallBack;
+        event HoloNETClientAdmin.DnasListedCallBack OnDnasListedCallBack;
+        event HoloNETClientAdmin.DnaRegisteredCallBack OnRegisterDnaCallBack;
         event HoloNETClientAdmin.UpdateCoordinatorsCallBack OnUpdateCoordinatorsCallBack;
         event HoloNETClientAdmin.ZomeCallCapabilityGrantedCallBack OnZomeCallCapabilityGrantedCallBack;
 
@@ -96,16 +96,16 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Interfaces
         Task<AppsListedCallBackEventArgs> ListAppsAsync(AppStatusFilter appStatusFilter, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null);
         ListCellIdsCallBackEventArgs ListCellIds(string id = null);
         Task<ListCellIdsCallBackEventArgs> ListCellIdsAsync(ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null);
-        ListDnasCallBackEventArgs ListDnas(string id = null);
-        Task<ListDnasCallBackEventArgs> ListDnasAsync(ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null);
+        DnasListedCallBackEventArgs ListDnas(string id = null);
+        Task<DnasListedCallBackEventArgs> ListDnasAsync(ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null);
         ListAppInterfacesCallBackEventArgs ListInterfaces(string id = null);
         Task<ListAppInterfacesCallBackEventArgs> ListInterfacesAsync(ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null);
-        RegisterDnaCallBackEventArgs RegisterDna(byte[] hash, string network_seed = null, object properties = null, string id = null);
-        RegisterDnaCallBackEventArgs RegisterDna(DnaBundle bundle, string network_seed = null, object properties = null, string id = null);
-        RegisterDnaCallBackEventArgs RegisterDna(string path, string network_seed = null, object properties = null, string id = null);
-        Task<RegisterDnaCallBackEventArgs> RegisterDnaAsync(byte[] hash, string network_seed = null, object properties = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null);
-        Task<RegisterDnaCallBackEventArgs> RegisterDnaAsync(DnaBundle bundle, string network_seed = null, object properties = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null);
-        Task<RegisterDnaCallBackEventArgs> RegisterDnaAsync(string path, string network_seed = null, object properties = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null);
+        DnaRegisteredCallBackEventArgs RegisterDna(byte[] hash, string network_seed = null, object properties = null, string id = null);
+        DnaRegisteredCallBackEventArgs RegisterDna(DnaBundle bundle, string network_seed = null, object properties = null, string id = null);
+        DnaRegisteredCallBackEventArgs RegisterDna(string path, string network_seed = null, object properties = null, string id = null);
+        Task<DnaRegisteredCallBackEventArgs> RegisterDnaAsync(byte[] hash, string network_seed = null, object properties = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null);
+        Task<DnaRegisteredCallBackEventArgs> RegisterDnaAsync(DnaBundle bundle, string network_seed = null, object properties = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null);
+        Task<DnaRegisteredCallBackEventArgs> RegisterDnaAsync(string path, string network_seed = null, object properties = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null);
         AppUninstalledCallBackEventArgs UninstallApp(string installedAppId, string id = null);
         Task<AppUninstalledCallBackEventArgs> UninstallAppAsync(string installedAppId, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null);
         UpdateCoordinatorsCallBackEventArgs UpdateCoordinators(byte[] dnaHash, CoordinatorBundle bundle, string id = null);
