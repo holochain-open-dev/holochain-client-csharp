@@ -78,6 +78,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public byte[] HoloHash { get; set; }
     }
 
+    public class DnaDefinitionReturnedCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
+    {
+        public DnaDefinitionResponse DnaDefinition { get; set; }
+    }
+
     public class AppsListedCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
         public List<AppInfo> Apps { get; set; } = new List<AppInfo>();
@@ -88,16 +93,14 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public byte[][] Dnas { get; set; }
     }
 
+    public class CellIdsListedCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
+    {
+        public byte[][][] CellIds { get; set; }
+    }
+
     public class GetAppInfoCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
         public AppInfo AppInfo { get; set; }
-    }
-
-    
-
-    public class ListCellIdsCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
-    {
-        public AppResponse AppResponse { get; set; }
     }
 
     public class ListAppInterfacesCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
@@ -111,11 +114,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
     }
 
     public class DumpFullStateCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
-    {
-        public AppResponse AppResponse { get; set; }
-    }
-
-    public class GetDnaDefinitionCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
         public AppResponse AppResponse { get; set; }
     }

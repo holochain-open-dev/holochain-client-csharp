@@ -20,11 +20,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         private Dictionary<string, TaskCompletionSource<DnaRegisteredCallBackEventArgs>> _taskCompletionDnaRegisteredCallBack = new Dictionary<string, TaskCompletionSource<DnaRegisteredCallBackEventArgs>>();
         private Dictionary<string, TaskCompletionSource<AppsListedCallBackEventArgs>> _taskCompletionAppsListedCallBack = new Dictionary<string, TaskCompletionSource<AppsListedCallBackEventArgs>>();
         private Dictionary<string, TaskCompletionSource<DnasListedCallBackEventArgs>> _taskCompletionDnasListedCallBack = new Dictionary<string, TaskCompletionSource<DnasListedCallBackEventArgs>>();
-        private Dictionary<string, TaskCompletionSource<ListCellIdsCallBackEventArgs>> _taskCompletionListCellIdsCallBack = new Dictionary<string, TaskCompletionSource<ListCellIdsCallBackEventArgs>>();
+        private Dictionary<string, TaskCompletionSource<CellIdsListedCallBackEventArgs>> _taskCompletionCellIdsListedCallBack = new Dictionary<string, TaskCompletionSource<CellIdsListedCallBackEventArgs>>();
         private Dictionary<string, TaskCompletionSource<ListAppInterfacesCallBackEventArgs>> _taskCompletionListAppInterfacesCallBack = new Dictionary<string, TaskCompletionSource<ListAppInterfacesCallBackEventArgs>>();
         private Dictionary<string, TaskCompletionSource<DumpFullStateCallBackEventArgs>> _taskCompletionDumpFullStateCallBack = new Dictionary<string, TaskCompletionSource<DumpFullStateCallBackEventArgs>>();
         private Dictionary<string, TaskCompletionSource<DumpStateCallBackEventArgs>> _taskCompletionDumpStateCallBack = new Dictionary<string, TaskCompletionSource<DumpStateCallBackEventArgs>>();
-        private Dictionary<string, TaskCompletionSource<GetDnaDefinitionCallBackEventArgs>> _taskCompletionGetDnaDefinitionCallBack = new Dictionary<string, TaskCompletionSource<GetDnaDefinitionCallBackEventArgs>>();
+        private Dictionary<string, TaskCompletionSource<DnaDefinitionReturnedCallBackEventArgs>> _taskCompletionDnaDefinitionReturnedCallBack = new Dictionary<string, TaskCompletionSource<DnaDefinitionReturnedCallBackEventArgs>>();
         private Dictionary<string, TaskCompletionSource<UpdateCoordinatorsCallBackEventArgs>> _taskCompletionUpdateCoordinatorsCallBack = new Dictionary<string, TaskCompletionSource<UpdateCoordinatorsCallBackEventArgs>>();
         private Dictionary<string, TaskCompletionSource<GetAgentInfoCallBackEventArgs>> _taskCompletionGetAgentInfoCallBack = new Dictionary<string, TaskCompletionSource<GetAgentInfoCallBackEventArgs>>();
         private Dictionary<string, TaskCompletionSource<AddAgentInfoCallBackEventArgs>> _taskCompletionAddAgentInfoCallBack = new Dictionary<string, TaskCompletionSource<AddAgentInfoCallBackEventArgs>>();
@@ -133,12 +133,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public event DnasListedCallBack OnDnasListedCallBack;
 
 
-        public delegate void ListCellIdsCallBack(object sender, ListCellIdsCallBackEventArgs e);
+        public delegate void CellIdsListedCallBack(object sender, CellIdsListedCallBackEventArgs e);
 
         /// <summary>
         /// Fired when a response is received from the conductor after the ListCellIdsAsync/ListCellIds method is called.
         /// </summary>
-        public event ListCellIdsCallBack OnListCellIdsCallBack;
+        public event CellIdsListedCallBack OnCellIdsListedCallBack;
 
 
         public delegate void ListAppInterfacesCallBack(object sender, ListAppInterfacesCallBackEventArgs e);
@@ -165,12 +165,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public event DumpStateCallBack OnDumpStateCallBack;
 
 
-        public delegate void GetDnaDefinitionCallBack(object sender, GetDnaDefinitionCallBackEventArgs e);
+        public delegate void DnaDefinitionReturnedCallBack(object sender, DnaDefinitionReturnedCallBackEventArgs e);
 
         /// <summary>
         /// Fired when a response is received from the conductor containing the DNA Definition for a DNA Hash after the GetDnaDefinitionAsync/GetDnaDefinition method is called.
         /// </summary>
-        public event GetDnaDefinitionCallBack OnGetDnaDefinitionCallBack;
+        public event DnaDefinitionReturnedCallBack OnDnaDefinitionReturnedCallBack;
 
 
         public delegate void UpdateCoordinatorsCallBack(object sender, UpdateCoordinatorsCallBackEventArgs e);

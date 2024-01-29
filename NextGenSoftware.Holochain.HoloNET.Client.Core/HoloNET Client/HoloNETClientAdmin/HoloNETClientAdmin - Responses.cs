@@ -51,11 +51,19 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                             DecodeDnaRegisteredReceived(response, dataReceivedEventArgs);
                             break;
 
+                        case HoloNETResponseType.AdminDnaDefinitionReturned:
+                            DecodeDnasListedReceived(response, dataReceivedEventArgs);
+                            break;
+
                         case HoloNETResponseType.AdminAppsListed:
                             DecodeAppsListedReceived(response, dataReceivedEventArgs);
                             break;
 
                         case HoloNETResponseType.AdminDnasListed:
+                            DecodeDnasListedReceived(response, dataReceivedEventArgs);
+                            break;
+
+                        case HoloNETResponseType.AdminCellIdsListed:
                             DecodeDnasListedReceived(response, dataReceivedEventArgs);
                             break;
                     }
@@ -116,6 +124,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                     case HoloNETRequestType.AdminListDnas:
                         RaiseDnasListedEvent(ProcessResponeError<DnasListedCallBackEventArgs>(response, dataReceivedEventArgs, "AdminListDnas", msg));
+                        break;
+
+                    case HoloNETRequestType.AdminListCellIds:
+                        RaiseCellIdsListedEvent(ProcessResponeError<CellIdsListedCallBackEventArgs>(response, dataReceivedEventArgs, "AdminListCellIds", msg));
                         break;
                 }
             }
@@ -315,11 +327,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 if (responseData != null)
                     args.HoloHash = responseData;
                 else
-                {
-                    args.Message = "Error occured in HoloNETClient.DecodeDnaRegisteredReceived. responseData is null.";
-                    args.IsError = true;
-                    HandleError(args.Message);
-                }
+                    HandleError(args, $"{errorMessage} ResponseData failed to deserialize.");
             }
             catch (Exception ex)
             {
@@ -327,6 +335,30 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
 
             RaiseDnaRegisteredEvent(args);
+        }
+
+        private void DecodeDnaDefinitionReturned(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
+        {
+            string errorMessage = "An unknown error occurred in HoloNETClient.DecodeDnaDefinitionReturned. Reason: ";
+            DnaDefinitionReturnedCallBackEventArgs args = CreateHoloNETArgs<DnaDefinitionReturnedCallBackEventArgs>(response, dataReceivedEventArgs);
+            args.HoloNETResponseType = HoloNETResponseType.AdminDnaDefinitionReturned;
+
+            try
+            {
+                Logger.Log("ADMIN DNA DEFINTION RETURNED\n", LogType.Info);
+                DnaDefinitionResponse dnaDefinition = MessagePackSerializer.Deserialize<DnaDefinitionResponse>(response.data, messagePackSerializerOptions);
+
+                if (dnaDefinition != null)
+                    args.DnaDefinition = dnaDefinition;
+                else
+                    HandleError(args, $"{errorMessage} dnaDefinition failed to deserialize.");
+            }
+            catch (Exception ex)
+            {
+                HandleError(args, $"{errorMessage} {ex}");
+            }
+
+            RaiseDnaDefinitionReturnedEvent(args);
         }
 
         private void DecodeAppsListedReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
@@ -360,7 +392,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                         HandleError(args.Message);
                 }
                 else
-                    HandleError(args, $"{errorMessage} appResponse is null.");
+                    HandleError(args, $"{errorMessage} appResponse failed to deserialize.");
             }
             catch (Exception ex)
             {
@@ -384,7 +416,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 if (dataResponse != null)
                     args.Dnas = dataResponse;
                 else
-                    HandleError(args, $"{errorMessage} dataResponse is null.");
+                    HandleError(args, $"{errorMessage} dataResponse failed to deserialize.");
             }
             catch (Exception ex)
             {
@@ -394,9 +426,33 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             RaiseDnasListedEvent(args);
         }
 
+        private void DecodeCellIdsListedReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
+        {
+            string errorMessage = "An unknown error occurred in HoloNETClient.DecodeCellIdsListedReceived. Reason: ";
+            CellIdsListedCallBackEventArgs args = CreateHoloNETArgs<CellIdsListedCallBackEventArgs>(response, dataReceivedEventArgs);
+            args.HoloNETResponseType = HoloNETResponseType.AdminCellIdsListed;
+
+            try
+            {
+                Logger.Log("ADMIN CELLID's LISTED\n", LogType.Info);
+                byte[][][] dataResponse = MessagePackSerializer.Deserialize<byte[][][]>(response.data, messagePackSerializerOptions);
+
+                if (dataResponse != null)
+                    args.CellIds = dataResponse;
+                else
+                    HandleError(args, $"{errorMessage} dataResponse failed to deserialize.");
+            }
+            catch (Exception ex)
+            {
+                HandleError(args, $"{errorMessage} {ex}");
+            }
+
+            RaiseCellIdsListedEvent(args);
+        }
+
         private void RaiseAgentPubKeyGeneratedEvent(AgentPubKeyGeneratedCallBackEventArgs adminAgentPubKeyGeneratedCallBackEventArgs)
         {
-            LogEvent("AgentPubKeyGeneratedCallBack", adminAgentPubKeyGeneratedCallBackEventArgs);
+            LogEvent("AdminAgentPubKeyGenerated", adminAgentPubKeyGeneratedCallBackEventArgs);
             OnAgentPubKeyGeneratedCallBack?.Invoke(this, adminAgentPubKeyGeneratedCallBackEventArgs);
 
             if (_taskCompletionAgentPubKeyGeneratedCallBack != null && !string.IsNullOrEmpty(adminAgentPubKeyGeneratedCallBackEventArgs.Id) && _taskCompletionAgentPubKeyGeneratedCallBack.ContainsKey(adminAgentPubKeyGeneratedCallBackEventArgs.Id))
@@ -405,7 +461,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         private void RaiseAppInstalledEvent(AppInstalledCallBackEventArgs adminAppInstalledCallBackEventArgs)
         {
-            LogEvent("AppInstalledCallBack", adminAppInstalledCallBackEventArgs);
+            LogEvent("AdminAppInstalled", adminAppInstalledCallBackEventArgs);
             OnAppInstalledCallBack?.Invoke(this, adminAppInstalledCallBackEventArgs);
 
             if (_taskCompletionAppInstalledCallBack != null && !string.IsNullOrEmpty(adminAppInstalledCallBackEventArgs.Id) && _taskCompletionAppInstalledCallBack.ContainsKey(adminAppInstalledCallBackEventArgs.Id))
@@ -414,7 +470,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         private void RaiseAppUninstalledEvent(AppUninstalledCallBackEventArgs adminAppUninstalledCallBackEventArgs)
         {
-            LogEvent("AppUninstalledCallBack", adminAppUninstalledCallBackEventArgs);
+            LogEvent("AdminAppUninstalled", adminAppUninstalledCallBackEventArgs);
             OnAppUninstalledCallBack?.Invoke(this, adminAppUninstalledCallBackEventArgs);
 
             if (_taskCompletionAppUninstalledCallBack != null && !string.IsNullOrEmpty(adminAppUninstalledCallBackEventArgs.Id) && _taskCompletionAppUninstalledCallBack.ContainsKey(adminAppUninstalledCallBackEventArgs.Id))
@@ -423,7 +479,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         private void RaiseAppEnabledEvent(AppEnabledCallBackEventArgs adminAppEnabledCallBackEventArgs)
         {
-            LogEvent("AppEnabledCallBack", adminAppEnabledCallBackEventArgs);
+            LogEvent("AdminAppEnabled", adminAppEnabledCallBackEventArgs);
             OnAppEnabledCallBack?.Invoke(this, adminAppEnabledCallBackEventArgs);
 
             if (_taskCompletionAppEnabledCallBack != null && !string.IsNullOrEmpty(adminAppEnabledCallBackEventArgs.Id) && _taskCompletionAppEnabledCallBack.ContainsKey(adminAppEnabledCallBackEventArgs.Id))
@@ -432,7 +488,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         private void RaiseAppDisabledEvent(AppDisabledCallBackEventArgs adminAppDisabledCallBackEventArgs)
         {
-            LogEvent("AppDisabledCallBack", adminAppDisabledCallBackEventArgs);
+            LogEvent("AdminAppDisabled", adminAppDisabledCallBackEventArgs);
             OnAppDisabledCallBack?.Invoke(this, adminAppDisabledCallBackEventArgs);
 
             if (_taskCompletionAppDisabledCallBack != null && !string.IsNullOrEmpty(adminAppDisabledCallBackEventArgs.Id) && _taskCompletionAppDisabledCallBack.ContainsKey(adminAppDisabledCallBackEventArgs.Id))
@@ -441,7 +497,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         private void RaiseZomeCallCapabilityGrantedEvent(ZomeCallCapabilityGrantedCallBackEventArgs adminZomeCallCapabilityGrantedCallBackEventArgs)
         {
-            LogEvent("ZomeCallCapabilityGranted", adminZomeCallCapabilityGrantedCallBackEventArgs);
+            LogEvent("AdminZomeCallCapabilityGranted", adminZomeCallCapabilityGrantedCallBackEventArgs);
             OnZomeCallCapabilityGrantedCallBack?.Invoke(this, adminZomeCallCapabilityGrantedCallBackEventArgs);
 
             if (_taskCompletionZomeCapabilityGrantedCallBack != null && !string.IsNullOrEmpty(adminZomeCallCapabilityGrantedCallBackEventArgs.Id) && _taskCompletionZomeCapabilityGrantedCallBack.ContainsKey(adminZomeCallCapabilityGrantedCallBackEventArgs.Id))
@@ -450,7 +506,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         private void RaiseAppInterfaceAttachedEvent(AppInterfaceAttachedCallBackEventArgs adminAppInterfaceAttachedCallBackEventArgs)
         {
-            LogEvent("AppInterfaceAttached", adminAppInterfaceAttachedCallBackEventArgs);
+            LogEvent("AdminAppInterfaceAttached", adminAppInterfaceAttachedCallBackEventArgs);
             OnAppInterfaceAttachedCallBack?.Invoke(this, adminAppInterfaceAttachedCallBackEventArgs);
 
             if (_taskCompletionAppInterfaceAttachedCallBack != null && !string.IsNullOrEmpty(adminAppInterfaceAttachedCallBackEventArgs.Id) && _taskCompletionAppInterfaceAttachedCallBack.ContainsKey(adminAppInterfaceAttachedCallBackEventArgs.Id))
@@ -459,16 +515,25 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         private void RaiseDnaRegisteredEvent(DnaRegisteredCallBackEventArgs dnaRegisteredCallBackEventArgs)
         {
-            LogEvent("DnaRegistered", dnaRegisteredCallBackEventArgs);
+            LogEvent("AdminDnaRegistered", dnaRegisteredCallBackEventArgs);
             OnDnaRegisteredCallBack?.Invoke(this, dnaRegisteredCallBackEventArgs);
 
             if (_taskCompletionDnaRegisteredCallBack != null && !string.IsNullOrEmpty(dnaRegisteredCallBackEventArgs.Id) && _taskCompletionDnaRegisteredCallBack.ContainsKey(dnaRegisteredCallBackEventArgs.Id))
                 _taskCompletionDnaRegisteredCallBack[dnaRegisteredCallBackEventArgs.Id].SetResult(dnaRegisteredCallBackEventArgs);
         }
 
+        private void RaiseDnaDefinitionReturnedEvent(DnaDefinitionReturnedCallBackEventArgs dnaDefinitionReturnedCallBackEventArgs)
+        {
+            LogEvent("AdminDnaDefintionReturned", dnaDefinitionReturnedCallBackEventArgs);
+            OnDnaDefinitionReturnedCallBack?.Invoke(this, dnaDefinitionReturnedCallBackEventArgs);
+
+            if (_taskCompletionDnaDefinitionReturnedCallBack != null && !string.IsNullOrEmpty(dnaDefinitionReturnedCallBackEventArgs.Id) && _taskCompletionDnaDefinitionReturnedCallBack.ContainsKey(dnaDefinitionReturnedCallBackEventArgs.Id))
+                _taskCompletionDnaDefinitionReturnedCallBack[dnaDefinitionReturnedCallBackEventArgs.Id].SetResult(dnaDefinitionReturnedCallBackEventArgs);
+        }
+
         private void RaiseAppsListedEvent(AppsListedCallBackEventArgs adminAppsListedCallBackEventArgs)
         {
-            LogEvent("AppsListed", adminAppsListedCallBackEventArgs);
+            LogEvent("AdminAppsListed", adminAppsListedCallBackEventArgs);
             OnAppsListedCallBack?.Invoke(this, adminAppsListedCallBackEventArgs);
 
             if (_taskCompletionAppsListedCallBack != null && !string.IsNullOrEmpty(adminAppsListedCallBackEventArgs.Id) && _taskCompletionAppsListedCallBack.ContainsKey(adminAppsListedCallBackEventArgs.Id))
@@ -477,11 +542,20 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         private void RaiseDnasListedEvent(DnasListedCallBackEventArgs dnasListedCallBackEventArgs)
         {
-            LogEvent("DnasListed", dnasListedCallBackEventArgs);
+            LogEvent("AdminDnasListed", dnasListedCallBackEventArgs);
             OnDnasListedCallBack?.Invoke(this, dnasListedCallBackEventArgs);
 
             if (_taskCompletionDnasListedCallBack != null && !string.IsNullOrEmpty(dnasListedCallBackEventArgs.Id) && _taskCompletionDnasListedCallBack.ContainsKey(dnasListedCallBackEventArgs.Id))
                 _taskCompletionDnasListedCallBack[dnasListedCallBackEventArgs.Id].SetResult(dnasListedCallBackEventArgs);
+        }
+
+        private void RaiseCellIdsListedEvent(CellIdsListedCallBackEventArgs cellIdsListedCallBackEventArgs)
+        {
+            LogEvent("AdminCellIdsListed", cellIdsListedCallBackEventArgs);
+            OnCellIdsListedCallBack?.Invoke(this, cellIdsListedCallBackEventArgs);
+
+            if (_taskCompletionCellIdsListedCallBack != null && !string.IsNullOrEmpty(cellIdsListedCallBackEventArgs.Id) && _taskCompletionCellIdsListedCallBack.ContainsKey(cellIdsListedCallBackEventArgs.Id))
+                _taskCompletionCellIdsListedCallBack[cellIdsListedCallBackEventArgs.Id].SetResult(cellIdsListedCallBackEventArgs);
         }
     }
 }
