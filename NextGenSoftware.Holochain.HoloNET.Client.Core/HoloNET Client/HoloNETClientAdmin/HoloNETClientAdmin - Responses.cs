@@ -1,7 +1,8 @@
 ﻿using System;
 using MessagePack;
 using NextGenSoftware.Logging;
-using NextGenSoftware.Holochain.HoloNET.Client.Interfaces;
+using System.Linq;
+using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
@@ -55,6 +56,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                             DecodeDnasListedReceived(response, dataReceivedEventArgs);
                             break;
 
+                        case HoloNETResponseType.AdminAppInterfacesListed:
+                            DecodeAppsListedReceived(response, dataReceivedEventArgs);
+                            break;
+
                         case HoloNETResponseType.AdminAppsListed:
                             DecodeAppsListedReceived(response, dataReceivedEventArgs);
                             break;
@@ -65,6 +70,26 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                         case HoloNETResponseType.AdminCellIdsListed:
                             DecodeDnasListedReceived(response, dataReceivedEventArgs);
+                            break;
+
+                        case HoloNETResponseType.AdminAgentInfoReturned:
+                            DecodeAgentInfoReceived(response, dataReceivedEventArgs);
+                            break;
+
+                        case HoloNETResponseType.AdminAgentInfoAdded:
+                            DecodeAgentInfoAddedReceived(response, dataReceivedEventArgs);
+                            break;
+
+                        case HoloNETResponseType.AdminCoordinatorsUpdated:
+                            DecodeCoordinatorsUpdatedReceived(response, dataReceivedEventArgs);
+                            break;
+
+                        case HoloNETResponseType.AdminCloneCellDeleted:
+                            DecodeCloneCellDeletedReceived(response, dataReceivedEventArgs);
+                            break;
+
+                        case HoloNETResponseType.AdminStateDumped:
+                            DecodeStateDumpedReceived(response, dataReceivedEventArgs);
                             break;
                     }
                 }
@@ -118,6 +143,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                         RaiseDnaRegisteredEvent(ProcessResponeError<DnaRegisteredCallBackEventArgs>(response, dataReceivedEventArgs, "AdminRegisterDna", msg));
                         break;
 
+                    case HoloNETRequestType.AdminListAppInterfaces:
+                        RaiseAppInterfacesListedEvent(ProcessResponeError<AppInterfacesListedCallBackEventArgs>(response, dataReceivedEventArgs, "AdminListAppInterfaces", msg));
+                        break;
+
                     case HoloNETRequestType.AdminListApps:
                         RaiseAppsListedEvent(ProcessResponeError<AppsListedCallBackEventArgs>(response, dataReceivedEventArgs, "AdminListApps", msg));
                         break;
@@ -129,6 +158,26 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     case HoloNETRequestType.AdminListCellIds:
                         RaiseCellIdsListedEvent(ProcessResponeError<CellIdsListedCallBackEventArgs>(response, dataReceivedEventArgs, "AdminListCellIds", msg));
                         break;
+
+                    case HoloNETRequestType.AdminAgentInfo:
+                        RaiseAgentInfoReturnedEvent(ProcessResponeError<AgentInfoReturnedCallBackEventArgs>(response, dataReceivedEventArgs, "AdminAgentInfo", msg));
+                        break;
+
+                    case HoloNETRequestType.AdminAddAgentInfo:
+                        RaiseAgentInfoAddedEvent(ProcessResponeError<AgentInfoAddedCallBackEventArgs>(response, dataReceivedEventArgs, "AdminAddAgentInfo", msg));
+                        break;
+
+                    case HoloNETRequestType.AdminUpdateCoordinators:
+                        RaiseCoordinatorsUpdatedEvent(ProcessResponeError<CoordinatorsUpdatedCallBackEventArgs>(response, dataReceivedEventArgs, "AdminUpdateCoordinators", msg));
+                        break;
+
+                    case HoloNETRequestType.AdminDeleteClonedCell:
+                        RaiseCloneCellDeletedEvent(ProcessResponeError<CloneCellDeletedCallBackEventArgs>(response, dataReceivedEventArgs, "AdminDeleteClonedCell", msg));
+                        break;
+
+                    case HoloNETRequestType.AdminDumpState:
+                        RaiseCloneCellDeletedEvent(ProcessResponeError<CloneCellDeletedCallBackEventArgs>(response, dataReceivedEventArgs, "AdminDeleteClonedCell", msg));
+                        break;
                 }
             }
 
@@ -138,6 +187,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         private void DecodeAgentPubKeyGeneratedReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
         {
             AgentPubKeyGeneratedCallBackEventArgs args = CreateHoloNETArgs<AgentPubKeyGeneratedCallBackEventArgs>(response, dataReceivedEventArgs);
+            args.HoloNETResponseType = HoloNETResponseType.AdminAgentPubKeyGenerated;
 
             try
             {
@@ -163,6 +213,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         {
             AppInstalledCallBackEventArgs args = new AppInstalledCallBackEventArgs();
             string errorMessage = "An unknown error occurred in HoloNETClient.DecodeAppInstalledReceived. Reason: ";
+            args.HoloNETResponseType = HoloNETResponseType.AdminAppInstalled;
 
             try
             {
@@ -269,11 +320,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         {
             string errorMessage = "An unknown error occurred in HoloNETClient.DecodeZomeCallCapabilityGrantedReceived. Reason: ";
             ZomeCallCapabilityGrantedCallBackEventArgs args = CreateHoloNETArgs<ZomeCallCapabilityGrantedCallBackEventArgs>(response, dataReceivedEventArgs);
+            args.HoloNETResponseType = HoloNETResponseType.AdminAppInterfaceAttached;
 
             try
             {
                 Logger.Log("ADMIN ZOME CALL CAPABILITY GRANTED\n", LogType.Info);
-                args.HoloNETResponseType = HoloNETResponseType.AdminZomeCallCapabilityGranted;
             }
             catch (Exception ex)
             {
@@ -361,11 +412,83 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             RaiseDnaDefinitionReturnedEvent(args);
         }
 
+        private void DecodeAppInterfacesListedReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
+        {
+            string errorMessage = "An unknown error occurred in HoloNETClient.DecodeAppInterfacesListedReceived. Reason: ";
+            AppInterfacesListedCallBackEventArgs args = CreateHoloNETArgs<AppInterfacesListedCallBackEventArgs>(response, dataReceivedEventArgs);
+            args.HoloNETResponseType = HoloNETResponseType.AdminAppInterfacesListed;
+
+            try
+            {
+                Logger.Log("ADMIN APP INTERFACES LISTED\n", LogType.Info);
+                ushort[] dataResponse = MessagePackSerializer.Deserialize<ushort[]>(response.data, messagePackSerializerOptions);
+
+                if (dataResponse != null)
+                    args.WebSocketPorts = dataResponse.ToList();
+                else
+                    HandleError(args, $"{errorMessage} dataResponse failed to deserialize.");
+            }
+            catch (Exception ex)
+            {
+                HandleError(args, $"{errorMessage} {ex}");
+            }
+
+            RaiseAppInterfacesListedEvent(args);
+        }
+
+        private void DecodeAgentInfoReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
+        {
+            string errorMessage = "An unknown error occurred in HoloNETClient.DecodeAgentInfoReceived. Reason: ";
+            AgentInfoReturnedCallBackEventArgs args = CreateHoloNETArgs<AgentInfoReturnedCallBackEventArgs>(response, dataReceivedEventArgs);
+            args.HoloNETResponseType = HoloNETResponseType.AdminAgentInfoReturned;
+
+            try
+            {
+                Logger.Log("ADMIN AGENT INFO RETURNED\n", LogType.Info);
+                AgentInfo agentInfo = MessagePackSerializer.Deserialize<AgentInfo>(response.data, messagePackSerializerOptions);
+
+                if (agentInfo != null)
+                    args.AgentInfo = agentInfo;
+                else
+                    HandleError(args, $"{errorMessage} dataResponse failed to deserialize.");
+            }
+            catch (Exception ex)
+            {
+                HandleError(args, $"{errorMessage} {ex}");
+            }
+
+            RaiseAgentInfoReturnedEvent(args);
+        }
+
+        private void DecodeAgentInfoAddedReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
+        {
+            string errorMessage = "An unknown error occurred in HoloNETClient.DecodeAgentInfoAddedReceived. Reason: ";
+            AgentInfoAddedCallBackEventArgs args = CreateHoloNETArgs<AgentInfoAddedCallBackEventArgs>(response, dataReceivedEventArgs);
+            args.HoloNETResponseType = HoloNETResponseType.AdminAgentInfoAdded;
+
+            try
+            {
+                Logger.Log("ADMIN AGENT INFO ADDED\n", LogType.Info);
+                object agentInfo = MessagePackSerializer.Deserialize<object>(response.data, messagePackSerializerOptions);
+
+                //if (agentInfo != null)
+                //    args.AgentInfo = agentInfo;
+                //else
+                //    HandleError(args, $"{errorMessage} dataResponse failed to deserialize.");
+            }
+            catch (Exception ex)
+            {
+                HandleError(args, $"{errorMessage} {ex}");
+            }
+
+            RaiseAgentInfoAddedEvent(args);
+        }
+
         private void DecodeAppsListedReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
         {
             string errorMessage = "An unknown error occurred in HoloNETClient.DecodeAppsListedReceived. Reason: ";
             AppsListedCallBackEventArgs args = CreateHoloNETArgs<AppsListedCallBackEventArgs>(response, dataReceivedEventArgs);
-            args.HoloNETResponseType = HoloNETResponseType.AdminAppInterfaceAttached;
+            args.HoloNETResponseType = HoloNETResponseType.AdminAppsListed;
 
             try
             {
@@ -406,7 +529,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         {
             string errorMessage = "An unknown error occurred in HoloNETClient.DecodeDnasListedReceived. Reason: ";
             DnasListedCallBackEventArgs args = CreateHoloNETArgs<DnasListedCallBackEventArgs>(response, dataReceivedEventArgs);
-            args.HoloNETResponseType = HoloNETResponseType.AdminAppInterfaceAttached;
+            args.HoloNETResponseType = HoloNETResponseType.AdminDnasListed;
 
             try
             {
@@ -448,6 +571,72 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
 
             RaiseCellIdsListedEvent(args);
+        }
+
+        private void DecodeCoordinatorsUpdatedReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
+        {
+            string errorMessage = "An unknown error occurred in HoloNETClient.DecodeCoordinatorsUpdatedReceived. Reason: ";
+            CoordinatorsUpdatedCallBackEventArgs args = CreateHoloNETArgs<CoordinatorsUpdatedCallBackEventArgs>(response, dataReceivedEventArgs);
+            args.HoloNETResponseType = HoloNETResponseType.AdminCoordinatorsUpdated;
+
+            try
+            {
+                Logger.Log("ADMIN CoordinatorsUpdated\n", LogType.Info);
+                object dataResponse = MessagePackSerializer.Deserialize<object>(response.data, messagePackSerializerOptions);
+
+                if (dataResponse == null)
+                    HandleError(args, $"{errorMessage} dataResponse failed to deserialize.");
+            }
+            catch (Exception ex)
+            {
+                HandleError(args, $"{errorMessage} {ex}");
+            }
+
+            RaiseCoordinatorsUpdatedEvent(args);
+        }
+
+        private void DecodeCloneCellDeletedReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
+        {
+            string errorMessage = "An unknown error occurred in HoloNETClient.DecodeCloneCellDeletedReceived. Reason: ";
+            CloneCellDeletedCallBackEventArgs args = CreateHoloNETArgs<CloneCellDeletedCallBackEventArgs>(response, dataReceivedEventArgs);
+            args.HoloNETResponseType = HoloNETResponseType.AdminCloneCellDeleted;
+
+            try
+            {
+                Logger.Log("ADMIN CLONE CELL DELETED\n", LogType.Info);
+                object dataResponse = MessagePackSerializer.Deserialize<object>(response.data, messagePackSerializerOptions);
+
+                if (dataResponse == null)
+                    HandleError(args, $"{errorMessage} dataResponse failed to deserialize.");
+            }
+            catch (Exception ex)
+            {
+                HandleError(args, $"{errorMessage} {ex}");
+            }
+
+            RaiseCloneCellDeletedEvent(args);
+        }
+
+        private void DecodeStateDumpedReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
+        {
+            string errorMessage = "An unknown error occurred in HoloNETClient.DecodeStateDumpedReceived. Reason: ";
+            CloneCellDeletedCallBackEventArgs args = CreateHoloNETArgs<CloneCellDeletedCallBackEventArgs>(response, dataReceivedEventArgs);
+            args.HoloNETResponseType = HoloNETResponseType.AdminCloneCellDeleted;
+
+            try
+            {
+                Logger.Log("ADMIN STATE DUMPED\n", LogType.Info);
+                object dataResponse = MessagePackSerializer.Deserialize<object>(response.data, messagePackSerializerOptions);
+
+                if (dataResponse == null)
+                    HandleError(args, $"{errorMessage} dataResponse failed to deserialize.");
+            }
+            catch (Exception ex)
+            {
+                HandleError(args, $"{errorMessage} {ex}");
+            }
+
+            RaiseCloneCellDeletedEvent(args);
         }
 
         private void RaiseAgentPubKeyGeneratedEvent(AgentPubKeyGeneratedCallBackEventArgs adminAgentPubKeyGeneratedCallBackEventArgs)
@@ -531,6 +720,15 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 _taskCompletionDnaDefinitionReturnedCallBack[dnaDefinitionReturnedCallBackEventArgs.Id].SetResult(dnaDefinitionReturnedCallBackEventArgs);
         }
 
+        private void RaiseAppInterfacesListedEvent(AppInterfacesListedCallBackEventArgs adminAppsListedCallBackEventArgs)
+        {
+            LogEvent("AdminAppInterfacesListed", adminAppsListedCallBackEventArgs);
+            OnAppInterfacesListedCallBack?.Invoke(this, adminAppsListedCallBackEventArgs);
+
+            if (_taskCompletionAppInterfacesListedCallBack != null && !string.IsNullOrEmpty(adminAppsListedCallBackEventArgs.Id) && _taskCompletionAppInterfacesListedCallBack.ContainsKey(adminAppsListedCallBackEventArgs.Id))
+                _taskCompletionAppInterfacesListedCallBack[adminAppsListedCallBackEventArgs.Id].SetResult(adminAppsListedCallBackEventArgs);
+        }
+
         private void RaiseAppsListedEvent(AppsListedCallBackEventArgs adminAppsListedCallBackEventArgs)
         {
             LogEvent("AdminAppsListed", adminAppsListedCallBackEventArgs);
@@ -556,6 +754,42 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             if (_taskCompletionCellIdsListedCallBack != null && !string.IsNullOrEmpty(cellIdsListedCallBackEventArgs.Id) && _taskCompletionCellIdsListedCallBack.ContainsKey(cellIdsListedCallBackEventArgs.Id))
                 _taskCompletionCellIdsListedCallBack[cellIdsListedCallBackEventArgs.Id].SetResult(cellIdsListedCallBackEventArgs);
+        }
+
+        private void RaiseAgentInfoReturnedEvent(AgentInfoReturnedCallBackEventArgs agentInfoReturnedCallBackEventArgs)
+        {
+            LogEvent("AdminAgentInfoReturned", agentInfoReturnedCallBackEventArgs);
+            OnAgentInfoReturnedCallBack?.Invoke(this, agentInfoReturnedCallBackEventArgs);
+
+            if (_taskCompletionAgentInfoReturnedCallBack != null && !string.IsNullOrEmpty(agentInfoReturnedCallBackEventArgs.Id) && _taskCompletionAgentInfoReturnedCallBack.ContainsKey(agentInfoReturnedCallBackEventArgs.Id))
+                _taskCompletionAgentInfoReturnedCallBack[agentInfoReturnedCallBackEventArgs.Id].SetResult(agentInfoReturnedCallBackEventArgs);
+        }
+
+        private void RaiseAgentInfoAddedEvent(AgentInfoAddedCallBackEventArgs agentInfoAddedCallBackEventArgs)
+        {
+            LogEvent("AdminAgentInfoAdded", agentInfoAddedCallBackEventArgs);
+            OnAgentInfoAddedCallBack?.Invoke(this, agentInfoAddedCallBackEventArgs);
+
+            if (_taskCompletionAgentInfoAddedCallBack != null && !string.IsNullOrEmpty(agentInfoAddedCallBackEventArgs.Id) && _taskCompletionAgentInfoReturnedCallBack.ContainsKey(agentInfoAddedCallBackEventArgs.Id))
+                _taskCompletionAgentInfoAddedCallBack[agentInfoAddedCallBackEventArgs.Id].SetResult(agentInfoAddedCallBackEventArgs);
+        }
+
+        private void RaiseCoordinatorsUpdatedEvent(CoordinatorsUpdatedCallBackEventArgs coordinatorsUpdatedCallBackEventArgs)
+        {
+            LogEvent("AdmiCoordinatorsUpdated", coordinatorsUpdatedCallBackEventArgs);
+            OnCoordinatorsUpdatedCallBack?.Invoke(this, coordinatorsUpdatedCallBackEventArgs);
+
+            if (_taskCompletionCoordinatorsUpdatedCallBack != null && !string.IsNullOrEmpty(coordinatorsUpdatedCallBackEventArgs.Id) && _taskCompletionCoordinatorsUpdatedCallBack.ContainsKey(coordinatorsUpdatedCallBackEventArgs.Id))
+                _taskCompletionCoordinatorsUpdatedCallBack[coordinatorsUpdatedCallBackEventArgs.Id].SetResult(coordinatorsUpdatedCallBackEventArgs);
+        }
+
+        private void RaiseCloneCellDeletedEvent(CloneCellDeletedCallBackEventArgs cloneCellDeletedCallBackEventArgs)
+        {
+            LogEvent("AdminCloneCellDeleted", cloneCellDeletedCallBackEventArgs);
+            OnCloneCellDeletedCallBack?.Invoke(this, cloneCellDeletedCallBackEventArgs);
+
+            if (_taskCompletionCloneCellDeletedCallBack != null && !string.IsNullOrEmpty(cloneCellDeletedCallBackEventArgs.Id) && _taskCompletionCloneCellDeletedCallBack.ContainsKey(cloneCellDeletedCallBackEventArgs.Id))
+                _taskCompletionCloneCellDeletedCallBack[cloneCellDeletedCallBackEventArgs.Id].SetResult(cloneCellDeletedCallBackEventArgs);
         }
     }
 }

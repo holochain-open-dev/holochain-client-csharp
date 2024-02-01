@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.AppManifest;
+using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects;
 using NextGenSoftware.WebSocket;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
@@ -83,6 +84,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public DnaDefinitionResponse DnaDefinition { get; set; }
     }
 
+    public class AppInterfacesListedCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
+    {
+        public List<ushort> WebSocketPorts { get; set; } = new List<ushort>();
+    }
+
     public class AppsListedCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
         public List<AppInfo> Apps { get; set; } = new List<AppInfo>();
@@ -103,11 +109,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public AppInfo AppInfo { get; set; }
     }
 
-    public class ListAppInterfacesCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
-    {
-        public AppResponse AppResponse { get; set; }
-    }
-
     public class DumpStateCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
         public AppResponse AppResponse { get; set; }
@@ -118,24 +119,24 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public AppResponse AppResponse { get; set; }
     }
 
-    public class UpdateCoordinatorsCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
+    public class CoordinatorsUpdatedCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
-        public AppResponse AppResponse { get; set; }
+ 
     }
 
-    public class GetAgentInfoCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
+    public class AgentInfoReturnedCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
-        public AppResponse AppResponse { get; set; }
+        public AgentInfo AgentInfo { get; set; }
     }
 
-    public class AddAgentInfoCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
+    public class AgentInfoAddedCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
-        public AppResponse AppResponse { get; set; }
+        //public AgentInfo AgentInfo { get; set; }
     }
 
-    public class DeleteCloneCellCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
+    public class CloneCellDeletedCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
-        public AppResponse AppResponse { get; set; }
+
     }
 
     public class GetStorageInfoCallBackEventArgs : HoloNETDataReceivedBaseEventArgs

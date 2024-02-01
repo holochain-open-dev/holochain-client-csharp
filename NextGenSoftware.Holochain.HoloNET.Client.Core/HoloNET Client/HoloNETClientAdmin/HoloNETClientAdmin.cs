@@ -21,14 +21,14 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         private Dictionary<string, TaskCompletionSource<AppsListedCallBackEventArgs>> _taskCompletionAppsListedCallBack = new Dictionary<string, TaskCompletionSource<AppsListedCallBackEventArgs>>();
         private Dictionary<string, TaskCompletionSource<DnasListedCallBackEventArgs>> _taskCompletionDnasListedCallBack = new Dictionary<string, TaskCompletionSource<DnasListedCallBackEventArgs>>();
         private Dictionary<string, TaskCompletionSource<CellIdsListedCallBackEventArgs>> _taskCompletionCellIdsListedCallBack = new Dictionary<string, TaskCompletionSource<CellIdsListedCallBackEventArgs>>();
-        private Dictionary<string, TaskCompletionSource<ListAppInterfacesCallBackEventArgs>> _taskCompletionListAppInterfacesCallBack = new Dictionary<string, TaskCompletionSource<ListAppInterfacesCallBackEventArgs>>();
+        private Dictionary<string, TaskCompletionSource<AppInterfacesListedCallBackEventArgs>> _taskCompletionAppInterfacesListedCallBack = new Dictionary<string, TaskCompletionSource<AppInterfacesListedCallBackEventArgs>>();
         private Dictionary<string, TaskCompletionSource<DumpFullStateCallBackEventArgs>> _taskCompletionDumpFullStateCallBack = new Dictionary<string, TaskCompletionSource<DumpFullStateCallBackEventArgs>>();
         private Dictionary<string, TaskCompletionSource<DumpStateCallBackEventArgs>> _taskCompletionDumpStateCallBack = new Dictionary<string, TaskCompletionSource<DumpStateCallBackEventArgs>>();
         private Dictionary<string, TaskCompletionSource<DnaDefinitionReturnedCallBackEventArgs>> _taskCompletionDnaDefinitionReturnedCallBack = new Dictionary<string, TaskCompletionSource<DnaDefinitionReturnedCallBackEventArgs>>();
-        private Dictionary<string, TaskCompletionSource<UpdateCoordinatorsCallBackEventArgs>> _taskCompletionUpdateCoordinatorsCallBack = new Dictionary<string, TaskCompletionSource<UpdateCoordinatorsCallBackEventArgs>>();
-        private Dictionary<string, TaskCompletionSource<GetAgentInfoCallBackEventArgs>> _taskCompletionGetAgentInfoCallBack = new Dictionary<string, TaskCompletionSource<GetAgentInfoCallBackEventArgs>>();
-        private Dictionary<string, TaskCompletionSource<AddAgentInfoCallBackEventArgs>> _taskCompletionAddAgentInfoCallBack = new Dictionary<string, TaskCompletionSource<AddAgentInfoCallBackEventArgs>>();
-        private Dictionary<string, TaskCompletionSource<DeleteCloneCellCallBackEventArgs>> _taskCompletionDeleteCloneCellCallBack = new Dictionary<string, TaskCompletionSource<DeleteCloneCellCallBackEventArgs>>();
+        private Dictionary<string, TaskCompletionSource<CoordinatorsUpdatedCallBackEventArgs>> _taskCompletionCoordinatorsUpdatedCallBack = new Dictionary<string, TaskCompletionSource<CoordinatorsUpdatedCallBackEventArgs>>();
+        private Dictionary<string, TaskCompletionSource<AgentInfoReturnedCallBackEventArgs>> _taskCompletionAgentInfoReturnedCallBack = new Dictionary<string, TaskCompletionSource<AgentInfoReturnedCallBackEventArgs>>();
+        private Dictionary<string, TaskCompletionSource<AgentInfoAddedCallBackEventArgs>> _taskCompletionAgentInfoAddedCallBack = new Dictionary<string, TaskCompletionSource<AgentInfoAddedCallBackEventArgs>>();
+        private Dictionary<string, TaskCompletionSource<CloneCellDeletedCallBackEventArgs>> _taskCompletionCloneCellDeletedCallBack = new Dictionary<string, TaskCompletionSource<CloneCellDeletedCallBackEventArgs>>();
         private Dictionary<string, TaskCompletionSource<GetStorageInfoCallBackEventArgs>> _taskCompletionGetStorageInfoCallBack = new Dictionary<string, TaskCompletionSource<GetStorageInfoCallBackEventArgs>>();
         private Dictionary<string, TaskCompletionSource<DumpNetworkStatsCallBackEventArgs>> _taskCompletionDumpNetworkStatsCallBack = new Dictionary<string, TaskCompletionSource<DumpNetworkStatsCallBackEventArgs>>();
 
@@ -119,6 +119,14 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         public delegate void AppsListedCallBack(object sender, AppsListedCallBackEventArgs e);
 
+
+        public delegate void AppInterfacesListedCallBack(object sender, AppInterfacesListedCallBackEventArgs e);
+
+        /// <summary>
+        /// Fired when a response is received from the conductor after the ListAppInterfacesAsync/ListAppInterfaces method is called.
+        /// </summary>
+        public event AppInterfacesListedCallBack OnAppInterfacesListedCallBack;
+
         /// <summary>
         /// Fired when a response is received from the conductor after the ListAppsAsync/ListApps method is called.
         /// </summary>
@@ -139,14 +147,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// Fired when a response is received from the conductor after the ListCellIdsAsync/ListCellIds method is called.
         /// </summary>
         public event CellIdsListedCallBack OnCellIdsListedCallBack;
-
-
-        public delegate void ListAppInterfacesCallBack(object sender, ListAppInterfacesCallBackEventArgs e);
-
-        /// <summary>
-        /// Fired when a response is received from the conductor after the ListAppInterfacesAsync/ListAppInterfaces method is called.
-        /// </summary>
-        public event ListAppInterfacesCallBack OnListAppInterfacesCallBack;
 
 
         public delegate void DumpFullStateCallBack(object sender, DumpFullStateCallBackEventArgs e);
@@ -173,36 +173,36 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public event DnaDefinitionReturnedCallBack OnDnaDefinitionReturnedCallBack;
 
 
-        public delegate void UpdateCoordinatorsCallBack(object sender, UpdateCoordinatorsCallBackEventArgs e);
+        public delegate void CoordinatorsUpdatedCallBack(object sender, CoordinatorsUpdatedCallBackEventArgs e);
 
         /// <summary>
         /// Fired when a response is received from the conductor after the UpdateCoordinatorsAsync/UpdateCoordinators method is called.
         /// </summary>
-        public event UpdateCoordinatorsCallBack OnUpdateCoordinatorsCallBack;
+        public event CoordinatorsUpdatedCallBack OnCoordinatorsUpdatedCallBack;
 
 
-        public delegate void GetAgentInfoCallBack(object sender, GetAgentInfoCallBackEventArgs e);
-
-        /// <summary>
-        /// Fired when a response is received from the conductor containing the requested Agent Info after the GetAgentInfoAsync/GetAgentInfo method is called.
-        /// </summary>
-        public event GetAgentInfoCallBack OnGetAgentInfoCallBack;
-
-
-        public delegate void AddAgentInfoCallBack(object sender, AddAgentInfoCallBackEventArgs e);
+        public delegate void AgentInfoReturnedCallBack(object sender, AgentInfoReturnedCallBackEventArgs e);
 
         /// <summary>
         /// Fired when a response is received from the conductor containing the requested Agent Info after the GetAgentInfoAsync/GetAgentInfo method is called.
         /// </summary>
-        public event AddAgentInfoCallBack OnAddAgentInfoCallBack;
+        public event AgentInfoReturnedCallBack OnAgentInfoReturnedCallBack;
 
 
-        public delegate void DeleteCloneCellCallBack(object sender, DeleteCloneCellCallBackEventArgs e);
+        public delegate void AgentInfoAddedCallBack(object sender, AgentInfoAddedCallBackEventArgs e);
 
         /// <summary>
         /// Fired when a response is received from the conductor containing the requested Agent Info after the GetAgentInfoAsync/GetAgentInfo method is called.
         /// </summary>
-        public event DeleteCloneCellCallBack OnDeleteCloneCellCallBack;
+        public event AgentInfoAddedCallBack OnAgentInfoAddedCallBack;
+
+
+        public delegate void CloneCellDeletedCallBack(object sender, CloneCellDeletedCallBackEventArgs e);
+
+        /// <summary>
+        /// Fired when a response is received from the conductor containing the requested Agent Info after the GetAgentInfoAsync/GetAgentInfo method is called.
+        /// </summary>
+        public event CloneCellDeletedCallBack OnCloneCellDeletedCallBack;
 
 
         public delegate void GetStorageInfoCallBack(object sender, GetStorageInfoCallBackEventArgs e);

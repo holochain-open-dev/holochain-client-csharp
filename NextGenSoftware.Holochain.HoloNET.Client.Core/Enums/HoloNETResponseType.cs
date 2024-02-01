@@ -15,9 +15,15 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         AdminAppInterfaceAttached,
         AdminDnaRegistered,
         AdminDnaDefinitionReturned,
+        AdminAppInterfacesListed,
         AdminAppsListed,
         AdminDnasListed,
         AdminCellIdsListed,
+        AdminAgentInfoReturned,
+        AdminAgentInfoAdded,
+        AdminCoordinatorsUpdated,
+        AdminCloneCellDeleted,
+        AdminStateDumped,
         Error
     }
 }
