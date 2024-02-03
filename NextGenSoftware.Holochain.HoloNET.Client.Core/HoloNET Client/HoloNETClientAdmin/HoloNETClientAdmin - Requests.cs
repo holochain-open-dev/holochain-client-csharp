@@ -1056,6 +1056,38 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             return DumpNetworkMetricsAsync(ConductorResponseCallBackMode.UseCallBackEvents, id).Result;
         }
 
+        /// <summary>
+        /// “Graft” record's onto the source chain of the specified CellId.
+        /// </summary>
+        /// <param name="cellId">The cell that the records are being inserted into.</param>
+        /// <param name="validate">If this is true, then the records will be validated before insertion. This is much slower but is useful for verifying the chain is valid. If this is false, then records will be inserted as is. This could lead to an invalid chain.</param>
+        /// <param name="records">The records to be inserted into the source chain.</param>
+        /// <param name="conductorResponseCallBackMode">The Concuctor Response CallBack Mode, set this to 'WaitForHolochainConductorResponse' if you want the function to wait for the Holochain Conductor response before returning that response or set it to 'UseCallBackEvents' to return from the function immediately and then raise the 'OnDumpFullStateCallBack' event when the conductor responds.   </param>
+        /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
+        /// <returns></returns>
+        public async Task<RecordsGraftedCallBackEventArgs> GraftRecordsAsync(byte[][] cellId, bool validate, record[] records, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
+        {
+            return await CallFunctionAsync(HoloNETRequestType.AdminGraftRecords, "graft_records", new GraftRecordsRequest()
+            {
+                 cell_id = cellId,
+                 validate = validate,
+                 records = records
+            }, null, _taskCompletionRecordsGraftedCallBack, "OnRecordsGraftedCallBack", conductorResponseCallBackMode, id);
+        }
+
+        /// <summary>
+        ///  Dump the network metrics tracked by kitsune.
+        /// </summary>
+        /// <param name="cellId">The cell that the records are being inserted into.</param>
+        /// <param name="validate">If this is true, then the records will be validated before insertion. This is much slower but is useful for verifying the chain is valid. If this is false, then records will be inserted as is. This could lead to an invalid chain.</param>
+        /// <param name="records">The records to be inserted into the source chain.</param>
+        /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
+        /// <returns></returns>
+        public RecordsGraftedCallBackEventArgs GraftRecords(byte[][] cellId, bool validate, record[] records, string id = null)
+        {
+            return GraftRecordsAsync(cellId, validate, records, ConductorResponseCallBackMode.UseCallBackEvents, id).Result;
+        }
+
         public override async Task<byte[][]> GetCellIdAsync()
         {
             if (string.IsNullOrEmpty(HoloNETDNA.AgentPubKey))

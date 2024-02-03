@@ -27,6 +27,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         AdminFullStateDumped,
         AdminNetworkMetricsDumped,
         AdminNetworkStatsDumped,
+        AdminStorageInfoReturned,
+        AdminRecordsGrafted,
+        AdminAdminInterfacesAdded,
         Error
     }
 }

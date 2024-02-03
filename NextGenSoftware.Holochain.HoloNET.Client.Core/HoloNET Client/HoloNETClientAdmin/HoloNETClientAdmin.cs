@@ -29,9 +29,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         private Dictionary<string, TaskCompletionSource<AgentInfoReturnedCallBackEventArgs>> _taskCompletionAgentInfoReturnedCallBack = new Dictionary<string, TaskCompletionSource<AgentInfoReturnedCallBackEventArgs>>();
         private Dictionary<string, TaskCompletionSource<AgentInfoAddedCallBackEventArgs>> _taskCompletionAgentInfoAddedCallBack = new Dictionary<string, TaskCompletionSource<AgentInfoAddedCallBackEventArgs>>();
         private Dictionary<string, TaskCompletionSource<CloneCellDeletedCallBackEventArgs>> _taskCompletionCloneCellDeletedCallBack = new Dictionary<string, TaskCompletionSource<CloneCellDeletedCallBackEventArgs>>();
-        private Dictionary<string, TaskCompletionSource<GetStorageInfoCallBackEventArgs>> _taskCompletionGetStorageInfoCallBack = new Dictionary<string, TaskCompletionSource<GetStorageInfoCallBackEventArgs>>();
-        private Dictionary<string, TaskCompletionSource<DumpNetworkStatsCallBackEventArgs>> _taskCompletionDumpNetworkStatsCallBack = new Dictionary<string, TaskCompletionSource<DumpNetworkStatsCallBackEventArgs>>();
+        private Dictionary<string, TaskCompletionSource<StorageInfoReturnedCallBackEventArgs>> _taskCompletionStorageInfoReturnedCallBack = new Dictionary<string, TaskCompletionSource<StorageInfoReturnedCallBackEventArgs>>();
+        private Dictionary<string, TaskCompletionSource<NetworkStatsDumpedCallBackEventArgs>> _taskCompletionNetworkStatsDumpedCallBack = new Dictionary<string, TaskCompletionSource<NetworkStatsDumpedCallBackEventArgs>>();
         private Dictionary<string, TaskCompletionSource<NetworkMetricsDumpedCallBackEventArgs>> _taskCompletionNetworkMetricsDumpedCallBack = new Dictionary<string, TaskCompletionSource<NetworkMetricsDumpedCallBackEventArgs>>();
+        private Dictionary<string, TaskCompletionSource<RecordsGraftedCallBackEventArgs>> _taskCompletionRecordsGraftedCallBack = new Dictionary<string, TaskCompletionSource<RecordsGraftedCallBackEventArgs>>();
+        private Dictionary<string, TaskCompletionSource<AdminInterfacesAddedCallBackEventArgs>> _taskCompletionAdminInterfacesAddedCallBack = new Dictionary<string, TaskCompletionSource<AdminInterfacesAddedCallBackEventArgs>>();
 
         //Events
 
@@ -206,20 +208,20 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public event CloneCellDeletedCallBack OnCloneCellDeletedCallBack;
 
 
-        public delegate void GetStorageInfoCallBack(object sender, GetStorageInfoCallBackEventArgs e);
+        public delegate void StorageInfoReturnedCallBack(object sender, StorageInfoReturnedCallBackEventArgs e);
 
         /// <summary>
         /// Fired when a response is received from the conductor containing the requested Agent Info after the GetAgentInfoAsync/GetAgentInfo method is called.
         /// </summary>
-        public event GetStorageInfoCallBack OnGetStorageInfoCallBack;
+        public event StorageInfoReturnedCallBack OnStorageInfoReturnedCallBack;
 
 
-        public delegate void DumpNetworkStatsCallBack(object sender, DumpNetworkStatsCallBackEventArgs e);
+        public delegate void NetworkStatsDumpedCallBack(object sender, NetworkStatsDumpedCallBackEventArgs e);
 
         /// <summary>
         /// Fired when a response is received from the conductor containing the requested Agent Info after the GetAgentInfoAsync/GetAgentInfo method is called.
         /// </summary>
-        public event DumpNetworkStatsCallBack OnDumpNetworkStatsCallBack;
+        public event NetworkStatsDumpedCallBack OnNetworkStatsDumpedCallBack;
 
 
         public delegate void NetworkMetricsDumpedCallBack(object sender, NetworkMetricsDumpedCallBackEventArgs e);
@@ -228,6 +230,23 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// Fired when a response is received from the conductor containing the requested Agent Info after the GetAgentInfoAsync/GetAgentInfo method is called.
         /// </summary>
         public event NetworkMetricsDumpedCallBack OnNetworkMetricsDumpedCallBack;
+
+
+        public delegate void RecordsGraftedCallBack(object sender, RecordsGraftedCallBackEventArgs e);
+
+        /// <summary>
+        /// Fired when a response is received from the conductor containing the requested Agent Info after the GetAgentInfoAsync/GetAgentInfo method is called.
+        /// </summary>
+        public event RecordsGraftedCallBack OnRecordsGraftedCallBack;
+
+
+        public delegate void AdminInterfacesAddedCallBack(object sender, AdminInterfacesAddedCallBackEventArgs e);
+
+        /// <summary>
+        /// Fired when a response is received from the conductor containing the requested Agent Info after the GetAgentInfoAsync/GetAgentInfo method is called.
+        /// </summary>
+        public event AdminInterfacesAddedCallBack OnAdminInterfacesAddedCallBack;
+
 
         /// <summary>
         /// This constructor uses the built-in DefaultLogger and the settings contained in the HoloNETDNA.

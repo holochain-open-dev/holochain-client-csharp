@@ -1,7 +1,9 @@
 ﻿using System;
 using MessagePack;
-using NextGenSoftware.Logging;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using NextGenSoftware.Logging;
 using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
@@ -103,6 +105,18 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                         case HoloNETResponseType.AdminNetworkStatsDumped:
                             DecodeNetworkStatsDumpedReceived(response, dataReceivedEventArgs);
                             break;
+
+                        case HoloNETResponseType.AdminStorageInfoReturned:
+                            DecodeStorageInfoReturned(response, dataReceivedEventArgs);
+                            break;
+
+                        case HoloNETResponseType.AdminRecordsGrafted:
+                            DecodeRecordsGraftedReceived(response, dataReceivedEventArgs);
+                            break;
+
+                        case HoloNETResponseType.AdminAdminInterfacesAdded:
+                            DecodeAdminInterfacesAddedReceived(response, dataReceivedEventArgs);
+                            break;
                     }
                 }
             }
@@ -200,8 +214,20 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                         break;
 
                     case HoloNETRequestType.AdminDumpNetworkStats:
-                        RaiseNetworkStatsDumpedEvent(ProcessResponeError<NetworkMetricsDumpedCallBackEventArgs>(response, dataReceivedEventArgs, "AdminDumpNetworkStats", msg));
+                        RaiseNetworkStatsDumpedEvent(ProcessResponeError<NetworkStatsDumpedCallBackEventArgs>(response, dataReceivedEventArgs, "AdminDumpNetworkStats", msg));
                         break;
+
+                    case HoloNETRequestType.AdminStorageInfo:
+                        RaiseStorageInfoReturnedEvent(ProcessResponeError<StorageInfoReturnedCallBackEventArgs>(response, dataReceivedEventArgs, "AdminStorageInfo", msg));
+                        break;
+
+                    case HoloNETRequestType.AdminGraftRecords:
+                        RaiseRecordsGraftedEvent(ProcessResponeError<RecordsGraftedCallBackEventArgs>(response, dataReceivedEventArgs, "AdminGraftRecords", msg));
+                        break;
+
+                    case HoloNETRequestType.AdminAddAdminInterfaces:
+                        RaiseAdminInterfacesAddedEvent(ProcessResponeError<AdminInterfacesAddedCallBackEventArgs>(response, dataReceivedEventArgs, "AdminAddAdminInterfaces", msg));
+                        break;     
                 }
             }
 
@@ -693,7 +719,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         {
             string errorMessage = "An unknown error occurred in HoloNETClient.DecodeNetworkMetricsDumpedReceived. Reason: ";
             NetworkMetricsDumpedCallBackEventArgs args = CreateHoloNETArgs<NetworkMetricsDumpedCallBackEventArgs>(response, dataReceivedEventArgs);
-            args.HoloNETResponseType = HoloNETResponseType.AdminFullStateDumped;
+            args.HoloNETResponseType = HoloNETResponseType.AdminNetworkMetricsDumped;
 
             try
             {
@@ -711,6 +737,115 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
 
             RaiseNetworkMetricsDumpedEvent(args);
+        }
+
+        private void DecodeNetworkStatsDumpedReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
+        {
+            string errorMessage = "An unknown error occurred in HoloNETClient.DecodeNetworkStatsDumpedReceived. Reason: ";
+            NetworkStatsDumpedCallBackEventArgs args = CreateHoloNETArgs<NetworkStatsDumpedCallBackEventArgs>(response, dataReceivedEventArgs);
+            args.HoloNETResponseType = HoloNETResponseType.AdminNetworkStatsDumped;
+
+            try
+            {
+                Logger.Log("ADMIN NETWORK STATS DUMPED\n", LogType.Info);
+                string dataResponse = MessagePackSerializer.Deserialize<string>(response.data, messagePackSerializerOptions);
+
+                if (dataResponse != null)
+                    args.NetworkStatsDumpJSON = dataResponse;
+                else
+                    HandleError(args, $"{errorMessage} dataResponse failed to deserialize.");
+            }
+            catch (Exception ex)
+            {
+                HandleError(args, $"{errorMessage} {ex}");
+            }
+
+            RaiseNetworkStatsDumpedEvent(args);
+        }
+
+        private void DecodeStorageInfoReturned(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
+        {
+            string errorMessage = "An unknown error occurred in HoloNETClient.DecodeStorageInfoReturned. Reason: ";
+            StorageInfoReturnedCallBackEventArgs args = CreateHoloNETArgs<StorageInfoReturnedCallBackEventArgs>(response, dataReceivedEventArgs);
+            args.HoloNETResponseType = HoloNETResponseType.AdminStorageInfoReturned;
+
+            try
+            {
+                Logger.Log("ADMIN STORAGE INFO RETURNED\n", LogType.Info);
+                StorageInfoResponse storageInfoResponse = MessagePackSerializer.Deserialize<StorageInfoResponse>(response.data, messagePackSerializerOptions);
+
+                if (storageInfoResponse != null)
+                    args.StorageInfoResponse = storageInfoResponse;
+                else
+                    HandleError(args, $"{errorMessage} storageInfoResponse failed to deserialize.");
+            }
+            catch (Exception ex)
+            {
+                HandleError(args, $"{errorMessage} {ex}");
+            }
+
+            RaiseStorageInfoReturnedEvent(args);
+        }
+
+        private void DecodeRecordsGraftedReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
+        {
+            string errorMessage = "An unknown error occurred in HoloNETClient.DecodeRecordsGraftedReceived. Reason: ";
+            RecordsGraftedCallBackEventArgs args = CreateHoloNETArgs<RecordsGraftedCallBackEventArgs>(response, dataReceivedEventArgs);
+            args.HoloNETResponseType = HoloNETResponseType.AdminRecordsGrafted;
+
+            try
+            {
+                Logger.Log("ADMIN RECORDS GRAFTED\n", LogType.Info);
+            }
+            catch (Exception ex)
+            {
+                HandleError(args, $"{errorMessage} {ex}");
+            }
+
+            RaiseRecordsGraftedEvent(args);
+        }
+
+        private void DecodeAdminInterfacesAddedReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
+        {
+            string errorMessage = "An unknown error occurred in HoloNETClient.DecodeAdminInterfacesAddedReceived. Reason: ";
+            AdminInterfacesAddedCallBackEventArgs args = CreateHoloNETArgs<AdminInterfacesAddedCallBackEventArgs>(response, dataReceivedEventArgs);
+            args.HoloNETResponseType = HoloNETResponseType.AdminAdminInterfacesAdded;
+
+            try
+            {
+                Logger.Log("ADMIN INTERFACES ADDED\n", LogType.Info);
+            }
+            catch (Exception ex)
+            {
+                HandleError(args, $"{errorMessage} {ex}");
+            }
+
+            RaiseAdminInterfacesAddedEvent(args);
+        }
+
+        //Generic version
+        private void DecodeResponseReceived<T>(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs, string eventName, Dictionary<string, TaskCompletionSource<HoloNETDataReceivedBaseBaseEventArgs<T>>> taskCompletionCallBack)
+        {
+            string errorMessage = "An unknown error occurred in HoloNETClient.DecodeResponseReceived. Reason: ";
+            HoloNETDataReceivedBaseBaseEventArgs<T> args = CreateHoloNETArgs<HoloNETDataReceivedBaseBaseEventArgs<T>>(response, dataReceivedEventArgs);
+            args.HoloNETResponseType = HoloNETResponseType.AdminStateDumped;
+
+            try
+            {
+                Logger.Log("ADMIN RESPONSE\n", LogType.Info);
+                T dataResponse = MessagePackSerializer.Deserialize<T>(response.data, messagePackSerializerOptions);
+
+                if (dataResponse != null)
+                    args.Response = dataResponse;
+                else
+                    HandleError(args, $"{errorMessage} dataResponse failed to deserialize.");
+            }
+            catch (Exception ex)
+            {
+                HandleError(args, $"{errorMessage} {ex}");
+            }
+
+            RaiseResponseReceivedEvent(args, eventName, taskCompletionCallBack);
         }
 
         private void RaiseAgentPubKeyGeneratedEvent(AgentPubKeyGeneratedCallBackEventArgs adminAgentPubKeyGeneratedCallBackEventArgs)
@@ -891,6 +1026,61 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             if (_taskCompletionNetworkMetricsDumpedCallBack != null && !string.IsNullOrEmpty(networkMetricsDumpedCallBackEventArgs.Id) && _taskCompletionNetworkMetricsDumpedCallBack.ContainsKey(networkMetricsDumpedCallBackEventArgs.Id))
                 _taskCompletionNetworkMetricsDumpedCallBack[networkMetricsDumpedCallBackEventArgs.Id].SetResult(networkMetricsDumpedCallBackEventArgs);
+        }
+
+        private void RaiseNetworkStatsDumpedEvent(NetworkStatsDumpedCallBackEventArgs networkStatsDumpedCallBackEventArgs)
+        {
+            LogEvent("AdminNetworkStatsDumped", networkStatsDumpedCallBackEventArgs);
+            OnNetworkStatsDumpedCallBack?.Invoke(this, networkStatsDumpedCallBackEventArgs);
+
+            if (_taskCompletionNetworkStatsDumpedCallBack != null && !string.IsNullOrEmpty(networkStatsDumpedCallBackEventArgs.Id) && _taskCompletionNetworkStatsDumpedCallBack.ContainsKey(networkStatsDumpedCallBackEventArgs.Id))
+                _taskCompletionNetworkStatsDumpedCallBack[networkStatsDumpedCallBackEventArgs.Id].SetResult(networkStatsDumpedCallBackEventArgs);
+        }
+
+        private void RaiseStorageInfoReturnedEvent(StorageInfoReturnedCallBackEventArgs storageInfoReturnedCallBackEventArgs)
+        {
+            LogEvent("AdminNetworkStatsDumped", storageInfoReturnedCallBackEventArgs);
+            OnStorageInfoReturnedCallBack?.Invoke(this, storageInfoReturnedCallBackEventArgs);
+
+            if (_taskCompletionStorageInfoReturnedCallBack != null && !string.IsNullOrEmpty(storageInfoReturnedCallBackEventArgs.Id) && _taskCompletionStorageInfoReturnedCallBack.ContainsKey(storageInfoReturnedCallBackEventArgs.Id))
+                _taskCompletionStorageInfoReturnedCallBack[storageInfoReturnedCallBackEventArgs.Id].SetResult(storageInfoReturnedCallBackEventArgs);
+        }
+
+        private void RaiseRecordsGraftedEvent(RecordsGraftedCallBackEventArgs recordsGraftedCallBackEventArgs)
+        {
+            LogEvent("AdminRecordsGrafted", recordsGraftedCallBackEventArgs);
+            OnRecordsGraftedCallBack?.Invoke(this, recordsGraftedCallBackEventArgs);
+
+            if (_taskCompletionRecordsGraftedCallBack != null && !string.IsNullOrEmpty(recordsGraftedCallBackEventArgs.Id) && _taskCompletionRecordsGraftedCallBack.ContainsKey(recordsGraftedCallBackEventArgs.Id))
+                _taskCompletionRecordsGraftedCallBack[recordsGraftedCallBackEventArgs.Id].SetResult(recordsGraftedCallBackEventArgs);
+        }
+
+        private void RaiseAdminInterfacesAddedEvent(AdminInterfacesAddedCallBackEventArgs adminInterfacesAddedCallBackEvent)
+        {
+            LogEvent("AdminInterfacesAdded", adminInterfacesAddedCallBackEvent);
+            OnAdminInterfacesAddedCallBack?.Invoke(this, adminInterfacesAddedCallBackEvent);
+
+            if (_taskCompletionAdminInterfacesAddedCallBack != null && !string.IsNullOrEmpty(adminInterfacesAddedCallBackEvent.Id) && _taskCompletionAdminInterfacesAddedCallBack.ContainsKey(adminInterfacesAddedCallBackEvent.Id))
+                _taskCompletionAdminInterfacesAddedCallBack[adminInterfacesAddedCallBackEvent.Id].SetResult(adminInterfacesAddedCallBackEvent);
+        }
+
+        //TODO: Finish trying to make this generic to massively reduce the repeated code! ;-)
+        //private void RaiseResponseReceivedEvent<T>(HoloNETDataReceivedBaseBaseEventArgs<T> holoNETDataReceivedBaseBaseEventArgs, string eventName, delegate callBack, Dictionary<string, TaskCompletionSource<HoloNETDataReceivedBaseBaseEventArgs<T>>> taskCompletionCallBack)
+        //{
+        //    LogEvent(eventName, holoNETDataReceivedBaseBaseEventArgs);
+        //    OnStateDumpedCallBack?.Invoke(this, holoNETDataReceivedBaseBaseEventArgs);
+
+        //    if (taskCompletionCallBack != null && !string.IsNullOrEmpty(holoNETDataReceivedBaseBaseEventArgs.Id) && taskCompletionCallBack.ContainsKey(holoNETDataReceivedBaseBaseEventArgs.Id))
+        //        taskCompletionCallBack[holoNETDataReceivedBaseBaseEventArgs.Id].SetResult(holoNETDataReceivedBaseBaseEventArgs);
+        //}
+
+        private void RaiseResponseReceivedEvent<T>(HoloNETDataReceivedBaseBaseEventArgs<T> holoNETDataReceivedBaseBaseEventArgs, string eventName, Dictionary<string, TaskCompletionSource<HoloNETDataReceivedBaseBaseEventArgs<T>>> taskCompletionCallBack)
+        {
+            LogEvent(eventName, holoNETDataReceivedBaseBaseEventArgs);
+            //OnStateDumpedCallBack?.Invoke(this, holoNETDataReceivedBaseBaseEventArgs);  //TODO: Need to work out how to pass an event as a param!
+
+            if (taskCompletionCallBack != null && !string.IsNullOrEmpty(holoNETDataReceivedBaseBaseEventArgs.Id) && taskCompletionCallBack.ContainsKey(holoNETDataReceivedBaseBaseEventArgs.Id))
+                taskCompletionCallBack[holoNETDataReceivedBaseBaseEventArgs.Id].SetResult(holoNETDataReceivedBaseBaseEventArgs);
         }
     }
 }
