@@ -22,8 +22,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         private Dictionary<string, TaskCompletionSource<DnasListedCallBackEventArgs>> _taskCompletionDnasListedCallBack = new Dictionary<string, TaskCompletionSource<DnasListedCallBackEventArgs>>();
         private Dictionary<string, TaskCompletionSource<CellIdsListedCallBackEventArgs>> _taskCompletionCellIdsListedCallBack = new Dictionary<string, TaskCompletionSource<CellIdsListedCallBackEventArgs>>();
         private Dictionary<string, TaskCompletionSource<AppInterfacesListedCallBackEventArgs>> _taskCompletionAppInterfacesListedCallBack = new Dictionary<string, TaskCompletionSource<AppInterfacesListedCallBackEventArgs>>();
-        private Dictionary<string, TaskCompletionSource<DumpFullStateCallBackEventArgs>> _taskCompletionDumpFullStateCallBack = new Dictionary<string, TaskCompletionSource<DumpFullStateCallBackEventArgs>>();
-        private Dictionary<string, TaskCompletionSource<DumpStateCallBackEventArgs>> _taskCompletionDumpStateCallBack = new Dictionary<string, TaskCompletionSource<DumpStateCallBackEventArgs>>();
+        private Dictionary<string, TaskCompletionSource<FullStateDumpedCallBackEventArgs>> _taskCompletionFullStateDumpedCallBack = new Dictionary<string, TaskCompletionSource<FullStateDumpedCallBackEventArgs>>();
+        private Dictionary<string, TaskCompletionSource<StateDumpedCallBackEventArgs>> _taskCompletionStateDumpedCallBack = new Dictionary<string, TaskCompletionSource<StateDumpedCallBackEventArgs>>();
         private Dictionary<string, TaskCompletionSource<DnaDefinitionReturnedCallBackEventArgs>> _taskCompletionDnaDefinitionReturnedCallBack = new Dictionary<string, TaskCompletionSource<DnaDefinitionReturnedCallBackEventArgs>>();
         private Dictionary<string, TaskCompletionSource<CoordinatorsUpdatedCallBackEventArgs>> _taskCompletionCoordinatorsUpdatedCallBack = new Dictionary<string, TaskCompletionSource<CoordinatorsUpdatedCallBackEventArgs>>();
         private Dictionary<string, TaskCompletionSource<AgentInfoReturnedCallBackEventArgs>> _taskCompletionAgentInfoReturnedCallBack = new Dictionary<string, TaskCompletionSource<AgentInfoReturnedCallBackEventArgs>>();
@@ -31,6 +31,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         private Dictionary<string, TaskCompletionSource<CloneCellDeletedCallBackEventArgs>> _taskCompletionCloneCellDeletedCallBack = new Dictionary<string, TaskCompletionSource<CloneCellDeletedCallBackEventArgs>>();
         private Dictionary<string, TaskCompletionSource<GetStorageInfoCallBackEventArgs>> _taskCompletionGetStorageInfoCallBack = new Dictionary<string, TaskCompletionSource<GetStorageInfoCallBackEventArgs>>();
         private Dictionary<string, TaskCompletionSource<DumpNetworkStatsCallBackEventArgs>> _taskCompletionDumpNetworkStatsCallBack = new Dictionary<string, TaskCompletionSource<DumpNetworkStatsCallBackEventArgs>>();
+        private Dictionary<string, TaskCompletionSource<NetworkMetricsDumpedCallBackEventArgs>> _taskCompletionNetworkMetricsDumpedCallBack = new Dictionary<string, TaskCompletionSource<NetworkMetricsDumpedCallBackEventArgs>>();
 
         //Events
 
@@ -149,20 +150,20 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public event CellIdsListedCallBack OnCellIdsListedCallBack;
 
 
-        public delegate void DumpFullStateCallBack(object sender, DumpFullStateCallBackEventArgs e);
+        public delegate void FullStateDumpedCallBack(object sender, FullStateDumpedCallBackEventArgs e);
 
         /// <summary>
         /// Fired when a response is received from the conductor after the DumpFullStateAsync/DumpFullState method is called.
         /// </summary>
-        public event DumpFullStateCallBack OnDumpFullStateCallBack;
+        public event FullStateDumpedCallBack OnFullStateDumpedCallBack;
 
 
-        public delegate void DumpStateCallBack(object sender, DumpStateCallBackEventArgs e);
+        public delegate void StateDumpedCallBack(object sender, StateDumpedCallBackEventArgs e);
 
         /// <summary>
         /// Fired when a response is received from the conductor after the DumpStateAsync/DumpState method is called.
         /// </summary>
-        public event DumpStateCallBack OnDumpStateCallBack;
+        public event StateDumpedCallBack OnStateDumpedCallBack;
 
 
         public delegate void DnaDefinitionReturnedCallBack(object sender, DnaDefinitionReturnedCallBackEventArgs e);
@@ -219,6 +220,14 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// Fired when a response is received from the conductor containing the requested Agent Info after the GetAgentInfoAsync/GetAgentInfo method is called.
         /// </summary>
         public event DumpNetworkStatsCallBack OnDumpNetworkStatsCallBack;
+
+
+        public delegate void NetworkMetricsDumpedCallBack(object sender, NetworkMetricsDumpedCallBackEventArgs e);
+
+        /// <summary>
+        /// Fired when a response is received from the conductor containing the requested Agent Info after the GetAgentInfoAsync/GetAgentInfo method is called.
+        /// </summary>
+        public event NetworkMetricsDumpedCallBack OnNetworkMetricsDumpedCallBack;
 
         /// <summary>
         /// This constructor uses the built-in DefaultLogger and the settings contained in the HoloNETDNA.

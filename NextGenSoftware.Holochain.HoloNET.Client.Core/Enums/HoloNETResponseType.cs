@@ -24,6 +24,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         AdminCoordinatorsUpdated,
         AdminCloneCellDeleted,
         AdminStateDumped,
+        AdminFullStateDumped,
+        AdminNetworkMetricsDumped,
+        AdminNetworkStatsDumped,
         Error
     }
 }

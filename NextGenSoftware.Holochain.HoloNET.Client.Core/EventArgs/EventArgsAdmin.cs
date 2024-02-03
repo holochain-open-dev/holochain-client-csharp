@@ -109,14 +109,14 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public AppInfo AppInfo { get; set; }
     }
 
-    public class DumpStateCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
+    public class StateDumpedCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
-        public AppResponse AppResponse { get; set; }
+        public string DumpedStateJSON { get; set; }
     }
 
-    public class DumpFullStateCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
+    public class FullStateDumpedCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
-        public AppResponse AppResponse { get; set; }
+        public FullStateDumpedResponse DumpedState { get; set; }
     }
 
     public class CoordinatorsUpdatedCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
@@ -142,6 +142,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
     public class GetStorageInfoCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
         public AppResponse AppResponse { get; set; }
+    }
+
+
+    public class NetworkMetricsDumpedCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
+    {
+        public string NetworkMetricsDumpJSON { get; set; }
     }
 
     public class DumpNetworkStatsCallBackEventArgs : HoloNETDataReceivedBaseEventArgs

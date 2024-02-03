@@ -91,6 +91,18 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                         case HoloNETResponseType.AdminStateDumped:
                             DecodeStateDumpedReceived(response, dataReceivedEventArgs);
                             break;
+
+                        case HoloNETResponseType.AdminFullStateDumped:
+                            DecodeStateDumpedReceived(response, dataReceivedEventArgs);
+                            break;
+
+                        case HoloNETResponseType.AdminNetworkMetricsDumped:
+                            DecodeNetworkMetricsDumpedReceived(response, dataReceivedEventArgs);
+                            break;
+
+                        case HoloNETResponseType.AdminNetworkStatsDumped:
+                            DecodeNetworkStatsDumpedReceived(response, dataReceivedEventArgs);
+                            break;
                     }
                 }
             }
@@ -176,7 +188,19 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                         break;
 
                     case HoloNETRequestType.AdminDumpState:
-                        RaiseCloneCellDeletedEvent(ProcessResponeError<CloneCellDeletedCallBackEventArgs>(response, dataReceivedEventArgs, "AdminDeleteClonedCell", msg));
+                        RaiseStateDumpedEvent(ProcessResponeError<StateDumpedCallBackEventArgs>(response, dataReceivedEventArgs, "AdminDumpState", msg));
+                        break;
+
+                    case HoloNETRequestType.AdminDumpFullState:
+                        RaiseFullStateDumpedEvent(ProcessResponeError<FullStateDumpedCallBackEventArgs>(response, dataReceivedEventArgs, "AdminDumpFullState", msg));
+                        break;
+
+                    case HoloNETRequestType.AdminDumpNetworkMetrics:
+                        RaiseNetworkMetricsDumpedEvent(ProcessResponeError<NetworkMetricsDumpedCallBackEventArgs>(response, dataReceivedEventArgs, "AdminDumpNetworkMetrics", msg));
+                        break;
+
+                    case HoloNETRequestType.AdminDumpNetworkStats:
+                        RaiseNetworkStatsDumpedEvent(ProcessResponeError<NetworkMetricsDumpedCallBackEventArgs>(response, dataReceivedEventArgs, "AdminDumpNetworkStats", msg));
                         break;
                 }
             }
@@ -620,15 +644,17 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         private void DecodeStateDumpedReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
         {
             string errorMessage = "An unknown error occurred in HoloNETClient.DecodeStateDumpedReceived. Reason: ";
-            CloneCellDeletedCallBackEventArgs args = CreateHoloNETArgs<CloneCellDeletedCallBackEventArgs>(response, dataReceivedEventArgs);
-            args.HoloNETResponseType = HoloNETResponseType.AdminCloneCellDeleted;
+            StateDumpedCallBackEventArgs args = CreateHoloNETArgs<StateDumpedCallBackEventArgs>(response, dataReceivedEventArgs);
+            args.HoloNETResponseType = HoloNETResponseType.AdminStateDumped;
 
             try
             {
                 Logger.Log("ADMIN STATE DUMPED\n", LogType.Info);
-                object dataResponse = MessagePackSerializer.Deserialize<object>(response.data, messagePackSerializerOptions);
+                string dataResponse = MessagePackSerializer.Deserialize<string>(response.data, messagePackSerializerOptions);
 
-                if (dataResponse == null)
+                if (dataResponse != null)
+                    args.DumpedStateJSON = dataResponse;
+                else
                     HandleError(args, $"{errorMessage} dataResponse failed to deserialize.");
             }
             catch (Exception ex)
@@ -636,7 +662,55 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 HandleError(args, $"{errorMessage} {ex}");
             }
 
-            RaiseCloneCellDeletedEvent(args);
+            RaiseStateDumpedEvent(args);
+        }
+
+        private void DecodeFullStateDumpedReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
+        {
+            string errorMessage = "An unknown error occurred in HoloNETClient.DecodeFullStateDumpedReceived. Reason: ";
+            FullStateDumpedCallBackEventArgs args = CreateHoloNETArgs<FullStateDumpedCallBackEventArgs>(response, dataReceivedEventArgs);
+            args.HoloNETResponseType = HoloNETResponseType.AdminFullStateDumped;
+
+            try
+            {
+                Logger.Log("ADMIN FULL STATE DUMPED\n", LogType.Info);
+                FullStateDumpedResponse fullStateDumpedResponse = MessagePackSerializer.Deserialize<FullStateDumpedResponse>(response.data, messagePackSerializerOptions);
+
+                if (fullStateDumpedResponse != null)
+                    args.DumpedState = fullStateDumpedResponse;
+                else
+                    HandleError(args, $"{errorMessage} fullStateDumpedResponse failed to deserialize.");
+            }
+            catch (Exception ex)
+            {
+                HandleError(args, $"{errorMessage} {ex}");
+            }
+
+            RaiseFullStateDumpedEvent(args);
+        }
+
+        private void DecodeNetworkMetricsDumpedReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
+        {
+            string errorMessage = "An unknown error occurred in HoloNETClient.DecodeNetworkMetricsDumpedReceived. Reason: ";
+            NetworkMetricsDumpedCallBackEventArgs args = CreateHoloNETArgs<NetworkMetricsDumpedCallBackEventArgs>(response, dataReceivedEventArgs);
+            args.HoloNETResponseType = HoloNETResponseType.AdminFullStateDumped;
+
+            try
+            {
+                Logger.Log("ADMIN NETWORK METRICS DUMPED\n", LogType.Info);
+                string dataResponse = MessagePackSerializer.Deserialize<string>(response.data, messagePackSerializerOptions);
+
+                if (dataResponse != null)
+                    args.NetworkMetricsDumpJSON = dataResponse;
+                else
+                    HandleError(args, $"{errorMessage} dataResponse failed to deserialize.");
+            }
+            catch (Exception ex)
+            {
+                HandleError(args, $"{errorMessage} {ex}");
+            }
+
+            RaiseNetworkMetricsDumpedEvent(args);
         }
 
         private void RaiseAgentPubKeyGeneratedEvent(AgentPubKeyGeneratedCallBackEventArgs adminAgentPubKeyGeneratedCallBackEventArgs)
@@ -790,6 +864,33 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             if (_taskCompletionCloneCellDeletedCallBack != null && !string.IsNullOrEmpty(cloneCellDeletedCallBackEventArgs.Id) && _taskCompletionCloneCellDeletedCallBack.ContainsKey(cloneCellDeletedCallBackEventArgs.Id))
                 _taskCompletionCloneCellDeletedCallBack[cloneCellDeletedCallBackEventArgs.Id].SetResult(cloneCellDeletedCallBackEventArgs);
+        }
+
+        private void RaiseStateDumpedEvent(StateDumpedCallBackEventArgs stateDumpedCallBackEventArgs)
+        {
+            LogEvent("AdminStateDumped", stateDumpedCallBackEventArgs);
+            OnStateDumpedCallBack?.Invoke(this, stateDumpedCallBackEventArgs);
+
+            if (_taskCompletionStateDumpedCallBack != null && !string.IsNullOrEmpty(stateDumpedCallBackEventArgs.Id) && _taskCompletionStateDumpedCallBack.ContainsKey(stateDumpedCallBackEventArgs.Id))
+                _taskCompletionStateDumpedCallBack[stateDumpedCallBackEventArgs.Id].SetResult(stateDumpedCallBackEventArgs);
+        }
+
+        private void RaiseFullStateDumpedEvent(FullStateDumpedCallBackEventArgs fullStateDumpedCallBackEventArgs)
+        {
+            LogEvent("AdminStateDumped", fullStateDumpedCallBackEventArgs);
+            OnFullStateDumpedCallBack?.Invoke(this, fullStateDumpedCallBackEventArgs);
+
+            if (_taskCompletionFullStateDumpedCallBack != null && !string.IsNullOrEmpty(fullStateDumpedCallBackEventArgs.Id) && _taskCompletionFullStateDumpedCallBack.ContainsKey(fullStateDumpedCallBackEventArgs.Id))
+                _taskCompletionFullStateDumpedCallBack[fullStateDumpedCallBackEventArgs.Id].SetResult(fullStateDumpedCallBackEventArgs);
+        }
+
+        private void RaiseNetworkMetricsDumpedEvent(NetworkMetricsDumpedCallBackEventArgs networkMetricsDumpedCallBackEventArgs)
+        {
+            LogEvent("AdminNetworkMetricsDumped", networkMetricsDumpedCallBackEventArgs);
+            OnNetworkMetricsDumpedCallBack?.Invoke(this, networkMetricsDumpedCallBackEventArgs);
+
+            if (_taskCompletionNetworkMetricsDumpedCallBack != null && !string.IsNullOrEmpty(networkMetricsDumpedCallBackEventArgs.Id) && _taskCompletionNetworkMetricsDumpedCallBack.ContainsKey(networkMetricsDumpedCallBackEventArgs.Id))
+                _taskCompletionNetworkMetricsDumpedCallBack[networkMetricsDumpedCallBackEventArgs.Id].SetResult(networkMetricsDumpedCallBackEventArgs);
         }
     }
 }

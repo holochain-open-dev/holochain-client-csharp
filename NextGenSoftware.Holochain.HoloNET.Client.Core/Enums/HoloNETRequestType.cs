@@ -26,6 +26,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         AdminAddAgentInfo,
         AdminDeleteClonedCell,
         AdminStorageInfo,
-        AdminDumpNetworkStats
+        AdminDumpNetworkStats,
+        AdminDumpNetworkMetrics
     }
 }
