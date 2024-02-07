@@ -11,7 +11,7 @@
 
 //namespace NextGenSoftware.Holochain.HoloNET.Client
 //{
-//    public partial class HoloNETClientAppAgent : HoloNETClientAppBase, IHoloNETClientAppAgent
+//    public partial class HoloNETClientAppAgent : HoloNETClientBase, IHoloNETClientAppAgent
 //    {
 //        /// <summary>
 //        /// This method will retrieve the AgentPubKey & DnaHash from either the Holochain Conductor or HC Sandbox depending on what params are passed in. It will default to retrieving from the Conductor first. It will call RetrieveAgentPubKeyAndDnaHashFromConductor and RetrieveAgentPubKeyAndDnaHashFromSandboxAsync internally.

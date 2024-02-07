@@ -19,7 +19,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             try
             {
                 if (string.IsNullOrEmpty(HoloNETDNAPath))
-                    throw new ArgumentNullException("holoNETDNAPath", "holoNETDNAPath cannot be null.");
+                    throw new ArgumentNullException("holoNETDNAPath", "holoNETDNAPath cannot be null."); //TODO: Need to come back to this since this exception will always be caught below! ;-)
 
                 HoloNETDNAPath = holoNETDNAPath;
 
@@ -33,7 +33,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
             catch (Exception ex) 
             {
-                return null; //TODO: Need to convert this to OASISResult ASAP and return error from exception.
+                return null; 
             }
         }
 
@@ -49,10 +49,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             try
             {
                 if (string.IsNullOrEmpty(holoNETDNAPath))
-                    throw new ArgumentNullException("holoNETDNAPath", "holoNETDNAPath cannot be null.");
+                    throw new ArgumentNullException("holoNETDNAPath", "holoNETDNAPath cannot be null."); //TODO: Need to come back to this since this exception will always be caught below! ;-)
 
                 if (holoNETDNA == null)
-                    throw new ArgumentNullException("holoNETDNA", "holoNETDNA cannot be null.");
+                    throw new ArgumentNullException("holoNETDNA", "holoNETDNA cannot be null."); //TODO: Need to come back to this since this exception will always be caught below! ;-)
 
                 HoloNETDNA = holoNETDNA;
                 HoloNETDNAPath = holoNETDNAPath;
@@ -66,7 +66,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
             catch (Exception ex) 
             {
-                return false; //TODO: Need to convert this to OASISResult ASAP and return error from exception.
+                return false;
             }
         }
     }

@@ -6,7 +6,7 @@ using NextGenSoftware.Holochain.HoloNET.Client.Interfaces;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
-    public partial class HoloNETClientAdmin : HoloNETClientBase//, IHoloNETClientAdmin
+    public partial class HoloNETClientAdmin : HoloNETClientBase, IHoloNETClientAdmin
     {
         private Dictionary<string, string> _disablingAppLookup = new Dictionary<string, string>();
         private Dictionary<string, string> _uninstallingAppLookup = new Dictionary<string, string>();

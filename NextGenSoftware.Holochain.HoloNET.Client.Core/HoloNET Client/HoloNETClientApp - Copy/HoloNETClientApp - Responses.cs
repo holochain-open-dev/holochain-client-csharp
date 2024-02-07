@@ -8,7 +8,7 @@
 
 //namespace NextGenSoftware.Holochain.HoloNET.Client
 //{
-//    public partial class HoloNETClientAppAgent : HoloNETClientAppBase, IHoloNETClientAppAgent
+//    public partial class HoloNETClientApp : HoloNETClientBase
 //    {
 //        /// <summary>
 //        /// This method maps the data returned from the Conductor zome call onto a dynamic data object passed into the CallZomeFunction method. Alternatively the type of the data object can be passed in, for which an instance of it will be created. Either way the now mapped and populated data object is then returned in the `ZomeFunctionCallBackEventArgs.EntryData.EntryDataObject` property during the OnZomeFunctionCallBack event. Please see OnZomeFunctionCallBack for more info. This method is called internally but can also be called manually and is used by the HoloNETEntryBaseClass and HoloNETAuditEntryBaseClass.

@@ -159,6 +159,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public bool LogToFile { get; set; } = true;
 
         /// <summary>
+        /// This is the max file size the log file can be (in bytes) before it creates a new file. The default is 1000000 bytes (1 MB).
+        /// </summary>
+        public int MaxLogFileSize { get; set; } = 1000000;
+
+        /// <summary>
         /// The logging path (will defualt to AppData\Roaming\NextGenSoftware\HoloNET\Logs). NOTE: This is only relevant if the built-in DefaultLogger is used.
         /// </summary>
         public string LogPath { get; set; } = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\NextGenSoftware\\HoloNET\\Logs";

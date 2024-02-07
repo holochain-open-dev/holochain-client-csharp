@@ -186,7 +186,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     result.ZomeCallCapabilityGrantedResult = installedResult.ZomeCallCapabilityGrantedResult;
                     result.AppInterfaceAttachedResult = installedResult.AppInterfaceAttachedResult;
 
-                    result.HoloNETClientAppAgent = new HoloNETClientAppAgent();
+                    result.HoloNETClientAppAgent = new HoloNETClientAppAgent(hAppId);
                     result.HoloNETConnectedResult = await result.HoloNETClientAppAgent.ConnectAsync($"ws://127.0.0.1:{installedResult.AttachedOnPort}");
 
                     if (result.HoloNETConnectedResult != null && !result.HoloNETConnectedResult.IsError && result.HoloNETConnectedResult.IsConnected)
@@ -448,7 +448,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             return await CallFunctionAsync(HoloNETRequestType.AdminListApps, "list_apps", new ListAppsRequest()
             {
                 status_filter = appStatusFilter != AppStatusFilter.All ? appStatusFilter : null
-            }, _taskCompletionAppsListedCallBack, "OnListAppsCallBack", conductorResponseCallBackMode, id);
+            }, _taskCompletionAppsListedCallBack, "OnAppsListedCallBack", conductorResponseCallBackMode, id);
         }
 
         public AppsListedCallBackEventArgs ListApps(AppStatusFilter appStatusFilter, string id = null)
@@ -466,22 +466,22 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             return ListDnasAsync(ConductorResponseCallBackMode.UseCallBackEvents, id).Result;
         }
 
-        public async Task<ListCellIdsCallBackEventArgs> ListCellIdsAsync(ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
+        public async Task<CellIdsListedCallBackEventArgs> ListCellIdsAsync(ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
-            return await CallFunctionAsync(HoloNETRequestType.AdminListCellIds, "list_cell_ids", null, _taskCompletionListCellIdsCallBack, "OnListCellIds", conductorResponseCallBackMode, id);
+            return await CallFunctionAsync(HoloNETRequestType.AdminListCellIds, "list_cell_ids", null, _taskCompletionCellIdsListedCallBack, "OnCellIdsListed", conductorResponseCallBackMode, id);
         }
 
-        public ListCellIdsCallBackEventArgs ListCellIds(string id = null)
+        public CellIdsListedCallBackEventArgs ListCellIds(string id = null)
         {
             return ListCellIdsAsync(ConductorResponseCallBackMode.UseCallBackEvents, id).Result;
         }
 
-        public async Task<ListAppInterfacesCallBackEventArgs> ListInterfacesAsync(ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
+        public async Task<AppInterfacesListedCallBackEventArgs> ListInterfacesAsync(ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
-            return await CallFunctionAsync(HoloNETRequestType.AdminListAppInterfaces, "list_app_interfaces", null, _taskCompletionListAppInterfacesCallBack, "OnListAppInterfacesCallBack", conductorResponseCallBackMode, id);
+            return await CallFunctionAsync(HoloNETRequestType.AdminListAppInterfaces, "list_app_interfaces", null, _taskCompletionAppInterfacesListedCallBack, "OnAppInterfacesListedCallBack", conductorResponseCallBackMode, id);
         }
 
-        public ListAppInterfacesCallBackEventArgs ListInterfaces(string id = null)
+        public AppInterfacesListedCallBackEventArgs ListInterfaces(string id = null)
         {
             return ListInterfacesAsync(ConductorResponseCallBackMode.UseCallBackEvents, id).Result;
         }
@@ -494,13 +494,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="conductorResponseCallBackMode">The Concuctor Response CallBack Mode, set this to 'WaitForHolochainConductorResponse' if you want the function to wait for the Holochain Conductor response before returning that response or set it to 'UseCallBackEvents' to return from the function immediately and then raise the 'OnDumpFullStateCallBack' event when the conductor responds.   </param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
-        public async Task<DumpFullStateCallBackEventArgs> DumpFullStateAsync(byte[][] cellId, int? dHTOpsCursor = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
+        public async Task<FullStateDumpedCallBackEventArgs> DumpFullStateAsync(byte[][] cellId, int? dHTOpsCursor = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
             return await CallFunctionAsync(HoloNETRequestType.AdminDumpFullState, "dump_full_state", new DumpFullStateRequest()
             {
                 cell_id = cellId,
                 dht_ops_cursor = dHTOpsCursor
-            }, _taskCompletionDumpFullStateCallBack, "OnDumpFullStateCallBack", conductorResponseCallBackMode, id);
+            }, _taskCompletionFullStateDumpedCallBack, "OnFullStateDumpedCallBack", conductorResponseCallBackMode, id);
         }
 
         /// <summary>
@@ -510,7 +510,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="dHTOpsCursor">The last seen DhtOp RowId, returned in the full dump state. Only DhtOps with RowId greater than the cursor will be returned.</param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
-        public DumpFullStateCallBackEventArgs DumpFullState(byte[][] cellId, int? dHTOpsCursor = null, string id = null)
+        public FullStateDumpedCallBackEventArgs DumpFullState(byte[][] cellId, int? dHTOpsCursor = null, string id = null)
         {
             return DumpFullStateAsync(cellId, dHTOpsCursor, ConductorResponseCallBackMode.UseCallBackEvents, id).Result;
         }
@@ -524,7 +524,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="conductorResponseCallBackMode">The Concuctor Response CallBack Mode, set this to 'WaitForHolochainConductorResponse' if you want the function to wait for the Holochain Conductor response before returning that response or set it to 'UseCallBackEvents' to return from the function immediately and then raise the 'OnDumpFullStateCallBack' event when the conductor responds.   </param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
-        public async Task<DumpFullStateCallBackEventArgs> DumpFullStateAsync(string agentPubKey, string dnaHash, int? dHTOpsCursor = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
+        public async Task<FullStateDumpedCallBackEventArgs> DumpFullStateAsync(string agentPubKey, string dnaHash, int? dHTOpsCursor = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
             return await DumpFullStateAsync(GetCellId(dnaHash, agentPubKey), dHTOpsCursor, conductorResponseCallBackMode, id);
         }
@@ -537,7 +537,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="dHTOpsCursor">The last seen DhtOp RowId, returned in the full dump state. Only DhtOps with RowId greater than the cursor will be returned.</param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
-        public DumpFullStateCallBackEventArgs DumpFullState(string agentPubKey, string dnaHash, int? dHTOpsCursor = null, string id = null)
+        public FullStateDumpedCallBackEventArgs DumpFullState(string agentPubKey, string dnaHash, int? dHTOpsCursor = null, string id = null)
         {
             return DumpFullStateAsync(agentPubKey, dnaHash, dHTOpsCursor, ConductorResponseCallBackMode.UseCallBackEvents, id).Result;
         }
@@ -549,7 +549,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="conductorResponseCallBackMode">The Concuctor Response CallBack Mode, set this to 'WaitForHolochainConductorResponse' if you want the function to wait for the Holochain Conductor response before returning that response or set it to 'UseCallBackEvents' to return from the function immediately and then raise the 'OnDumpFullStateCallBack' event when the conductor responds.   </param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
-        public async Task<DumpFullStateCallBackEventArgs> DumpFullStateAsync(int? dHTOpsCursor = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
+        public async Task<FullStateDumpedCallBackEventArgs> DumpFullStateAsync(int? dHTOpsCursor = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
             return await DumpFullStateAsync(await GetCellIdAsync(), dHTOpsCursor, conductorResponseCallBackMode, id);
         }
@@ -560,7 +560,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="dHTOpsCursor">The last seen DhtOp RowId, returned in the full dump state. Only DhtOps with RowId greater than the cursor will be returned.</param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
-        public DumpFullStateCallBackEventArgs DumpFullState(int? dHTOpsCursor = null, string id = null)
+        public FullStateDumpedCallBackEventArgs DumpFullState(int? dHTOpsCursor = null, string id = null)
         {
             return DumpFullStateAsync(dHTOpsCursor, ConductorResponseCallBackMode.UseCallBackEvents, id).Result;
         }
@@ -573,12 +573,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="conductorResponseCallBackMode">The Concuctor Response CallBack Mode, set this to 'WaitForHolochainConductorResponse' if you want the function to wait for the Holochain Conductor response before returning that response or set it to 'UseCallBackEvents' to return from the function immediately and then raise the 'OnDumpFullStateCallBack' event when the conductor responds.   </param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
-        public async Task<DumpStateCallBackEventArgs> DumpStateAsync(byte[][] cellId, int? dHTOpsCursor = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
+        public async Task<StateDumpedCallBackEventArgs> DumpStateAsync(byte[][] cellId, int? dHTOpsCursor = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
             return await CallFunctionAsync(HoloNETRequestType.AdminDumpState, "dump_state", new DumpStateRequest()
             {
                 cell_id = cellId
-            }, _taskCompletionDumpStateCallBack, "OnDumpStateCallBack", conductorResponseCallBackMode, id);
+            }, _taskCompletionStateDumpedCallBack, "OnStateDumpedCallBack", conductorResponseCallBackMode, id);
         }
 
         /// <summary>
@@ -588,7 +588,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="dHTOpsCursor">The last seen DhtOp RowId, returned in the full dump state. Only DhtOps with RowId greater than the cursor will be returned.</param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
-        public DumpStateCallBackEventArgs DumpState(byte[][] cellId, int? dHTOpsCursor = null, string id = null)
+        public StateDumpedCallBackEventArgs DumpState(byte[][] cellId, int? dHTOpsCursor = null, string id = null)
         {
             return DumpStateAsync(cellId, dHTOpsCursor, ConductorResponseCallBackMode.UseCallBackEvents, id).Result;
         }
@@ -602,7 +602,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="conductorResponseCallBackMode">The Concuctor Response CallBack Mode, set this to 'WaitForHolochainConductorResponse' if you want the function to wait for the Holochain Conductor response before returning that response or set it to 'UseCallBackEvents' to return from the function immediately and then raise the 'OnDumpFullStateCallBack' event when the conductor responds.   </param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
-        public async Task<DumpStateCallBackEventArgs> DumpStateAsync(string agentPubKey, string dnaHash, int? dHTOpsCursor = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
+        public async Task<StateDumpedCallBackEventArgs> DumpStateAsync(string agentPubKey, string dnaHash, int? dHTOpsCursor = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
             return await DumpStateAsync(GetCellId(dnaHash, agentPubKey), dHTOpsCursor, conductorResponseCallBackMode, id);
         }
@@ -615,7 +615,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="dHTOpsCursor"></param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
-        public DumpStateCallBackEventArgs DumpState(string agentPubKey, string dnaHash, int? dHTOpsCursor = null, string id = null)
+        public StateDumpedCallBackEventArgs DumpState(string agentPubKey, string dnaHash, int? dHTOpsCursor = null, string id = null)
         {
             return DumpStateAsync(agentPubKey, dnaHash, dHTOpsCursor, ConductorResponseCallBackMode.UseCallBackEvents, id).Result;
         }
@@ -627,7 +627,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="conductorResponseCallBackMode">The Concuctor Response CallBack Mode, set this to 'WaitForHolochainConductorResponse' if you want the function to wait for the Holochain Conductor response before returning that response or set it to 'UseCallBackEvents' to return from the function immediately and then raise the 'OnDumpFullStateCallBack' event when the conductor responds.   </param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
-        public async Task<DumpStateCallBackEventArgs> DumpStateAsync(int? dHTOpsCursor = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
+        public async Task<StateDumpedCallBackEventArgs> DumpStateAsync(int? dHTOpsCursor = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
             return await DumpStateAsync(await GetCellIdAsync(), dHTOpsCursor, conductorResponseCallBackMode, id);
         }
@@ -638,7 +638,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="dHTOpsCursor"></param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
-        public DumpStateCallBackEventArgs DumpState(int? dHTOpsCursor = null, string id = null)
+        public StateDumpedCallBackEventArgs DumpState(int? dHTOpsCursor = null, string id = null)
         {
             return DumpStateAsync(dHTOpsCursor, ConductorResponseCallBackMode.UseCallBackEvents, id).Result;
         }
@@ -651,12 +651,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="conductorResponseCallBackMode">The Concuctor Response CallBack Mode, set this to 'WaitForHolochainConductorResponse' if you want the function to wait for the Holochain Conductor response before returning that response or set it to 'UseCallBackEvents' to return from the function immediately and then raise the 'OnDumpFullStateCallBack' event when the conductor responds.   </param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
-        public async Task<GetDnaDefinitionCallBackEventArgs> GetDnaDefinitionAsync(byte[] dnaHash, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
+        public async Task<DnaDefinitionReturnedCallBackEventArgs> GetDnaDefinitionAsync(byte[] dnaHash, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
             return await CallFunctionAsync(HoloNETRequestType.AdminGetDnaDefinition, "get_dna_definition", new UpdateCoordinatorsRequest()
             {
                 dnaHash = dnaHash
-            }, _taskCompletionGetDnaDefinitionCallBack, "OnGetDnaDefinitionCallBack", conductorResponseCallBackMode, id);
+            }, _taskCompletionDnaDefinitionReturnedCallBack, "OnDnaDefinitionReturnedCallBack", conductorResponseCallBackMode, id);
         }
 
         /// <summary>
@@ -665,7 +665,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="dnaHash">The hash of the dna.</param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
-        public GetDnaDefinitionCallBackEventArgs GetDnaDefinition(byte[] dnaHash, string id = null)
+        public DnaDefinitionReturnedCallBackEventArgs GetDnaDefinition(byte[] dnaHash, string id = null)
         {
             return GetDnaDefinitionAsync(dnaHash, ConductorResponseCallBackMode.UseCallBackEvents, id).Result;
         }
@@ -677,7 +677,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="conductorResponseCallBackMode">The Concuctor Response CallBack Mode, set this to 'WaitForHolochainConductorResponse' if you want the function to wait for the Holochain Conductor response before returning that response or set it to 'UseCallBackEvents' to return from the function immediately and then raise the 'OnDumpFullStateCallBack' event when the conductor responds.   </param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
-        public async Task<GetDnaDefinitionCallBackEventArgs> GetDnaDefinitionAsync(string dnaHash, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
+        public async Task<DnaDefinitionReturnedCallBackEventArgs> GetDnaDefinitionAsync(string dnaHash, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
             return await GetDnaDefinitionAsync(ConvertHoloHashToBytes(dnaHash), conductorResponseCallBackMode, id);
         }
@@ -688,7 +688,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="dnaHash">The hash of the dna.</param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
-        public GetDnaDefinitionCallBackEventArgs GetDnaDefinition(string dnaHash, string id = null)
+        public DnaDefinitionReturnedCallBackEventArgs GetDnaDefinition(string dnaHash, string id = null)
         {
             return GetDnaDefinitionAsync(dnaHash, ConductorResponseCallBackMode.UseCallBackEvents, id).Result;
         }
@@ -699,7 +699,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="conductorResponseCallBackMode">The Concuctor Response CallBack Mode, set this to 'WaitForHolochainConductorResponse' if you want the function to wait for the Holochain Conductor response before returning that response or set it to 'UseCallBackEvents' to return from the function immediately and then raise the 'OnDumpFullStateCallBack' event when the conductor responds.   </param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
-        public async Task<UpdateCoordinatorsCallBackEventArgs> UpdateCoordinatorsAsync(byte[] dnaHash, string path, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
+        public async Task<CoordinatorsUpdatedCallBackEventArgs> UpdateCoordinatorsAsync(byte[] dnaHash, string path, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
             return await UpdateCoordinatorsAsync(dnaHash, path, null, conductorResponseCallBackMode, id);
         }
@@ -710,7 +710,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="dnaHash"></param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
-        public UpdateCoordinatorsCallBackEventArgs UpdateCoordinators(byte[] dnaHash, string path, string id = null)
+        public CoordinatorsUpdatedCallBackEventArgs UpdateCoordinators(byte[] dnaHash, string path, string id = null)
         {
             return UpdateCoordinatorsAsync(dnaHash, path, ConductorResponseCallBackMode.UseCallBackEvents, id).Result;
         }
@@ -721,7 +721,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="conductorResponseCallBackMode">The Concuctor Response CallBack Mode, set this to 'WaitForHolochainConductorResponse' if you want the function to wait for the Holochain Conductor response before returning that response or set it to 'UseCallBackEvents' to return from the function immediately and then raise the 'OnDumpFullStateCallBack' event when the conductor responds.   </param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
-        public async Task<UpdateCoordinatorsCallBackEventArgs> UpdateCoordinatorsAsync(string dnaHash, string path, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
+        public async Task<CoordinatorsUpdatedCallBackEventArgs> UpdateCoordinatorsAsync(string dnaHash, string path, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
             return await UpdateCoordinatorsAsync(ConvertHoloHashToBytes(dnaHash), path, null, conductorResponseCallBackMode, id);
         }
@@ -732,7 +732,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="dnaHash"></param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
-        public UpdateCoordinatorsCallBackEventArgs UpdateCoordinators(string dnaHash, string path, string id = null)
+        public CoordinatorsUpdatedCallBackEventArgs UpdateCoordinators(string dnaHash, string path, string id = null)
         {
             return UpdateCoordinatorsAsync(dnaHash, path, ConductorResponseCallBackMode.UseCallBackEvents, id).Result;
         }
@@ -743,7 +743,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="conductorResponseCallBackMode">The Concuctor Response CallBack Mode, set this to 'WaitForHolochainConductorResponse' if you want the function to wait for the Holochain Conductor response before returning that response or set it to 'UseCallBackEvents' to return from the function immediately and then raise the 'OnDumpFullStateCallBack' event when the conductor responds.   </param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
-        public async Task<UpdateCoordinatorsCallBackEventArgs> UpdateCoordinatorsAsync(byte[] dnaHash, CoordinatorBundle bundle, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
+        public async Task<CoordinatorsUpdatedCallBackEventArgs> UpdateCoordinatorsAsync(byte[] dnaHash, CoordinatorBundle bundle, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
             return await UpdateCoordinatorsAsync(dnaHash, null, bundle, conductorResponseCallBackMode, id);
         }
@@ -754,7 +754,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="dnaHash"></param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
-        public UpdateCoordinatorsCallBackEventArgs UpdateCoordinators(byte[] dnaHash, CoordinatorBundle bundle, string id = null)
+        public CoordinatorsUpdatedCallBackEventArgs UpdateCoordinators(byte[] dnaHash, CoordinatorBundle bundle, string id = null)
         {
             return UpdateCoordinatorsAsync(dnaHash, bundle, ConductorResponseCallBackMode.UseCallBackEvents, id).Result;
         }
@@ -764,7 +764,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="conductorResponseCallBackMode">The Concuctor Response CallBack Mode, set this to 'WaitForHolochainConductorResponse' if you want the function to wait for the Holochain Conductor response before returning that response or set it to 'UseCallBackEvents' to return from the function immediately and then raise the 'OnDumpFullStateCallBack' event when the conductor responds.   </param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
-        public async Task<UpdateCoordinatorsCallBackEventArgs> UpdateCoordinatorsAsync(string dnaHash, CoordinatorBundle bundle, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
+        public async Task<CoordinatorsUpdatedCallBackEventArgs> UpdateCoordinatorsAsync(string dnaHash, CoordinatorBundle bundle, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
             return await UpdateCoordinatorsAsync(ConvertHoloHashToBytes(dnaHash), null, bundle, conductorResponseCallBackMode, id);
         }
@@ -775,7 +775,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="dnaHash"></param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
-        public UpdateCoordinatorsCallBackEventArgs UpdateCoordinators(string dnaHash, CoordinatorBundle bundle, string id = null)
+        public CoordinatorsUpdatedCallBackEventArgs UpdateCoordinators(string dnaHash, CoordinatorBundle bundle, string id = null)
         {
             return UpdateCoordinatorsAsync(dnaHash, bundle, ConductorResponseCallBackMode.UseCallBackEvents, id).Result;
         }
@@ -788,12 +788,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="conductorResponseCallBackMode">The Concuctor Response CallBack Mode, set this to 'WaitForHolochainConductorResponse' if you want the function to wait for the Holochain Conductor response before returning that response or set it to 'UseCallBackEvents' to return from the function immediately and then raise the 'OnDumpFullStateCallBack' event when the conductor responds.   </param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
-        public async Task<GetAgentInfoCallBackEventArgs> GetAgentInfoAsync(byte[][] cellId, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
+        public async Task<AgentInfoReturnedCallBackEventArgs> GetAgentInfoAsync(byte[][] cellId, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
             return await CallFunctionAsync(HoloNETRequestType.AdminAgentInfo, "agent_info", new GetAgentInfoRequest()
             {
                 cell_id = cellId
-            }, _taskCompletionGetAgentInfoCallBack, "OnGetAgentInfoCallBack", conductorResponseCallBackMode, id);
+            }, _taskCompletionAgentInfoReturnedCallBack, "OnAgentInfoReturnedCallBack", conductorResponseCallBackMode, id);
         }
 
         /// <summary>
@@ -802,7 +802,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="cellId">The cell id to retrive the angent info for.</param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
-        public GetAgentInfoCallBackEventArgs GetAgentInfo(byte[][] cellId, string id = null)
+        public AgentInfoReturnedCallBackEventArgs GetAgentInfo(byte[][] cellId, string id = null)
         {
             return GetAgentInfoAsync(cellId, ConductorResponseCallBackMode.UseCallBackEvents, id).Result;
         }
@@ -815,7 +815,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="conductorResponseCallBackMode">The Concuctor Response CallBack Mode, set this to 'WaitForHolochainConductorResponse' if you want the function to wait for the Holochain Conductor response before returning that response or set it to 'UseCallBackEvents' to return from the function immediately and then raise the 'OnDumpFullStateCallBack' event when the conductor responds.   </param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
-        public async Task<GetAgentInfoCallBackEventArgs> GetAgentInfoAsync(string agentPubKey, string dnaHash, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
+        public async Task<AgentInfoReturnedCallBackEventArgs> GetAgentInfoAsync(string agentPubKey, string dnaHash, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
             return await GetAgentInfoAsync(GetCellId(dnaHash, agentPubKey), conductorResponseCallBackMode, id);
         }
@@ -827,7 +827,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="dnaHash">The DnaHash for the cell to dump the full state for.</param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
-        public GetAgentInfoCallBackEventArgs GetAgentInfo(string agentPubKey, string dnaHash, string id = null)
+        public AgentInfoReturnedCallBackEventArgs GetAgentInfo(string agentPubKey, string dnaHash, string id = null)
         {
             return GetAgentInfoAsync(agentPubKey, dnaHash, ConductorResponseCallBackMode.UseCallBackEvents, id).Result;
         }
@@ -838,7 +838,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="conductorResponseCallBackMode">The Concuctor Response CallBack Mode, set this to 'WaitForHolochainConductorResponse' if you want the function to wait for the Holochain Conductor response before returning that response or set it to 'UseCallBackEvents' to return from the function immediately and then raise the 'OnDumpFullStateCallBack' event when the conductor responds.   </param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
-        public async Task<GetAgentInfoCallBackEventArgs> GetAgentInfoAsync(ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
+        public async Task<AgentInfoReturnedCallBackEventArgs> GetAgentInfoAsync(ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
             return await GetAgentInfoAsync(await GetCellIdAsync(), conductorResponseCallBackMode, id);
         }
@@ -848,7 +848,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// </summary>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
-        public GetAgentInfoCallBackEventArgs GetAgentInfo(string id = null)
+        public AgentInfoReturnedCallBackEventArgs GetAgentInfo(string id = null)
         {
             return GetAgentInfoAsync(ConductorResponseCallBackMode.UseCallBackEvents, id).Result;
         }
@@ -860,12 +860,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="conductorResponseCallBackMode">The Concuctor Response CallBack Mode, set this to 'WaitForHolochainConductorResponse' if you want the function to wait for the Holochain Conductor response before returning that response or set it to 'UseCallBackEvents' to return from the function immediately and then raise the 'OnDumpFullStateCallBack' event when the conductor responds.   </param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
-        public async Task<AddAgentInfoCallBackEventArgs> AddAgentInfoAsync(AgentInfo[] agentInfos, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
+        public async Task<AgentInfoAddedCallBackEventArgs> AddAgentInfoAsync(AgentInfo[] agentInfos, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
             return await CallFunctionAsync(HoloNETRequestType.AdminAddAgentInfo, "add_agent_info", new AddAgentInfoRequest()
             {
                 agent_infos = agentInfos
-            }, _taskCompletionAddAgentInfoCallBack, "OnAddAgentInfoCallBack", conductorResponseCallBackMode, id);
+            }, _taskCompletionAgentInfoAddedCallBack, "OnAgentInfoAddedCallBack", conductorResponseCallBackMode, id);
         }
 
         /// <summary>
@@ -874,7 +874,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="agentInfos">The agentInfo's to add.</param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
-        public AddAgentInfoCallBackEventArgs AddAgentInfo(AgentInfo[] agentInfos, string id = null)
+        public AgentInfoAddedCallBackEventArgs AddAgentInfo(AgentInfo[] agentInfos, string id = null)
         {
             return AddAgentInfoAsync(agentInfos, ConductorResponseCallBackMode.UseCallBackEvents, id).Result;
         }
@@ -887,13 +887,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="conductorResponseCallBackMode">The Concuctor Response CallBack Mode, set this to 'WaitForHolochainConductorResponse' if you want the function to wait for the Holochain Conductor response before returning that response or set it to 'UseCallBackEvents' to return from the function immediately and then raise the 'OnDumpFullStateCallBack' event when the conductor responds.   </param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
-        public async Task<DeleteCloneCellCallBackEventArgs> DeleteCloneCellAsync(string appId, string roleName, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
+        public async Task<CloneCellDeletedCallBackEventArgs> DeleteCloneCellAsync(string appId, string roleName, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
             return await CallFunctionAsync(HoloNETRequestType.AdminDeleteClonedCell, "delete_clone_cell", new DeleteCloneCellRequest()
             {
                 app_id = appId,
                 clone_cell_id = roleName
-            }, _taskCompletionDeleteCloneCellCallBack, "OnDeleteCloneCellCallBack", conductorResponseCallBackMode, id);
+            }, _taskCompletionCloneCellDeletedCallBack, "OnCloneCellDeletedCallBack", conductorResponseCallBackMode, id);
         }
 
         /// <summary>
@@ -903,7 +903,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="cellId"> The cell id of the cloned cell.</param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
-        public DeleteCloneCellCallBackEventArgs DeleteCloneCell(string appId, string roleName, string id = null)
+        public CloneCellDeletedCallBackEventArgs DeleteCloneCell(string appId, string roleName, string id = null)
         {
             return DeleteCloneCellAsync(appId, roleName, ConductorResponseCallBackMode.UseCallBackEvents, id).Result;
         }
@@ -916,13 +916,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="conductorResponseCallBackMode">The Concuctor Response CallBack Mode, set this to 'WaitForHolochainConductorResponse' if you want the function to wait for the Holochain Conductor response before returning that response or set it to 'UseCallBackEvents' to return from the function immediately and then raise the 'OnDumpFullStateCallBack' event when the conductor responds.   </param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
-        public async Task<DeleteCloneCellCallBackEventArgs> DeleteCloneCellAsync(string appId, byte[][] cellId, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
+        public async Task<CloneCellDeletedCallBackEventArgs> DeleteCloneCellAsync(string appId, byte[][] cellId, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
             return await CallFunctionAsync(HoloNETRequestType.AdminDeleteClonedCell, "delete_clone_cell", new DeleteCloneCellRequest()
             {
                 app_id = appId,
                 clone_cell_id = cellId
-            }, _taskCompletionDeleteCloneCellCallBack, "OnDeleteCloneCellCallBack", conductorResponseCallBackMode, id);
+            }, _taskCompletionCloneCellDeletedCallBack, "OnCloneCellDeletedCallBack", conductorResponseCallBackMode, id);
         }
 
         /// <summary>
@@ -932,7 +932,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="cellId"> The cell id of the cloned cell.</param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
-        public DeleteCloneCellCallBackEventArgs DeleteCloneCell(string appId, byte[][] cellId, string id = null)
+        public CloneCellDeletedCallBackEventArgs DeleteCloneCell(string appId, byte[][] cellId, string id = null)
         {
             return DeleteCloneCellAsync(appId, cellId, ConductorResponseCallBackMode.UseCallBackEvents, id).Result;
         }
@@ -946,7 +946,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="conductorResponseCallBackMode">The Concuctor Response CallBack Mode, set this to 'WaitForHolochainConductorResponse' if you want the function to wait for the Holochain Conductor response before returning that response or set it to 'UseCallBackEvents' to return from the function immediately and then raise the 'OnDumpFullStateCallBack' event when the conductor responds.   </param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
-        public async Task<DeleteCloneCellCallBackEventArgs> DeleteCloneCellAsync(string appId, string agentPubKey, string dnaHash, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
+        public async Task<CloneCellDeletedCallBackEventArgs> DeleteCloneCellAsync(string appId, string agentPubKey, string dnaHash, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
             return await DeleteCloneCellAsync(appId, GetCellId(dnaHash, agentPubKey), conductorResponseCallBackMode, id);
         }
@@ -959,7 +959,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="dnaHash">The DnaHash for the cell.</param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
-        public DeleteCloneCellCallBackEventArgs DeleteCloneCell(string appId, string agentPubKey, string dnaHash, string id = null)
+        public CloneCellDeletedCallBackEventArgs DeleteCloneCell(string appId, string agentPubKey, string dnaHash, string id = null)
         {
             return DeleteCloneCellAsync(appId, agentPubKey, dnaHash, ConductorResponseCallBackMode.UseCallBackEvents, id).Result;
         }
@@ -971,7 +971,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="conductorResponseCallBackMode">The Concuctor Response CallBack Mode, set this to 'WaitForHolochainConductorResponse' if you want the function to wait for the Holochain Conductor response before returning that response or set it to 'UseCallBackEvents' to return from the function immediately and then raise the 'OnDumpFullStateCallBack' event when the conductor responds.   </param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
-        public async Task<DeleteCloneCellCallBackEventArgs> DeleteCloneCellAsync(string appId, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
+        public async Task<CloneCellDeletedCallBackEventArgs> DeleteCloneCellAsync(string appId, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
             return await DeleteCloneCellAsync(appId, await GetCellIdAsync(), conductorResponseCallBackMode, id);
         }
@@ -982,7 +982,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="appId">The app id that the clone cell belongs to.</param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
-        public DeleteCloneCellCallBackEventArgs DeleteCloneCell(string appId, string id = null)
+        public CloneCellDeletedCallBackEventArgs DeleteCloneCell(string appId, string id = null)
         {
             return DeleteCloneCellAsync(appId, ConductorResponseCallBackMode.UseCallBackEvents, id).Result;
         }
@@ -993,9 +993,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="conductorResponseCallBackMode">The Concuctor Response CallBack Mode, set this to 'WaitForHolochainConductorResponse' if you want the function to wait for the Holochain Conductor response before returning that response or set it to 'UseCallBackEvents' to return from the function immediately and then raise the 'OnDumpFullStateCallBack' event when the conductor responds.   </param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
-        public async Task<GetStorageInfoCallBackEventArgs> GetStorageInfoAsync(ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
+        public async Task<StorageInfoReturnedCallBackEventArgs> GetStorageInfoAsync(ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
-            return await CallFunctionAsync(HoloNETRequestType.AdminStorageInfo, "storage_info", null, _taskCompletionGetStorageInfoCallBack, "OnGetStorageInfoCallBack", conductorResponseCallBackMode, id);
+            return await CallFunctionAsync(HoloNETRequestType.AdminStorageInfo, "storage_info", null, _taskCompletionStorageInfoReturnedCallBack, "OnStorageInfoReturnedCallBack", conductorResponseCallBackMode, id);
         }
 
         /// <summary>
@@ -1005,7 +1005,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="cloneCellId"> The clone id or cell id of the clone cell. Can be RoleName (string) or CellId (byte[][]).</param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
-        public GetStorageInfoCallBackEventArgs GetStorageInfo(string id = null)
+        public StorageInfoReturnedCallBackEventArgs GetStorageInfo(string id = null)
         {
             return GetStorageInfoAsync(ConductorResponseCallBackMode.UseCallBackEvents, id).Result;
         }
@@ -1016,9 +1016,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="conductorResponseCallBackMode">The Concuctor Response CallBack Mode, set this to 'WaitForHolochainConductorResponse' if you want the function to wait for the Holochain Conductor response before returning that response or set it to 'UseCallBackEvents' to return from the function immediately and then raise the 'OnDumpFullStateCallBack' event when the conductor responds.   </param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
-        public async Task<DumpNetworkStatsCallBackEventArgs> DumpNetworkStatsAsync(ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
+        public async Task<NetworkStatsDumpedCallBackEventArgs> DumpNetworkStatsAsync(ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
-            return await CallFunctionAsync(HoloNETRequestType.AdminDumpNetworkStats, "dump_network_stats", null, _taskCompletionDumpNetworkStatsCallBack, "OnDumpNetworkStatsCallBack", conductorResponseCallBackMode, id);
+            return await CallFunctionAsync(HoloNETRequestType.AdminDumpNetworkStats, "dump_network_stats", null, _taskCompletionNetworkStatsDumpedCallBack, "OnNetworkStatsDumpedCallBack", conductorResponseCallBackMode, id);
         }
 
         /// <summary>
@@ -1028,7 +1028,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="cloneCellId"> The clone id or cell id of the clone cell. Can be RoleName (string) or CellId (byte[][]).</param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
-        public DumpNetworkStatsCallBackEventArgs DumpNetworkStats(string id = null)
+        public NetworkStatsDumpedCallBackEventArgs DumpNetworkStats(string id = null)
         {
             return DumpNetworkStatsAsync(ConductorResponseCallBackMode.UseCallBackEvents, id).Result;
         }
@@ -1039,9 +1039,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="conductorResponseCallBackMode">The Concuctor Response CallBack Mode, set this to 'WaitForHolochainConductorResponse' if you want the function to wait for the Holochain Conductor response before returning that response or set it to 'UseCallBackEvents' to return from the function immediately and then raise the 'OnDumpFullStateCallBack' event when the conductor responds.   </param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
-        public async Task<DumpNetworkStatsCallBackEventArgs> DumpNetworkMetricsAsync(ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
+        public async Task<NetworkMetricsDumpedCallBackEventArgs> DumpNetworkMetricsAsync(ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
-            return await CallFunctionAsync(HoloNETRequestType.AdminDumpNetworkMetrics, "dump_network_metrics", null, _taskCompletionDumpNetworkStatsCallBack, "OnNetworkMetricsDumpedCallBack", conductorResponseCallBackMode, id);
+            return await CallFunctionAsync(HoloNETRequestType.AdminDumpNetworkMetrics, "dump_network_metrics", null, _taskCompletionNetworkMetricsDumpedCallBack, "OnNetworkMetricsDumpedCallBack", conductorResponseCallBackMode, id);
         }
 
         /// <summary>
@@ -1051,7 +1051,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="cloneCellId"> The clone id or cell id of the clone cell. Can be RoleName (string) or CellId (byte[][]).</param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
-        public DumpNetworkStatsCallBackEventArgs DumpNetworkMetrics(string id = null)
+        public NetworkMetricsDumpedCallBackEventArgs DumpNetworkMetrics(string id = null)
         {
             return DumpNetworkMetricsAsync(ConductorResponseCallBackMode.UseCallBackEvents, id).Result;
         }
@@ -1065,14 +1065,14 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="conductorResponseCallBackMode">The Concuctor Response CallBack Mode, set this to 'WaitForHolochainConductorResponse' if you want the function to wait for the Holochain Conductor response before returning that response or set it to 'UseCallBackEvents' to return from the function immediately and then raise the 'OnDumpFullStateCallBack' event when the conductor responds.   </param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
-        public async Task<RecordsGraftedCallBackEventArgs> GraftRecordsAsync(byte[][] cellId, bool validate, record[] records, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
+        public async Task<RecordsGraftedCallBackEventArgs> GraftRecordsAsync(byte[][] cellId, bool validate, object[] records, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
             return await CallFunctionAsync(HoloNETRequestType.AdminGraftRecords, "graft_records", new GraftRecordsRequest()
             {
                  cell_id = cellId,
                  validate = validate,
                  records = records
-            }, null, _taskCompletionRecordsGraftedCallBack, "OnRecordsGraftedCallBack", conductorResponseCallBackMode, id);
+            }, _taskCompletionRecordsGraftedCallBack, "OnRecordsGraftedCallBack", conductorResponseCallBackMode, id);
         }
 
         /// <summary>
@@ -1083,7 +1083,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="records">The records to be inserted into the source chain.</param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
-        public RecordsGraftedCallBackEventArgs GraftRecords(byte[][] cellId, bool validate, record[] records, string id = null)
+        public RecordsGraftedCallBackEventArgs GraftRecords(byte[][] cellId, bool validate, object[] records, string id = null)
         {
             return GraftRecordsAsync(cellId, validate, records, ConductorResponseCallBackMode.UseCallBackEvents, id).Result;
         }
@@ -1284,14 +1284,14 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="conductorResponseCallBackMode">The Concuctor Response CallBack Mode, set this to 'WaitForHolochainConductorResponse' if you want the function to wait for the Holochain Conductor response before returning that response or set it to 'UseCallBackEvents' to return from the function immediately and then raise the 'OnDumpFullStateCallBack' event when the conductor responds.   </param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
-        private async Task<UpdateCoordinatorsCallBackEventArgs> UpdateCoordinatorsAsync(byte[] dnaHash, string path, CoordinatorBundle bundle, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
+        private async Task<CoordinatorsUpdatedCallBackEventArgs> UpdateCoordinatorsAsync(byte[] dnaHash, string path, CoordinatorBundle bundle, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
             return await CallFunctionAsync(HoloNETRequestType.AdminUpdateCoordinators, "update_coordinators", new UpdateCoordinatorsRequest()
             {
                 dnaHash = dnaHash,
                 path = path,
                 bundle = bundle
-            }, _taskCompletionUpdateCoordinatorsCallBack, "OnUpdateCoordinatorsCallBack", conductorResponseCallBackMode, id);
+            }, _taskCompletionCoordinatorsUpdatedCallBack, "OnCoordinatorsUpdatedCallBack", conductorResponseCallBackMode, id);
         }
 
         private async Task<T> CallFunctionAsync<T>(HoloNETRequestType requestType, string holochainConductorFunctionName, dynamic holoNETDataDetailed, Dictionary<string, TaskCompletionSource<T>> _taskCompletionCallBack, string eventCallBackName, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null) where T : HoloNETDataReceivedBaseEventArgs, new()

@@ -10,10 +10,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public AgentInfoDump this_agent_info { get; set; }
 
         [Key("this_agent_info")]
-        public DnaHash this_dna { get; set; } //Option<(DnaHash, KitsuneSpace)>
+        public byte[] this_dna { get; set; } //Option<(DnaHash, KitsuneSpace)>
 
         [Key("this_agent")]
-        public AgentPubKey this_agent { get; set; } //Option<(AgentPubKey, KitsuneAgent)>,
+        public byte[] this_agent { get; set; } //Option<(AgentPubKey, KitsuneAgent)>,
 
         [Key("this_agent")]
         public AgentInfoDump[] peers { get; set; }

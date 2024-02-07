@@ -194,7 +194,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 HoloNETDNA = holoNETDNA;
 
             InitLogger();
-            Logger.AddLogProvider(new DefaultLogProvider(HoloNETDNA.LogToConsole, HoloNETDNA.LogToFile, HoloNETDNA.LogPath, HoloNETDNA.LogFileName, HoloNETDNA.AddAdditionalSpaceAfterEachLogEntry, HoloNETDNA.ShowColouredLogs, HoloNETDNA.DebugColour, HoloNETDNA.InfoColour, HoloNETDNA.WarningColour, HoloNETDNA.ErrorColour, HoloNETDNA.NumberOfRetriesToLogToFile, HoloNETDNA.RetryLoggingToFileEverySeconds));
+            Logger.AddLogProvider(new DefaultLogProvider(HoloNETDNA.LogToConsole, HoloNETDNA.LogToFile, HoloNETDNA.LogPath, HoloNETDNA.LogFileName, HoloNETDNA.MaxLogFileSize, HoloNETDNA.AddAdditionalSpaceAfterEachLogEntry, HoloNETDNA.ShowColouredLogs, HoloNETDNA.DebugColour, HoloNETDNA.InfoColour, HoloNETDNA.WarningColour, HoloNETDNA.ErrorColour, HoloNETDNA.NumberOfRetriesToLogToFile, HoloNETDNA.RetryLoggingToFileEverySeconds));
             Init(new Uri(HoloNETDNA.HolochainConductorAppAgentURI));
         }
 
@@ -213,7 +213,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             Logger.AddLogProvider(logProvider);
 
             if (alsoUseDefaultLogger)
-                Logger.AddLogProvider(new DefaultLogProvider(HoloNETDNA.LogToConsole, HoloNETDNA.LogToFile, HoloNETDNA.LogPath, HoloNETDNA.LogFileName, HoloNETDNA.AddAdditionalSpaceAfterEachLogEntry, HoloNETDNA.ShowColouredLogs, HoloNETDNA.DebugColour, HoloNETDNA.InfoColour, HoloNETDNA.WarningColour, HoloNETDNA.ErrorColour, HoloNETDNA.NumberOfRetriesToLogToFile, HoloNETDNA.RetryLoggingToFileEverySeconds));
+                Logger.AddLogProvider(new DefaultLogProvider(HoloNETDNA.LogToConsole, HoloNETDNA.LogToFile, HoloNETDNA.LogPath, HoloNETDNA.LogFileName, HoloNETDNA.MaxLogFileSize, HoloNETDNA.AddAdditionalSpaceAfterEachLogEntry, HoloNETDNA.ShowColouredLogs, HoloNETDNA.DebugColour, HoloNETDNA.InfoColour, HoloNETDNA.WarningColour, HoloNETDNA.ErrorColour, HoloNETDNA.NumberOfRetriesToLogToFile, HoloNETDNA.RetryLoggingToFileEverySeconds));
 
             Init(new Uri(HoloNETDNA.HolochainConductorAppAgentURI));
         }
@@ -233,7 +233,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             Logger.AddLogProviders(new List<ILogProvider>(logProviders));
 
             if (alsoUseDefaultLogger)
-                Logger.AddLogProvider(new DefaultLogProvider(HoloNETDNA.LogToConsole, HoloNETDNA.LogToFile, HoloNETDNA.LogPath, HoloNETDNA.LogFileName, HoloNETDNA.AddAdditionalSpaceAfterEachLogEntry, HoloNETDNA.ShowColouredLogs, HoloNETDNA.DebugColour, HoloNETDNA.InfoColour, HoloNETDNA.WarningColour, HoloNETDNA.ErrorColour, HoloNETDNA.NumberOfRetriesToLogToFile, HoloNETDNA.RetryLoggingToFileEverySeconds));
+                Logger.AddLogProvider(new DefaultLogProvider(HoloNETDNA.LogToConsole, HoloNETDNA.LogToFile, HoloNETDNA.LogPath, HoloNETDNA.LogFileName, HoloNETDNA.MaxLogFileSize, HoloNETDNA.AddAdditionalSpaceAfterEachLogEntry, HoloNETDNA.ShowColouredLogs, HoloNETDNA.DebugColour, HoloNETDNA.InfoColour, HoloNETDNA.WarningColour, HoloNETDNA.ErrorColour, HoloNETDNA.NumberOfRetriesToLogToFile, HoloNETDNA.RetryLoggingToFileEverySeconds));
 
             Init(new Uri(HoloNETDNA.HolochainConductorAppAgentURI));
         }

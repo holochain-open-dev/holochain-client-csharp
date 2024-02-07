@@ -13,6 +13,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests
         public bool validate { get; set; } 
 
         [Key("records")]
-        public Record[] records { get; set; }
+        //public Record[] records { get; set; }
+        public object[] records { get; set; }
     }
 }
