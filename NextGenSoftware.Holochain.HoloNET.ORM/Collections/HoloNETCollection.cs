@@ -70,6 +70,45 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM.Collections
         /// It has two main types of constructors, one that allows you to pass in a HoloNETClient instance (which can be shared with other classes that extend the HoloNETEntryBase class or HoloNETEntryBase class as well as other HoloNETCollection's) or if you do not pass a HoloNETClient instance in using the other constructor it will create its own internal instance to use just for this class. 
         /// NOTE: This is a preview of some of the advanced functionality that will be present in the upcoming .NET HDK Low Code Generator, which generates dynamic rust and c# code from your metadata freeing you to focus on your amazing business idea and creativity rather than worrying about learning Holochain, Rust and then getting it to all work in Windows and with C#. HAppy Days! ;-)
         /// </summary>
+        /// <param name="installedAppId">The AppId of the installed hApp this HoloNETCollection will be bound to (it will be bound to the internal HoloNETClientAppAgent). This will overrite the InstalledAppId stored in the HoloNETDNA (if there is one).</param>
+        /// <param name="myAgentPubKey">The agentPubKey of the agent that this HoloNETCollection will be bound to (it will be bound to the internal HoloNETClientAppAgent). This will overrite the AgentPubKey defined in the HoloNETDNA (if there is one).</param>
+        /// <param name="zomeName">This is the name of the rust zome in your hApp that this instance of the HoloNETEntryBaseClass maps onto. This will also update the ZomeName property.</param>
+        /// <param name="zomeLoadCollectionFunction">This is the name of the rust zome function in your hApp that will be used to load a Holochain collection that this instance of the HoloNETCollection maps onto. This will be used by the LoadCollection method. This also updates the ZomeLoadCollectionFunction property.</param>
+        /// <param name="zomeAddEntryToCollectionFunction">This is the name of the rust zome function in your hApp that will be used to add Holochain Entries to a collection that this instance of the HoloNETCollection maps onto. This will be used by the AddHoloNETEntryToCollectionAndSave method. This also updates the ZomeAddEntryToCollectionFunction property.</param>
+        /// <param name="zomeRemoveEntryFromCollectionFunction">This is the name of the rust zome function in your hApp that will be used to remove a Holochain Entry from a Holochain collection that this instance of the HoloNETCollection maps onto. This will be used by the RemoveHoloNETEntryFromCollectionAndSave method. This also updates the ZomeRemoveEntryFromCollectionFunction property.</param>
+        /// <param name="zomeBatchUpdateCollectionFunction">This is the name of the rust zome function in your hApp that will be used to bulk update Holochain Entries in a collection that this instance of the HoloNETCollection maps onto. This will be used by the SaveCollection method. This also updates the ZomeBatchUpdateCollectionFunction property. This param is optional.</param>        
+        /// <param name="autoCallInitialize">Set this to true if you wish HoloNETEntryBaseClass to auto-call the Initialize method when a new instance is created. Set this to false if you do not wish it to do this, you may want to do this manually if you want to initialize (will call the Connect method on the HoloNET Client) at a later stage.</param>
+        /// <param name="holoNETDNA">This is the HoloNETDNA object that controls how HoloNET operates. This will be passed into the internally created instance of the HoloNET Client.</param>
+        /// <param name="connectedCallBackMode">If set to `WaitForHolochainConductorToConnect` (default) it will await until it is connected before returning, otherwise it will return immediately and then call the OnConnected event once it has finished connecting.</param>
+        /// <param name="retrieveAgentPubKeyAndDnaHashMode">If set to `Wait` (default) it will await until it has finished retrieving the AgentPubKey & DnaHash before returning, otherwise it will return immediately and then call the OnReadyForZomeCalls event once it has finished retrieving the DnaHash & AgentPubKey.</param>
+        /// <param name="retrieveAgentPubKeyAndDnaHashFromConductor">Set this to true for HoloNET to automatically retrieve the AgentPubKey & DnaHash from the Holochain Conductor after it has connected. This defaults to true.</param>
+        /// <param name="retrieveAgentPubKeyAndDnaHashFromSandbox">Set this to true if you wish HoloNET to automatically retrieve the AgentPubKey & DnaHash from the hc sandbox after it has connected. This defaults to true.</param>
+        /// <param name="automaticallyAttemptToRetrieveFromConductorIfSandBoxFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the Holochain Conductor if it fails to get them from the HC Sandbox command. This defaults to true.</param>
+        /// <param name="automaticallyAttemptToRetrieveFromSandBoxIfConductorFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the HC Sandbox command if it fails to get them from the Holochain Conductor. This defaults to true.</param>
+        /// <param name="updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved">Set this to true (default) to automatically update the HoloNETDNA once it has retrieved the DnaHash & AgentPubKey.</param>
+        public HoloNETCollection(string installedAppId, string myAgentPubKey, string zomeName, string zomeLoadCollectionFunction, string zomeAddEntryToCollectionFunction, string zomeRemoveEntryFromCollectionFunction, string zomeBatchUpdateCollectionFunction = "", bool autoCallInitialize = true, HoloNETDNA holoNETDNA = null, ConnectedCallBackMode connectedCallBackMode = ConnectedCallBackMode.WaitForHolochainConductorToConnect, RetrieveAgentPubKeyAndDnaHashMode retrieveAgentPubKeyAndDnaHashMode = RetrieveAgentPubKeyAndDnaHashMode.Wait, bool retrieveAgentPubKeyAndDnaHashFromConductor = true, bool retrieveAgentPubKeyAndDnaHashFromSandbox = true, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true, bool updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved = true)
+        {
+            HoloNETClient = new HoloNETClientAppAgent(installedAppId, myAgentPubKey, holoNETDNA);
+            _disposeOfHoloNETClient = true;
+
+            ZomeName = zomeName;
+            ZomeLoadCollectionFunction = zomeLoadCollectionFunction;
+            ZomeAddEntryToCollectionFunction = zomeAddEntryToCollectionFunction;
+            ZomeRemoveEntryFromCollectionFunction = zomeRemoveEntryFromCollectionFunction;
+            ZomeBatchUpdateCollectionFunction = zomeBatchUpdateCollectionFunction;
+
+            if (holoNETDNA != null)
+                HoloNETClient.HoloNETDNA = holoNETDNA;
+
+            if (autoCallInitialize)
+                InitializeAsync(connectedCallBackMode, retrieveAgentPubKeyAndDnaHashMode, retrieveAgentPubKeyAndDnaHashFromConductor, retrieveAgentPubKeyAndDnaHashFromSandbox, automaticallyAttemptToRetrieveFromConductorIfSandBoxFails, automaticallyAttemptToRetrieveFromSandBoxIfConductorFails, updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved);
+        }
+
+        /// <summary>
+        /// This is a new class introduced in HoloNET 3 that makes it super easy to manage collections of HoloNETEntries so you do not need to interact with the client directly.
+        /// It has two main types of constructors, one that allows you to pass in a HoloNETClient instance (which can be shared with other classes that extend the HoloNETEntryBase class or HoloNETEntryBase class as well as other HoloNETCollection's) or if you do not pass a HoloNETClient instance in using the other constructor it will create its own internal instance to use just for this class. 
+        /// NOTE: This is a preview of some of the advanced functionality that will be present in the upcoming .NET HDK Low Code Generator, which generates dynamic rust and c# code from your metadata freeing you to focus on your amazing business idea and creativity rather than worrying about learning Holochain, Rust and then getting it to all work in Windows and with C#. HAppy Days! ;-)
+        /// </summary>
         /// <param name="zomeName">This is the name of the rust zome in your hApp that this instance of the HoloNETEntryBaseClass maps onto. This will also update the ZomeName property.</param>
         /// <param name="zomeLoadCollectionFunction">This is the name of the rust zome function in your hApp that will be used to load a Holochain collection that this instance of the HoloNETCollection maps onto. This will be used by the LoadCollection method. This also updates the ZomeLoadCollectionFunction property.</param>
         /// <param name="zomeAddEntryToCollectionFunction">This is the name of the rust zome function in your hApp that will be used to add Holochain Entries to a collection that this instance of the HoloNETCollection maps onto. This will be used by the AddHoloNETEntryToCollectionAndSave method. This also updates the ZomeAddEntryToCollectionFunction property.</param>
@@ -86,7 +125,48 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM.Collections
         /// <param name="updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved">Set this to true (default) to automatically update the HoloNETDNA once it has retrieved the DnaHash & AgentPubKey.</param>
         public HoloNETCollection(string zomeName, string zomeLoadCollectionFunction, string zomeAddEntryToCollectionFunction, string zomeRemoveEntryFromCollectionFunction, string zomeBatchUpdateCollectionFunction = "", bool autoCallInitialize = true, HoloNETDNA holoNETDNA = null, ConnectedCallBackMode connectedCallBackMode = ConnectedCallBackMode.WaitForHolochainConductorToConnect, RetrieveAgentPubKeyAndDnaHashMode retrieveAgentPubKeyAndDnaHashMode = RetrieveAgentPubKeyAndDnaHashMode.Wait, bool retrieveAgentPubKeyAndDnaHashFromConductor = true, bool retrieveAgentPubKeyAndDnaHashFromSandbox = true, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true, bool updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved = true)
         {
-            HoloNETClient = new HoloNETClientAppAgent(holoNETDNA);
+            HoloNETClient = new HoloNETClientApp(holoNETDNA);
+            _disposeOfHoloNETClient = true;
+
+            ZomeName = zomeName;
+            ZomeLoadCollectionFunction = zomeLoadCollectionFunction;
+            ZomeAddEntryToCollectionFunction = zomeAddEntryToCollectionFunction;
+            ZomeRemoveEntryFromCollectionFunction = zomeRemoveEntryFromCollectionFunction;
+            ZomeBatchUpdateCollectionFunction = zomeBatchUpdateCollectionFunction;
+
+            if (holoNETDNA != null)
+                HoloNETClient.HoloNETDNA = holoNETDNA;
+
+            if (autoCallInitialize)
+                InitializeAsync(connectedCallBackMode, retrieveAgentPubKeyAndDnaHashMode, retrieveAgentPubKeyAndDnaHashFromConductor, retrieveAgentPubKeyAndDnaHashFromSandbox, automaticallyAttemptToRetrieveFromConductorIfSandBoxFails, automaticallyAttemptToRetrieveFromSandBoxIfConductorFails, updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved);
+        }
+
+        /// <summary>
+        /// This is a new class introduced in HoloNET 3 that makes it super easy to manage collections of HoloNETEntries so you do not need to interact with the client directly.
+        /// It has two main types of constructors, one that allows you to pass in a HoloNETClient instance (which can be shared with other classes that extend the HoloNETEntryBase class or HoloNETEntryBase class as well as other HoloNETCollection's) or if you do not pass a HoloNETClient instance in using the other constructor it will create its own internal instance to use just for this class. 
+        /// NOTE: This is a preview of some of the advanced functionality that will be present in the upcoming .NET HDK Low Code Generator, which generates dynamic rust and c# code from your metadata freeing you to focus on your amazing business idea and creativity rather than worrying about learning Holochain, Rust and then getting it to all work in Windows and with C#. HAppy Days! ;-)
+        /// </summary>
+        /// <param name="installedAppId">The AppId of the installed hApp this HoloNETCollection will be bound to (it will be bound to the internal HoloNETClientAppAgent). This will overrite the InstalledAppId stored in the HoloNETDNA (if there is one).</param>
+        /// <param name="myAgentPubKey">The agentPubKey of the agent that this HoloNETCollection will be bound to (it will be bound to the internal HoloNETClientAppAgent). This will overrite the AgentPubKey defined in the HoloNETDNA (if there is one).</param>
+        /// <param name="zomeName">This is the name of the rust zome in your hApp that this instance of the HoloNETEntryBaseClass maps onto. This will also update the ZomeName property.</param>
+        /// <param name="zomeLoadCollectionFunction">This is the name of the rust zome function in your hApp that will be used to load a Holochain collection that this instance of the HoloNETCollection maps onto. This will be used by the LoadCollection method. This also updates the ZomeLoadCollectionFunction property.</param>
+        /// <param name="zomeAddEntryToCollectionFunction">This is the name of the rust zome function in your hApp that will be used to add Holochain Entries to a collection that this instance of the HoloNETCollection maps onto. This will be used by the AddHoloNETEntryToCollectionAndSave method. This also updates the ZomeAddEntryToCollectionFunction property.</param>
+        /// <param name="zomeRemoveEntryFromCollectionFunction">This is the name of the rust zome function in your hApp that will be used to remove a Holochain Entry from a Holochain collection that this instance of the HoloNETCollection maps onto. This will be used by the RemoveHoloNETEntryFromCollectionAndSave method. This also updates the ZomeRemoveEntryFromCollectionFunction property.</param>
+        /// <param name="logProvider">An implementation of the ILogProvider interface. [DefaultLogger](#DefaultLogger) is an example of this and is used by the constructor (top one) that does not have logProvider as a param. You can injet in (DI) your own implementations of the ILogProvider interface using this param.</param>
+        /// <param name="alsoUseDefaultLogger">Set this to true if you wish HoloNET to also log to the DefaultLogger as well as any custom logger injected in. </param>
+        /// <param name="zomeBatchUpdateCollectionFunction">This is the name of the rust zome function in your hApp that will be used to bulk update Holochain Entries in a collection that this instance of the HoloNETCollection maps onto. This will be used by the SaveCollection method. This also updates the ZomeBatchUpdateCollectionFunction property. This param is optional.</param>        
+        /// <param name="autoCallInitialize">Set this to true if you wish [HoloNETEntryBaseClass](#HoloNETEntryBaseClass) to auto-call the [Initialize](#Initialize) method when a new instance is created. Set this to false if you do not wish it to do this, you may want to do this manually if you want to initialize (will call the [Connect](#connect) method on the HoloNET Client) at a later stage.</param>
+        /// <param name="holoNETDNA">This is the HoloNETDNA object that controls how HoloNET operates. This will be passed into the internally created instance of the HoloNET Client.</param>
+        /// <param name="connectedCallBackMode">If set to `WaitForHolochainConductorToConnect` (default) it will await until it is connected before returning, otherwise it will return immediately and then call the OnConnected event once it has finished connecting.</param>
+        /// <param name="retrieveAgentPubKeyAndDnaHashMode">If set to `Wait` (default) it will await until it has finished retrieving the AgentPubKey & DnaHash before returning, otherwise it will return immediately and then call the OnReadyForZomeCalls event once it has finished retrieving the DnaHash & AgentPubKey.</param>
+        /// <param name="retrieveAgentPubKeyAndDnaHashFromConductor">Set this to true for HoloNET to automatically retrieve the AgentPubKey & DnaHash from the Holochain Conductor after it has connected. This defaults to true.</param>
+        /// <param name="retrieveAgentPubKeyAndDnaHashFromSandbox">Set this to true if you wish HoloNET to automatically retrieve the AgentPubKey & DnaHash from the hc sandbox after it has connected. This defaults to true.</param>
+        /// <param name="automaticallyAttemptToRetrieveFromConductorIfSandBoxFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the Holochain Conductor if it fails to get them from the HC Sandbox command. This defaults to true.</param>
+        /// <param name="automaticallyAttemptToRetrieveFromSandBoxIfConductorFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the HC Sandbox command if it fails to get them from the Holochain Conductor. This defaults to true.</param>
+        /// <param name="updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved">Set this to true (default) to automatically update the HoloNETDNA once it has retrieved the DnaHash & AgentPubKey.</param>
+        public HoloNETCollection(string installedAppId, string myAgentPubKey, string zomeName, string zomeLoadCollectionFunction, string zomeAddEntryToCollectionFunction, string zomeRemoveEntryFromCollectionFunction, ILogProvider logProvider, bool alsoUseDefaultLogger = false, string zomeBatchUpdateCollectionFunction = "", bool autoCallInitialize = true, string holochainConductorURI = "ws://localhost:8888", HoloNETDNA holoNETDNA = null, ConnectedCallBackMode connectedCallBackMode = ConnectedCallBackMode.WaitForHolochainConductorToConnect, RetrieveAgentPubKeyAndDnaHashMode retrieveAgentPubKeyAndDnaHashMode = RetrieveAgentPubKeyAndDnaHashMode.Wait, bool retrieveAgentPubKeyAndDnaHashFromConductor = true, bool retrieveAgentPubKeyAndDnaHashFromSandbox = true, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true, bool updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved = true, bool logToConsole = true, bool logToFile = true, string releativePathToLogFolder = "Logs", string logFileName = "HoloNET.log", bool addAdditionalSpaceAfterEachLogEntry = false, bool showColouredLogs = true, ConsoleColor debugColour = ConsoleColor.White, ConsoleColor infoColour = ConsoleColor.Green, ConsoleColor warningColour = ConsoleColor.Yellow, ConsoleColor errorColour = ConsoleColor.Red)
+        {
+            HoloNETClient = new HoloNETClientAppAgent(installedAppId, myAgentPubKey, logProvider, alsoUseDefaultLogger, holoNETDNA);
             _disposeOfHoloNETClient = true;
 
             ZomeName = zomeName;
@@ -125,7 +205,7 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM.Collections
         /// <param name="updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved">Set this to true (default) to automatically update the HoloNETDNA once it has retrieved the DnaHash & AgentPubKey.</param>
         public HoloNETCollection(string zomeName, string zomeLoadCollectionFunction, string zomeAddEntryToCollectionFunction, string zomeRemoveEntryFromCollectionFunction, ILogProvider logProvider, bool alsoUseDefaultLogger = false, string zomeBatchUpdateCollectionFunction = "", bool autoCallInitialize = true, string holochainConductorURI = "ws://localhost:8888", HoloNETDNA holoNETDNA = null, ConnectedCallBackMode connectedCallBackMode = ConnectedCallBackMode.WaitForHolochainConductorToConnect, RetrieveAgentPubKeyAndDnaHashMode retrieveAgentPubKeyAndDnaHashMode = RetrieveAgentPubKeyAndDnaHashMode.Wait, bool retrieveAgentPubKeyAndDnaHashFromConductor = true, bool retrieveAgentPubKeyAndDnaHashFromSandbox = true, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true, bool updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved = true, bool logToConsole = true, bool logToFile = true, string releativePathToLogFolder = "Logs", string logFileName = "HoloNET.log", bool addAdditionalSpaceAfterEachLogEntry = false, bool showColouredLogs = true, ConsoleColor debugColour = ConsoleColor.White, ConsoleColor infoColour = ConsoleColor.Green, ConsoleColor warningColour = ConsoleColor.Yellow, ConsoleColor errorColour = ConsoleColor.Red)
         {
-            HoloNETClient = new HoloNETClientAppAgent(logProvider, alsoUseDefaultLogger, holoNETDNA);
+            HoloNETClient = new HoloNETClientApp(logProvider, alsoUseDefaultLogger, holoNETDNA);
             _disposeOfHoloNETClient = true;
 
             ZomeName = zomeName;
@@ -136,6 +216,44 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM.Collections
 
             if (holoNETDNA != null)
                 HoloNETClient.HoloNETDNA = holoNETDNA;
+
+            if (autoCallInitialize)
+                InitializeAsync(connectedCallBackMode, retrieveAgentPubKeyAndDnaHashMode, retrieveAgentPubKeyAndDnaHashFromConductor, retrieveAgentPubKeyAndDnaHashFromSandbox, automaticallyAttemptToRetrieveFromConductorIfSandBoxFails, automaticallyAttemptToRetrieveFromSandBoxIfConductorFails, updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved);
+        }
+
+        /// <summary>
+        /// This is a new class introduced in HoloNET 3 that makes it super easy to manage collections of HoloNETEntries so you do not need to interact with the client directly.
+        /// It has two main types of constructors, one that allows you to pass in a HoloNETClient instance (which can be shared with other classes that extend the HoloNETEntryBase class or HoloNETEntryBase class as well as other HoloNETCollection's) or if you do not pass a HoloNETClient instance in using the other constructor it will create its own internal instance to use just for this class. 
+        /// NOTE: This is a preview of some of the advanced functionality that will be present in the upcoming .NET HDK Low Code Generator, which generates dynamic rust and c# code from your metadata freeing you to focus on your amazing business idea and creativity rather than worrying about learning Holochain, Rust and then getting it to all work in Windows and with C#. HAppy Days! ;-)
+        /// </summary>
+        /// <param name="installedAppId">The AppId of the installed hApp this HoloNETCollection will be bound to (it will be bound to the internal HoloNETClientAppAgent). This will overrite the InstalledAppId stored in the HoloNETDNA (if there is one).</param>
+        /// <param name="myAgentPubKey">The agentPubKey of the agent that this HoloNETCollection will be bound to (it will be bound to the internal HoloNETClientAppAgent). This will overrite the AgentPubKey defined in the HoloNETDNA (if there is one).</param>
+        /// <param name="zomeName">This is the name of the rust zome in your hApp that this instance of the HoloNETEntryBaseClass maps onto. This will also update the ZomeName property.</param>
+        /// <param name="zomeLoadCollectionFunction">This is the name of the rust zome function in your hApp that will be used to load a Holochain collection that this instance of the HoloNETCollection maps onto. This will be used by the LoadCollection method. This also updates the ZomeLoadCollectionFunction property.</param>
+        /// <param name="zomeAddEntryToCollectionFunction">This is the name of the rust zome function in your hApp that will be used to add Holochain Entries to a collection that this instance of the HoloNETCollection maps onto. This will be used by the AddHoloNETEntryToCollectionAndSave method. This also updates the ZomeAddEntryToCollectionFunction property.</param>
+        /// <param name="zomeRemoveEntryFromCollectionFunction">This is the name of the rust zome function in your hApp that will be used to remove a Holochain Entry from a Holochain collection that this instance of the HoloNETCollection maps onto. This will be used by the RemoveHoloNETEntryFromCollectionAndSave method. This also updates the ZomeRemoveEntryFromCollectionFunction property.</param>
+        /// <param name="logProviders">Allows you to inject in (DI) more than one implementation of the ILogProvider interface. HoloNET will then log to each logProvider injected in. </param>
+        /// <param name="zomeBatchUpdateCollectionFunction">This is the name of the rust zome function in your hApp that will be used to bulk update Holochain Entries in a collection that this instance of the HoloNETCollection maps onto. This will be used by the SaveCollection method. This also updates the ZomeBatchUpdateCollectionFunction property. This param is optional.</param>        
+        /// <param name="alsoUseDefaultLogger">Set this to true if you wish HoloNET to also log to the DefaultLogger as well as any custom logger injected in. </param>
+        /// <param name="autoCallInitialize">Set this to true if you wish [HoloNETEntryBaseClass](#HoloNETEntryBaseClass) to auto-call the [Initialize](#Initialize) method when a new instance is created. Set this to false if you do not wish it to do this, you may want to do this manually if you want to initialize (will call the [Connect](#connect) method on the HoloNET Client) at a later stage.</param>
+        /// <param name="holoNETDNA">This is the HoloNETDNA object that controls how HoloNET operates. This will be passed into the internally created instance of the HoloNET Client.</param>
+        /// <param name="connectedCallBackMode">If set to `WaitForHolochainConductorToConnect` (default) it will await until it is connected before returning, otherwise it will return immediately and then call the OnConnected event once it has finished connecting.</param>
+        /// <param name="retrieveAgentPubKeyAndDnaHashMode">If set to `Wait` (default) it will await until it has finished retrieving the AgentPubKey & DnaHash before returning, otherwise it will return immediately and then call the OnReadyForZomeCalls event once it has finished retrieving the DnaHash & AgentPubKey.</param>
+        /// <param name="retrieveAgentPubKeyAndDnaHashFromConductor">Set this to true for HoloNET to automatically retrieve the AgentPubKey & DnaHash from the Holochain Conductor after it has connected. This defaults to true.</param>
+        /// <param name="retrieveAgentPubKeyAndDnaHashFromSandbox">Set this to true if you wish HoloNET to automatically retrieve the AgentPubKey & DnaHash from the hc sandbox after it has connected. This defaults to true.</param>
+        /// <param name="automaticallyAttemptToRetrieveFromConductorIfSandBoxFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the Holochain Conductor if it fails to get them from the HC Sandbox command. This defaults to true.</param>
+        /// <param name="automaticallyAttemptToRetrieveFromSandBoxIfConductorFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the HC Sandbox command if it fails to get them from the Holochain Conductor. This defaults to true.</param>
+        /// <param name="updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved">Set this to true (default) to automatically update the HoloNETDNA once it has retrieved the DnaHash & AgentPubKey.</param>
+        public HoloNETCollection(string installedAppId, string myAgentPubKey, string zomeName, string zomeLoadCollectionFunction, string zomeAddEntryToCollectionFunction, string zomeRemoveEntryFromCollectionFunction, IEnumerable<ILogProvider> logProviders, string zomeBatchUpdateCollectionFunction = "", bool alsoUseDefaultLogger = false, bool autoCallInitialize = true, HoloNETDNA holoNETDNA = null, ConnectedCallBackMode connectedCallBackMode = ConnectedCallBackMode.WaitForHolochainConductorToConnect, RetrieveAgentPubKeyAndDnaHashMode retrieveAgentPubKeyAndDnaHashMode = RetrieveAgentPubKeyAndDnaHashMode.Wait, bool retrieveAgentPubKeyAndDnaHashFromConductor = true, bool retrieveAgentPubKeyAndDnaHashFromSandbox = true, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true, bool updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved = true)
+        {
+            HoloNETClient = new HoloNETClientAppAgent(installedAppId, myAgentPubKey, logProviders, alsoUseDefaultLogger, holoNETDNA);
+            _disposeOfHoloNETClient = true;
+
+            ZomeName = zomeName;
+            ZomeLoadCollectionFunction = zomeLoadCollectionFunction;
+            ZomeAddEntryToCollectionFunction = zomeAddEntryToCollectionFunction;
+            ZomeRemoveEntryFromCollectionFunction = zomeRemoveEntryFromCollectionFunction;
+            ZomeBatchUpdateCollectionFunction = zomeBatchUpdateCollectionFunction;
 
             if (autoCallInitialize)
                 InitializeAsync(connectedCallBackMode, retrieveAgentPubKeyAndDnaHashMode, retrieveAgentPubKeyAndDnaHashFromConductor, retrieveAgentPubKeyAndDnaHashFromSandbox, automaticallyAttemptToRetrieveFromConductorIfSandBoxFails, automaticallyAttemptToRetrieveFromSandBoxIfConductorFails, updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved);
@@ -164,7 +282,44 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM.Collections
         /// <param name="updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved">Set this to true (default) to automatically update the HoloNETDNA once it has retrieved the DnaHash & AgentPubKey.</param>
         public HoloNETCollection(string zomeName, string zomeLoadCollectionFunction, string zomeAddEntryToCollectionFunction, string zomeRemoveEntryFromCollectionFunction, IEnumerable<ILogProvider> logProviders, string zomeBatchUpdateCollectionFunction = "", bool alsoUseDefaultLogger = false, bool autoCallInitialize = true, HoloNETDNA holoNETDNA = null, ConnectedCallBackMode connectedCallBackMode = ConnectedCallBackMode.WaitForHolochainConductorToConnect, RetrieveAgentPubKeyAndDnaHashMode retrieveAgentPubKeyAndDnaHashMode = RetrieveAgentPubKeyAndDnaHashMode.Wait, bool retrieveAgentPubKeyAndDnaHashFromConductor = true, bool retrieveAgentPubKeyAndDnaHashFromSandbox = true, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true, bool updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved = true)
         {
-            HoloNETClient = new HoloNETClientAppAgent(logProviders, alsoUseDefaultLogger, holoNETDNA);
+            HoloNETClient = new HoloNETClientApp(logProviders, alsoUseDefaultLogger, holoNETDNA);
+            _disposeOfHoloNETClient = true;
+
+            ZomeName = zomeName;
+            ZomeLoadCollectionFunction = zomeLoadCollectionFunction;
+            ZomeAddEntryToCollectionFunction = zomeAddEntryToCollectionFunction;
+            ZomeRemoveEntryFromCollectionFunction = zomeRemoveEntryFromCollectionFunction;
+            ZomeBatchUpdateCollectionFunction = zomeBatchUpdateCollectionFunction;
+
+            if (autoCallInitialize)
+                InitializeAsync(connectedCallBackMode, retrieveAgentPubKeyAndDnaHashMode, retrieveAgentPubKeyAndDnaHashFromConductor, retrieveAgentPubKeyAndDnaHashFromSandbox, automaticallyAttemptToRetrieveFromConductorIfSandBoxFails, automaticallyAttemptToRetrieveFromSandBoxIfConductorFails, updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved);
+        }
+
+        /// <summary>
+        /// This is a new class introduced in HoloNET 3 that makes it super easy to manage collections of HoloNETEntries so you do not need to interact with the client directly.
+        /// It has two main types of constructors, one that allows you to pass in a HoloNETClient instance (which can be shared with other classes that extend the HoloNETEntryBase class or HoloNETEntryBase class as well as other HoloNETCollection's) or if you do not pass a HoloNETClient instance in using the other constructor it will create its own internal instance to use just for this class. 
+        /// NOTE: This is a preview of some of the advanced functionality that will be present in the upcoming .NET HDK Low Code Generator, which generates dynamic rust and c# code from your metadata freeing you to focus on your amazing business idea and creativity rather than worrying about learning Holochain, Rust and then getting it to all work in Windows and with C#. HAppy Days! ;-)
+        /// </summary>
+        /// <param name="installedAppId">The AppId of the installed hApp this HoloNETCollection will be bound to (it will be bound to the internal HoloNETClientAppAgent). This will overrite the InstalledAppId stored in the HoloNETDNA (if there is one).</param>
+        /// <param name="myAgentPubKey">The agentPubKey of the agent that this HoloNETCollection will be bound to (it will be bound to the internal HoloNETClientAppAgent). This will overrite the AgentPubKey defined in the HoloNETDNA (if there is one).</param>
+        /// <param name="zomeName">This is the name of the rust zome in your hApp that this instance of the HoloNETEntryBaseClass maps onto. This will also update the ZomeName property.</param>
+        /// <param name="zomeLoadCollectionFunction">This is the name of the rust zome function in your hApp that will be used to load a Holochain collection that this instance of the HoloNETCollection maps onto. This will be used by the LoadCollection method. This also updates the ZomeLoadCollectionFunction property.</param>
+        /// <param name="zomeAddEntryToCollectionFunction">This is the name of the rust zome function in your hApp that will be used to add Holochain Entries to a collection that this instance of the HoloNETCollection maps onto. This will be used by the AddHoloNETEntryToCollectionAndSave method. This also updates the ZomeAddEntryToCollectionFunction property.</param>
+        /// <param name="zomeRemoveEntryFromCollectionFunction">This is the name of the rust zome function in your hApp that will be used to remove a Holochain Entry from a Holochain collection that this instance of the HoloNETCollection maps onto. This will be used by the RemoveHoloNETEntryFromCollectionAndSave method. This also updates the ZomeRemoveEntryFromCollectionFunction property.</param>
+        /// <param name="logger">Allows you to inject in (DI) more than one implementation of the ILogger interface. HoloNET will then log to each logger injected in.</param>
+        /// <param name="zomeBatchUpdateCollectionFunction">This is the name of the rust zome function in your hApp that will be used to bulk update Holochain Entries in a collection that this instance of the HoloNETCollection maps onto. This will be used by the SaveCollection method. This also updates the ZomeBatchUpdateCollectionFunction property. This param is optional.</param>        
+        /// <param name="autoCallInitialize">Set this to true if you wish [HoloNETEntryBaseClass](#HoloNETEntryBaseClass) to auto-call the [Initialize](#Initialize) method when a new instance is created. Set this to false if you do not wish it to do this, you may want to do this manually if you want to initialize (will call the [Connect](#connect) method on the HoloNET Client) at a later stage.</param>
+        /// <param name="holoNETDNA">This is the HoloNETDNA object that controls how HoloNET operates. This will be passed into the internally created instance of the HoloNET Client.</param>
+        /// <param name="connectedCallBackMode">If set to `WaitForHolochainConductorToConnect` (default) it will await until it is connected before returning, otherwise it will return immediately and then call the OnConnected event once it has finished connecting.</param>
+        /// <param name="retrieveAgentPubKeyAndDnaHashMode">If set to `Wait` (default) it will await until it has finished retrieving the AgentPubKey & DnaHash before returning, otherwise it will return immediately and then call the OnReadyForZomeCalls event once it has finished retrieving the DnaHash & AgentPubKey.</param>
+        /// <param name="retrieveAgentPubKeyAndDnaHashFromConductor">Set this to true for HoloNET to automatically retrieve the AgentPubKey & DnaHash from the Holochain Conductor after it has connected. This defaults to true.</param>
+        /// <param name="retrieveAgentPubKeyAndDnaHashFromSandbox">Set this to true if you wish HoloNET to automatically retrieve the AgentPubKey & DnaHash from the hc sandbox after it has connected. This defaults to true.</param>
+        /// <param name="automaticallyAttemptToRetrieveFromConductorIfSandBoxFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the Holochain Conductor if it fails to get them from the HC Sandbox command. This defaults to true.</param>
+        /// <param name="automaticallyAttemptToRetrieveFromSandBoxIfConductorFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the HC Sandbox command if it fails to get them from the Holochain Conductor. This defaults to true.</param>
+        /// <param name="updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved">Set this to true (default) to automatically update the HoloNETDNA once it has retrieved the DnaHash & AgentPubKey.</param>
+        public HoloNETCollection(string installedAppId, string myAgentPubKey, string zomeName, string zomeLoadCollectionFunction, string zomeAddEntryToCollectionFunction, string zomeRemoveEntryFromCollectionFunction, Logger logger, string zomeBatchUpdateCollectionFunction = "", bool autoCallInitialize = true, HoloNETDNA holoNETDNA = null, ConnectedCallBackMode connectedCallBackMode = ConnectedCallBackMode.WaitForHolochainConductorToConnect, RetrieveAgentPubKeyAndDnaHashMode retrieveAgentPubKeyAndDnaHashMode = RetrieveAgentPubKeyAndDnaHashMode.Wait, bool retrieveAgentPubKeyAndDnaHashFromConductor = true, bool retrieveAgentPubKeyAndDnaHashFromSandbox = true, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true, bool updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved = true)
+        {
+            HoloNETClient = new HoloNETClientAppAgent(installedAppId, myAgentPubKey, logger, holoNETDNA);
             _disposeOfHoloNETClient = true;
 
             ZomeName = zomeName;
@@ -199,7 +354,7 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM.Collections
         /// <param name="updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved">Set this to true (default) to automatically update the HoloNETDNA once it has retrieved the DnaHash & AgentPubKey.</param>
         public HoloNETCollection(string zomeName, string zomeLoadCollectionFunction, string zomeAddEntryToCollectionFunction, string zomeRemoveEntryFromCollectionFunction, Logger logger, string zomeBatchUpdateCollectionFunction = "", bool autoCallInitialize = true, HoloNETDNA holoNETDNA = null, ConnectedCallBackMode connectedCallBackMode = ConnectedCallBackMode.WaitForHolochainConductorToConnect, RetrieveAgentPubKeyAndDnaHashMode retrieveAgentPubKeyAndDnaHashMode = RetrieveAgentPubKeyAndDnaHashMode.Wait, bool retrieveAgentPubKeyAndDnaHashFromConductor = true, bool retrieveAgentPubKeyAndDnaHashFromSandbox = true, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true, bool updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved = true)
         {
-            HoloNETClient = new HoloNETClientAppAgent(logger, holoNETDNA);
+            HoloNETClient = new HoloNETClientApp(logger, holoNETDNA);
             _disposeOfHoloNETClient = true;
 
             ZomeName = zomeName;
@@ -248,7 +403,7 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM.Collections
         /// <summary>
         /// This is a reference to the internal instance of the HoloNET Client (either the one passed in through a constructor or one created internally.)
         /// </summary>
-        public HoloNETClientAppAgent HoloNETClient { get; set; }
+        public HoloNETClientAppBase HoloNETClient { get; set; }
 
         /// <summary>
         /// This will return true whilst HoloNETEntryBaseClass and it's internal HoloNET client is initializing. The Initialize method will begin the initialization process. This will also call the Connect and RetrieveAgentPubKeyAndDnaHash methods on the HoloNET client. Once the HoloNET client has successfully connected to the Holochain Conductor, retrieved the AgentPubKey & DnaHash & then raised the OnReadyForZomeCalls event it will raise the OnInitialized event. See also the IsInitialized property.

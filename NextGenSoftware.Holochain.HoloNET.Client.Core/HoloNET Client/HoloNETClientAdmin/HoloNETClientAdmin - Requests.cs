@@ -186,7 +186,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     result.ZomeCallCapabilityGrantedResult = installedResult.ZomeCallCapabilityGrantedResult;
                     result.AppInterfaceAttachedResult = installedResult.AppInterfaceAttachedResult;
 
-                    result.HoloNETClientAppAgent = new HoloNETClientAppAgent(hAppId);
+                    result.HoloNETClientAppAgent = new HoloNETClientAppAgent(hAppId, result.AgentPubKey);
                     result.HoloNETConnectedResult = await result.HoloNETClientAppAgent.ConnectAsync($"ws://127.0.0.1:{installedResult.AttachedOnPort}");
 
                     if (result.HoloNETConnectedResult != null && !result.HoloNETConnectedResult.IsError && result.HoloNETConnectedResult.IsConnected)

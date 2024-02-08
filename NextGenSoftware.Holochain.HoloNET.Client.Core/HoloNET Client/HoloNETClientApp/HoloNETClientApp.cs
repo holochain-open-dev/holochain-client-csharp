@@ -11,17 +11,17 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="holoNETDNA">The HoloNETDNA you wish to use for this connection (optional). If this is not passed in then it will use the default HoloNETDNA defined in the HoloNETDNA property.</param>
         public HoloNETClientApp(HoloNETDNA holoNETDNA = null) : base(holoNETDNA)
         {
-            //if (holoNETDNA == null)
-            //    HoloNETDNA = new HoloNETDNA() { AutoStartHolochainConductor = false, AutoShutdownHolochainConductor = false };
+            ////if (holoNETDNA == null)
+            ////    HoloNETDNA = new HoloNETDNA() { AutoStartHolochainConductor = false, AutoShutdownHolochainConductor = false };
 
-            if (holoNETDNA == null)
-            {
-                //Will load the HoloNETDNA from disk if there is a HoloNET_DNA.json file and then default to not starting or shutting down the conductor (because the admin takes care of this).
-                HoloNETDNA.AutoStartHolochainConductor = false;
-                HoloNETDNA.AutoShutdownHolochainConductor = false;
-            }
-            else
-                HoloNETDNA = holoNETDNA;
+            //if (holoNETDNA == null)
+            //{
+            //    //Will load the HoloNETDNA from disk if there is a HoloNET_DNA.json file and then default to not starting or shutting down the conductor (because the admin takes care of this).
+            //    HoloNETDNA.AutoStartHolochainConductor = false;
+            //    HoloNETDNA.AutoShutdownHolochainConductor = false;
+            //}
+            //else
+            //    HoloNETDNA = holoNETDNA;
         }
 
         /// <summary>
@@ -32,17 +32,17 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="holoNETDNA">The HoloNETDNA you wish to use for this connection (optional). If this is not passed in then it will use the default HoloNETDNA defined in the HoloNETDNA property.</param>
         public HoloNETClientApp(ILogProvider logProvider, bool alsoUseDefaultLogger = false, HoloNETDNA holoNETDNA = null) : base(logProvider, alsoUseDefaultLogger, holoNETDNA)
         {
-            //if (holoNETDNA == null)
-            //    HoloNETDNA = new HoloNETDNA() { AutoStartHolochainConductor = false, AutoShutdownHolochainConductor = false };
+            ////if (holoNETDNA == null)
+            ////    HoloNETDNA = new HoloNETDNA() { AutoStartHolochainConductor = false, AutoShutdownHolochainConductor = false };
 
-            if (holoNETDNA == null)
-            {
-                //Will load the HoloNETDNA from disk if there is a HoloNET_DNA.json file and then default to not starting or shutting down the conductor (because the admin takes care of this).
-                HoloNETDNA.AutoStartHolochainConductor = false;
-                HoloNETDNA.AutoShutdownHolochainConductor = false;
-            }
-            else
-                HoloNETDNA = holoNETDNA;
+            //if (holoNETDNA == null)
+            //{
+            //    //Will load the HoloNETDNA from disk if there is a HoloNET_DNA.json file and then default to not starting or shutting down the conductor (because the admin takes care of this).
+            //    HoloNETDNA.AutoStartHolochainConductor = false;
+            //    HoloNETDNA.AutoShutdownHolochainConductor = false;
+            //}
+            //else
+            //    HoloNETDNA = holoNETDNA;
         }
 
         /// <summary>
@@ -53,19 +53,19 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="holoNETDNA">The HoloNETDNA you wish to use for this connection (optional). If this is not passed in then it will use the default HoloNETDNA defined in the HoloNETDNA property.</param>
         public HoloNETClientApp(IEnumerable<ILogProvider> logProviders, bool alsoUseDefaultLogger = false, HoloNETDNA holoNETDNA = null) : base(logProviders, alsoUseDefaultLogger, holoNETDNA)
         {
+            ////if (holoNETDNA == null)
+            ////    HoloNETDNA = new HoloNETDNA() { AutoStartHolochainConductor = false, AutoShutdownHolochainConductor = false };
+            ////else
+            ////    HoloNETDNA = holoNETDNA;
+
             //if (holoNETDNA == null)
-            //    HoloNETDNA = new HoloNETDNA() { AutoStartHolochainConductor = false, AutoShutdownHolochainConductor = false };
+            //{
+            //    //Will load the HoloNETDNA from disk if there is a HoloNET_DNA.json file and then default to not starting or shutting down the conductor (because the admin takes care of this).
+            //    HoloNETDNA.AutoStartHolochainConductor = false;
+            //    HoloNETDNA.AutoShutdownHolochainConductor= false;
+            //}
             //else
             //    HoloNETDNA = holoNETDNA;
-
-            if (holoNETDNA == null)
-            {
-                //Will load the HoloNETDNA from disk if there is a HoloNET_DNA.json file and then default to not starting or shutting down the conductor (because the admin takes care of this).
-                HoloNETDNA.AutoStartHolochainConductor = false;
-                HoloNETDNA.AutoShutdownHolochainConductor= false;
-            }
-            else
-                HoloNETDNA = holoNETDNA;
         }
 
         /// <summary>
@@ -75,17 +75,17 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="holoNETDNA">The HoloNETDNA you wish to use for this connection (optional). If this is not passed in then it will use the default HoloNETDNA defined in the HoloNETDNA property.</param>
         public HoloNETClientApp(Logger logger, HoloNETDNA holoNETDNA = null) : base(logger, holoNETDNA)
         {
-            //if (holoNETDNA == null)
-            //   HoloNETDNA = new HoloNETDNA() { AutoStartHolochainConductor = false, AutoShutdownHolochainConductor = false };
+            ////if (holoNETDNA == null)
+            ////   HoloNETDNA = new HoloNETDNA() { AutoStartHolochainConductor = false, AutoShutdownHolochainConductor = false };
 
-            if (holoNETDNA == null)
-            {
-                //Will load the HoloNETDNA from disk if there is a HoloNET_DNA.json file and then default to not starting or shutting down the conductor (because the admin takes care of this).
-                HoloNETDNA.AutoStartHolochainConductor = false;
-                HoloNETDNA.AutoShutdownHolochainConductor = false;
-            }
-            else
-                HoloNETDNA = holoNETDNA;
+            //if (holoNETDNA == null)
+            //{
+            //    //Will load the HoloNETDNA from disk if there is a HoloNET_DNA.json file and then default to not starting or shutting down the conductor (because the admin takes care of this).
+            //    HoloNETDNA.AutoStartHolochainConductor = false;
+            //    HoloNETDNA.AutoShutdownHolochainConductor = false;
+            //}
+            //else
+            //    HoloNETDNA = holoNETDNA;
         }
     }
 }

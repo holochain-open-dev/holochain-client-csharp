@@ -238,12 +238,28 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 {
                     appInfoResponse.data = ProcessAppInfo(appInfoResponse.data, args);
                     args.AppInfoResponse = appInfoResponse;
+                    args.AppStatus = appInfoResponse.data.AppStatus;
+                    args.AppStatusReason = appInfoResponse.data.AppStatusReason;
+                    args.AppManifest = appInfoResponse.data.manifest;
+
+                    if (response != null &&
+                        _roleLookup.ContainsKey(response.id.ToString()) &&
+                        !string.IsNullOrEmpty(_roleLookup[response.id.ToString()]) && appInfoResponse != null &&
+                            appInfoResponse.data != null &&
+                            appInfoResponse.data.cell_info != null &&
+                            appInfoResponse.data.cell_info.ContainsKey(_roleLookup[response.id.ToString()]) &&
+                            appInfoResponse.data.cell_info[_roleLookup[response.id.ToString()]] != null &&
+                            appInfoResponse.data.cell_info[_roleLookup[response.id.ToString()]].Count > 0 &&
+                            appInfoResponse.data.cell_info[_roleLookup[response.id.ToString()]][0] != null)
+                        args.CellType = appInfoResponse.data.cell_info[_roleLookup[response.id.ToString()]][0].CellInfoType;
+
+                    CachedAppInfo = appInfoResponse.data;
+                    _roleLookup.Remove(response.id.ToString());
                 }
                 else
                 {
                     args.Message = "Error occured in HoloNETClient.DecodeAppInfoDataReceived. appInfoResponse is null.";
                     args.IsError = true;
-                    //args.IsCallSuccessful = false;
                     HandleError(args.Message);
                 }
             }
@@ -251,7 +267,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             {
                 string msg = $"An unknown error occurred in HoloNETClient.DecodeAppInfoDataReceived. Reason: {ex}";
                 args.IsError = true;
-                //args.IsCallSuccessful = false;
                 args.Message = msg;
                 HandleError(msg, ex);
             }
@@ -260,7 +275,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             if (!args.IsError)
             {
                 if (!string.IsNullOrEmpty(HoloNETDNA.AgentPubKey) && !string.IsNullOrEmpty(HoloNETDNA.DnaHash))
-                    SetReadyForZomeCalls();
+                    SetReadyForZomeCalls(response.id.ToString());
 
                 else if (_automaticallyAttemptToGetFromSandboxIfConductorFails)
                     RetrieveAgentPubKeyAndDnaHashFromSandbox();
@@ -554,6 +569,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         {
             LogEvent("AppInfoCallBack", appInfoCallBackEventArgs, string.Concat("AgentPubKey: ", appInfoCallBackEventArgs.AgentPubKey, ", DnaHash: ", appInfoCallBackEventArgs.DnaHash, ", Installed App Id: ", appInfoCallBackEventArgs.InstalledAppId));
             OnAppInfoCallBack?.Invoke(this, appInfoCallBackEventArgs);
+
+            if (_taskCompletionAppInfoRetrieved != null && !string.IsNullOrEmpty(appInfoCallBackEventArgs.Id) && _taskCompletionAppInfoRetrieved.ContainsKey(appInfoCallBackEventArgs.Id))
+            {
+                _taskCompletionAppInfoRetrieved[appInfoCallBackEventArgs.Id].SetResult(appInfoCallBackEventArgs);
+                _taskCompletionAppInfoRetrieved.Remove(appInfoCallBackEventArgs.Id);
+            }
         }
 
         private void RaiseZomeDataReceivedEvent(ZomeFunctionCallBackEventArgs zomeFunctionCallBackArgs)
@@ -564,7 +585,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 _callbackLookup[zomeFunctionCallBackArgs.Id].DynamicInvoke(this, zomeFunctionCallBackArgs);
 
             if (_taskCompletionZomeCallBack.ContainsKey(zomeFunctionCallBackArgs.Id) && _taskCompletionZomeCallBack[zomeFunctionCallBackArgs.Id] != null)
+            {
                 _taskCompletionZomeCallBack[zomeFunctionCallBackArgs.Id].SetResult(zomeFunctionCallBackArgs);
+                _taskCompletionZomeCallBack.Remove(zomeFunctionCallBackArgs.Id);
+            }
 
             OnZomeFunctionCallBack?.Invoke(this, zomeFunctionCallBackArgs);
 
@@ -581,10 +605,21 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             _taskCompletionZomeCallBack.Remove(zomeFunctionCallBackArgs.Id);
         }
 
-        private void SetReadyForZomeCalls()
+        private void SetReadyForZomeCalls(string id)
         {
             RetrievingAgentPubKeyAndDnaHash = false;
-            _taskCompletionAgentPubKeyAndDnaHashRetrieved.SetResult(new AgentPubKeyDnaHash() { AgentPubKey = HoloNETDNA.AgentPubKey, DnaHash = HoloNETDNA.DnaHash });
+            
+            //TODO: Check this works...
+            if (id == "-1")
+                _taskCompletionAgentPubKeyAndDnaHashRetrieved[id] = new TaskCompletionSource<AgentPubKeyDnaHash>();
+
+            if (_taskCompletionAgentPubKeyAndDnaHashRetrieved != null && _taskCompletionAgentPubKeyAndDnaHashRetrieved.ContainsKey(id))
+            {
+                _taskCompletionAgentPubKeyAndDnaHashRetrieved[id].SetResult(new AgentPubKeyDnaHash() { AgentPubKey = HoloNETDNA.AgentPubKey, DnaHash = HoloNETDNA.DnaHash });
+                _taskCompletionAgentPubKeyAndDnaHashRetrieved.Remove(id);
+            }
+
+            //_taskCompletionAgentPubKeyAndDnaHashRetrieved.SetResult(new AgentPubKeyDnaHash() { AgentPubKey = HoloNETDNA.AgentPubKey, DnaHash = HoloNETDNA.DnaHash });
 
             IsReadyForZomesCalls = true;
             ReadyForZomeCallsEventArgs eventArgs = new ReadyForZomeCallsEventArgs(EndPoint, HoloNETDNA.DnaHash, HoloNETDNA.AgentPubKey);

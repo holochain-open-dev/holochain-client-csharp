@@ -337,7 +337,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
                 {
                     LogMessage($"APP: No Existing HoloNETClient AppAgent WebSocket Found Running For AgentPubKey {CurrentApp.AgentPubKey}, DnaHash {CurrentApp.DnaHash} And InstalledAppId {CurrentApp.Name} So Creating New HoloNETClient AppAgent WebSocket Now...");
 
-                    HoloNETClientAppAgent newClient = CreateNewAppAgentClientConnection(e.Port.Value);
+                    HoloNETClientAppAgent newClient = CreateNewAppAgentClientConnection(CurrentApp.Name, CurrentApp.AgentPubKey, e.Port.Value);
                     LogMessage($"APP: New HoloNETClient AppAgent WebSocket Created.");
 
                     ShowStatusMessage($"Connecting To HoloNETClient AppAgent WebSocket On Port {e.Port}...", StatusMessageType.Information, true);

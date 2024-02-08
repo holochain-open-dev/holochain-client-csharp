@@ -16,20 +16,24 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <summary>
         /// This method will retrieve the AgentPubKey & DnaHash from either the Holochain Conductor or HC Sandbox depending on what params are passed in. It will default to retrieving from the Conductor first. It will call RetrieveAgentPubKeyAndDnaHashFromConductor and RetrieveAgentPubKeyAndDnaHashFromSandboxAsync internally.
         /// </summary>
+        /// <param name="installedAppId">If this is set then HoloNET will retreive the agentPubKey and DnaHash for this AppId. If it is not set it will retreive it for the InstalledAppId defined in the HoloNETDNA. This field is optional.</param>
+        /// <param name="roleName">If this is set then HoloNET will look up the CellType and return it in the OnAppInfoCallBack event. This field is optional.</param>
         /// <param name="retrieveAgentPubKeyAndDnaHashFromConductor">Set this to true for HoloNET to automatically retrieve the AgentPubKey & DnaHash from the Holochain Conductor after it has connected. This defaults to true.</param>
         /// <param name="retrieveAgentPubKeyAndDnaHashFromSandbox">Set this to true if you wish HoloNET to automatically retrieve the AgentPubKey & DnaHash from the hc sandbox after it has connected. This defaults to true.</param>
         /// <param name="automaticallyAttemptToRetrieveFromConductorIfSandBoxFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the Holochain Conductor if it fails to get them from the HC Sandbox command. This defaults to true.</param>
         /// <param name="automaticallyAttemptToRetrieveFromSandBoxIfConductorFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the HC Sandbox command if it fails to get them from the Holochain Conductor. This defaults to true.</param>
         /// <param name="updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved">Set this to true (default) to automatically update the HoloNETDNA property once it has retrieved the DnaHash & AgentPubKey.</param>
         /// <returns>The AgentPubKey and DnaHash</returns>
-        public AgentPubKeyDnaHash RetrieveAgentPubKeyAndDnaHash(bool retrieveAgentPubKeyAndDnaHashFromConductor = true, bool retrieveAgentPubKeyAndDnaHashFromSandbox = false, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true, bool updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved = true)
+        public AgentPubKeyDnaHash RetrieveAgentPubKeyAndDnaHash(string installedAppId = null, string roleName = null, bool retrieveAgentPubKeyAndDnaHashFromConductor = true, bool retrieveAgentPubKeyAndDnaHashFromSandbox = false, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true, bool updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved = true)
         {
-            return RetrieveAgentPubKeyAndDnaHashAsync(RetrieveAgentPubKeyAndDnaHashMode.UseCallBackEvents, retrieveAgentPubKeyAndDnaHashFromConductor, retrieveAgentPubKeyAndDnaHashFromSandbox, automaticallyAttemptToRetrieveFromConductorIfSandBoxFails, automaticallyAttemptToRetrieveFromSandBoxIfConductorFails, updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved).Result;
+            return RetrieveAgentPubKeyAndDnaHashAsync(installedAppId, roleName, RetrieveAgentPubKeyAndDnaHashMode.UseCallBackEvents, retrieveAgentPubKeyAndDnaHashFromConductor, retrieveAgentPubKeyAndDnaHashFromSandbox, automaticallyAttemptToRetrieveFromConductorIfSandBoxFails, automaticallyAttemptToRetrieveFromSandBoxIfConductorFails, updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved).Result;
         }
 
         /// <summary>
         /// This method will retrieve the AgentPubKey & DnaHash from either the Holochain Conductor or HC Sandbox depending on what params are passed in. It will default to retrieving from the Conductor first. It will call RetrieveAgentPubKeyAndDnaHashFromConductor and RetrieveAgentPubKeyAndDnaHashFromSandboxAsync internally.
         /// </summary>
+        /// <param name="installedAppId">If this is set then HoloNET will retreive the agentPubKey and DnaHash for this AppId. If it is not set it will retreive it for the InstalledAppId defined in the HoloNETDNA. This field is optional.</param>
+        /// <param name="roleName">If this is set then HoloNET will look up the CellType and return it in the OnAppInfoCallBack event. This field is optional.</param>
         /// <param name="retrieveAgentPubKeyAndDnaHashMode">If set to `Wait` (default) it will await until it has finished retrieving the AgentPubKey & DnaHash before returning, otherwise it will return immediately and then raise the OnReadyForZomeCalls event once it has finished retrieving the DnaHash & AgentPubKey.</param>
         /// <param name="retrieveAgentPubKeyAndDnaHashFromConductor">Set this to true for HoloNET to automatically retrieve the AgentPubKey & DnaHash from the Holochain Conductor after it has connected. This defaults to true.</param>
         /// <param name="retrieveAgentPubKeyAndDnaHashFromSandbox">Set this to true if you wish HoloNET to automatically retrieve the AgentPubKey & DnaHash from the hc sandbox after it has connected. This defaults to true.</param>
@@ -37,7 +41,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="automaticallyAttemptToRetrieveFromSandBoxIfConductorFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the HC Sandbox command if it fails to get them from the Holochain Conductor. This defaults to true.</param>
         /// <param name="updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved">Set this to true (default) to automatically update the HoloNETDNA property once it has retrieved the DnaHash & AgentPubKey.</param>
         /// <returns>The AgentPubKey and DnaHash</returns>
-        public async Task<AgentPubKeyDnaHash> RetrieveAgentPubKeyAndDnaHashAsync(RetrieveAgentPubKeyAndDnaHashMode retrieveAgentPubKeyAndDnaHashMode = RetrieveAgentPubKeyAndDnaHashMode.Wait, bool retrieveAgentPubKeyAndDnaHashFromConductor = true, bool retrieveAgentPubKeyAndDnaHashFromSandbox = true, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true, bool updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved = true)
+        public async Task<AgentPubKeyDnaHash> RetrieveAgentPubKeyAndDnaHashAsync(string installedAppId = null, string roleName = null, RetrieveAgentPubKeyAndDnaHashMode retrieveAgentPubKeyAndDnaHashMode = RetrieveAgentPubKeyAndDnaHashMode.Wait, bool retrieveAgentPubKeyAndDnaHashFromConductor = true, bool retrieveAgentPubKeyAndDnaHashFromSandbox = true, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true, bool updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved = true)
         {
             if (RetrievingAgentPubKeyAndDnaHash)
                 return null;
@@ -46,7 +50,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             //Try to first get from the conductor.
             if (retrieveAgentPubKeyAndDnaHashFromConductor)
-                return await RetrieveAgentPubKeyAndDnaHashFromConductorAsync(null, retrieveAgentPubKeyAndDnaHashMode, updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved, automaticallyAttemptToRetrieveFromSandBoxIfConductorFails);
+                return await RetrieveAgentPubKeyAndDnaHashFromConductorAsync(installedAppId, roleName,retrieveAgentPubKeyAndDnaHashMode, updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved, automaticallyAttemptToRetrieveFromSandBoxIfConductorFails);
 
             else if (retrieveAgentPubKeyAndDnaHashFromSandbox)
             {
@@ -110,7 +114,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     Logger.Log("AgentPubKey & DnaHash successfully retrieved from hc sandbox.", LogType.Info, false);
 
                     if (WebSocket.State == WebSocketState.Open && !string.IsNullOrEmpty(HoloNETDNA.AgentPubKey) && !string.IsNullOrEmpty(HoloNETDNA.DnaHash))
-                        SetReadyForZomeCalls();
+                        SetReadyForZomeCalls("-1");
 
                     return new AgentPubKeyDnaHash() { DnaHash = dnaHash, AgentPubKey = agentPubKey };
                 }
@@ -139,11 +143,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <summary>
         /// This method gets the AgentPubKey & DnaHash from the Holochain Conductor (the Connect method will automatically call this by default). Once it has retrieved them and the WebSocket has connceted to the Holochain Conductor it will raise the OnReadyForZomeCalls event. If it fails to retrieve the AgentPubKey and DnaHash from the Conductor and the optional `automaticallyAttemptToRetrieveFromSandBoxIfConductorFails` flag is true (defaults to true), it will call the RetrieveAgentPubKeyAndDnaHashFromSandbox method. 
         /// </summary>
+        /// <param name="installedAppId">If this is set then HoloNET will retreive the agentPubKey and DnaHash for this AppId. If it is not set it will retreive it for the InstalledAppId defined in the HoloNETDNA. This field is optional.</param>
+        /// <param name="roleName">If this is set then HoloNET will look up the CellType and return it in the OnAppInfoCallBack event. This field is optional.</param>
         /// <param name="retrieveAgentPubKeyAndDnaHashMode">If set to `Wait` (default) it will await until it has finished retrieving the AgentPubKey & DnaHash before returning, otherwise it will return immediately and then raise the OnReadyForZomeCalls event once it has finished retrieving the DnaHash & AgentPubKey.</param>
         /// <param name="updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved">Set this to true (default) to automatically update the HoloNETDNA property once it has retrieved the DnaHash & AgentPubKey.</param>
         /// <param name="automaticallyAttemptToRetrieveFromSandBoxIfConductorFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the HC Sandbox command if it fails to get them from the Holochain Conductor. This defaults to true.</param>
         /// <returns>The AgentPubKey and DnaHash</returns>
-        public async Task<AgentPubKeyDnaHash> RetrieveAgentPubKeyAndDnaHashFromConductorAsync(string installedAppId = null, RetrieveAgentPubKeyAndDnaHashMode retrieveAgentPubKeyAndDnaHashMode = RetrieveAgentPubKeyAndDnaHashMode.Wait, bool updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true)
+        public async Task<AgentPubKeyDnaHash> RetrieveAgentPubKeyAndDnaHashFromConductorAsync(string installedAppId = null, string roleName = null, RetrieveAgentPubKeyAndDnaHashMode retrieveAgentPubKeyAndDnaHashMode = RetrieveAgentPubKeyAndDnaHashMode.Wait, bool updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true)
         {
             try
             {
@@ -157,6 +163,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     else
                         installedAppId = "test-app";
                 }
+
+                _currentId++;
+                _taskCompletionAgentPubKeyAndDnaHashRetrieved[_currentId.ToString()] = new TaskCompletionSource<AgentPubKeyDnaHash>();
+
+                if (!string.IsNullOrEmpty(roleName))
+                    _roleLookup[_currentId.ToString()] = roleName;
 
                 _automaticallyAttemptToGetFromSandboxIfConductorFails = automaticallyAttemptToRetrieveFromSandBoxIfConductorFails;
                 RetrievingAgentPubKeyAndDnaHash = true;
@@ -172,10 +184,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     }
                 };
 
-                await SendHoloNETRequestAsync(holoNETData, HoloNETRequestType.AppInfo);
+                await SendHoloNETRequestAsync(holoNETData, HoloNETRequestType.AppInfo, _currentId.ToString());
 
                 if (retrieveAgentPubKeyAndDnaHashMode == RetrieveAgentPubKeyAndDnaHashMode.Wait)
-                    return await _taskCompletionAgentPubKeyAndDnaHashRetrieved.Task;
+                    return await _taskCompletionAgentPubKeyAndDnaHashRetrieved[_currentId.ToString()].Task;
             }
             catch (Exception ex)
             {
@@ -188,12 +200,77 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <summary>
         /// This method gets the AgentPubKey & DnaHash from the Holochain Conductor (the Connect method will automatically call this by default). Once it has retrieved them and the WebSocket has connceted to the Holochain Conductor it will raise the OnReadyForZomeCalls event. If it fails to retrieve the AgentPubKey and DnaHash from the Conductor and the optional `automaticallyAttemptToRetrieveFromSandBoxIfConductorFails` flag is true (defaults to true), it will call the RetrieveAgentPubKeyAndDnaHashFromSandbox method. 
         /// </summary>
+        /// <param name="installedAppId">If this is set then HoloNET will retreive the agentPubKey and DnaHash for this AppId. If it is not set it will retreive it for the InstalledAppId defined in the HoloNETDNA. This field is optional.</param>
+        /// <param name="roleName">If this is set then HoloNET will look up the CellType and return it in the OnAppInfoCallBack event. This field is optional.</param>
         /// <param name="updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved">Set this to true (default) to automatically update the HoloNETDNA property once it has retrieved the DnaHash & AgentPubKey.</param>
         /// <param name="automaticallyAttemptToRetrieveFromSandBoxIfConductorFails">If this is set to true it will automatically attempt to get the AgentPubKey & DnaHash from the HC Sandbox command if it fails to get them from the Holochain Conductor. This defaults to true.</param>
         /// <returns>The AgentPubKey and DnaHash</returns>
-        public AgentPubKeyDnaHash RetrieveAgentPubKeyAndDnaHashFromConductor(string installedAppId = null, bool updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true)
+        public AgentPubKeyDnaHash RetrieveAgentPubKeyAndDnaHashFromConductor(string installedAppId = null, string roleName = null, bool updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true)
         {
-            return RetrieveAgentPubKeyAndDnaHashFromConductorAsync(installedAppId, RetrieveAgentPubKeyAndDnaHashMode.UseCallBackEvents, updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved, automaticallyAttemptToRetrieveFromSandBoxIfConductorFails).Result;
+            return RetrieveAgentPubKeyAndDnaHashFromConductorAsync(installedAppId, roleName, RetrieveAgentPubKeyAndDnaHashMode.UseCallBackEvents, updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved, automaticallyAttemptToRetrieveFromSandBoxIfConductorFails).Result;
+        }
+
+        /// <summary>
+        /// This method gets the AppInfo from the Holochain Conductor.
+        /// </summary>
+        /// <param name="installedAppId">If this is set then HoloNET will retreive the agentPubKey and DnaHash for this AppId. If it is not set it will retreive it for the InstalledAppId defined in the HoloNETDNA. This field is optional.</param>
+        /// <param name="roleName">If this is set then HoloNET will look up the CellType and return it in the OnAppInfoCallBack event. This field is optional.</param>
+        /// <param name="conductorResponseCallBackMode">If set to `WaitForHolochainConductorResponse` (default) it will await until it has finished retrieving the AppInfo before returning, otherwise it will return immediately and then raise the OnAppInfoCallBack event once it has finished retrieving the AppInfo.</param>
+        /// <returns>AppInfoCallBackEventArgs</returns>
+        public async Task<AppInfoCallBackEventArgs> GetAppInfoAsync(string installedAppId = null, string roleName = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(installedAppId))
+                {
+                    if (!string.IsNullOrEmpty(HoloNETDNA.InstalledAppId))
+                        installedAppId = HoloNETDNA.InstalledAppId;
+                    else
+                        installedAppId = "test-app";
+                }
+
+                _currentId++;
+                _taskCompletionAppInfoRetrieved[_currentId.ToString()] = new TaskCompletionSource<AppInfoCallBackEventArgs>();
+
+                if (!string.IsNullOrEmpty(roleName))
+                    _roleLookup[_currentId.ToString()] = roleName;
+
+                RetrievingAgentPubKeyAndDnaHash = true;
+               // _updateDnaHashAndAgentPubKey = updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved;
+                Logger.Log("Attempting To Retrieve AppInfo from Holochain Conductor...", LogType.Info, true);
+
+                HoloNETData holoNETData = new HoloNETData()
+                {
+                    type = "app_info",
+                    data = new AppInfoRequest()
+                    {
+                        installed_app_id = installedAppId
+                    }
+                };
+
+                await SendHoloNETRequestAsync(holoNETData, HoloNETRequestType.AppInfo, _currentId.ToString());
+
+                if (conductorResponseCallBackMode == ConductorResponseCallBackMode.WaitForHolochainConductorResponse)
+                    return await _taskCompletionAppInfoRetrieved[_currentId.ToString()].Task;
+            }
+            catch (Exception ex)
+            {
+                HandleError("Error occurred in HoloNETClient.GetAppInfoAsync method getting the AppInfo from hApp.", ex);
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// This method gets the AppInfo from the Holochain Conductor.
+        /// </summary>
+        /// <param name="installedAppId">If this is set then HoloNET will retreive the agentPubKey and DnaHash for this AppId. If it is not set it will retreive it for the InstalledAppId defined in the HoloNETDNA. This field is optional.</param>
+        /// <param name="roleName">If this is set then HoloNET will look up the CellType and return it in the OnAppInfoCallBack event. This field is optional.</param>
+        /// <param name="conductorResponseCallBackMode">If set to `WaitForHolochainConductorResponse` (default) it will await until it has finished retrieving the AppInfo before returning, otherwise it will return immediately and then raise the OnAppInfoCallBack event once it has finished retrieving the AppInfo.</param>
+        /// <returns>AppInfoCallBackEventArgs</returns>
+        public async Task<AppInfoCallBackEventArgs> GetAppInfo(string installedAppId = null, string roleName = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse)
+        {
+            return GetAppInfoAsync(installedAppId, roleName, ConductorResponseCallBackMode.UseCallBackEvents).Result;
         }
 
         /// <summary>

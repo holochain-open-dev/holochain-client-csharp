@@ -5,7 +5,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.MAUI
     public partial class MainPage : ContentPage
     {
         int count = 0;
-        HoloNETClientAppAgent _client = new HoloNETClientAppAgent();
+        HoloNETClientApp _client = new HoloNETClientApp();
 
         public MainPage()
         {

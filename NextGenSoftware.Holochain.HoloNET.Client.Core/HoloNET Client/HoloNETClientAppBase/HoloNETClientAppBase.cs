@@ -14,6 +14,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         private bool _getAgentPubKeyAndDnaHashFromConductor;
         private bool _automaticallyAttemptToGetFromSandboxIfConductorFails;
         private bool _updateDnaHashAndAgentPubKey = true;
+        private Dictionary<string, string> _roleLookup = new Dictionary<string, string>();
         private Dictionary<string, string> _zomeLookup = new Dictionary<string, string>();
         private Dictionary<string, string> _funcLookup = new Dictionary<string, string>();
         private Dictionary<string, Type> _entryDataObjectTypeLookup = new Dictionary<string, Type>();
@@ -21,10 +22,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         private Dictionary<string, ZomeFunctionCallBack> _callbackLookup = new Dictionary<string, ZomeFunctionCallBack>();
         private Dictionary<string, ZomeFunctionCallBackEventArgs> _zomeReturnDataLookup = new Dictionary<string, ZomeFunctionCallBackEventArgs>();
         private Dictionary<string, bool> _cacheZomeReturnDataLookup = new Dictionary<string, bool>();
-        private TaskCompletionSource<AgentPubKeyDnaHash> _taskCompletionAgentPubKeyAndDnaHashRetrieved = new TaskCompletionSource<AgentPubKeyDnaHash>();
+        private Dictionary<string, TaskCompletionSource<AgentPubKeyDnaHash>> _taskCompletionAgentPubKeyAndDnaHashRetrieved = new Dictionary<string, TaskCompletionSource<AgentPubKeyDnaHash>>();
+        private Dictionary<string, TaskCompletionSource<AppInfoCallBackEventArgs>> _taskCompletionAppInfoRetrieved = new Dictionary<string, TaskCompletionSource<AppInfoCallBackEventArgs>>();
         private Dictionary<string, TaskCompletionSource<ZomeFunctionCallBackEventArgs>> _taskCompletionZomeCallBack = new Dictionary<string, TaskCompletionSource<ZomeFunctionCallBackEventArgs>>();
         private Dictionary<string, PropertyInfo[]> _dictPropertyInfos = new Dictionary<string, PropertyInfo[]>();
         private TaskCompletionSource<ReadyForZomeCallsEventArgs> _taskCompletionReadyForZomeCalls = new TaskCompletionSource<ReadyForZomeCallsEventArgs>();
+
+        public AppInfo CachedAppInfo { get; set; }
 
         //Events
 
@@ -205,7 +209,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         {
             _getAgentPubKeyAndDnaHashFromConductor = retrieveAgentPubKeyAndDnaHashFromConductor;
             _taskCompletionReadyForZomeCalls = new TaskCompletionSource<ReadyForZomeCallsEventArgs>();
-            _taskCompletionAgentPubKeyAndDnaHashRetrieved = new TaskCompletionSource<AgentPubKeyDnaHash>(); //TODO: Need to init all of these in the code base for each call! ;-)
+           // _taskCompletionAgentPubKeyAndDnaHashRetrieved = new Dictionary<string, TaskCompletionSource<AgentPubKeyDnaHash>>(); //TODO: Need to init all of these in the code base for each call! ;-)
 
             if (string.IsNullOrEmpty(holochainConductorURI))
                 holochainConductorURI = HoloNETDNA.HolochainConductorAppAgentURI;
@@ -269,7 +273,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             {
                 //If the AgentPubKey & DnaHash have already been retrieved from the hc sandbox command (or was passed in) then raise the OnReadyForZomeCalls event.
                 if (WebSocket.State == WebSocketState.Open && !string.IsNullOrEmpty(HoloNETDNA.AgentPubKey) && !string.IsNullOrEmpty(HoloNETDNA.DnaHash))
-                    SetReadyForZomeCalls();
+                    SetReadyForZomeCalls("-1");
 
                 //Otherwise, if the retrieveAgentPubKeyAndDnaHashFromConductor param was set to true when calling the Connect method, retrieve them now...
                 else if (_getAgentPubKeyAndDnaHashFromConductor)
@@ -277,7 +281,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     if (_connectingAsync)
                         RetrieveAgentPubKeyAndDnaHashFromConductorAsync();
                     else
-                        RetrieveAgentPubKeyAndDnaHashFromConductorAsync(null, RetrieveAgentPubKeyAndDnaHashMode.UseCallBackEvents);
+                        RetrieveAgentPubKeyAndDnaHashFromConductorAsync(null, null, RetrieveAgentPubKeyAndDnaHashMode.UseCallBackEvents);
                 }
 
                 base.WebSocket_OnConnected(sender, e);

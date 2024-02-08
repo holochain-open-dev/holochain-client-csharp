@@ -13,7 +13,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
 {
     public partial class HoloNETManager
     {
-        public HoloNETClientAppAgent CreateNewAppAgentClientConnection(ushort port)
+        public HoloNETClientAppAgent CreateNewAppAgentClientConnection(string installedAppId, string agentPubKey, ushort port)
         {
             //_test[CurrentApp.Name] = new HoloNETClientAppAgent(new HoloNETDNA()
             //{
@@ -57,7 +57,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
             //return _holoNETappClients[_holoNETappClients.Count - 1];
 
             // If you do not pass a HoloNETDNA in then it will use the one persisted to disk from the previous run if SaveDNA was called(if there is no saved DNA then it will use the defaults).
-            HoloNETClientAppAgent newClient = new HoloNETClientAppAgent(new HoloNETDNA()
+            HoloNETClientAppAgent newClient = new HoloNETClientAppAgent(installedAppId, agentPubKey, new HoloNETDNA()
             {
                 HolochainConductorAppAgentURI = $"ws://127.0.0.1:{port}"
             });
