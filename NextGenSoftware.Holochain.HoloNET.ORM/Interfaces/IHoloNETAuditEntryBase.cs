@@ -1,11 +1,10 @@
 ﻿using NextGenSoftware.Holochain.HoloNET.Client;
-using NextGenSoftware.Holochain.HoloNET.ORM.Entries;
 
 namespace NextGenSoftware.Holochain.HoloNET.ORM.Interfaces
 {
     public interface IHoloNETAuditEntryBase : IHoloNETEntryBase
     {
-        List<HoloNETAuditEntry> AuditEntries { get; set; }
+        List<IHoloNETAuditEntry> AuditEntries { get; set; }
         string CreatedBy { get; set; }
         DateTime CreatedDate { get; set; }
         string DeletedBy { get; set; }

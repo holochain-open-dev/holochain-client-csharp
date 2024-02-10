@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.WebSockets;
-using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.AppManifest;
+using NextGenSoftware.Holochain.HoloNET.Client.Interfaces;
 using NextGenSoftware.WebSocket;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
@@ -51,7 +51,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public Dictionary<string, object> ZomeReturnData { get; set; }
         public Dictionary<object, object> RawZomeReturnData { get; set; }
         public string ZomeReturnHash { get; set; }
-        public List<EntryData> Entries { get; set; } = new List<EntryData>();
+        public List<IEntryData> Entries { get; set; } = new List<IEntryData>();
         public Dictionary<string, string> KeyValuePair { get; set; }
         public string KeyValuePairAsString { get; set; }
     }
@@ -70,10 +70,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
     public class AppInfoCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
-        public AppInfoResponse AppInfoResponse { get; set; }
+        public IAppInfoResponse AppInfoResponse { get; set; }
         public AppInfoStatusEnum AppStatus { get; set; } //TODO: Set
         public string AppStatusReason { get; set; } //TODO: Set
-        public AppManifest AppManifest { get; set; } //TODO: Set
+        public IAppManifest AppManifest { get; set; } //TODO: Set
         public string InstalledAppId { get; set; }
         public string DnaHash { get; set; }
         public string AgentPubKey { get; set; }
@@ -142,7 +142,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public string AgentPubKey { get; set; }
         public string DnaHash { get; set; }
         public SignalType SignalType { get; set; }
-        public SignalData RawSignalData { get;set;}
+        public ISignalData RawSignalData { get;set;}
         public Dictionary<string, object> SignalData { get; set; }
         public string SignalDataAsString { get; set; }
     }

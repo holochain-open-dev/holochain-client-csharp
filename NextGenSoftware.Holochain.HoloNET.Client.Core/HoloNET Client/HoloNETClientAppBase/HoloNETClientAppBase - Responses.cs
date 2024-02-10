@@ -8,7 +8,7 @@ using NextGenSoftware.Holochain.HoloNET.Client.Interfaces;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
-    public abstract partial class HoloNETClientAppBase : HoloNETClientBase
+    public abstract partial class HoloNETClientAppBase : HoloNETClientBase, IHoloNETClientAppBase
     {
         /// <summary>
         /// This method maps the data returned from the Conductor zome call onto a dynamic data object passed into the CallZomeFunction method. Alternatively the type of the data object can be passed in, for which an instance of it will be created. Either way the now mapped and populated data object is then returned in the `ZomeFunctionCallBackEventArgs.EntryData.EntryDataObject` property during the OnZomeFunctionCallBack event. Please see OnZomeFunctionCallBack for more info. This method is called internally but can also be called manually and is used by the HoloNETEntryBaseClass and HoloNETAuditEntryBaseClass.
@@ -155,9 +155,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             return MapEntryDataObjectAsync(entryDataObject, keyValuePairs, cacheEntryDataObjectPropertyInfos).Result;
         }
 
-        protected override HoloNETResponse ProcessDataReceived(WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
+        protected override IHoloNETResponse ProcessDataReceived(WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
         {
-            HoloNETResponse response = null;
+            IHoloNETResponse response = null;
 
             try
             {
@@ -190,7 +190,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             return response;
         }
 
-        protected override string ProcessErrorReceivedFromConductor(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
+        protected override string ProcessErrorReceivedFromConductor(IHoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
         {
             string msg = base.ProcessErrorReceivedFromConductor(response, dataReceivedEventArgs);
 
@@ -223,7 +223,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             return msg;
         }
 
-        private void DecodeAppInfoDataReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
+        private void DecodeAppInfoDataReceived(IHoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
         {
             AppInfoCallBackEventArgs args = new AppInfoCallBackEventArgs();
             AppInfoResponse appInfoResponse = null;
@@ -284,7 +284,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             RaiseAppInfoReceivedEvent(args);
         }
 
-        private void DecodeSignalDataReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
+        private void DecodeSignalDataReceived(IHoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
         {
             SignalCallBackEventArgs signalCallBackEventArgs = new SignalCallBackEventArgs();
 
@@ -336,7 +336,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             RaiseSignalReceivedEvent(signalCallBackEventArgs);
         }
 
-        private void DecodeZomeDataReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
+        private void DecodeZomeDataReceived(IHoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
         {
             Logger.Log("ZOME RESPONSE DATA DETECTED\n", LogType.Info);
             AppResponse appResponse = MessagePackSerializer.Deserialize<AppResponse>(response.data, messagePackSerializerOptions);

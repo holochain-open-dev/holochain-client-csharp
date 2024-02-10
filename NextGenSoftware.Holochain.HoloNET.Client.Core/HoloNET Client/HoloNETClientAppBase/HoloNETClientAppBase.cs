@@ -6,10 +6,11 @@ using System.Reflection;
 using NextGenSoftware.WebSocket;
 using NextGenSoftware.Logging;
 using NextGenSoftware.Holochain.HoloNET.Client.Interfaces;
+using NextGenSoftware.Logging.Interfaces;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
-    public abstract partial class HoloNETClientAppBase : HoloNETClientBase
+    public abstract partial class HoloNETClientAppBase : HoloNETClientBase, IHoloNETClientAppBase
     {
         private bool _getAgentPubKeyAndDnaHashFromConductor;
         private bool _automaticallyAttemptToGetFromSandboxIfConductorFails;
@@ -80,7 +81,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// This constructor uses the built-in DefaultLogger and the settings contained in the HoloNETDNA.
         /// </summary>
         /// <param name="holoNETDNA">The HoloNETDNA you wish to use for this connection (optional). If this is not passed in then it will use the default HoloNETDNA defined in the HoloNETDNA property.</param>
-        public HoloNETClientAppBase(HoloNETDNA holoNETDNA = null) : base(holoNETDNA)
+        public HoloNETClientAppBase(IHoloNETDNA holoNETDNA = null) : base(holoNETDNA)
         {
             //if (holoNETDNA == null)
             //    HoloNETDNA = new HoloNETDNA() { AutoStartHolochainConductor = false, AutoShutdownHolochainConductor = false };
@@ -101,7 +102,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="logProvider">The implementation of the ILogProvider interface (custom logProvider).</param>
         /// <param name="alsoUseDefaultLogger">Set this to true if you wish HoloNET to also log to the DefaultLogger as well as any custom logger injected in.</param>
         /// <param name="holoNETDNA">The HoloNETDNA you wish to use for this connection (optional). If this is not passed in then it will use the default HoloNETDNA defined in the HoloNETDNA property.</param>
-        public HoloNETClientAppBase(ILogProvider logProvider, bool alsoUseDefaultLogger = false, HoloNETDNA holoNETDNA = null) : base(logProvider, alsoUseDefaultLogger, holoNETDNA)
+        public HoloNETClientAppBase(ILogProvider logProvider, bool alsoUseDefaultLogger = false, IHoloNETDNA holoNETDNA = null) : base(logProvider, alsoUseDefaultLogger, holoNETDNA)
         {
             //if (holoNETDNA == null)
             //    HoloNETDNA = new HoloNETDNA() { AutoStartHolochainConductor = false, AutoShutdownHolochainConductor = false };
@@ -122,7 +123,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="logProviders">The implementations of the ILogProvider interface (custom logProviders).</param>
         /// <param name="alsoUseDefaultLogger">Set this to true if you wish HoloNET to also log to the DefaultLogger as well as any custom loggers injected in.</param>
         /// <param name="holoNETDNA">The HoloNETDNA you wish to use for this connection (optional). If this is not passed in then it will use the default HoloNETDNA defined in the HoloNETDNA property.</param>
-        public HoloNETClientAppBase(IEnumerable<ILogProvider> logProviders, bool alsoUseDefaultLogger = false, HoloNETDNA holoNETDNA = null) : base(logProviders, alsoUseDefaultLogger, holoNETDNA)
+        public HoloNETClientAppBase(IEnumerable<ILogProvider> logProviders, bool alsoUseDefaultLogger = false, IHoloNETDNA holoNETDNA = null) : base(logProviders, alsoUseDefaultLogger, holoNETDNA)
         {
             //if (holoNETDNA == null)
             //    HoloNETDNA = new HoloNETDNA() { AutoStartHolochainConductor = false, AutoShutdownHolochainConductor = false };
@@ -144,7 +145,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// </summary>
         /// <param name="logger">The logger instance to use.</param>
         /// <param name="holoNETDNA">The HoloNETDNA you wish to use for this connection (optional). If this is not passed in then it will use the default HoloNETDNA defined in the HoloNETDNA property.</param>
-        public HoloNETClientAppBase(Logger logger, HoloNETDNA holoNETDNA = null) : base(logger, holoNETDNA)
+        public HoloNETClientAppBase(ILogger logger, IHoloNETDNA holoNETDNA = null) : base(logger, holoNETDNA)
         {
             //if (holoNETDNA == null)
             //   HoloNETDNA = new HoloNETDNA() { AutoStartHolochainConductor = false, AutoShutdownHolochainConductor = false };

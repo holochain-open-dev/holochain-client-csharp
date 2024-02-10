@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.AppManifest;
 using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects;
+using NextGenSoftware.Holochain.HoloNET.Client.Interfaces;
 using NextGenSoftware.WebSocket;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
@@ -21,7 +21,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public CellInfoType CellType { get; set; } = CellInfoType.None;
         public AppInfoStatusEnum AppStatus { get; set; }
         public string AppStatusReason { get; set; }
-        public AppManifest AppManifest { get; set; }
+        public IAppManifest AppManifest { get; set; }
         public UInt16? AttachedOnPort { get; set; }
 
         public AgentPubKeyGeneratedCallBackEventArgs AgentPubKeyGeneratedResult { get; set; }
@@ -34,7 +34,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
     public class InstallEnableSignAttachAndConnectToHappEventArgs : InstallEnableSignAndAttachHappEventArgs
     {
         public bool IsAppConnected { get; set; }
-        public HoloNETClientAppAgent HoloNETClientAppAgent { get; set; }
+        public IHoloNETClientAppAgent HoloNETClientAppAgent { get; set; }
         public HoloNETConnectedEventArgs HoloNETConnectedResult { get; set; }
     }
 
@@ -50,7 +50,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
     public class AgentPubKeyGeneratedCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
-        public AppResponse AppResponse { get; set; }
+        public IAppResponse AppResponse { get; set; }
         public string AgentPubKey { get; set; }
     }
 
@@ -81,7 +81,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
     public class DnaDefinitionReturnedCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
-        public DnaDefinitionResponse DnaDefinition { get; set; }
+        public IDnaDefinitionResponse DnaDefinition { get; set; }
     }
 
     public class AppInterfacesListedCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
@@ -91,7 +91,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
     public class AppsListedCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
-        public List<AppInfo> Apps { get; set; } = new List<AppInfo>();
+        public List<IAppInfo> Apps { get; set; } = new List<IAppInfo>();
     }
 
     public class DnasListedCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
@@ -106,7 +106,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
     public class GetAppInfoCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
-        public AppInfo AppInfo { get; set; }
+        public IAppInfo AppInfo { get; set; }
     }
 
     public class StateDumpedCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
@@ -116,7 +116,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
     public class FullStateDumpedCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
-        public FullStateDumpedResponse DumpedState { get; set; }
+        public IFullStateDumpedResponse DumpedState { get; set; }
     }
 
     public class CoordinatorsUpdatedCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
@@ -126,7 +126,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
     public class AgentInfoReturnedCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
-        public AgentInfo AgentInfo { get; set; }
+        public IAgentInfo AgentInfo { get; set; }
     }
 
     public class AgentInfoAddedCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
@@ -141,7 +141,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
     public class StorageInfoReturnedCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
-        public StorageInfoResponse StorageInfoResponse { get; set; }
+        public IStorageInfoResponse StorageInfoResponse { get; set; }
     }
 
     public class NetworkMetricsDumpedCallBackEventArgs : HoloNETDataReceivedBaseEventArgs

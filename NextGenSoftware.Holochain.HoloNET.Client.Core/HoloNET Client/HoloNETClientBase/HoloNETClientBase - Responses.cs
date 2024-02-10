@@ -10,11 +10,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 {
     public abstract partial class HoloNETClientBase : IHoloNETClientBase
     {
-        protected virtual HoloNETResponse ProcessDataReceived(WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
+        protected virtual IHoloNETResponse ProcessDataReceived(WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
         {
             string rawBinaryDataAsString = "";
             string rawBinaryDataDecoded = "";
-            HoloNETResponse response = null;
+            IHoloNETResponse response = null;
 
             try
             {
@@ -42,7 +42,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             return response;
         }
 
-        protected virtual string ProcessErrorReceivedFromConductor(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
+        protected virtual string ProcessErrorReceivedFromConductor(IHoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
         {
             string msg = $"Error in HoloNETClient.ProcessErrorReceivedFromConductor method. Error received from Holochain Conductor: ";
 
@@ -69,7 +69,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             return msg;
         }
 
-        protected virtual T ProcessResponeError<T>(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs, string responseErrorType, string msg) where T : HoloNETDataReceivedBaseEventArgs, new()
+        protected virtual T ProcessResponeError<T>(IHoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs, string responseErrorType, string msg) where T : HoloNETDataReceivedBaseEventArgs, new()
         {
             Logger.Log($"{responseErrorType} ERROR", LogType.Error);
             T args = CreateHoloNETArgs<T>(response, dataReceivedEventArgs);
@@ -79,9 +79,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             return args;
         }
 
-        protected virtual HoloNETResponse DecodeDataReceived(byte[] rawBinaryData, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
+        protected virtual IHoloNETResponse DecodeDataReceived(byte[] rawBinaryData, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
         {
-            HoloNETResponse response = null;
+            IHoloNETResponse response = null;
             HoloNETDataReceivedEventArgs holoNETDataReceivedEventArgs = new HoloNETDataReceivedEventArgs();
 
             try
@@ -253,7 +253,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             return appInfo;
         }
 
-        protected virtual T CreateHoloNETArgs<T>(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs) where T : HoloNETDataReceivedBaseEventArgs, new()
+        protected virtual T CreateHoloNETArgs<T>(IHoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs) where T : HoloNETDataReceivedBaseEventArgs, new()
         {
             return new T()
             {

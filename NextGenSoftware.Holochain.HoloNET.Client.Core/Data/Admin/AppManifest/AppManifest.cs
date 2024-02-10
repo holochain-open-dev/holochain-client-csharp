@@ -1,5 +1,6 @@
 ﻿
 using MessagePack;
+using NextGenSoftware.Holochain.HoloNET.Client.Interfaces;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.AppManifest
 {
@@ -11,7 +12,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.AppManifest
     //}
 
     [MessagePackObject]
-    public class AppManifest
+    public class AppManifest : IAppManifest
     {
         [Key("manifest_version")]
         public string manifest_version { get; set; }

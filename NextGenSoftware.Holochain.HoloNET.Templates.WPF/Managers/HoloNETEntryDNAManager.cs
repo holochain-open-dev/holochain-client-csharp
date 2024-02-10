@@ -1,7 +1,7 @@
-﻿using Newtonsoft.Json;
-using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Objects;
-using System;
+﻿using System;
 using System.IO;
+using Newtonsoft.Json;
+using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Objects;
 
 namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
 {

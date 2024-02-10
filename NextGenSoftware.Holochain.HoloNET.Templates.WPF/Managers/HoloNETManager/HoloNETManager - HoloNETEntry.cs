@@ -1,11 +1,12 @@
 ﻿using System.Threading.Tasks;
 using NextGenSoftware.Holochain.HoloNET.Client;
 using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Enums;
+using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Interfaces;
 using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Models;
 
 namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
 {
-    public partial class HoloNETManager
+    public partial class HoloNETManager : IHoloNETManager
     {
         /// <summary>
         /// Will init the HoloNET Entry which includes installing and enabling the app, signing credentials, attaching the app interface, then finally creating and connecting to the internal instance of the HoloNETClient.

@@ -1,10 +1,11 @@
 ﻿
 using MessagePack;
+using NextGenSoftware.Holochain.HoloNET.Client.Interfaces;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
     [MessagePackObject]
-    public class HoloNETData
+    public class HoloNETData : IHoloNETData
     {
         [Key("type")]
         public string type { get; set; }

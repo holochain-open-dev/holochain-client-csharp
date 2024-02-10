@@ -1,4 +1,5 @@
 ﻿using NextGenSoftware.Holochain.HoloNET.Client;
+using NextGenSoftware.Holochain.HoloNET.Client.Interfaces;
 using NextGenSoftware.Holochain.HoloNET.ORM.Entries;
 using NextGenSoftware.Holochain.HoloNET.ORM.Enums;
 
@@ -6,14 +7,14 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM.Interfaces
 {
     public interface IHoloNETEntryBase
     {
-        EntryData EntryData { get; set; }
+        IEntryData EntryData { get; set; }
         string EntryHash { get; set; }
-        HoloNETClientAppBase HoloNETClient { get; set; }
+        IHoloNETClientAppBase HoloNETClient { get; set; }
         bool IsChanged { get; set; }
         bool IsInitialized { get; }
         bool IsInitializing { get; }
         Dictionary<string, object> OrginalDataKeyValuePairs { get; }
-        HoloNETEntryBase OrginalEntry { get; }
+        IHoloNETEntryBase OrginalEntry { get; }
         Dictionary<string, string> OrginalKeyValuePairs { get; }
         string PreviousVersionEntryHash { get; set; }
         HoloNETEntryState State { get; set; }

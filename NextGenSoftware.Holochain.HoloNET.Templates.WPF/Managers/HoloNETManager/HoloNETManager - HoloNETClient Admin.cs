@@ -3,13 +3,15 @@ using System.Threading.Tasks;
 using System.Windows.Threading;
 using NextGenSoftware.Holochain.HoloNET.Client;
 using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects;
+using NextGenSoftware.Holochain.HoloNET.Client.Interfaces;
 using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Enums;
+using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Interfaces;
 using NextGenSoftware.Logging;
 
 namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
 {
-    public partial class HoloNETManager
-    {        
+    public partial class HoloNETManager : IHoloNETManager
+    {
         public void InitHoloNETClientAdmin()
         {
             HoloNETEntryDNAManager.LoadDNA();
@@ -269,7 +271,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
 
                 //Look for the HoloNETClientAppAgent connection that matches the current hApp DnaHash and AgentPubKey (CellId).
                 bool foundClient = false;
-                foreach (HoloNETClientAppAgent client in HoloNETClientAppAgentClients)
+                foreach (IHoloNETClientAppAgent client in HoloNETClientAppAgentClients)
                 {
                     if (client != null && client.HoloNETDNA.DnaHash == CurrentApp.DnaHash && client.HoloNETDNA.AgentPubKey == CurrentApp.AgentPubKey && client.HoloNETDNA.InstalledAppId == CurrentApp.Name)
                     {
@@ -337,7 +339,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
                 {
                     LogMessage($"APP: No Existing HoloNETClient AppAgent WebSocket Found Running For AgentPubKey {CurrentApp.AgentPubKey}, DnaHash {CurrentApp.DnaHash} And InstalledAppId {CurrentApp.Name} So Creating New HoloNETClient AppAgent WebSocket Now...");
 
-                    HoloNETClientAppAgent newClient = CreateNewAppAgentClientConnection(CurrentApp.Name, CurrentApp.AgentPubKey, e.Port.Value);
+                    IHoloNETClientAppAgent newClient = CreateNewAppAgentClientConnection(CurrentApp.Name, CurrentApp.AgentPubKey, e.Port.Value);
                     LogMessage($"APP: New HoloNETClient AppAgent WebSocket Created.");
 
                     ShowStatusMessage($"Connecting To HoloNETClient AppAgent WebSocket On Port {e.Port}...", StatusMessageType.Information, true);

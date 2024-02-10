@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Threading.Tasks;
 using NextGenSoftware.Holochain.HoloNET.Client;
+using NextGenSoftware.Holochain.HoloNET.Client.Interfaces;
 using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Enums;
+using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Interfaces;
 using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Models;
 
 namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
 {
-    public partial class HoloNETManager
+    public partial class HoloNETManager : IHoloNETManager
     {
-        public void InitHoloNETEntryShared(HoloNETClientAppAgent client)
+        public void InitHoloNETEntryShared(IHoloNETClientAppAgent client)
         {
             LogMessage("APP: Initializing HoloNET Entry (Shared Connection)...");
             ShowStatusMessage("Initializing HoloNET Entry (Shared Connection)...", StatusMessageType.Information, true, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
@@ -32,7 +34,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
             ShowStatusMessage("HoloNET Entry (Shared Connection) Initialized.", StatusMessageType.Success, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
         }
 
-        public async Task<ZomeFunctionCallBackEventArgs> LoadHoloNETEntrySharedAsync(HoloNETClientAppAgent client)
+        public async Task<ZomeFunctionCallBackEventArgs> LoadHoloNETEntrySharedAsync(IHoloNETClientAppAgent client)
         {
             ZomeFunctionCallBackEventArgs result = new ZomeFunctionCallBackEventArgs();
             CheckIfHoloNETEntrySharedInitOK(client);
@@ -62,7 +64,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
             return result;
         }
 
-        public async Task<ZomeFunctionCallBackEventArgs> SaveHoloNETEntrySharedAsync(HoloNETClientAppAgent client, string firstName, string lastName, DateTime dob, string email)
+        public async Task<ZomeFunctionCallBackEventArgs> SaveHoloNETEntrySharedAsync(IHoloNETClientAppAgent client, string firstName, string lastName, DateTime dob, string email)
         {
             ZomeFunctionCallBackEventArgs result = new ZomeFunctionCallBackEventArgs();
             CheckIfHoloNETEntrySharedInitOK(client);
@@ -97,7 +99,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
             return result;
         }
 
-        private void CheckIfHoloNETEntrySharedInitOK(HoloNETClientAppAgent client)
+        private void CheckIfHoloNETEntrySharedInitOK(IHoloNETClientAppAgent client)
         {
             ShowStatusMessage($"Checking If HoloNET Entry (Shared Connection) Already Initialized...", StatusMessageType.Information, true, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
             LogMessage($"APP: Checking If HoloNET Entry (Shared Connection) Already Initialized...");

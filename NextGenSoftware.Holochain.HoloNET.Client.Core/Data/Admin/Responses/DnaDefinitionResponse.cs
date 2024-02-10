@@ -1,11 +1,12 @@
 ﻿
 using MessagePack;
 using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.AppManifest;
+using NextGenSoftware.Holochain.HoloNET.Client.Interfaces;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
     [MessagePackObject]
-    public class DnaDefinitionResponse
+    public class DnaDefinitionResponse : IDnaDefinitionResponse
     {
         [Key("name")]
         public string name { get; set; }

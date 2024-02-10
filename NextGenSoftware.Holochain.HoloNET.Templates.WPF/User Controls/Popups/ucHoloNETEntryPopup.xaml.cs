@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using NextGenSoftware.Holochain.HoloNET.Client;
 using NextGenSoftware.Holochain.HoloNET.ORM.Entries;
+using NextGenSoftware.Holochain.HoloNET.ORM.Interfaces;
 using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Enums;
 using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers;
 
@@ -87,7 +88,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls
             }
         }
 
-        private void RefreshHoloNETEntryMetaData(HoloNETAuditEntryBase holoNETEntry, ucHoloNETEntryMetaData userControl)
+        private void RefreshHoloNETEntryMetaData(IHoloNETAuditEntryBase holoNETEntry, ucHoloNETEntryMetaData userControl)
         {
             userControl.DataContext = holoNETEntry;
 
@@ -126,7 +127,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls
             //userControl.Type = holoNETEntry.EntryData.Type;
         }
 
-        private string GetHoloNETEntryMetaData(HoloNETAuditEntryBase entry)
+        private string GetHoloNETEntryMetaData(IHoloNETAuditEntryBase entry)
         {
             string metaData = $"EntryHash: {HoloNETManager.Instance.HoloNETEntry.EntryHash}, Created By: {HoloNETManager.Instance.HoloNETEntry.CreatedBy}, Created Date: {HoloNETManager.Instance.HoloNETEntry.CreatedDate}, Modified By: {HoloNETManager.Instance.HoloNETEntry.ModifiedBy}, Modified Date: {HoloNETManager.Instance.HoloNETEntry.ModifiedDate}, Version: {HoloNETManager.Instance.HoloNETEntry.Version}, Previous Version Hash: {HoloNETManager.Instance.HoloNETEntry.PreviousVersionEntryHash}, Id: {HoloNETManager.Instance.HoloNETEntry.Id}, IsActive: {HoloNETManager.Instance.HoloNETEntry.IsActive}";
 

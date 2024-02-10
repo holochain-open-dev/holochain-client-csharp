@@ -6,11 +6,12 @@ using System.IO;
 using System.Diagnostics;
 using System.Linq;
 using MessagePack;
-using NextGenSoftware.WebSocket;
-using NextGenSoftware.Logging;
 using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects;
 using NextGenSoftware.Holochain.HoloNET.Client.Properties;
 using NextGenSoftware.Holochain.HoloNET.Client.Interfaces;
+using NextGenSoftware.Logging.Interfaces;
+using NextGenSoftware.Logging;
+using NextGenSoftware.WebSocket;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
@@ -19,7 +20,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         private bool _shuttingDownHoloNET = false;
         private TaskCompletionSource<DisconnectedEventArgs> _taskCompletionDisconnected = new TaskCompletionSource<DisconnectedEventArgs>();
         private TaskCompletionSource<HoloNETShutdownEventArgs> _taskCompletionHoloNETShutdown = new TaskCompletionSource<HoloNETShutdownEventArgs>();
-        private HoloNETDNA _holoNETDNA = null;
+        private IHoloNETDNA _holoNETDNA = null;
         private Process _conductorProcess = null;
         private int _conductorProcessSessionId = 0;
         private ShutdownHolochainConductorsMode _shutdownHolochainConductorsMode = ShutdownHolochainConductorsMode.UseHoloNETDNASettings;
@@ -114,12 +115,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// </summary>
         public WebSocket.WebSocket WebSocket { get; set; }
 
-        public Logger Logger { get; set; } = new Logger();
+        public ILogger Logger { get; set; } = new Logger();
 
         /// <summary>
         /// This property contains a struct called HoloNETHoloNETDNA containing the sub-properties: AgentPubKey, DnaHash, FullPathToRootHappFolder, FullPathToCompiledHappFolder, HolochainConductorMode, FullPathToExternalHolochainConductorBinary, FullPathToExternalHCToolBinary, SecondsToWaitForHolochainConductorToStart, AutoStartHolochainConductor, ShowHolochainConductorWindow, AutoShutdownHolochainConductor, ShutDownALLHolochainConductors, HolochainConductorToUse, OnlyAllowOneHolochainConductorToRunAtATime, LoggingMode & ErrorHandlingBehaviour.
         /// </summary>
-        public HoloNETDNA HoloNETDNA
+        public IHoloNETDNA HoloNETDNA
         {
             get
             {
@@ -188,7 +189,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// This constructor uses the built-in DefaultLogger and the settings contained in the HoloNETDNA.
         /// </summary>
         /// <param name="holoNETDNA">The HoloNETDNA you wish to use for this connection (optional). If this is not passed in then it will use the default HoloNETDNA defined in the HoloNETDNA property.</param>
-        public HoloNETClientBase(HoloNETDNA holoNETDNA = null)
+        public HoloNETClientBase(IHoloNETDNA holoNETDNA = null)
         {
             if (holoNETDNA != null)
                 HoloNETDNA = holoNETDNA;
@@ -204,7 +205,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="logProvider">The implementation of the ILogProvider interface (custom logProvider).</param>
         /// <param name="alsoUseDefaultLogger">Set this to true if you wish HoloNET to also log to the DefaultLogger as well as any custom logger injected in.</param>
         /// <param name="holoNETDNA">The HoloNETDNA you wish to use for this connection (optional). If this is not passed in then it will use the default HoloNETDNA defined in the HoloNETDNA property.</param>
-        public HoloNETClientBase(ILogProvider logProvider, bool alsoUseDefaultLogger = false, HoloNETDNA holoNETDNA = null)
+        public HoloNETClientBase(ILogProvider logProvider, bool alsoUseDefaultLogger = false, IHoloNETDNA holoNETDNA = null)
         {
             if (holoNETDNA != null)
                 HoloNETDNA = holoNETDNA;
@@ -224,7 +225,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="logProviders">The implementations of the ILogProvider interface (custom logProviders).</param>
         /// <param name="alsoUseDefaultLogger">Set this to true if you wish HoloNET to also log to the DefaultLogger as well as any custom loggers injected in.</param>
         /// <param name="holoNETDNA">The HoloNETDNA you wish to use for this connection (optional). If this is not passed in then it will use the default HoloNETDNA defined in the HoloNETDNA property.</param>
-        public HoloNETClientBase(IEnumerable<ILogProvider> logProviders, bool alsoUseDefaultLogger = false, HoloNETDNA holoNETDNA = null)
+        public HoloNETClientBase(IEnumerable<ILogProvider> logProviders, bool alsoUseDefaultLogger = false, IHoloNETDNA holoNETDNA = null)
         {
             if (holoNETDNA != null)
                 HoloNETDNA = holoNETDNA;
@@ -243,7 +244,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// </summary>
         /// <param name="logger">The logger instance to use.</param>
         /// <param name="holoNETDNA">The HoloNETDNA you wish to use for this connection (optional). If this is not passed in then it will use the default HoloNETDNA defined in the HoloNETDNA property.</param>
-        public HoloNETClientBase(Logger logger, HoloNETDNA holoNETDNA = null)
+        public HoloNETClientBase(ILogger logger, IHoloNETDNA holoNETDNA = null)
         {
             if (holoNETDNA != null)
                 HoloNETDNA = holoNETDNA;
@@ -252,7 +253,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             Init(new Uri(HoloNETDNA.HolochainConductorAppAgentURI));
         }
 
-        public virtual HoloNETDNA LoadDNA()
+        public virtual IHoloNETDNA LoadDNA()
         {
             //return _holoNETDNAManager.LoadDNA();
             return HoloNETDNAManager.LoadDNA();
@@ -909,7 +910,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
         }
 
-        protected virtual void InitLogger(Logger logger = null)
+        protected virtual void InitLogger(ILogger logger = null)
         {
             if (logger != null)
                 Logger = logger;

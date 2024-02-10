@@ -1,10 +1,11 @@
 ﻿
 using System;
 using System.Collections.Generic;
+using NextGenSoftware.Holochain.HoloNET.Client.Interfaces;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
-    public class EntryData
+    public class EntryData : IEntryData
     {
         /// <summary>
         /// The author of the entry (AgentPubKey on their device).
@@ -14,12 +15,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <summary>
         /// The true EntryHash (is Hash in the meta data returned from the Holochain Conductor)
         /// </summary>
-        public string Hash { get; set; } 
+        public string Hash { get; set; }
 
         /// <summary>
         /// Unknown - still investigating...
         /// </summary>
-        public string EntryHash { get; set; } 
+        public string EntryHash { get; set; }
 
         /// <summary>
         /// The previous Hash (EntryHash).
@@ -49,7 +50,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <summary>
         /// //App/Not sure what other types there are?
         /// </summary>
-        public string EntryType { get; set; } 
+        public string EntryType { get; set; }
 
         /// <summary>
         /// The Action Sequence for this entry.

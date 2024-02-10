@@ -1,8 +1,9 @@
 ﻿using System.Windows.Media;
+using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Interfaces;
 
 namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Models
 {
-    public class InstalledApp
+    public class InstalledApp : IInstalledApp
     {
         public string Name { get; set; }
         public string Status { get; set; }

@@ -17,16 +17,16 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
         public Avatar(HoloNETDNA holoNETConfig) : base("oasis", "get_entry_avatar", "create_entry_avatar", "update_entry_avatar", "delete_entry_avatar", holoNETConfig) { }
 
 
-        [HolochainFieldName("first_name")]
+        [HolochainRustFieldName("first_name")]
         public string FirstName { get; set; }
 
-        [HolochainFieldName("last_name")]
+        [HolochainRustFieldName("last_name")]
         public string LastName { get; set; }
 
-        [HolochainFieldName("email")]
+        [HolochainRustFieldName("email")]
         public string Email { get; set; }
 
-        [HolochainFieldName("dob")]
+        [HolochainRustFieldName("dob")]
         public DateTime DOB { get; set; }
 
         public override Task<ZomeFunctionCallBackEventArgs> SaveAsync(Dictionary<string, string> customDataKeyValuePair = null, Dictionary<string, bool> holochainFieldsIsEnabledKeyValuePair = null, bool cachePropertyInfos = true, bool useReflectionToMapKeyValuePairResponseOntoEntryDataObject = true)

@@ -1,24 +1,25 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.IO;
+using Newtonsoft.Json;
+using NextGenSoftware.Holochain.HoloNET.Client.Interfaces;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
     public static class HoloNETDNAManager
     {
         public static string HoloNETDNAPath = "HoloNET_DNA.json";
-        public static HoloNETDNA HoloNETDNA { get; set; } = new HoloNETDNA();
+        public static IHoloNETDNA HoloNETDNA { get; set; } = new HoloNETDNA();
 
-        public static HoloNETDNA LoadDNA()
+        public static IHoloNETDNA LoadDNA()
         {
             return LoadDNA(HoloNETDNAPath);
         }
 
-        public static HoloNETDNA LoadDNA(string holoNETDNAPath)
+        public static IHoloNETDNA LoadDNA(string holoNETDNAPath)
         {
             try
             {
-                if (string.IsNullOrEmpty(HoloNETDNAPath))
+                if (string.IsNullOrEmpty(holoNETDNAPath))
                     throw new ArgumentNullException("holoNETDNAPath", "holoNETDNAPath cannot be null."); //TODO: Need to come back to this since this exception will always be caught below! ;-)
 
                 HoloNETDNAPath = holoNETDNAPath;
@@ -26,7 +27,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 using (StreamReader r = new StreamReader(holoNETDNAPath))
                 {
                     string json = r.ReadToEnd();
-                    HoloNETDNA = JsonConvert.DeserializeObject<HoloNETDNA>(json);
+                    HoloNETDNA = JsonConvert.DeserializeObject<IHoloNETDNA>(json);
                     IsLoaded = true;
                     return HoloNETDNA;
                 }
@@ -44,12 +45,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             return SaveDNA(HoloNETDNAPath, HoloNETDNA);
         }
 
-        public static bool SaveDNA(string holoNETDNAPath, HoloNETDNA holoNETDNA)
+        public static bool SaveDNA(string holoNETDNAPath, IHoloNETDNA holoNETDNA)
         {
             try
             {
                 if (string.IsNullOrEmpty(holoNETDNAPath))
-                    throw new ArgumentNullException("holoNETDNAPath", "holoNETDNAPath cannot be null."); //TODO: Need to come back to this since this exception will always be caught below! ;-)
+                    throw new ArgumentNullException("holoNETDNA", "holoNETDNA cannot be null."); //TODO: Need to come back to this since this exception will always be caught below! ;-)
 
                 if (holoNETDNA == null)
                     throw new ArgumentNullException("holoNETDNA", "holoNETDNA cannot be null."); //TODO: Need to come back to this since this exception will always be caught below! ;-)

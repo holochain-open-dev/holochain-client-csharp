@@ -2,15 +2,17 @@
 using System.Collections.Specialized;
 using System.Threading.Tasks;
 using NextGenSoftware.Holochain.HoloNET.Client;
+using NextGenSoftware.Holochain.HoloNET.Client.Interfaces;
 using NextGenSoftware.Holochain.HoloNET.ORM.Collections;
 using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Enums;
+using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Interfaces;
 using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Models;
 
 namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
 {
-    public partial class HoloNETManager
+    public partial class HoloNETManager : IHoloNETManager
     {
-        public void InitHoloNETCollection(HoloNETClientAppAgent client)
+        public void InitHoloNETCollection(IHoloNETClientAppAgent client)
         {
             LogMessage("APP: Initializing HoloNET Collection (Shared Connection)...");
             ShowStatusMessage("Initializing HoloNET Collection (Shared Connection)...", StatusMessageType.Information, true, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
@@ -34,7 +36,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
             ShowStatusMessage("HoloNET Collection (Shared Connection) Initialized.", StatusMessageType.Success, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
         }
 
-        public async Task<HoloNETCollectionLoadedResult<AvatarShared>> LoadCollectionAsync(HoloNETClientAppAgent client)
+        public async Task<HoloNETCollectionLoadedResult<AvatarShared>> LoadCollectionAsync(IHoloNETClientAppAgent client)
         {
             HoloNETCollectionLoadedResult<AvatarShared> result = new HoloNETCollectionLoadedResult<AvatarShared>();
             CheckIfHoloNETCollectionSharedInitOK(client);
@@ -59,7 +61,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
             return result;
         }
 
-        public async Task<ZomeFunctionCallBackEventArgs> AddHoloNETEntryToCollectionAsync(HoloNETClientAppAgent client, string firstName, string lastName, DateTime dob, string email)
+        public async Task<ZomeFunctionCallBackEventArgs> AddHoloNETEntryToCollectionAsync(IHoloNETClientAppAgent client, string firstName, string lastName, DateTime dob, string email)
         {
             ZomeFunctionCallBackEventArgs result = new ZomeFunctionCallBackEventArgs();
             CheckIfHoloNETCollectionSharedInitOK(client);
@@ -115,7 +117,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
             return result;
         }
 
-        public async Task<ZomeFunctionCallBackEventArgs> RemoveHoloNETEntryFromCollectionAsync(HoloNETClientAppAgent client, AvatarShared avatar)
+        public async Task<ZomeFunctionCallBackEventArgs> RemoveHoloNETEntryFromCollectionAsync(IHoloNETClientAppAgent client, IAvatarShared avatar)
         {
             ZomeFunctionCallBackEventArgs result = new ZomeFunctionCallBackEventArgs();
             CheckIfHoloNETCollectionSharedInitOK(client);
@@ -125,7 +127,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
                 ShowStatusMessage($"Removing HoloNETEntry From Collection...", StatusMessageType.Information, true, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
                 LogMessage($"APP: Removing HoloNETEntry From Collection...");
 
-                result = await HoloNETEntriesShared[CurrentApp.Name].RemoveHoloNETEntryFromCollectionAndSaveAsync(avatar);
+                result = await HoloNETEntriesShared[CurrentApp.Name].RemoveHoloNETEntryFromCollectionAndSaveAsync((AvatarShared)avatar);
             }
             else
             {
@@ -136,7 +138,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
             return result;
         }
 
-        public async Task<HoloNETCollectionSavedResult> UpdateHoloNETEntryInCollectionAsync(HoloNETClientAppAgent client)
+        public async Task<HoloNETCollectionSavedResult> UpdateHoloNETEntryInCollectionAsync(IHoloNETClientAppAgent client)
         {
             HoloNETCollectionSavedResult result = new HoloNETCollectionSavedResult();
             CheckIfHoloNETCollectionSharedInitOK(client);
@@ -157,7 +159,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
             return result;
         }
 
-        private void CheckIfHoloNETCollectionSharedInitOK(HoloNETClientAppAgent client)
+        private void CheckIfHoloNETCollectionSharedInitOK(IHoloNETClientAppAgent client)
         {
             ShowStatusMessage($"Checking If HoloNET Collection (Shared Connection) Already Initialized...", StatusMessageType.Information, false, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
             LogMessage($"APP: Checking If HoloNET Collection (Shared Connection) Already Initialized...");

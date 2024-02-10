@@ -1,12 +1,13 @@
 ﻿using MessagePack;
 using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.AppManifest;
 using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects;
+using NextGenSoftware.Holochain.HoloNET.Client.Interfaces;
 using System.Collections.Generic;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
     [MessagePackObject]
-    public class AppInfo
+    public class AppInfo : IAppInfo
     {
         [Key("installed_app_id")]
         public string installed_app_id { get; set; }
@@ -77,14 +78,14 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                         return AppInfoStatusEnum.Disabled;
                     }
                 }
-               
+
                 return AppInfoStatusEnum.None;
             }
         }
 
         [IgnoreMember]
         public string AppStatusReason { get; private set; }
-        
+
 
         [Key("manifest")]
         public AppManifest manifest { get; set; }

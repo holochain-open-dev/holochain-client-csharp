@@ -1,10 +1,12 @@
 ﻿
 using MessagePack;
+using NextGenSoftware.Holochain.HoloNET.Client.Interfaces;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects
 {
     [MessagePackObject]
-    public class AgentInfo //AgentInfoInner (Rust name is AgentInfoInner but hopefully we can use AgentInfo because sounds better! ;-) )
+    public class AgentInfo : IAgentInfo
+    //AgentInfoInner (Rust name is AgentInfoInner but hopefully we can use AgentInfo because sounds better! ;-) )
     {
         [Key("space")]
         public KitsuneSpace space { get; set; }

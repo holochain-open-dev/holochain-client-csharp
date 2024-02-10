@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using NextGenSoftware.Holochain.HoloNET.Client.Interfaces;
 using NextGenSoftware.Logging;
+using NextGenSoftware.Logging.Interfaces;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
@@ -9,19 +11,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// This constructor uses the built-in DefaultLogger and the settings contained in the HoloNETDNA.
         /// </summary>
         /// <param name="holoNETDNA">The HoloNETDNA you wish to use for this connection (optional). If this is not passed in then it will use the default HoloNETDNA defined in the HoloNETDNA property.</param>
-        public HoloNETClientApp(HoloNETDNA holoNETDNA = null) : base(holoNETDNA)
+        public HoloNETClientApp(IHoloNETDNA holoNETDNA = null) : base(holoNETDNA)
         {
-            ////if (holoNETDNA == null)
-            ////    HoloNETDNA = new HoloNETDNA() { AutoStartHolochainConductor = false, AutoShutdownHolochainConductor = false };
 
-            //if (holoNETDNA == null)
-            //{
-            //    //Will load the HoloNETDNA from disk if there is a HoloNET_DNA.json file and then default to not starting or shutting down the conductor (because the admin takes care of this).
-            //    HoloNETDNA.AutoStartHolochainConductor = false;
-            //    HoloNETDNA.AutoShutdownHolochainConductor = false;
-            //}
-            //else
-            //    HoloNETDNA = holoNETDNA;
         }
 
         /// <summary>
@@ -30,19 +22,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="logProvider">The implementation of the ILogProvider interface (custom logProvider).</param>
         /// <param name="alsoUseDefaultLogger">Set this to true if you wish HoloNET to also log to the DefaultLogger as well as any custom logger injected in.</param>
         /// <param name="holoNETDNA">The HoloNETDNA you wish to use for this connection (optional). If this is not passed in then it will use the default HoloNETDNA defined in the HoloNETDNA property.</param>
-        public HoloNETClientApp(ILogProvider logProvider, bool alsoUseDefaultLogger = false, HoloNETDNA holoNETDNA = null) : base(logProvider, alsoUseDefaultLogger, holoNETDNA)
+        public HoloNETClientApp(ILogProvider logProvider, bool alsoUseDefaultLogger = false, IHoloNETDNA holoNETDNA = null) : base(logProvider, alsoUseDefaultLogger, holoNETDNA)
         {
-            ////if (holoNETDNA == null)
-            ////    HoloNETDNA = new HoloNETDNA() { AutoStartHolochainConductor = false, AutoShutdownHolochainConductor = false };
 
-            //if (holoNETDNA == null)
-            //{
-            //    //Will load the HoloNETDNA from disk if there is a HoloNET_DNA.json file and then default to not starting or shutting down the conductor (because the admin takes care of this).
-            //    HoloNETDNA.AutoStartHolochainConductor = false;
-            //    HoloNETDNA.AutoShutdownHolochainConductor = false;
-            //}
-            //else
-            //    HoloNETDNA = holoNETDNA;
         }
 
         /// <summary>
@@ -51,21 +33,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="logProviders">The implementations of the ILogProvider interface (custom logProviders).</param>
         /// <param name="alsoUseDefaultLogger">Set this to true if you wish HoloNET to also log to the DefaultLogger as well as any custom loggers injected in.</param>
         /// <param name="holoNETDNA">The HoloNETDNA you wish to use for this connection (optional). If this is not passed in then it will use the default HoloNETDNA defined in the HoloNETDNA property.</param>
-        public HoloNETClientApp(IEnumerable<ILogProvider> logProviders, bool alsoUseDefaultLogger = false, HoloNETDNA holoNETDNA = null) : base(logProviders, alsoUseDefaultLogger, holoNETDNA)
+        public HoloNETClientApp(IEnumerable<ILogProvider> logProviders, bool alsoUseDefaultLogger = false, IHoloNETDNA holoNETDNA = null) : base(logProviders, alsoUseDefaultLogger, holoNETDNA)
         {
-            ////if (holoNETDNA == null)
-            ////    HoloNETDNA = new HoloNETDNA() { AutoStartHolochainConductor = false, AutoShutdownHolochainConductor = false };
-            ////else
-            ////    HoloNETDNA = holoNETDNA;
 
-            //if (holoNETDNA == null)
-            //{
-            //    //Will load the HoloNETDNA from disk if there is a HoloNET_DNA.json file and then default to not starting or shutting down the conductor (because the admin takes care of this).
-            //    HoloNETDNA.AutoStartHolochainConductor = false;
-            //    HoloNETDNA.AutoShutdownHolochainConductor= false;
-            //}
-            //else
-            //    HoloNETDNA = holoNETDNA;
         }
 
         /// <summary>
@@ -73,19 +43,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// </summary>
         /// <param name="logger">The logger instance to use.</param>
         /// <param name="holoNETDNA">The HoloNETDNA you wish to use for this connection (optional). If this is not passed in then it will use the default HoloNETDNA defined in the HoloNETDNA property.</param>
-        public HoloNETClientApp(Logger logger, HoloNETDNA holoNETDNA = null) : base(logger, holoNETDNA)
+        public HoloNETClientApp(ILogger logger, IHoloNETDNA holoNETDNA = null) : base(logger, holoNETDNA)
         {
-            ////if (holoNETDNA == null)
-            ////   HoloNETDNA = new HoloNETDNA() { AutoStartHolochainConductor = false, AutoShutdownHolochainConductor = false };
 
-            //if (holoNETDNA == null)
-            //{
-            //    //Will load the HoloNETDNA from disk if there is a HoloNET_DNA.json file and then default to not starting or shutting down the conductor (because the admin takes care of this).
-            //    HoloNETDNA.AutoStartHolochainConductor = false;
-            //    HoloNETDNA.AutoShutdownHolochainConductor = false;
-            //}
-            //else
-            //    HoloNETDNA = holoNETDNA;
         }
     }
 }

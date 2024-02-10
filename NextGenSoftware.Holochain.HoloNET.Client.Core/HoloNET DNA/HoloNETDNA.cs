@@ -1,10 +1,11 @@
 ﻿
 using System;
+using NextGenSoftware.Holochain.HoloNET.Client.Interfaces;
 using NextGenSoftware.Logging;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
-    public class HoloNETDNA
+    public class HoloNETDNA : IHoloNETDNA
     {
         /// <summary>
         /// The Holochain Conductor config path. This defaults to AppData\Roaming\holochain\holochain\config\conductor-config.yml (this is where the conductor will as default install the config file).
@@ -201,7 +202,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         //retrieveAgentPubKeyAndDnaHashFromSandbox
         //automaticallyAttemptToRetrieveFromConductorIfSandBoxFails
         //automaticallyAttemptToRetrieveFromSandBoxIfConductorFails
-        //updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved
+        //updateIHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved
 
         //with these 40 settings! :)
     }

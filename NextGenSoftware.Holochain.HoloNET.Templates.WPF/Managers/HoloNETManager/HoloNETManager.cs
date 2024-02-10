@@ -2,17 +2,19 @@
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using NextGenSoftware.Holochain.HoloNET.Client;
+using NextGenSoftware.Holochain.HoloNET.Client.Interfaces;
 using NextGenSoftware.Holochain.HoloNET.ORM.Collections;
 using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Enums;
+using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Interfaces;
 using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Models;
 using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Objects;
 using NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls;
 
 namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
 {
-    public partial class HoloNETManager
+    public partial class HoloNETManager : IHoloNETManager
     {
-        private static HoloNETManager _instance = null;
+        private static IHoloNETManager _instance = null;
         private const string _holoNETEntryDemoAppId = "oasis-holonet-entry-demo-app";
         private const string _holoNETCollectionDemoAppId = "oasis-holonet-collection-demo-app";
         private const string _holoNETEntryDemoHappPath = @"E:\hc\holochain-holochain-0.1.5\happs\oasis\BUILD\happ\oasis.happ";
@@ -38,23 +40,23 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
         public delegate void InstalledAppsChanged(object sender, InstalledAppsEventArgs e);
         public event InstalledAppsChanged OnInstalledAppsChanged;
 
-        public HoloNETClientAdmin? HoloNETClientAdmin { get; set; }
-        public List<HoloNETClientAppAgent> HoloNETClientAppAgentClients { get; set; } = new List<HoloNETClientAppAgent>();
-        public ObservableCollection<InstalledApp> InstalledApps { get; set; } = new ObservableCollection<InstalledApp>();
+        public IHoloNETClientAdmin? HoloNETClientAdmin { get; set; }
+        public List<IHoloNETClientAppAgent> HoloNETClientAppAgentClients { get; set; } = new List<IHoloNETClientAppAgent>();
+        public ObservableCollection<IInstalledApp> InstalledApps { get; set; } = new ObservableCollection<IInstalledApp>();
 
         //This HoloNETEntry and HoloNETCollection use their own interal HoloNETClient (AppAgent) connection.
-        public Avatar HoloNETEntry { get; set; }
+        public IAvatar HoloNETEntry { get; set; }
         public HoloNETObservableCollection<Avatar> HoloNETEntries { get; set; }
 
         //This HoloNETEntry and HoloNETCollection use a shared HoloNETClient (AppAgent) connection for the given hApp from the HoloNETClientAppAgentClients connection pool.
-        public Dictionary<string, AvatarShared> HoloNETEntryShared { get; set; } = new Dictionary<string, AvatarShared>();
+        public Dictionary<string, IAvatarShared> HoloNETEntryShared { get; set; } = new Dictionary<string, IAvatarShared>();
         public Dictionary<string, HoloNETObservableCollection<AvatarShared>> HoloNETEntriesShared { get; set; } = new Dictionary<string, HoloNETObservableCollection<AvatarShared>>();
 
         public string HoloNETEntryDemoHappPath { get; private set; } = _holoNETEntryDemoHappPath;
         public string HoloNETEntryDemoAppId { get; private set; } = _holoNETEntryDemoAppId;
         public string HoloNETCollectionDemoAppId { get; private set; } = _holoNETCollectionDemoAppId;
-        public InstalledApp CurrentApp { get; set; }
-        public AvatarShared CurrentAvatar;
+        public IInstalledApp CurrentApp { get; set; }
+        public IAvatarShared CurrentAvatar { get; set; }
         public bool ShowDetailedLogMessages { get; set; } = false;
         public bool InitHoloNETEntryDemo { get; set; } = false;
         public bool ShowAppsListedInLog { get; set; } = true;
@@ -64,9 +66,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
         public ClientOperation ClientOperation { get; set; }
         public ZomeCallParams ZomeCallParams { get; set; } = new ZomeCallParams();
         public InstallingAppParams InstallingAppParams { get; set; } = new InstallingAppParams();
-        
-        public static HoloNETManager Instance 
-        { 
+
+        public static IHoloNETManager Instance
+        {
             get
             {
                 if (_instance == null)
@@ -81,7 +83,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
             InitHoloNETClientAdmin();
         }
 
-        public  void Reboot()
+        public void Reboot()
         {
             _clientsToDisconnect = HoloNETClientAppAgentClients.Count;
             _rebooting = true;
@@ -211,7 +213,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
 
                             //Refresh the list of installed hApps.
                             ProcessListedApps(await HoloNETClientAdmin.ListAppsAsync(AppStatusFilter.All));
-                            
+
                             //Update number of connections UI.
                             UpdateNumerOfClientConnections();
                         }
@@ -312,7 +314,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
             }
         }
 
-        public  void ShutdownHoloNETManager()
+        public void ShutdownHoloNETManager()
         {
             if (HoloNETEntry != null)
             {

@@ -12,7 +12,7 @@ using NextGenSoftware.Holochain.HoloNET.Client.Interfaces;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
-    public partial class HoloNETClientAdmin : HoloNETClientBase//, IHoloNETClientAdmin
+    public partial class HoloNETClientAdmin : HoloNETClientBase, IHoloNETClientAdmin
     {
         /// <summary>
         /// Will init the hApp, which includes installing and enabling the app, signing credentials & attaching the app interface.

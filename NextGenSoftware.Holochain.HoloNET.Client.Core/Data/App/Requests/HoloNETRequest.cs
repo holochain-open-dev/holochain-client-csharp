@@ -1,9 +1,10 @@
 ﻿using MessagePack;
+using NextGenSoftware.Holochain.HoloNET.Client.Interfaces;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
     [MessagePackObject]
-    public class HoloNETRequest
+    public class HoloNETRequest : IHoloNETRequest
     {
         [Key("id")]
         public ulong id { get; set; }

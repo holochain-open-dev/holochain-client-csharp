@@ -7,6 +7,7 @@ using System.Windows.Media;
 using Microsoft.Win32;
 using NextGenSoftware.Holochain.HoloNET.Client;
 using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Enums;
+using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Interfaces;
 using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers;
 using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Models;
 using NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls;
@@ -206,7 +207,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
 
                 if (button != null)
                 {
-                    InstalledApp? app = button.DataContext as InstalledApp;
+                    IInstalledApp? app = button.DataContext as IInstalledApp;
 
                     if (app != null)
                     {
@@ -260,7 +261,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
 
         private void btnDisconnectClient_Click(object sender, RoutedEventArgs e)
         {
-            InstalledApp app = gridHapps.SelectedItem as InstalledApp;
+            IInstalledApp app = gridHapps.SelectedItem as IInstalledApp;
 
             if (app != null)
             {

@@ -2,20 +2,22 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using NextGenSoftware.Holochain.HoloNET.Client;
+using NextGenSoftware.Holochain.HoloNET.Client.Interfaces;
 using NextGenSoftware.Holochain.HoloNET.ORM.Entries;
+using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Interfaces;
 
 namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Models
 {
     /// <summary>
     /// This example creates its own internal instance of the HoloNETClient, you should only use this if you will be extending only one HoloNETAuditEntryBaseClass/HoloNETEntryBaseClass otherwise use the AvatarShared Example.
     /// </summary>
-    public class Avatar : HoloNETAuditEntryBase
+    public class Avatar : HoloNETAuditEntryBase, IAvatar
     {
         // Example of how you can disable the 3 different audit options (you can of course only disable one of two of them).
         //public Avatar() : base("oasis", "get_entry_avatar", "create_entry_avatar", "update_entry_avatar", "delete_entry_avatar", false, false, false) { }
         //public Avatar(HoloNETConfig holoNETConfig) : base("oasis", "get_entry_avatar", "create_entry_avatar", "update_entry_avatar", "delete_entry_avatar", holoNETConfig, false, false, false) { }
         public Avatar() : base("oasis", "get_entry_avatar", "create_entry_avatar", "update_entry_avatar", "delete_entry_avatar") { }
-        public Avatar(HoloNETDNA holoNETDNA) : base("oasis", "get_entry_avatar", "create_entry_avatar", "update_entry_avatar", "delete_entry_avatar", true, holoNETDNA) { }
+        public Avatar(IHoloNETDNA holoNETDNA) : base("oasis", "get_entry_avatar", "create_entry_avatar", "update_entry_avatar", "delete_entry_avatar", true, holoNETDNA) { }
 
 
         [HolochainRustFieldName("first_name")]

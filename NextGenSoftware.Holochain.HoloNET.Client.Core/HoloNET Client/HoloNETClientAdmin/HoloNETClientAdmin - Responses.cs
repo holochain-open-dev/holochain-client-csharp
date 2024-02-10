@@ -5,14 +5,15 @@ using System.Linq;
 using System.Threading.Tasks;
 using NextGenSoftware.Logging;
 using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects;
+using NextGenSoftware.Holochain.HoloNET.Client.Interfaces;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
-    public partial class HoloNETClientAdmin : HoloNETClientBase//, IHoloNETClientAdmin
+    public partial class HoloNETClientAdmin : HoloNETClientBase, IHoloNETClientAdmin
     {
-        protected override HoloNETResponse ProcessDataReceived(WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
+        protected override IHoloNETResponse ProcessDataReceived(WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
         {
-            HoloNETResponse response = null;
+            IHoloNETResponse response = null;
 
             try
             {
@@ -129,7 +130,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             return response;
         }
 
-        protected override string ProcessErrorReceivedFromConductor(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
+        protected override string ProcessErrorReceivedFromConductor(IHoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
         {
             string msg = base.ProcessErrorReceivedFromConductor(response, dataReceivedEventArgs);
 
@@ -234,7 +235,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             return msg;
         }
 
-        private void DecodeAgentPubKeyGeneratedReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
+        private void DecodeAgentPubKeyGeneratedReceived(IHoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
         {
             AgentPubKeyGeneratedCallBackEventArgs args = CreateHoloNETArgs<AgentPubKeyGeneratedCallBackEventArgs>(response, dataReceivedEventArgs);
             args.HoloNETResponseType = HoloNETResponseType.AdminAgentPubKeyGenerated;
@@ -259,7 +260,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             RaiseAgentPubKeyGeneratedEvent(args);
         }
 
-        private void DecodeAppInstalledReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
+        private void DecodeAppInstalledReceived(IHoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
         {
             AppInstalledCallBackEventArgs args = new AppInstalledCallBackEventArgs();
             string errorMessage = "An unknown error occurred in HoloNETClient.DecodeAppInstalledReceived. Reason: ";
@@ -288,7 +289,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             RaiseAppInstalledEvent(args);
         }
 
-        private void DecodeAppUninstalledReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
+        private void DecodeAppUninstalledReceived(IHoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
         {
             AppUninstalledCallBackEventArgs args = new AppUninstalledCallBackEventArgs();
             args.HoloNETResponseType = HoloNETResponseType.AdminAppUninstalled;
@@ -312,7 +313,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             RaiseAppUninstalledEvent(args);
         }
 
-        private void DecodeAppEnabledReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
+        private void DecodeAppEnabledReceived(IHoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
         {
             string errorMessage = "An unknown error occurred in HoloNETClient.DecodeAppEnabledReceived. Reason: ";
             AppEnabledCallBackEventArgs args = CreateHoloNETArgs<AppEnabledCallBackEventArgs>(response, dataReceivedEventArgs);
@@ -342,7 +343,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             RaiseAppEnabledEvent(args);
         }
 
-        private void DecodeAppDisabledReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
+        private void DecodeAppDisabledReceived(IHoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
         {
             string errorMessage = "An unknown error occurred in HoloNETClient.DecodeAppEnabledReceived. Reason: ";
             AppDisabledCallBackEventArgs args = CreateHoloNETArgs<AppDisabledCallBackEventArgs>(response, dataReceivedEventArgs);
@@ -366,7 +367,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             RaiseAppDisabledEvent(args);
         }
 
-        private void DecodeZomeCallCapabilityGrantedReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
+        private void DecodeZomeCallCapabilityGrantedReceived(IHoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
         {
             string errorMessage = "An unknown error occurred in HoloNETClient.DecodeZomeCallCapabilityGrantedReceived. Reason: ";
             ZomeCallCapabilityGrantedCallBackEventArgs args = CreateHoloNETArgs<ZomeCallCapabilityGrantedCallBackEventArgs>(response, dataReceivedEventArgs);
@@ -384,7 +385,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             RaiseZomeCallCapabilityGrantedEvent(args);
         }
 
-        private void DecodeAppInterfaceAttachedReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
+        private void DecodeAppInterfaceAttachedReceived(IHoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
         {
             string errorMessage = "An unknown error occurred in HoloNETClient.DecodeAppInterfaceAttachedReceived. Reason: ";
             AppInterfaceAttachedCallBackEventArgs args = CreateHoloNETArgs<AppInterfaceAttachedCallBackEventArgs>(response, dataReceivedEventArgs);
@@ -414,7 +415,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             RaiseAppInterfaceAttachedEvent(args);
         }
 
-        private void DecodeDnaRegisteredReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
+        private void DecodeDnaRegisteredReceived(IHoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
         {
             string errorMessage = "An unknown error occurred in HoloNETClient.DecodeDnaRegisteredReceived. Reason: ";
             DnaRegisteredCallBackEventArgs args = CreateHoloNETArgs<DnaRegisteredCallBackEventArgs>(response, dataReceivedEventArgs);
@@ -438,7 +439,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             RaiseDnaRegisteredEvent(args);
         }
 
-        private void DecodeDnaDefinitionReturned(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
+        private void DecodeDnaDefinitionReturned(IHoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
         {
             string errorMessage = "An unknown error occurred in HoloNETClient.DecodeDnaDefinitionReturned. Reason: ";
             DnaDefinitionReturnedCallBackEventArgs args = CreateHoloNETArgs<DnaDefinitionReturnedCallBackEventArgs>(response, dataReceivedEventArgs);
@@ -462,7 +463,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             RaiseDnaDefinitionReturnedEvent(args);
         }
 
-        private void DecodeAppInterfacesListedReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
+        private void DecodeAppInterfacesListedReceived(IHoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
         {
             string errorMessage = "An unknown error occurred in HoloNETClient.DecodeAppInterfacesListedReceived. Reason: ";
             AppInterfacesListedCallBackEventArgs args = CreateHoloNETArgs<AppInterfacesListedCallBackEventArgs>(response, dataReceivedEventArgs);
@@ -486,7 +487,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             RaiseAppInterfacesListedEvent(args);
         }
 
-        private void DecodeAgentInfoReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
+        private void DecodeAgentInfoReceived(IHoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
         {
             string errorMessage = "An unknown error occurred in HoloNETClient.DecodeAgentInfoReceived. Reason: ";
             AgentInfoReturnedCallBackEventArgs args = CreateHoloNETArgs<AgentInfoReturnedCallBackEventArgs>(response, dataReceivedEventArgs);
@@ -510,7 +511,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             RaiseAgentInfoReturnedEvent(args);
         }
 
-        private void DecodeAgentInfoAddedReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
+        private void DecodeAgentInfoAddedReceived(IHoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
         {
             string errorMessage = "An unknown error occurred in HoloNETClient.DecodeAgentInfoAddedReceived. Reason: ";
             AgentInfoAddedCallBackEventArgs args = CreateHoloNETArgs<AgentInfoAddedCallBackEventArgs>(response, dataReceivedEventArgs);
@@ -534,7 +535,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             RaiseAgentInfoAddedEvent(args);
         }
 
-        private void DecodeAppsListedReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
+        private void DecodeAppsListedReceived(IHoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
         {
             string errorMessage = "An unknown error occurred in HoloNETClient.DecodeAppsListedReceived. Reason: ";
             AppsListedCallBackEventArgs args = CreateHoloNETArgs<AppsListedCallBackEventArgs>(response, dataReceivedEventArgs);
@@ -575,7 +576,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             RaiseAppsListedEvent(args);
         }
 
-        private void DecodeDnasListedReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
+        private void DecodeDnasListedReceived(IHoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
         {
             string errorMessage = "An unknown error occurred in HoloNETClient.DecodeDnasListedReceived. Reason: ";
             DnasListedCallBackEventArgs args = CreateHoloNETArgs<DnasListedCallBackEventArgs>(response, dataReceivedEventArgs);
@@ -599,7 +600,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             RaiseDnasListedEvent(args);
         }
 
-        private void DecodeCellIdsListedReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
+        private void DecodeCellIdsListedReceived(IHoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
         {
             string errorMessage = "An unknown error occurred in HoloNETClient.DecodeCellIdsListedReceived. Reason: ";
             CellIdsListedCallBackEventArgs args = CreateHoloNETArgs<CellIdsListedCallBackEventArgs>(response, dataReceivedEventArgs);
@@ -623,7 +624,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             RaiseCellIdsListedEvent(args);
         }
 
-        private void DecodeCoordinatorsUpdatedReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
+        private void DecodeCoordinatorsUpdatedReceived(IHoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
         {
             string errorMessage = "An unknown error occurred in HoloNETClient.DecodeCoordinatorsUpdatedReceived. Reason: ";
             CoordinatorsUpdatedCallBackEventArgs args = CreateHoloNETArgs<CoordinatorsUpdatedCallBackEventArgs>(response, dataReceivedEventArgs);
@@ -645,7 +646,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             RaiseCoordinatorsUpdatedEvent(args);
         }
 
-        private void DecodeCloneCellDeletedReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
+        private void DecodeCloneCellDeletedReceived(IHoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
         {
             string errorMessage = "An unknown error occurred in HoloNETClient.DecodeCloneCellDeletedReceived. Reason: ";
             CloneCellDeletedCallBackEventArgs args = CreateHoloNETArgs<CloneCellDeletedCallBackEventArgs>(response, dataReceivedEventArgs);
@@ -667,7 +668,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             RaiseCloneCellDeletedEvent(args);
         }
 
-        private void DecodeStateDumpedReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
+        private void DecodeStateDumpedReceived(IHoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
         {
             string errorMessage = "An unknown error occurred in HoloNETClient.DecodeStateDumpedReceived. Reason: ";
             StateDumpedCallBackEventArgs args = CreateHoloNETArgs<StateDumpedCallBackEventArgs>(response, dataReceivedEventArgs);
@@ -691,7 +692,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             RaiseStateDumpedEvent(args);
         }
 
-        private void DecodeFullStateDumpedReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
+        private void DecodeFullStateDumpedReceived(IHoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
         {
             string errorMessage = "An unknown error occurred in HoloNETClient.DecodeFullStateDumpedReceived. Reason: ";
             FullStateDumpedCallBackEventArgs args = CreateHoloNETArgs<FullStateDumpedCallBackEventArgs>(response, dataReceivedEventArgs);
@@ -715,7 +716,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             RaiseFullStateDumpedEvent(args);
         }
 
-        private void DecodeNetworkMetricsDumpedReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
+        private void DecodeNetworkMetricsDumpedReceived(IHoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
         {
             string errorMessage = "An unknown error occurred in HoloNETClient.DecodeNetworkMetricsDumpedReceived. Reason: ";
             NetworkMetricsDumpedCallBackEventArgs args = CreateHoloNETArgs<NetworkMetricsDumpedCallBackEventArgs>(response, dataReceivedEventArgs);
@@ -739,7 +740,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             RaiseNetworkMetricsDumpedEvent(args);
         }
 
-        private void DecodeNetworkStatsDumpedReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
+        private void DecodeNetworkStatsDumpedReceived(IHoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
         {
             string errorMessage = "An unknown error occurred in HoloNETClient.DecodeNetworkStatsDumpedReceived. Reason: ";
             NetworkStatsDumpedCallBackEventArgs args = CreateHoloNETArgs<NetworkStatsDumpedCallBackEventArgs>(response, dataReceivedEventArgs);
@@ -763,7 +764,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             RaiseNetworkStatsDumpedEvent(args);
         }
 
-        private void DecodeStorageInfoReturned(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
+        private void DecodeStorageInfoReturned(IHoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
         {
             string errorMessage = "An unknown error occurred in HoloNETClient.DecodeStorageInfoReturned. Reason: ";
             StorageInfoReturnedCallBackEventArgs args = CreateHoloNETArgs<StorageInfoReturnedCallBackEventArgs>(response, dataReceivedEventArgs);
@@ -787,7 +788,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             RaiseStorageInfoReturnedEvent(args);
         }
 
-        private void DecodeRecordsGraftedReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
+        private void DecodeRecordsGraftedReceived(IHoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
         {
             string errorMessage = "An unknown error occurred in HoloNETClient.DecodeRecordsGraftedReceived. Reason: ";
             RecordsGraftedCallBackEventArgs args = CreateHoloNETArgs<RecordsGraftedCallBackEventArgs>(response, dataReceivedEventArgs);
@@ -805,7 +806,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             RaiseRecordsGraftedEvent(args);
         }
 
-        private void DecodeAdminInterfacesAddedReceived(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
+        private void DecodeAdminInterfacesAddedReceived(IHoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
         {
             string errorMessage = "An unknown error occurred in HoloNETClient.DecodeAdminInterfacesAddedReceived. Reason: ";
             AdminInterfacesAddedCallBackEventArgs args = CreateHoloNETArgs<AdminInterfacesAddedCallBackEventArgs>(response, dataReceivedEventArgs);
@@ -824,7 +825,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         }
 
         //Generic version
-        private void DecodeResponseReceived<T>(HoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs, string eventName, Dictionary<string, TaskCompletionSource<HoloNETDataReceivedBaseBaseEventArgs<T>>> taskCompletionCallBack)
+        private void DecodeResponseReceived<T>(IHoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs, string eventName, Dictionary<string, TaskCompletionSource<HoloNETDataReceivedBaseBaseEventArgs<T>>> taskCompletionCallBack)
         {
             string errorMessage = "An unknown error occurred in HoloNETClient.DecodeResponseReceived. Reason: ";
             HoloNETDataReceivedBaseBaseEventArgs<T> args = CreateHoloNETArgs<HoloNETDataReceivedBaseBaseEventArgs<T>>(response, dataReceivedEventArgs);

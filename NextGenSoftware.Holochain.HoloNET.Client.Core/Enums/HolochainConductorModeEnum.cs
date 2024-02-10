@@ -4,7 +4,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
     public enum HolochainConductorModeEnum
     {
         /// <summary>
-        /// If this is set you then need to spcecify the full path to the holochain.exe in the 'FullPathToExternalHolochainConductorBinary' setting on the HoloNETDNA (if 'HolochainConductorToUse' is set to 'HolochainProductionConductor') or the full path to the hc.exe in the 'FullPathToExternalHCToolBinary' setting (if 'HolochainConductorToUse' is set to 'HcDevTool'). 
+        /// If this is set you then need to spcecify the full path to the holochain.exe in the 'FullPathToExternalHolochainConductorBinary' setting on the IHoloNETDNA (if 'HolochainConductorToUse' is set to 'HolochainProductionConductor') or the full path to the hc.exe in the 'FullPathToExternalHCToolBinary' setting (if 'HolochainConductorToUse' is set to 'HcDevTool'). 
         /// </summary>
         UseExternal,
 
