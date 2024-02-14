@@ -939,14 +939,14 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         protected virtual void WebSocket_OnDataSent(object sender, DataSentEventArgs e)
         {
-            Logger.Log(string.Concat("EVENT RAISED: DataSent: Raw Binary Data: ", e.RawBinaryDataDecoded, "(", e.RawBinaryDataAsString, ")"), LogType.Info);
+            Logger.Log(string.Concat("EVENT RAISED: DataSent: Raw Binary Data: ", e.RawBinaryDataDecoded, "(", e.RawBinaryDataAsString, ")"), LogType.Debug);
             OnDataSent?.Invoke(this, new HoloNETDataSentEventArgs { EndPoint = e.EndPoint, RawBinaryData = e.RawBinaryData, RawBinaryDataAsString = e.RawBinaryDataAsString, RawBinaryDataDecoded = e.RawBinaryDataDecoded });
             //OnDataSent?.Invoke(this, new HoloNETDataSentEventArgs { IsCallSuccessful = e.IsCallSuccessful, EndPoint = e.EndPoint, RawBinaryData = e.RawBinaryData, RawBinaryDataAsString = e.RawBinaryDataAsString, RawBinaryDataDecoded = e.RawBinaryDataDecoded });
         }
 
         protected virtual void WebSocket_OnDataReceived(object sender, WebSocket.DataReceivedEventArgs e)
         {
-            Logger.Log(string.Concat("EVENT RAISED: DataReceived: Raw Binary Data: ", e.RawBinaryDataDecoded.Trim(), "(", e.RawBinaryDataAsString.Trim(), ")"), LogType.Info);
+            Logger.Log(string.Concat("EVENT RAISED: DataReceived: Raw Binary Data: ", e.RawBinaryDataDecoded.Trim(), "(", e.RawBinaryDataAsString.Trim(), ")"), LogType.Debug);
             ProcessDataReceived(e);
         }
 
@@ -1075,8 +1075,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             if (!string.IsNullOrEmpty(optionalAdditionalLogDetails))
                 optionalAdditionalLogDetails = $", {optionalAdditionalLogDetails}";
 
-            Logger.Log(string.Concat("EVENT RAISED: ", eventName, ": Id: ", holoNETEvent.Id, ", Is Call Successful: ", optionalAdditionalLogDetails, ", Raw Binary Data: ", holoNETEvent.RawBinaryDataDecoded, "(", holoNETEvent.RawBinaryDataAsString, ")"), LogType.Info);
-            //Logger.Log(string.Concat("EVENT RAISED: ", eventName, ": Id: ", holoNETEvent.Id, ", Is Call Successful: ", holoNETEvent.IsCallSuccessful ? "True" : "False", optionalAdditionalLogDetails, ", Raw Binary Data: ", holoNETEvent.RawBinaryDataDecoded, "(", holoNETEvent.RawBinaryDataAsString, ")"), LogType.Info);
+            Logger.Log(string.Concat("EVENT RAISED: ", eventName, ": Id: ", holoNETEvent.Id, ", Is Call Successful: ", optionalAdditionalLogDetails, ", Raw Binary Data: ", holoNETEvent.RawBinaryDataDecoded, "(", holoNETEvent.RawBinaryDataAsString, ")"), LogType.Debug);
         }
 
         protected virtual void Log(string msg, LogType logType, Action<string, LogType> loggingFunction = null)

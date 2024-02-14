@@ -110,17 +110,32 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public EnforceRequestToResponseIdMatchingBehaviour EnforceRequestToResponseIdMatchingBehaviour { get; set; } = EnforceRequestToResponseIdMatchingBehaviour.Error;
 
         /// <summary>
-        /// This passes through to the static LogConfig.LoggingMode property in [NextGenSoftware.Logging](https://www.nuget.org/packages/NextGenSoftware.Logging) package. It can be either `WarningsErrorsInfoAndDebug`, `WarningsErrorsAndInfo`, `WarningsAndErrors` or `ErrorsOnly`.
+        /// This passes through to the static LogConfig.FileLoggingMode property in [NextGenSoftware.Logging](https://www.nuget.org/packages/NextGenSoftware.Logging) package. It can be either `WarningsErrorsInfoAndDebug`, `WarningsErrorsAndInfo`, `WarningsAndErrors` or `ErrorsOnly`.
         /// </summary>
-        public LoggingMode LoggingMode
+        public LoggingMode FileLoggingMode
         {
             get
             {
-                return LogConfig.LoggingMode;
+                return LogConfig.FileLoggingMode;
             }
             set
             {
-                LogConfig.LoggingMode = value;
+                LogConfig.FileLoggingMode = value;
+            }
+        }
+
+        /// <summary>
+        /// This passes through to the static LogConfig.ConsoleLoggingMode property in [NextGenSoftware.Logging](https://www.nuget.org/packages/NextGenSoftware.Logging) package. It can be either `WarningsErrorsInfoAndDebug`, `WarningsErrorsAndInfo`, `WarningsAndErrors` or `ErrorsOnly`.
+        /// </summary>
+        public LoggingMode ConsoleLoggingMode
+        {
+            get
+            {
+                return LogConfig.ConsoleLoggingMode;
+            }
+            set
+            {
+                LogConfig.ConsoleLoggingMode = value;
             }
         }
 

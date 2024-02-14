@@ -7,9 +7,14 @@
     Shell.FlyoutBehavior="Disabled"
     Title="NextGenSoftware.Holochain.HoloNET.Templates.MAUI">
 
-    <ShellContent
+    <!--<ShellContent
         Title="Home"
         ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
+        Route="MainPage" />-->
+
+    <ShellContent
+    Title="Home"
+    ContentTemplate="{DataTemplate local:MainWindow}"
+    Route="MainPage" />
 
 </Shell>

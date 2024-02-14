@@ -57,7 +57,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     if (log)
                     {
                         Log($"ADMIN: AgentPubKey Generated Successfully. AgentPubKey: {result.AgentPubKeyGeneratedResult.AgentPubKey}", LogType.Info, loggingFunction);
-                        Log($"ADMIN: Installing App {{appId}}...", LogType.Info, loggingFunction);
+                        Log($"ADMIN: Installing App {hAppId}...", LogType.Info, loggingFunction);
                     }
 
                     result.IsAgentPubKeyGenerated = true;
@@ -161,7 +161,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             {
                 InstallEnableSignAndAttachHappEventArgs installedResult = await InstallEnableSignAndAttachHappAsync(hAppId, hAppInstallPath, roleName, capGrantAccessType, grantedFunctionsType, grantedFunctions, uninstallhAppIfAlreadyInstalled, log, loggingFunction);
 
-                if (installedResult != null && !installedResult.IsError && result.IsSuccess)
+                if (installedResult != null && !installedResult.IsError && installedResult.IsSuccess)
                 {
                     if (log)
                         Log($"APP: Connecting to HoloNETClientAppAgent 'ws://127.0.0.1:{installedResult.AttachedOnPort}' {hAppId}...", LogType.Info, loggingFunction);

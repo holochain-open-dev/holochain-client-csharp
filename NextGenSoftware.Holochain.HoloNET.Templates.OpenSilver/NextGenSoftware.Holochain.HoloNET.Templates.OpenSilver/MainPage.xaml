@@ -6,9 +6,713 @@
     xmlns:local="clr-namespace:NextGenSoftware.Holochain.HoloNET.Templates.OpenSilver"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d">
-    <Canvas>
-        <TextBlock Text="Hello World!" x:Name="TextBlock1" Canvas.Left="20" Canvas.Top="30"/>
+    xmlns:fa="http://schemas.fontawesome.io/icons/"
+    xmlns:uc="clr-namespace:NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls"
+    xmlns:managers="clr-namespace:NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers"
+    mc:Ignorable="d"
+ Title="NextGen Software HoloNET WPF Test Harness v1.0" Height="770" Width="1650"
+    >
+    <Page.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/NextGenSoftware.Holochain.HoloNET.Templates.WPF;component/Resources/Resources.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Page.Resources>
+
+    <Page.DataContext>
+        <managers:HoloNETManager />
+    </Page.DataContext>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="160"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="5"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="40"></RowDefinition>
+        </Grid.RowDefinitions>
+
+        <Grid.Background>
+            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                <GradientStop Color="Black"/>
+                <GradientStop Color="Blue" Offset="1"/>
+            </LinearGradientBrush>
+        </Grid.Background>
+
+        <StackPanel Grid.Row="0"  Orientation="Vertical">
+            <Label x:Name="lblOutput" HorizontalAlignment="Center" Foreground="White" FontWeight="Bold" Margin="20" FontSize="14" Content="NextGen Software HoloNET WPF Test Harness v1.0" VerticalAlignment="Center">
+                <Label.Effect>
+                    <DropShadowEffect BlurRadius="10" ShadowDepth="0" Opacity="1" 
+                      Color="White"/>
+                </Label.Effect>
+            </Label>
+            <StackPanel Orientation="Horizontal">
+                <CheckBox x:Name="chkShowDetailedMessages" Content="Show Detailed Logs" Margin="20" Foreground="White" Checked="chkShowDetailedMessages_Checked" Unchecked="chkShowDetailedMessages_Unchecked"></CheckBox>
+                <Button x:Name="btnInstall" Style="{StaticResource ButtonStyle}" FontSize="14" Cursor="Hand" Content="Install hApp" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnInstall_Click" >
+                    <Button.Effect>
+                        <DropShadowEffect x:Name="btnInstallGlowEffect" ShadowDepth="0"
+                          Color="White"
+                          Opacity="0"
+                          BlurRadius="10"/>
+                    </Button.Effect>
+
+                    <Button.Triggers>
+                        <EventTrigger RoutedEvent="Button.MouseEnter">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation
+                                    Storyboard.TargetName="btnInstallGlowEffect" 
+                                    Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+                                    From="0.0" To="1.0" Duration="0:0:0.5" 
+                                    AutoReverse="False" RepeatBehavior="1x" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                        <EventTrigger RoutedEvent="Button.MouseLeave">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation
+                                    Storyboard.TargetName="btnInstallGlowEffect" 
+                                    Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+                                    From="1" To="0" Duration="0:0:0.5" 
+                                    AutoReverse="False" RepeatBehavior="1x" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                    </Button.Triggers>
+                </Button>
+                <Button x:Name="btnRefreshInstalledhApps" Style="{StaticResource ButtonStyle}" FontSize="14" Cursor="Hand" Content="Refresh hApps" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnRefreshInstalledhApps_Click" >
+                    <Button.Effect>
+                        <DropShadowEffect x:Name="btnRefreshInstalledhAppsGlowEffect" ShadowDepth="0"
+                          Color="White"
+                          Opacity="0"
+                          BlurRadius="10"/>
+                    </Button.Effect>
+
+                    <Button.Triggers>
+                        <EventTrigger RoutedEvent="Button.MouseEnter">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation
+                                    Storyboard.TargetName="btnRefreshInstalledhAppsGlowEffect" 
+                                    Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+                                    From="0.0" To="1.0" Duration="0:0:0.5" 
+                                    AutoReverse="False" RepeatBehavior="1x" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                        <EventTrigger RoutedEvent="Button.MouseLeave">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation
+                                    Storyboard.TargetName="btnRefreshInstalledhAppsGlowEffect" 
+                                    Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+                                    From="1" To="0" Duration="0:0:0.5" 
+                                    AutoReverse="False" RepeatBehavior="1x" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                    </Button.Triggers>
+                </Button>
+                <Button x:Name="btnListDNAs" Style="{StaticResource ButtonStyle}" FontSize="14" Cursor="Hand" Content="List DNAs" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnListDNAs_Click" >
+                    <Button.Effect>
+                        <DropShadowEffect x:Name="btnListDNAsGlowEffect" ShadowDepth="0"
+                          Color="White"
+                          Opacity="0"
+                          BlurRadius="10"/>
+                    </Button.Effect>
+
+                    <Button.Triggers>
+                        <EventTrigger RoutedEvent="Button.MouseEnter">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation
+                                    Storyboard.TargetName="btnListDNAsGlowEffect" 
+                                    Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+                                    From="0.0" To="1.0" Duration="0:0:0.5" 
+                                    AutoReverse="False" RepeatBehavior="1x" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                        <EventTrigger RoutedEvent="Button.MouseLeave">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation
+                                    Storyboard.TargetName="btnListDNAsGlowEffect" 
+                                    Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+                                    From="1" To="0" Duration="0:0:0.5" 
+                                    AutoReverse="False" RepeatBehavior="1x" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                    </Button.Triggers>
+                </Button>
+                <Button x:Name="btnListCellIds" Style="{StaticResource ButtonStyle}" FontSize="14" Cursor="Hand" Content="List Cell Ids" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnListCellIds_Click" >
+                    <Button.Effect>
+                        <DropShadowEffect x:Name="btnListCellIdsGlowEffect" ShadowDepth="0"
+                          Color="White"
+                          Opacity="0"
+                          BlurRadius="10"/>
+                    </Button.Effect>
+
+                    <Button.Triggers>
+                        <EventTrigger RoutedEvent="Button.MouseEnter">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation
+                                    Storyboard.TargetName="btnListCellIdsGlowEffect" 
+                                    Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+                                    From="0.0" To="1.0" Duration="0:0:0.5" 
+                                    AutoReverse="False" RepeatBehavior="1x" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                        <EventTrigger RoutedEvent="Button.MouseLeave">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation
+                                    Storyboard.TargetName="btnListCellIdsGlowEffect" 
+                                    Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+                                    From="1" To="0" Duration="0:0:0.5" 
+                                    AutoReverse="False" RepeatBehavior="1x" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                    </Button.Triggers>
+                </Button>
+                <Button x:Name="btnListAttachedInterfaces" Style="{StaticResource ButtonStyle}" FontSize="14" Cursor="Hand" Content="List Attached Interfaces" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnListAttachedInterfaces_Click" >
+                    <Button.Effect>
+                        <DropShadowEffect x:Name="btnListAttachedInterfacesGlowEffect" ShadowDepth="0"
+                          Color="White"
+                          Opacity="0"
+                          BlurRadius="10"/>
+                    </Button.Effect>
+
+                    <Button.Triggers>
+                        <EventTrigger RoutedEvent="Button.MouseEnter">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation
+                                    Storyboard.TargetName="btnListAttachedInterfacesGlowEffect" 
+                                    Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+                                    From="0.0" To="1.0" Duration="0:0:0.5" 
+                                    AutoReverse="False" RepeatBehavior="1x" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                        <EventTrigger RoutedEvent="Button.MouseLeave">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation
+                                    Storyboard.TargetName="btnListAttachedInterfacesGlowEffect" 
+                                    Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+                                    From="1" To="0" Duration="0:0:0.5" 
+                                    AutoReverse="False" RepeatBehavior="1x" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                    </Button.Triggers>
+                </Button>
+                <Button x:Name="btnClearLog" Style="{StaticResource ButtonStyle}" FontSize="14" Cursor="Hand" Content="Clear Log" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnClearLog_Click">
+                    <Button.Effect>
+                        <DropShadowEffect x:Name="btnClearLogGlowEffect" ShadowDepth="0"
+                          Color="White"
+                          Opacity="0"
+                          BlurRadius="10"/>
+                    </Button.Effect>
+
+                    <Button.Triggers>
+                        <EventTrigger RoutedEvent="Button.MouseEnter">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation
+                                    Storyboard.TargetName="btnClearLogGlowEffect" 
+                                    Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+                                    From="0.0" To="1.0" Duration="0:0:0.5" 
+                                    AutoReverse="False" RepeatBehavior="1x" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                        <EventTrigger RoutedEvent="Button.MouseLeave">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation
+                                    Storyboard.TargetName="btnClearLogGlowEffect" 
+                                    Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+                                    From="1" To="0" Duration="0:0:0.5" 
+                                    AutoReverse="False" RepeatBehavior="1x" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                    </Button.Triggers>
+                </Button>
+                <Button x:Name="btnShowLog" Style="{StaticResource ButtonStyle}" FontSize="14" Cursor="Hand" Content="Show Log" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnShowLog_Click">
+                    <Button.Effect>
+                        <DropShadowEffect x:Name="btnShowLogGlowEffect" ShadowDepth="0"
+                          Color="White"
+                          Opacity="0"
+                          BlurRadius="10"/>
+                    </Button.Effect>
+
+                    <Button.Triggers>
+                        <EventTrigger RoutedEvent="Button.MouseEnter">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation
+                                    Storyboard.TargetName="btnShowLogGlowEffect" 
+                                    Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+                                    From="0.0" To="1.0" Duration="0:0:0.5" 
+                                    AutoReverse="False" RepeatBehavior="1x" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                        <EventTrigger RoutedEvent="Button.MouseLeave">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation
+                                    Storyboard.TargetName="btnShowLogGlowEffect" 
+                                    Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+                                    From="1" To="0" Duration="0:0:0.5" 
+                                    AutoReverse="False" RepeatBehavior="1x" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                    </Button.Triggers>
+                </Button>
+                <Button x:Name="btnReboot" Style="{StaticResource ButtonStyle}" FontSize="14" Cursor="Hand" Content="Reboot" Margin="10" Foreground="DarkGray"  IsEnabled="True" Padding="5,2,5,2"  Background="Black" Click="btnReboot_Click">
+                    <Button.Effect>
+                        <DropShadowEffect x:Name="btnRebootGlowEffect" ShadowDepth="0"
+                          Color="White"
+                          Opacity="0"
+                          BlurRadius="10"/>
+                    </Button.Effect>
+
+                    <Button.Triggers>
+                        <EventTrigger RoutedEvent="Button.MouseEnter">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation
+                                    Storyboard.TargetName="btnRebootGlowEffect" 
+                                    Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+                                    From="0.0" To="1.0" Duration="0:0:0.5" 
+                                    AutoReverse="False" RepeatBehavior="1x" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                        <EventTrigger RoutedEvent="Button.MouseLeave">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation
+                                    Storyboard.TargetName="btnRebootGlowEffect" 
+                                    Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+                                    From="1" To="0" Duration="0:0:0.5" 
+                                    AutoReverse="False" RepeatBehavior="1x" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                    </Button.Triggers>
+                </Button>
+                <Button x:Name="btnHoloNETEntry" Style="{StaticResource ButtonStyle}" FontSize="14" Cursor="Hand" Content="HoloNET Entry" Margin="10" Foreground="DarkGray"  IsEnabled="True" Padding="5,2,5,2"  Background="Black" Click="btnHoloNETEntry_Click">
+                    <Button.Effect>
+                        <DropShadowEffect x:Name="btnHoloNETEntryGlowEffect" ShadowDepth="0"
+                      Color="White"
+                      Opacity="0"
+                      BlurRadius="10"/>
+                    </Button.Effect>
+
+                    <Button.Triggers>
+                        <EventTrigger RoutedEvent="Button.MouseEnter">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation
+                        Storyboard.TargetName="btnHoloNETEntryGlowEffect" 
+                        Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+                        From="0.0" To="1.0" Duration="0:0:0.5" 
+                        AutoReverse="False" RepeatBehavior="1x" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                        <EventTrigger RoutedEvent="Button.MouseLeave">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation
+                        Storyboard.TargetName="btnHoloNETEntryGlowEffect" 
+                        Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+                        From="1" To="0" Duration="0:0:0.5" 
+                        AutoReverse="False" RepeatBehavior="1x" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                    </Button.Triggers>
+                </Button>
+
+                <Button x:Name="btnHoloNETCollection" Style="{StaticResource ButtonStyle}" FontSize="14" Cursor="Hand" Content="HoloNET Collection" Margin="10" Foreground="DarkGray"  IsEnabled="True" Padding="5,2,5,2"  Background="Black" Click="btnHoloNETCollection_Click">
+                    <Button.Effect>
+                        <DropShadowEffect x:Name="btnHoloNETCollectionGlowEffect" ShadowDepth="0"
+      Color="White"
+      Opacity="0"
+      BlurRadius="10"/>
+                    </Button.Effect>
+
+                    <Button.Triggers>
+                        <EventTrigger RoutedEvent="Button.MouseEnter">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation
+        Storyboard.TargetName="btnHoloNETCollectionGlowEffect" 
+        Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+        From="0.0" To="1.0" Duration="0:0:0.5" 
+        AutoReverse="False" RepeatBehavior="1x" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                        <EventTrigger RoutedEvent="Button.MouseLeave">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation
+        Storyboard.TargetName="btnHoloNETCollectionGlowEffect" 
+        Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+        From="1" To="0" Duration="0:0:0.5" 
+        AutoReverse="False" RepeatBehavior="1x" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                    </Button.Triggers>
+                </Button>
+            </StackPanel>
+
+            <Label  HorizontalAlignment="Left" Foreground="White" FontWeight="Bold" Margin="10" FontSize="12" Content="Installed hApps" VerticalAlignment="Center"/>
+        </StackPanel>
+
+        <DataGrid Grid.Row="1" x:Name="gridHapps" ItemsSource="{Binding Path=Instance.InstalledApps}" SelectedCellsChanged="gridHapps_SelectedCellsChanged" HeadersVisibility="Column" Margin="10" AutoGenerateColumns="False" IsReadOnly="true"  RowBackground="DarkBlue" AlternatingRowBackground="Blue"  Background="Transparent"  Foreground="White">
+            <DataGrid.Resources>
+                <Style BasedOn="{StaticResource {x:Type DataGridColumnHeader}}" TargetType="{x:Type DataGridColumnHeader}">
+                    <Setter Property="Background" Value="Blue" />
+                </Style>
+
+                <ResourceDictionary x:Key="gridResources">
+                    <Style x:Key="{x:Type DataGridCell}" TargetType="{x:Type DataGridCell}">
+                        <Setter Property="Background" Value="{x:Null}" />
+                        <Setter Property="BorderBrush" Value="{x:Null}" />
+                        <Style.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Background" Value="{x:Null}" />
+                                <Setter Property="BorderBrush" Value="{x:Null}" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                    <Style TargetType="{x:Type DataGridRow}">
+                        <Setter Property="Background" Value="{x:Null}" />
+                        <Setter Property="BorderBrush" Value="{x:Null}" />
+                        <Style.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Background" Value="{x:Null}" />
+                                <Setter Property="BorderBrush" Value="{x:Null}" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </ResourceDictionary>
+            </DataGrid.Resources>
+            <DataGrid.Columns>
+                <DataGridTextColumn Width="*" Header="Name" Binding="{Binding Path=Name}" CanUserSort="True" ></DataGridTextColumn>
+                <DataGridTextColumn Width="*" Header="Status" Binding="{Binding Path=Status}" CanUserSort="True" ></DataGridTextColumn>
+                <DataGridTextColumn Width="*" Header="Status Reason" Binding="{Binding Path=StatusReason}" CanUserSort="True" ></DataGridTextColumn>
+                <DataGridTextColumn Width="*" Header="Port" Binding="{Binding Path=Port}" CanUserSort="True" ></DataGridTextColumn>
+                <DataGridTextColumn Width="*" Header="Shared Connection" Binding="{Binding Path=IsSharedConnection}" CanUserSort="True" ></DataGridTextColumn>
+                <DataGridTextColumn Width="*" Header="Manifest" Binding="{Binding Path=Manifest}" CanUserSort="True" ></DataGridTextColumn>
+                <DataGridTextColumn Width="4*" MinWidth="200" Header="Agent Pub Key" Binding="{Binding Path=AgentPubKey}" CanUserSort="True" ></DataGridTextColumn>
+                <DataGridTextColumn Width="4*" MinWidth="200" Header="Dna Hash" Binding="{Binding Path=DnaHash}" CanUserSort="True" ></DataGridTextColumn>
+                <DataGridTemplateColumn Width="660">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel Grid.Row="2" Orientation="Horizontal">
+                                <Button x:Name="btnEnableApp" Style="{StaticResource ButtonStyle}" FontSize="12" Cursor="Hand" IsEnabled="{Binding Path=IsDisabled}"  Background="Black" Margin="10,0,10,10"  Padding="5,5,5,5" Foreground="{Binding Path=EnabledButtonForegroundColour}"  Content="Enable" Click="btnEnableApp_Click">
+                                    <Button.Effect>
+                                        <DropShadowEffect x:Name="btnEnableAppGlowEffect" ShadowDepth="0"
+                                      Color="White"
+                                      Opacity="0"
+                                      BlurRadius="10"/>
+                                    </Button.Effect>
+
+                                    <Button.Triggers>
+                                        <EventTrigger RoutedEvent="Button.MouseEnter">
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <DoubleAnimation
+                                    Storyboard.TargetName="btnEnableAppGlowEffect" 
+                                    Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+                                    From="0.0" To="1.0" Duration="0:0:0.5" 
+                                    AutoReverse="False" RepeatBehavior="1x" />
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </EventTrigger>
+                                        <EventTrigger RoutedEvent="Button.MouseLeave">
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <DoubleAnimation
+                                    Storyboard.TargetName="btnEnableAppGlowEffect" 
+                                    Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+                                    From="1" To="0" Duration="0:0:0.5" 
+                                    AutoReverse="False" RepeatBehavior="1x" />
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </EventTrigger>
+                                    </Button.Triggers>
+                                </Button>
+                                <Button x:Name="btnDisableApp" Style="{StaticResource ButtonStyle}" FontSize="12" Cursor="Hand" IsEnabled="{Binding Path=IsEnabled}" Background="Black" Margin="10,0,10,10" Padding="5,5,5,5" Foreground="{Binding Path=DisabledButtonForegroundColour}" Content="Disable" Click="btnDisableApp_Click">
+                                    <Button.Effect>
+                                        <DropShadowEffect x:Name="btnDisableAppGlowEffect" ShadowDepth="0"
+                                      Color="White"
+                                      Opacity="0"
+                                      BlurRadius="10"/>
+                                    </Button.Effect>
+
+                                    <Button.Triggers>
+                                        <EventTrigger RoutedEvent="Button.MouseEnter">
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <DoubleAnimation
+                                    Storyboard.TargetName="btnDisableAppGlowEffect" 
+                                    Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+                                    From="0.0" To="1.0" Duration="0:0:0.5" 
+                                    AutoReverse="False" RepeatBehavior="1x" />
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </EventTrigger>
+                                        <EventTrigger RoutedEvent="Button.MouseLeave">
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <DoubleAnimation
+                                    Storyboard.TargetName="btnDisableAppGlowEffect" 
+                                    Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+                                    From="1" To="0" Duration="0:0:0.5" 
+                                    AutoReverse="False" RepeatBehavior="1x" />
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </EventTrigger>
+                                    </Button.Triggers>
+                                </Button>
+                                <Button x:Name="btnUninstallApp" Style="{StaticResource ButtonStyle}" Foreground="WhiteSmoke" FontSize="12"  Cursor="Hand" Background="Black" Margin="10,0,10,10"  Padding="5,5,5,5" Content="Uninstall" Click="btnUninstallApp_Click">
+                                    <Button.Effect>
+                                        <DropShadowEffect x:Name="btnUninstallAppGlowEffect" ShadowDepth="0"
+                          Color="White"
+                          Opacity="0"
+                          BlurRadius="10"/>
+                                    </Button.Effect>
+
+                                    <Button.Triggers>
+                                        <EventTrigger RoutedEvent="Button.MouseEnter">
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <DoubleAnimation
+                                    Storyboard.TargetName="btnUninstallAppGlowEffect" 
+                                    Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+                                    From="0.0" To="1.0" Duration="0:0:0.5" 
+                                    AutoReverse="False" RepeatBehavior="1x" />
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </EventTrigger>
+                                        <EventTrigger RoutedEvent="Button.MouseLeave">
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <DoubleAnimation
+                                    Storyboard.TargetName="btnUninstallAppGlowEffect" 
+                                    Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+                                    From="1" To="0" Duration="0:0:0.5" 
+                                    AutoReverse="False" RepeatBehavior="1x" />
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </EventTrigger>
+                                    </Button.Triggers>
+                                </Button>
+                                <Button x:Name="btnDisconnectClient" Style="{StaticResource ButtonStyle}" IsEnabled="{Binding Path=IsConnected}" Foreground="{Binding Path=DisconnectButtonForegroundColour}" FontSize="12"  Cursor="Hand" Background="Black" Margin="10,0,10,10"  Padding="5,5,5,5" Content="Disconnect" Click="btnDisconnectClient_Click">
+                                    <Button.Effect>
+                                        <DropShadowEffect x:Name="btnDisconnectClientGlowEffect" ShadowDepth="0"
+Color="White"
+Opacity="0"
+BlurRadius="10"/>
+                                    </Button.Effect>
+
+                                    <Button.Triggers>
+                                        <EventTrigger RoutedEvent="Button.MouseEnter">
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <DoubleAnimation
+          Storyboard.TargetName="btnDisconnectClientGlowEffect" 
+          Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+          From="0.0" To="1.0" Duration="0:0:0.5" 
+          AutoReverse="False" RepeatBehavior="1x" />
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </EventTrigger>
+                                        <EventTrigger RoutedEvent="Button.MouseLeave">
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <DoubleAnimation
+              Storyboard.TargetName="btnDisconnectClientGlowEffect" 
+              Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+              From="1" To="0" Duration="0:0:0.5" 
+              AutoReverse="False" RepeatBehavior="1x" />
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </EventTrigger>
+                                    </Button.Triggers>
+                                </Button>
+                                <Button x:Name="btnCallZomeFunction" Style="{StaticResource ButtonStyle}" IsEnabled="{Binding Path=IsCallZomeFunctionAndViewDataEntriesEnabled}" Foreground="{Binding Path=DisabledButtonForegroundColour}" FontSize="12"  Cursor="Hand" Background="Black" Margin="10,0,10,10"  Padding="5,5,5,5" Content="Call Zome Function" Click="btnCallZomeFunction_Click">
+                                    <Button.Effect>
+                                        <DropShadowEffect x:Name="btnCallZomeFunctionGlowEffect" ShadowDepth="0"
+                          Color="White"
+                          Opacity="0"
+                          BlurRadius="10"/>
+                                    </Button.Effect>
+
+                                    <Button.Triggers>
+                                        <EventTrigger RoutedEvent="Button.MouseEnter">
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <DoubleAnimation
+                                    Storyboard.TargetName="btnCallZomeFunctionGlowEffect" 
+                                    Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+                                    From="0.0" To="1.0" Duration="0:0:0.5" 
+                                    AutoReverse="False" RepeatBehavior="1x" />
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </EventTrigger>
+                                        <EventTrigger RoutedEvent="Button.MouseLeave">
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <DoubleAnimation
+                                    Storyboard.TargetName="btnCallZomeFunctionGlowEffect" 
+                                    Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+                                    From="1" To="0" Duration="0:0:0.5" 
+                                    AutoReverse="False" RepeatBehavior="1x" />
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </EventTrigger>
+                                    </Button.Triggers>
+                                </Button>
+
+                                <Button x:Name="btnViewDataEntries" Style="{StaticResource ButtonStyle}" IsEnabled="{Binding Path=IsCallZomeFunctionAndViewDataEntriesEnabled}" Foreground="{Binding Path=DisabledButtonForegroundColour}" FontSize="12"  Cursor="Hand" Background="Black" Margin="10,0,10,10"  Padding="5,5,5,5" Content="View Data Entries" Click="btnViewDataEntries_Click">
+                                    <Button.Effect>
+                                        <DropShadowEffect x:Name="tbnViewDataEntriesGlowEffect" ShadowDepth="0"
+                                            Color="White"
+                                            Opacity="0"
+                                            BlurRadius="10"/>
+                                    </Button.Effect>
+
+                                    <Button.Triggers>
+                                        <EventTrigger RoutedEvent="Button.MouseEnter">
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <DoubleAnimation
+                            Storyboard.TargetName="tbnViewDataEntriesGlowEffect" 
+                            Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+                            From="0.0" To="1.0" Duration="0:0:0.5" 
+                            AutoReverse="False" RepeatBehavior="1x" />
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </EventTrigger>
+                                        <EventTrigger RoutedEvent="Button.MouseLeave">
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <DoubleAnimation
+                                                Storyboard.TargetName="tbnViewDataEntriesGlowEffect" 
+                                                Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+                                                From="1" To="0" Duration="0:0:0.5" 
+                                                AutoReverse="False" RepeatBehavior="1x" />
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </EventTrigger>
+                                    </Button.Triggers>
+                                </Button>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <GridSplitter Grid.Column="0" Grid.Row="2" Height="5" HorizontalAlignment="Stretch" />
+
+        <Grid Grid.Row="3" x:Name="gridLog" LayoutUpdated="gridLog_LayoutUpdated">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="40"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+            </Grid.RowDefinitions>
+            <Label Grid.Row="0" Content="Log:" Height="40" Margin="10,10,0,0" Foreground="WhiteSmoke" FontWeight="Bold"></Label>
+            <ListBox Grid.Row="1" VerticalAlignment="Top"  MinHeight="200" x:Name="lstOutput" Margin="10" Background="Transparent"  Foreground="White"/>
+        </Grid>
+
+        <Grid Grid.Row="5">
+            <Grid.RowDefinitions>
+                <RowDefinition></RowDefinition>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition Width="150"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal">
+                <TextBlock x:Name="txtStatus" TextWrapping="Wrap" FontWeight="Bold"  Text="Status: Ready" HorizontalAlignment="Left" Margin="10,0,0,10" VerticalAlignment="Center" Foreground="WhiteSmoke">
+                    <TextBlock.Effect>
+                        <DropShadowEffect x:Name="glowEffect" ShadowDepth="0"
+                          Color="White"
+                          Opacity="0"
+                          BlurRadius="10"/>
+                    </TextBlock.Effect>
+
+                    <TextBlock.Triggers>
+                        <EventTrigger x:Name="eventTriggerAnimateStatus" RoutedEvent="TextBlock.Loaded">
+                            <BeginStoryboard>
+                                <Storyboard x:Name="sbAnimateStatus">
+                                    <DoubleAnimation
+                                    Storyboard.TargetName="glowEffect" 
+                                    Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+                                    From="0.0" To="1.0" Duration="0:0:0.5" 
+                                    AutoReverse="True" RepeatBehavior="1x" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                    </TextBlock.Triggers>
+                </TextBlock>
+                <fa:ImageAwesome x:Name="spinner" Icon="Cog" Visibility="Hidden" Spin="True" Foreground="WhiteSmoke" VerticalAlignment="Center" Margin="5,0,0,4" Height="20" Width="20" />
+            </StackPanel>
+
+
+            <TextBlock x:Name="txtConnections" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right" FontWeight="Bold"  Text="Client Connections: 0" VerticalAlignment="Center" Margin="0,0,15,10" Foreground="WhiteSmoke">
+                <TextBlock.Effect>
+                    <DropShadowEffect x:Name="glowEffectConnections" ShadowDepth="0"
+                Color="White"
+                Opacity="0"
+                BlurRadius="10"/>
+                </TextBlock.Effect>
+
+                <TextBlock.Triggers>
+                    <EventTrigger RoutedEvent="TextBlock.Loaded">
+                        <BeginStoryboard>
+                            <Storyboard x:Name="sbAnimateConnections">
+                                <DoubleAnimation
+                    Storyboard.TargetName="glowEffectConnections" 
+                    Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+                    From="0.0" To="1.0" Duration="0:0:0.5" 
+                    AutoReverse="True" RepeatBehavior="1x" />
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </EventTrigger>
+                </TextBlock.Triggers>
+            </TextBlock>
+
+
+        </Grid>
+
+        <uc:ucConductorSettingsPopup x:Name="ucConductorSettingsPopup" Grid.Row="0" Opacity="0.9" Grid.RowSpan="6" Visibility="Visible"></uc:ucConductorSettingsPopup>
+        <uc:ucInstallAppPopup x:Name="ucInstallAppPopup" Grid.Row="0" Opacity="0.9" Grid.RowSpan="6" Visibility="Collapsed"></uc:ucInstallAppPopup>
+        <uc:ucCallZomePopup x:Name="ucCallZomePopup" Grid.Row="0" Opacity="0.9" Grid.RowSpan="6" Visibility="Collapsed"></uc:ucCallZomePopup>
+        <uc:ucHoloNETEntryPopup x:Name="ucHoloNETEntryPopup" Grid.Row="0" Opacity="0.9" Grid.RowSpan="6" Visibility="Collapsed"></uc:ucHoloNETEntryPopup>
+        <uc:ucHoloNETCollectionPopup x:Name="ucHoloNETCollectionPopup" Grid.Row="0" Opacity="0.9" Grid.RowSpan="6" Visibility="Collapsed"></uc:ucHoloNETCollectionPopup>
+        <uc:ucHoloNETEntryAndCollectionSharedPopup x:Name="ucHoloNETEntryAndCollectionSharedPopup" Grid.Row="0" Opacity="0.9" Grid.RowSpan="6" Visibility="Collapsed"></uc:ucHoloNETEntryAndCollectionSharedPopup>
+    </Grid>
     </Canvas>
     
 </sdk:Page>

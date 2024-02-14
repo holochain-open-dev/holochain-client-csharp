@@ -224,8 +224,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                         HoloNETDNA.CellId = args.CellId;
                 }
 
-                Logger.Log($"AGENT PUB KEY RETURNED FROM CONDUCTOR: {HoloNETDNA.AgentPubKey}", LogType.Info);
-                Logger.Log($"DNA HASH RETURNED FROM CONDUCTOR:: {HoloNETDNA.DnaHash}", LogType.Info);
+                Logger.Log($"AGENT PUB KEY RETURNED FROM CONDUCTOR: {agentPubKey}", LogType.Info);
+                Logger.Log($"DNA HASH RETURNED FROM CONDUCTOR:: {dnaHash}", LogType.Info);
 
                 args.AgentPubKey = agentPubKey;
                 args.DnaHash = dnaHash;

@@ -14,14 +14,164 @@
     <ApplicationDefinition Include="App.xaml">
       <Generator>MSBuild:Compile</Generator>
     </ApplicationDefinition>
+    <Page Include="MainPage - Copy.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MainWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Resources\Resources.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="User Controls\Popups\ucCallZomePopup.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="User Controls\Popups\ucConductorSettingsPopup.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="User Controls\Popups\ucHoloNETCollectionPopup.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="User Controls\Popups\ucHoloNETEntryAndCollectionSharedPopup.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="User Controls\Popups\ucHoloNETEntryPopup.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="User Controls\Popups\ucInstallAppPopup.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="User Controls\Spinner.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="User Controls\ucHoloNETEntry.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="User Controls\ucHoloNETEntryMetaData.xaml">
+      <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
 
   <ItemGroup>
     <Compile Include="App.xaml.cs" />
+    <Compile Include="Enums\AdminOperation.cs" />
+    <Compile Include="Enums\ClientOperation.cs" />
+    <Compile Include="Enums\ConnectToAppAgentClientResponseType.cs" />
+    <Compile Include="Enums\StatusMessageType.cs" />
+    <Compile Include="EventArgs\InstalledAppsEventArgs.cs" />
+    <Compile Include="EventArgs\LogMessageEventArgs.cs" />
+    <Compile Include="EventArgs\NumberOfClientConnectionsEventArgs.cs" />
+    <Compile Include="EventArgs\StatusMessageEventArgs.cs" />
+    <Compile Include="Interfaces\IAvatar.cs" />
+    <Compile Include="Interfaces\IAvatarShared.cs" />
+    <Compile Include="Interfaces\IHoloNETManager.cs" />
+    <Compile Include="Interfaces\IInstalledApp.cs" />
+    <Compile Include="MainPage - Copy.xaml.cs" />
     <Compile Include="MainPage.xaml.cs" />
+    <Compile Include="MainWindow.xaml.cs" />
+    <Compile Include="Managers\HoloNETEntryDNAManager.cs" />
+    <Compile Include="Managers\HoloNETEntryUIManager.cs" />
+    <Compile Include="Managers\HoloNETManager\HoloNETManager - HoloNETClient Admin.cs" />
+    <Compile Include="Managers\HoloNETManager\HoloNETManager - HoloNETClient AppAgent.cs" />
+    <Compile Include="Managers\HoloNETManager\HoloNETManager - HoloNETCollection.cs" />
+    <Compile Include="Managers\HoloNETManager\HoloNETManager - HoloNETCollectionShared.cs" />
+    <Compile Include="Managers\HoloNETManager\HoloNETManager - HoloNETEntry.cs" />
+    <Compile Include="Managers\HoloNETManager\HoloNETManager - HoloNETEntryShared.cs" />
+    <Compile Include="Managers\HoloNETManager\HoloNETManager.cs" />
+    <Compile Include="Managers\PopupManager.cs" />
+    <Compile Include="Models\Avatar.cs" />
+    <Compile Include="Models\AvatarShared.cs" />
+    <Compile Include="Models\InstalledApp.cs" />
+    <Compile Include="Objects\ConnectToAppAgentClientResult.cs" />
+    <Compile Include="Objects\HoloNETEntryDNA.cs" />
+    <Compile Include="Objects\InstallingAppParams.cs" />
+    <Compile Include="Objects\ZomeCallParams.cs" />
+    <Compile Include="User Controls\Popups\ucCallZomePopup.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="User Controls\Popups\ucConductorSettingsPopup.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="User Controls\Popups\ucHoloNETCollectionPopup.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="User Controls\Popups\ucHoloNETEntryAndCollectionSharedPopup.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="User Controls\Popups\ucHoloNETEntryPopup.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="User Controls\Popups\ucInstallAppPopup.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="User Controls\Spinner.xaml.cs" />
+    <Compile Include="User Controls\ucHoloNETEntry.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="User Controls\ucHoloNETEntryMetaData.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="User Controls\Popups\ucCallZomePopup.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="User Controls\Popups\ucConductorSettingsPopup.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="User Controls\Popups\ucHoloNETCollectionPopup.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="User Controls\Popups\ucHoloNETEntryAndCollectionSharedPopup.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="User Controls\Popups\ucHoloNETEntryPopup.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="User Controls\Popups\ucInstallAppPopup.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="User Controls\Spinner.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="User Controls\ucHoloNETEntry.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="User Controls\ucHoloNETEntryMetaData.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Resources\Resources.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="MainWindow.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="MainPage - Copy.xaml" />
   </ItemGroup>
 
 </Project>

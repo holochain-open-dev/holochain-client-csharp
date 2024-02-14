@@ -62,6 +62,19 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <MauiXaml Remove="MainWindow.xaml" />
+	  <MauiXaml Remove="User Controls\Popups\ucCallZomePopup.xaml" />
+	  <MauiXaml Remove="User Controls\Popups\ucConductorSettingsPopup.xaml" />
+	  <MauiXaml Remove="User Controls\Popups\ucHoloNETCollectionPopup.xaml" />
+	  <MauiXaml Remove="User Controls\Popups\ucHoloNETEntryAndCollectionSharedPopup.xaml" />
+	  <MauiXaml Remove="User Controls\Popups\ucHoloNETEntryPopup.xaml" />
+	  <MauiXaml Remove="User Controls\Popups\ucInstallAppPopup.xaml" />
+	  <MauiXaml Remove="User Controls\Spinner.xaml" />
+	  <MauiXaml Remove="User Controls\ucHoloNETEntry.xaml" />
+	  <MauiXaml Remove="User Controls\ucHoloNETEntryMetaData.xaml" />
+	</ItemGroup>
+
+	<ItemGroup>
 	  <None Remove="Resources\Raw\holochain.exe" />
 	</ItemGroup>
 
@@ -75,6 +88,48 @@
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Page Include="MainWindow.xaml">
+	    <SubType>Designer</SubType>
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	  <Page Include="User Controls\Popups\ucCallZomePopup.xaml">
+	    <SubType>Designer</SubType>
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	  <Page Include="User Controls\Popups\ucConductorSettingsPopup.xaml">
+	    <SubType>Designer</SubType>
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	  <Page Include="User Controls\Popups\ucHoloNETCollectionPopup.xaml">
+	    <SubType>Designer</SubType>
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	  <Page Include="User Controls\Popups\ucHoloNETEntryAndCollectionSharedPopup.xaml">
+	    <SubType>Designer</SubType>
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	  <Page Include="User Controls\Popups\ucHoloNETEntryPopup.xaml">
+	    <SubType>Designer</SubType>
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	  <Page Include="User Controls\Popups\ucInstallAppPopup.xaml">
+	    <SubType>Designer</SubType>
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	  <Page Include="User Controls\Spinner.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	  <Page Include="User Controls\ucHoloNETEntry.xaml">
+	    <SubType>Designer</SubType>
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	  <Page Include="User Controls\ucHoloNETEntryMetaData.xaml">
+	    <SubType>Designer</SubType>
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
 	</ItemGroup>
 
 	<ItemGroup>

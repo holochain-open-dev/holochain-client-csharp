@@ -27,7 +27,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Interfaces
         ConsoleColor InfoColour { get; set; }
         string InstalledAppId { get; set; }
         string LogFileName { get; set; }
-        LoggingMode LoggingMode { get; set; }
+        LoggingMode FileLoggingMode { get; set; }
+        LoggingMode ConsoleLoggingMode { get; set; }
         string LogPath { get; set; }
         bool LogToConsole { get; set; }
         bool LogToFile { get; set; }
