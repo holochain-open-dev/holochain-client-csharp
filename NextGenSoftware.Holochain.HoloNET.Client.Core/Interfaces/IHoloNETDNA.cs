@@ -5,7 +5,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Interfaces
 {
     public interface IHoloNETDNA
     {
-        bool AddAdditionalSpaceAfterEachLogEntry { get; set; }
+        bool InsertExtraNewLineAfterLogMessage { get; set; }
+        int IndentLogMessagesBy { get; set; } 
         string AgentPubKey { get; set; }
         bool AutoShutdownHolochainConductor { get; set; }
         bool AutoStartHolochainConductor { get; set; }

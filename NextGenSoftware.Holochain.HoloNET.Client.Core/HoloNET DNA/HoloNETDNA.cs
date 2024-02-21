@@ -202,7 +202,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <summary>
         /// Set this to true to add additional space after the end of each log entry. NOTE: This is only relevant if the built-in DefaultLogger is used.
         /// </summary>
-        public bool AddAdditionalSpaceAfterEachLogEntry { get; set; } = false;
+        public bool InsertExtraNewLineAfterLogMessage { get; set; } = false;
+
+        /// <summary>
+        /// The amount of space to indent the log message by. NOTE: This is only relevant if the built-in DefaultLogger is used.
+        /// </summary>
+        public int IndentLogMessagesBy { get; set; } = 1;
 
         /// <summary>
         /// An enum that specifies what to do when anm error occurs. The options are: `AlwaysThrowExceptionOnError`, `OnlyThrowExceptionIfNoErrorHandlerSubscribedToOnErrorEvent` & `NeverThrowExceptions`). The default is `OnlyThrowExceptionIfNoErrorHandlerSubscribedToOnErrorEvent` meaning it will only throw an error if the `OnError` event has not been subscribed to. This delegates error handling to the caller. If no event has been subscribed then HoloNETClient will throw an error. `AlwaysThrowExceptionOnError` will always throw an error even if the `OnError` event has been subscribed to. The `NeverThrowException` enum option will never throw an error even if the `OnError` event has not been subscribed to. Regardless of what enum is selected, the error will always be logged using whatever ILogger`s have been injected into the constructor or set on the static Logging.Loggers property.
