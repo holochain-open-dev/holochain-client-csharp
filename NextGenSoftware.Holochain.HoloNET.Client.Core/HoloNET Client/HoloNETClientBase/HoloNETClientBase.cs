@@ -662,7 +662,15 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         {
             try
             {
-                return Convert.FromBase64String(hash.Replace('-', '+').Replace('_', '/').Substring(1, hash.Length - 1)); //also remove the u prefix.
+                // return Convert.FromBase64String(hash.Replace('-', '+').Replace('_', '/').Substring(1, hash.Length - 1)); //also remove the u prefix.
+                string incoming = hash.Replace('_', '/').Replace('-', '+').Substring(1, hash.Length - 1); //also remove the u prefix.
+                switch (hash.Length % 4)
+                {
+                    case 2: incoming += "=="; break;
+                    case 3: incoming += "="; break;
+                }
+
+                return Convert.FromBase64String(incoming);
             }
             catch (Exception e)
             {

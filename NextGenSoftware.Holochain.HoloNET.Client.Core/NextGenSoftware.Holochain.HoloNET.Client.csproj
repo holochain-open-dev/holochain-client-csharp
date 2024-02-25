@@ -35,6 +35,8 @@
 	  <!--<PackageLicenseFile>..\LICENSE</PackageLicenseFile>-->
 
 	  <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
+
+	  <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
@@ -69,6 +71,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="holochain_serialisation_wrapper.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="HolochainBinaries\hc.exe">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
@@ -78,6 +83,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="External Libs\" />
     <Folder Include="Properties\" />
   </ItemGroup>
 

@@ -8,6 +8,7 @@ using MessagePack;
 using Blake2Fast;
 using NextGenSoftware.Logging;
 using NextGenSoftware.Holochain.HoloNET.Client.Interfaces;
+using Sodium;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
@@ -633,30 +634,53 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                 }
 
-                //TODO: Also be good to implement same functionality in js client where it will error if there is no matching request to a response (id etc). I think we can make this optional param for these method overloads like responseMustHaveMatchingRequest which defaults to true.
-
-                //byte[][] cellId = await GetCellIdAsync();
                 string cellId = $"{HoloNETDNA.AgentPubKey}:{HoloNETDNA.DnaHash}";
 
-                // global using BandPass = (int Min, int Max); //TODO: Need to upgrade to C#12 (.NET 8) before names tuple aliases will work...
+               // global using BandPass = (int Min, int Max); //TODO: Need to upgrade to C#12 (.NET 8) before names tuple aliases will work...
 
                 if (_signingCredentialsForCell.ContainsKey(cellId) && _signingCredentialsForCell[cellId] != null)
                 {
-                    ZomeCall payload = new ZomeCall()
+                    ZomeCallUnsigned payload = new ZomeCallUnsigned()
                     {
                         cap_secret = _signingCredentialsForCell[cellId].CapSecret,
-                        cell_id = new byte[2][] { ConvertHoloHashToBytes(HoloNETDNA.DnaHash), ConvertHoloHashToBytes(HoloNETDNA.AgentPubKey) },
-                        //cell_id = new CellId() { agent_pubkey = ConvertHoloHashToBytes(HoloNETDNA.AgentPubKey), dna_hash = ConvertHoloHashToBytes(HoloNETDNA.DnaHash) },
-                        //cell_id = (ConvertHoloHashToBytes(HoloNETDNA.DnaHash), ConvertHoloHashToBytes(HoloNETDNA.AgentPubKey)),
+                        cell_id_agent_pub_key = ConvertHoloHashToBytes(HoloNETDNA.AgentPubKey),
+                        cell_id_dna_hash = ConvertHoloHashToBytes(HoloNETDNA.DnaHash),
                         fn_name = function,
                         zome_name = zome,
                         payload = MessagePackSerializer.Serialize(paramsObject),
                         provenance = ConvertHoloHashToBytes(HoloNETDNA.AgentPubKey),
-                        nonce = RandomNumberGenerator.GetBytes(32),
-                        expires_at = DateTime.Now.AddMinutes(5).Ticks / 10 //DateTime.Now.AddMinutes(5).ToBinary(), //Conductor expects it in microseconds.
+                        nonce = SodiumCore.GetRandomBytes(32), //RandomNumberGenerator.GetBytes(32),
+                        //expires_at = DateTime.Now.AddMinutes(5).Ticks / 10
+                        expires_at = (DateTimeOffset.Now.ToUnixTimeMilliseconds() + 5 * 60 * 1000) * 1000
                     };
 
-                    byte[] hash = Blake2b.ComputeHash(MessagePackSerializer.Serialize(payload));
+                    //ZomeCall payload = new ZomeCall()
+                    //{
+                    //    cap_secret = _signingCredentialsForCell[cellId].CapSecret,
+                    //    cell_id = new byte[2][] { ConvertHoloHashToBytes(HoloNETDNA.DnaHash), ConvertHoloHashToBytes(HoloNETDNA.AgentPubKey) },
+                    //    ////cell_id = new CellId() { agent_pubkey = ConvertHoloHashToBytes(HoloNETDNA.AgentPubKey), dna_hash = ConvertHoloHashToBytes(HoloNETDNA.DnaHash) },
+                    //    ////cell_id = (ConvertHoloHashToBytes(HoloNETDNA.DnaHash), ConvertHoloHashToBytes(HoloNETDNA.AgentPubKey)),
+                    //    fn_name = function,
+                    //    zome_name = zome,
+                    //    payload = MessagePackSerializer.Serialize(paramsObject),
+                    //    provenance = ConvertHoloHashToBytes(HoloNETDNA.AgentPubKey),
+                    //    nonce = RandomNumberGenerator.GetBytes(32),
+                    //    expires_at = DateTime.Now.AddMinutes(5).Ticks / 10 //DateTime.Now.AddMinutes(5).ToBinary(), //Conductor expects it in microseconds.
+                    //};
+
+                    byte[] hash = new byte[32];
+                    try
+                    {
+                        // Call into the `holochain_zome_types` crate to get a blake2b hash of the zomeCall
+                        HolochainSerialisationWrapper.call_get_data_to_sign(hash, payload);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("Failed to get data to sign: " + e.ToString());
+                    }
+
+
+                    //byte[] hash = Blake2b.ComputeHash(MessagePackSerializer.Serialize(payload));
                     //var sig = Ed25519.Sign(hash, _signingCredentialsForCell[cellId].KeyPair.PrivateKey);
                     //var sig = Sodium.PublicKeyAuth.Sign(hash, _signingCredentialsForCell[cellId].KeyPair.PrivateKey).Take(64).ToArray();
                     var sig = Sodium.PublicKeyAuth.SignDetached(hash, _signingCredentialsForCell[cellId].KeyPair.PrivateKey);
@@ -664,22 +688,30 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     ZomeCallSigned signedPayload = new ZomeCallSigned()
                     {
                         cap_secret = payload.cap_secret,
-                        cell_id = payload.cell_id,
+                        //cell_id = payload.cell_id,
+                        cell_id = [payload.cell_id_dna_hash, payload.cell_id_agent_pub_key],
                         fn_name = payload.fn_name,
                         zome_name = payload.zome_name,
                         payload = payload.payload,
                         provenance = payload.provenance,
                         nonce = payload.nonce,
                         expires_at = payload.expires_at,
-                        signature = sig
+                        signature = sig[0..64]
                     };
+
+                    //byte[][] cell_id = new byte[2][] { ConvertHoloHashToBytes(HoloNETDNA.DnaHash), ConvertHoloHashToBytes(HoloNETDNA.AgentPubKey) };
 
                     HoloNETData holoNETData = new HoloNETData()
                     {
                         type = "call_zome",
+                        //data = cell_id
                         data = signedPayload
+                        //data = payload
                     };
 
+                    //byte[][] cell_id = new byte[2][] { ConvertHoloHashToBytes(HoloNETDNA.DnaHash), ConvertHoloHashToBytes(HoloNETDNA.AgentPubKey) };
+                    //await SendHoloNETRequestAsync(MessagePackSerializer.Serialize(cell_id), HoloNETRequestType.ZomeCall, id);
+                    //await SendHoloNETRequestAsync(ConvertHoloHashToBytes(HoloNETDNA.DnaHash), HoloNETRequestType.ZomeCall, id);
                     await SendHoloNETRequestAsync(holoNETData, HoloNETRequestType.ZomeCall, id);
 
                     if (zomeResultCallBackMode == ConductorResponseCallBackMode.WaitForHolochainConductorResponse)

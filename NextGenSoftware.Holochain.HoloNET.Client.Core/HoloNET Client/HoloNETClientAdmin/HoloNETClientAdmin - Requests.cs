@@ -9,6 +9,7 @@ using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.AppManifest;
 using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests;
 using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects;
 using NextGenSoftware.Holochain.HoloNET.Client.Interfaces;
+using Sodium;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
@@ -1256,8 +1257,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
 
             Sodium.KeyPair pair = Sodium.PublicKeyAuth.GenerateKeyPair(RandomNumberGenerator.GetBytes(32));
-            byte[] DHTLocation = ConvertHoloHashToBytes(HoloNETDNA.AgentPubKey).TakeLast(4).ToArray();
-            byte[] signingKey = new byte[] { 132, 32, 36 }.Concat(pair.PublicKey).Concat(DHTLocation).ToArray();
+            //byte[] DHTLocation = ConvertHoloHashToBytes(HoloNETDNA.AgentPubKey).TakeLast(4).ToArray();
+            //byte[] signingKey = new byte[] { 132, 32, 36 }.Concat(pair.PublicKey).Concat(DHTLocation).ToArray();
+
+            var signingKey = new byte[39];
+            Buffer.BlockCopy(new byte[3] { 132, 32, 36 }, 0, signingKey, 0, 3);
+            Buffer.BlockCopy(pair.PublicKey, 0, signingKey, 3, 32);
+            Buffer.BlockCopy(new byte[4] { 0, 0, 0, 0 }, 0, signingKey, 35, 4);
 
             Dictionary<GrantedFunctionsType, List<(string, string)>> grantedFunctions = new Dictionary<GrantedFunctionsType, List<(string, string)>>();
 
@@ -1270,8 +1276,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             //_signingCredentialsForCell[$"{HoloNETDNA.AgentPubKey}:{HoloNETDNA.DnaHash}"] = new SigningCredentials()
             _signingCredentialsForCell[$"{ConvertHoloHashToString(cellId[1])}:{ConvertHoloHashToString(cellId[0])}"] = new SigningCredentials()
             {
-                CapSecret = RandomNumberGenerator.GetBytes(64),
-                KeyPair = new KeyPair() { PrivateKey = pair.PrivateKey, PublicKey = pair.PublicKey },
+                CapSecret = SodiumCore.GetRandomBytes(64), //RandomNumberGenerator.GetBytes(64),
+                KeyPair = new Data.Admin.Requests.Objects.KeyPair() { PrivateKey = pair.PrivateKey, PublicKey = pair.PublicKey },
                 SigningKey = signingKey
             };
 
