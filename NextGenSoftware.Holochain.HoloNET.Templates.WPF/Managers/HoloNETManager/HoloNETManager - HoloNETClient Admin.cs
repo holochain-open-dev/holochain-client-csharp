@@ -71,7 +71,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
         /// </summary>
         public async Task<InstallEnableSignAndAttachHappEventArgs> InitDemoApp(string hAppId, string hAppInstallPath)
         {
-            return await HoloNETClientAdmin.InstallEnableSignAndAttachHappAsync(hAppId, hAppInstallPath, _role_name, CapGrantAccessType.Unrestricted, GrantedFunctionsType.All, null, true, true, (string logMsg, LogType logType) =>
+            //return await HoloNETClientAdmin.InstallEnableSignAndAttachHappAsync(hAppId, hAppInstallPath, _role_name, CapGrantAccessType.Unrestricted, GrantedFunctionsType.All, null, true, true, (string logMsg, LogType logType) =>
+            return await HoloNETClientAdmin.InstallEnableSignAndAttachHappAsync(hAppId, hAppInstallPath, _role_name, CapGrantAccessType.Assigned, GrantedFunctionsType.All, null, true, true, (string logMsg, LogType logType) =>
             {
                 LogMessage(logMsg);
 

@@ -1,4 +1,5 @@
-﻿namespace NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects
+﻿
+namespace NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects
 {
     public class SigningCredentials
     {

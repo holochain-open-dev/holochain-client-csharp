@@ -22,6 +22,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public bool IsConnected { get; set; }
     }
 
+    public class HoloNETDisconnectedEventArgs : CallBackBaseEventArgs
+    {
+        public bool IsDisconnected { get; set; }
+    }
+
     public class HoloNETErrorEventArgs : EventArgs
     {
         public Uri EndPoint { get; set; }

@@ -16,8 +16,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Models
         // Example of how you can disable the 3 different audit options (you can of course only disable one of two of them).
         //public Avatar() : base("oasis", "get_entry_avatar", "create_entry_avatar", "update_entry_avatar", "delete_entry_avatar", false, false, false) { }
         //public Avatar(HoloNETConfig holoNETConfig) : base("oasis", "get_entry_avatar", "create_entry_avatar", "update_entry_avatar", "delete_entry_avatar", holoNETConfig, false, false, false) { }
-        public Avatar() : base("oasis", "get_entry_avatar", "create_entry_avatar", "update_entry_avatar", "delete_entry_avatar") { }
-        public Avatar(IHoloNETDNA holoNETDNA) : base("oasis", "get_entry_avatar", "create_entry_avatar", "update_entry_avatar", "delete_entry_avatar", true, holoNETDNA) { }
+        public Avatar() : base("oasis", "get_avatar", "create_avatar", "update_avatar", "delete_avatar") { }
+        public Avatar(IHoloNETDNA holoNETDNA) : base("oasis", "get_avatar", "create_avatar", "update_avatar", "delete_avatar", true, holoNETDNA) { }
 
 
         [HolochainRustFieldName("first_name")]

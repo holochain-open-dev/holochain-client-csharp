@@ -14,10 +14,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Models
         private string _firstName = "";
 
         //This constructor will create an empty object with no internal HoloNETClient connection.
-        public AvatarShared() : base("oasis", "get_entry_avatar", "create_entry_avatar", "update_entry_avatar", "delete_entry_avatar", false) { }
+        public AvatarShared() : base("oasis", "get_avatar", "create_avatar", "update_avatar", "delete_avatar", false) { }
 
         //This constructor takes a shared HoloNETClient connection as a param.
-        public AvatarShared(IHoloNETClientAppAgent holoNETclient) : base("oasis", "get_entry_avatar", "create_entry_avatar", "update_entry_avatar", "delete_entry_avatar", holoNETclient) { }
+        public AvatarShared(IHoloNETClientAppAgent holoNETclient) : base("oasis", "get_avatar", "create_avatar", "update_avatar", "delete_avatar", holoNETclient) { }
 
         //[HolochainFieldName("first_name")]
         //public string FirstName { get; set; }

@@ -617,19 +617,38 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="disconnectedCallBackMode">If this is set to `WaitForHolochainConductorToDisconnect` (default) then it will await until it has disconnected before returning to the caller, otherwise (it is set to `UseCallBackEvents`) it will return immediately and then raise the [OnDisconnected](#ondisconnected) once it is disconnected.</param>
         /// <param name="shutdownHolochainConductorsMode">Once it has successfully disconnected it will automatically call the ShutDownAllHolochainConductors method if the `shutdownHolochainConductorsMode` flag (defaults to `UseHoloNETDNASettings`) is not set to `DoNotShutdownAnyConductors`. Other values it can be are 'ShutdownCurrentConductorOnly' or 'ShutdownAllConductors'. Please see the ShutDownConductors method below for more detail.</param>
         /// <returns></returns>
-        public virtual async Task DisconnectAsync(DisconnectedCallBackMode disconnectedCallBackMode = DisconnectedCallBackMode.WaitForHolochainConductorToDisconnect, ShutdownHolochainConductorsMode shutdownHolochainConductorsMode = ShutdownHolochainConductorsMode.UseHoloNETDNASettings)
+        public virtual async Task<HoloNETDisconnectedEventArgs> DisconnectAsync(DisconnectedCallBackMode disconnectedCallBackMode = DisconnectedCallBackMode.WaitForHolochainConductorToDisconnect, ShutdownHolochainConductorsMode shutdownHolochainConductorsMode = ShutdownHolochainConductorsMode.UseHoloNETDNASettings)
         {
-            if (IsDisconnecting)
-                return;
+            HoloNETDisconnectedEventArgs disconnectedEventArgs = new HoloNETDisconnectedEventArgs();
 
-            IsDisconnecting = true;
-            _taskCompletionDisconnected = new TaskCompletionSource<DisconnectedEventArgs>();
+            try
+            {
+                if (IsDisconnecting)
+                {
+                    disconnectedEventArgs.IsWarning = true;
+                    disconnectedEventArgs.Message = "Already Disconnected...";
+                    return disconnectedEventArgs;
+                }
 
-            _shutdownHolochainConductorsMode = shutdownHolochainConductorsMode;
-            await WebSocket.DisconnectAsync();
+                IsDisconnecting = true;
+                _taskCompletionDisconnected = new TaskCompletionSource<DisconnectedEventArgs>();
 
-            if (disconnectedCallBackMode == DisconnectedCallBackMode.WaitForHolochainConductorToDisconnect)
-                await _taskCompletionDisconnected.Task;
+                _shutdownHolochainConductorsMode = shutdownHolochainConductorsMode;
+                await WebSocket.DisconnectAsync();
+
+                if (disconnectedCallBackMode == DisconnectedCallBackMode.WaitForHolochainConductorToDisconnect)
+                    await _taskCompletionDisconnected.Task;
+
+                if (WebSocket.State == WebSocketState.Closed)
+                    disconnectedEventArgs.IsDisconnected = true;
+            }
+            catch (Exception e) 
+            {
+                disconnectedEventArgs.Message = $"Unknown Error Occured in HoloNETClientBase.DisconnectAsync method. Reason: {e}";
+                HandleError(disconnectedEventArgs.Message);
+            }
+
+            return disconnectedEventArgs;
         }
 
         /// <summary>
@@ -638,9 +657,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="disconnectedCallBackMode">If this is set to `WaitForHolochainConductorToDisconnect` (default) then it will await until it has disconnected before returning to the caller, otherwise (it is set to `UseCallBackEvents`) it will return immediately and then raise the [OnDisconnected](#ondisconnected) once it is disconnected.</param>
         /// <param name="shutdownHolochainConductorsMode">Once it has successfully disconnected it will automatically call the ShutDownAllHolochainConductors method if the `shutdownHolochainConductorsMode` flag (defaults to `UseHoloNETDNASettings`) is not set to `DoNotShutdownAnyConductors`. Other values it can be are 'ShutdownCurrentConductorOnly' or 'ShutdownAllConductors'. Please see the ShutDownConductors method below for more detail.</param>
         /// <returns></returns>
-        public virtual void Disconnect(DisconnectedCallBackMode disconnectedCallBackMode = DisconnectedCallBackMode.WaitForHolochainConductorToDisconnect, ShutdownHolochainConductorsMode shutdownHolochainConductorsMode = ShutdownHolochainConductorsMode.UseHoloNETDNASettings)
+        public virtual HoloNETDisconnectedEventArgs Disconnect(DisconnectedCallBackMode disconnectedCallBackMode = DisconnectedCallBackMode.WaitForHolochainConductorToDisconnect, ShutdownHolochainConductorsMode shutdownHolochainConductorsMode = ShutdownHolochainConductorsMode.UseHoloNETDNASettings)
         {
-            DisconnectAsync(disconnectedCallBackMode, shutdownHolochainConductorsMode);
+            return DisconnectAsync(disconnectedCallBackMode, shutdownHolochainConductorsMode).Result;
         }
 
 
