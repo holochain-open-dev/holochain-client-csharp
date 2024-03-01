@@ -302,10 +302,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
 
                 InstalledApps.Add(installedApp);
 
-                if (hApps != "")
-                    hApps = $"{hApps}, ";
+                //if (hApps != "")
+                //    hApps = $"{hApps}";
 
-                hApps = $"{hApps}{app.installed_app_id}";
+                hApps = $"{hApps}{app.installed_app_id}\n";
             }
 
             //Set the status to connected in the list of installed apps (this is good example of how you can access the internal HoloNETClientAppAgent inside the HoloNET Entry).
@@ -321,7 +321,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
 
             if (ShowAppsListedInLog)
             {
-                LogMessage($"ADMIN: hApps Listed: {hApps}");
+                LogMessage($"ADMIN: hApps Listed: \n{hApps}");
                 ShowStatusMessage("hApps Listed.", StatusMessageType.Success);
             }
         }

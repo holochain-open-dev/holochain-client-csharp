@@ -60,7 +60,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                             break;
 
                         case HoloNETResponseType.AdminAppInterfacesListed:
-                            DecodeAppsListedReceived(response, dataReceivedEventArgs);
+                            DecodeAppInterfacesListedReceived(response, dataReceivedEventArgs);
                             break;
 
                         case HoloNETResponseType.AdminAppsListed:
@@ -72,7 +72,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                             break;
 
                         case HoloNETResponseType.AdminCellIdsListed:
-                            DecodeDnasListedReceived(response, dataReceivedEventArgs);
+                            DecodeCellIdsListedReceived(response, dataReceivedEventArgs);
                             break;
 
                         case HoloNETResponseType.AdminAgentInfoReturned:
@@ -463,30 +463,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             RaiseDnaDefinitionReturnedEvent(args);
         }
 
-        private void DecodeAppInterfacesListedReceived(IHoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
-        {
-            string errorMessage = "An unknown error occurred in HoloNETClient.DecodeAppInterfacesListedReceived. Reason: ";
-            AppInterfacesListedCallBackEventArgs args = CreateHoloNETArgs<AppInterfacesListedCallBackEventArgs>(response, dataReceivedEventArgs);
-            args.HoloNETResponseType = HoloNETResponseType.AdminAppInterfacesListed;
-
-            try
-            {
-                Logger.Log("ADMIN APP INTERFACES LISTED\n", LogType.Info);
-                ushort[] dataResponse = MessagePackSerializer.Deserialize<ushort[]>(response.data, messagePackSerializerOptions);
-
-                if (dataResponse != null)
-                    args.WebSocketPorts = dataResponse.ToList();
-                else
-                    HandleError(args, $"{errorMessage} dataResponse failed to deserialize.");
-            }
-            catch (Exception ex)
-            {
-                HandleError(args, $"{errorMessage} {ex}");
-            }
-
-            RaiseAppInterfacesListedEvent(args);
-        }
-
         private void DecodeAgentInfoReceived(IHoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
         {
             string errorMessage = "An unknown error occurred in HoloNETClient.DecodeAgentInfoReceived. Reason: ";
@@ -548,10 +524,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                 if (appResponse != null)
                 {
+                    string hApps = "";
                     foreach (AppInfo appInfo in appResponse.Apps)
                     {
                         AppInfoCallBackEventArgs appInfoArgs = new AppInfoCallBackEventArgs();
-                        AppInfo processedAppInfo = ProcessAppInfo(appInfo, appInfoArgs);
+                        AppInfo processedAppInfo = ProcessAppInfo(appInfo, appInfoArgs, false);
 
                         if (!appInfoArgs.IsError)
                             args.Apps.Add(processedAppInfo);
@@ -560,7 +537,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                             args.IsError = true;
                             args.Message = $"{args.Message} # {appInfoArgs.Message}";
                         }
+
+                        hApps = $"{hApps}hAPP: {appInfo.installed_app_id}, AgentPubKey: {appInfo.AgentPubKey}, DnaHash: {appInfo.DnaHash}\"\n";
                     }
+
+                    Logger.Log($"hApps:\n{hApps}", LogType.Info);
 
                     if (args.IsError)
                         HandleError(args.Message);
@@ -585,12 +566,21 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             try
             {
                 Logger.Log("ADMIN DNA's LISTED\n", LogType.Info);
-                byte[][] dataResponse = MessagePackSerializer.Deserialize<byte[][]>(response.data, messagePackSerializerOptions);
+                AppResponse appResponse = MessagePackSerializer.Deserialize<AppResponse>(response.data, messagePackSerializerOptions);
 
-                if (dataResponse != null)
-                    args.Dnas = dataResponse;
+                if (appResponse != null)
+                {
+                    string dnas = "";
+                    foreach (byte[] dna in appResponse.data)
+                    {
+                        dnas = $"{dnas}\n{ConvertHoloHashToString(dna)}";
+                        args.Dnas.Add(dna);
+                    }
+
+                    Logger.Log($"DnaHashes's: {dnas}", LogType.Info);
+                }
                 else
-                    HandleError(args, $"{errorMessage} dataResponse failed to deserialize.");
+                    HandleError(args, $"{errorMessage} appResponse failed to deserialize.");
             }
             catch (Exception ex)
             {
@@ -609,12 +599,24 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             try
             {
                 Logger.Log("ADMIN CELLID's LISTED\n", LogType.Info);
-                byte[][][] dataResponse = MessagePackSerializer.Deserialize<byte[][][]>(response.data, messagePackSerializerOptions);
+                AppResponse appResponse = MessagePackSerializer.Deserialize<AppResponse>(response.data, messagePackSerializerOptions);
 
-                if (dataResponse != null)
-                    args.CellIds = dataResponse;
+                if (appResponse != null)
+                {
+                    string cellIds = "";
+                    foreach (object[] cell in appResponse.data)
+                    {
+                        byte[][] cellId = new byte[2][];
+                        cellId[0] = (byte[])cell[0];
+                        cellId[1] = (byte[])cell[1];
+                        args.CellIds.Add(cellId);
+                        cellIds = $"{cellIds}\nCell: (DnaHash: {ConvertHoloHashToString(cellId[0])} AgentPubKey: {ConvertHoloHashToString(cellId[1])})";
+                    }
+
+                    Logger.Log($"Cell Id's: {cellIds}", LogType.Info);
+                }
                 else
-                    HandleError(args, $"{errorMessage} dataResponse failed to deserialize.");
+                    HandleError(args, $"{errorMessage} appResponse failed to deserialize.");
             }
             catch (Exception ex)
             {
@@ -622,6 +624,40 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
 
             RaiseCellIdsListedEvent(args);
+        }
+
+        private void DecodeAppInterfacesListedReceived(IHoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
+        {
+            string errorMessage = "An unknown error occurred in HoloNETClient.DecodeAppInterfacesListedReceived. Reason: ";
+            AppInterfacesListedCallBackEventArgs args = CreateHoloNETArgs<AppInterfacesListedCallBackEventArgs>(response, dataReceivedEventArgs);
+            args.HoloNETResponseType = HoloNETResponseType.AdminAppInterfacesListed;
+
+            try
+            {
+                Logger.Log("ADMIN APP INTERFACES LISTED\n", LogType.Info);
+                AppResponse appResponse = MessagePackSerializer.Deserialize<AppResponse>(response.data, messagePackSerializerOptions);
+
+                if (appResponse != null)
+                {
+                    string ports = "";
+                    foreach (ushort port in appResponse.data)
+                    {
+                        ports = $"{ports}{port},";
+                        args.WebSocketPorts.Add(port);
+                    }
+
+                    ports = ports.Substring(0, ports.Length - 1);
+                    Logger.Log($"App Interfaces Listed: {ports}", LogType.Info);
+                }
+                else
+                    HandleError(args, $"{errorMessage} appResponse failed to deserialize.");
+            }
+            catch (Exception ex)
+            {
+                HandleError(args, $"{errorMessage} {ex}");
+            }
+
+            RaiseAppInterfacesListedEvent(args);
         }
 
         private void DecodeCoordinatorsUpdatedReceived(IHoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)

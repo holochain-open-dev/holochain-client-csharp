@@ -152,7 +152,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
         {
             LogMessage("ADMIN: Listing DNAs...");
             ShowStatusMessage($"Listing DNAs...");
-            HoloNETManager.Instance.HoloNETClientAdmin.ListApps(AppStatusFilter.All);
+            HoloNETManager.Instance.HoloNETClientAdmin.ListDnas();
         }
 
         private void btnListCellIds_Click(object sender, RoutedEventArgs e)

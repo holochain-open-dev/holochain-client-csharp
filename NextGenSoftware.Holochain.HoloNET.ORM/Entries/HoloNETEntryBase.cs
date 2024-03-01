@@ -653,7 +653,8 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM.Entries
         {
             try
             {
-                ZomeFunctionCallBackEventArgs result = await CallZomeFunction(ZomeDeleteEntryFunction, "entry_hash", entryHash, "entry_hash", "EntryHash", customDataKeyValuePairs, useReflectionToMapKeyValuePairResponseOntoEntryDataObject);
+                //ZomeFunctionCallBackEventArgs result = await CallZomeFunction(ZomeLoadEntryFunction, "entry_hash", entryHash, "entry_hash", "EntryHash", customDataKeyValuePairs, useReflectionToMapKeyValuePairResponseOntoEntryDataObject);
+                ZomeFunctionCallBackEventArgs result = await CallZomeFunction(ZomeLoadEntryFunction, "", entryHash, customDataKeyValuePairs, useReflectionToMapKeyValuePairResponseOntoEntryDataObject);
                 UpdateChangeTracking(result);
 
                 OnLoaded?.Invoke(this, result);
@@ -715,7 +716,8 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM.Entries
         {
             try
             {
-                ZomeFunctionCallBackEventArgs result = await CallZomeFunction(ZomeDeleteEntryFunction, customFieldToLoadByKey, customFieldToLoadByValue, "customFieldToLoadByKey", "customFieldToLoadByValue", customDataKeyValuePairs, useReflectionToMapKeyValuePairResponseOntoEntryDataObject);
+                //ZomeFunctionCallBackEventArgs result = await CallZomeFunction(ZomeLoadEntryFunction, customFieldToLoadByKey, customFieldToLoadByValue, "customFieldToLoadByKey", "customFieldToLoadByValue", customDataKeyValuePairs, useReflectionToMapKeyValuePairResponseOntoEntryDataObject);
+                ZomeFunctionCallBackEventArgs result = await CallZomeFunction(ZomeLoadEntryFunction, customFieldToLoadByKey, customFieldToLoadByValue, customDataKeyValuePairs, useReflectionToMapKeyValuePairResponseOntoEntryDataObject);
                 OnLoaded?.Invoke(this, result);
                 return result;
             }
@@ -970,7 +972,8 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM.Entries
         {
             try
             {
-                ZomeFunctionCallBackEventArgs result = await CallZomeFunction(ZomeDeleteEntryFunction, "entry_hash", entryHash, "entry_hash", "EntryHash", customDataKeyValuePairs, useReflectionToMapKeyValuePairResponseOntoEntryDataObject);
+                //ZomeFunctionCallBackEventArgs result = await CallZomeFunction(ZomeDeleteEntryFunction, "entry_hash", entryHash, "entry_hash", "EntryHash", customDataKeyValuePairs, useReflectionToMapKeyValuePairResponseOntoEntryDataObject);
+                ZomeFunctionCallBackEventArgs result = await CallZomeFunction(ZomeDeleteEntryFunction, "entry_hash", entryHash, customDataKeyValuePairs, useReflectionToMapKeyValuePairResponseOntoEntryDataObject);
                 OnDeleted?.Invoke(this, result);
                 return result;
             }
@@ -1006,7 +1009,8 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM.Entries
         {
             try
             {
-                ZomeFunctionCallBackEventArgs result = await CallZomeFunction(ZomeDeleteEntryFunction, customFieldToDeleteByKey, customFieldToDeleteByValue, "customFieldToDeleteByKey", "customFieldToDeleteByValue", customDataKeyValuePairs, useReflectionToMapKeyValuePairResponseOntoEntryDataObject);
+                //ZomeFunctionCallBackEventArgs result = await CallZomeFunction(ZomeDeleteEntryFunction, customFieldToDeleteByKey, customFieldToDeleteByValue, "customFieldToDeleteByKey", "customFieldToDeleteByValue", customDataKeyValuePairs, useReflectionToMapKeyValuePairResponseOntoEntryDataObject);
+                ZomeFunctionCallBackEventArgs result = await CallZomeFunction(ZomeDeleteEntryFunction, customFieldToDeleteByKey, customFieldToDeleteByValue, customDataKeyValuePairs, useReflectionToMapKeyValuePairResponseOntoEntryDataObject);
                 OnDeleted?.Invoke(this, result);
                 return result;
             }
@@ -1278,7 +1282,8 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM.Entries
             OnInitialized?.Invoke(this, e);
         }
 
-        private async Task<ZomeFunctionCallBackEventArgs> CallZomeFunction(string zomeFunctionName, string key, string value, string keyDisplayName, string valueDisplayName, Dictionary<string, string> customDataKeyValuePairs = null, bool useReflectionToMapKeyValuePairResponseOntoEntryDataObject = true)
+        //private async Task<ZomeFunctionCallBackEventArgs> CallZomeFunction(string zomeFunctionName, string key, string value, string keyDisplayName, string valueDisplayName, Dictionary<string, string> customDataKeyValuePairs = null, bool useReflectionToMapKeyValuePairResponseOntoEntryDataObject = true)
+        private async Task<ZomeFunctionCallBackEventArgs> CallZomeFunction(string zomeFunctionName, string key, string value, Dictionary<string, string> customDataKeyValuePairs = null, bool useReflectionToMapKeyValuePairResponseOntoEntryDataObject = true)
         {
             ZomeFunctionCallBackEventArgs result = null;
 
@@ -1300,8 +1305,11 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM.Entries
 
                         result = await HoloNETClient.CallZomeFunctionAsync(ZomeName, zomeFunctionName, paramsObject);
                     }
+                    //result = new ZomeFunctionCallBackEventArgs() { IsError = true, Message = $"The key {keyDisplayName} is null, please set before calling this function." };
                     else
-                        result = new ZomeFunctionCallBackEventArgs() { IsError = true, Message = $"The key {keyDisplayName} is null, please set before calling this function." };
+                    {
+                        result = await HoloNETClient.CallZomeFunctionAsync(ZomeName, zomeFunctionName, value);
+                    }
                 }
                 else
                     result = await HoloNETClient.CallZomeFunctionAsync(ZomeName, zomeFunctionName, value);
@@ -1309,7 +1317,8 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM.Entries
                 ProcessZomeReturnCall(result, useReflectionToMapKeyValuePairResponseOntoEntryDataObject);
             }
             else
-                result = new ZomeFunctionCallBackEventArgs() { IsError = true, Message = $"The value {valueDisplayName} is null, please set before calling this function." };
+                result = new ZomeFunctionCallBackEventArgs() { IsError = true, Message = $"The value {value} is null, please set before calling this function." };
+            //result = new ZomeFunctionCallBackEventArgs() { IsError = true, Message = $"The value {valueDisplayName} is null, please set before calling this function." };
 
             return result;
         }

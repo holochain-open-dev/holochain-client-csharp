@@ -96,12 +96,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
     public class DnasListedCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
-        public byte[][] Dnas { get; set; }
+        public List<byte[]> Dnas { get; set; } = new List<byte[]>();
     }
 
     public class CellIdsListedCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
-        public byte[][][] CellIds { get; set; }
+        public List<byte[][]> CellIds { get; set; } = new List<byte[][]>();
     }
 
     public class GetAppInfoCallBackEventArgs : HoloNETDataReceivedBaseEventArgs

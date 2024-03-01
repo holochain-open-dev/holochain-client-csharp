@@ -1,18 +1,37 @@
-﻿using System;
+﻿using MessagePack;
+using System;
 using System.Runtime.InteropServices;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
+   // [MessagePackObject]
     public struct ZomeCallUnsigned
     {
+        //[Key("provenance")]
         public byte[] provenance;
+
+        //[Key("cell_id_dna_hash")]
         public byte[] cell_id_dna_hash;
+
+        //[Key("cell_id_agent_pub_key")]
         public byte[] cell_id_agent_pub_key;
+
+        //[Key("zome_name")]
         public string zome_name;
+
+        //[Key("fn_name")]
         public string fn_name;
+
+        //[Key("cap_secret")]
         public byte[] cap_secret;
+
+        //[Key("payload")]
         public byte[] payload;
+
+        //[Key("nonce")]
         public byte[] nonce;
+
+        //[Key("expires_at")]
         public Int64 expires_at;
     }
 

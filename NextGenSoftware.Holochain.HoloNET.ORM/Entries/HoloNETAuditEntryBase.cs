@@ -446,7 +446,7 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM.Entries
             if (customDataKeyValuePairs == null)
                 customDataKeyValuePairs = new Dictionary<string, string>();
 
-            customDataKeyValuePairs["version"] = version.ToString();
+            //customDataKeyValuePairs["version"] = version.ToString(); //TODO: Put back in once worked out how to pass this to the zome functions in the rust code! :)
             return await base.LoadAsync(entryHash, customDataKeyValuePairs, useReflectionToMapKeyValuePairResponseOntoEntryDataObject);
         }
 

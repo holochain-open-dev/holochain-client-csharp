@@ -147,6 +147,70 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                         response.HoloNETResponseType = HoloNETResponseType.AdminAppsListed;
                         break;
 
+                    case "dnas_listed":
+                        response.HoloNETResponseType = HoloNETResponseType.AdminDnasListed;
+                        break;
+
+                    case "cell_ids_listed":
+                        response.HoloNETResponseType = HoloNETResponseType.AdminCellIdsListed;
+                        break;
+
+                    case "app_interfaces_listed":
+                        response.HoloNETResponseType = HoloNETResponseType.AdminAppInterfacesListed;
+                        break;
+
+                    case "dna_registered":
+                        response.HoloNETResponseType = HoloNETResponseType.AdminDnaRegistered;
+                        break;
+
+                    case "dna_definition_returned":
+                        response.HoloNETResponseType = HoloNETResponseType.AdminDnaDefinitionReturned;
+                        break;
+
+                    case "agent_info":
+                        response.HoloNETResponseType = HoloNETResponseType.AdminAgentInfoReturned;
+                        break;
+
+                    case "agent_info_added":
+                        response.HoloNETResponseType = HoloNETResponseType.AdminAgentInfoAdded;
+                        break;
+
+                    case "coordinators_updated":
+                        response.HoloNETResponseType = HoloNETResponseType.AdminCoordinatorsUpdated;
+                        break;
+
+                    case "clone_cell_deleted":
+                        response.HoloNETResponseType = HoloNETResponseType.AdminCloneCellDeleted;
+                        break;
+
+                    case "state_dumped":
+                        response.HoloNETResponseType = HoloNETResponseType.AdminStateDumped;
+                        break;
+
+                    case "full_state_dumped":
+                        response.HoloNETResponseType = HoloNETResponseType.AdminFullStateDumped;
+                        break;
+
+                    case "network_metrics_dumped":
+                        response.HoloNETResponseType = HoloNETResponseType.AdminNetworkMetricsDumped;
+                        break;
+
+                    case "network_stats_dumped":
+                        response.HoloNETResponseType = HoloNETResponseType.AdminNetworkStatsDumped;
+                        break;
+
+                    case "network_storage_info":
+                        response.HoloNETResponseType = HoloNETResponseType.AdminStorageInfoReturned;
+                        break;
+
+                    case "records_grafted":
+                        response.HoloNETResponseType = HoloNETResponseType.AdminRecordsGrafted;
+                        break;
+
+                    case "admin_interfaces_added":
+                        response.HoloNETResponseType = HoloNETResponseType.AdminAdminInterfacesAdded;
+                        break;
+
                     case "error":
                         response.HoloNETResponseType = HoloNETResponseType.Error;
                         break;
@@ -181,7 +245,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             return response;
         }
 
-        protected virtual AppInfo ProcessAppInfo(AppInfo appInfo, AppInfoCallBackEventArgs args)
+        protected virtual AppInfo ProcessAppInfo(AppInfo appInfo, AppInfoCallBackEventArgs args, bool log = true)
         {
             if (appInfo != null)
             {
@@ -223,9 +287,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     if (args.CellId != null)
                         HoloNETDNA.CellId = args.CellId;
                 }
-
-                Logger.Log($"AGENT PUB KEY RETURNED FROM CONDUCTOR: {agentPubKey}", LogType.Info);
-                Logger.Log($"DNA HASH RETURNED FROM CONDUCTOR:: {dnaHash}", LogType.Info);
+                
+                if (log)
+                    Logger.Log($"hAPP {appInfo.installed_app_id}: AgentPubKey: {agentPubKey}, DnaHash: {dnaHash}", LogType.Info);
 
                 args.AgentPubKey = agentPubKey;
                 args.DnaHash = dnaHash;

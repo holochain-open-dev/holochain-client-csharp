@@ -43,8 +43,43 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
             HoloNETClientAdmin.OnZomeCallCapabilityGrantedCallBack += _holoNETClientAdmin_OnZomeCallCapabilityGrantedCallBack;
             HoloNETClientAdmin.OnAppInterfaceAttachedCallBack += _holoNETClientAdmin_OnAppInterfaceAttachedCallBack;
             HoloNETClientAdmin.OnAppsListedCallBack += _holoNETClientAdmin_OnAppsListedCallBack;
+            HoloNETClientAdmin.OnDnasListedCallBack += HoloNETClientAdmin_OnDnasListedCallBack;
+            HoloNETClientAdmin.OnCellIdsListedCallBack += HoloNETClientAdmin_OnCellIdsListedCallBack;
+            HoloNETClientAdmin.OnAppInterfacesListedCallBack += HoloNETClientAdmin_OnAppInterfacesListedCallBack;
             HoloNETClientAdmin.OnDisconnected += _holoNETClientAdmin_OnDisconnected;
             HoloNETClientAdmin.OnError += _holoNETClientAdmin_OnError;
+        }
+
+        private void HoloNETClientAdmin_OnAppInterfacesListedCallBack(object sender, AppInterfacesListedCallBackEventArgs e)
+        {
+            string ports = "";
+            foreach (ushort port in e.WebSocketPorts)
+                ports = $"{ports}{port},";
+
+            ports = ports.Substring(0, ports.Length - 1);
+
+            LogMessage($"ADMIN: App Interfaces Listed: {ports}");
+            ShowStatusMessage("App Interfaces Listed.", StatusMessageType.Success);
+        }
+
+        private void HoloNETClientAdmin_OnCellIdsListedCallBack(object sender, CellIdsListedCallBackEventArgs e)
+        {
+            string cellIds = "";
+            foreach (byte[][] cellId in e.CellIds)
+                cellIds = $"{cellIds}\nCell: (DnaHash: {HoloNETClientAdmin.ConvertHoloHashToString(cellId[0])} AgentPubKey: {HoloNETClientAdmin.ConvertHoloHashToString(cellId[1])})";
+
+            LogMessage($"ADMIN: Cell ID's Listed: {cellIds}");
+            ShowStatusMessage("Cell ID's Listed.", StatusMessageType.Success);
+        }
+
+        private void HoloNETClientAdmin_OnDnasListedCallBack(object sender, DnasListedCallBackEventArgs e)
+        {
+            string dnas = "";
+            foreach (byte[] dna in e.Dnas)
+                dnas = $"{dnas}\n{HoloNETClientAdmin.ConvertHoloHashToString(dna)}";
+            
+            LogMessage($"ADMIN: DNA's Listed: {dnas}");
+            ShowStatusMessage("DNA's Listed.", StatusMessageType.Success);
         }
 
         public async Task ConnectAdminAsync()
