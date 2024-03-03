@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Linq;
 using System.Security.Cryptography;
 using Nito.AsyncEx.Synchronous;
 using NextGenSoftware.Logging;
@@ -18,7 +17,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <summary>
         /// Will init the hApp, which includes installing and enabling the app, signing credentials & attaching the app interface.
         /// </summary>
-        public async Task<InstallEnableSignAndAttachHappEventArgs> InstallEnableSignAndAttachHappAsync(string hAppId, string hAppInstallPath, string roleName, CapGrantAccessType capGrantAccessType = CapGrantAccessType.Unrestricted, GrantedFunctionsType grantedFunctionsType = GrantedFunctionsType.All, List<(string, string)> grantedFunctions = null, bool uninstallhAppIfAlreadyInstalled = true, bool log = true, Action<string, LogType> loggingFunction = null)
+        //public async Task<InstallEnableSignAndAttachHappEventArgs> InstallEnableSignAndAttachHappAsync(string hAppId, string hAppInstallPath, string roleName, CapGrantAccessType capGrantAccessType = CapGrantAccessType.Unrestricted, GrantedFunctionsType grantedFunctionsType = GrantedFunctionsType.All, List<(string, string)> grantedFunctions = null, bool uninstallhAppIfAlreadyInstalled = true, bool log = true, Action<string, LogType> loggingFunction = null)
+        public async Task<InstallEnableSignAndAttachHappEventArgs> InstallEnableSignAndAttachHappAsync(string hAppId, string hAppInstallPath, string roleName, CapGrantAccessType capGrantAccessType = CapGrantAccessType.Assigned, GrantedFunctionsType grantedFunctionsType = GrantedFunctionsType.All, List<(string, string)> grantedFunctions = null, bool uninstallhAppIfAlreadyInstalled = true, bool log = true, Action<string, LogType> loggingFunction = null)
         {
             InstallEnableSignAndAttachHappEventArgs result = new InstallEnableSignAndAttachHappEventArgs();
 
@@ -154,7 +154,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <summary>
         /// Will init the hApp, which includes installing and enabling the app, signing credentials & attaching the app interface. It will then connect to the hApp and return the HoloNETClientAppAgent connection.
         /// </summary>
-        public async Task<InstallEnableSignAttachAndConnectToHappEventArgs> InstallEnableSignAttachAndConnectToHappAsync(string hAppId, string hAppInstallPath, string roleName, CapGrantAccessType capGrantAccessType = CapGrantAccessType.Unrestricted, GrantedFunctionsType grantedFunctionsType = GrantedFunctionsType.All, List<(string, string)> grantedFunctions = null, bool uninstallhAppIfAlreadyInstalled = true, bool log = true, Action<string, LogType> loggingFunction = null)
+        //public async Task<InstallEnableSignAttachAndConnectToHappEventArgs> InstallEnableSignAttachAndConnectToHappAsync(string hAppId, string hAppInstallPath, string roleName, CapGrantAccessType capGrantAccessType = CapGrantAccessType.Unrestricted, GrantedFunctionsType grantedFunctionsType = GrantedFunctionsType.All, List<(string, string)> grantedFunctions = null, bool uninstallhAppIfAlreadyInstalled = true, bool log = true, Action<string, LogType> loggingFunction = null)
+        public async Task<InstallEnableSignAttachAndConnectToHappEventArgs> InstallEnableSignAttachAndConnectToHappAsync(string hAppId, string hAppInstallPath, string roleName, CapGrantAccessType capGrantAccessType = CapGrantAccessType.Assigned, GrantedFunctionsType grantedFunctionsType = GrantedFunctionsType.All, List<(string, string)> grantedFunctions = null, bool uninstallhAppIfAlreadyInstalled = true, bool log = true, Action<string, LogType> loggingFunction = null)
         {
             InstallEnableSignAttachAndConnectToHappEventArgs result = new InstallEnableSignAttachAndConnectToHappEventArgs();
 
@@ -188,7 +189,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     result.AppInterfaceAttachedResult = installedResult.AppInterfaceAttachedResult;
 
                     result.HoloNETClientAppAgent = new HoloNETClientAppAgent(hAppId, result.AgentPubKey);
-                    result.HoloNETConnectedResult = await result.HoloNETClientAppAgent.ConnectAsync($"ws://127.0.0.1:{installedResult.AttachedOnPort}");
+                    result.HoloNETConnectedResult = await result.HoloNETClientAppAgent.ConnectAsync(hAppId, $"ws://127.0.0.1:{installedResult.AttachedOnPort}");
 
                     if (result.HoloNETConnectedResult != null && !result.HoloNETConnectedResult.IsError && result.HoloNETConnectedResult.IsConnected)
                     {

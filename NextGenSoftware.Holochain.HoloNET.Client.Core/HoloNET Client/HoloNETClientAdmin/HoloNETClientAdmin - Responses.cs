@@ -242,7 +242,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             try
             {
-                Logger.Log("ADMIN AGENT PUB KEY GENERATED DATA DETECTED\n", LogType.Info);
+                Logger.Log("ADMIN: AGENT PUB KEY GENERATED DATA DETECTED\n", LogType.Info);
                 AppResponse appResponse = MessagePackSerializer.Deserialize<AppResponse>(response.data, messagePackSerializerOptions);
                 args.AgentPubKey = ConvertHoloHashToString(appResponse.data);
                 args.AppResponse = appResponse;
@@ -268,7 +268,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             try
             {
-                Logger.Log("ADMIN APP INSTALLED DATA DETECTED\n", LogType.Info);
+                Logger.Log("ADMIN: APP INSTALLED DATA DETECTED\n", LogType.Info);
 
                 AppInfoResponse appInfoResponse = MessagePackSerializer.Deserialize<AppInfoResponse>(response.data, messagePackSerializerOptions);
                 args = CreateHoloNETArgs<AppInstalledCallBackEventArgs>(response, dataReceivedEventArgs);
@@ -296,7 +296,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             try
             {
-                Logger.Log("ADMIN APP UNINSTALLED DATA DETECTED\n", LogType.Info);
+                Logger.Log("ADMIN: APP UNINSTALLED DATA DETECTED\n", LogType.Info);
                 args = CreateHoloNETArgs<AppUninstalledCallBackEventArgs>(response, dataReceivedEventArgs);
 
                 if (_uninstallingAppLookup != null && _uninstallingAppLookup.ContainsKey(response.id.ToString()))
@@ -321,7 +321,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             try
             {
-                Logger.Log("ADMIN APP ENABLED DATA DETECTED\n", LogType.Info);
+                Logger.Log("ADMIN: APP ENABLED DATA DETECTED\n", LogType.Info);
                 EnableAppResponse enableAppResponse = MessagePackSerializer.Deserialize<EnableAppResponse>(response.data, messagePackSerializerOptions);
 
                 if (enableAppResponse != null)
@@ -351,7 +351,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             try
             {
-                Logger.Log("ADMIN APP DISABLED DATA DETECTED\n", LogType.Info);
+                Logger.Log("ADMIN: APP DISABLED DATA DETECTED\n", LogType.Info);
 
                 if (_disablingAppLookup != null && _disablingAppLookup.ContainsKey(response.id.ToString()))
                 {
@@ -375,7 +375,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             try
             {
-                Logger.Log("ADMIN ZOME CALL CAPABILITY GRANTED\n", LogType.Info);
+                Logger.Log("ADMIN: ZOME CALL CAPABILITY GRANTED\n", LogType.Info);
             }
             catch (Exception ex)
             {
@@ -393,7 +393,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             try
             {
-                Logger.Log("ADMIN APP INTERFACE ATTACHED\n", LogType.Info);
+                Logger.Log("ADMIN: APP INTERFACE ATTACHED\n", LogType.Info);
                 //object attachAppInterfaceResponse = MessagePackSerializer.Deserialize<object>(response.data, messagePackSerializerOptions);
                 AppResponse appResponse = MessagePackSerializer.Deserialize<AppResponse>(response.data, messagePackSerializerOptions);
 
@@ -423,7 +423,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             try
             {
-                Logger.Log("ADMIN DNA REGISTERED\n", LogType.Info);
+                Logger.Log("ADMIN: DNA REGISTERED\n", LogType.Info);
                 byte[] responseData = MessagePackSerializer.Deserialize<byte[]>(response.data, messagePackSerializerOptions);
 
                 if (responseData != null)
@@ -447,7 +447,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             try
             {
-                Logger.Log("ADMIN DNA DEFINTION RETURNED\n", LogType.Info);
+                Logger.Log("ADMIN: DNA DEFINTION RETURNED\n", LogType.Info);
                 DnaDefinitionResponse dnaDefinition = MessagePackSerializer.Deserialize<DnaDefinitionResponse>(response.data, messagePackSerializerOptions);
 
                 if (dnaDefinition != null)
@@ -471,7 +471,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             try
             {
-                Logger.Log("ADMIN AGENT INFO RETURNED\n", LogType.Info);
+                Logger.Log("ADMIN: AGENT INFO RETURNED\n", LogType.Info);
                 AgentInfo agentInfo = MessagePackSerializer.Deserialize<AgentInfo>(response.data, messagePackSerializerOptions);
 
                 if (agentInfo != null)
@@ -495,7 +495,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             try
             {
-                Logger.Log("ADMIN AGENT INFO ADDED\n", LogType.Info);
+                Logger.Log("ADMIN: AGENT INFO ADDED\n", LogType.Info);
                 object agentInfo = MessagePackSerializer.Deserialize<object>(response.data, messagePackSerializerOptions);
 
                 //if (agentInfo != null)
@@ -519,7 +519,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             try
             {
-                Logger.Log("ADMIN APPS LISTED\n", LogType.Info);
+                Logger.Log("ADMIN: APPS LISTED\n", LogType.Info);
                 ListAppsResponse appResponse = MessagePackSerializer.Deserialize<ListAppsResponse>(response.data, messagePackSerializerOptions);
 
                 if (appResponse != null)
@@ -565,7 +565,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             try
             {
-                Logger.Log("ADMIN DNA's LISTED\n", LogType.Info);
+                Logger.Log("ADMIN: DNA's LISTED\n", LogType.Info);
                 AppResponse appResponse = MessagePackSerializer.Deserialize<AppResponse>(response.data, messagePackSerializerOptions);
 
                 if (appResponse != null)
@@ -598,7 +598,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             try
             {
-                Logger.Log("ADMIN CELLID's LISTED\n", LogType.Info);
+                Logger.Log("ADMIN: CELLID's LISTED\n", LogType.Info);
                 AppResponse appResponse = MessagePackSerializer.Deserialize<AppResponse>(response.data, messagePackSerializerOptions);
 
                 if (appResponse != null)
@@ -634,7 +634,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             try
             {
-                Logger.Log("ADMIN APP INTERFACES LISTED\n", LogType.Info);
+                Logger.Log("ADMIN: APP INTERFACES LISTED\n", LogType.Info);
                 AppResponse appResponse = MessagePackSerializer.Deserialize<AppResponse>(response.data, messagePackSerializerOptions);
 
                 if (appResponse != null)
@@ -668,7 +668,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             try
             {
-                Logger.Log("ADMIN CoordinatorsUpdated\n", LogType.Info);
+                Logger.Log("ADMIN: CoordinatorsUpdated\n", LogType.Info);
                 object dataResponse = MessagePackSerializer.Deserialize<object>(response.data, messagePackSerializerOptions);
 
                 if (dataResponse == null)
@@ -690,7 +690,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             try
             {
-                Logger.Log("ADMIN CLONE CELL DELETED\n", LogType.Info);
+                Logger.Log("ADMIN: CLONE CELL DELETED\n", LogType.Info);
                 object dataResponse = MessagePackSerializer.Deserialize<object>(response.data, messagePackSerializerOptions);
 
                 if (dataResponse == null)
@@ -712,7 +712,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             try
             {
-                Logger.Log("ADMIN STATE DUMPED\n", LogType.Info);
+                Logger.Log("ADMIN: STATE DUMPED\n", LogType.Info);
                 string dataResponse = MessagePackSerializer.Deserialize<string>(response.data, messagePackSerializerOptions);
 
                 if (dataResponse != null)
@@ -736,7 +736,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             try
             {
-                Logger.Log("ADMIN FULL STATE DUMPED\n", LogType.Info);
+                Logger.Log("ADMIN: FULL STATE DUMPED\n", LogType.Info);
                 FullStateDumpedResponse fullStateDumpedResponse = MessagePackSerializer.Deserialize<FullStateDumpedResponse>(response.data, messagePackSerializerOptions);
 
                 if (fullStateDumpedResponse != null)
@@ -760,7 +760,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             try
             {
-                Logger.Log("ADMIN NETWORK METRICS DUMPED\n", LogType.Info);
+                Logger.Log("ADMIN: NETWORK METRICS DUMPED\n", LogType.Info);
                 string dataResponse = MessagePackSerializer.Deserialize<string>(response.data, messagePackSerializerOptions);
 
                 if (dataResponse != null)
@@ -784,7 +784,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             try
             {
-                Logger.Log("ADMIN NETWORK STATS DUMPED\n", LogType.Info);
+                Logger.Log("ADMIN: NETWORK STATS DUMPED\n", LogType.Info);
                 string dataResponse = MessagePackSerializer.Deserialize<string>(response.data, messagePackSerializerOptions);
 
                 if (dataResponse != null)
@@ -808,7 +808,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             try
             {
-                Logger.Log("ADMIN STORAGE INFO RETURNED\n", LogType.Info);
+                Logger.Log("ADMIN: STORAGE INFO RETURNED\n", LogType.Info);
                 StorageInfoResponse storageInfoResponse = MessagePackSerializer.Deserialize<StorageInfoResponse>(response.data, messagePackSerializerOptions);
 
                 if (storageInfoResponse != null)
@@ -832,7 +832,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             try
             {
-                Logger.Log("ADMIN RECORDS GRAFTED\n", LogType.Info);
+                Logger.Log("ADMIN: RECORDS GRAFTED\n", LogType.Info);
             }
             catch (Exception ex)
             {
@@ -850,7 +850,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             try
             {
-                Logger.Log("ADMIN INTERFACES ADDED\n", LogType.Info);
+                Logger.Log("ADMIN: INTERFACES ADDED\n", LogType.Info);
             }
             catch (Exception ex)
             {
@@ -869,7 +869,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             try
             {
-                Logger.Log("ADMIN RESPONSE\n", LogType.Info);
+                Logger.Log("ADMIN: RESPONSE\n", LogType.Info);
                 T dataResponse = MessagePackSerializer.Deserialize<T>(response.data, messagePackSerializerOptions);
 
                 if (dataResponse != null)

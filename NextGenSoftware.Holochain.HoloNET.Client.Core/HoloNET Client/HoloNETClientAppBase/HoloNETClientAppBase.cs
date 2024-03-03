@@ -215,6 +215,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             if (string.IsNullOrEmpty(holochainConductorURI))
                 holochainConductorURI = HoloNETDNA.HolochainConductorAppAgentURI;
 
+            Log($"APP: Connecting To App(Agent) WebSocket...", LogType.Info);
             return await base.ConnectAsync(holochainConductorURI, connectedCallBackMode, retrieveAgentPubKeyAndDnaHashMode, retrieveAgentPubKeyAndDnaHashFromConductor, retrieveAgentPubKeyAndDnaHashFromSandbox, automaticallyAttemptToRetrieveFromConductorIfSandBoxFails, automaticallyAttemptToRetrieveFromSandBoxIfConductorFails, updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved);
         }
 

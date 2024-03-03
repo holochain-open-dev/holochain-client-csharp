@@ -169,6 +169,48 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
             HoloNETManager.Instance.HoloNETClientAdmin.ListInterfaces();
         }
 
+        private void btnGetAgentInfo_Click(object sender, RoutedEventArgs e)
+        {
+            LogMessage("ADMIN: Getting Agent Info...");
+            ShowStatusMessage($"Getting Agent Info...", StatusMessageType.Information, true);
+            HoloNETManager.Instance.HoloNETClientAdmin.GetAgentInfo();
+        }
+
+        private void btnGetStorageInfo_Click(object sender, RoutedEventArgs e)
+        {
+            LogMessage("ADMIN: Getting Storage Info...");
+            ShowStatusMessage($"Getting Storage Info...", StatusMessageType.Information, true);
+            HoloNETManager.Instance.HoloNETClientAdmin.GetStorageInfo();
+        }
+
+        private void btnDumpNetWorkStats_Click(object sender, RoutedEventArgs e)
+        {
+            LogMessage("ADMIN: Dumping Network Stats...");
+            ShowStatusMessage($"Dumping Network Stats....", StatusMessageType.Information, true);
+            HoloNETManager.Instance.HoloNETClientAdmin.DumpNetworkStats();
+        }
+
+        private void btnDumpNetworkMetrics_Click(object sender, RoutedEventArgs e)
+        {
+            LogMessage("ADMIN: Dumping Network Metrics...");
+            ShowStatusMessage($"Dumping Network Metrics....", StatusMessageType.Information, true);
+            HoloNETManager.Instance.HoloNETClientAdmin.DumpNetworkMetrics();
+        }
+
+        private void btnDumpState_Click(object sender, RoutedEventArgs e)
+        {
+            LogMessage("ADMIN: Dump State...");
+            ShowStatusMessage($"Dump State....", StatusMessageType.Information, true);
+            HoloNETManager.Instance.HoloNETClientAdmin.DumpState();
+        }
+
+        private void btnFullDump_Click(object sender, RoutedEventArgs e)
+        {
+            LogMessage("ADMIN: Dump Full State...");
+            ShowStatusMessage($"Dump Full State....", StatusMessageType.Information, true);
+            HoloNETManager.Instance.HoloNETClientAdmin.DumpFullState();
+        }
+
         private void btnShowLog_Click(object sender, RoutedEventArgs e)
         {
             //Process.Start("notepad.exe", "Logs\\HoloNET.log");
@@ -310,6 +352,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
         {
             if (PopupManager.CurrentPopup == null)
                 HoloNETManager.Instance.CurrentApp = gridHapps.SelectedItem as InstalledApp;
-        }
+        }        
     }
 }

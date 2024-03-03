@@ -211,6 +211,237 @@
                         </EventTrigger>
                     </Button.Triggers>
                 </Button>
+                <Button x:Name="btnGetAgentInfo" Style="{StaticResource ButtonStyle}" FontSize="14" Cursor="Hand" Content="Get Agent Info" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnGetAgentInfo_Click" >
+                    <Button.Effect>
+                        <DropShadowEffect x:Name="btnGetAgentInfoGlowEffect" ShadowDepth="0"
+Color="White"
+Opacity="0"
+BlurRadius="10"/>
+                    </Button.Effect>
+
+                    <Button.Triggers>
+                        <EventTrigger RoutedEvent="Button.MouseEnter">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation
+          Storyboard.TargetName="btnGetAgentInfoGlowEffect" 
+          Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+          From="0.0" To="1.0" Duration="0:0:0.5" 
+          AutoReverse="False" RepeatBehavior="1x" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                        <EventTrigger RoutedEvent="Button.MouseLeave">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation
+          Storyboard.TargetName="btnGetAgentInfoGlowEffect" 
+          Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+          From="1" To="0" Duration="0:0:0.5" 
+          AutoReverse="False" RepeatBehavior="1x" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                    </Button.Triggers>
+                </Button>
+                <Button x:Name="btnGetStorageInfo" Style="{StaticResource ButtonStyle}" FontSize="14" Cursor="Hand" Content="Get Storage Info" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnGetStorageInfo_Click" >
+                    <Button.Effect>
+                        <DropShadowEffect x:Name="btnGetStorageInfoGlowEffect" ShadowDepth="0"
+Color="White"
+Opacity="0"
+BlurRadius="10"/>
+                    </Button.Effect>
+
+                    <Button.Triggers>
+                        <EventTrigger RoutedEvent="Button.MouseEnter">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation
+          Storyboard.TargetName="btnGetStorageInfoGlowEffect" 
+          Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+          From="0.0" To="1.0" Duration="0:0:0.5" 
+          AutoReverse="False" RepeatBehavior="1x" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                        <EventTrigger RoutedEvent="Button.MouseLeave">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation
+          Storyboard.TargetName="btnGetStorageInfoGlowEffect" 
+          Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+          From="1" To="0" Duration="0:0:0.5" 
+          AutoReverse="False" RepeatBehavior="1x" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                    </Button.Triggers>
+                </Button>
+                <Button x:Name="btnDumpNetWorkStats" Style="{StaticResource ButtonStyle}" FontSize="14" Cursor="Hand" Content="Dump Network Stats" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnDumpNetWorkStats_Click" >
+                    <Button.Effect>
+                        <DropShadowEffect x:Name="btnDumpNetWorkStatsGlowEffect" ShadowDepth="0"
+          Color="White"
+          Opacity="0"
+          BlurRadius="10"/>
+                    </Button.Effect>
+
+                    <Button.Triggers>
+                        <EventTrigger RoutedEvent="Button.MouseEnter">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation
+                    Storyboard.TargetName="btnDumpNetWorkStatsGlowEffect" 
+                    Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+                    From="0.0" To="1.0" Duration="0:0:0.5" 
+                    AutoReverse="False" RepeatBehavior="1x" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                        <EventTrigger RoutedEvent="Button.MouseLeave">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation
+                    Storyboard.TargetName="btnDumpNetWorkStatsGlowEffect" 
+                    Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+                    From="1" To="0" Duration="0:0:0.5" 
+                    AutoReverse="False" RepeatBehavior="1x" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                    </Button.Triggers>
+                </Button>
+                <Button x:Name="btnDumpNetworkMetrics" Style="{StaticResource ButtonStyle}" FontSize="14" Cursor="Hand" Content="Dump Network Metrics" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnDumpNetworkMetrics_Click" >
+                    <Button.Effect>
+                        <DropShadowEffect x:Name="btnDumpNetworkMetricsGlowEffect" ShadowDepth="0"
+Color="White"
+Opacity="0"
+BlurRadius="10"/>
+                    </Button.Effect>
+
+                    <Button.Triggers>
+                        <EventTrigger RoutedEvent="Button.MouseEnter">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation
+          Storyboard.TargetName="btnDumpNetworkMetricsGlowEffect" 
+          Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+          From="0.0" To="1.0" Duration="0:0:0.5" 
+          AutoReverse="False" RepeatBehavior="1x" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                        <EventTrigger RoutedEvent="Button.MouseLeave">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation
+          Storyboard.TargetName="btnDumpNetworkMetricsGlowEffect" 
+          Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+          From="1" To="0" Duration="0:0:0.5" 
+          AutoReverse="False" RepeatBehavior="1x" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                    </Button.Triggers>
+                </Button>
+                <Button x:Name="btnDumpState" Style="{StaticResource ButtonStyle}" FontSize="14" Cursor="Hand" Content="Dump State" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnDumpState_Click" >
+                    <Button.Effect>
+                        <DropShadowEffect x:Name="btnDumpStateGlowEffect" ShadowDepth="0"
+Color="White"
+Opacity="0"
+BlurRadius="10"/>
+                    </Button.Effect>
+
+                    <Button.Triggers>
+                        <EventTrigger RoutedEvent="Button.MouseEnter">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation
+          Storyboard.TargetName="btnDumpStateGlowEffect" 
+          Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+          From="0.0" To="1.0" Duration="0:0:0.5" 
+          AutoReverse="False" RepeatBehavior="1x" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                        <EventTrigger RoutedEvent="Button.MouseLeave">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation
+          Storyboard.TargetName="btnDumpStateGlowEffect" 
+          Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+          From="1" To="0" Duration="0:0:0.5" 
+          AutoReverse="False" RepeatBehavior="1x" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                    </Button.Triggers>
+                </Button>
+                <Button x:Name="btnFullDump" Style="{StaticResource ButtonStyle}" FontSize="14" Cursor="Hand" Content="Dump Full State" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnFullDump_Click" >
+                    <Button.Effect>
+                        <DropShadowEffect x:Name="btnFullDumpGlowEffect" ShadowDepth="0"
+Color="White"
+Opacity="0"
+BlurRadius="10"/>
+                    </Button.Effect>
+
+                    <Button.Triggers>
+                        <EventTrigger RoutedEvent="Button.MouseEnter">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation
+          Storyboard.TargetName="btnFullDumpGlowEffect" 
+          Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+          From="0.0" To="1.0" Duration="0:0:0.5" 
+          AutoReverse="False" RepeatBehavior="1x" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                        <EventTrigger RoutedEvent="Button.MouseLeave">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation
+          Storyboard.TargetName="btnFullDumpGlowEffect" 
+          Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+          From="1" To="0" Duration="0:0:0.5" 
+          AutoReverse="False" RepeatBehavior="1x" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                    </Button.Triggers>
+                </Button>
+                <Button x:Name="btnClearLog" Style="{StaticResource ButtonStyle}" FontSize="14" Cursor="Hand" Content="Clear Log" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnClearLog_Click">
+                    <Button.Effect>
+                        <DropShadowEffect x:Name="btnClearLogGlowEffect" ShadowDepth="0"
+                          Color="White"
+                          Opacity="0"
+                          BlurRadius="10"/>
+                    </Button.Effect>
+
+                    <Button.Triggers>
+                        <EventTrigger RoutedEvent="Button.MouseEnter">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation
+                                    Storyboard.TargetName="btnClearLogGlowEffect" 
+                                    Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+                                    From="0.0" To="1.0" Duration="0:0:0.5" 
+                                    AutoReverse="False" RepeatBehavior="1x" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                        <EventTrigger RoutedEvent="Button.MouseLeave">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation
+                                    Storyboard.TargetName="btnClearLogGlowEffect" 
+                                    Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+                                    From="1" To="0" Duration="0:0:0.5" 
+                                    AutoReverse="False" RepeatBehavior="1x" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                    </Button.Triggers>
+                </Button>
                 <Button x:Name="btnClearLog" Style="{StaticResource ButtonStyle}" FontSize="14" Cursor="Hand" Content="Clear Log" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnClearLog_Click">
                     <Button.Effect>
                         <DropShadowEffect x:Name="btnClearLogGlowEffect" ShadowDepth="0"
