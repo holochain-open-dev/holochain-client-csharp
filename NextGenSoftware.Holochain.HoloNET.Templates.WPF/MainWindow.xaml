@@ -409,9 +409,9 @@ BlurRadius="10"/>
                         </EventTrigger>
                     </Button.Triggers>
                 </Button>
-                <Button x:Name="btnClearLog" Style="{StaticResource ButtonStyle}" FontSize="14" Cursor="Hand" Content="Clear Log" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnClearLog_Click">
+                <!--<Button x:Name="btnGetCellId" Style="{StaticResource ButtonStyle}" FontSize="14" Cursor="Hand" Content="Get Cell Id" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnGetCellId_Click">
                     <Button.Effect>
-                        <DropShadowEffect x:Name="btnClearLogGlowEffect" ShadowDepth="0"
+                        <DropShadowEffect x:Name="btnGetCellIdGlowEffect" ShadowDepth="0"
                           Color="White"
                           Opacity="0"
                           BlurRadius="10"/>
@@ -422,7 +422,7 @@ BlurRadius="10"/>
                             <BeginStoryboard>
                                 <Storyboard>
                                     <DoubleAnimation
-                                    Storyboard.TargetName="btnClearLogGlowEffect" 
+                                    Storyboard.TargetName="btnGetCellIdGlowEffect" 
                                     Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
                                     From="0.0" To="1.0" Duration="0:0:0.5" 
                                     AutoReverse="False" RepeatBehavior="1x" />
@@ -433,10 +433,43 @@ BlurRadius="10"/>
                             <BeginStoryboard>
                                 <Storyboard>
                                     <DoubleAnimation
-                                    Storyboard.TargetName="btnClearLogGlowEffect" 
+                                    Storyboard.TargetName="btnGetCellIdGlowEffect" 
                                     Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
                                     From="1" To="0" Duration="0:0:0.5" 
                                     AutoReverse="False" RepeatBehavior="1x" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                    </Button.Triggers>
+                </Button>-->
+                <Button x:Name="btnGetDNADefinition" Style="{StaticResource ButtonStyle}" FontSize="14" Cursor="Hand" Content="Get DNA Definition" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnGetDNADefinition_Click">
+                    <Button.Effect>
+                        <DropShadowEffect x:Name="btnGetDNADefinitionGlowEffect" ShadowDepth="0"
+          Color="White"
+          Opacity="0"
+          BlurRadius="10"/>
+                    </Button.Effect>
+
+                    <Button.Triggers>
+                        <EventTrigger RoutedEvent="Button.MouseEnter">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation
+                    Storyboard.TargetName="btnGetDNADefinitionGlowEffect" 
+                    Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+                    From="0.0" To="1.0" Duration="0:0:0.5" 
+                    AutoReverse="False" RepeatBehavior="1x" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                        <EventTrigger RoutedEvent="Button.MouseLeave">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation
+                    Storyboard.TargetName="btnGetDNADefinitionGlowEffect" 
+                    Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+                    From="1" To="0" Duration="0:0:0.5" 
+                    AutoReverse="False" RepeatBehavior="1x" />
                                 </Storyboard>
                             </BeginStoryboard>
                         </EventTrigger>

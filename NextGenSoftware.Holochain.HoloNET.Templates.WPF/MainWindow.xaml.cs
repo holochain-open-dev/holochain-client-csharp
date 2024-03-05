@@ -209,6 +209,32 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
             LogMessage("ADMIN: Dump Full State...");
             ShowStatusMessage($"Dump Full State....", StatusMessageType.Information, true);
             HoloNETManager.Instance.HoloNETClientAdmin.DumpFullState();
+            //HoloNETManager.Instance.HoloNETClientAdmin.GetDnaDefinition();
+
+            //HoloNETManager.Instance.HoloNETClientAdmin.AddAgentInfo
+            //HoloNETManager.Instance.HoloNETClientAdmin.DeleteCloneCellAsync()
+            //HoloNETManager.Instance.HoloNETClientAdmin.GraftRecords()
+            //HoloNETManager.Instance.HoloNETClientAdmin.UpdateCoordinators
+        }
+
+        //private void btnGetCellId_Click(object sender, RoutedEventArgs e)
+        //{
+        //    if (HoloNETManager.Instance != null && HoloNETManager.Instance.CurrentApp != null)
+        //    {
+        //        LogMessage("ADMIN: Getting Cell Id...");
+        //        ShowStatusMessage($"Getting Cell Id....", StatusMessageType.Information, true);
+        //        HoloNETManager.Instance.HoloNETClientAdmin.GetCellId();
+        //    }
+        //}
+
+        private void btnGetDNADefinition_Click(object sender, RoutedEventArgs e)
+        {
+            if (HoloNETManager.Instance != null && HoloNETManager.Instance.CurrentApp != null)
+            {
+                LogMessage("ADMIN: Getting DNA Defintion...");
+                ShowStatusMessage($"Getting DNA Defintion....", StatusMessageType.Information, true);
+                HoloNETManager.Instance.HoloNETClientAdmin.GetDnaDefinition(HoloNETManager.Instance.CurrentApp.DnaHash);
+            }
         }
 
         private void btnShowLog_Click(object sender, RoutedEventArgs e)
@@ -352,6 +378,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
         {
             if (PopupManager.CurrentPopup == null)
                 HoloNETManager.Instance.CurrentApp = gridHapps.SelectedItem as InstalledApp;
-        }        
+        }
     }
 }
