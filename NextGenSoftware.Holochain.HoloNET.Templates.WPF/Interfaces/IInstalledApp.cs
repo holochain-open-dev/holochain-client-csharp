@@ -5,11 +5,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Interfaces
     public interface IInstalledApp
     {
         string AgentPubKey { get; set; }
-        Brush CallZomeAndViewDataEntriesButtonsForegroundColour { get; }
-        Brush DisabledButtonForegroundColour { get; }
-        Brush DisconnectButtonForegroundColour { get; }
         string DnaHash { get; set; }
-        Brush EnabledButtonForegroundColour { get; }
+        byte[][] CellId { get; set; }
         bool IsCallZomeFunctionAndViewDataEntriesEnabled { get; }
         bool IsConnected { get; set; }
         bool IsConnectionInternal { get; }
@@ -21,5 +18,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Interfaces
         string Port { get; set; }
         string Status { get; set; }
         string StatusReason { get; set; }
+
+        //TODO: Remove these ASAP! Use Convertors instead in XAML to handle this! ;-)
+        Brush CallZomeAndViewDataEntriesButtonsForegroundColour { get; }
+        Brush DisabledButtonForegroundColour { get; }
+        Brush DisconnectButtonForegroundColour { get; }
+        Brush EnabledButtonForegroundColour { get; }
     }
 }

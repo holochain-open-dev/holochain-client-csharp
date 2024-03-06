@@ -209,7 +209,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
             LogMessage("ADMIN: Dump Full State...");
             ShowStatusMessage($"Dump Full State....", StatusMessageType.Information, true);
             HoloNETManager.Instance.HoloNETClientAdmin.DumpFullState();
-            //HoloNETManager.Instance.HoloNETClientAdmin.GetDnaDefinition();
 
             //HoloNETManager.Instance.HoloNETClientAdmin.AddAgentInfo
             //HoloNETManager.Instance.HoloNETClientAdmin.DeleteCloneCellAsync()
@@ -234,6 +233,44 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
                 LogMessage("ADMIN: Getting DNA Defintion...");
                 ShowStatusMessage($"Getting DNA Defintion....", StatusMessageType.Information, true);
                 HoloNETManager.Instance.HoloNETClientAdmin.GetDnaDefinition(HoloNETManager.Instance.CurrentApp.DnaHash);
+            }
+        }
+
+        private void btnAddAgentInfo_Click(object sender, RoutedEventArgs e)
+        {
+            LogMessage("ADMIN: Adding Agent Info...");
+            ShowStatusMessage($"Adding Agent Info....", StatusMessageType.Information, true);
+            //HoloNETManager.Instance.HoloNETClientAdmin.AddAgentInfo();
+        }
+
+        private void btnDeleteCloneCell_Click(object sender, RoutedEventArgs e)
+        {
+            if (HoloNETManager.Instance != null && HoloNETManager.Instance.CurrentApp != null)
+            {
+                LogMessage("ADMIN: Deleting Clone Cell...");
+                ShowStatusMessage($"Deleting Clone Cell....", StatusMessageType.Information, true);
+                HoloNETManager.Instance.HoloNETClientAdmin.DeleteCloneCell(HoloNETManager.Instance.CurrentApp.Name, HoloNETManager.Instance.CurrentApp.AgentPubKey, HoloNETManager.Instance.CurrentApp.DnaHash);
+            }
+        }
+
+        private void btnGraftRecords_Click(object sender, RoutedEventArgs e)
+        {
+            if (HoloNETManager.Instance != null && HoloNETManager.Instance.CurrentApp != null)
+            {
+                LogMessage("ADMIN: Grafting Records...");
+                ShowStatusMessage($"Grafting Records....", StatusMessageType.Information, true);
+                HoloNETManager.Instance.HoloNETClientAdmin.GraftRecords(HoloNETManager.Instance.CurrentApp.CellId, true, new object[1]);
+            }
+        }
+
+        private void btnUpdateCoordinators_Click(object sender, RoutedEventArgs e)
+        {
+            if (HoloNETManager.Instance != null && HoloNETManager.Instance.CurrentApp != null)
+            {
+                LogMessage("ADMIN: Updating Coordinator Zomes...");
+                ShowStatusMessage($"Updating Coordinator Zomes....", StatusMessageType.Information, true);
+                //HoloNETManager.Instance.HoloNETClientAdmin.UpdateCoordinators(HoloNETManager.Instance.HoloNETClientAdmin.ConvertHoloHashToBytes(HoloNETManager.Instance.CurrentApp.DnaHash), "");
+                HoloNETManager.Instance.HoloNETClientAdmin.UpdateCoordinators(HoloNETManager.Instance.CurrentApp.CellId[0], "");
             }
         }
 

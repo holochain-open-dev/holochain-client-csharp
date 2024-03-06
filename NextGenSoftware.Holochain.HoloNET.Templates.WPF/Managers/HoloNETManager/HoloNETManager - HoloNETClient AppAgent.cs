@@ -281,6 +281,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
             {
                 IInstalledApp installedApp = new InstalledApp()
                 {
+                    CellId = app.CellId,
                     AgentPubKey = app.AgentPubKey,
                     DnaHash = app.DnaHash,
                     Name = app.installed_app_id,

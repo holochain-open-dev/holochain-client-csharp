@@ -12,6 +12,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Models
         public string Manifest { get; set; }
         public string AgentPubKey { get; set; }
         public string DnaHash { get; set; }
+        public byte[][] CellId { get; set; }
         public bool IsEnabled { get; set; }
         public bool IsDisabled { get; set; }
         public bool IsConnected { get; set; }
