@@ -26,6 +26,11 @@
     </Setter>
 </Style>-->
 
+    <!--<Storyboard x:Key="sbAnimateButtonsRow" x:Name="sbAnimateButtonsRow" EnableDependentAnimation="true">
+        <DoubleAnimation Storyboard.TargetProperty="Height" x:Name="animation" Duration="0:0:1.0"
+             Storyboard.TargetName="gridAnimated" />
+    </Storyboard>-->
+
     <Style x:Key="ButtonFocusVisual">
         <Setter Property="Control.Template">
             <Setter.Value>
@@ -79,6 +84,51 @@
                         <Trigger Property="IsMouseOver" Value="true">
                             <Setter Property="Foreground" TargetName="text" Value="White"/>
                             <Setter Property="BorderBrush" TargetName="border" Value="White"/>
+                        </Trigger>
+
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="ButtonStyleBlue" TargetType="Button">
+        <Setter Property="SnapsToDevicePixels"
+Value="true" />
+        <Setter Property="OverridesDefaultStyle"
+Value="true" />
+        <Setter Property="FocusVisualStyle"
+Value="{StaticResource ButtonFocusVisual}" />
+        <Setter Property="MinHeight"
+Value="23" />
+        <Setter Property="MinWidth"
+Value="75" />
+        <Setter Property="BorderBrush">
+            <Setter.Value>
+                <SolidColorBrush Color="LightBlue"/>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Grid Cursor="Hand">
+                        <Border x:Name="border" Background="Transparent" BorderBrush="{TemplateBinding BorderBrush}" Cursor="Hand" BorderThickness="0.8" CornerRadius="5">
+                            <Border.Effect>
+                                <DropShadowEffect x:Name="buttonGlowEffect" Opacity="1" Color="LightBlue" BlurRadius="20"/>
+                            </Border.Effect>
+
+                            <TextBlock Margin="10" x:Name="text" Cursor="Hand" Foreground="{TemplateBinding BorderBrush}" FontSize="{TemplateBinding FontSize}" Text="{TemplateBinding Content}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </Grid>
+
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsEnabled" Value="false">
+                            <Setter Property="Background" TargetName="border" Value="Gray"/>
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="true">
+                            <Setter Property="Foreground" TargetName="text" Value="LightBlue"/>
+                            <Setter Property="BorderBrush" TargetName="border" Value="LightBlue"/>
                         </Trigger>
 
                     </ControlTemplate.Triggers>

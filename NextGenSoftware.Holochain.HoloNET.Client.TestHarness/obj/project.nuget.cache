@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "dtKLttV5S+Lw2tXY9fQr62dPgP3GdqkWxCRmbGLc+lVwXXqEWj8vQBmNLxPeALURl0fIBrdZHZLqxPIYukXxCg==",
+  "dgSpecHash": "O6QN2kvyxXT1I+3qPlL+/IvzFJutQzpglbqcR4Eq3byJHN5crXZ9ByFB/AjN6N+Eyu6ehVEY6zoY147K6jKUnQ==",
   "success": true,
   "projectFilePath": "C:\\Users\\USER\\source\\repos\\holochain-client-csharp\\NextGenSoftware.Holochain.HoloNET.Client.TestHarness\\NextGenSoftware.Holochain.HoloNET.Client.TestHarness.csproj",
   "expectedPackageFiles": [

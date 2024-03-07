@@ -277,7 +277,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
         private void btnShowLog_Click(object sender, RoutedEventArgs e)
         {
             //Process.Start("notepad.exe", "Logs\\HoloNET.log");
-            Process.Start("notepad.exe", $"{HoloNETDNAManager.HoloNETDNA.LogPath}\\{HoloNETDNAManager.HoloNETDNA.LogFileName}");
+            //Process.Start("notepad.exe", $"{HoloNETDNAManager.HoloNETDNA.LogPath}\\{HoloNETDNAManager.HoloNETDNA.LogFileName}");
+            Process.Start($"{HoloNETDNAManager.HoloNETDNA.LogPath}");
         }
 
         private void btnClearLog_Click(object sender, RoutedEventArgs e)
@@ -415,6 +416,33 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
         {
             if (PopupManager.CurrentPopup == null)
                 HoloNETManager.Instance.CurrentApp = gridHapps.SelectedItem as InstalledApp;
+        }
+
+        private void btnHideButtons_Click(object sender, RoutedEventArgs e)
+        {
+            if (btnHideButtons.Content.ToString() == "Hide Buttons")
+            {
+                animAnimateButtonsRow.From = rowDefButtons.Height; //stkpnlButtons.ActualHeight;
+                animAnimateButtonsRow.To = new GridLength(0);
+                sbAnimateButtonsRow.Begin();
+
+                //rowDefButtons.Height = new GridLength(0);
+                // btnHideButtons.Content = "Show Buttons";
+            }
+            else
+            {
+                rowDefButtons.Height = new GridLength(200);
+               // btnHideButtons.Content = "Hide Buttons";
+            }
+        }
+
+        private void lblHeading_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            //animAnimateButtonsRowExpand.From = rowDefButtons.Height; //stkpnlButtons.ActualHeight;
+            //animAnimateButtonsRowExpand.To = new GridLength(0);
+            
+            if (rowDefButtons.Height.Value == 0)
+                sbAnimateButtonsRowExpand.Begin();
         }
     }
 }

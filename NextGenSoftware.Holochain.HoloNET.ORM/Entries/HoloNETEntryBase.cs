@@ -1286,39 +1286,51 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM.Entries
         private async Task<ZomeFunctionCallBackEventArgs> CallZomeFunction(string zomeFunctionName, string key, string value, Dictionary<string, string> customDataKeyValuePairs = null, bool useReflectionToMapKeyValuePairResponseOntoEntryDataObject = true)
         {
             ZomeFunctionCallBackEventArgs result = null;
+            string errorMessage = "Error Occured In HoloNETEntryBase In CallZomeFunction. Reason: ";
 
-            if (!IsInitialized && !IsInitializing)
-                await InitializeAsync();
-
-            if (!string.IsNullOrEmpty(value))
+            try
             {
-                if (customDataKeyValuePairs != null)
+                if (!IsInitialized && !IsInitializing)
+                    await InitializeAsync();
+
+                if (HoloNETClient != null)
                 {
-                    dynamic paramsObject = new ExpandoObject();
-
-                    if (!string.IsNullOrEmpty(key))
+                    if (!string.IsNullOrEmpty(value))
                     {
-                        ExpandoObjectHelpers.AddProperty(paramsObject, key, value);
+                        if (customDataKeyValuePairs != null)
+                        {
+                            dynamic paramsObject = new ExpandoObject();
 
-                        foreach (string k in customDataKeyValuePairs.Keys)
-                            ExpandoObjectHelpers.AddProperty(paramsObject, k, customDataKeyValuePairs[k]);
+                            if (!string.IsNullOrEmpty(key))
+                            {
+                                ExpandoObjectHelpers.AddProperty(paramsObject, key, value);
 
-                        result = await HoloNETClient.CallZomeFunctionAsync(ZomeName, zomeFunctionName, paramsObject);
+                                foreach (string k in customDataKeyValuePairs.Keys)
+                                    ExpandoObjectHelpers.AddProperty(paramsObject, k, customDataKeyValuePairs[k]);
+
+                                result = await HoloNETClient.CallZomeFunctionAsync(ZomeName, zomeFunctionName, paramsObject);
+                            }
+                            //result = new ZomeFunctionCallBackEventArgs() { IsError = true, Message = $"The key {keyDisplayName} is null, please set before calling this function." };
+                            else
+                            {
+                                result = await HoloNETClient.CallZomeFunctionAsync(ZomeName, zomeFunctionName, value);
+                            }
+                        }
+                        else
+                            result = await HoloNETClient.CallZomeFunctionAsync(ZomeName, zomeFunctionName, value);
+
+                        ProcessZomeReturnCall(result, useReflectionToMapKeyValuePairResponseOntoEntryDataObject);
                     }
-                    //result = new ZomeFunctionCallBackEventArgs() { IsError = true, Message = $"The key {keyDisplayName} is null, please set before calling this function." };
                     else
-                    {
-                        result = await HoloNETClient.CallZomeFunctionAsync(ZomeName, zomeFunctionName, value);
-                    }
+                        result = new ZomeFunctionCallBackEventArgs() { IsError = true, Message = $"{errorMessage}The value {value} is null, please set before calling this function." };
                 }
                 else
-                    result = await HoloNETClient.CallZomeFunctionAsync(ZomeName, zomeFunctionName, value);
-
-                ProcessZomeReturnCall(result, useReflectionToMapKeyValuePairResponseOntoEntryDataObject);
+                    result = new ZomeFunctionCallBackEventArgs() { IsError = true, Message = $"{errorMessage}HoloNETClient is null! Please make sure this has been set and is connected and the InitializeAsync/Initialize method has been called." };
             }
-            else
-                result = new ZomeFunctionCallBackEventArgs() { IsError = true, Message = $"The value {value} is null, please set before calling this function." };
-            //result = new ZomeFunctionCallBackEventArgs() { IsError = true, Message = $"The value {valueDisplayName} is null, please set before calling this function." };
+            catch (Exception ex)
+            {
+                result = new ZomeFunctionCallBackEventArgs() { IsError = true, Message = $"{errorMessage}Unknown Error Occured: {ex}" };
+            }
 
             return result;
         }
