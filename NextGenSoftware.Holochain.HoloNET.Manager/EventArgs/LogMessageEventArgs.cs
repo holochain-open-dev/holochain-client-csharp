@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
+namespace NextGenSoftware.Holochain.HoloNET.Manager
 {
     public class LogMessageEventArgs : EventArgs
     {

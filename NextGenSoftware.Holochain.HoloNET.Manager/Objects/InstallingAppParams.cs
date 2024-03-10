@@ -1,4 +1,4 @@
-﻿namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Objects
+﻿namespace NextGenSoftware.Holochain.HoloNET.Manager.Objects
 {
     public class InstallingAppParams
     {

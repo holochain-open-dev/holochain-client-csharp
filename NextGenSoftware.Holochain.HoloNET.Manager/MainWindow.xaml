@@ -1,19 +1,19 @@
-﻿<Window x:Class="NextGenSoftware.Holochain.HoloNET.Templates.WPF.MainWindow"
+﻿<Window x:Class="NextGenSoftware.Holochain.HoloNET.Manager.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:fa="http://schemas.fontawesome.io/icons/"
-        xmlns:uc="clr-namespace:NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls"
-        xmlns:managers="clr-namespace:NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers"
-        xmlns:gridAnimation="clr-namespace:NextGenSoftware.Holochain.HoloNET.Templates.WPF"
+        xmlns:uc="clr-namespace:NextGenSoftware.Holochain.HoloNET.Manager.UserControls"
+        xmlns:managers="clr-namespace:NextGenSoftware.Holochain.HoloNET.Manager.Managers"
+        xmlns:gridAnimation="clr-namespace:NextGenSoftware.Holochain.HoloNET.Manager"
         mc:Ignorable="d"
         Title="NextGen Software HoloNET Manager v1.1" Height="770" Width="1650">
 
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/NextGenSoftware.Holochain.HoloNET.Templates.WPF;component/Resources/Resources.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/NextGenSoftware.Holochain.HoloNET.Manager;component/Resources/Resources.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
@@ -24,8 +24,9 @@
 
     <Grid>
         <Grid.RowDefinitions>
+            <!--<RowDefinition Height="120"></RowDefinition>-->
             <RowDefinition Height="100"></RowDefinition>
-            <RowDefinition x:Name="rowDefButtons" Height="180" MaxHeight="180"></RowDefinition>
+            <RowDefinition x:Name="rowDefButtons" Height="100" MaxHeight="180"></RowDefinition>
             <RowDefinition Height="5"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
             <RowDefinition Height="5"></RowDefinition>
@@ -40,13 +41,6 @@
             </LinearGradientBrush>
         </Grid.Background>
 
-        <!--<Grid.Resources>
-            <Storyboard x:Key="sbAnimateButtonsRow" x:Name="sbAnimateButtonsRow" EnableDependentAnimation="true">
-                <DoubleAnimation Storyboard.TargetProperty="Height" x:Name="animation" Duration="0:0:1.0"
-                         Storyboard.TargetName="gridAnimated" />
-            </Storyboard>
-        </Grid.Resources>-->
-        
         <Grid.Triggers>
             <EventTrigger RoutedEvent="UIElement.KeyDown">
                 <EventTrigger.Actions>
@@ -64,20 +58,24 @@
             </EventTrigger>
         </Grid.Triggers>
 
-        <Label x:Name="lblHeading" MouseDown="lblHeading_MouseDown"  Grid.Row="0" HorizontalAlignment="Center" Foreground="White" FontWeight="Bold" Margin="20" FontSize="22" Content="NextGen Software HoloNET Manager v1.1" VerticalAlignment="Center">
+        <!--<Label x:Name="lblHeading" MouseDown="lblHeading_MouseDown" Grid.Row="0" HorizontalAlignment="Center" Foreground="White" FontWeight="Bold" Margin="20" FontSize="44" Content="NextGen Software HoloNET Manager v1.1" VerticalAlignment="Center">-->
+        <!--<Label x:Name="lblHeading" MouseDown="lblHeading_MouseDown" Grid.Row="0" HorizontalAlignment="Center" Foreground="White" FontWeight="Bold" Margin="20" FontSize="22" Content="NextGen Software HoloNET Manager v1.1" VerticalAlignment="Center">-->
+        <Label x:Name="lblHeading" MouseDown="lblHeading_MouseDown" Grid.Row="0" HorizontalAlignment="Center" Foreground="White" FontWeight="Bold" Margin="20" FontSize="30" Content="HoloNET Manager v1.1" VerticalAlignment="Center">
             <Label.Effect>
-                <DropShadowEffect BlurRadius="10" x:Name="glowEffectTitle" ShadowDepth="0" Opacity="1" 
-                          Color="White"/>
+                <DropShadowEffect BlurRadius="22" x:Name="glowEffectTitle" ShadowDepth="7" Opacity="1" 
+                    Color="White"/>
+                <!--<DropShadowEffect BlurRadius="10" x:Name="glowEffectTitle" ShadowDepth="0" Opacity="1" 
+                          Color="White"/>-->
             </Label.Effect>
             <Label.Triggers>
                 <EventTrigger RoutedEvent="Label.Loaded">
                     <BeginStoryboard>
                         <Storyboard>
                             <DoubleAnimation
-    Storyboard.TargetName="glowEffectTitle" 
-    Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
-    From="0.0" To="1.0" Duration="0:0:0.5" 
-    AutoReverse="True" RepeatBehavior="1x" />
+                                Storyboard.TargetName="glowEffectTitle" 
+                                Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+                                From="0.0" To="1.0" Duration="0:0:1.0" 
+                                AutoReverse="True" RepeatBehavior="Forever" />   
                         </Storyboard>
                     </BeginStoryboard>
                 </EventTrigger>
@@ -86,9 +84,9 @@
                         <BeginStoryboard>
                             <Storyboard x:Name="sbAnimateButtonsRowExpand" FillBehavior="Stop">
                                 <gridAnimation:GridLengthAnimation x:Name="animAnimateButtonsRowExpand"
-      Storyboard.TargetName="rowDefButtons"
-      Storyboard.TargetProperty="Height"
-      From="0" To="180" Duration="0:0:1" />
+                                  Storyboard.TargetName="rowDefButtons"
+                                  Storyboard.TargetProperty="Height"
+                                  From="0" To="180" Duration="0:0:1" /> 
                             </Storyboard>
                         </BeginStoryboard>
                     </EventTrigger.Actions>
@@ -122,7 +120,10 @@
                 </EventTrigger>
             </StackPanel.Triggers>-->
             <StackPanel Orientation="Horizontal">
-                <CheckBox x:Name="chkShowDetailedMessages" Content="Show Detailed Logs" Margin="20" Foreground="White" Checked="chkShowDetailedMessages_Checked" Unchecked="chkShowDetailedMessages_Unchecked"></CheckBox>
+                <StackPanel Orientation="Vertical">
+                    <CheckBox x:Name="chkShowDetailedMessages" Content="Show Detailed Logs" Margin="20,10,20,0" Foreground="White" Checked="chkShowDetailedMessages_Checked" Unchecked="chkShowDetailedMessages_Unchecked"></CheckBox>
+                    <CheckBox x:Name="shkShowAdvancedAdminTools" Content="Show Advanced Admin Tools" Margin="20,10,20,0" Foreground="White" Checked="shkShowAdvancedAdminTools_Checked"  Unchecked="shkShowAdvancedAdminTools_Unchecked"></CheckBox>
+                </StackPanel>
                 <Button x:Name="btnInstall" Style="{StaticResource ButtonStyleBlue}" FontSize="14" Cursor="Hand" Content="Install hApp" Margin="10" Foreground="Blue" Padding="5,2,5,2"  Background="Black" Click="btnInstall_Click" >
                     <Button.Effect>
                         <DropShadowEffect x:Name="btnInstallGlowEffect" ShadowDepth="0"
@@ -488,11 +489,43 @@ BlurRadius="10"/>
                         </EventTrigger>
                     </Button.Triggers>
                 </Button>
+                <Button x:Name="btnHideButtons" Width="110" Style="{StaticResource ButtonStyle}" FontSize="14" Cursor="Hand" Content="Hide Buttons" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnHideButtons_Click">
+                    <Button.Effect>
+                        <DropShadowEffect x:Name="btnHideButtonsGlowEffect" ShadowDepth="0"
+Color="White"
+Opacity="0"
+BlurRadius="10"/>
+                    </Button.Effect>
+
+                    <Button.Triggers>
+                        <EventTrigger RoutedEvent="Button.MouseEnter">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation
+          Storyboard.TargetName="btnHideButtonsGlowEffect" 
+          Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+          From="0.0" To="1.0" Duration="0:0:0.5" 
+          AutoReverse="False" RepeatBehavior="1x" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                        <EventTrigger RoutedEvent="Button.MouseLeave">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation
+          Storyboard.TargetName="btnHideButtonsGlowEffect" 
+          Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+          From="1" To="0" Duration="0:0:0.5" 
+          AutoReverse="False" RepeatBehavior="1x" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                    </Button.Triggers>
+                </Button>
             </StackPanel>
 
             <StackPanel Orientation="Horizontal">
-
-                <Button x:Name="btnGetStorageInfo" Style="{StaticResource ButtonStyleBlue}" FontSize="14" Cursor="Hand" Content="Get Storage Info" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnGetStorageInfo_Click" >
+                <Button x:Name="btnGetStorageInfo" Visibility="Collapsed" Style="{StaticResource ButtonStyleBlue}" FontSize="14" Cursor="Hand" Content="Get Storage Info" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnGetStorageInfo_Click" >
                     <Button.Effect>
                         <DropShadowEffect x:Name="btnGetStorageInfoGlowEffect" ShadowDepth="0"
 Color="White"
@@ -526,7 +559,7 @@ BlurRadius="10"/>
                     </Button.Triggers>
                 </Button>
 
-                <Button x:Name="btnGetDNADefinition" Style="{StaticResource ButtonStyleBlue}" FontSize="14" Cursor="Hand" Content="Get DNA Definition" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnGetDNADefinition_Click">
+                <Button x:Name="btnGetDNADefinition" Visibility="Collapsed" Style="{StaticResource ButtonStyleBlue}" FontSize="14" Cursor="Hand" Content="Get DNA Definition" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnGetDNADefinition_Click">
                     <Button.Effect>
                         <DropShadowEffect x:Name="btnGetDNADefinitionGlowEffect" ShadowDepth="0"
           Color="White"
@@ -559,7 +592,7 @@ BlurRadius="10"/>
                         </EventTrigger>
                     </Button.Triggers>
                 </Button>
-                <Button x:Name="btnAddAgentInfo" Style="{StaticResource ButtonStyleBlue}" FontSize="14" Cursor="Hand" Content="Add Agent Info" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnAddAgentInfo_Click">
+                <Button x:Name="btnAddAgentInfo" Visibility="Collapsed" Style="{StaticResource ButtonStyleBlue}" FontSize="14" Cursor="Hand" Content="Add Agent Info" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnAddAgentInfo_Click">
                     <Button.Effect>
                         <DropShadowEffect x:Name="btnAddAgentInfoGlowEffect" ShadowDepth="0"
 Color="White"
@@ -592,7 +625,7 @@ BlurRadius="10"/>
                         </EventTrigger>
                     </Button.Triggers>
                 </Button>
-                <Button x:Name="btnDeleteCloneCell" Style="{StaticResource ButtonStyleBlue}" FontSize="14" Cursor="Hand" Content="Delete Clone Cell" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnDeleteCloneCell_Click">
+                <Button x:Name="btnDeleteCloneCell" Visibility="Collapsed" Style="{StaticResource ButtonStyleBlue}" FontSize="14" Cursor="Hand" Content="Delete Clone Cell" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnDeleteCloneCell_Click">
                     <Button.Effect>
                         <DropShadowEffect x:Name="btnDeleteCloneCellGlowEffect" ShadowDepth="0"
 Color="White"
@@ -625,7 +658,7 @@ BlurRadius="10"/>
                         </EventTrigger>
                     </Button.Triggers>
                 </Button>
-                <Button x:Name="btnGraftRecords" Style="{StaticResource ButtonStyleBlue}" FontSize="14" Cursor="Hand" Content="Graft Records" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnGraftRecords_Click">
+                <Button x:Name="btnGraftRecords" Visibility="Collapsed" Style="{StaticResource ButtonStyleBlue}" FontSize="14" Cursor="Hand" Content="Graft Records" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnGraftRecords_Click">
                     <Button.Effect>
                         <DropShadowEffect x:Name="btnGraftRecordsGlowEffect" ShadowDepth="0"
 Color="White"
@@ -658,7 +691,7 @@ BlurRadius="10"/>
                         </EventTrigger>
                     </Button.Triggers>
                 </Button>
-                <Button x:Name="btnUpdateCoordinators" Style="{StaticResource ButtonStyleBlue}" FontSize="14" Cursor="Hand" Content="Update Coordinators" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnUpdateCoordinators_Click">
+                <Button x:Name="btnUpdateCoordinators" Visibility="Collapsed" Style="{StaticResource ButtonStyleBlue}" FontSize="14" Cursor="Hand" Content="Update Coordinators" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnUpdateCoordinators_Click">
                     <Button.Effect>
                         <DropShadowEffect x:Name="btnUpdateCoordinatorsGlowEffect" ShadowDepth="0"
 Color="White"
@@ -691,7 +724,7 @@ BlurRadius="10"/>
                         </EventTrigger>
                     </Button.Triggers>
                 </Button>
-                <Button x:Name="btnDumpNetWorkStats" Style="{StaticResource ButtonStyleBlue}" FontSize="14" Cursor="Hand" Content="Dump Network Stats" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnDumpNetWorkStats_Click" >
+                <Button x:Name="btnDumpNetWorkStats" Visibility="Collapsed" Style="{StaticResource ButtonStyleBlue}" FontSize="14" Cursor="Hand" Content="Dump Network Stats" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnDumpNetWorkStats_Click" >
                     <Button.Effect>
                         <DropShadowEffect x:Name="btnDumpNetWorkStatsGlowEffect" ShadowDepth="0"
           Color="White"
@@ -724,7 +757,7 @@ BlurRadius="10"/>
                         </EventTrigger>
                     </Button.Triggers>
                 </Button>
-                <Button x:Name="btnDumpNetworkMetrics" Style="{StaticResource ButtonStyleBlue}" FontSize="14" Cursor="Hand" Content="Dump Network Metrics" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnDumpNetworkMetrics_Click" >
+                <Button x:Name="btnDumpNetworkMetrics" Visibility="Collapsed" Style="{StaticResource ButtonStyleBlue}" FontSize="14" Cursor="Hand" Content="Dump Network Metrics" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnDumpNetworkMetrics_Click" >
                     <Button.Effect>
                         <DropShadowEffect x:Name="btnDumpNetworkMetricsGlowEffect" ShadowDepth="0"
 Color="White"
@@ -757,7 +790,7 @@ BlurRadius="10"/>
                         </EventTrigger>
                     </Button.Triggers>
                 </Button>
-                <Button x:Name="btnDumpState" Style="{StaticResource ButtonStyleBlue}" FontSize="14" Cursor="Hand" Content="Dump State" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnDumpState_Click" >
+                <Button x:Name="btnDumpState" Visibility="Collapsed" Style="{StaticResource ButtonStyleBlue}" FontSize="14" Cursor="Hand" Content="Dump State" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnDumpState_Click" >
                     <Button.Effect>
                         <DropShadowEffect x:Name="btnDumpStateGlowEffect" ShadowDepth="0"
 Color="White"
@@ -790,7 +823,7 @@ BlurRadius="10"/>
                         </EventTrigger>
                     </Button.Triggers>
                 </Button>
-                <Button x:Name="btnFullDump" Style="{StaticResource ButtonStyleBlue}" FontSize="14" Cursor="Hand" Content="Dump Full State" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnFullDump_Click" >
+                <Button x:Name="btnFullDump" Visibility="Collapsed" Style="{StaticResource ButtonStyleBlue}" FontSize="14" Cursor="Hand" Content="Dump Full State" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnFullDump_Click" >
                     <Button.Effect>
                         <DropShadowEffect x:Name="btnFullDumpGlowEffect" ShadowDepth="0"
 Color="White"
@@ -815,40 +848,6 @@ BlurRadius="10"/>
                                 <Storyboard>
                                     <DoubleAnimation
           Storyboard.TargetName="btnFullDumpGlowEffect" 
-          Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
-          From="1" To="0" Duration="0:0:0.5" 
-          AutoReverse="False" RepeatBehavior="1x" />
-                                </Storyboard>
-                            </BeginStoryboard>
-                        </EventTrigger>
-                    </Button.Triggers>
-                </Button>
-
-                <Button x:Name="btnHideButtons" Width="110" Style="{StaticResource ButtonStyle}" FontSize="14" Cursor="Hand" Content="Hide Buttons" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnHideButtons_Click">
-                    <Button.Effect>
-                        <DropShadowEffect x:Name="btnHideButtonsGlowEffect" ShadowDepth="0"
-Color="White"
-Opacity="0"
-BlurRadius="10"/>
-                    </Button.Effect>
-
-                    <Button.Triggers>
-                        <EventTrigger RoutedEvent="Button.MouseEnter">
-                            <BeginStoryboard>
-                                <Storyboard>
-                                    <DoubleAnimation
-          Storyboard.TargetName="btnHideButtonsGlowEffect" 
-          Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
-          From="0.0" To="1.0" Duration="0:0:0.5" 
-          AutoReverse="False" RepeatBehavior="1x" />
-                                </Storyboard>
-                            </BeginStoryboard>
-                        </EventTrigger>
-                        <EventTrigger RoutedEvent="Button.MouseLeave">
-                            <BeginStoryboard>
-                                <Storyboard>
-                                    <DoubleAnimation
-          Storyboard.TargetName="btnHideButtonsGlowEffect" 
           Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
           From="1" To="0" Duration="0:0:0.5" 
           AutoReverse="False" RepeatBehavior="1x" />
@@ -1162,7 +1161,7 @@ BlurRadius="10"/>
 
             <TextBlock x:Name="txtConnections" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right" FontWeight="Bold"  Text="Client Connections: 0" VerticalAlignment="Center" Margin="0,0,15,10" Foreground="WhiteSmoke">
                 <TextBlock.Effect>
-                    <DropShadowEffect x:Name="glowEffectConnections" ShadowDepth="0"
+                    <DropShadowEffect x:Name="glowEffectConnections" ShadowDepth="7"
                 Color="White"
                 Opacity="0"
                 BlurRadius="10"/>

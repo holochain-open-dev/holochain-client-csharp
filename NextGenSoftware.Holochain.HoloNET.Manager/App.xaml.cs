@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
+namespace NextGenSoftware.Holochain.HoloNET.Manager
 {
     /// <summary>
     /// Interaction logic for App.xaml

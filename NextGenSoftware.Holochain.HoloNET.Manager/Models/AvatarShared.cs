@@ -2,9 +2,9 @@
 using NextGenSoftware.Holochain.HoloNET.Client;
 using NextGenSoftware.Holochain.HoloNET.Client.Interfaces;
 using NextGenSoftware.Holochain.HoloNET.ORM.Entries;
-using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Interfaces;
+using NextGenSoftware.Holochain.HoloNET.Manager.Interfaces;
 
-namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Models
+namespace NextGenSoftware.Holochain.HoloNET.Manager.Models
 {
     /// <summary>
     /// This example passes in a HoloNETClient instance that is shared with other classes/objects that extend from HoloNETAuditEntryBaseClass/HoloNETEntryBaseClass. Only use this if you have more than one class extending HoloNETAuditEntryBaseClass/HoloNETEntryBaseClass otherwise use the Avatar example.

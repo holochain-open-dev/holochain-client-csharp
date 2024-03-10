@@ -1,6 +1,6 @@
 ﻿using System.Windows.Media;
 
-namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Interfaces
+namespace NextGenSoftware.Holochain.HoloNET.Manager.Interfaces
 {
     public interface IInstalledApp
     {

@@ -4,9 +4,9 @@ using System.Threading.Tasks;
 using NextGenSoftware.Holochain.HoloNET.Client;
 using NextGenSoftware.Holochain.HoloNET.Client.Interfaces;
 using NextGenSoftware.Holochain.HoloNET.ORM.Entries;
-using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Interfaces;
+using NextGenSoftware.Holochain.HoloNET.Manager.Interfaces;
 
-namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Models
+namespace NextGenSoftware.Holochain.HoloNET.Manager.Models
 {
     /// <summary>
     /// This example creates its own internal instance of the HoloNETClient, you should only use this if you will be extending only one HoloNETAuditEntryBaseClass/HoloNETEntryBaseClass otherwise use the AvatarShared Example.

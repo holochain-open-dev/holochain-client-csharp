@@ -870,8 +870,7 @@
         "framework": ".NETCoreApp,Version=v8.0",
         "dependencies": {
           "NextGenSoftware.ErrorHandling": "1.0.0",
-          "NextGenSoftware.Logging": "1.2.0",
-          "NextGenSoftware.Utilities": "1.1.0"
+          "NextGenSoftware.Logging": "1.2.0"
         },
         "compile": {
           "bin/placeholder/NextGenSoftware.WebSocket.dll": {}
@@ -3308,7 +3307,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.101/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.102/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

@@ -6,13 +6,13 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using Microsoft.Win32;
 using NextGenSoftware.Holochain.HoloNET.Client;
-using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Enums;
-using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Interfaces;
-using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers;
-using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Models;
-using NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls;
+using NextGenSoftware.Holochain.HoloNET.Manager.Enums;
+using NextGenSoftware.Holochain.HoloNET.Manager.Interfaces;
+using NextGenSoftware.Holochain.HoloNET.Manager.Managers;
+using NextGenSoftware.Holochain.HoloNET.Manager.Models;
+using NextGenSoftware.Holochain.HoloNET.Manager.UserControls;
 
-namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
+namespace NextGenSoftware.Holochain.HoloNET.Manager
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -171,9 +171,17 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
 
         private void btnGetAgentInfo_Click(object sender, RoutedEventArgs e)
         {
-            LogMessage("ADMIN: Getting Agent Info...");
-            ShowStatusMessage($"Getting Agent Info...", StatusMessageType.Information, true);
-            HoloNETManager.Instance.HoloNETClientAdmin.GetAgentInfo();
+            if (HoloNETManager.Instance != null && HoloNETManager.Instance.CurrentApp != null)
+            {
+                LogMessage("ADMIN: Getting Agent Info...");
+                ShowStatusMessage($"Getting Agent Info...", StatusMessageType.Information, true);
+                HoloNETManager.Instance.HoloNETClientAdmin.GetAgentInfo(HoloNETManager.Instance.CurrentApp.CellId);
+            }
+            else
+            {
+                LogMessage("ADMIN: Select A hApp From The Installed hApps List First!");
+                ShowStatusMessage($"Select A hApp From The Installed hApps List First!", StatusMessageType.Information);
+            }
         }
 
         private void btnGetStorageInfo_Click(object sender, RoutedEventArgs e)
@@ -234,6 +242,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
                 ShowStatusMessage($"Getting DNA Defintion....", StatusMessageType.Information, true);
                 HoloNETManager.Instance.HoloNETClientAdmin.GetDnaDefinition(HoloNETManager.Instance.CurrentApp.DnaHash);
             }
+            else
+            {
+                LogMessage("ADMIN: Select A hApp From The Installed hApps List First!");
+                ShowStatusMessage($"Select A hApp From The Installed hApps List First!", StatusMessageType.Information);
+            }
         }
 
         private void btnAddAgentInfo_Click(object sender, RoutedEventArgs e)
@@ -251,6 +264,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
                 ShowStatusMessage($"Deleting Clone Cell....", StatusMessageType.Information, true);
                 HoloNETManager.Instance.HoloNETClientAdmin.DeleteCloneCell(HoloNETManager.Instance.CurrentApp.Name, HoloNETManager.Instance.CurrentApp.AgentPubKey, HoloNETManager.Instance.CurrentApp.DnaHash);
             }
+            else
+            {
+                LogMessage("ADMIN: Select A hApp From The Installed hApps List First!");
+                ShowStatusMessage($"Select A hApp From The Installed hApps List First!", StatusMessageType.Information);
+            }
         }
 
         private void btnGraftRecords_Click(object sender, RoutedEventArgs e)
@@ -260,6 +278,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
                 LogMessage("ADMIN: Grafting Records...");
                 ShowStatusMessage($"Grafting Records....", StatusMessageType.Information, true);
                 HoloNETManager.Instance.HoloNETClientAdmin.GraftRecords(HoloNETManager.Instance.CurrentApp.CellId, true, new object[1]);
+            }
+            else
+            {
+                LogMessage("ADMIN: Select A hApp From The Installed hApps List First!");
+                ShowStatusMessage($"Select A hApp From The Installed hApps List First!", StatusMessageType.Information);
             }
         }
 
@@ -271,6 +294,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
                 ShowStatusMessage($"Updating Coordinator Zomes....", StatusMessageType.Information, true);
                 //HoloNETManager.Instance.HoloNETClientAdmin.UpdateCoordinators(HoloNETManager.Instance.HoloNETClientAdmin.ConvertHoloHashToBytes(HoloNETManager.Instance.CurrentApp.DnaHash), "");
                 HoloNETManager.Instance.HoloNETClientAdmin.UpdateCoordinators(HoloNETManager.Instance.CurrentApp.CellId[0], "");
+            }
+            else
+            {
+                LogMessage("ADMIN: Select A hApp From The Installed hApps List First!");
+                ShowStatusMessage($"Select A hApp From The Installed hApps List First!", StatusMessageType.Information);
             }
         }
 
@@ -420,29 +448,61 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
 
         private void btnHideButtons_Click(object sender, RoutedEventArgs e)
         {
-            if (btnHideButtons.Content.ToString() == "Hide Buttons")
-            {
-                animAnimateButtonsRow.From = rowDefButtons.Height; //stkpnlButtons.ActualHeight;
-                animAnimateButtonsRow.To = new GridLength(0);
-                sbAnimateButtonsRow.Begin();
+           
+            //animAnimateButtonsRow.From = rowDefButtons.Height; //stkpnlButtons.ActualHeight;
+            //animAnimateButtonsRow.To = new GridLength(0);
+            //sbAnimateButtonsRow.Begin();
 
-                //rowDefButtons.Height = new GridLength(0);
-                // btnHideButtons.Content = "Show Buttons";
-            }
-            else
-            {
-                rowDefButtons.Height = new GridLength(200);
-               // btnHideButtons.Content = "Hide Buttons";
-            }
+            rowDefButtons.Height = new GridLength(0);
         }
 
         private void lblHeading_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            //animAnimateButtonsRowExpand.From = rowDefButtons.Height; //stkpnlButtons.ActualHeight;
-            //animAnimateButtonsRowExpand.To = new GridLength(0);
+            ////animAnimateButtonsRowExpand.From = rowDefButtons.Height; //stkpnlButtons.ActualHeight;
+            ////animAnimateButtonsRowExpand.To = new GridLength(0);
             
-            if (rowDefButtons.Height.Value == 0)
-                sbAnimateButtonsRowExpand.Begin();
+            //if (rowDefButtons.Height.Value == 0)
+            //    sbAnimateButtonsRowExpand.Begin();
+        }
+
+        private void shkShowAdvancedAdminTools_Checked(object sender, RoutedEventArgs e)
+        {
+            btnGetStorageInfo.Visibility = Visibility.Visible;
+            btnGetDNADefinition.Visibility = Visibility.Visible;
+            btnAddAgentInfo.Visibility = Visibility.Visible;
+            btnDeleteCloneCell.Visibility = Visibility.Visible;
+            btnGraftRecords.Visibility = Visibility.Visible;
+            btnUpdateCoordinators.Visibility = Visibility.Visible;
+            btnDumpNetWorkStats.Visibility = Visibility.Visible;
+            btnDumpNetworkMetrics.Visibility = Visibility.Visible;
+            btnDumpState.Visibility = Visibility.Visible;
+            btnFullDump.Visibility = Visibility.Visible;
+
+            rowDefButtons.Height = new GridLength(180);
+            rowDefButtons.MaxHeight = 180;
+            //animAnimateButtonsRowExpand.From = rowDefButtons.Height; //stkpnlButtons.ActualHeight;
+            //animAnimateButtonsRowExpand.To = new GridLength(180);
+            //sbAnimateButtonsRowExpand.Begin();
+        }
+
+        private void shkShowAdvancedAdminTools_Unchecked(object sender, RoutedEventArgs e)
+        {
+            btnGetStorageInfo.Visibility = Visibility.Collapsed;
+            btnGetDNADefinition.Visibility = Visibility.Collapsed;
+            btnAddAgentInfo.Visibility = Visibility.Collapsed;
+            btnDeleteCloneCell.Visibility = Visibility.Collapsed;
+            btnGraftRecords.Visibility = Visibility.Collapsed;
+            btnUpdateCoordinators.Visibility = Visibility.Collapsed;
+            btnDumpNetWorkStats.Visibility = Visibility.Collapsed;
+            btnDumpNetworkMetrics.Visibility = Visibility.Collapsed;
+            btnDumpState.Visibility = Visibility.Collapsed;
+            btnFullDump.Visibility = Visibility.Collapsed;
+
+            rowDefButtons.Height = new GridLength(100);
+            rowDefButtons.MaxHeight = 100;
+            //animAnimateButtonsRowExpand.From = rowDefButtons.Height; //stkpnlButtons.ActualHeight;
+            //animAnimateButtonsRowExpand.To = new GridLength(100);
+            //sbAnimateButtonsRowExpand.Begin();
         }
     }
 }

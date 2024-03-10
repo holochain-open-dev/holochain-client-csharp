@@ -6,12 +6,12 @@ using System.Windows.Threading;
 using NextGenSoftware.Holochain.HoloNET.Client;
 using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects;
 using NextGenSoftware.Holochain.HoloNET.Client.Interfaces;
-using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Enums;
-using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Interfaces;
-using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Models;
-using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Objects;
+using NextGenSoftware.Holochain.HoloNET.Manager.Enums;
+using NextGenSoftware.Holochain.HoloNET.Manager.Interfaces;
+using NextGenSoftware.Holochain.HoloNET.Manager.Models;
+using NextGenSoftware.Holochain.HoloNET.Manager.Objects;
 
-namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
+namespace NextGenSoftware.Holochain.HoloNET.Manager.Managers
 {
     public partial class HoloNETManager : IHoloNETManager
     {

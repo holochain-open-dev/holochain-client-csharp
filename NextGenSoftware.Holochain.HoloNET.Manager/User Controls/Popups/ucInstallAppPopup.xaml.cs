@@ -1,8 +1,8 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
-using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers;
+using NextGenSoftware.Holochain.HoloNET.Manager.Managers;
 
-namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls
+namespace NextGenSoftware.Holochain.HoloNET.Manager.UserControls
 {
     /// <summary>
     /// Interaction logic for ucHoloNETMetaData.xaml

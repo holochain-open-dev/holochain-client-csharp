@@ -1,18 +1,18 @@
 ﻿using NextGenSoftware.Holochain.HoloNET.Client;
 using NextGenSoftware.Holochain.HoloNET.Client.Interfaces;
 using NextGenSoftware.Holochain.HoloNET.ORM.Collections;
-using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Enums;
-using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers;
-using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Models;
-using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Objects;
-using NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls;
+using NextGenSoftware.Holochain.HoloNET.Manager.Enums;
+using NextGenSoftware.Holochain.HoloNET.Manager.Managers;
+using NextGenSoftware.Holochain.HoloNET.Manager.Models;
+using NextGenSoftware.Holochain.HoloNET.Manager.Objects;
+using NextGenSoftware.Holochain.HoloNET.Manager.UserControls;
 using NextGenSoftware.WebSocket;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 
-namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Interfaces
+namespace NextGenSoftware.Holochain.HoloNET.Manager.Interfaces
 {
     public interface IHoloNETManager
     {

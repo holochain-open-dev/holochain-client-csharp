@@ -1,7 +1,7 @@
 ﻿using System;
 using NextGenSoftware.Holochain.HoloNET.ORM.Interfaces;
 
-namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Interfaces
+namespace NextGenSoftware.Holochain.HoloNET.Manager.Interfaces
 {
     public interface IAvatarShared : IHoloNETAuditEntryBase
     {

@@ -3,12 +3,12 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using NextGenSoftware.Holochain.HoloNET.Client;
-using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Enums;
-using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers;
-using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Models;
-using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Objects;
+using NextGenSoftware.Holochain.HoloNET.Manager.Enums;
+using NextGenSoftware.Holochain.HoloNET.Manager.Managers;
+using NextGenSoftware.Holochain.HoloNET.Manager.Models;
+using NextGenSoftware.Holochain.HoloNET.Manager.Objects;
 
-namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls
+namespace NextGenSoftware.Holochain.HoloNET.Manager.UserControls
 {
     /// <summary>
     /// Interaction logic for ucHoloNETMetaData.xaml

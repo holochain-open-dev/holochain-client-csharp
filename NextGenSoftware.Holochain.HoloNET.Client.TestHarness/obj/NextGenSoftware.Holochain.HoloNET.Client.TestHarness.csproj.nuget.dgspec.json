@@ -168,7 +168,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.101/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.102/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
@@ -551,9 +551,6 @@
               },
               "C:\\Users\\USER\\source\\repos\\NextGenSoftware-Libraries\\NextGenSoftware Libraries\\NextGenSoftware.Logging\\NextGenSoftware.Logging.csproj": {
                 "projectPath": "C:\\Users\\USER\\source\\repos\\NextGenSoftware-Libraries\\NextGenSoftware Libraries\\NextGenSoftware.Logging\\NextGenSoftware.Logging.csproj"
-              },
-              "C:\\Users\\USER\\source\\repos\\NextGenSoftware-Libraries\\NextGenSoftware Libraries\\NextGenSoftware.Utilities\\NextGenSoftware.Utilities.csproj": {
-                "projectPath": "C:\\Users\\USER\\source\\repos\\NextGenSoftware-Libraries\\NextGenSoftware Libraries\\NextGenSoftware.Utilities\\NextGenSoftware.Utilities.csproj"
               }
             }
           }

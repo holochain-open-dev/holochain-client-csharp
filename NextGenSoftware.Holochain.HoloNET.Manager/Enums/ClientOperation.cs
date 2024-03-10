@@ -1,4 +1,4 @@
-﻿namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Enums
+﻿namespace NextGenSoftware.Holochain.HoloNET.Manager.Enums
 {
     public enum ClientOperation
     {

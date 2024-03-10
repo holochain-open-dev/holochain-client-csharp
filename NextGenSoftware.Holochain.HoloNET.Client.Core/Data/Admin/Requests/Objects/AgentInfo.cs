@@ -5,34 +5,45 @@ using NextGenSoftware.Holochain.HoloNET.Client.Interfaces;
 namespace NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects
 {
     [MessagePackObject]
-    public class AgentInfo : IAgentInfo
+    public class AgentInfo //: IAgentInfo
     //AgentInfoInner (Rust name is AgentInfoInner but hopefully we can use AgentInfo because sounds better! ;-) )
     {
-        [Key("space")]
-        public KitsuneSpace space { get; set; }
+        [Key("type")]
+        public string type { get; set; }
 
-        [Key("agent")]
-        public KitsuneAgent agent { get; set; }
-
-        [Key("storage_arc")]
-        //public DhtArc storage_arc { get; set; }
-        public object storage_arc { get; set; }
-
-        [Key("url_list")]
-        public string[] url_list { get; set; }
-
-        [Key("signed_at_ms")]
-        public long signed_at_ms { get; set; }
-
-        [Key("expires_at_ms")]
-        public long expires_at_ms { get; set; }
-
-        [Key("signature")]
-        public KitsuneSignature signature { get; set; }
-
-        [Key("encoded_bytes")]
-        public byte[] encoded_bytes { get; set; }
+        [Key("data")]
+        //public AgentInfoDetailed data { get; set; }
+        public object data { get; set; }
     }
+
+    //public class AgentInfo : IAgentInfo
+    ////AgentInfoInner (Rust name is AgentInfoInner but hopefully we can use AgentInfo because sounds better! ;-) )
+    //{
+    //    [Key("space")]
+    //    public KitsuneSpace space { get; set; }
+
+    //    [Key("agent")]
+    //    public KitsuneAgent agent { get; set; }
+
+    //    [Key("storage_arc")]
+    //    //public DhtArc storage_arc { get; set; }
+    //    public object storage_arc { get; set; }
+
+    //    [Key("url_list")]
+    //    public string[] url_list { get; set; }
+
+    //    [Key("signed_at_ms")]
+    //    public long signed_at_ms { get; set; }
+
+    //    [Key("expires_at_ms")]
+    //    public long expires_at_ms { get; set; }
+
+    //    [Key("signature")]
+    //    public KitsuneSignature signature { get; set; }
+
+    //    [Key("encoded_bytes")]
+    //    public byte[] encoded_bytes { get; set; }
+    //}
 }
 
 //https://docs.rs/kitsune_p2p/0.2.1/kitsune_p2p/agent_store/struct.AgentInfoInner.html

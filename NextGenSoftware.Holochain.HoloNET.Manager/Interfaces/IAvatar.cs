@@ -4,12 +4,12 @@ using System.Threading.Tasks;
 using NextGenSoftware.Holochain.HoloNET.Client;
 using NextGenSoftware.Holochain.HoloNET.ORM.Interfaces;
 
-namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Interfaces
+namespace NextGenSoftware.Holochain.HoloNET.Manager.Interfaces
 {
     public interface IAvatar : IHoloNETAuditEntryBase
     {
         DateTime DOB { get; set; }
-        string Email { get; set; }
+        string Email { get; set; }  
         string FirstName { get; set; }
         string LastName { get; set; }
 

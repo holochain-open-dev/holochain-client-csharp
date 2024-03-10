@@ -1,11 +1,8 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Windows.Media.Animation;
 using System.Windows;
-using System.Diagnostics;
 
-namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
+namespace NextGenSoftware.Holochain.HoloNET.Manager
 {
     public class GridLengthAnimation : AnimationTimeline
     {

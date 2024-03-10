@@ -473,11 +473,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             {
                 Logger.Log("ADMIN: AGENT INFO RETURNED\n", LogType.Info);
                 AgentInfo agentInfo = MessagePackSerializer.Deserialize<AgentInfo>(response.data, messagePackSerializerOptions);
+                //object agentInfo = MessagePackSerializer.Deserialize<object>(response.data, messagePackSerializerOptions);
 
-                if (agentInfo != null)
-                    args.AgentInfo = agentInfo;
-                else
-                    HandleError(args, $"{errorMessage} dataResponse failed to deserialize.");
+                //if (agentInfo != null)
+                //    args.AgentInfo = agentInfo;
+                //else
+                //    HandleError(args, $"{errorMessage} dataResponse failed to deserialize.");
             }
             catch (Exception ex)
             {

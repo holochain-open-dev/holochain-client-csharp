@@ -1,6 +1,6 @@
 ﻿using System.Windows.Controls;
 
-namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
+namespace NextGenSoftware.Holochain.HoloNET.Manager.Managers
 {
     public static class PopupManager
     {

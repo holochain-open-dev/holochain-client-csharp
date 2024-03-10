@@ -1,8 +1,8 @@
 ﻿using System;
-using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Enums;
-using NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls;
+using NextGenSoftware.Holochain.HoloNET.Manager.Enums;
+using NextGenSoftware.Holochain.HoloNET.Manager.UserControls;
 
-namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF
+namespace NextGenSoftware.Holochain.HoloNET.Manager
 {
     public class StatusMessageEventArgs : EventArgs
     {

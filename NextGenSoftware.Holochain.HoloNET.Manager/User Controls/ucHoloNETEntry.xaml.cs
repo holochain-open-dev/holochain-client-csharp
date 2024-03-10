@@ -1,10 +1,10 @@
-﻿using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Enums;
+﻿using NextGenSoftware.Holochain.HoloNET.Manager.Enums;
 using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
-namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls
+namespace NextGenSoftware.Holochain.HoloNET.Manager.UserControls
 {
     /// <summary>
     /// Interaction logic for ucHoloNETMetaData.xaml

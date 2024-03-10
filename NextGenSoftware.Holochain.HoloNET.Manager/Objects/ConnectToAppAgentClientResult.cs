@@ -1,7 +1,7 @@
 ﻿using NextGenSoftware.Holochain.HoloNET.Client.Interfaces;
-using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Enums;
+using NextGenSoftware.Holochain.HoloNET.Manager.Enums;
 
-namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Objects
+namespace NextGenSoftware.Holochain.HoloNET.Manager.Objects
 {
     public class ConnectToAppAgentClientResult
     {

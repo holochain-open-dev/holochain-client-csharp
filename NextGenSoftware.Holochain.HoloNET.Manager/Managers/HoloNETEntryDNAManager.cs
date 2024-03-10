@@ -1,9 +1,9 @@
 ﻿using System;
 using System.IO;
 using Newtonsoft.Json;
-using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Objects;
+using NextGenSoftware.Holochain.HoloNET.Manager.Objects;
 
-namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
+namespace NextGenSoftware.Holochain.HoloNET.Manager.Managers
 {
     public static class HoloNETEntryDNAManager
     {

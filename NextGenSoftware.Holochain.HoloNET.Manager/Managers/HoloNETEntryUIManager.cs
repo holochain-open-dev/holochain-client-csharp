@@ -1,6 +1,6 @@
-﻿using NextGenSoftware.Holochain.HoloNET.Templates.WPF.UserControls;
+﻿using NextGenSoftware.Holochain.HoloNET.Manager.UserControls;
 
-namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
+namespace NextGenSoftware.Holochain.HoloNET.Manager.Managers
 {
     public static class HoloNETEntryUIManager
     {

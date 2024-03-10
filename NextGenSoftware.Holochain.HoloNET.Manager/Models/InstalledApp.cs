@@ -1,7 +1,7 @@
 ﻿using System.Windows.Media;
-using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Interfaces;
+using NextGenSoftware.Holochain.HoloNET.Manager.Interfaces;
 
-namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Models
+namespace NextGenSoftware.Holochain.HoloNET.Manager.Models
 {
     public class InstalledApp : IInstalledApp
     {

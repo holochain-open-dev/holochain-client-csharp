@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Threading.Tasks;
 using System.Windows.Threading;
+using NextGenSoftware.Logging;
 using NextGenSoftware.Holochain.HoloNET.Client;
 using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects;
 using NextGenSoftware.Holochain.HoloNET.Client.Interfaces;
-using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Enums;
-using NextGenSoftware.Holochain.HoloNET.Templates.WPF.Interfaces;
-using NextGenSoftware.Logging;
+using NextGenSoftware.Holochain.HoloNET.Manager.Enums;
+using NextGenSoftware.Holochain.HoloNET.Manager.Interfaces;
 
-namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
+namespace NextGenSoftware.Holochain.HoloNET.Manager.Managers
 {
     public partial class HoloNETManager : IHoloNETManager
     {
@@ -20,15 +20,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
             HoloNETClientAdmin.HoloNETDNA.HolochainConductorMode = HolochainConductorModeEnum.UseEmbedded;
             //HoloNETClientAdmin.HoloNETDNA.HolochainConductorToUse = HolochainConductorEnum.HcDevTool;
             HoloNETClientAdmin.HoloNETDNA.HolochainConductorToUse = HolochainConductorEnum.HolochainProductionConductor;
-
-            //txtAdminURI.Text = HoloNETClientAdmin.HoloNETDNA.HolochainConductorAdminURI;
-            //chkAutoStartConductor.IsChecked = HoloNETClientAdmin.HoloNETDNA.AutoStartHolochainConductor;
-            //chkAutoShutdownConductor.IsChecked = HoloNETClientAdmin.HoloNETDNA.AutoShutdownHolochainConductor;
-            //chkShowConductorWindow.IsChecked = HoloNETClientAdmin.HoloNETDNA.ShowHolochainConductorWindow;
-            //txtSecondsToWaitForConductorToStart.Text = HoloNETClientAdmin.HoloNETDNA.SecondsToWaitForHolochainConductorToStart.ToString();
-            //HoloNETClientAdmin.HoloNETDNA.FullPathToRootHappFolder = @"C:\Users\USER\holochain-holochain-0.1.5\happs\oasis";
-            // //HoloNETClientAdmin.HoloNETDNA.FullPathToRootHappFolder = @"C:\Users\USER\holochain-holochain-0.1.5";
-            // // HoloNETClientAdmin.HoloNETDNA.FullPathToCompiledHappFolder = @"C:\Users\USER\holochain-holochain-0.1.5\happs\oasis\BUILD\happ";
 
             HoloNETClientAdmin.OnHolochainConductorStarting += _holoNETClientAdmin_OnHolochainConductorStarting;
             HoloNETClientAdmin.OnHolochainConductorStarted += _holoNETClientAdmin_OnHolochainConductorStarted;
@@ -46,8 +37,21 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
             HoloNETClientAdmin.OnDnasListedCallBack += HoloNETClientAdmin_OnDnasListedCallBack;
             HoloNETClientAdmin.OnCellIdsListedCallBack += HoloNETClientAdmin_OnCellIdsListedCallBack;
             HoloNETClientAdmin.OnAppInterfacesListedCallBack += HoloNETClientAdmin_OnAppInterfacesListedCallBack;
+            HoloNETClientAdmin.OnAgentInfoReturnedCallBack += HoloNETClientAdmin_OnAgentInfoReturnedCallBack;
             HoloNETClientAdmin.OnDisconnected += _holoNETClientAdmin_OnDisconnected;
             HoloNETClientAdmin.OnError += _holoNETClientAdmin_OnError;
+        }
+
+        private void HoloNETClientAdmin_OnAgentInfoReturnedCallBack(object sender, AgentInfoReturnedCallBackEventArgs e)
+        {
+            string agentInfo = "";
+
+            //TODO: Need to find out more on how this works such as KitsumeAgent etc! :)
+            if (e.AgentInfo !=  null && e.AgentInfo.agent != null)
+                agentInfo = Utilities.DataHelper.ConvertBinaryDataToString(e.AgentInfo.agent.Data);
+
+            LogMessage($"ADMIN: Agent Info Returned: {agentInfo}");
+            ShowStatusMessage("Agent Info Returned.", StatusMessageType.Success);
         }
 
         private void HoloNETClientAdmin_OnAppInterfacesListedCallBack(object sender, AppInterfacesListedCallBackEventArgs e)
@@ -404,13 +408,17 @@ namespace NextGenSoftware.Holochain.HoloNET.Templates.WPF.Managers
                     HoloNETClientAdmin.OnDataSent -= _holoNETClientAdmin_OnDataSent;
                     HoloNETClientAdmin.OnDataReceived -= _holoNETClientAdmin_OnDataReceived;
                     HoloNETClientAdmin.OnAgentPubKeyGeneratedCallBack -= _holoNETClientAdmin_OnAgentPubKeyGeneratedCallBack;
-                    HoloNETClientAdmin.OnAppsListedCallBack -= _holoNETClientAdmin_OnAppsListedCallBack;
                     HoloNETClientAdmin.OnAppInstalledCallBack -= _holoNETClientAdmin_OnAppInstalledCallBack;
                     HoloNETClientAdmin.OnAppUninstalledCallBack -= _holoNETClientAdmin_OnAppUninstalledCallBack;
                     HoloNETClientAdmin.OnAppEnabledCallBack -= _holoNETClientAdmin_OnAppEnabledCallBack;
                     HoloNETClientAdmin.OnAppDisabledCallBack -= _holoNETClientAdmin_OnAppDisabledCallBack;
                     HoloNETClientAdmin.OnZomeCallCapabilityGrantedCallBack -= _holoNETClientAdmin_OnZomeCallCapabilityGrantedCallBack;
                     HoloNETClientAdmin.OnAppInterfaceAttachedCallBack -= _holoNETClientAdmin_OnAppInterfaceAttachedCallBack;
+                    HoloNETClientAdmin.OnAppsListedCallBack -= _holoNETClientAdmin_OnAppsListedCallBack;
+                    HoloNETClientAdmin.OnDnasListedCallBack -= HoloNETClientAdmin_OnDnasListedCallBack;
+                    HoloNETClientAdmin.OnCellIdsListedCallBack -= HoloNETClientAdmin_OnCellIdsListedCallBack;
+                    HoloNETClientAdmin.OnAppInterfacesListedCallBack -= HoloNETClientAdmin_OnAppInterfacesListedCallBack;
+                    HoloNETClientAdmin.OnAgentInfoReturnedCallBack -= HoloNETClientAdmin_OnAgentInfoReturnedCallBack;
                     HoloNETClientAdmin.OnDisconnected -= _holoNETClientAdmin_OnDisconnected;
                     HoloNETClientAdmin.OnError -= _holoNETClientAdmin_OnError;
                     HoloNETClientAdmin = null;
