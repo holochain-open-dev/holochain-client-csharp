@@ -129,10 +129,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Manager.UserControls
 
         private string GetHoloNETEntryMetaData(IHoloNETAuditEntryBase entry)
         {
-            string metaData = $"EntryHash: {HoloNETManager.Instance.HoloNETEntry.EntryHash}, Created By: {HoloNETManager.Instance.HoloNETEntry.CreatedBy}, Created Date: {HoloNETManager.Instance.HoloNETEntry.CreatedDate}, Modified By: {HoloNETManager.Instance.HoloNETEntry.ModifiedBy}, Modified Date: {HoloNETManager.Instance.HoloNETEntry.ModifiedDate}, Version: {HoloNETManager.Instance.HoloNETEntry.Version}, Previous Version Hash: {HoloNETManager.Instance.HoloNETEntry.PreviousVersionEntryHash}, Id: {HoloNETManager.Instance.HoloNETEntry.Id}, IsActive: {HoloNETManager.Instance.HoloNETEntry.IsActive}";
+            string metaData = $"EntryHash: {HoloNETManager.Instance.HoloNETEntry.EntryHash}, Created By: {HoloNETManager.Instance.HoloNETEntry.CreatedBy}, Created Date: {HoloNETManager.Instance.HoloNETEntry.CreatedDate}, Modified By: {HoloNETManager.Instance.HoloNETEntry.ModifiedBy}, Modified Date: {HoloNETManager.Instance.HoloNETEntry.ModifiedDate}, Version: {HoloNETManager.Instance.HoloNETEntry.Version}, Previous Version Hash: {HoloNETManager.Instance.HoloNETEntry.PreviousVersionActionHash}, Id: {HoloNETManager.Instance.HoloNETEntry.Id}, IsActive: {HoloNETManager.Instance.HoloNETEntry.IsActive}";
 
-            if (entry.EntryData != null)
-                metaData = $"{metaData}, Action Sequence: {HoloNETManager.Instance.HoloNETEntry.EntryData.ActionSequence}, EntryType: {HoloNETManager.Instance.HoloNETEntry.EntryData.EntryType}, Hash: {HoloNETManager.Instance.HoloNETEntry.EntryData.Hash}, OriginalActionAddress: {HoloNETManager.Instance.HoloNETEntry.EntryData.OriginalActionAddress}, OriginalEntryAddress: {HoloNETManager.Instance.HoloNETEntry.EntryData.OriginalEntryAddress}, Signature: {HoloNETManager.Instance.HoloNETEntry.EntryData.Signature}, TimeStamp: {HoloNETManager.Instance.HoloNETEntry.EntryData.Timestamp}, Type: {HoloNETManager.Instance.HoloNETEntry.EntryData.Type}";
+            if (entry.Record != null)
+                metaData = $"{metaData}, Action Sequence: {HoloNETManager.Instance.HoloNETEntry.Record.ActionSequence}, EntryType: {HoloNETManager.Instance.HoloNETEntry.Record.EntryType}, Hash: {HoloNETManager.Instance.HoloNETEntry.Record.ActionHash}, OriginalActionAddress: {HoloNETManager.Instance.HoloNETEntry.Record.OriginalActionAddress}, OriginalEntryAddress: {HoloNETManager.Instance.HoloNETEntry.Record.OriginalEntryAddress}, Signature: {HoloNETManager.Instance.HoloNETEntry.Record.Signature}, TimeStamp: {HoloNETManager.Instance.HoloNETEntry.Record.Timestamp}, Type: {HoloNETManager.Instance.HoloNETEntry.Record.Type}";
 
             return metaData;
         }

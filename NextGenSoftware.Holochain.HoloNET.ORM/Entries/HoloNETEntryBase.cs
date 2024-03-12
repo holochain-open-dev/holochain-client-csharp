@@ -516,27 +516,24 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM.Entries
         /// <summary>
         /// Metadata for the Entry.
         /// </summary>
-        public IEntryData EntryData { get; set; }
+        public IRecord Record { get; set; }
 
         /// <summary>
-        /// The Entry hash.
+        /// The EntryHash.
         /// </summary>
-        //[HolochainFieldName("entry_hash")]
         public string EntryHash { get; set; }
+
+        /// <summary>
+        /// The ActionHash.
+        /// </summary>
+        public string ActionHash { get; set; }
 
         //public string Author { get; set; }
 
         /// <summary>
-        /// The previous entry hash.
+        /// The previous ActionHash.
         /// </summary>
-        //[HolochainFieldName("previous_version_entry_hash")]
-        public string PreviousVersionEntryHash { get; set; }
-
-        ///// <summary>
-        ///// The current version of the entry.
-        ///// </summary>
-        //[HolochainFieldName("version")]
-        //public int Version { get; set; } = 1;
+        public string PreviousVersionActionHash { get; set; }
 
         /// <summary>
         /// The name of the zome to call the respective ZomeLoadEntryFunction, ZomeCreateEntryFunction, ZomeUpdateEntryFunction & ZomeDeleteEntryFunction.
@@ -562,12 +559,6 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM.Entries
         /// The name of the zome function to call to delete the entry.
         /// </summary>
         public string ZomeDeleteEntryFunction { get; set; }
-
-        /// <summary>
-        ///// List of all previous hashes along with the type and datetime.
-        ///// </summary>
-        //public List<HoloNETAuditEntry> AuditEntries { get; set; } = new List<HoloNETAuditEntry>();
-
 
 
         /// <summary>
@@ -1181,29 +1172,41 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM.Entries
             {
                 if (!result.IsError)
                 {
-                    //Load
-                    if (result.Entries != null && result.Entries.Count > 0)
+                    if (result.Records != null && result.Records.Count > 0)
                     {
-                        EntryData = result.Entries[0];
+                        Record = result.Records[0];
 
-                        if (!string.IsNullOrEmpty(result.Entries[0].EntryHash))
-                            EntryHash = result.Entries[0].EntryHash;
+                        if (!string.IsNullOrEmpty(result.Records[0].EntryHash))
+                            EntryHash = result.Records[0].EntryHash;
 
-                        if (!string.IsNullOrEmpty(result.Entries[0].PreviousHash))
-                            PreviousVersionEntryHash = result.Entries[0].PreviousHash;
+                        if (!string.IsNullOrEmpty(result.Records[0].ActionHash))
+                            ActionHash = result.Records[0].ActionHash;
+
+                        if (!string.IsNullOrEmpty(result.Records[0].PreviousActionHash))
+                            PreviousVersionActionHash = result.Records[0].PreviousActionHash;
+
+                        //if (result.Entries[0].Type == "Create" || result.Entries[0].Type == "Update" || result.Entries[0].Type == "Delete")
+                        //{
+                        //    if (!string.IsNullOrEmpty(EntryHash))
+                        //        PreviousVersionEntryHash = EntryHash;
+
+                        //    //EntryHash = result.ZomeReturnHash;
+                        //}
 
                         //if (!string.IsNullOrEmpty(result.Entry.Author))
                         //    this.Author = result.Entry.Author;
                     }
 
                     //Create/Updates/Delete
-                    if (!string.IsNullOrEmpty(result.ZomeReturnHash))
-                    {
-                        if (!string.IsNullOrEmpty(EntryHash))
-                            PreviousVersionEntryHash = EntryHash;
+                    //if (!string.IsNullOrEmpty(result.ZomeReturnHash))
+                    //{
+                    //    if (!string.IsNullOrEmpty(EntryHash))
+                    //        PreviousVersionEntryHash = EntryHash;
 
-                        EntryHash = result.ZomeReturnHash;
-                    }
+                    //    EntryHash = result.ZomeReturnHash;
+                    //    ActionHash = result.KeyValuePair["hash"];
+                    //    ActionHash = result.Entries[0].Hash;
+                    //}
 
                     if (result.KeyValuePair != null && useReflectionToMapKeyValuePairResponseOntoEntryDataObject)
                     {
@@ -1243,14 +1246,14 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM.Entries
 
         private void UpdateChangeTracking(ZomeFunctionCallBackEventArgs zomeFunctionCallBackEventArgs)
         {
-            if (zomeFunctionCallBackEventArgs != null && zomeFunctionCallBackEventArgs.Entries != null && zomeFunctionCallBackEventArgs.Entries.Count > 0 && zomeFunctionCallBackEventArgs.Entries[0] != null && zomeFunctionCallBackEventArgs.Entries[0].EntryDataObject != null)
-                OrginalEntry = zomeFunctionCallBackEventArgs.Entries[0].EntryDataObject;
+            if (zomeFunctionCallBackEventArgs != null && zomeFunctionCallBackEventArgs.Records != null && zomeFunctionCallBackEventArgs.Records.Count > 0 && zomeFunctionCallBackEventArgs.Records[0] != null && zomeFunctionCallBackEventArgs.Records[0].EntryDataObject != null)
+                OrginalEntry = zomeFunctionCallBackEventArgs.Records[0].EntryDataObject;
 
             if (zomeFunctionCallBackEventArgs != null && zomeFunctionCallBackEventArgs.KeyValuePair != null)
                 OrginalKeyValuePairs = zomeFunctionCallBackEventArgs.KeyValuePair;
 
-            if (zomeFunctionCallBackEventArgs != null && zomeFunctionCallBackEventArgs.Entries != null && zomeFunctionCallBackEventArgs.Entries.Count > 0 && zomeFunctionCallBackEventArgs.Entries[0] != null && zomeFunctionCallBackEventArgs.Entries[0].EntryKeyValuePairs != null)
-                OrginalDataKeyValuePairs = zomeFunctionCallBackEventArgs.Entries[0].EntryKeyValuePairs;
+            if (zomeFunctionCallBackEventArgs != null && zomeFunctionCallBackEventArgs.Records != null && zomeFunctionCallBackEventArgs.Records.Count > 0 && zomeFunctionCallBackEventArgs.Records[0] != null && zomeFunctionCallBackEventArgs.Records[0].EntryKeyValuePairs != null)
+                OrginalDataKeyValuePairs = zomeFunctionCallBackEventArgs.Records[0].EntryKeyValuePairs;
 
             //TODO: REMOVE AFTER, TEMP TILL GET ZOMECALLS WORKING AGAIN!
             MockData();

@@ -41,7 +41,7 @@
             </LinearGradientBrush>
         </Grid.Background>
 
-        <Grid.Triggers>
+        <!--<Grid.Triggers>
             <EventTrigger RoutedEvent="UIElement.KeyDown">
                 <EventTrigger.Actions>
                     <BeginStoryboard>
@@ -50,13 +50,11 @@
                                   Storyboard.TargetName="rowDefButtons"
                                   Storyboard.TargetProperty="Height"
                                   From="*" To="0" Duration="0:0:1" />          
-                            <!--<DoubleAnimation Storyboard.TargetProperty="Height" x:Name="animAnimateButtonsRow" Duration="0:0:1.0"
-                            Storyboard.TargetName="rowDefButtons" />-->
                         </Storyboard>       
                     </BeginStoryboard>
                 </EventTrigger.Actions>
             </EventTrigger>
-        </Grid.Triggers>
+        </Grid.Triggers>-->
 
         <!--<Label x:Name="lblHeading" MouseDown="lblHeading_MouseDown" Grid.Row="0" HorizontalAlignment="Center" Foreground="White" FontWeight="Bold" Margin="20" FontSize="44" Content="NextGen Software HoloNET Manager v1.1" VerticalAlignment="Center">-->
         <!--<Label x:Name="lblHeading" MouseDown="lblHeading_MouseDown" Grid.Row="0" HorizontalAlignment="Center" Foreground="White" FontWeight="Bold" Margin="20" FontSize="22" Content="NextGen Software HoloNET Manager v1.1" VerticalAlignment="Center">-->
@@ -79,26 +77,14 @@
                         </Storyboard>
                     </BeginStoryboard>
                 </EventTrigger>
-                <EventTrigger RoutedEvent="UIElement.KeyDown">
+                <!--<EventTrigger RoutedEvent="UIElement.KeyDown">
                     <EventTrigger.Actions>
                         <BeginStoryboard>
                             <Storyboard x:Name="sbAnimateButtonsRowExpand" FillBehavior="Stop">
                                 <gridAnimation:GridLengthAnimation x:Name="animAnimateButtonsRowExpand"
                                   Storyboard.TargetName="rowDefButtons"
                                   Storyboard.TargetProperty="Height"
-                                  From="0" To="180" Duration="0:0:1" /> 
-                            </Storyboard>
-                        </BeginStoryboard>
-                    </EventTrigger.Actions>
-                </EventTrigger>
-                <!--<EventTrigger RoutedEvent="UIElement.MouseDown">
-                    <EventTrigger.Actions>
-                        <BeginStoryboard>
-                            <Storyboard x:Name="sbAnimateButtonsRowExpand">
-                                <gridAnimation:GridLengthAnimation x:Name="animAnimateButtonsRowExpand"
-                      Storyboard.TargetName="rowDefButtons"
-                      Storyboard.TargetProperty="Height"
-                      From="0" To="180" Duration="0:0:1" />
+                                  From="0" To="180" Duration="0:0:1" />
                             </Storyboard>
                         </BeginStoryboard>
                     </EventTrigger.Actions>
@@ -107,18 +93,6 @@
         </Label>
 
         <StackPanel x:Name="stkpnlButtons" Grid.Row="1" Orientation="Vertical">
-            <!--<StackPanel.Triggers>
-                <EventTrigger RoutedEvent="UIElement.MouseEnter">
-                    <EventTrigger.Actions>
-                        <BeginStoryboard>
-                            <Storyboard  x:Name="sbAnimateButtonsRow">
-                                <DoubleAnimation Storyboard.TargetProperty="Height" x:Name="animAnimateButtonsRow" Duration="0:0:1.0"
-                    Storyboard.TargetName="stkpnlButtons" />
-                            </Storyboard>
-                        </BeginStoryboard>
-                    </EventTrigger.Actions>
-                </EventTrigger>
-            </StackPanel.Triggers>-->
             <StackPanel Orientation="Horizontal">
                 <StackPanel Orientation="Vertical">
                     <CheckBox x:Name="chkShowDetailedMessages" Content="Show Detailed Logs" Margin="20,10,20,0" Foreground="White" Checked="chkShowDetailedMessages_Checked" Unchecked="chkShowDetailedMessages_Unchecked"></CheckBox>

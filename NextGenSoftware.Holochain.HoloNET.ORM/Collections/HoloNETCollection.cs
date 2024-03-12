@@ -607,21 +607,21 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM.Collections
 
                 if (zomeResult != null && !zomeResult.IsError)
                 {
-                    foreach (EntryData entryData in zomeResult.Entries)
+                    foreach (Record record in zomeResult.Records)
                     {
-                        HoloNETEntryBase entry = entryData.EntryDataObject as HoloNETEntryBase;
+                        HoloNETEntryBase entry = record.EntryDataObject as HoloNETEntryBase;
 
                         if (entry != null)
                         {
                             entry.HoloNETClient = HoloNETClient; //The entries will share the same clinet/connection as the collection.
-                            entry.OrginalDataKeyValuePairs = entryData.EntryKeyValuePairs;
-                            entry.OrginalEntry = entryData.EntryDataObject;
+                            entry.OrginalDataKeyValuePairs = record.EntryKeyValuePairs;
+                            entry.OrginalEntry = record.EntryDataObject;
                             //entry.OrginalKeyValuePairs = entryData.
 
                             //TODO: REMOVE AFTER, TEMP TILL GET ZOMECALLS WORKING AGAIN!
                             //entry.MockData();
 
-                            Add(entryData.EntryDataObject);
+                            Add(record.EntryDataObject);
                             //Add((T)entry);
                         }
 

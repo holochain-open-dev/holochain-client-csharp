@@ -4,10 +4,15 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:NextGenSoftware.Holochain.HoloNET.Manager.UserControls"
+             xmlns:convertors="clr-namespace:NextGenSoftware.Holochain.HoloNET.Manager.Convertors"
              mc:Ignorable="d" 
              d:DesignHeight="220" d:DesignWidth="800">
 
-    <ScrollViewer>
+    <UserControl.Resources>
+        <convertors:DateTimeConverter x:Key="dateConverter"/>    
+    </UserControl.Resources>
+    
+    <ScrollViewer HorizontalScrollBarVisibility="Hidden">
         <Grid Margin="10">
             <Grid.RowDefinitions>
                 <RowDefinition></RowDefinition>
@@ -32,7 +37,7 @@
             </Grid.RowDefinitions>
 
             <Grid.ColumnDefinitions>
-                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition Width="200"></ColumnDefinition>
                 <ColumnDefinition></ColumnDefinition>
             </Grid.ColumnDefinitions>
 
@@ -49,19 +54,22 @@
             <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="3" Grid.Column="1" Text="{Binding Path=CreatedBy}" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
 
             <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="4" Grid.Column="0"  Text="Created Date:" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
-            <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="4" Grid.Column="1" Text="{Binding Path=CreatedDate}" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
+            <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="4" Grid.Column="1" Text="{Binding Path=CreatedDate, StringFormat={}{0:dd/MM/yyyy HH:mm}, Converter={StaticResource dateConverter}}" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
 
             <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="5" Grid.Column="0"  Text="Modified By:" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
             <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="5" Grid.Column="1" Text="{Binding Path=ModifiedBy}" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
 
             <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="6" Grid.Column="0"  Text="Modified Date:" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
-            <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="6" Grid.Column="1" Text="{Binding Path=ModifiedDate}" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
+            <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="6" Grid.Column="1" Text="{Binding Path=ModifiedDate, StringFormat={}{0:dd/MM/yyyy HH:mm},Converter={StaticResource dateConverter}}" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
 
             <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="7" Grid.Column="0"  Text="Deleted By:" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
             <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="7" Grid.Column="1" Text="{Binding Path=DeletedBy}" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
 
             <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="8" Grid.Column="0"  Text="Deleted Date:" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
-            <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="8" Grid.Column="1" Text="{Binding Path=DeletedDate}" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
+            <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="8" Grid.Column="1" Text="{Binding Path=DeletedDate, StringFormat={}{0:dd/MM/yyyy HH:mm}, Converter={StaticResource dateConverter}}" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
+
+            <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="11" Grid.Column="0"  Text="Action Hash:" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
+            <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="11" Grid.Column="1" Text="{Binding Path=ActionHash}" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
 
             <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="9" Grid.Column="0" Text="Entry Hash:" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
             <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="9" Grid.Column="1" Text="{Binding Path=EntryHash}" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
@@ -69,29 +77,26 @@
             <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="10" Grid.Column="0"  Text="Previous Version Entry Hash:" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
             <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="10" Grid.Column="1" Text="{Binding Path=PreviousVersionEntryHash}" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
 
-            <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="11" Grid.Column="0"  Text="Hash:" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
-            <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="11" Grid.Column="1" Text="{Binding Path=Hash}" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
-
             <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="12" Grid.Column="0"  Text="Action Sequence:" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
-            <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="12" Grid.Column="1" Text="{Binding Path=ActionSequence}" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
+            <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="12" Grid.Column="1" Text="{Binding Path=EntryData.ActionSequence}" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
 
             <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="13" Grid.Column="0"  Text="Entry Type:" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
-            <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="13" Grid.Column="1" Text="{Binding Path=EntryType}" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
+            <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="13" Grid.Column="1" Text="{Binding Path=EntryData.EntryType}" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
 
             <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="14" Grid.Column="0"  Text="Original Action Address:" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
-            <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="14" Grid.Column="1" Text="{Binding Path=OriginalActionAddress}" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
+            <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="14" Grid.Column="1" Text="{Binding Path=EntryData.OriginalActionAddress}" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
 
             <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="15" Grid.Column="0"  Text="Original Entry Address:" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
-            <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="15" Grid.Column="1" Text="{Binding Path=OriginalEntryAddress}" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
+            <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="15" Grid.Column="1" Text="{Binding Path=EntryData.OriginalEntryAddress}" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
 
             <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="16" Grid.Column="0"  Text="Signature:" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
-            <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="16" Grid.Column="1" Text="{Binding Path=Signature}" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
+            <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="16" Grid.Column="1" Text="{Binding Path=EntryData.Signature}" TextWrapping="WrapWithOverflow" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
 
             <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="17" Grid.Column="0"  Text="Timestamp:" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
-            <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="17" Grid.Column="1" Text="{Binding Path=Timestamp}" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
+            <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="17" Grid.Column="1" Text="{Binding Path=EntryData.Timestamp}" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
 
             <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="18" Grid.Column="0"  Text="Type:" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
-            <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="18" Grid.Column="1" Text="{Binding Path=Type}"  Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
+            <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="18" Grid.Column="1" Text="{Binding Path=EntryData.Type}"  Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
         </Grid>
     </ScrollViewer>
 </UserControl>

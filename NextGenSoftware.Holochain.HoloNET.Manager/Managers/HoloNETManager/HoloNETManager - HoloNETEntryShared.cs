@@ -41,7 +41,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Manager.Managers
 
             if (HoloNETEntryShared.ContainsKey(CurrentApp.Name) && HoloNETEntryShared[CurrentApp.Name] != null)
             {
-                if (!string.IsNullOrEmpty(HoloNETEntryDNAManager.HoloNETEntryDNA.AvatarSharedEntryHash))
+                if (!string.IsNullOrEmpty(HoloNETEntryDNAManager.HoloNETEntryDNA.AvatarSharedActionHash))
                 {
                     ShowStatusMessage($"Loading HoloNET Entry (Shared Connection)...", StatusMessageType.Information, true, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
                     LogMessage($"APP: Loading HoloNET Entry (Shared Connection)...");
@@ -52,7 +52,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Manager.Managers
 
                     // Async way
                     // LoadAsync (as well as all other async methods) will automatically init and wait for the client to finish connecting and retreiving agentPubKey (if needed) and raising the OnInitialized event.
-                    result = await HoloNETEntryShared[CurrentApp.Name].LoadAsync(HoloNETEntryDNAManager.HoloNETEntryDNA.AvatarSharedEntryHash); //No event handlers are needed but you can still use if you like.
+                    result = await HoloNETEntryShared[CurrentApp.Name].LoadAsync(HoloNETEntryDNAManager.HoloNETEntryDNA.AvatarSharedActionHash); //No event handlers are needed but you can still use if you like.
                 }
             }
             else
@@ -90,7 +90,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Manager.Managers
                 if (!result.IsError)
                 {
                     // Can use either of the lines below to get the EntryHash for the new entry.
-                    HoloNETEntryDNAManager.HoloNETEntryDNA.AvatarSharedEntryHash = result.Entries[0].EntryHash;
+                    HoloNETEntryDNAManager.HoloNETEntryDNA.AvatarSharedActionHash = result.Records[0].EntryHash;
                     //HoloNETEntryDNAManager.HoloNETEntryDNA.AvatarSharedEntryHash = HoloNETEntryShared[CurrentApp.Name].EntryHash;
                     HoloNETEntryDNAManager.SaveDNA();
                 }

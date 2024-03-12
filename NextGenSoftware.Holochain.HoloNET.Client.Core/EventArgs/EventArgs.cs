@@ -56,7 +56,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public Dictionary<string, object> ZomeReturnData { get; set; }
         public Dictionary<object, object> RawZomeReturnData { get; set; }
         public string ZomeReturnHash { get; set; }
-        public List<IEntryData> Entries { get; set; } = new List<IEntryData>();
+        public List<Record> Records { get; set; } = new List<Record>();
         public Dictionary<string, string> KeyValuePair { get; set; }
         public string KeyValuePairAsString { get; set; }
     }

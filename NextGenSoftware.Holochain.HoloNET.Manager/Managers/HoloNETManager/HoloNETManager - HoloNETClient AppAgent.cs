@@ -339,8 +339,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Manager.Managers
 
         public string GetEntryInfo(ZomeFunctionCallBackEventArgs e)
         {
-            if (e != null && e.Entries.Count > 0)
-                return $"DateTime: {e.Entries[0].DateTime}, Author: {e.Entries[0].Author}, ActionSequence: {e.Entries[0].ActionSequence}, Signature: {e.Entries[0].Signature}, Type: {e.Entries[0].Type}, Hash: {e.Entries[0].Hash}, Previous Hash: {e.Entries[0].PreviousHash}, OriginalActionAddress: {e.Entries[0].OriginalActionAddress}, OriginalEntryAddress: {e.Entries[0].OriginalEntryAddress}";
+            if (e != null && e.Records.Count > 0)
+                return $"DateTime: {e.Records[0].DateTime}, Author: {e.Records[0].Author}, ActionSequence: {e.Records[0].ActionSequence}, Signature: {e.Records[0].Signature}, Type: {e.Records[0].Type}, Hash: {e.Records[0].ActionHash}, Previous Hash: {e.Records[0].PreviousActionHash}, OriginalActionAddress: {e.Records[0].OriginalActionAddress}, OriginalEntryAddress: {e.Records[0].OriginalEntryAddress}";
             else
                 return "";
         }

@@ -29,7 +29,7 @@
         <TextBox MinWidth="150"  Grid.Row="1" Grid.Column="1"  Margin="10" Text="{Binding Path=LastName}" TextChanged="txtHoloNETEntryLastName_TextChanged" FontSize="14" x:Name="txtHoloNETEntryLastName"/>
 
         <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="2" Grid.Column="0"  Text="DOB:" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
-        <TextBox MinWidth="150" Grid.Row="2" Grid.Column="1" Margin="10" FontSize="14" Text="{Binding Path=DOB}" TextChanged="txtHoloNETEntryDOB_TextChanged" Name="txtHoloNETEntryDOB"/>
+        <TextBox MinWidth="150" Grid.Row="2" Grid.Column="1" Margin="10" FontSize="14" Text="{Binding Path=DOB, StringFormat={}{0:dd/MM/yyyy}}" TextChanged="txtHoloNETEntryDOB_TextChanged" Name="txtHoloNETEntryDOB"/>
 
         <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="3" Grid.Column="0"  Text="Email:" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
         <TextBox MinWidth="150" Grid.Row="3" Grid.Column="1" Margin="10" FontSize="14" Text="{Binding Path=Email}" TextChanged="txtHoloNETEntryEmail_TextChanged" x:Name="txtHoloNETEntryEmail"/>

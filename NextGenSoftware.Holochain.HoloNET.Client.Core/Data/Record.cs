@@ -5,7 +5,7 @@ using NextGenSoftware.Holochain.HoloNET.Client.Interfaces;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
-    public class EntryData : IEntryData
+    public class Record : IRecord
     {
         /// <summary>
         /// The author of the entry (AgentPubKey on their device).
@@ -13,19 +13,19 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public string Author { get; set; }
 
         /// <summary>
-        /// The true EntryHash (is Hash in the meta data returned from the Holochain Conductor)
+        /// The ActionHash
         /// </summary>
-        public string Hash { get; set; }
+        public string ActionHash { get; set; }
 
         /// <summary>
-        /// Unknown - still investigating...
+        /// Hash of the entry
         /// </summary>
         public string EntryHash { get; set; }
 
         /// <summary>
-        /// The previous Hash (EntryHash).
+        /// The previous ActionHash.
         /// </summary>
-        public string PreviousHash { get; set; }
+        public string PreviousActionHash { get; set; }
 
         /// <summary>
         /// The signature of the entry.

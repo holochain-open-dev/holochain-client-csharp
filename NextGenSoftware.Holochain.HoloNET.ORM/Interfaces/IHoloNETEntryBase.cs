@@ -7,8 +7,9 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM.Interfaces
 {
     public interface IHoloNETEntryBase
     {
-        IEntryData EntryData { get; set; }
+        IRecord Record { get; set; }
         string EntryHash { get; set; }
+        string ActionHash { get; set; }
         IHoloNETClientAppBase HoloNETClient { get; set; }
         bool IsChanged { get; set; }
         bool IsInitialized { get; }
@@ -16,7 +17,7 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM.Interfaces
         Dictionary<string, object> OrginalDataKeyValuePairs { get; }
         IHoloNETEntryBase OrginalEntry { get; }
         Dictionary<string, string> OrginalKeyValuePairs { get; }
-        string PreviousVersionEntryHash { get; set; }
+        string PreviousVersionActionHash { get; set; }
         HoloNETEntryState State { get; set; }
         string ZomeCreateEntryFunction { get; set; }
         string ZomeDeleteEntryFunction { get; set; }

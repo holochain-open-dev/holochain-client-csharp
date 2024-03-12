@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client.Interfaces
 {
-    public interface IEntryData
+    public interface IRecord
     {
         int ActionSequence { get; set; }
         string Author { get; set; }
@@ -14,10 +14,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Interfaces
         string EntryHash { get; set; }
         Dictionary<string, object> EntryKeyValuePairs { get; set; }
         string EntryType { get; set; }
-        string Hash { get; set; }
+        string ActionHash { get; set; }
         string OriginalActionAddress { get; set; }
         string OriginalEntryAddress { get; set; }
-        string PreviousHash { get; set; }
+        string PreviousActionHash { get; set; }
         string Signature { get; set; }
         long Timestamp { get; set; }
         string Type { get; set; }

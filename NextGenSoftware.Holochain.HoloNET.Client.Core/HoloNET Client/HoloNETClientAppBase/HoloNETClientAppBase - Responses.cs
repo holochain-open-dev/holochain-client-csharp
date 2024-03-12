@@ -349,25 +349,34 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 Dictionary<string, object> appResponseData = new Dictionary<string, object>();
                 Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
                 string keyValuePairsAsString = "";
-                EntryData entryData = null;
-
-                (appResponseData, keyValuePairs, keyValuePairsAsString, entryData) = DecodeRawZomeData(rawAppResponseData, appResponseData, keyValuePairs, keyValuePairsAsString);
-
-                if (_entryDataObjectTypeLookup.ContainsKey(id) && _entryDataObjectTypeLookup[id] != null)
-                    entryData.EntryDataObject = MapEntryDataObject(_entryDataObjectTypeLookup[id], keyValuePairs);
-
-                else if (_entryDataObjectLookup.ContainsKey(id) && _entryDataObjectLookup[id] != null)
-                    entryData.EntryDataObject = MapEntryDataObject(_entryDataObjectLookup[id], keyValuePairs);
-
-                Logger.Log($"Decoded Data:\n{keyValuePairsAsString}", LogType.Info);
+                Record record = null;
 
                 zomeFunctionCallBackArgs = CreateHoloNETArgs<ZomeFunctionCallBackEventArgs>(response, dataReceivedEventArgs);
                 zomeFunctionCallBackArgs.Zome = GetItemFromCache(id, _zomeLookup);
                 zomeFunctionCallBackArgs.ZomeFunction = GetItemFromCache(id, _funcLookup);
-                zomeFunctionCallBackArgs.RawZomeReturnData = rawAppResponseData;
-                zomeFunctionCallBackArgs.KeyValuePair = keyValuePairs;
-                zomeFunctionCallBackArgs.KeyValuePairAsString = keyValuePairsAsString;
-                zomeFunctionCallBackArgs.Entries.Add(entryData); //TODO: Need to add support for multiple entries ASAP!
+
+                if (rawAppResponseData != null)
+                {
+                    (appResponseData, keyValuePairs, keyValuePairsAsString, record) = DecodeRawZomeData(rawAppResponseData, appResponseData, keyValuePairs, keyValuePairsAsString);
+
+                    if (_entryDataObjectTypeLookup.ContainsKey(id) && _entryDataObjectTypeLookup[id] != null)
+                        record.EntryDataObject = MapEntryDataObject(_entryDataObjectTypeLookup[id], keyValuePairs);
+
+                    else if (_entryDataObjectLookup.ContainsKey(id) && _entryDataObjectLookup[id] != null)
+                        record.EntryDataObject = MapEntryDataObject(_entryDataObjectLookup[id], keyValuePairs);
+
+                    Logger.Log($"Decoded Data:\n{keyValuePairsAsString}", LogType.Info);
+
+                    zomeFunctionCallBackArgs.RawZomeReturnData = rawAppResponseData;
+                    zomeFunctionCallBackArgs.KeyValuePair = keyValuePairs;
+                    zomeFunctionCallBackArgs.KeyValuePairAsString = keyValuePairsAsString;
+                    zomeFunctionCallBackArgs.Records.Add(record); //TODO: Need to add support for multiple entries ASAP!
+                }
+                else
+                {
+                    zomeFunctionCallBackArgs.Message = "Bad/Null Data Returned From The Holochain Conductor.";
+                    zomeFunctionCallBackArgs.IsError = true;
+                }
             }
             catch (Exception ex)
             {
@@ -409,13 +418,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             RaiseZomeDataReceivedEvent(zomeFunctionCallBackArgs);
         }
 
-        private (Dictionary<string, object>, Dictionary<string, string> keyValuePair, string keyValuePairAsString, EntryData entry) DecodeRawZomeData(Dictionary<object, object> rawAppResponseData, Dictionary<string, object> appResponseData, Dictionary<string, string> keyValuePair, string keyValuePairAsString, EntryData entryData = null)
+        private (Dictionary<string, object>, Dictionary<string, string> keyValuePair, string keyValuePairAsString, Record record) DecodeRawZomeData(Dictionary<object, object> rawAppResponseData, Dictionary<string, object> appResponseData, Dictionary<string, string> keyValuePair, string keyValuePairAsString, Record record = null)
         {
             string value = "";
             var options = MessagePackSerializerOptions.Standard.WithSecurity(MessagePackSecurity.UntrustedData);
 
-            if (entryData == null)
-                entryData = new EntryData();
+            if (record == null)
+                record = new Record();
 
             try
             {
@@ -449,10 +458,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                                         keyValuePairAsString = string.Concat(keyValuePairAsString, entryKey.ToString(), "=", entry[entryKey].ToString(), "\n");
                                     }
 
-                                    entryData.Bytes = bytes;
-                                    entryData.BytesString = byteString;
-                                    entryData.EntryKeyValuePairs = decodedEntry;
-                                    appResponseData[key] = entryData;
+                                    record.Bytes = bytes;
+                                    record.BytesString = byteString;
+                                    record.EntryKeyValuePairs = decodedEntry;
+                                    appResponseData[key] = record;
                                 }
                             }
                             else
@@ -465,7 +474,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                             if (dict != null)
                             {
                                 Dictionary<string, object> tempDict = new Dictionary<string, object>();
-                                (tempDict, keyValuePair, keyValuePairAsString, entryData) = DecodeRawZomeData(dict, tempDict, keyValuePair, keyValuePairAsString, entryData);
+                                (tempDict, keyValuePair, keyValuePairAsString, record) = DecodeRawZomeData(dict, tempDict, keyValuePair, keyValuePairAsString, record);
                                 appResponseData[key] = tempDict;
                             }
                             else if (rawAppResponseData[key] != null)
@@ -483,51 +492,51 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                                 switch (key)
                                 {
                                     case "hash":
-                                        entryData.Hash = value;
+                                        record.ActionHash = value;
                                         break;
 
                                     case "entry_hash":
-                                        entryData.EntryHash = value;
+                                        record.EntryHash = value;
                                         break;
 
                                     case "prev_action":
-                                        entryData.PreviousHash = value;
+                                        record.PreviousActionHash = value;
                                         break;
 
                                     case "signature":
-                                        entryData.Signature = value;
+                                        record.Signature = value;
                                         break;
 
                                     case "action_seq":
-                                        entryData.ActionSequence = Convert.ToInt32(value);
+                                        record.ActionSequence = Convert.ToInt32(value);
                                         break;
 
                                     case "author":
-                                        entryData.Author = value;
+                                        record.Author = value;
                                         break;
 
                                     case "original_action_address":
-                                        entryData.OriginalActionAddress = value;
+                                        record.OriginalActionAddress = value;
                                         break;
 
                                     case "original_entry_address":
-                                        entryData.OriginalEntryAddress = value;
+                                        record.OriginalEntryAddress = value;
                                         break;
 
                                     case "timestamp":
                                         {
-                                            entryData.Timestamp = Convert.ToInt64(value);
-                                            long time = entryData.Timestamp / 1000; // Divide by 1,000 because we need milliseconds, not microseconds.
-                                            entryData.DateTime = DateTimeOffset.FromUnixTimeMilliseconds(time).DateTime.AddHours(-5).AddMinutes(1);
+                                            record.Timestamp = Convert.ToInt64(value);
+                                            long time = record.Timestamp / 1000; // Divide by 1,000 because we need milliseconds, not microseconds.
+                                            record.DateTime = DateTimeOffset.FromUnixTimeMilliseconds(time).DateTime.AddHours(-5).AddMinutes(1);
                                         }
                                         break;
 
                                     case "type":
-                                        entryData.Type = value;
+                                        record.Type = value;
                                         break;
 
                                     case "entry_type":
-                                        entryData.EntryType = value;
+                                        record.EntryType = value;
                                         break;
                                 }
                             }
@@ -548,7 +557,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 HandleError("Error in HoloNETClient.DecodeZomeReturnData method.", ex);
             }
 
-            return (appResponseData, keyValuePair, keyValuePairAsString, entryData);
+            return (appResponseData, keyValuePair, keyValuePairAsString, record);
         }
 
         private void RaiseSignalReceivedEvent(SignalCallBackEventArgs signalCallBackEventArgs)

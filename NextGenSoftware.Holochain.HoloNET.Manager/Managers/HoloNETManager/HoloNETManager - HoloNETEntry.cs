@@ -107,7 +107,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Manager.Managers
                 LogMessage($"APP: HoloNET Entry (Internal Connection) Already Initialized..");
             }
 
-            if (HoloNETEntry != null && HoloNETEntryDNAManager.HoloNETEntryDNA != null && !string.IsNullOrEmpty(HoloNETEntryDNAManager.HoloNETEntryDNA.AvatarEntryHash))
+            //if (HoloNETEntry != null && HoloNETEntryDNAManager.HoloNETEntryDNA != null && !string.IsNullOrEmpty(HoloNETEntryDNAManager.HoloNETEntryDNA.AvatarEntryHash))
+            if (HoloNETEntry != null && HoloNETEntryDNAManager.HoloNETEntryDNA != null && !string.IsNullOrEmpty(HoloNETEntryDNAManager.HoloNETEntryDNA.AvatarActionHash))
             {
                 ShowStatusMessage($"Loading HoloNET Entry (Internal Connection)...", StatusMessageType.Information, true, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
                 LogMessage($"APP: Loading HoloNET Entry (Internal Connection)...");
@@ -118,7 +119,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Manager.Managers
 
                 // Async way.
                 //LoadAsync (as well as SaveAsync & DeleteAsync) will automatically init and wait for the client to finish connecting and retreiving agentPubKey (if needed) and raising the OnInitialized event.
-                result = await HoloNETEntry.LoadAsync(HoloNETEntryDNAManager.HoloNETEntryDNA.AvatarEntryHash); //No event handlers are needed.
+                //result = await HoloNETEntry.LoadAsync(HoloNETEntryDNAManager.HoloNETEntryDNA.AvatarEntryHash); //No event handlers are needed.
+                result = await HoloNETEntry.LoadAsync(HoloNETEntryDNAManager.HoloNETEntryDNA.AvatarActionHash); //No event handlers are needed.
             }
             else
             {
@@ -171,8 +173,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Manager.Managers
                 if (!result.IsError)
                 {
                     //Persist the entryhash so the next time we start the app we can re-load the entry from the hash.
-                    HoloNETEntryDNAManager.HoloNETEntryDNA.AvatarEntryHash = HoloNETEntry.EntryHash;
-                    HoloNETEntryDNAManager.HoloNETEntryDNA.AvatarEntryHash = result.Entries[0].EntryHash; //We can also get the entryHash from the callback eventargs.
+                    //HoloNETEntryDNAManager.HoloNETEntryDNA.AvatarEntryHash = HoloNETEntry.EntryHash;
+                    //HoloNETEntryDNAManager.HoloNETEntryDNA.AvatarEntryHash = result.Entries[0].EntryHash; //We can also get the entryHash from the callback eventargs.
+                    HoloNETEntryDNAManager.HoloNETEntryDNA.AvatarActionHash = HoloNETEntry.ActionHash;
                     HoloNETEntryDNAManager.SaveDNA();
                 }
             }
@@ -208,9 +211,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Manager.Managers
 
                 if (!result.IsError)
                 {
-                    // Persist the entryhash so the next time we start the app we can re-load the entry from the hash.
-                    HoloNETEntryDNAManager.HoloNETEntryDNA.AvatarEntryHash = HoloNETEntry.EntryHash;
-                    HoloNETEntryDNAManager.HoloNETEntryDNA.AvatarEntryHash = result.Entries[0].EntryHash; //We can also get the entryHash from the callback eventargs.
+                    // Persist the ActionHash so the next time we start the app we can re-load the entry from the hash.
+                    HoloNETEntryDNAManager.HoloNETEntryDNA.AvatarActionHash = HoloNETEntry.ActionHash;
+                    HoloNETEntryDNAManager.HoloNETEntryDNA.AvatarActionHash = result.Records[0].ActionHash; //We can also get the ActionHash from the callback eventargs.
                     HoloNETEntryDNAManager.SaveDNA(); 
                 }
             }
