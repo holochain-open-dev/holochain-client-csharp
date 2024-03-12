@@ -626,21 +626,30 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 if (IsDisconnecting)
                 {
                     disconnectedEventArgs.IsWarning = true;
-                    disconnectedEventArgs.Message = "Already Disconnected...";
+                    disconnectedEventArgs.Message = "Already Disconnecting...";
                     return disconnectedEventArgs;
                 }
 
-                IsDisconnecting = true;
-                _taskCompletionDisconnected = new TaskCompletionSource<DisconnectedEventArgs>();
+                if (State == WebSocketState.Open)
+                {
+                    IsDisconnecting = true;
+                    _taskCompletionDisconnected = new TaskCompletionSource<DisconnectedEventArgs>();
 
-                _shutdownHolochainConductorsMode = shutdownHolochainConductorsMode;
-                await WebSocket.DisconnectAsync();
+                    _shutdownHolochainConductorsMode = shutdownHolochainConductorsMode;
+                    await WebSocket.DisconnectAsync();
 
-                if (disconnectedCallBackMode == DisconnectedCallBackMode.WaitForHolochainConductorToDisconnect)
-                    await _taskCompletionDisconnected.Task;
+                    if (disconnectedCallBackMode == DisconnectedCallBackMode.WaitForHolochainConductorToDisconnect)
+                        await _taskCompletionDisconnected.Task;
 
-                if (WebSocket.State == WebSocketState.Closed)
-                    disconnectedEventArgs.IsDisconnected = true;
+                    if (WebSocket.State == WebSocketState.Closed)
+                        disconnectedEventArgs.IsDisconnected = true;
+                }
+                else
+                {
+                    disconnectedEventArgs.IsWarning = true;
+                    disconnectedEventArgs.Message = "HoloNET Is Already Disconnected!";
+                    return disconnectedEventArgs;
+                }
             }
             catch (Exception e) 
             {

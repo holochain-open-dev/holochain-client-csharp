@@ -48,7 +48,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Manager.Managers
 
             //TODO: Need to find out more on how this works such as KitsumeAgent etc! :)
             if (e.AgentInfo !=  null && e.AgentInfo.agent != null)
-                agentInfo = Utilities.DataHelper.ConvertBinaryDataToString(e.AgentInfo.agent.Data);
+                agentInfo = $"\nagent={Utilities.DataHelper.ConvertBinaryDataToString(e.AgentInfo.agent)}\nagent hash={HoloNETClientAdmin.ConvertHoloHashToString(e.AgentInfo.agent)}\nsignature={Utilities.DataHelper.ConvertBinaryDataToString(e.AgentInfo.signature)}\nsignature hash={HoloNETClientAdmin.ConvertHoloHashToString(e.AgentInfo.signature)}\nagent_info={Utilities.DataHelper.ConvertBinaryDataToString(e.AgentInfo.agent_info)}\nagent_info hash={HoloNETClientAdmin.ConvertHoloHashToString(e.AgentInfo.agent_info)}";
+                //agentInfo = Utilities.DataHelper.ConvertBinaryDataToString(e.AgentInfo.agent.Data);
 
             LogMessage($"ADMIN: Agent Info Returned: {agentInfo}");
             ShowStatusMessage("Agent Info Returned.", StatusMessageType.Success);

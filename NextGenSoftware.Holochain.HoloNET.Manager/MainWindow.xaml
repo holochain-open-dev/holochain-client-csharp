@@ -26,7 +26,7 @@
         <Grid.RowDefinitions>
             <!--<RowDefinition Height="120"></RowDefinition>-->
             <RowDefinition Height="100"></RowDefinition>
-            <RowDefinition x:Name="rowDefButtons" Height="100" MaxHeight="180"></RowDefinition>
+            <RowDefinition x:Name="rowDefButtons" Height="100" MaxHeight="100"></RowDefinition>
             <RowDefinition Height="5"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
             <RowDefinition Height="5"></RowDefinition>

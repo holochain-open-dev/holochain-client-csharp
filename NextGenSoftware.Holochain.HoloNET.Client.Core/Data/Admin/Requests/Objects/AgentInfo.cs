@@ -8,12 +8,14 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects
     public class AgentInfo //: IAgentInfo
     //AgentInfoInner (Rust name is AgentInfoInner but hopefully we can use AgentInfo because sounds better! ;-) )
     {
-        [Key("type")]
-        public string type { get; set; }
+        [Key("agent")]
+        public byte[] agent { get; set; }
 
-        [Key("data")]
-        //public AgentInfoDetailed data { get; set; }
-        public object data { get; set; }
+        [Key("signature")]
+        public byte[] signature { get; set; }
+
+        [Key("agent_info")]
+        public byte[] agent_info { get; set; }
     }
 
     //public class AgentInfo : IAgentInfo

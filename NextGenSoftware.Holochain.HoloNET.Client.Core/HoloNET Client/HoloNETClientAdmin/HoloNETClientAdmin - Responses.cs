@@ -472,8 +472,18 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             try
             {
                 Logger.Log("ADMIN: AGENT INFO RETURNED\n", LogType.Info);
-                AgentInfo agentInfo = MessagePackSerializer.Deserialize<AgentInfo>(response.data, messagePackSerializerOptions);
+                //AgentInfo agentInfo = MessagePackSerializer.Deserialize<AgentInfo>(response.data, messagePackSerializerOptions);
+                HoloNETData agentInfo = MessagePackSerializer.Deserialize<HoloNETData>(response.data, messagePackSerializerOptions);
                 //object agentInfo = MessagePackSerializer.Deserialize<object>(response.data, messagePackSerializerOptions);
+
+                object[] agentInfoObj = agentInfo.data as object[];
+                Dictionary<object, object> agentInfoDict = agentInfoObj[0] as Dictionary<object, object>;
+                args.AgentInfo = new AgentInfo()
+                {
+                    agent = agentInfoDict["agent"] as byte[],
+                    signature = agentInfoDict["signature"] as byte[],
+                    agent_info = agentInfoDict["agent_info"] as byte[]
+                };
 
                 //if (agentInfo != null)
                 //    args.AgentInfo = agentInfo;

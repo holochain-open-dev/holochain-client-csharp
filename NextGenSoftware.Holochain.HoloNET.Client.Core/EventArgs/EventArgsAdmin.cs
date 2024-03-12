@@ -126,7 +126,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
     public class AgentInfoReturnedCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
-        public IAgentInfo AgentInfo { get; set; }
+        //public IAgentInfo AgentInfo { get; set; }
+        public AgentInfo AgentInfo { get; set; }
     }
 
     public class AgentInfoAddedCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
