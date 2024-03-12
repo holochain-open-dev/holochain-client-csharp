@@ -41,7 +41,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Manager.Managers
 
             if (HoloNETEntryShared.ContainsKey(CurrentApp.Name) && HoloNETEntryShared[CurrentApp.Name] != null)
             {
-                if (!string.IsNullOrEmpty(HoloNETEntryDNAManager.HoloNETEntryDNA.AvatarSharedActionHash))
+                if (HoloNETEntryDNAManager.HoloNETEntryDNA != null && !string.IsNullOrEmpty(HoloNETEntryDNAManager.HoloNETEntryDNA.AvatarSharedActionHash))
                 {
                     ShowStatusMessage($"Loading HoloNET Entry (Shared Connection)...", StatusMessageType.Information, true, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
                     LogMessage($"APP: Loading HoloNET Entry (Shared Connection)...");
@@ -57,8 +57,21 @@ namespace NextGenSoftware.Holochain.HoloNET.Manager.Managers
             }
             else
             {
-                result.IsError = true;
-                result.Message = "HoloNET Entry (Shared Connection) Failed To Initialize";
+                if (HoloNETEntry == null)
+                {
+                    result.Message = "HoloNET Entry (Shared Connection) Failed To Initialize";
+                    result.IsError = true;
+                }
+                else if (HoloNETEntryDNAManager.HoloNETEntryDNA == null)
+                {
+                    result.Message = "HoloNETEntryDNAManager.HoloNETEntryDNA is null. This is likely caused by a corrupt HoloNETEntryDNA.json file, please delete and retry.";
+                    result.IsError = true;
+                }
+                else
+                {
+                    result.Message = "AvatarSharedActionHash in HoloNETEntryDNA is null. The likely cause is that no previous data has been saved for this entry.";
+                    result.IsWarning = true;
+                }
             }
 
             return result;

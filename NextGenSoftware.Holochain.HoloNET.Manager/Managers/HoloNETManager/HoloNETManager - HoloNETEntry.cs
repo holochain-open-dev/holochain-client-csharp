@@ -107,7 +107,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Manager.Managers
                 LogMessage($"APP: HoloNET Entry (Internal Connection) Already Initialized..");
             }
 
-            //if (HoloNETEntry != null && HoloNETEntryDNAManager.HoloNETEntryDNA != null && !string.IsNullOrEmpty(HoloNETEntryDNAManager.HoloNETEntryDNA.AvatarEntryHash))
             if (HoloNETEntry != null && HoloNETEntryDNAManager.HoloNETEntryDNA != null && !string.IsNullOrEmpty(HoloNETEntryDNAManager.HoloNETEntryDNA.AvatarActionHash))
             {
                 ShowStatusMessage($"Loading HoloNET Entry (Internal Connection)...", StatusMessageType.Information, true, HoloNETEntryUIManager.CurrentHoloNETEntryUI);
@@ -136,7 +135,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Manager.Managers
                 }
                 else
                 {
-                    result.Message = "AvatarEntryHash in HoloNETEntryDNA is null. The likely cause is that no previous data has been saved for this entry.";
+                    result.Message = "AvatarActionHash in HoloNETEntryDNA is null. The likely cause is that no previous data has been saved for this entry.";
                     result.IsWarning = true;
                 }
             }
