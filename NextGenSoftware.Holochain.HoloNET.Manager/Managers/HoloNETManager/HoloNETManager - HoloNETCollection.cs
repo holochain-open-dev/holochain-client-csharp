@@ -37,7 +37,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Manager.Managers
                 //_holoNETEntry = new Avatar(dna);
 
                 //If we do not pass in a HoloNETClient it will create it's own internal connection/client
-                HoloNETEntries = new HoloNETObservableCollection<Avatar>("oasis", "load_avatars", "add_avatar", "remove_avatar", "bacth_update_collection", true, new HoloNETDNA()
+                HoloNETEntries = new HoloNETObservableCollection<Avatar>("oasis", "get_all_avatars", "add_avatar", "remove_avatar", "bacth_update_collection", true, new HoloNETDNA()
                 {
                     HolochainConductorAppAgentURI = $"ws://localhost:{initDemoResult.AttachedOnPort}",
                     InstalledAppId = HoloNETCollectionDemoAppId, //You need to set either the InstalledAppId or the AgentPubKey & DnaHash. You can set all 3 if you wish but only one or the other works fine too (if only the InstalledAppId is set it will look up the AgentPubKey & DnaHash from the conductor).

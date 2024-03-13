@@ -130,7 +130,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Manager.Managers
                     //});
 
                     // NOTE: EVERY method on HoloNETClientAppAgent can be called either async or non-async, in these examples we are using non-async. Normally you would use async because it is less code and easier to follow but we wanted to test and demo both versions (and show how you would use non async as well as async versions)...
-                    HoloNETClientAdmin.AuthorizeSigningCredentialsAndGrantZomeCallCapability(HoloNETClientAdmin.GetCellId(CurrentApp.DnaHash, CurrentApp.AgentPubKey), CapGrantAccessType.Unrestricted, GrantedFunctionsType.All, null);
+                    //HoloNETClientAdmin.AuthorizeSigningCredentialsAndGrantZomeCallCapability(HoloNETClientAdmin.GetCellId(CurrentApp.DnaHash, CurrentApp.AgentPubKey), CapGrantAccessType.Unrestricted, GrantedFunctionsType.All, null);
+                    HoloNETClientAdmin.AuthorizeSigningCredentialsAndGrantZomeCallCapability(HoloNETClientAdmin.GetCellId(CurrentApp.DnaHash, CurrentApp.AgentPubKey), CapGrantAccessType.Assigned, GrantedFunctionsType.All, null);
                     result.ResponseType = ConnectToAppAgentClientResponseType.GrantingZomeCapabilities;
                 }
             }

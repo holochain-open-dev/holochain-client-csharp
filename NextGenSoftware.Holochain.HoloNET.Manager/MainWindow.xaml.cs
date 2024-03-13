@@ -306,7 +306,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Manager
         {
             //Process.Start("notepad.exe", "Logs\\HoloNET.log");
             //Process.Start("notepad.exe", $"{HoloNETDNAManager.HoloNETDNA.LogPath}\\{HoloNETDNAManager.HoloNETDNA.LogFileName}");
-            Process.Start($"{HoloNETDNAManager.HoloNETDNA.LogPath}");
+            //Process.Start($"{HoloNETDNAManager.HoloNETDNA.LogPath}");
+            Process.Start("explorer.exe", $"{HoloNETDNAManager.HoloNETDNA.LogPath}");
         }
 
         private void btnClearLog_Click(object sender, RoutedEventArgs e)

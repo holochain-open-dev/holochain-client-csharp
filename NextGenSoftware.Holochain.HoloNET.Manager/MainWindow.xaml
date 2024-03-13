@@ -397,7 +397,7 @@ BlurRadius="10"/>
                         </EventTrigger>
                     </Button.Triggers>
                 </Button>
-                <Button x:Name="btnShowLog" Style="{StaticResource ButtonStyle}" FontSize="14" Cursor="Hand" Content="Show Log" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnShowLog_Click">
+                <Button x:Name="btnShowLog" Style="{StaticResource ButtonStyle}" FontSize="14" Cursor="Hand" Content="Show Logs" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnShowLog_Click">
                     <Button.Effect>
                         <DropShadowEffect x:Name="btnShowLogGlowEffect" ShadowDepth="0"
            Color="White"
