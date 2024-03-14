@@ -655,10 +655,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public async Task<DnaDefinitionReturnedCallBackEventArgs> GetDnaDefinitionAsync(byte[] dnaHash, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
-            return await CallFunctionAsync(HoloNETRequestType.AdminGetDnaDefinition, "get_dna_definition", new UpdateCoordinatorsRequest()
-            {
-                dnaHash = dnaHash
-            }, _taskCompletionDnaDefinitionReturnedCallBack, "OnDnaDefinitionReturnedCallBack", conductorResponseCallBackMode, id);
+            return await CallFunctionAsync(HoloNETRequestType.AdminGetDnaDefinition, "get_dna_definition", dnaHash, _taskCompletionDnaDefinitionReturnedCallBack, "OnDnaDefinitionReturnedCallBack", conductorResponseCallBackMode, id);
         }
 
         /// <summary>

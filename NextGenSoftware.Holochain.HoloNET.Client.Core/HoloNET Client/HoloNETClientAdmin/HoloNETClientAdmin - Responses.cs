@@ -56,7 +56,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                             break;
 
                         case HoloNETResponseType.AdminDnaDefinitionReturned:
-                            DecodeDnasListedReceived(response, dataReceivedEventArgs);
+                            DecodeDnaDefinitionReturned(response, dataReceivedEventArgs);
                             break;
 
                         case HoloNETResponseType.AdminAppInterfacesListed:
@@ -448,12 +448,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             try
             {
                 Logger.Log("ADMIN: DNA DEFINTION RETURNED\n", LogType.Info);
-                DnaDefinitionResponse dnaDefinition = MessagePackSerializer.Deserialize<DnaDefinitionResponse>(response.data, messagePackSerializerOptions);
+                //DnaDefinitionResponse dnaDefinition = MessagePackSerializer.Deserialize<DnaDefinitionResponse>(response.data, messagePackSerializerOptions);
+                object dnaDefinition = MessagePackSerializer.Deserialize<object>(response.data, messagePackSerializerOptions);
 
-                if (dnaDefinition != null)
-                    args.DnaDefinition = dnaDefinition;
-                else
-                    HandleError(args, $"{errorMessage} dnaDefinition failed to deserialize.");
+                //if (dnaDefinition != null)
+                //    args.DnaDefinition = dnaDefinition;
+                //else
+                //    HandleError(args, $"{errorMessage} dnaDefinition failed to deserialize.");
             }
             catch (Exception ex)
             {
