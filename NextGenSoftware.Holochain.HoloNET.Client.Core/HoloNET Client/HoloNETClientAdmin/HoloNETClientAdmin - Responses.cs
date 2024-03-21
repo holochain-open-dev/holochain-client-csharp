@@ -449,7 +449,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             {
                 Logger.Log("ADMIN: DNA DEFINTION RETURNED\n", LogType.Info);
                 //DnaDefinitionResponse dnaDefinition = MessagePackSerializer.Deserialize<DnaDefinitionResponse>(response.data, messagePackSerializerOptions);
-                object dnaDefinition = MessagePackSerializer.Deserialize<object>(response.data, messagePackSerializerOptions);
+                //object dnaDefinition = MessagePackSerializer.Deserialize<object>(response.data, messagePackSerializerOptions);
+                HoloNETData data = MessagePackSerializer.Deserialize<HoloNETData>(response.data, messagePackSerializerOptions);
+                DnaDefinitionResponse dnaDefinition = MessagePackSerializer.Deserialize<HoloNETData>(data.data, messagePackSerializerOptions);
+
 
                 //if (dnaDefinition != null)
                 //    args.DnaDefinition = dnaDefinition;
