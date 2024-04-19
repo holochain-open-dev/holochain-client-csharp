@@ -22,7 +22,7 @@
 	<PackageReleaseNotes>
 		This release is a MAJOR release and milestone, HoloNET has been re-written from the ground up with many improvements, bug fixes etc. Part of this includes making it compatible with the latest beta version of Holochain. It has also been upgraded to work with the latest version of .NET (v8.0) so has even further performance improvements, bug fixes, etc.
 
-		HoloNETClient has now been split out into HoloNETClientAppAgent, HoloNETClientApp &amp; HoloNETClientAdmin so is now more in line with the rust and js clients so existing hc devs will now find it more famliar! ;-)
+		HoloNETClient has now been split out into HoloNETClientAppAgent, HoloNETClientApp &amp; HoloNETClientAdmin so is now more in line with the rust and js clients so existing hc devs will now find it more familiar! ;-)
 
 		This release also features the new HoloNET ORM (Object Relational Maping) package. This consists of the HoloNETEntryBase, HoloNETAuditEntryBase, HoloNETCollection and HoloNETObservsableCollection classes. The first two can be extended to create your HoloNET Entry models that map directly onto your data structs in your rust hApp zome code. The second two are collections of these entries. You can then simply call basic CRUD methods on your classes such as Load, Save, Delete, etc making it very quick and easy to build hApps. You also get change tracking, version control &amp; rollback functionality for free. More documentation will be coming soon for this...
 
