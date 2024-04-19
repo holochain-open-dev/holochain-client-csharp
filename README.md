@@ -150,6 +150,42 @@ You can also find the Test Harness here:
 
 Read more on how to use the [Test Harness here](https://github.com/holochain-open-dev/holochain-client-csharp/tree/main/NextGenSoftware.Holochain.HoloNET.Client.TestHarness).
 
+[NextGenSoftware.Holochain.HoloNET.ORM](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.ORM)
+The new HoloNET ORM (Object Relational Mapping) allowing very easy &amp; rapid development of hApps. This consists of the HoloNETEntryBase, HoloNETAuditEntryBase, HoloNETCollection and HoloNETObservsableCollection classes. The first two can be extended to create your HoloNET Entry models that map directly onto your data structs in your rust hApp zome code. The second two are collections of these entries. You can then simply call basic CRUD methods on your classes such as Load, Save, Delete, etc making it very quick and easy to build hApps. You also get change tracking, version control &amp; rollback functionality for free. HoloNET ORM allows any existing .net app/website/game/service to be rapidly and quickly converted to a Holochain hApp with very little code changes (you can simply add a new attribute to the properties in your models) and it will now map to your rust hApp structs (which WEB5 [NextGenSoftware.OASIS.STAR](https://www.nuget.org/packages/NextGenSoftware.OASIS.STAR)) can also dynamically generate (it generates rust and c# code). More documentation will be coming soon for this...
+
+[NextGenSoftware.Holochain.HoloNET.Manager](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.Manager)
+The new UI to HoloNET Client &amp; HoloNET ORM show casing all of their advanced features.  This has many generic backend and UI components that can be used to allow other .net devs to rapidly construct their own .net hApps using HoloNET HDK (HoloNET Client, HoloNET ORM, HoloNET Manager, WEB5 STAR ODK/HDK &amp; HoloNET HyperNET). The HoloNET Manager is currently implemented in WPF but we have plans to port this to Uno, MAUI &amp; OpenSilver meaning it can run natively on Windows, Mac, Linux, TV's, IPads, tablets, android, IOS &amp; web. The work for this has already begun so expect future releases soon...
+
+[NextGenSoftware.Holochain.HoloNET.HDK](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.HDK)
+The new HoloNET HDK consisting of HoloNET Client, HoloNET ORM, HoloNET Manager, WEB5 STAR ODK/HDK &amp; HoloNET HyperNET. This package contains a plugin to the generic WEB5 STAR ODK No/Low Code Generator extending it so it can generate hApps from metadata built on top of the HoloNET Client/ORM. Release Coming Soon...
+
+[NextGenSoftware.OASIS.STAR](https://www.nuget.org/packages/NextGenSoftware.OASIS.STAR)
+The new No/Low Code Generator allowing you to generate code for any supported OASIS Provider (web2 and web3) and currently supports Holochain, IPFS, Solana, EOS, Ethereum, Telos, SEEDS, MongoDB, SQLLite, Neo4j &amp; Azure. The generated code runs on top of OASIS/STAR COSMIC ORM making it a very easy and powerful way to share data between any web2 or web3 provider. Release Coming Soon...
+
+[NextGenSoftware.Holochain.HoloNET.HyperNET](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.HyperNET)
+This is built on top of the HoloNET Client &amp; HoloNET ORM and allows Unity and Unreal games to implement lag free P2P networking allowing near unlimited number of players to play online smashing previous limitations on classic cloud/server hosting. Release Coming Soon...
+
+The latest release notes can be found below:
+
+This release is a MAJOR release and milestone, HoloNET has been re-written from the ground up with many improvements, bug fixes etc. Part of this includes making it compatible with the latest beta version of Holochain. It has also been upgraded to work with the latest version of .NET (v8.0) so has even further performance improvements, bug fixes, etc.
+
+This release also features the new HoloNET ORM (Object Relational Maping) package. This consists of the HoloNETEntryBase, HoloNETAuditEntryBase, HoloNETCollection and HoloNETObservsableCollection classes. The first two can be extended to create your HoloNET Entry models that map directly onto your data structs in your rust hApp zome code. The second two are collections of these entries. You can then simply call basic CRUD methods on your classes such as Load, Save, Delete, etc making it very quick and easy to build hApps. You also get change tracking, version control &amp; rollback functionality for free. More documentation will be coming soon for this...
+
+HoloNET ORM allows any existing .net app/website/game/service to be rapidly and quickly converted to a Holochain hApp with very little code changes (you can simply add a new attribute to the properties in your models) and it will now map to your rust hApp structs (which WEB5 STAR ODK/HDK) can also dynamically generate (it generates rust and c# code). Your hAPP will also be metaverse ready because STAR is also a interoperable metaverse generator (hence the name! ;-) ) and can also connect &amp; bridge to any web2 or web3 provider thanks to it being built on the WEB4 OASIS API.
+
+This release also features a new HoloNET Manager UI (think Launcher/Dev Store for .net and then some!) which show cases all of the advanced features of HoloNET Client and HoloNET ORM.  This has many generic backend and UI components that can be used to allow other .net devs to rapidly construct their own .net hApps using HoloNET HDK. Yes, that is right, this client has grown so much now that it is now in a number of packages forming the official Holochain .NET HDK. This includes the WEB5 STAR ODK/HDK No/Low Code Generator allowing you to generate hApps built on top of the HoloNET Client and HoloNET ORM from simple metadata (this part is in alpha and will be shortly released). The HoloNET Manager is currently implemented in WPF but we have plans to port this to Uno, MAUI &amp; OpenSilver meaning it can run natively on Windows, Mac, Linux, TV's, IPads, tablets, android, IOS &amp; web. The work for this has already begun so expect future releases soon...
+
+This release now fully implements the full Holochain Conductor Admin API so is now on par with the javascript and rust clients.
+
+Finally this release also features HoloNET HyperNET allowing Unity and Unreal games to implement lag free P2P networking with near unlimited number of players to play online smashing previous limitations on classic cloud/server hosting.
+
+This is the BIGGEST update to HoloNET to date and is pretty much a whole new product now! ;-)
+
+**NOTE: The documentation is still for the previous version, please bare with us while we update this soon... thank you!**
+
+Read more here:
+https://github.com/holochain-open-dev/holochain-client-csharp/releases/tag/v3.0.0
+
 ## HoloNET Code Has Migrated
 
 This code was migrated from the main OASIS API/STAR Metaverse/HoloNET/.NET HDK code found here:

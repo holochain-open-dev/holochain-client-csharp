@@ -1,4 +1,6 @@
 ﻿
+using NextGenSoftware.Holochain.HoloNET.Client.Interfaces;
+using NextGenSoftware.Holochain.HoloNET.ORM.Entries;
 using System;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
@@ -6,20 +8,20 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
     /// <summary>
     /// This example passes in a HoloNETClient instance that is shared with other classes/objects such as the AvatarMultiple class/object. Only use this if you have more than one class extending HoloNETAuditEntryBaseClass/HoloNETEntryBaseClass otherwise use the Single Class Example.
     /// </summary>
-    public class Holon : HoloNETAuditEntryBaseClass
+    public class Holon : HoloNETAuditEntryBase
     {
-        public Holon(HoloNETClient holonNETClient) : base("oasis", "get_holon_entry", "create_holon_entry", "update_holon_entry", "delete_holon_entry", holonNETClient) { }
+        public Holon(IHoloNETClientAppAgent holoNETclient) : base("oasis", "get_holon_entry", "create_holon_entry", "update_holon_entry", "delete_holon_entry", holoNETclient) { }
 
-        [HolochainFieldName("parent_id")]
+        [HolochainRustFieldName("parent_id")]
         public Guid ParentId { get; set; }
 
-        [HolochainFieldName("name")]
+        [HolochainRustFieldName("name")]
         public string Name { get; set; }
 
-        [HolochainFieldName("description")]
+        [HolochainRustFieldName("description")]
         public string Description { get; set; }
 
-        [HolochainFieldName("type")]
+        [HolochainRustFieldName("type")]
         public string Type { get; set; }
     }
 }

@@ -1,18 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using NextGenSoftware.CLI.Engine;
-using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin;
-using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects;
-using NextGenSoftware.Logging;
 using NextGenSoftware.WebSocket;
+using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects;
+using NextGenSoftware.Holochain.HoloNET.Client.Interfaces;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
 {
     public class HoloNETTestHarness
     {
-        private static HoloNETClient _holoNETClient = null;
+        private static IHoloNETClientAppAgent _holoNETClientAppAgent = null;
+        private static IHoloNETClientAdmin _holoNETClientAdmin = null;
         private static TestToRun _testToRun;
         private static int _numberOfZomeCallResponsesReceived = 0;
         private static Dictionary<int, bool> _loadEntryResponseReceived = new Dictionary<int, bool>();
@@ -24,10 +24,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
         private const string _hcAdminURI = "ws://localhost:65464";
         private const string _hcAppURI = "ws://localhost:8888";
         //private const string _oasisHappPath = @"\hApps\oasis\zomes\workdir\happ";
-        private const string _oasisHappPath = @"C:\Users\USER\holochain-holochain-0.1.5\happs\oasis\BUILD\happ\oasis.happ";
+        private const string _oasisHappId = "oasis";
+        private const string _oasisRoleName = "oasis";
+        private const string _oasisHappPath = @"E:\Code\hc\holochain-holochain-0.1.5\happs\oasis\BUILD\happ\oasis.happ";
         private const string _numbersHappPath = @"\hApps\happ-build-tutorial-develop\workdir\happ";
         private const string _oasisHappFolder = @"C:\Users\USER\holochain-holochain-0.1.5\happs\oasis\BUILD\happ";
-        private const string _oasisDnaPath = @"C:\Users\USER\holochain-holochain-0.1.5\happs\oasis\BUILD\dna\oasis.dna";
+        private const string _oasisDnaPath = @"E:\Code\hc\holochain-holochain-0.1.5\happs\oasis\BUILD\dna\oasis.dna";
         private const string _oasisDnaHash = ""; //TODO Generate Hash here!
 
         static async Task Main(string[] args)
@@ -56,22 +58,18 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
         {
             _timer.Start();
             _testToRun = testToRun;
-            Console.WriteLine("NextGenSoftware.Holochain.HoloNET.Client Test Harness v2.1.4");
+            Console.WriteLine("NextGenSoftware.Holochain.HoloNET.Client Test Harness v3.0.1");
             Console.WriteLine("");
             bool isAdmin = false;
 
             HoloNETDNA config = new HoloNETDNA()
             {
-                LoggingMode = LoggingMode.WarningsErrorsInfoAndDebug,
-
-                //holoNETClient.Config.ErrorHandlingBehaviour = ErrorHandlingBehaviour.OnlyThrowExceptionIfNoErrorHandlerSubscribedToOnErrorEvent
                 AutoStartHolochainConductor = true,
                 AutoShutdownHolochainConductor = true,
                 ShutDownALLHolochainConductors = true, //Normally default's to false, but if you want to make sure no holochain processes are left running set this to true.
                 ShowHolochainConductorWindow = true, //Defaults to false.
                 HolochainConductorMode = HolochainConductorModeEnum.UseEmbedded,
-                HolochainConductorToUse = HolochainConductorEnum.HcDevTool
-                 
+                HolochainConductorToUse = HolochainConductorEnum.HolochainProductionConductor
             };
 
             switch (testToRun)
@@ -123,59 +121,82 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                     case TestToRun.AdminDeleteCloneCell:
                     case TestToRun.AdminGetStorageInfo:
                     case TestToRun.AdminDumpNetworkStats:
-                        _holoNETClient = new HoloNETClient(_hcAdminURI);
+                        _holoNETClientAdmin = new HoloNETClientAdmin();
                         isAdmin = true;
                         break;
 
                     default:
-                        _holoNETClient = new HoloNETClient(_hcAppURI);
+                        _holoNETClientAdmin = new HoloNETClientAdmin();
                         break;
                 }
 
                 //We would normally just set the Config property but in this case we need to share the Config object with multiple HoloNET instances (such as in the SaveLoadOASISEntryUsingSingleHoloNETBaseClass test) 
-                _holoNETClient.HoloNETDNA = config;
+                _holoNETClientAdmin.HoloNETDNA = config;
 
-                _holoNETClient.OnConnected += HoloNETClient_OnConnected;
-                _holoNETClient.OnDataReceived += HoloNETClient_OnDataReceived;
-                _holoNETClient.OnZomeFunctionCallBack += HoloNETClient_OnZomeFunctionCallBack;
-                _holoNETClient.OnAppInfoCallBack += HoloNETClient_OnAppInfoCallBack;
-                _holoNETClient.OnReadyForZomeCalls += _holoNETClient_OnReadyForZomeCalls;
-                _holoNETClient.OnSignalCallBack += HoloNETClient_OnSignalCallBack;
-                _holoNETClient.OnDisconnected += HoloNETClient_OnDisconnected;
-                _holoNETClient.OnError += HoloNETClient_OnError;
-                _holoNETClient.OnHolochainConductorsShutdownComplete += _holoNETClient_OnHolochainConductorsShutdownComplete;
-                _holoNETClient.OnHoloNETShutdownComplete += _holoNETClient_OnHoloNETShutdownComplete;
-                _holoNETClient.OnAdminAgentPubKeyGeneratedCallBack += _holoNETClient_OnAdminAgentPubKeyGeneratedCallBack;
-                _holoNETClient.OnAdminAppInstalledCallBack += _holoNETClient_OnAdminAppInstalledCallBack;
-                _holoNETClient.OnAdminAppEnabledCallBack += _holoNETClient_OnAdminAppEnabledCallBack;
-                _holoNETClient.OnAdminAppDisabledCallBack += _holoNETClient_OnAdminAppDisabledCallBack;
-                _holoNETClient.OnAdminAppInterfaceAttachedCallBack += _holoNETClient_OnAdminAppInterfaceAttachedCallBack;
-                _holoNETClient.OnAdminZomeCallCapabilityGrantedCallBack += _holoNETClient_OnAdminZomeCallCapabilityGranted;
-                _holoNETClient.OnAdminRegisterDnaCallBack += _holoNETClient_OnAdminRegisterDnaCallBack;
-                _holoNETClient.OnAdminAppsListedCallBack += _holoNETClient_OnAdminListAppsCallBack;
-                _holoNETClient.OnAdminListDnasCallBack += _holoNETClient_OnAdminListDnasCallBack;
-                _holoNETClient.OnAdminListCellIdsCallBack += _holoNETClient_OnAdminListCellIdsCallBack;
-                _holoNETClient.OnAdminListAppInterfacesCallBack += _holoNETClient_OnAdminListAppInterfacesCallBack;
-                _holoNETClient.OnAdminDumpFullStateCallBack += _holoNETClient_OnAdminDumpFullStateCallBack;
-                _holoNETClient.OnAdminDumpStateCallBack += _holoNETClient_OnAdminDumpStateCallBack;
-                _holoNETClient.OnAdminGetDnaDefinitionCallBack += _holoNETClient_OnAdminGetDnaDefinitionCallBack;
-                _holoNETClient.OnAdminUpdateCoordinatorsCallBack += _holoNETClient_OnAdminUpdateCoordinatorsCallBack;
-                _holoNETClient.OnAdminGetAgentInfoCallBack += _holoNETClient_OnAdminGetAgentInfoCallBack;
-                _holoNETClient.OnAdminAddAgentInfoCallBack += _holoNETClient_OnAdminAddAgentInfoCallBack;
-                _holoNETClient.OnAdminDeleteCloneCellCallBack += _holoNETClient_OnAdminDeleteCloneCellCallBack;
-                _holoNETClient.OnAdminGetStorageInfoCallBack += _holoNETClient_OnAdminGetStorageInfoCallBack;
-                _holoNETClient.OnAdminDumpNetworkStatsCallBack += _holoNETClient_OnAdminDumpNetworkStatsCallBack;
+                _holoNETClientAdmin.OnConnected += _holoNETClientAdmin_OnConnected;
+                _holoNETClientAdmin.OnDataReceived += _holoNETClientAdmin_OnDataReceived;
+                _holoNETClientAdmin.OnDataSent += _holoNETClientAdmin_OnDataSent;
+                _holoNETClientAdmin.OnError += _holoNETClientAdmin_OnError;
+                _holoNETClientAdmin.OnDisconnected += _holoNETClientAdmin_OnDisconnected;
+                _holoNETClientAdmin.OnHolochainConductorStarting += _holoNETClientAdmin_OnHolochainConductorStarting;
+                _holoNETClientAdmin.OnHolochainConductorStarted += _holoNETClientAdmin_OnHolochainConductorStarted;
+                _holoNETClientAdmin.OnHolochainConductorsShutdownComplete += _holoNETClientAdmin_OnHolochainConductorsShutdownComplete;
+                _holoNETClientAdmin.OnHoloNETShutdownComplete += _holoNETClientAdmin_OnHoloNETShutdownComplete;
+                _holoNETClientAdmin.OnAgentPubKeyGeneratedCallBack += _holoNETClientAdmin_OnAgentPubKeyGeneratedCallBack;
+                _holoNETClientAdmin.OnAppInstalledCallBack += _holoNETClientAdmin_OnAppInstalledCallBack;
+                _holoNETClientAdmin.OnAppUninstalledCallBack += _holoNETClientAdmin_OnAppUninstalledCallBack;
+                _holoNETClientAdmin.OnAppEnabledCallBack += _holoNETClientAdmin_OnAppEnabledCallBack;
+                _holoNETClientAdmin.OnAppDisabledCallBack += _holoNETClientAdmin_OnAppDisabledCallBack;
+                _holoNETClientAdmin.OnAppInterfaceAttachedCallBack += _holoNETClientAdmin_OnAppInterfaceAttachedCallBack;
+                _holoNETClientAdmin.OnZomeCallCapabilityGrantedCallBack += _holoNETClientAdmin_OnZomeCallCapabilityGranted;
+                _holoNETClientAdmin.OnDnaRegisteredCallBack += _holoNETClientAdmin_OnDnaRegisteredCallBack;
+                _holoNETClientAdmin.OnAppsListedCallBack += _holoNETClientAdmin_OnListAppsCallBack;
+                _holoNETClientAdmin.OnDnasListedCallBack += _holoNETClientAdmin_OnDnasListedCallBack;
+                _holoNETClientAdmin.OnCellIdsListedCallBack += _holoNETClientAdmin_OnCellIdsListedCallBack;
+                _holoNETClientAdmin.OnAppInterfacesListedCallBack += _holoNETClientAdmin_OnAppInterfacesListedCallBack;
+                _holoNETClientAdmin.OnAdminInterfacesAddedCallBack += _holoNETClientAdmin_OnInterfacesAddedCallBack;
+                _holoNETClientAdmin.OnDnaDefinitionReturnedCallBack += _holoNETClientAdmin_OnDnaDefinitionReturnedCallBack;
+                _holoNETClientAdmin.OnCoordinatorsUpdatedCallBack += _holoNETClientAdmin_OnCoordinatorsUpdatedCallBack;
+                _holoNETClientAdmin.OnAgentInfoReturnedCallBack += _holoNETClientAdmin_OnAgentInfoReturnedCallBack;
+                _holoNETClientAdmin.OnAgentInfoAddedCallBack += _holoNETClientAdmin_OnAgentInfoAddedCallBack;
+                _holoNETClientAdmin.OnCloneCellDeletedCallBack += _holoNETClientAdmin_OnCloneCellDeletedCallBack;
+                _holoNETClientAdmin.OnStorageInfoReturnedCallBack += _holoNETClientAdmin_OnStorageInfoReturnedCallBack;
+                _holoNETClientAdmin.OnNetworkStatsDumpedCallBack += _holoNETClientAdmin_OnNetworkStatsDumpedCallBack;
+                _holoNETClientAdmin.OnNetworkMetricsDumpedCallBack += _holoNETClientAdmin_OnNetworkMetricsDumpedCallBack;
+                _holoNETClientAdmin.OnFullStateDumpedCallBack += _holoNETClientAdmin_OnFullStateDumpedCallBack;
+                _holoNETClientAdmin.OnStateDumpedCallBack += _holoNETClientAdmin_OnStateDumpedCallBack;
+                _holoNETClientAdmin.OnInstallEnableSignAndAttachHappCallBack += _holoNETClientAdmin_OnInstallEnableSignAndAttachHappCallBack;
+                _holoNETClientAdmin.OnInstallEnableSignAttachAndConnectToHappCallBack += _holoNETClientAdmin_OnInstallEnableSignAttachAndConnectToHappCallBack;
+                _holoNETClientAdmin.OnRecordsGraftedCallBack += _holoNETClientAdmin_OnRecordsGraftedCallBack;
 
-                ////Use this if you to manually pass in the AgentPubKey &DnaHash(otherwise it will be automatically queried from the conductor or sandbox).
-                //_holoNETClient.Config.AgentPubKey = "YOUR KEY";
-                //_holoNETClient.Config.DnaHash = "YOUR HASH";
+                ////Use this if you wish to manually pass in the AgentPubKey & DnaHash(otherwise it will be automatically queried from the conductor or sandbox).
+                //_holoNETClientAdmin.Config.AgentPubKey = "YOUR KEY";
+                //_holoNETClientAdmin.Config.DnaHash = "YOUR HASH";
+                //await _holoNETClientAdmin.Connect(false, false);
 
-                //await _holoNETClient.Connect(false, false);
+                HoloNETConnectedEventArgs connectedResult = await _holoNETClientAdmin.ConnectAsync();
 
-                if (isAdmin)
-                    await _holoNETClient.ConnectAdminAsync();
-                else
-                    await _holoNETClient.ConnectAsync();
+                if (connectedResult != null && !connectedResult.IsError && connectedResult.IsConnected)
+                {
+                    if (!isAdmin)
+                    {
+                        InstallEnableSignAttachAndConnectToHappEventArgs installResult = await _holoNETClientAdmin.InstallEnableSignAttachAndConnectToHappAsync(_oasisHappId, _oasisHappPath, _oasisRoleName);
+
+                        if (installResult != null && !installResult.IsError && installResult.IsAppConnected)
+                        {
+                            _holoNETClientAppAgent = installResult.HoloNETClientAppAgent;
+                            _holoNETClientAppAgent.OnConnected += _holoNETClientAppAgent_OnConnected;
+                            _holoNETClientAppAgent.OnDataSent += _holoNETClientAppAgent_OnDataSent;
+                            _holoNETClientAppAgent.OnDataReceived += HoloNETClient_OnDataReceived;
+                            _holoNETClientAppAgent.OnZomeFunctionCallBack += HoloNETClient_OnZomeFunctionCallBack;
+                            _holoNETClientAppAgent.OnAppInfoCallBack += HoloNETClient_OnAppInfoCallBack;
+                            _holoNETClientAppAgent.OnReadyForZomeCalls += _holoNETClient_OnReadyForZomeCalls;
+                            _holoNETClientAppAgent.OnSignalCallBack += HoloNETClient_OnSignalCallBack;
+                            _holoNETClientAppAgent.OnDisconnected += HoloNETClient_OnDisconnected;
+                            _holoNETClientAppAgent.OnError += HoloNETClient_OnError;
+                        }
+                    }
+                } 
             }
 
             switch (testToRun)
@@ -231,7 +252,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
 
                         //await avatar.LoadAsync(true, new { david = ellams, bob = harper });
 
-                        if (result.IsCallSuccessful && !result.IsError && !string.IsNullOrEmpty(result.ZomeReturnHash))
+                        if (!result.IsError && !string.IsNullOrEmpty(result.ZomeReturnHash))
                         {
                             CLIEngine.ShowSuccessMessage(string.Concat("TEST HARNESS: AVATAR SINGLE HOLONET BASE ENTRY.SAVE/CREATE RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
                             Console.WriteLine("");
@@ -263,7 +284,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                             CLIEngine.ShowWorkingMessage("Loading Avatar...");
                             result = await avatar.LoadAsync();
 
-                            if (result.IsCallSuccessful && !result.IsError)
+                            if (!result.IsError)
                             {
                                 CLIEngine.ShowSuccessMessage(string.Concat("TEST HARNESS: AVATAR SINGLE HOLONET BASE ENTRY.LOAD RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
                                 ShowAvatarDetails(avatar);
@@ -274,7 +295,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                                 CLIEngine.ShowWorkingMessage("Saving Avatar...");
                                 result = await avatar.SaveAsync();
 
-                                if (result.IsCallSuccessful && !result.IsError && !string.IsNullOrEmpty(result.ZomeReturnHash))
+                                if (!result.IsError && !string.IsNullOrEmpty(result.ZomeReturnHash))
                                 {
                                     CLIEngine.ShowSuccessMessage(string.Concat("TEST HARNESS: AVATAR SINGLE HOLONET BASE ENTRY.SAVE/UPDATE RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
                                     ShowAvatarDetails(avatar);
@@ -286,7 +307,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                                     avatar = ResetAvatar(avatar);
                                     result = await avatar.LoadAsync();
 
-                                    if (result.IsCallSuccessful && !result.IsError)
+                                    if (!result.IsError)
                                     {
                                         CLIEngine.ShowSuccessMessage(string.Concat("TEST HARNESS: AVATAR SINGLE HOLONET BASE ENTRY.LOAD RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
                                         ShowAvatarDetails(avatar);
@@ -295,7 +316,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                                         CLIEngine.ShowWorkingMessage("Deleting Avatar...");
                                         result = await avatar.DeleteAsync();
 
-                                        if (result.IsCallSuccessful && !result.IsError && !string.IsNullOrEmpty(result.ZomeReturnHash))
+                                        if (!result.IsError && !string.IsNullOrEmpty(result.ZomeReturnHash))
                                             CLIEngine.ShowSuccessMessage(string.Concat("TEST HARNESS: AVATAR SINGLE HOLONET BASE ENTRY.DELETE RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
                                         else
                                             CLIEngine.ShowErrorMessage(string.Concat("TEST HARNESS: AVATAR SINGLE HOLONET BASE ENTRY.DELETE RESPONSE: AN ERROR OCCURED: ", result.Message));
@@ -332,7 +353,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                 case TestToRun.SaveLoadOASISEntryUsingMultipleHoloNETAuditEntryBaseClasses:
                     {
                         //In this example we are passing in an existing instance of the HoloNET client so it along with the connection to the holochain condutor is shared amongst the objects/classes that inherit from HoloNETEntryBaseClass.
-                        AvatarMultiple avatar = new AvatarMultiple(_holoNETClient)
+                        AvatarMultiple avatar = new AvatarMultiple(_holoNETClientAppAgent)
                         {
                             Id = Guid.NewGuid(),
                             FirstName = "David",
@@ -352,7 +373,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                         CLIEngine.ShowWorkingMessage("Saving Avatar...");
                         ZomeFunctionCallBackEventArgs result = await avatar.SaveAsync();
 
-                        if (result.IsCallSuccessful && !result.IsError && !string.IsNullOrEmpty(result.ZomeReturnHash))
+                        if (!result.IsError && !string.IsNullOrEmpty(result.ZomeReturnHash))
                         {
                             Console.WriteLine(string.Concat("TEST HARNESS: AVATAR MULTIPLE HOLONETBASECLASS.SAVE/CREATE RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
                             Console.WriteLine("");
@@ -361,12 +382,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
 
                             //There is no need to call Dispose on an object sharing a HoloNETClient instance (passed in) because it will only dispose of (disconnect etc) a HoloNETClient if one was NOT passed in because it was internally created and used (like the single use above).
                             //avatar.Dispose(); //Free any resources including disconnecting from the Holochain Conductor, shutting down any running conductors etc...
-                            avatar = new AvatarMultiple(_holoNETClient); //Normally you wouldn't need to create a new instance but we want to verify the data is fully loaded so best to use a new object.
+                            avatar = new AvatarMultiple(_holoNETClientAppAgent); //Normally you wouldn't need to create a new instance but we want to verify the data is fully loaded so best to use a new object.
                             avatar.EntryHash = entryHash;
                             CLIEngine.ShowWorkingMessage("Loading Avatar...");
                             result = await avatar.LoadAsync();
 
-                            if (result.IsCallSuccessful && !result.IsError)
+                            if (!result.IsError)
                             {
                                 Console.WriteLine(string.Concat("TEST HARNESS: AVATAR MULTIPLE HOLONETBASECLASS.LOAD RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
                                 Console.WriteLine("");
@@ -377,7 +398,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                                 CLIEngine.ShowWorkingMessage("Saving Avatar...");
                                 result = await avatar.SaveAsync();
 
-                                if (result.IsCallSuccessful && !result.IsError && !string.IsNullOrEmpty(result.ZomeReturnHash))
+                                if (!result.IsError && !string.IsNullOrEmpty(result.ZomeReturnHash))
                                 {
                                     CLIEngine.ShowSuccessMessage(string.Concat("TEST HARNESS: AVATAR MULTIPLE HOLONET BASE ENTRY.SAVE/UPDATE RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
                                     ShowAvatarDetails(avatar);
@@ -389,7 +410,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                                     avatar = ResetAvatar(avatar);
                                     result = await avatar.LoadAsync();
 
-                                    if (result.IsCallSuccessful && !result.IsError)
+                                    if (!result.IsError)
                                     {
                                         CLIEngine.ShowSuccessMessage(string.Concat("TEST HARNESS: AVATAR MULTIPLE HOLONET BASE ENTRY.LOAD RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
                                         ShowAvatarDetails(avatar);
@@ -398,7 +419,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                                         CLIEngine.ShowWorkingMessage("Deleting Avatar...");
                                         result = await avatar.DeleteAsync();
 
-                                        if (result.IsCallSuccessful && !result.IsError && !string.IsNullOrEmpty(result.ZomeReturnHash))
+                                        if (!result.IsError && !string.IsNullOrEmpty(result.ZomeReturnHash))
                                             CLIEngine.ShowSuccessMessage(string.Concat("TEST HARNESS: AVATAR MULTIPLE HOLONET BASE ENTRY.DELETE RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
                                         else
                                             CLIEngine.ShowErrorMessage(string.Concat("TEST HARNESS: AVATAR MULTIPLE HOLONET BASE ENTRY.DELETE RESPONSE: AN ERROR OCCURED: ", result.Message));
@@ -421,7 +442,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                             Console.WriteLine("");
                         }
 
-                        Holon holon = new Holon(_holoNETClient)
+                        Holon holon = new Holon(_holoNETClientAppAgent)
                         {
                             Id = Guid.NewGuid(),
                             ParentId = Guid.NewGuid(),
@@ -441,7 +462,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                         CLIEngine.ShowWorkingMessage("Saving Holon...");
                         result = await holon.SaveAsync();
 
-                        if (result.IsCallSuccessful && !result.IsError && !string.IsNullOrEmpty(result.ZomeReturnHash))
+                        if (!result.IsError && !string.IsNullOrEmpty(result.ZomeReturnHash))
                         {
                             Console.WriteLine(string.Concat("TEST HARNESS: HOLON MULTIPLE HOLONETBASECLASS.SAVE/CREATE RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
                             Console.WriteLine("");
@@ -450,12 +471,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
 
                             //There is no need to call Dispose on an object sharing a HoloNETClient instance (passed in) because it will only dispose of (disconnect etc) a HoloNETClient if one was NOT passed in because it was internally created and used (like the single use above).
                             //holon.Dispose(); //Free any resources including disconnecting from the Holochain Conductor, shutting down any running conductors etc...
-                            holon = new Holon(_holoNETClient); //Normally you wouldn't need to create a new instance but we want to verify the data is fully loaded so best to use a new object.
+                            holon = new Holon(_holoNETClientAppAgent); //Normally you wouldn't need to create a new instance but we want to verify the data is fully loaded so best to use a new object.
                             holon.EntryHash = entryHash;
                             CLIEngine.ShowWorkingMessage("Loading Holon...");
                             result = await holon.LoadAsync();
 
-                            if (result.IsCallSuccessful && !result.IsError)
+                            if (!result.IsError)
                             {
                                 Console.WriteLine(string.Concat("TEST HARNESS: HOLON MULTIPLE HOLONETBASECLASS.LOAD RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
                                 Console.WriteLine("");
@@ -466,7 +487,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                                 CLIEngine.ShowWorkingMessage("Saving Holon...");
                                 result = await holon.SaveAsync();
 
-                                if (result.IsCallSuccessful && !result.IsError && !string.IsNullOrEmpty(result.ZomeReturnHash))
+                                if (!result.IsError && !string.IsNullOrEmpty(result.ZomeReturnHash))
                                 {
                                     CLIEngine.ShowSuccessMessage(string.Concat("TEST HARNESS: AVATAR SINGLE HOLONET BASE ENTRY.SAVE/UPDATE RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
                                     ShowAvatarDetails(avatar);
@@ -478,7 +499,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                                     holon = ResetHolon(holon);
                                     result = await holon.LoadAsync();
 
-                                    if (result.IsCallSuccessful && !result.IsError)
+                                    if (!result.IsError)
                                     {
                                         CLIEngine.ShowSuccessMessage(string.Concat("TEST HARNESS: HOLON MULTIPLE HOLONET BASE ENTRY.LOAD RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
                                         ShowAvatarDetails(avatar);
@@ -487,7 +508,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                                         CLIEngine.ShowWorkingMessage("Deleting Holon...");
                                         result = await avatar.DeleteAsync();
 
-                                        if (result.IsCallSuccessful && !result.IsError && !string.IsNullOrEmpty(result.ZomeReturnHash))
+                                        if (!result.IsError && !string.IsNullOrEmpty(result.ZomeReturnHash))
                                             CLIEngine.ShowSuccessMessage(string.Concat("TEST HARNESS: HOLON MULTIPLE HOLONET BASE ENTRY.DELETE RESPONSE: ", ProcessZomeFunctionCallBackEventArgs(result)));
                                         else
                                             CLIEngine.ShowErrorMessage(string.Concat("TEST HARNESS: HOLON MULTIPLEHOLONET BASE ENTRY.DELETE RESPONSE: AN ERROR OCCURED: ", result.Message));
@@ -542,128 +563,374 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
             }
         }
 
-        private static void _holoNETClient_OnAdminZomeCallCapabilityGranted(object sender, AdminZomeCallCapabilityGrantedCallBackEventArgs e)
+        private async static void _holoNETClientAdmin_OnConnected(object sender, ConnectedEventArgs e)
         {
-            string msg = $"TEST HARNESS: _holoNETClient_OnAdminZomeCallCapabilityGranted, EndPoint: {e.EndPoint}, Id: {e.Id}, Raw Binary Data: {e.RawBinaryData}, Raw Binary Data As String: {e.RawBinaryDataAsString}, Raw Binary Data Decoded: {e.RawBinaryDataDecoded}, IsError: {e.IsError}, Message: {e.Message}";
+            CLIEngine.ShowMessage($"TEST HARNESS: _holoNETClientAdmin_OnConnected, EndPoint: {e.EndPoint}");
+
+            Console.WriteLine(string.Concat("TEST HARNESS: CONNECTED CALLBACK: Connected to ", e.EndPoint));
+            Console.WriteLine("");
+
+            switch (_testToRun)
+            {
+                case TestToRun.AdminGenerateAgentPubKey:
+                    {
+                        Console.WriteLine("Calling AdminGenerateAgentPubKeyAsync function on Admin API...\n");
+                        await _holoNETClientAdmin.GenerateAgentPubKeyAsync();
+                    }
+                    break;
+
+                case TestToRun.AdminInstallApp:
+                    {
+                        Console.WriteLine("Calling AdminInstallAppAsync function on Admin API...\n");
+                        await _holoNETClientAdmin.InstallAppAsync("oasis-app4", _oasisHappPath);
+                    }
+                    break;
+
+                case TestToRun.AdminEnableApp:
+                    {
+                        Console.WriteLine("Calling AdminEnableAppAsync function on Admin API...\n");
+                        await _holoNETClientAdmin.EnableAppAsync("test-app");
+                    }
+                    break;
+
+                case TestToRun.AdminDisableApp:
+                    {
+                        Console.WriteLine("Calling AdminDisableAppAsync function on Admin API...\n");
+                        await _holoNETClientAdmin.DisableAppAsync("test-app");
+                    }
+                    break;
+
+                case TestToRun.AdminAuthorizeSigningCredentials:
+                    {
+                        Console.WriteLine("Calling AdminAuthorizeSigningCredentialsAsync function on Admin API...\n");
+                        await _holoNETClientAdmin.AuthorizeSigningCredentialsAndGrantZomeCallCapabilityAsync(_holoNETClientAppAgent.HoloNETDNA.CellId, CapGrantAccessType.Assigned, GrantedFunctionsType.Listed, new List<(string, string)>()
+                        {
+                            ("zome1", "function1"),
+                            ("zome2", "function2")
+                        });
+                    }
+                    break;
+
+                case TestToRun.AdminAttachAppInterface:
+                    {
+                        Console.WriteLine("Calling AdminAttachAppInterfaceAsync function on Admin API...\n");
+                        await _holoNETClientAdmin.AttachAppInterfaceAsync(777);
+                    }
+                    break;
+
+                case TestToRun.AdminRegisterDna:
+                    {
+                        Console.WriteLine("Calling AdminRegisterDna function on Admin API...\n");
+                        await _holoNETClientAdmin.RegisterDnaAsync(_oasisDnaPath);
+
+                        await _holoNETClientAdmin.RegisterDnaAsync(new DnaBundle()
+                        {
+                            manifest = new DnaManifest()
+                            {
+                                manifest_version = "1",
+                                name = "oasis-test",
+                                network_seed = "1",
+                                properties = "test props",
+                                zomes = new ZomeManifest[]
+                                {
+                                    new ZomeManifest()
+                                    {
+                                         //bundled = "", //Can ONLY be one of bundled, path or url.
+                                         path = _oasisDnaPath, //Can ONLY be one of bundled, path or url.
+                                         //url = "", //Can ONLY be one of bundled, path or url.
+                                         name = "OASIS Test",
+                                         hash = "",
+                                         dependencies = new ZomeDependency[]{ new ZomeDependency(){ name = "oasis"} }
+                                    }
+                                }
+
+                            },
+                            resources = new Dictionary<string, byte[]>()
+                        });
+                    }
+                    break;
+
+                case TestToRun.AdminListApps:
+                    {
+                        Console.WriteLine("Calling AdminListApps function on Admin API...\n");
+                        await _holoNETClientAdmin.ListAppsAsync(AppStatusFilter.Running);
+                    }
+                    break;
+
+                case TestToRun.AdminListDnas:
+                    {
+                        Console.WriteLine("Calling AdminListDnas function on Admin API...\n");
+                        await _holoNETClientAdmin.ListDnasAsync();
+                    }
+                    break;
+
+                case TestToRun.AdminListCellIds:
+                    {
+                        Console.WriteLine("Calling AdminListCellIds function on Admin API...\n");
+                        await _holoNETClientAdmin.ListCellIdsAsync();
+                    }
+                    break;
+
+                case TestToRun.AdminListInterfaces:
+                    {
+                        Console.WriteLine("Calling AdminListInterfaces function on Admin API...\n");
+                        await _holoNETClientAdmin.ListInterfacesAsync();
+                    }
+                    break;
+
+                case TestToRun.AdminDumpFullState:
+                    {
+                        Console.WriteLine("Calling AdminDumpFullState function on Admin API...\n");
+                        await _holoNETClientAdmin.DumpFullStateAsync();
+                    }
+                    break;
+
+                case TestToRun.AdminDumpState:
+                    {
+                        Console.WriteLine("Calling AdminDumpState function on Admin API...\n");
+                        await _holoNETClientAdmin.DumpStateAsync();
+                    }
+                    break;
+
+                case TestToRun.AdminGetDnaDefinition:
+                    {
+                        Console.WriteLine("Calling AdminGetDnaDefinition function on Admin API...\n");
+                        await _holoNETClientAdmin.GetDnaDefinitionAsync(_oasisDnaHash);
+                    }
+                    break;
+
+                case TestToRun.AdminUpdateCoordinators:
+                    {
+                        Console.WriteLine("Calling AdminUpdateCoordinators function on Admin API...\n");
+                        await _holoNETClientAdmin.UpdateCoordinatorsAsync(_oasisDnaHash, _oasisDnaPath);
+                    }
+                    break;
+
+                case TestToRun.AdminGetAgentInfo:
+                    {
+                        Console.WriteLine("Calling AdminGetAgentInfo function on Admin API...\n");
+                        await _holoNETClientAdmin.GetAgentInfoAsync();
+                    }
+                    break;
+
+                case TestToRun.AdminAddAgentInfo:
+                    {
+                        Console.WriteLine("Calling AdminAddAgentInfo function on Admin API...\n");
+                        await _holoNETClientAdmin.AddAgentInfoAsync(new AgentInfo[]
+                        {
+                            new AgentInfo
+                            {
+                                agent = new byte[] { },
+                                signature = new byte[] { },
+                                agent_info = new byte[] { },
+                            }
+                            //new AgentInfo
+                            //{
+                            //    agent = new KitsuneAgent(new byte[] { }),
+                            //    space = new KitsuneSpace(new byte[] { }),
+                            //    signature = new KitsuneSignature(new byte[] { }),
+                            //    encoded_bytes = new byte[] {},
+                            //    expires_at_ms = 0,
+                            //    signed_at_ms= 0,
+                            //    url_list = new string[] { "http://holochain.org", "http://holo-net.com"}
+                            //}
+                        });
+                    }
+                    break;
+
+                case TestToRun.AdminDeleteCloneCell:
+                    {
+                        Console.WriteLine("Calling AdminDeleteCloneCell function on Admin API...\n");
+                        await _holoNETClientAdmin.DeleteCloneCellAsync("oasis");
+                    }
+                    break;
+
+                case TestToRun.AdminGetStorageInfo:
+                    {
+                        Console.WriteLine("Calling AdminGetStorageInfo function on Admin API...\n");
+                        await _holoNETClientAdmin.GetStorageInfoAsync();
+                    }
+                    break;
+
+                case TestToRun.AdminDumpNetworkStats:
+                    {
+                        Console.WriteLine("Calling AdminDumpNetworkStats function on Admin API...\n");
+                        await _holoNETClientAdmin.DumpNetworkStatsAsync();
+                    }
+                    break;
+            }
+        }
+
+        private static void _holoNETClientAdmin_OnRecordsGraftedCallBack(object sender, RecordsGraftedCallBackEventArgs e)
+        {
+            CLIEngine.ShowMessage($"TEST HARNESS: _holoNETClientAdmin_OnRecordsGraftedCallBack, EndPoint: {e.EndPoint}, Id: {e.Id}, Raw Binary Data: {e.RawBinaryData}, Raw Binary Data As String: {e.RawBinaryDataAsString}, Raw Binary Data Decoded: {e.RawBinaryDataDecoded}, IsError: {e.IsError}, Message: {e.Message}");
+        }
+
+        private static void _holoNETClientAdmin_OnNetworkMetricsDumpedCallBack(object sender, NetworkMetricsDumpedCallBackEventArgs e)
+        {
+            CLIEngine.ShowMessage($"TEST HARNESS: _holoNETClientAdmin_OnNetworkMetricsDumpedCallBack, EndPoint: {e.EndPoint}, Id: {e.Id}, Raw Binary Data: {e.RawBinaryData}, Raw Binary Data As String: {e.RawBinaryDataAsString}, Raw Binary Data Decoded: {e.RawBinaryDataDecoded}, IsError: {e.IsError}, Message: {e.Message}");
+        }
+
+        private static void _holoNETClientAdmin_OnInstallEnableSignAttachAndConnectToHappCallBack(object sender, InstallEnableSignAttachAndConnectToHappEventArgs e)
+        {
+            CLIEngine.ShowMessage($"TEST HARNESS: _holoNETClientAdmin_OnInstallEnableSignAttachAndConnectToHappCallBack, AgentPubKey: {e.AgentPubKey}, DnaHash: {e.DnaHash}, InstalledAppId: {e.AppInstalledResult.InstalledAppId}, AttachedOnPort: {e.AttachedOnPort}, AppStatusReason: {e.AppStatusReason}");
+        }
+
+        private static void _holoNETClientAdmin_OnInstallEnableSignAndAttachHappCallBack(object sender, InstallEnableSignAndAttachHappEventArgs e)
+        {
+            CLIEngine.ShowMessage($"TEST HARNESS: _holoNETClientAdmin_OnInstallEnableSignAndAttachHappCallBack, AgentPubKey: {e.AgentPubKey}, DnaHash: {e.DnaHash}, InstalledAppId: {e.AppInstalledResult.InstalledAppId}, AttachedOnPort: {e.AttachedOnPort}, AppStatusReason: {e.AppStatusReason}");
+        }
+
+        private static void _holoNETClientAdmin_OnHolochainConductorStarting(object sender, HolochainConductorStartingEventArgs e)
+        {
+            CLIEngine.ShowMessage($"TEST HARNESS: _holoNETClientAdmin_OnHolochainConductorStarting");
+        }
+
+        private static void _holoNETClientAdmin_OnHolochainConductorStarted(object sender, HolochainConductorStartedEventArgs e)
+        {
+            CLIEngine.ShowMessage($"TEST HARNESS: _holoNETClientAdmin_OnHolochainConductorStarted");
+        }
+
+        private static void _holoNETClientAdmin_OnDisconnected(object sender, DisconnectedEventArgs e)
+        {
+            CLIEngine.ShowMessage($"TEST HARNESS: _holoNETClientAdmin_OnDisconnected, EndPoint: {e.EndPoint}, Reason: {e.Reason}");
+        }
+
+        private static void _holoNETClientAdmin_OnError(object sender, HoloNETErrorEventArgs e)
+        {
+            CLIEngine.ShowMessage($"TEST HARNESS: _holoNETClientAdmin_OnError, EndPoint: {e.EndPoint}, Reason: {e.Reason}, ErrorDetails: {e.ErrorDetails}");
+        }
+
+        private static void _holoNETClientAdmin_OnDataSent(object sender, HoloNETDataSentEventArgs e)
+        {
+            CLIEngine.ShowMessage($"TEST HARNESS: _holoNETClientAdmin_OnDataSent, EndPoint: {e.EndPoint}, Raw Binary Data: {e.RawBinaryData}, Raw Binary Data As String: {e.RawBinaryDataAsString}, Raw Binary Data Decoded: {e.RawBinaryDataDecoded}, IsError: {e.IsError}, Message: {e.Message}");
+        }
+
+        private static void _holoNETClientAdmin_OnDataReceived(object sender, HoloNETDataReceivedEventArgs e)
+        {
+            CLIEngine.ShowMessage($"TEST HARNESS: _holoNETClientAdmin_OnDataReceived, EndPoint: {e.EndPoint}, Id: {e.Id}, Raw Binary Data: {e.RawBinaryData}, Raw Binary Data As String: {e.RawBinaryDataAsString}, Raw Binary Data Decoded: {e.RawBinaryDataDecoded}, IsError: {e.IsError}, Message: {e.Message}");
+        }
+
+        private static void _holoNETClientAdmin_OnInterfacesAddedCallBack(object sender, AdminInterfacesAddedCallBackEventArgs e)
+        {
+            CLIEngine.ShowMessage($"TEST HARNESS: _holoNETClientAdmin_OnAdminInterfacesAddedCallBack, EndPoint: {e.EndPoint}, Id: {e.Id}, Raw Binary Data: {e.RawBinaryData}, Raw Binary Data As String: {e.RawBinaryDataAsString}, Raw Binary Data Decoded: {e.RawBinaryDataDecoded}, IsError: {e.IsError}, Message: {e.Message}");
+        }
+
+        private static void _holoNETClientAdmin_OnAppUninstalledCallBack(object sender, AppUninstalledCallBackEventArgs e)
+        {
+            CLIEngine.ShowMessage($"TEST HARNESS: _holoNETClientAdmin_OnAppUninstalledCallBack, EndPoint: {e.EndPoint}, Id: {e.Id}, Raw Binary Data: {e.RawBinaryData}, Raw Binary Data As String: {e.RawBinaryDataAsString}, Raw Binary Data Decoded: {e.RawBinaryDataDecoded}, IsError: {e.IsError}, Message: {e.Message}");
+        }
+
+        private static void _holoNETClientAdmin_OnNetworkStatsDumpedCallBack(object sender, NetworkStatsDumpedCallBackEventArgs e)
+        {
+            CLIEngine.ShowMessage($"TEST HARNESS: _holoNETClientAdmin_OnNetworkStatsDumpedCallBack, EndPoint: {e.EndPoint}, Id: {e.Id}, Raw Binary Data: {e.RawBinaryData}, Raw Binary Data As String: {e.RawBinaryDataAsString}, Raw Binary Data Decoded: {e.RawBinaryDataDecoded}, IsError: {e.IsError}, Message: {e.Message}");
+        }
+
+        private static void _holoNETClientAdmin_OnStorageInfoReturnedCallBack(object sender, StorageInfoReturnedCallBackEventArgs e)
+        {
+            CLIEngine.ShowMessage($"TEST HARNESS: _holoNETClientAdmin_OnStorageInfoReturnedCallBack, EndPoint: {e.EndPoint}, Id: {e.Id}, Raw Binary Data: {e.RawBinaryData}, Raw Binary Data As String: {e.RawBinaryDataAsString}, Raw Binary Data Decoded: {e.RawBinaryDataDecoded}, IsError: {e.IsError}, Message: {e.Message}");
+        }
+
+        private static void _holoNETClientAdmin_OnCloneCellDeletedCallBack(object sender, CloneCellDeletedCallBackEventArgs e)
+        {
+            CLIEngine.ShowMessage($"TEST HARNESS: _holoNETClientAdmin_OnCloneCellDeletedCallBack, EndPoint: {e.EndPoint}, Id: {e.Id}, Raw Binary Data: {e.RawBinaryData}, Raw Binary Data As String: {e.RawBinaryDataAsString}, Raw Binary Data Decoded: {e.RawBinaryDataDecoded}, IsError: {e.IsError}, Message: {e.Message}");
+        }
+
+        private static void _holoNETClientAdmin_OnAgentInfoAddedCallBack(object sender, AgentInfoAddedCallBackEventArgs e)
+        {
+            CLIEngine.ShowMessage($"TEST HARNESS: _holoNETClientAdmin_OnAgentInfoAddedCallBack, EndPoint: {e.EndPoint}, Id: {e.Id}, Raw Binary Data: {e.RawBinaryData}, Raw Binary Data As String: {e.RawBinaryDataAsString}, Raw Binary Data Decoded: {e.RawBinaryDataDecoded}, IsError: {e.IsError}, Message: {e.Message}");
+        }
+
+        private static void _holoNETClientAdmin_OnAgentInfoReturnedCallBack(object sender, AgentInfoReturnedCallBackEventArgs e)
+        {
+            CLIEngine.ShowMessage($"TEST HARNESS: _holoNETClientAdmin_OnAgentInfoReturnedCallBack, EndPoint: {e.EndPoint}, Id: {e.Id}, Raw Binary Data: {e.RawBinaryData}, Raw Binary Data As String: {e.RawBinaryDataAsString}, Raw Binary Data Decoded: {e.RawBinaryDataDecoded}, IsError: {e.IsError}, Message: {e.Message}");
+        }
+
+        private static void _holoNETClientAdmin_OnCoordinatorsUpdatedCallBack(object sender, CoordinatorsUpdatedCallBackEventArgs e)
+        {
+            CLIEngine.ShowMessage($"TEST HARNESS: _holoNETClientAdmin_OnCoordinatorsUpdatedCallBack, EndPoint: {e.EndPoint}, Id: {e.Id}, Raw Binary Data: {e.RawBinaryData}, Raw Binary Data As String: {e.RawBinaryDataAsString}, Raw Binary Data Decoded: {e.RawBinaryDataDecoded}, IsError: {e.IsError}, Message: {e.Message}");
+        }
+
+        private static void _holoNETClientAdmin_OnDnaDefinitionReturnedCallBack(object sender, DnaDefinitionReturnedCallBackEventArgs e)
+        {
+            CLIEngine.ShowMessage($"TEST HARNESS: _holoNETClientAdmin_OnDnaDefinitionReturnedCallBack, EndPoint: {e.EndPoint}, Id: {e.Id}, Raw Binary Data: {e.RawBinaryData}, Raw Binary Data As String: {e.RawBinaryDataAsString}, Raw Binary Data Decoded: {e.RawBinaryDataDecoded}, IsError: {e.IsError}, Message: {e.Message}");
+        }
+
+        private static void _holoNETClientAdmin_OnStateDumpedCallBack(object sender, StateDumpedCallBackEventArgs e)
+        {
+            CLIEngine.ShowMessage($"TEST HARNESS: _holoNETClientAdmin_OnStateDumpedCallBack, EndPoint: {e.EndPoint}, Id: {e.Id}, Raw Binary Data: {e.RawBinaryData}, Raw Binary Data As String: {e.RawBinaryDataAsString}, Raw Binary Data Decoded: {e.RawBinaryDataDecoded}, IsError: {e.IsError}, Message: {e.Message}");
+        }
+
+        private static void _holoNETClientAdmin_OnFullStateDumpedCallBack(object sender, FullStateDumpedCallBackEventArgs e)
+        {
+            CLIEngine.ShowMessage($"TEST HARNESS: _holoNETClientAdmin_OnFullStateDumpedCallBack, EndPoint: {e.EndPoint}, Id: {e.Id}, Raw Binary Data: {e.RawBinaryData}, Raw Binary Data As String: {e.RawBinaryDataAsString}, Raw Binary Data Decoded: {e.RawBinaryDataDecoded}, IsError: {e.IsError}, Message: {e.Message}");
+        }
+
+        private static void _holoNETClientAdmin_OnAppInterfacesListedCallBack(object sender, AppInterfacesListedCallBackEventArgs e)
+        {
+            CLIEngine.ShowMessage($"TEST HARNESS: _holoNETClientAdmin_OnAppInterfacesListedCallBack, EndPoint: {e.EndPoint}, Id: {e.Id}, Raw Binary Data: {e.RawBinaryData}, Raw Binary Data As String: {e.RawBinaryDataAsString}, Raw Binary Data Decoded: {e.RawBinaryDataDecoded}, IsError: {e.IsError}, Message: {e.Message}");
+        }
+
+        private static void _holoNETClientAdmin_OnCellIdsListedCallBack(object sender, CellIdsListedCallBackEventArgs e)
+        {
+            CLIEngine.ShowMessage($"TEST HARNESS: _holoNETClientAdmin_OnCellIdsListedCallBack, EndPoint: {e.EndPoint}, Id: {e.Id}, Raw Binary Data: {e.RawBinaryData}, Raw Binary Data As String: {e.RawBinaryDataAsString}, Raw Binary Data Decoded: {e.RawBinaryDataDecoded}, IsError: {e.IsError}, Message: {e.Message}");
+        }
+
+        private static void _holoNETClientAdmin_OnDnasListedCallBack(object sender, DnasListedCallBackEventArgs e)
+        {
+            CLIEngine.ShowMessage($"TEST HARNESS: _holoNETClientAdmin_OnDnasListedCallBack, EndPoint: {e.EndPoint}, Id: {e.Id}, Raw Binary Data: {e.RawBinaryData}, Raw Binary Data As String: {e.RawBinaryDataAsString}, Raw Binary Data Decoded: {e.RawBinaryDataDecoded}, IsError: {e.IsError}, Message: {e.Message}");
+        }
+
+        private static void _holoNETClientAdmin_OnDnaRegisteredCallBack(object sender, DnaRegisteredCallBackEventArgs e)
+        {
+            string msg = $"TEST HARNESS: _holoNETClientAdmin_OnDnaRegisteredCallBack, EndPoint: {e.EndPoint}, Id: {e.Id}, Raw Binary Data: {e.RawBinaryData}, Raw Binary Data As String: {e.RawBinaryDataAsString}, Raw Binary Data Decoded: {e.RawBinaryDataDecoded}, IsError: {e.IsError}, Message: {e.Message}";
             CLIEngine.ShowMessage(msg);
         }
 
-        private static void _holoNETClient_OnAdminDumpNetworkStatsCallBack(object sender, AdminDumpNetworkStatsCallBackEventArgs e)
+        private static void _holoNETClientAdmin_OnZomeCallCapabilityGranted(object sender, ZomeCallCapabilityGrantedCallBackEventArgs e)
         {
-            string msg = $"TEST HARNESS: _holoNETClient_OnAdminDumpNetworkStatsCallBack, EndPoint: {e.EndPoint}, Id: {e.Id}, Raw Binary Data: {e.RawBinaryData}, Raw Binary Data As String: {e.RawBinaryDataAsString}, Raw Binary Data Decoded: {e.RawBinaryDataDecoded}, IsError: {e.IsError}, Message: {e.Message}";
+            string msg = $"TEST HARNESS: _holoNETClientAdmin_OnZomeCallCapabilityGranted, EndPoint: {e.EndPoint}, Id: {e.Id}, Raw Binary Data: {e.RawBinaryData}, Raw Binary Data As String: {e.RawBinaryDataAsString}, Raw Binary Data Decoded: {e.RawBinaryDataDecoded}, IsError: {e.IsError}, Message: {e.Message}";
             CLIEngine.ShowMessage(msg);
         }
 
-        private static void _holoNETClient_OnAdminGetStorageInfoCallBack(object sender, AdminGetStorageInfoCallBackEventArgs e)
+        private static void _holoNETClientAdmin_OnListAppsCallBack(object sender, AppsListedCallBackEventArgs e)
         {
-            string msg = $"TEST HARNESS: _holoNETClient_OnAdminGetStorageInfoCallBack, EndPoint: {e.EndPoint}, Id: {e.Id}, Raw Binary Data: {e.RawBinaryData}, Raw Binary Data As String: {e.RawBinaryDataAsString}, Raw Binary Data Decoded: {e.RawBinaryDataDecoded}, IsError: {e.IsError}, Message: {e.Message}";
+            string msg = $"TEST HARNESS: _holoNETClientAdmin_OnListAppsCallBack, EndPoint: {e.EndPoint}, Id: {e.Id}, Raw Binary Data: {e.RawBinaryData}, Raw Binary Data As String: {e.RawBinaryDataAsString}, Raw Binary Data Decoded: {e.RawBinaryDataDecoded}, IsError: {e.IsError}, Message: {e.Message}";
             CLIEngine.ShowMessage(msg);
         }
 
-        private static void _holoNETClient_OnAdminDeleteCloneCellCallBack(object sender, AdminDeleteCloneCellCallBackEventArgs e)
+        private static void _holoNETClientAdmin_OnAppInterfaceAttachedCallBack(object sender, AppInterfaceAttachedCallBackEventArgs e)
         {
-            string msg = $"TEST HARNESS: _holoNETClient_OnAdminDeleteCloneCellCallBack, EndPoint: {e.EndPoint}, Id: {e.Id}, Raw Binary Data: {e.RawBinaryData}, Raw Binary Data As String: {e.RawBinaryDataAsString}, Raw Binary Data Decoded: {e.RawBinaryDataDecoded}, IsError: {e.IsError}, Message: {e.Message}";
+            string msg = $"TEST HARNESS: _holoNETClientAdmin_OnAppInterfaceAttachedCallBack, EndPoint: {e.EndPoint}, Id: {e.Id}, Raw Binary Data: {e.RawBinaryData}, Raw Binary Data As String: {e.RawBinaryDataAsString}, Raw Binary Data Decoded: {e.RawBinaryDataDecoded}, IsError: {e.IsError}, Message: {e.Message}";
             CLIEngine.ShowMessage(msg);
         }
 
-        private static void _holoNETClient_OnAdminAddAgentInfoCallBack(object sender, AdminAddAgentInfoCallBackEventArgs e)
+        private static void _holoNETClientAdmin_OnAppDisabledCallBack(object sender, AppDisabledCallBackEventArgs e)
         {
-            string msg = $"TEST HARNESS: _holoNETClient_OnAdminAddAgentInfoCallBack, EndPoint: {e.EndPoint}, Id: {e.Id}, Raw Binary Data: {e.RawBinaryData}, Raw Binary Data As String: {e.RawBinaryDataAsString}, Raw Binary Data Decoded: {e.RawBinaryDataDecoded}, IsError: {e.IsError}, Message: {e.Message}";
+            string msg = $"TEST HARNESS: _holoNETClientAdmin_OnAppDisabledCallBack, EndPoint: {e.EndPoint}, Id: {e.Id}, Raw Binary Data: {e.RawBinaryData}, Raw Binary Data As String: {e.RawBinaryDataAsString}, Raw Binary Data Decoded: {e.RawBinaryDataDecoded}, IsError: {e.IsError}, Message: {e.Message}";
             CLIEngine.ShowMessage(msg);
         }
 
-        private static void _holoNETClient_OnAdminGetAgentInfoCallBack(object sender, AdminGetAgentInfoCallBackEventArgs e)
+        private static void _holoNETClientAdmin_OnAppEnabledCallBack(object sender, AppEnabledCallBackEventArgs e)
         {
-            string msg = $"TEST HARNESS: _holoNETClient_OnAdminGetAgentInfoCallBack, EndPoint: {e.EndPoint}, Id: {e.Id}, Raw Binary Data: {e.RawBinaryData}, Raw Binary Data As String: {e.RawBinaryDataAsString}, Raw Binary Data Decoded: {e.RawBinaryDataDecoded}, IsError: {e.IsError}, Message: {e.Message}";
+            string msg = $"TEST HARNESS: _holoNETClientAdmin_OnAppEnabledCallBack, EndPoint: {e.EndPoint}, Id: {e.Id}, Raw Binary Data: {e.RawBinaryData}, Raw Binary Data As String: {e.RawBinaryDataAsString}, Raw Binary Data Decoded: {e.RawBinaryDataDecoded}, IsError: {e.IsError}, Message: {e.Message}";
             CLIEngine.ShowMessage(msg);
         }
 
-        private static void _holoNETClient_OnAdminUpdateCoordinatorsCallBack(object sender, AdminUpdateCoordinatorsCallBackEventArgs e)
-        {
-            string msg = $"TEST HARNESS: _holoNETClient_OnAdminUpdateCoordinatorsCallBack, EndPoint: {e.EndPoint}, Id: {e.Id}, Raw Binary Data: {e.RawBinaryData}, Raw Binary Data As String: {e.RawBinaryDataAsString}, Raw Binary Data Decoded: {e.RawBinaryDataDecoded}, IsError: {e.IsError}, Message: {e.Message}";
-            CLIEngine.ShowMessage(msg);
-        }
-
-        private static void _holoNETClient_OnAdminGetDnaDefinitionCallBack(object sender, AdminGetDnaDefinitionCallBackEventArgs e)
-        {
-            string msg = $"TEST HARNESS: _holoNETClient_OnAdminGetDnaDefinitionCallBack, EndPoint: {e.EndPoint}, Id: {e.Id}, Raw Binary Data: {e.RawBinaryData}, Raw Binary Data As String: {e.RawBinaryDataAsString}, Raw Binary Data Decoded: {e.RawBinaryDataDecoded}, IsError: {e.IsError}, Message: {e.Message}";
-            CLIEngine.ShowMessage(msg);
-        }
-
-        private static void _holoNETClient_OnAdminDumpStateCallBack(object sender, AdminDumpStateCallBackEventArgs e)
-        {
-            string msg = $"TEST HARNESS: _holoNETClient_OnAdminDumpStateCallBack, EndPoint: {e.EndPoint}, Id: {e.Id}, Raw Binary Data: {e.RawBinaryData}, Raw Binary Data As String: {e.RawBinaryDataAsString}, Raw Binary Data Decoded: {e.RawBinaryDataDecoded}, IsError: {e.IsError}, Message: {e.Message}";
-            CLIEngine.ShowMessage(msg);
-        }
-
-        private static void _holoNETClient_OnAdminDumpFullStateCallBack(object sender, AdminDumpFullStateCallBackEventArgs e)
-        {
-            string msg = $"TEST HARNESS: _holoNETClient_OnAdminDumpFullStateCallBack, EndPoint: {e.EndPoint}, Id: {e.Id}, Raw Binary Data: {e.RawBinaryData}, Raw Binary Data As String: {e.RawBinaryDataAsString}, Raw Binary Data Decoded: {e.RawBinaryDataDecoded}, IsError: {e.IsError}, Message: {e.Message}";
-            CLIEngine.ShowMessage(msg);
-        }
-
-        private static void _holoNETClient_OnAdminListAppInterfacesCallBack(object sender, AdminListAppInterfacesCallBackEventArgs e)
-        {
-            string msg = $"TEST HARNESS: _holoNETClient_OnAdminListAppInterfacesCallBack, EndPoint: {e.EndPoint}, Id: {e.Id}, Raw Binary Data: {e.RawBinaryData}, Raw Binary Data As String: {e.RawBinaryDataAsString}, Raw Binary Data Decoded: {e.RawBinaryDataDecoded}, IsError: {e.IsError}, Message: {e.Message}";
-            CLIEngine.ShowMessage(msg);
-        }
-
-        private static void _holoNETClient_OnAdminListCellIdsCallBack(object sender, AdminListCellIdsCallBackEventArgs e)
-        {
-            string msg = $"TEST HARNESS: _holoNETClient_OnAdminListCellIdsCallBack, EndPoint: {e.EndPoint}, Id: {e.Id}, Raw Binary Data: {e.RawBinaryData}, Raw Binary Data As String: {e.RawBinaryDataAsString}, Raw Binary Data Decoded: {e.RawBinaryDataDecoded}, IsError: {e.IsError}, Message: {e.Message}";
-            CLIEngine.ShowMessage(msg);
-        }
-
-        private static void _holoNETClient_OnAdminListDnasCallBack(object sender, AdminListDnasCallBackEventArgs e)
-        {
-            string msg = $"TEST HARNESS: _holoNETClient_OnAdminListDnasCallBack, EndPoint: {e.EndPoint}, Id: {e.Id}, Raw Binary Data: {e.RawBinaryData}, Raw Binary Data As String: {e.RawBinaryDataAsString}, Raw Binary Data Decoded: {e.RawBinaryDataDecoded}, IsError: {e.IsError}, Message: {e.Message}";
-            CLIEngine.ShowMessage(msg);
-        }
-
-        private static void _holoNETClient_OnAdminListAppsCallBack(object sender, AdminAppsListedCallBackEventArgs e)
-        {
-            string msg = $"TEST HARNESS: _holoNETClient_OnAdminAppsListedCallBack, EndPoint: {e.EndPoint}, Id: {e.Id}, Raw Binary Data: {e.RawBinaryData}, Raw Binary Data As String: {e.RawBinaryDataAsString}, Raw Binary Data Decoded: {e.RawBinaryDataDecoded}, IsError: {e.IsError}, Message: {e.Message}";
-            CLIEngine.ShowMessage(msg);
-        }
-
-        private static void _holoNETClient_OnAdminRegisterDnaCallBack(object sender, AdminRegisterDnaCallBackEventArgs e)
-        {
-            string msg = $"TEST HARNESS: _holoNETClient_OnAdminRegisterDnaCallBack, EndPoint: {e.EndPoint}, Id: {e.Id}, Raw Binary Data: {e.RawBinaryData}, Raw Binary Data As String: {e.RawBinaryDataAsString}, Raw Binary Data Decoded: {e.RawBinaryDataDecoded}, IsError: {e.IsError}, Message: {e.Message}";
-            CLIEngine.ShowMessage(msg);
-        }
-
-        private static void _holoNETClient_OnAdminAppInterfaceAttachedCallBack(object sender, AdminAppInterfaceAttachedCallBackEventArgs e)
-        {
-            string msg = $"TEST HARNESS: _holoNETClient_OnAdminAppInterfaceAttachedCallBack, EndPoint: {e.EndPoint}, Id: {e.Id}, Raw Binary Data: {e.RawBinaryData}, Raw Binary Data As String: {e.RawBinaryDataAsString}, Raw Binary Data Decoded: {e.RawBinaryDataDecoded}, IsError: {e.IsError}, Message: {e.Message}";
-            CLIEngine.ShowMessage(msg);
-        }
-
-        private static void _holoNETClient_OnAdminAppDisabledCallBack(object sender, AdminAppDisabledCallBackEventArgs e)
-        {
-            string msg = $"TEST HARNESS: _holoNETClient_OnAdminAppDisabledCallBack, EndPoint: {e.EndPoint}, Id: {e.Id}, Raw Binary Data: {e.RawBinaryData}, Raw Binary Data As String: {e.RawBinaryDataAsString}, Raw Binary Data Decoded: {e.RawBinaryDataDecoded}, IsError: {e.IsError}, Message: {e.Message}";
-            CLIEngine.ShowMessage(msg);
-        }
-
-        private static void _holoNETClient_OnAdminAppEnabledCallBack(object sender, AdminAppEnabledCallBackEventArgs e)
-        {
-            string msg = $"TEST HARNESS: _holoNETClient_OnAdminAppEnabledCallBack, EndPoint: {e.EndPoint}, Id: {e.Id}, Raw Binary Data: {e.RawBinaryData}, Raw Binary Data As String: {e.RawBinaryDataAsString}, Raw Binary Data Decoded: {e.RawBinaryDataDecoded}, IsError: {e.IsError}, Message: {e.Message}";
-            CLIEngine.ShowMessage(msg);
-        }
-
-        private static void _holoNETClient_OnAdminAppInstalledCallBack(object sender, AdminAppInstalledCallBackEventArgs e)
+        private static void _holoNETClientAdmin_OnAppInstalledCallBack(object sender, AppInstalledCallBackEventArgs e)
         {
             //string msg = $"TEST HARNESS: _holoNETClient_OnAdminAppInstalledCallBack, EndPoint: {e.EndPoint}, Id: {e.Id}, Raw Binary Data: {e.RawBinaryData}, Raw Binary Data As String: {e.RawBinaryDataAsString}, Raw Binary Data Decoded: {e.RawBinaryDataDecoded}, IsError: {e.IsError}, Message: {e.Message}";
-            string msg = $"TEST HARNESS: _holoNETClient_OnAdminAppInstalledCallBack, EndPoint: {e.EndPoint}, Id: {e.Id}, Raw Binary Data Decoded: {e.RawBinaryDataDecoded}, IsError: {e.IsError}, Message: {e.Message}";
+            string msg = $"TEST HARNESS: _holoNETClientAdmin_OnAppInstalledCallBack, EndPoint: {e.EndPoint}, Id: {e.Id}, Raw Binary Data Decoded: {e.RawBinaryDataDecoded}, IsError: {e.IsError}, Message: {e.Message}";
             CLIEngine.ShowMessage(msg);
         }
 
-        private static void _holoNETClient_OnAdminAgentPubKeyGeneratedCallBack(object sender, AdminAgentPubKeyGeneratedCallBackEventArgs e)
+        private static void _holoNETClientAdmin_OnAgentPubKeyGeneratedCallBack(object sender, AgentPubKeyGeneratedCallBackEventArgs e)
         {
-            string msg = $"TEST HARNESS: _holoNETClient_OnAdminAgentPubKeyGeneratedCallBack, EndPoint: {e.EndPoint}, Id: {e.Id},  AgentPubKey: {e.AgentPubKey}, IsError: {e.IsError}, Message: {e.Message}";
+            string msg = $"TEST HARNESS: _holoNETClientAdmin_OnAgentPubKeyGeneratedCallBack, EndPoint: {e.EndPoint}, Id: {e.Id},  AgentPubKey: {e.AgentPubKey}, IsError: {e.IsError}, Message: {e.Message}";
             CLIEngine.ShowMessage(msg);
         }
 
-        private static void _holoNETClient_OnHoloNETShutdownComplete(object sender, HoloNETShutdownEventArgs e)
+        private static void _holoNETClientAdmin_OnHoloNETShutdownComplete(object sender, HoloNETShutdownEventArgs e)
         {
             string msg = $"TEST HARNESS: OnHoloNETShutdownComplete, EndPoint: {e.EndPoint}, AgentPubKey: {e.AgentPubKey}, DnaHash: {e.DnaHash}, IsError: {e.IsError}, Message: {e.Message}";
             
@@ -673,9 +940,222 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
             CLIEngine.ShowMessage(msg);
         }
 
-        private static void _holoNETClient_OnHolochainConductorsShutdownComplete(object sender, HolochainConductorsShutdownEventArgs e)
+        private static void _holoNETClientAdmin_OnHolochainConductorsShutdownComplete(object sender, HolochainConductorsShutdownEventArgs e)
         {
             CLIEngine.ShowMessage($"TEST HARNESS: OnHolochainConductorsShutdownComplete, EndPoint: {e.EndPoint}, AgentPubKey: {e.AgentPubKey}, DnaHash: {e.DnaHash}, IsError: {e.IsError}, Message: {e.Message}, NumberOfHcExeInstancesShutdown: { e.NumberOfHcExeInstancesShutdown}, NumberOfHolochainExeInstancesShutdown: {e.NumberOfHolochainExeInstancesShutdown}, NumberOfRustcExeInstancesShutdown: {e.NumberOfRustcExeInstancesShutdown}.");
+        }
+
+
+
+        private static void _holoNETClientAppAgent_OnConnected(object sender, ConnectedEventArgs e)
+        {
+            CLIEngine.ShowMessage($"TEST HARNESS: _holoNETClientAppAgent_OnConnected, EndPoint: {e.EndPoint}");
+        }
+
+        private static void _holoNETClientAppAgent_OnDataSent(object sender, HoloNETDataSentEventArgs e)
+        {
+            CLIEngine.ShowMessage(string.Concat("\nTEST HARNESS: DATA SENT EVENT HANDLER: EndPoint: ", e.EndPoint, ", Raw JSON Data: ", e.RawJSONData, ", Raw Binary Data: ", e.RawBinaryData, ", IsError: ", e.IsError, ", Message:", e.Message));
+        }
+
+        private static void HoloNETClient_OnDataReceived(object sender, HoloNETDataReceivedEventArgs e)
+        {
+            if (!e.IsConductorDebugInfo)
+                CLIEngine.ShowMessage(string.Concat("\nTEST HARNESS: DATA RECEIVED EVENT HANDLER: EndPoint: ", e.EndPoint, ", Raw JSON Data: ", e.RawJSONData, ", Raw Binary Data: ", e.RawBinaryData, ", IsError: ", e.IsError, ", Message:", e.Message));
+        }
+
+        private async static void _holoNETClient_OnReadyForZomeCalls(object sender, ReadyForZomeCallsEventArgs e)
+        {
+            Console.WriteLine(string.Concat("TEST HARNESS: READY FOR ZOME CALLS EVENT HANDLER: EndPoint: ", e.EndPoint, ", AgentPubKey: ", e.AgentPubKey, ", DnaHash: ", e.DnaHash, ", IsError: ", e.IsError, ", Message: ", e.Message));
+            Console.WriteLine("");
+
+            switch (_testToRun)
+            {
+                case TestToRun.WhoAmI:
+                    {
+                        Console.WriteLine("Calling whoami function on WhoAmI Test Zome...\n");
+                        await _holoNETClientAppAgent.CallZomeFunctionAsync("whoami", "whoami", ZomeCallback, null);
+                    }
+                    break;
+
+                case TestToRun.Numbers:
+                    {
+                        Console.WriteLine("Calling add_ten function on Numbers Test Zome...\n");
+                        await _holoNETClientAppAgent.CallZomeFunctionAsync("numbers", "add_ten", ZomeCallback, new { number = 10 });
+                    }
+                    break;
+
+                case TestToRun.SaveLoadOASISEntryWithEntryDataObject:
+                case TestToRun.SaveLoadOASISEntryWithTypeOfEntryDataObject:
+                {
+                        Console.WriteLine("Calling create_entry_avatar function on OASIS Test Zome...\n");
+                        await _holoNETClientAppAgent.CallZomeFunctionAsync("oasis", "create_entry_avatar", ZomeCallback, new 
+                        { 
+                            id = Guid.NewGuid(), 
+                            first_name = "David", 
+                            last_name = "Ellams", 
+                            email = "davidellams@superland.com", 
+                            dob = "11/07/1980",
+                            created_date = DateTime.Now.ToString(),
+                            created_by = _holoNETClientAppAgent.HoloNETDNA.AgentPubKey,
+                            modified_date = "",
+                            modified_by = "",
+                            deleted_date = "",
+                            deleted_by = "",
+                            is_active = true,
+                            version = 1
+                        });
+                    }
+                    break;
+
+                case TestToRun.Signal:
+                    {
+                        Console.WriteLine("Calling test_signal function on OASIS Test Zome...\n");
+                        await _holoNETClientAppAgent.CallZomeFunctionAsync("oasis", "test_signal_as_string", ZomeCallback, "test signal data");
+                        //await _holoNETClientAppAgent.CallZomeFunctionAsync("oasis", "test_signal_as_int", ZomeCallback, 7);
+                        //await _holoNETClientAppAgent.CallZomeFunctionAsync("oasis", "test_signal_as_int_2", ZomeCallback, 8);
+                    }
+                    break;
+
+                case TestToRun.LoadTestNumbers:
+                    {
+                        Console.WriteLine("Calling add_ten function on Numbers Test Zome (Load Testing)...\n");
+
+                        for (int i = 0; i < 100; i++)
+                            await _holoNETClientAppAgent.CallZomeFunctionAsync("numbers", "add_ten", ZomeCallback, new { number = 10 });
+                    }
+                    break;
+
+                case TestToRun.LoadTestSaveLoadOASISEntry:
+                    {
+                        Console.WriteLine("Calling create_entry_avatar function on OASIS Test Zome (Load Testing)...\n");
+
+                        for (int i = 0; i < 100; i++)
+                        {
+                            await _holoNETClientAppAgent.CallZomeFunctionAsync("oasis", "create_entry_avatar", ZomeCallback, new
+                            {
+                                id = Guid.NewGuid(),
+                                first_name = "David",
+                                last_name = "Ellams",
+                                email = "davidellams@hotmail.com",
+                                dob = "11/07/1980",
+                                created_date = DateTime.Now.ToString(),
+                                created_by = _holoNETClientAppAgent.HoloNETDNA.AgentPubKey,
+                                modified_date = "",
+                                modified_by = "",
+                                deleted_date = "",
+                                deleted_by = "",
+                                is_active = true,
+                                version = 1
+                            });
+                        }
+                    }
+                    break;
+            }
+        }
+
+        private static void HoloNETClient_OnAppInfoCallBack(object sender, AppInfoCallBackEventArgs e)
+        {
+            string msg = $"TEST HARNESS: APPINFO CALLBACK EVENT HANDLER: EndPoint: { e.EndPoint}, Id: {e.Id}, AgentPubKey: {e.AgentPubKey}, DnaHash: {e.DnaHash}, Installed App Id: {e.InstalledAppId}, Raw Binary Data: {e.RawBinaryData}, IsError: {e.IsError}, Message: {e.Message}";
+            Console.WriteLine(string.Concat(msg, ", Raw JSON Data: ", e.RawJSONData));
+            Console.WriteLine("");
+        }
+
+        private static void HoloNETClient_OnConductorDebugCallBack(object sender, ConductorDebugCallBackEventArgs e)
+        {
+            Console.WriteLine(string.Concat("OnConductorDebugCallBack: EndPoint: ", e.EndPoint, ", Data: ", e.RawJSONData, ", NumberDelayedValidations: ", e.NumberDelayedValidations, ", NumberHeldAspects: ", e.NumberHeldAspects, ", NumberHeldEntries: ", e.NumberHeldEntries, ", NumberPendingValidations: ", e.NumberPendingValidations, ", NumberRunningZomeCalls: ", e.NumberRunningZomeCalls, ", Offline: ", e.Offline, ", Type: ", e.Type));
+            Console.WriteLine("");
+        }
+
+        private static void HoloNETClient_OnSignalCallBack(object sender, SignalCallBackEventArgs e)
+        {
+            Console.WriteLine(string.Concat("TEST HARNESS: SIGINALS CALLBACK EVENT HANDLER: EndPoint: ", e.EndPoint, ", Id: ", e.Id, ", Data: ", e.RawJSONData, ", AgentPubKey =  ", e.AgentPubKey, ", DnaHash = ", e.DnaHash, ", Signal Type: ", Enum.GetName(typeof(SignalType), e.SignalType), ", Signal Data: ", e.SignalDataAsString, ", IsError: ", e.IsError, ", Message: ", e.Message));
+            //Console.WriteLine("\nSignal Data:");
+
+            //foreach (string key in e.SignalData.Keys)
+            //    Console.WriteLine(string.Concat(key, "=", e.SignalData[key]), "\n");
+            
+            Console.WriteLine("");
+        }
+
+        private static void HoloNETClient_OnError(object sender, HoloNETErrorEventArgs e)
+        {
+            CLIEngine.ShowErrorMessage(string.Concat("TEST HARNESS: ERROR EVENT HANDLER: Error Occurred. Resason: ", e.Reason, ", EndPoint: ", e.EndPoint, ",Error Details: ", e.ErrorDetails));
+            Console.WriteLine("");
+        }
+
+        private static void ZomeCallback(object sender, ZomeFunctionCallBackEventArgs e)
+        {
+            Console.WriteLine(string.Concat("\nTEST HARNESS: ZOME CALLBACK DELEGATE EVENT HANDLER: ", ProcessZomeFunctionCallBackEventArgs(e)));
+            Console.WriteLine("");
+        }
+
+        private static void HoloNETClient_OnDisconnected(object sender, DisconnectedEventArgs e)
+        {
+            Console.WriteLine(string.Concat("TEST HARNESS: DISCONNECTED CALL BACK: Disconnected from ", e.EndPoint, ". Resason: ", e.Reason));
+            Console.WriteLine("");
+
+            //if (_testToRun == TestToRun.LoadTestNumbers || _testToRun == TestToRun.LoadTestSaveLoadOASISEntry)
+            //{
+            //    TimeSpan timeSpan = _endTime.Subtract(_startTime);
+            //    Console.WriteLine($"Test Complete: Time Took: {timeSpan}");
+            //}
+
+            Console.ReadKey();
+        }
+
+        private static void HoloNETClient_OnZomeFunctionCallBack(object sender, ZomeFunctionCallBackEventArgs e)
+        {
+            bool disconect = false;
+            Console.WriteLine(string.Concat("TEST HARNESS: ZOME FUNCTION CALLBACK EVENT HANDLER: ", ProcessZomeFunctionCallBackEventArgs(e)));
+            Console.WriteLine("");
+
+            if (!string.IsNullOrEmpty(e.ZomeReturnHash) && e.ZomeFunction == "create_entry_avatar" && (_testToRun == TestToRun.SaveLoadOASISEntryWithTypeOfEntryDataObject || _testToRun == TestToRun.SaveLoadOASISEntryWithEntryDataObject || _testToRun == TestToRun.LoadTestSaveLoadOASISEntry))
+            {
+                _saveEntryResponseReceived[_requestNumber] = true;
+
+                if (_testToRun == TestToRun.SaveLoadOASISEntryWithTypeOfEntryDataObject)
+                    _holoNETClientAppAgent.CallZomeFunctionAsync("oasis", "get_entry_avatar", ZomeCallback, e.ZomeReturnHash, typeof(AvatarEntryDataObject));
+
+                else if (_testToRun == TestToRun.SaveLoadOASISEntryWithEntryDataObject)
+                {
+                    _avatarEntryDataObject = new AvatarEntryDataObject();
+                    _holoNETClientAppAgent.CallZomeFunctionAsync("oasis", "get_entry_avatar", ZomeCallback, e.ZomeReturnHash, _avatarEntryDataObject);
+                }
+            }
+            else
+            {
+                //TODO: Need to make tests and results more accurate... (in future version)...
+                if (((_testToRun == TestToRun.LoadTestNumbers
+                    || _testToRun == TestToRun.LoadTestSaveLoadOASISEntry)
+                    && _numberOfZomeCallResponsesReceived >= 96)
+                    || (_testToRun != TestToRun.LoadTestNumbers
+                    && _testToRun != TestToRun.LoadTestSaveLoadOASISEntry))
+                {
+                    if (_testToRun == TestToRun.LoadTestNumbers || _testToRun == TestToRun.LoadTestSaveLoadOASISEntry)
+                    {
+                        _timer.Stop();
+                        Console.WriteLine($"Test Complete: Time Took: {_timer.Elapsed.Minutes} minute(s) and {_timer.Elapsed.Seconds} second(s).");
+                    }
+
+                    disconect = true;
+                }
+                else
+                    _numberOfZomeCallResponsesReceived++;
+            }
+
+            Console.WriteLine(String.Concat("Number Of Zome Call Responses Received = ", _numberOfZomeCallResponsesReceived));
+
+            if (disconect)
+            {
+                Console.WriteLine("");
+                //_holoNETClientAppAgent.ShutdownHoloNETAsync(DisconnectedCallBackMode.WaitForHolochainConductorToDisconnect, ShutdownHolochainConductorsMode.ShutdownAllConductors);
+
+                _holoNETClientAppAgent.Disconnect();
+                _holoNETClientAppAgent.ShutDownHolochainConductors();
+               
+            }
+
+            //_requestNumber++;
         }
 
         private static void Holon_OnInitialized(object sender, ReadyForZomeCallsEventArgs e)
@@ -736,6 +1216,39 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
         private static void Avatar_OnLoaded(object sender, ZomeFunctionCallBackEventArgs e)
         {
             CLIEngine.ShowMessage($"TEST HARNESS: Avatar_OnLoaded: {ProcessZomeFunctionCallBackEventArgs(e)}");
+        }
+
+        private static string ProcessZomeFunctionCallBackEventArgs(ZomeFunctionCallBackEventArgs args)
+        {
+            string result = "";
+            //result = string.Concat("\nEndPoint: ", args.EndPoint, "\nId: ", args.Id, "\nZome: ", args.Zome, "\nZomeFunction: ", args.ZomeFunction, "\n\nZomeReturnData: ", args.ZomeReturnData, "\nZomeReturnHash: ", args.ZomeReturnHash, "\nRaw Zome Return Data: ", args.RawZomeReturnData, "\nRaw Binary Data: ", args.RawBinaryData, "\nRaw Binary Data As String: ", args.RawBinaryDataAsString, "\nRaw Binary Data Decoded: ", args.RawBinaryDataDecoded, "\nRaw Binary Data After MessagePack Decode: ", args.RawBinaryDataAfterMessagePackDecode, "\nRaw Binary Data After MessagePack Decode As String: ", args.RawBinaryDataAfterMessagePackDecodeAsString, "\nRaw Binary Data Decoded After MessagePack Decode: ", args.RawBinaryDataAfterMessagePackDecodeDecoded, "\nRaw JSON Data: ", args.RawJSONData, "\nIsCallSuccessful: ", args.IsCallSuccessful ? "true" : "false", "\nIsError: ", args.IsError ? "true" : "false", "\nMessage: ", args.Message);
+            result = string.Concat("\nEndPoint: ", args.EndPoint, "\nId: ", args.Id, "\nZome: ", args.Zome, "\nZomeFunction: ", args.ZomeFunction, "\n\nZomeReturnData: ", args.ZomeReturnData, "\nZomeReturnHash: ", args.ZomeReturnHash, "\nRaw Zome Return Data: ", args.RawZomeReturnData, "\nRaw Binary Data: ", args.RawBinaryData, "\nRaw Binary Data As String: ", args.RawBinaryDataAsString, "\nRaw Binary Data Decoded: ", args.RawBinaryDataDecoded, "\nRaw JSON Data: ", args.RawJSONData, "\nIsError: ", args.IsError ? "true" : "false", "\nMessage: ", args.Message);
+
+            if (!string.IsNullOrEmpty(args.KeyValuePairAsString))
+                result = string.Concat(result, "\n\nProcessed Zome Return Data:\n", args.KeyValuePairAsString);
+
+            if (args.Records != null && args.Records[0] != null)
+            {
+                AvatarEntryDataObject avatar = args.Records[0].EntryDataObject as AvatarEntryDataObject;
+
+                if (avatar != null)
+                    result = BuildEntryDataObjectMessage(avatar, "Entry.EntryDataObject", result);
+            }
+            
+            if (_avatarEntryDataObject != null)
+                result = BuildEntryDataObjectMessage(_avatarEntryDataObject, "Global.EntryDataObject", result);
+
+            return result;
+        }
+
+        private static string BuildEntryDataObjectMessage(AvatarEntryDataObject avatar, string header, string message)
+        {
+            message = string.Concat(message, "\n\n", header, ".FirstName: ", avatar.FirstName);
+            message = string.Concat(message, "\n", header, ".LastName: ", avatar.LastName);
+            message = string.Concat(message, "\n", header, ".Email: ", avatar.Email);
+            message = string.Concat(message, "\n", header, ".DOB: ", avatar.DOB);
+
+            return message;
         }
 
         private static Avatar ResetAvatar(Avatar avatar)
@@ -836,464 +1349,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
             Console.WriteLine(string.Concat("Holon.DeletedDate = ", holon.DeletedDate.ToString()));
             Console.WriteLine(string.Concat("Holon.DeletedBy = ", holon.DeletedBy));
             Console.WriteLine(string.Concat("Holon.IsActive = ", holon.IsActive.ToString()));
-        }
-
-        private async static void _holoNETClient_OnReadyForZomeCalls(object sender, ReadyForZomeCallsEventArgs e)
-        {
-            Console.WriteLine(string.Concat("TEST HARNESS: READY FOR ZOME CALLS EVENT HANDLER: EndPoint: ", e.EndPoint, ", AgentPubKey: ", e.AgentPubKey, ", DnaHash: ", e.DnaHash, ", IsError: ", e.IsError, ", Message: ", e.Message));
-            Console.WriteLine("");
-
-            switch (_testToRun)
-            {
-                //case TestToRun.AdminGrantCapability:
-                //    {
-                //        Console.WriteLine("Calling GrantCapabilityAsync function on Admin API...\n");
-                //        await _holoNETClient.GrantCapabilityAsync(GrantedFunctionsType.Listed, new List<(string, string)>()
-                //        {
-                //            ("zome1", "function1"),
-                //            ("zome2", "function2")
-                //        });
-                //    }
-                //    break;
-
-                case TestToRun.WhoAmI:
-                    {
-                        Console.WriteLine("Calling whoami function on WhoAmI Test Zome...\n");
-                        await _holoNETClient.CallZomeFunctionAsync("whoami", "whoami", ZomeCallback, null);
-                    }
-                    break;
-
-                case TestToRun.Numbers:
-                    {
-                        Console.WriteLine("Calling add_ten function on Numbers Test Zome...\n");
-                        await _holoNETClient.CallZomeFunctionAsync("numbers", "add_ten", ZomeCallback, new { number = 10 });
-                    }
-                    break;
-
-                case TestToRun.SaveLoadOASISEntryWithEntryDataObject:
-                case TestToRun.SaveLoadOASISEntryWithTypeOfEntryDataObject:
-                {
-                        Console.WriteLine("Calling create_entry_avatar function on OASIS Test Zome...\n");
-                        await _holoNETClient.CallZomeFunctionAsync("oasis", "create_entry_avatar", ZomeCallback, new 
-                        { 
-                            id = Guid.NewGuid(), 
-                            first_name = "David", 
-                            last_name = "Ellams", 
-                            email = "davidellams@hotmail.com", 
-                            dob = "11/07/1980",
-                            created_date = DateTime.Now.ToString(),
-                            created_by = _holoNETClient.HoloNETDNA.AgentPubKey,
-                            modified_date = "",
-                            modified_by = "",
-                            deleted_date = "",
-                            deleted_by = "",
-                            is_active = true,
-                            version = 1
-                        });
-                    }
-                    break;
-
-                case TestToRun.Signal:
-                    {
-                        Console.WriteLine("Calling test_signal function on OASIS Test Zome...\n");
-                        await _holoNETClient.CallZomeFunctionAsync("oasis", "test_signal_as_string", ZomeCallback, "test signal data");
-                        //await _holoNETClient.CallZomeFunctionAsync("oasis", "test_signal_as_int", ZomeCallback, 7);
-                        //await _holoNETClient.CallZomeFunctionAsync("oasis", "test_signal_as_int_2", ZomeCallback, 8);
-                    }
-                    break;
-
-                case TestToRun.LoadTestNumbers:
-                    {
-                        Console.WriteLine("Calling add_ten function on Numbers Test Zome (Load Testing)...\n");
-
-                        for (int i = 0; i < 100; i++)
-                            await _holoNETClient.CallZomeFunctionAsync("numbers", "add_ten", ZomeCallback, new { number = 10 });
-                    }
-                    break;
-
-                case TestToRun.LoadTestSaveLoadOASISEntry:
-                    {
-                        Console.WriteLine("Calling create_entry_avatar function on OASIS Test Zome (Load Testing)...\n");
-
-                        for (int i = 0; i < 100; i++)
-                        {
-                            await _holoNETClient.CallZomeFunctionAsync("oasis", "create_entry_avatar", ZomeCallback, new
-                            {
-                                id = Guid.NewGuid(),
-                                first_name = "David",
-                                last_name = "Ellams",
-                                email = "davidellams@hotmail.com",
-                                dob = "11/07/1980",
-                                created_date = DateTime.Now.ToString(),
-                                created_by = _holoNETClient.HoloNETDNA.AgentPubKey,
-                                modified_date = "",
-                                modified_by = "",
-                                deleted_date = "",
-                                deleted_by = "",
-                                is_active = true,
-                                version = 1
-                            });
-                        }
-                    }
-                    break;
-            }
-        }
-
-        private static void HoloNETClient_OnAppInfoCallBack(object sender, AppInfoCallBackEventArgs e)
-        {
-            string msg = $"TEST HARNESS: APPINFO CALLBACK EVENT HANDLER: EndPoint: { e.EndPoint}, Id: {e.Id}, AgentPubKey: {e.AgentPubKey}, DnaHash: {e.DnaHash}, Installed App Id: {e.InstalledAppId}, Raw Binary Data: {e.RawBinaryData}, IsError: {e.IsError}, Message: {e.Message}";
-            Console.WriteLine(string.Concat(msg, ", Raw JSON Data: ", e.RawJSONData));
-            Console.WriteLine("");
-        }
-
-        private static void HoloNETClient_OnConductorDebugCallBack(object sender, ConductorDebugCallBackEventArgs e)
-        {
-            Console.WriteLine(string.Concat("OnConductorDebugCallBack: EndPoint: ", e.EndPoint, ", Data: ", e.RawJSONData, ", NumberDelayedValidations: ", e.NumberDelayedValidations, ", NumberHeldAspects: ", e.NumberHeldAspects, ", NumberHeldEntries: ", e.NumberHeldEntries, ", NumberPendingValidations: ", e.NumberPendingValidations, ", NumberRunningZomeCalls: ", e.NumberRunningZomeCalls, ", Offline: ", e.Offline, ", Type: ", e.Type));
-            Console.WriteLine("");
-        }
-
-        private static void HoloNETClient_OnSignalCallBack(object sender, SignalCallBackEventArgs e)
-        {
-            Console.WriteLine(string.Concat("TEST HARNESS: SIGINALS CALLBACK EVENT HANDLER: EndPoint: ", e.EndPoint, ", Id: ", e.Id, ", Data: ", e.RawJSONData, ", AgentPubKey =  ", e.AgentPubKey, ", DnaHash = ", e.DnaHash, ", Signal Type: ", Enum.GetName(typeof(SignalType), e.SignalType), ", Signal Data: ", e.SignalDataAsString, ", IsError: ", e.IsError, ", Message: ", e.Message));
-            //Console.WriteLine("\nSignal Data:");
-
-            //foreach (string key in e.SignalData.Keys)
-            //    Console.WriteLine(string.Concat(key, "=", e.SignalData[key]), "\n");
-            
-            Console.WriteLine("");
-        }
-
-        private static void HoloNETClient_OnError(object sender, HoloNETErrorEventArgs e)
-        {
-            CLIEngine.ShowErrorMessage(string.Concat("TEST HARNESS: ERROR EVENT HANDLER: Error Occurred. Resason: ", e.Reason, ", EndPoint: ", e.EndPoint, ",Error Details: ", e.ErrorDetails));
-            Console.WriteLine("");
-        }
-
-        private static void ZomeCallback(object sender, ZomeFunctionCallBackEventArgs e)
-        {
-            Console.WriteLine(string.Concat("\nTEST HARNESS: ZOME CALLBACK DELEGATE EVENT HANDLER: ", ProcessZomeFunctionCallBackEventArgs(e)));
-            Console.WriteLine("");
-        }
-
-        private static void HoloNETClient_OnDisconnected(object sender, DisconnectedEventArgs e)
-        {
-            Console.WriteLine(string.Concat("TEST HARNESS: DISCONNECTED CALL BACK: Disconnected from ", e.EndPoint, ". Resason: ", e.Reason));
-            Console.WriteLine("");
-
-            //if (_testToRun == TestToRun.LoadTestNumbers || _testToRun == TestToRun.LoadTestSaveLoadOASISEntry)
-            //{
-            //    TimeSpan timeSpan = _endTime.Subtract(_startTime);
-            //    Console.WriteLine($"Test Complete: Time Took: {timeSpan}");
-            //}
-
-            Console.ReadKey();
-        }
-
-        private static void HoloNETClient_OnZomeFunctionCallBack(object sender, ZomeFunctionCallBackEventArgs e)
-        {
-            bool disconect = false;
-            Console.WriteLine(string.Concat("TEST HARNESS: ZOME FUNCTION CALLBACK EVENT HANDLER: ", ProcessZomeFunctionCallBackEventArgs(e)));
-            Console.WriteLine("");
-
-            //if (!string.IsNullOrEmpty(e.ZomeReturnHash) && e.ZomeFunction == "create_entry_avatar" && (_testToRun == TestToRun.SaveLoadOASISEntry || _testToRun == TestToRun.LoadTestSaveLoadOASISEntry))
-            //{
-            //    _saveEntryResponseReceived[_requestNumber] = true;
-            //    _holoNETClient.CallZomeFunctionAsync(_requestNumber.ToString(), "oasis", "get_entry_avatar", ZomeCallback, e.ZomeReturnHash);
-            //}
-            //else if (e.ZomeFunction == "get_entry_avatar")
-            //{
-            //    _loadEntryResponseReceived[_requestNumber] = true;
-            //    _numberOfZomeCallResponsesReceived++;
-            //}
-
-            //if (_loadEntryResponseReceived.Count >= 100)
-            //    _holoNETClient.Disconnect();
-
-            //Console.WriteLine(String.Concat("Current Request Number = ", _requestNumber));
-            //Console.WriteLine(String.Concat("Number Of Zome Call Responses Received = ", _numberOfZomeCallResponsesReceived));
-            //Console.WriteLine(String.Concat("Save Entry Response Received = ", _saveEntryResponseReceived.Count));
-            //Console.WriteLine(String.Concat("Load Entry Response Received = ", _loadEntryResponseReceived.Count));
-
-            if (!string.IsNullOrEmpty(e.ZomeReturnHash) && e.ZomeFunction == "create_entry_avatar" && (_testToRun == TestToRun.SaveLoadOASISEntryWithTypeOfEntryDataObject || _testToRun == TestToRun.SaveLoadOASISEntryWithEntryDataObject || _testToRun == TestToRun.LoadTestSaveLoadOASISEntry))
-            {
-                _saveEntryResponseReceived[_requestNumber] = true;
-
-                if (_testToRun == TestToRun.SaveLoadOASISEntryWithTypeOfEntryDataObject)
-                    _holoNETClient.CallZomeFunctionAsync("oasis", "get_entry_avatar", ZomeCallback, e.ZomeReturnHash, typeof(AvatarEntryDataObject));
-
-                else if (_testToRun == TestToRun.SaveLoadOASISEntryWithEntryDataObject)
-                {
-                    _avatarEntryDataObject = new AvatarEntryDataObject();
-                    _holoNETClient.CallZomeFunctionAsync("oasis", "get_entry_avatar", ZomeCallback, e.ZomeReturnHash, _avatarEntryDataObject);
-                }
-            }
-            else
-            {
-                //TODO: Need to make tests and results more accurate... (in future version)...
-                if (((_testToRun == TestToRun.LoadTestNumbers
-                    || _testToRun == TestToRun.LoadTestSaveLoadOASISEntry)
-                    && _numberOfZomeCallResponsesReceived >= 96)
-                    || (_testToRun != TestToRun.LoadTestNumbers
-                    && _testToRun != TestToRun.LoadTestSaveLoadOASISEntry))
-                {
-                    if (_testToRun == TestToRun.LoadTestNumbers || _testToRun == TestToRun.LoadTestSaveLoadOASISEntry)
-                    {
-                        _timer.Stop();
-                        Console.WriteLine($"Test Complete: Time Took: {_timer.Elapsed.Minutes} minute(s) and {_timer.Elapsed.Seconds} second(s).");
-                    }
-
-                    disconect = true;
-                }
-                else
-                    _numberOfZomeCallResponsesReceived++;
-            }
-
-            Console.WriteLine(String.Concat("Number Of Zome Call Responses Received = ", _numberOfZomeCallResponsesReceived));
-
-            if (disconect)
-            {
-                Console.WriteLine("");
-                //_holoNETClient.ShutdownHoloNETAsync(DisconnectedCallBackMode.WaitForHolochainConductorToDisconnect, ShutdownHolochainConductorsMode.ShutdownAllConductors);
-
-                _holoNETClient.Disconnect();
-                _holoNETClient.ShutDownHolochainConductors();
-               
-            }
-
-            //_requestNumber++;
-        }
-
-        private static string ProcessZomeFunctionCallBackEventArgs(ZomeFunctionCallBackEventArgs args)
-        {
-            string result = "";
-            //result = string.Concat("\nEndPoint: ", args.EndPoint, "\nId: ", args.Id, "\nZome: ", args.Zome, "\nZomeFunction: ", args.ZomeFunction, "\n\nZomeReturnData: ", args.ZomeReturnData, "\nZomeReturnHash: ", args.ZomeReturnHash, "\nRaw Zome Return Data: ", args.RawZomeReturnData, "\nRaw Binary Data: ", args.RawBinaryData, "\nRaw Binary Data As String: ", args.RawBinaryDataAsString, "\nRaw Binary Data Decoded: ", args.RawBinaryDataDecoded, "\nRaw Binary Data After MessagePack Decode: ", args.RawBinaryDataAfterMessagePackDecode, "\nRaw Binary Data After MessagePack Decode As String: ", args.RawBinaryDataAfterMessagePackDecodeAsString, "\nRaw Binary Data Decoded After MessagePack Decode: ", args.RawBinaryDataAfterMessagePackDecodeDecoded, "\nRaw JSON Data: ", args.RawJSONData, "\nIsCallSuccessful: ", args.IsCallSuccessful ? "true" : "false", "\nIsError: ", args.IsError ? "true" : "false", "\nMessage: ", args.Message);
-            result = string.Concat("\nEndPoint: ", args.EndPoint, "\nId: ", args.Id, "\nZome: ", args.Zome, "\nZomeFunction: ", args.ZomeFunction, "\n\nZomeReturnData: ", args.ZomeReturnData, "\nZomeReturnHash: ", args.ZomeReturnHash, "\nRaw Zome Return Data: ", args.RawZomeReturnData, "\nRaw Binary Data: ", args.RawBinaryData, "\nRaw Binary Data As String: ", args.RawBinaryDataAsString, "\nRaw Binary Data Decoded: ", args.RawBinaryDataDecoded, "\nRaw JSON Data: ", args.RawJSONData, "\nIsCallSuccessful: ", args.IsCallSuccessful ? "true" : "false", "\nIsError: ", args.IsError ? "true" : "false", "\nMessage: ", args.Message);
-
-            if (!string.IsNullOrEmpty(args.KeyValuePairAsString))
-                result = string.Concat(result, "\n\nProcessed Zome Return Data:\n", args.KeyValuePairAsString);
-
-            if (args.Entry != null && args.Entry.EntryDataObject != null)
-            {
-                AvatarEntryDataObject avatar = args.Entry.EntryDataObject as AvatarEntryDataObject;
-
-                if (avatar != null)
-                    result = BuildEntryDataObjectMessage(avatar, "Entry.EntryDataObject", result);
-            }
-            
-            if (_avatarEntryDataObject != null)
-                result = BuildEntryDataObjectMessage(_avatarEntryDataObject, "Global.EntryDataObject", result);
-
-            return result;
-        }
-
-        private static string BuildEntryDataObjectMessage(AvatarEntryDataObject avatar, string header, string message)
-        {
-            message = string.Concat(message, "\n\n", header, ".FirstName: ", avatar.FirstName);
-            message = string.Concat(message, "\n", header, ".LastName: ", avatar.LastName);
-            message = string.Concat(message, "\n", header, ".Email: ", avatar.Email);
-            message = string.Concat(message, "\n", header, ".DOB: ", avatar.DOB);
-
-            return message;
-        }
-
-        private static void HoloNETClient_OnDataReceived(object sender, HoloNETDataReceivedEventArgs e)
-        {
-            if (!e.IsConductorDebugInfo)
-            {
-                //Console.WriteLine(string.Concat("\nTEST HARNESS: DATA RECEIVED EVENT HANDLER: EndPoint: ", e.EndPoint, ", Raw JSON Data: ", e.RawJSONData, ", Raw Binary Data: ", e.RawBinaryData, ", Raw Binary Data After MessagePack Decode: ", e.RawBinaryDataAfterMessagePackDecode, ", Raw Binary Data After MessagePack Decode As String: ", e.RawBinaryDataAfterMessagePackDecodeAsString, ", IsError: ", e.IsError, ", Message:", e.Message));
-                Console.WriteLine(string.Concat("\nTEST HARNESS: DATA RECEIVED EVENT HANDLER: EndPoint: ", e.EndPoint, ", Raw JSON Data: ", e.RawJSONData, ", Raw Binary Data: ", e.RawBinaryData, ", IsError: ", e.IsError, ", Message:", e.Message));
-                Console.WriteLine("");
-            }
-        }
-
-        private static async void HoloNETClient_OnConnected(object sender, ConnectedEventArgs e)
-        {
-            Console.WriteLine(string.Concat("TEST HARNESS: CONNECTED CALLBACK: Connected to ", e.EndPoint));
-            Console.WriteLine("");
-
-            switch (_testToRun)
-            {
-                case TestToRun.AdminGenerateAgentPubKey:
-                    {
-                        Console.WriteLine("Calling AdminGenerateAgentPubKeyAsync function on Admin API...\n");
-                        await _holoNETClient.AdminGenerateAgentPubKeyAsync();
-                    }
-                    break;
-
-                case TestToRun.AdminInstallApp:
-                    {
-                        Console.WriteLine("Calling AdminInstallAppAsync function on Admin API...\n");
-                        await _holoNETClient.AdminInstallAppAsync("oasis-app4", _oasisHappPath);
-                    }
-                    break;
-
-                case TestToRun.AdminEnableApp:
-                    {
-                        Console.WriteLine("Calling AdminEnableAppAsync function on Admin API...\n");
-                        await _holoNETClient.AdminEnableAppAsync("test-app");
-                    }
-                    break;
-
-                case TestToRun.AdminDisableApp:
-                    {
-                        Console.WriteLine("Calling AdminDisableAppAsync function on Admin API...\n");
-                        await _holoNETClient.AdminDisableAppAsync("test-app");
-                    }
-                    break;
-
-                case TestToRun.AdminAuthorizeSigningCredentials:
-                    {
-                        Console.WriteLine("Calling AdminAuthorizeSigningCredentialsAsync function on Admin API...\n");
-                        await _holoNETClient.AdminAuthorizeSigningCredentialsAndGrantZomeCallCapabilityAsync(_holoNETClient.HoloNETDNA.CellId, CapGrantAccessType.Assigned, GrantedFunctionsType.Listed, new List<(string, string)>()
-                        {
-                            ("zome1", "function1"),
-                            ("zome2", "function2")
-                        });
-                    }
-                    break;
-
-                case TestToRun.AdminAttachAppInterface:
-                    {
-                        Console.WriteLine("Calling AdminAttachAppInterfaceAsync function on Admin API...\n");
-                        await _holoNETClient.AdminAttachAppInterfaceAsync(777);
-                    }
-                    break;
-
-                case TestToRun.AdminRegisterDna:
-                    {
-                        Console.WriteLine("Calling AdminRegisterDna function on Admin API...\n");
-                        await _holoNETClient.AdminRegisterDnaAsync(_oasisDnaPath);
-
-                        await _holoNETClient.AdminRegisterDnaAsync(new DnaBundle() 
-                        { 
-                            manifest = new DnaManifest() 
-                            { 
-                                manifest_version = "1",
-                                name = "oasis-test",
-                                network_seed = "1",
-                                properties = "test props",
-                                zomes = new ZomeManifest[]
-                                {
-                                    new ZomeManifest()
-                                    {
-                                         //bundled = "", //Can ONLY be one of bundled, path or url.
-                                         path = _oasisDnaPath, //Can ONLY be one of bundled, path or url.
-                                         //url = "", //Can ONLY be one of bundled, path or url.
-                                         name = "OASIS Test",
-                                         hash = "",
-                                         dependencies = new ZomeDependency[]{ new ZomeDependency(){ name = "oasis"} }
-                                    }
-                                }
-
-                            },
-                            resources = new Dictionary<string, byte[]>()
-                        });
-                    }
-                    break;
-
-                case TestToRun.AdminListApps:
-                    {
-                        Console.WriteLine("Calling AdminListApps function on Admin API...\n");
-                        await _holoNETClient.AdminListAppsAsync(AppStatusFilter.Running);
-                    }
-                    break;
-
-                case TestToRun.AdminListDnas:
-                    {
-                        Console.WriteLine("Calling AdminListDnas function on Admin API...\n");
-                        await _holoNETClient.AdminListDnasAsync();
-                    }
-                    break;
-
-                case TestToRun.AdminListCellIds:
-                    {
-                        Console.WriteLine("Calling AdminListCellIds function on Admin API...\n");
-                        await _holoNETClient.AdminListCellIdsAsync();
-                    }
-                    break;
-
-                case TestToRun.AdminListInterfaces:
-                    {
-                        Console.WriteLine("Calling AdminListInterfaces function on Admin API...\n");
-                        await _holoNETClient.AdminListInterfacesAsync();
-                    }
-                    break;
-
-                case TestToRun.AdminDumpFullState:
-                    {
-                        Console.WriteLine("Calling AdminDumpFullState function on Admin API...\n");
-                        await _holoNETClient.AdminDumpFullStateAsync();
-                    }
-                    break;
-
-                case TestToRun.AdminDumpState:
-                    {
-                        Console.WriteLine("Calling AdminDumpState function on Admin API...\n");
-                        await _holoNETClient.AdminDumpStateAsync();
-                    }
-                    break;
-
-                case TestToRun.AdminGetDnaDefinition:
-                    {
-                        Console.WriteLine("Calling AdminGetDnaDefinition function on Admin API...\n");
-                        await _holoNETClient.AdminGetDnaDefinitionAsync(_oasisDnaHash);
-                    }
-                    break;
-
-                case TestToRun.AdminUpdateCoordinators:
-                    {
-                        Console.WriteLine("Calling AdminUpdateCoordinators function on Admin API...\n");
-                        await _holoNETClient.AdminUpdateCoordinatorsAsync(_oasisDnaHash, _oasisDnaPath);
-                    }
-                    break;
-
-                case TestToRun.AdminGetAgentInfo:
-                    {
-                        Console.WriteLine("Calling AdminGetAgentInfo function on Admin API...\n");
-                        await _holoNETClient.AdminGetAgentInfoAsync();
-                    }
-                    break;
-
-                case TestToRun.AdminAddAgentInfo:
-                    {
-                        Console.WriteLine("Calling AdminAddAgentInfo function on Admin API...\n");
-                        await _holoNETClient.AdminAddAgentInfoAsync(new AgentInfo[]
-                        {
-                            new AgentInfo
-                            {
-                                agent = new KitsuneAgent(new byte[] { }),
-                                space = new KitsuneSpace(new byte[] { }),
-                                signature = new KitsuneSignature(new byte[] { }),
-                                encoded_bytes = new byte[] {},
-                                expires_at_ms = 0,
-                                signed_at_ms= 0,
-                                url_list = new string[] { "http://holochain.org", "http://holo-net.com"}
-                            }
-                        });
-                    }
-                    break;
-
-                case TestToRun.AdminDeleteCloneCell:
-                    {
-                        Console.WriteLine("Calling AdminDeleteCloneCell function on Admin API...\n");
-                        await _holoNETClient.AdminDeleteCloneCellAsync("oasis");
-                    }
-                    break;
-
-                case TestToRun.AdminGetStorageInfo:
-                    {
-                        Console.WriteLine("Calling AdminGetStorageInfo function on Admin API...\n");
-                        await _holoNETClient.AdminGetStorageInfoAsync();
-                    }
-                    break;
-
-                case TestToRun.AdminDumpNetworkStats:
-                    {
-                        Console.WriteLine("Calling AdminDumpNetworkStats function on Admin API...\n");
-                        await _holoNETClient.AdminDumpNetworkStatsAsync();
-                    }
-                    break;
-            }
         }
     }
 }

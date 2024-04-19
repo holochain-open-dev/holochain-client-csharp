@@ -16,8 +16,8 @@ Once you have Holochain setup on your machine and got the example hApp ready abo
 The Test Harness sets the paths to the test hApp you compiled above using the following lines:
 
 ````c#
-_holoNETClient.Config.FullPathToRootHappFolder = string.Concat(Environment.CurrentDirectory, @"\hApps\happ-build-tutorial-develop");
-_holoNETClient.Config.FullPathToCompiledHappFolder = string.Concat(Environment.CurrentDirectory, @"\hApps\happ-build-tutorial-develop\workdir\happ");
+_holoNETClientAppAgent.Config.FullPathToRootHappFolder = string.Concat(Environment.CurrentDirectory, @"\hApps\happ-build-tutorial-develop");
+_holoNETClientAppAgent.Config.FullPathToCompiledHappFolder = string.Concat(Environment.CurrentDirectory, @"\hApps\happ-build-tutorial-develop\workdir\happ");
 ````
 
 If you wish to run the OASIS test (real world use case saving and loading an entry) then you will need to clone this repo: \
@@ -26,8 +26,8 @@ https://github.com/NextGenSoftwareUK/OASIS-Holochain-hApp
 The Test Harness will set the paths to the OASIS hApp you compiled above using the following lines:
 
 ````c#
-_holoNETClient.Config.FullPathToRootHappFolder = string.Concat(Environment.CurrentDirectory, @"\hApps\OASIS-Holochain-hApp");
-_holoNETClient.Config.FullPathToCompiledHappFolder = string.Concat(Environment.CurrentDirectory, @"\hApps\OASIS-Holochain-hApp\zomes\workdir\happ");
+_holoNETClientAppAgent.Config.FullPathToRootHappFolder = string.Concat(Environment.CurrentDirectory, @"\hApps\OASIS-Holochain-hApp");
+_holoNETClientAppAgent.Config.FullPathToCompiledHappFolder = string.Concat(Environment.CurrentDirectory, @"\hApps\OASIS-Holochain-hApp\zomes\workdir\happ");
 ````
 
 Finally, from within your app simply call the following method:
