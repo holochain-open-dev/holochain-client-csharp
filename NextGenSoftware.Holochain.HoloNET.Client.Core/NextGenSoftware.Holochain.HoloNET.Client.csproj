@@ -3,15 +3,15 @@
   <PropertyGroup>
 	  <TargetFramework>net8.0</TargetFramework>
 	  <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-	  <PackageId>NextGenSoftware.Holochain.HoloNET.Client.Embedded</PackageId>
-	  <!--<PackageId>NextGenSoftware.Holochain.HoloNET.Client</PackageId>-->
+	  <!--<PackageId>NextGenSoftware.Holochain.HoloNET.Client.Embedded</PackageId>-->
+	  <PackageId>NextGenSoftware.Holochain.HoloNET.Client</PackageId>
 	  <Company>NextGen Software Ltd</Company>
 	  <Product>HoloNET Holochain Client</Product>
 	  <Title>HoloNET Holochain Client</Title>
-	  <!--<Summary>The world's first .NET &amp; Unity client for Holochain.</Summary>-->
-	  <Summary>The world's first .NET &amp; Unity client for Holochain. This version comes with the Holochain binaries built in.</Summary>
-	  <!--<Description>The world's first .NET &amp; Unity client for Holochain.</Description>-->
-	  <Description>The world's first .NET &amp; Unity client for Holochain. This version comes with the Holochain binaries built in.</Description>
+	  <Summary>The world's first .NET &amp; Unity client for Holochain.</Summary>
+	  <!--<Summary>The world's first .NET &amp; Unity client for Holochain. This version comes with the Holochain binaries built in.</Summary>-->
+	  <Description>The world's first .NET &amp; Unity client for Holochain.</Description>
+	  <!--<Description>The world's first .NET &amp; Unity client for Holochain. This version comes with the Holochain binaries built in.</Description>-->
 	  <PackageProjectUrl>https://github.com/holochain-open-dev/holochain-client-csharp</PackageProjectUrl>
 	  <PackageIcon>hc logo.png</PackageIcon>
 	  <Authors>David Ellams (NextGen Software Ltd)</Authors>

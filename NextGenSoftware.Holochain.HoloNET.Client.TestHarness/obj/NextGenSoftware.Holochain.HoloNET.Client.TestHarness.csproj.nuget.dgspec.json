@@ -8,7 +8,7 @@
       "version": "3.0.2",
       "restore": {
         "projectUniqueName": "C:\\Users\\USER\\source\\repos\\holochain-client-csharp\\NextGenSoftware.Holochain.HoloNET.Client.Core\\NextGenSoftware.Holochain.HoloNET.Client.csproj",
-        "projectName": "NextGenSoftware.Holochain.HoloNET.Client.Embedded",
+        "projectName": "NextGenSoftware.Holochain.HoloNET.Client",
         "projectPath": "C:\\Users\\USER\\source\\repos\\holochain-client-csharp\\NextGenSoftware.Holochain.HoloNET.Client.Core\\NextGenSoftware.Holochain.HoloNET.Client.csproj",
         "packagesPath": "C:\\Users\\USER\\.nuget\\packages\\",
         "outputPath": "C:\\Users\\USER\\source\\repos\\holochain-client-csharp\\NextGenSoftware.Holochain.HoloNET.Client.Core\\obj\\",

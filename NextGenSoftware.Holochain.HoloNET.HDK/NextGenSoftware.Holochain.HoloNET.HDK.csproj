@@ -9,11 +9,14 @@
     <InvariantGlobalization>true</InvariantGlobalization>
 	  <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 	  <PackageId>NextGenSoftware.Holochain.HoloNET.HDK</PackageId>
+	  <!--<PackageId>NextGenSoftware.Holochain.HoloNET.HDK.Embedded</PackageId>-->
 	  <Company>NextGen Software Ltd</Company>
 	  <Product>HoloNET HDK</Product>
 	  <Title>HoloNET HDK</Title>
 	  <Summary>Powerful .NET HDK built on top of the world's first .NET &amp; Unity Client for Holochain &amp; the WEB5 STAR ODK Omniverse Interoperable Metaverse No/Low Code Generator.</Summary>
 	  <Description>Powerful .NET HDK built on top of the world's first .NET &amp; Unity Client for Holochain &amp; the WEB5 STAR ODK Omniverse Interoperable Metaverse No/Low Code Generator.</Description>
+	  <!--<Summary>Powerful .NET HDK built on top of the world's first .NET &amp; Unity Client for Holochain &amp; the WEB5 STAR ODK Omniverse Interoperable Metaverse No/Low Code Generator. This version comes with the Holochain binaries built in.</Summary>
+	  <Description>Powerful .NET HDK built on top of the world's first .NET &amp; Unity Client for Holochain &amp; the WEB5 STAR ODK Omniverse Interoperable Metaverse No/Low Code Generator. This version comes with the Holochain binaries built in.</Description>-->
 	  <PackageProjectUrl>https://github.com/holochain-open-dev/holochain-client-csharp</PackageProjectUrl>
 	  <PackageIcon>hc logo.png</PackageIcon>
 	  <Authors>David Ellams (NextGen Software Ltd)</Authors>
@@ -89,7 +92,7 @@
 	  <!--<PackageLicenseExpression>GNU GPLv3</PackageLicenseExpression>-->
 	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
 	  <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-	  <Version>3.0.2</Version>
+	  <Version>3.0.3</Version>
 	  <!--<PackageLicenseFile>..\LICENSE</PackageLicenseFile>-->
 
 	  <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>

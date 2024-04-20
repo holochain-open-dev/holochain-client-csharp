@@ -6,15 +6,15 @@
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
 	<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-	<!--<PackageId>NextGenSoftware.Holochain.HoloNET.Client.Embedded</PackageId>-->
+	<!--<PackageId>NextGenSoftware.Holochain.HoloNET.Manager.Embedded</PackageId>-->
 	<PackageId>NextGenSoftware.Holochain.HoloNET.Manager</PackageId>
 	<Company>NextGen Software Ltd</Company>
 	<Product>HoloNET Holochain Manager</Product>
 	<Title>HoloNET Holochain Manager</Title>
 	<Summary>The UI manager to the world's first .NET &amp; Unity Client for Holochain.</Summary>
-	<!--<Summary>The world's first .NET &amp; Unity client for Holochain. This version comes with the Holochain binaries built in.</Summary>-->
+	<!--<Summary>The UI manager to the world's first .NET &amp; Unity Client for Holochain. This version comes with the Holochain binaries built in.</Summary>-->
 	<Description>The UI manager to the world's first .NET &amp; Unity Client for Holochain.</Description>
-	<!--<Description>The world's first .NET &amp; Unity client for Holochain. This version comes with the Holochain binaries built in.</Description>-->
+	<!--<Description>The UI manager to the world's first .NET &amp; Unity Client for Holochain. This version comes with the Holochain binaries built in.</Description>-->
 	<PackageProjectUrl>https://github.com/holochain-open-dev/holochain-client-csharp</PackageProjectUrl>
 	<PackageIcon>hc logo.png</PackageIcon>
 	<Authors>David Ellams (NextGen Software Ltd)</Authors>
@@ -94,7 +94,7 @@
 	<!--<PackageLicenseExpression>GNU GPLv3</PackageLicenseExpression>-->
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-	<Version>3.0.2</Version>
+	<Version>3.0.3</Version>
 	<!--<PackageLicenseFile>..\LICENSE</PackageLicenseFile>-->
 
 	<AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>

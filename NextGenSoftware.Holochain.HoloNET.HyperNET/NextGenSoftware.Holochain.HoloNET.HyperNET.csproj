@@ -6,11 +6,14 @@
     <Nullable>enable</Nullable>
 	  <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 	  <PackageId>NextGenSoftware.Holochain.HoloNET.HyperNET</PackageId>
+	  <!--<PackageId>NextGenSoftware.Holochain.HoloNET.HyperNET.Embedded</PackageId>-->
 	  <Company>NextGen Software Ltd</Company>
-	  <Product>HoloNET P2P HyperNETM</Product>
+	  <Product>HoloNET P2P HyperNET</Product>
 	  <Title>HoloNET P2P HyperNET</Title>
 	  <Summary>Powerful P2P Gaming Networking Layer built on top of the world's first .NET, Unity &amp; Unreal Client for Holochain.</Summary>
 	  <Description>Powerful P2P Gaming Networking Layer built on top of the world's first .NET, Unity &amp; Unreal Client for Holochain.</Description>
+	  <!--<Summary>Powerful P2P Gaming Networking Layer built on top of the world's first .NET, Unity &amp; Unreal Client for Holochain. This version comes with the Holochain binaries built in.</Summary>
+	  <Description>Powerful P2P Gaming Networking Layer built on top of the world's first .NET, Unity &amp; Unreal Client for Holochain. This version comes with the Holochain binaries built in.</Description>-->
 	  <PackageProjectUrl>https://github.com/holochain-open-dev/holochain-client-csharp</PackageProjectUrl>
 	  <PackageIcon>hc logo.png</PackageIcon>
 	  <Authors>David Ellams (NextGen Software Ltd)</Authors>
@@ -86,7 +89,7 @@
 	  <!--<PackageLicenseExpression>GNU GPLv3</PackageLicenseExpression>-->
 	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
 	  <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-	  <Version>3.0.2</Version>
+	  <Version>3.0.3</Version>
 	  <!--<PackageLicenseFile>..\LICENSE</PackageLicenseFile>-->
 
 	  <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
