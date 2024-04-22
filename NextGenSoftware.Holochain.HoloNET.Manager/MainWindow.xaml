@@ -58,7 +58,7 @@
 
         <!--<Label x:Name="lblHeading" MouseDown="lblHeading_MouseDown" Grid.Row="0" HorizontalAlignment="Center" Foreground="White" FontWeight="Bold" Margin="20" FontSize="44" Content="NextGen Software HoloNET Manager v1.1" VerticalAlignment="Center">-->
         <!--<Label x:Name="lblHeading" MouseDown="lblHeading_MouseDown" Grid.Row="0" HorizontalAlignment="Center" Foreground="White" FontWeight="Bold" Margin="20" FontSize="22" Content="NextGen Software HoloNET Manager v1.1" VerticalAlignment="Center">-->
-        <Label x:Name="lblHeading" MouseDown="lblHeading_MouseDown" Grid.Row="0" HorizontalAlignment="Center" Foreground="White" FontWeight="Bold" Margin="20" FontSize="30" Content="HoloNET Manager v1.1" VerticalAlignment="Center">
+        <Label x:Name="lblHeading" MouseDown="lblHeading_MouseDown" Grid.Row="0" HorizontalAlignment="Center" Foreground="White" FontWeight="Bold" Margin="20" FontSize="30" Content="HoloNET Manager v3.0.3" VerticalAlignment="Center">
             <Label.Effect>
                 <DropShadowEffect BlurRadius="22" x:Name="glowEffectTitle" ShadowDepth="7" Opacity="1" 
                     Color="White"/>

@@ -74,6 +74,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NextGenSoftware.WebSocket",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NextGenSoftware.Holochain.HoloNET.Manager", "NextGenSoftware.Holochain.HoloNET.Manager\NextGenSoftware.Holochain.HoloNET.Manager.csproj", "{AD5EE3D5-3947-4902-ABF8-F79A548934CA}"
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "NextGenSoftware.Holochain.HoloNET.Manager.Installer", "NextGenSoftware.Holochain.HoloNET.Manager.Installer\NextGenSoftware.Holochain.HoloNET.Manager.Installer.vdproj", "{6197BC21-EFA4-477D-88FF-97606382B8C6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -637,6 +639,14 @@ Global
 		{AD5EE3D5-3947-4902-ABF8-F79A548934CA}.Release|x64.Build.0 = Release|Any CPU
 		{AD5EE3D5-3947-4902-ABF8-F79A548934CA}.Release|x86.ActiveCfg = Release|Any CPU
 		{AD5EE3D5-3947-4902-ABF8-F79A548934CA}.Release|x86.Build.0 = Release|Any CPU
+		{6197BC21-EFA4-477D-88FF-97606382B8C6}.Debug|Any CPU.ActiveCfg = Debug
+		{6197BC21-EFA4-477D-88FF-97606382B8C6}.Debug|arm64.ActiveCfg = Debug
+		{6197BC21-EFA4-477D-88FF-97606382B8C6}.Debug|x64.ActiveCfg = Debug
+		{6197BC21-EFA4-477D-88FF-97606382B8C6}.Debug|x86.ActiveCfg = Debug
+		{6197BC21-EFA4-477D-88FF-97606382B8C6}.Release|Any CPU.ActiveCfg = Release
+		{6197BC21-EFA4-477D-88FF-97606382B8C6}.Release|arm64.ActiveCfg = Release
+		{6197BC21-EFA4-477D-88FF-97606382B8C6}.Release|x64.ActiveCfg = Release
+		{6197BC21-EFA4-477D-88FF-97606382B8C6}.Release|x86.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
