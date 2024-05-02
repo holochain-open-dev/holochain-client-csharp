@@ -15,6 +15,12 @@
     {
         "Entry"
         {
+        "MsmKey" = "8:_2BF0D921E6B843DBA644DBBCFDBC12FC"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_2F54300938F2433D821DC3371ED103A8"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -43,6 +49,14 @@
         "PrivateKeyFile" = "8:"
         "TimeStampServer" = "8:"
         "InstallerBootstrapper" = "3:2"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:TRUE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+            }
         }
         "Release"
         {
@@ -59,6 +73,22 @@
         "PrivateKeyFile" = "8:"
         "TimeStampServer" = "8:"
         "InstallerBootstrapper" = "3:2"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:TRUE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.7.2"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4.7.2 (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.7.2"
+                    }
+                }
+            }
         }
     }
     "Deployable"
@@ -90,6 +120,26 @@
         }
         "File"
         {
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_2BF0D921E6B843DBA644DBBCFDBC12FC"
+            {
+            "SourcePath" = "8:..\\NextGenSoftware.Holochain.HoloNET.Manager\\HoloNET2.ico"
+            "TargetName" = "8:HoloNET2.ico"
+            "Tag" = "8:"
+            "Folder" = "8:_0D4E72D3A4B24DE4A585AB8B4E5AB899"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_2F54300938F2433D821DC3371ED103A8"
             {
             "SourcePath" = "8:..\\NextGenSoftware.Holochain.HoloNET.Manager\\bin\\Release\\net8.0-windows7.0\\NextGenSoftware.Holochain.HoloNET.Manager.exe"
@@ -178,7 +228,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:HoloNET Manager"
         "ProductCode" = "8:{84EE6FFB-2E9D-45AE-BCB1-68E3E5C79AF6}"
-        "PackageCode" = "8:{DE0477FC-801E-429A-BF4B-D4C7C6B3D101}"
+        "PackageCode" = "8:{12BBA8D6-8B73-40E8-81F2-85E10EDC2F7D}"
         "UpgradeCode" = "8:{338A7AE7-A592-47E8-A973-827E3C875541}"
         "AspNetVersion" = "8:2.0.50727.0"
         "RestartWWWService" = "11:FALSE"
@@ -188,14 +238,14 @@
         "ProductVersion" = "8:3.0.3"
         "Manufacturer" = "8:NextGen World Ltd"
         "ARPHELPTELEPHONE" = "8:"
-        "ARPHELPLINK" = "8:"
+        "ARPHELPLINK" = "8:http://www.holo-net.com"
         "Title" = "8:HoloNET Manager"
-        "Subject" = "8:"
+        "Subject" = "8:HoloNET Manager"
         "ARPCONTACT" = "8:NextGen World Ltd"
         "Keywords" = "8:"
         "ARPCOMMENTS" = "8:HoloNET Manager"
-        "ARPURLINFOABOUT" = "8:http://www.nextgensoftware.co.uk"
-        "ARPPRODUCTICON" = "8:"
+        "ARPURLINFOABOUT" = "8:http://www.holo-net.com"
+        "ARPPRODUCTICON" = "8:_2BF0D921E6B843DBA644DBBCFDBC12FC"
         "ARPIconIndex" = "3:0"
         "SearchPath" = "8:"
         "UseSystemSearchPath" = "11:TRUE"
@@ -309,21 +359,7 @@
             "Target" = "8:_2F54300938F2433D821DC3371ED103A8"
             "Folder" = "8:_DC9EACAF41234706BBEF44546813AF56"
             "WorkingFolder" = "8:_0D4E72D3A4B24DE4A585AB8B4E5AB899"
-            "Icon" = "8:"
-            "Feature" = "8:"
-            }
-            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_A041B00F199F4EFCA4CA13B4FC7CAD8F"
-            {
-            "Name" = "8:Shortcut to %sHoloNET Manager"
-            "Arguments" = "8:"
-            "Description" = "8:"
-            "ShowCmd" = "3:1"
-            "IconIndex" = "3:0"
-            "Transitive" = "11:FALSE"
-            "Target" = "8:_DC9EACAF41234706BBEF44546813AF56"
-            "Folder" = "8:_ED1DB924411940F2BD548F7B1A775E54"
-            "WorkingFolder" = "8:_ED1DB924411940F2BD548F7B1A775E54"
-            "Icon" = "8:"
+            "Icon" = "8:_2BF0D921E6B843DBA644DBBCFDBC12FC"
             "Feature" = "8:"
             }
             "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_A6C9D955D98F4D6D94886B3560A16CA5"
@@ -337,7 +373,7 @@
             "Target" = "8:_2F54300938F2433D821DC3371ED103A8"
             "Folder" = "8:_3DC96102B3574A80A89CC67A065FE40D"
             "WorkingFolder" = "8:_0D4E72D3A4B24DE4A585AB8B4E5AB899"
-            "Icon" = "8:"
+            "Icon" = "8:_2BF0D921E6B843DBA644DBBCFDBC12FC"
             "Feature" = "8:"
             }
         }

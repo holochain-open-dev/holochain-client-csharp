@@ -100,6 +100,8 @@
 	<AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
 
 	<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+
+	<ApplicationIcon>HoloNET2.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -108,6 +110,10 @@
 
   <ItemGroup>
     <Page Remove="MainWindow - Copy.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="HoloNET2.ico" />
   </ItemGroup>
 
   <ItemGroup>
