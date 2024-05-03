@@ -5,15 +5,15 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 	<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-	<PackageId>NextGenSoftware.Holochain.HoloNET.ORM</PackageId>
-	<!--<PackageId>NextGenSoftware.Holochain.HoloNET.ORM.Embedded</PackageId>-->
+	<!--<PackageId>NextGenSoftware.Holochain.HoloNET.ORM</PackageId>-->
+	<PackageId>NextGenSoftware.Holochain.HoloNET.ORM.Embedded</PackageId>
 	<Company>NextGen Software Ltd</Company>
 	<Product>HoloNET Holochain ORM</Product>
 	<Title>HoloNET Holochain ORM</Title>
-	<Summary>Powerful ORM built on top of the world's first .NET &amp; Unity Client for Holochain.</Summary>
-	  <!--<Summary>Powerful ORM built on top of the world's first .NET &amp; Unity Client for Holochain. This version comes with the Holochain binaries built in.</Summary>-->
-	<Description>Powerful ORM built on top of the world's first .NET &amp; Unity Client for Holochain.</Description>
-	  <!--<Description>Powerful ORM built on top of the world's first .NET &amp; Unity Client for Holochain. This version comes with the Holochain binaries built in.</Description>-->
+	<Summary>Powerful ORM built on top of the world's first .NET &amp; Unity Client for Holochain. This version comes with the Holochain binaries built in.</Summary>
+	<Description>Powerful ORM built on top of the world's first .NET &amp; Unity Client for Holochain. This version comes with the Holochain binaries built in.</Description>
+	<!--<Summary>Powerful ORM built on top of the world's first .NET &amp; Unity Client for Holochain.</Summary>
+	<Description>Powerful ORM built on top of the world's first .NET &amp; Unity Client for Holochain.</Description>-->
 	<PackageProjectUrl>https://github.com/holochain-open-dev/holochain-client-csharp</PackageProjectUrl>
 	<PackageIcon>hc logo.png</PackageIcon>
 	<Authors>David Ellams (NextGen Software Ltd)</Authors>

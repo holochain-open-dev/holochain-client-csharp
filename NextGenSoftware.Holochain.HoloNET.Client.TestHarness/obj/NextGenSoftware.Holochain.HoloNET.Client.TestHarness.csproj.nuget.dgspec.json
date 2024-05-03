@@ -5,10 +5,10 @@
   },
   "projects": {
     "C:\\Users\\USER\\source\\repos\\holochain-client-csharp\\NextGenSoftware.Holochain.HoloNET.Client.Core\\NextGenSoftware.Holochain.HoloNET.Client.csproj": {
-      "version": "3.0.2",
+      "version": "3.0.3",
       "restore": {
         "projectUniqueName": "C:\\Users\\USER\\source\\repos\\holochain-client-csharp\\NextGenSoftware.Holochain.HoloNET.Client.Core\\NextGenSoftware.Holochain.HoloNET.Client.csproj",
-        "projectName": "NextGenSoftware.Holochain.HoloNET.Client",
+        "projectName": "NextGenSoftware.Holochain.HoloNET.Client.Embedded",
         "projectPath": "C:\\Users\\USER\\source\\repos\\holochain-client-csharp\\NextGenSoftware.Holochain.HoloNET.Client.Core\\NextGenSoftware.Holochain.HoloNET.Client.csproj",
         "packagesPath": "C:\\Users\\USER\\.nuget\\packages\\",
         "outputPath": "C:\\Users\\USER\\source\\repos\\holochain-client-csharp\\NextGenSoftware.Holochain.HoloNET.Client.Core\\obj\\",
@@ -176,7 +176,7 @@
       "version": "3.0.3",
       "restore": {
         "projectUniqueName": "C:\\Users\\USER\\source\\repos\\holochain-client-csharp\\NextGenSoftware.Holochain.HoloNET.ORM\\NextGenSoftware.Holochain.HoloNET.ORM.csproj",
-        "projectName": "NextGenSoftware.Holochain.HoloNET.ORM",
+        "projectName": "NextGenSoftware.Holochain.HoloNET.ORM.Embedded",
         "projectPath": "C:\\Users\\USER\\source\\repos\\holochain-client-csharp\\NextGenSoftware.Holochain.HoloNET.ORM\\NextGenSoftware.Holochain.HoloNET.ORM.csproj",
         "packagesPath": "C:\\Users\\USER\\.nuget\\packages\\",
         "outputPath": "C:\\Users\\USER\\source\\repos\\holochain-client-csharp\\NextGenSoftware.Holochain.HoloNET.ORM\\obj\\",
