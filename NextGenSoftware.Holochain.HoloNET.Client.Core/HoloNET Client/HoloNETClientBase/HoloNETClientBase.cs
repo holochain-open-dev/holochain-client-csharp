@@ -444,27 +444,27 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                             {
                                 //throw new InvalidOperationException("You must install the Embedded version if you wish to use HolochainConductorMode.UseEmbedded.");
 
-                                try
-                                {
-                                    fullPathToHolochainExe = Path.Combine(Directory.GetCurrentDirectory(), "hc.exe");
-                                    //fullPathToHolochainExe = Path.Combine(Directory.GetCurrentDirectory(), "HolochainBinaries/beta/holochain.exe");
+                                //try
+                                //{
+                                //    fullPathToHolochainExe = Path.Combine(Directory.GetCurrentDirectory(), "hc.exe");
+                                //    //fullPathToHolochainExe = Path.Combine(Directory.GetCurrentDirectory(), "HolochainBinaries/beta/holochain.exe");
 
-                                    if (!File.Exists(fullPathToHolochainExe))
-                                    {
-                                        using (FileStream fsDst = new FileStream(fullPathToHolochainExe, FileMode.CreateNew, FileAccess.Write))
-                                        {
-                                            byte[] bytes = Resources.holochain;
-                                            fsDst.Write(bytes, 0, bytes.Length);
-                                        }
-                                    }
-                                }
-                                catch (Exception ex)
-                                {
-                                    HandleError($"An error occured in HoloNETClientBase.StartHolochainConductorAsync attempting to write the embedded hc.exe to the current working directory {Directory.GetCurrentDirectory()}", ex);
+                                //    if (!File.Exists(fullPathToHolochainExe))
+                                //    {
+                                //        using (FileStream fsDst = new FileStream(fullPathToHolochainExe, FileMode.CreateNew, FileAccess.Write))
+                                //        {
+                                //            byte[] bytes = Resources.holochain;
+                                //            fsDst.Write(bytes, 0, bytes.Length);
+                                //        }
+                                //    }
+                                //}
+                                //catch (Exception ex)
+                                //{
+                                //    HandleError($"An error occured in HoloNETClientBase.StartHolochainConductorAsync attempting to write the embedded hc.exe to the current working directory {Directory.GetCurrentDirectory()}", ex);
 
                                     try
                                     {
-                                        fullPathToHolochainExe = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "\\NextGenSoftware\\HoloNET\\hc.exe");
+                                        fullPathToHolochainExe = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "NextGenSoftware\\HoloNET\\hc.exe");
                                         //fullPathToHolochainExe = Path.Combine(Directory.GetCurrentDirectory(), "HolochainBinaries/beta/holochain.exe");
 
                                         if (!File.Exists(fullPathToHolochainExe))
@@ -481,7 +481,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                                         HandleError($"An error occured in HoloNETClientBase.StartHolochainConductorAsync attempting to write the embedded hc.exe to the AppData directory {Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "\\NextGenSoftware\\HoloNET")}", ex2);
                                     }
                                 }
-                            }
+                            //}
                             break;
 
                         case HolochainConductorModeEnum.UseSystemGlobal:
@@ -501,48 +501,50 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                             {
                                 //throw new InvalidOperationException("You must install the Embedded version if you wish to use HolochainConductorMode.UseEmbedded.");
 
-                                try
-                                {
-                                    fullPathToHolochainExe = Path.Combine(Directory.GetCurrentDirectory(), "holochain.exe");
-                                    //fullPathToHolochainExe = Path.Combine(Directory.GetCurrentDirectory(), "HolochainBinaries/beta/holochain.exe");
+                                //try
+                                //{
+                                //    fullPathToHolochainExe = Path.Combine(Directory.GetCurrentDirectory(), "holochain.exe");
+                                //    //fullPathToHolochainExe = Path.Combine(Directory.GetCurrentDirectory(), "HolochainBinaries/beta/holochain.exe");
 
-                                    if (!File.Exists(fullPathToHolochainExe))
-                                    {
-                                        using (FileStream fsDst = new FileStream(fullPathToHolochainExe, FileMode.CreateNew, FileAccess.Write))
-                                        {
-                                            byte[] bytes = Resources.holochain;
-                                            fsDst.Write(bytes, 0, bytes.Length);
-                                        }
-                                    }
-                                }
-                                catch (Exception ex)
-                                {
-                                    HandleError($"An error occured in HoloNETClientBase.StartHolochainConductorAsync attempting to write the embedded holochain.exe to the current working directory { fullPathToHolochainExe }", ex);
+                                //    if (!File.Exists(fullPathToHolochainExe))
+                                //    {
+                                //        using (FileStream fsDst = new FileStream(fullPathToHolochainExe, FileMode.CreateNew, FileAccess.Write))
+                                //        {
+                                //            byte[] bytes = Resources.holochain;
+                                //            fsDst.Write(bytes, 0, bytes.Length);
+                                //        }
+                                //    }
+                                //}
+                                //catch (Exception ex)
+                                //{
+                                //    HandleError($"An error occured in HoloNETClientBase.StartHolochainConductorAsync attempting to write the embedded holochain.exe to the current working directory {fullPathToHolochainExe}", ex);
 
                                     try
                                     {
                                         //fullPathToHolochainExe = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "\\NextGenSoftware\\HoloNET\\holochain.exe");
-                                        fullPathToHolochainExe = $" { Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) }\\NextGenSoftware\\HoloNET\\holochain.exe";
+                                        //fullPathToHolochainExe = $" { Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) }\\NextGenSoftware\\HoloNET\\holochain.exe";
+                                        fullPathToHolochainExe =  Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "NextGenSoftware\\HoloNET\\holochain.exe");
+                                        //Logger.Log($"fullPathToHolochainExe={fullPathToHolochainExe}", LogType.Info);
 
                                         if (!File.Exists(fullPathToHolochainExe))
                                         {
-                                            using (IsolatedStorageFile isoStore = IsolatedStorageFile.GetStore(IsolatedStorageScope.User | IsolatedStorageScope.Domain | IsolatedStorageScope.Assembly, null, null))
-                                            {
-                                                using (IsolatedStorageFileStream stream = isoStore.CreateFile("NextGenSoftware/HoloNET/holochain.exe"))
-                                                {
-                                                    fullPathToHolochainExe = stream.Name;
-                                                    byte[] bytes = Resources.holochain;
-                                                    stream.Write(bytes, 0, bytes.Length);
-                                                }
-                                            }
-
-                                            //using (FileStream fsDst = new FileStream(fullPathToHolochainExe, FileMode.CreateNew, FileAccess.Write))
-                                            ////using (StreamWriter writer = new StreamWriter(fullPathToHolochainExe, System.Text.Encoding.Default, new FileStreamOptions() { Access = FileAccess.Write, Mode = FileMode.CreateNew, Options = FileOptions.None, Share = FileShare.Read, UnixCreateMode = UnixFileMode.UserExecute }))
+                                            //using (IsolatedStorageFile isoStore = IsolatedStorageFile.GetStore(IsolatedStorageScope.User | IsolatedStorageScope.Domain | IsolatedStorageScope.Assembly, null, null))
                                             //{
-                                            //    byte[] bytes = Resources.holochain;
-                                            //    //writer.Write(bytes, 0, bytes.Length);
-                                            //    fsDst.Write(bytes, 0, bytes.Length);
+                                            //    using (IsolatedStorageFileStream stream = isoStore.CreateFile("NextGenSoftware/HoloNET/holochain.exe"))
+                                            //    {
+                                            //        fullPathToHolochainExe = stream.Name;
+                                            //        byte[] bytes = Resources.holochain;
+                                            //        stream.Write(bytes, 0, bytes.Length);
+                                            //    }
                                             //}
+
+                                            using (FileStream fsDst = new FileStream(fullPathToHolochainExe, FileMode.CreateNew, FileAccess.Write))
+                                            //using (StreamWriter writer = new StreamWriter(fullPathToHolochainExe, System.Text.Encoding.Default, new FileStreamOptions() { Access = FileAccess.Write, Mode = FileMode.CreateNew, Options = FileOptions.None, Share = FileShare.Read, UnixCreateMode = UnixFileMode.UserExecute }))
+                                            {
+                                                byte[] bytes = Resources.holochain;
+                                                //writer.Write(bytes, 0, bytes.Length);
+                                                fsDst.Write(bytes, 0, bytes.Length);
+                                            }
                                         }
                                     }
                                     catch (Exception ex2)
@@ -552,7 +554,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                                         HandleError($"An error occured in HoloNETClientBase.StartHolochainConductorAsync attempting to write the embedded holochain.exe to the IsolatedStorage directory { fullPathToHolochainExe }", ex2);
                                     }
                                 }
-                            }
+                            //}
                             break;
 
                         case HolochainConductorModeEnum.UseSystemGlobal:
