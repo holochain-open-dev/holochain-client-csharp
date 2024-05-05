@@ -7,7 +7,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 {
     public static class HoloNETDNAManager
     {
-        public static string HoloNETDNAPath = "HoloNET_DNA.json";
+        //public static string HoloNETDNAPath = "HoloNET_DNA.json";
+        //public static string HoloNETDNAPath = "HoloNET_DNA.json";
+        public static string HoloNETDNAPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "NextGenSoftware\\HoloNET\\HoloNETDNA.json");
         public static IHoloNETDNA HoloNETDNA { get; set; } = new HoloNETDNA();
 
         public static IHoloNETDNA LoadDNA()
@@ -54,6 +56,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                 if (holoNETDNA == null)
                     throw new ArgumentNullException("holoNETDNA", "holoNETDNA cannot be null."); //TODO: Need to come back to this since this exception will always be caught below! ;-)
+
+                FileInfo fileInfo = new FileInfo(holoNETDNAPath);
+
+                if (!Directory.Exists(fileInfo.DirectoryName))
+                    Directory.CreateDirectory(fileInfo.DirectoryName);
 
                 HoloNETDNA = holoNETDNA;
                 HoloNETDNAPath = holoNETDNAPath;

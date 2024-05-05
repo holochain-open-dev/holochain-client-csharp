@@ -56,6 +56,14 @@
             "PrerequisitesLocation" = "2:1"
             "Url" = "8:"
             "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.7.2"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4.7.2 (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.7.2"
+                    }
+                }
             }
         }
         "Release"
@@ -227,15 +235,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:HoloNET Manager"
-        "ProductCode" = "8:{84EE6FFB-2E9D-45AE-BCB1-68E3E5C79AF6}"
-        "PackageCode" = "8:{052C5C8A-7933-42E1-8345-7390A9FB187B}"
+        "ProductCode" = "8:{196A57E0-AA39-4B2C-800B-C6C7EA2D6AA8}"
+        "PackageCode" = "8:{771F3055-F34D-41E8-9202-F6393EF75224}"
         "UpgradeCode" = "8:{338A7AE7-A592-47E8-A973-827E3C875541}"
         "AspNetVersion" = "8:2.0.50727.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:3.0.3"
+        "ProductVersion" = "8:3.0.4"
         "Manufacturer" = "8:NextGen Software Ltd"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:http://www.holo-net.com"

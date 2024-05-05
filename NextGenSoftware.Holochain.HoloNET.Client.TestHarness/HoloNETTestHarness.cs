@@ -211,7 +211,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                             FirstName = "David",
                             LastName = "Ellams",
                             DOB = Convert.ToDateTime("11/07/1980"),
-                            Email = "davidellams@hotmail.com",
+                            Email = "davidellams@superland.com",
                             IsActive = true
                         };
 
@@ -264,7 +264,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                                 FirstName = "David",
                                 LastName = "Ellams",
                                 DOB = Convert.ToDateTime("11/07/1980"),
-                                Email = "davidellams@hotmail.com",
+                                Email = "davidellams@superland.com",
                                 IsActive = true
                             };
 
@@ -359,7 +359,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                             FirstName = "David",
                             LastName = "Ellams",
                             DOB = Convert.ToDateTime("11/07/1980"),
-                            Email = "davidellams@hotmail.com",
+                            Email = "davidellams@superland.com",
                             IsActive = true
                         };
 
@@ -1036,7 +1036,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                                 id = Guid.NewGuid(),
                                 first_name = "David",
                                 last_name = "Ellams",
-                                email = "davidellams@hotmail.com",
+                                email = "davidellams@superland.com",
                                 dob = "11/07/1980",
                                 created_date = DateTime.Now.ToString(),
                                 created_by = _holoNETClientAppAgent.HoloNETDNA.AgentPubKey,

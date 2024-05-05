@@ -456,7 +456,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Manager.UserControls
                             Id = Guid.NewGuid(),
                             FirstName = "David",
                             LastName = "Ellams",
-                            Email = "davidellams@hotmail.com",
+                            Email = "davidellams@superland.com",
                             DOB = new DateTime(1980, 4, 11)
                         };
 
@@ -470,7 +470,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Manager.UserControls
                         Id = Guid.NewGuid(),
                         FirstName = "James",
                         LastName = "Ellams",
-                        Email = "davidellams@hotmail.com",
+                        Email = "davidellams@superland.com",
                         DOB = new DateTime(1980, 4, 11)
                     };
 
@@ -483,7 +483,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Manager.UserControls
                         Id = Guid.NewGuid(),
                         FirstName = "Noah",
                         LastName = "Ellams",
-                        Email = "davidellams@hotmail.com",
+                        Email = "davidellams@superland.com",
                         DOB = new DateTime(1980, 4, 11)
                     };
 
@@ -500,7 +500,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Manager.UserControls
                             Id = Guid.NewGuid(),
                             FirstName = "Elba",
                             LastName = "Ellams",
-                            Email = "davidellams@hotmail.com",
+                            Email = "davidellams@superland.com",
                             DOB = new DateTime(1980, 4, 11)
                         };
 
@@ -513,7 +513,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Manager.UserControls
                             Id = Guid.NewGuid(),
                             FirstName = "David",
                             LastName = "Ellams",
-                            Email = "davidellams@hotmail.com",
+                            Email = "davidellams@superland.com",
                             DOB = new DateTime(1980, 4, 11)
                         };
 
@@ -526,7 +526,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Manager.UserControls
                             Id = Guid.NewGuid(),
                             FirstName = "James",
                             LastName = "Ellams",
-                            Email = "davidellams@hotmail.com",
+                            Email = "davidellams@superland.com",
                             DOB = new DateTime(1980, 4, 11)
                         };
 
@@ -539,7 +539,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Manager.UserControls
                             Id = Guid.NewGuid(),
                             FirstName = "Noah",
                             LastName = "Ellams",
-                            Email = "davidellams@hotmail.com",
+                            Email = "davidellams@superland.com",
                             DOB = new DateTime(1980, 4, 11)
                         };
 

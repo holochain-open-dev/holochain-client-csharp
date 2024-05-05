@@ -7,7 +7,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Manager.Managers
 {
     public static class HoloNETEntryDNAManager
     {
-        public static string HoloNETEntryDNAPath = "HoloNETEntryDNA.json";
+        //public static string HoloNETEntryDNAPath = "HoloNETEntryDNA.json";
+        public static string HoloNETEntryDNAPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "NextGenSoftware\\HoloNET\\HoloNETEntryDNA.json");
         public static HoloNETEntryDNA HoloNETEntryDNA { get; set; } = new HoloNETEntryDNA();
 
         public static HoloNETEntryDNA LoadDNA()
