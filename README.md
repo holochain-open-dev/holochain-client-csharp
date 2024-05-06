@@ -201,9 +201,9 @@ This is the BIGGEST update to HoloNET to date and is pretty much a whole new pro
 Read more here:
 https://github.com/holochain-open-dev/holochain-client-csharp/releases/tag/v3.0.0
 
-The latest release now also includes a downloadable MSI package for the HoloNET Manager so you can give it a go yourself and give us vital feedback, thank you! :)
+**This also now includes a msi installer for the HoloNET Manager so is the first real world deployment of HolonNET! Yay! :) This is a MAJOR milestone and shows and proves HoloNET working in a real world use case so you can give it a go yourself and give us vital feedback, thank you! :)**
 
-https://www.oasisweb4.com/downloads/HoloNET_Manager_v3.0.4.msi
+[HoloNET Manager v3.0.4](https://www.oasisweb4.com/downloads/HoloNET_Manager_v3.0.4.msi)
 
 **This is the UI to HoloNET and is also used to demo and test all functionality of HoloNET Client and HoloNET ORM. Read more about this above.**
 
