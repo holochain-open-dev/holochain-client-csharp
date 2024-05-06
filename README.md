@@ -2853,7 +2853,7 @@ https://www.thejusticeleagueaccademy.icu
 
 ## Contribute
 
-Holochain is an open source project.  We welcome all sorts of participation and are actively working on increasing surface area to accept it.  Please see our [contribution guidelines](/CONTRIBUTING.md) for our general practices and protocols on participating in the community, as well as specific expectations around things like code formatting, testing practices, continuous integration, etc.
+Holochain & HoloNET are open source projects.  Just like with Holochain we at HoloNET welcome all sorts of participation and are actively working on increasing surface areas to accept it.  Please see our [contribution guidelines](/CONTRIBUTING.md) for our general practices and protocols on participating in the community, as well as specific expectations around things like code formatting, testing practices, continuous integration, etc.
 
 * Connect with us on [Discord](https://discord.gg/k55DS5dmPH)
 
@@ -2861,7 +2861,7 @@ Holochain is an open source project.  We welcome all sorts of participation and 
 
  [![License: CAL 1.0](https://img.shields.io/badge/License-CAL%201.0-blue.svg)](https://github.com/holochain/cryptographic-autonomy-license)
 
-Copyright (C) 2020-2023, Holochain Foundation
+Copyright (C) 2020-2024, Holochain Foundation
 
 This program is free software: you can redistribute it and/or modify it under the terms of the license
 provided in the LICENSE file (CAL-1.0).  This program is distributed in the hope that it will be useful,
