@@ -201,6 +201,13 @@ This is the BIGGEST update to HoloNET to date and is pretty much a whole new pro
 Read more here:
 https://github.com/holochain-open-dev/holochain-client-csharp/releases/tag/v3.0.0
 
+The latest release now also includes a downloadable MSI package for the HoloNET Manager so you can give it a go yourself and give us vital feedback, thank you! :)
+
+https://www.oasisweb4.com/downloads/HoloNET_Manager_v3.0.4.msi
+
+This is the UI to HoloNET and is also used to demo and test all functionality of HoloNET Client and HoloNET ORM. Read more about this above. Please leave feedback in our [Telegram group](https://t.me/holonetchat).  We are aware of a few bugs we are still working on, we originally wanted to wait till we got these fixed but if we are being honest we couldn't wait any longer to get this out there to get early feedback and see where the demands were for further features, enhancements and what part of the HoloNET Family we should focus more on etc... We also wanted help squishing these last few bugs because they have been quite tricky little buggers to track down! Please find them in our [GitHub Issues](https://github.com/holochain-open-dev/holochain-client-csharp/issues)... :) Thank you! :) 
+
+
 ## HoloNET Code Has Migrated
 
 This code was migrated from the main OASIS API/STAR Metaverse/HoloNET/.NET HDK code found here:
