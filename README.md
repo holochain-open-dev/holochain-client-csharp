@@ -201,6 +201,19 @@ This is the BIGGEST update to HoloNET to date and is pretty much a whole new pro
 Read more here:
 https://github.com/holochain-open-dev/holochain-client-csharp/releases/tag/v3.0.0
 
+**This also now includes a msi installer for the HoloNET Manager so is the first real world deployment of HolonNET! Yay! :) This is a MAJOR milestone and shows and proves HoloNET working in a real world use case so you can give it a go yourself and give us vital feedback, thank you! :)**
+
+[HoloNET Manager v3.0.4](https://www.oasisweb4.com/downloads/HoloNET_Manager_v3.0.4.msi)
+
+**This is the UI to HoloNET and is also used to demo and test all functionality of HoloNET Client and HoloNET ORM. Read more about this above.**
+
+**Please leave feedback in our [Telegram group](https://t.me/holonetchat).  We are aware of a few bugs we are still working on, we originally wanted to wait till we got these fixed but if we are being honest we couldn't wait any longer to get this out there to get early feedback and see where the demands were for further features, enhancements and what part of the HoloNET Family we should focus more on etc...**
+
+**We also wanted help squishing these last few bugs because they have been quite tricky little buggers to track down! Please find them in our [GitHub Issues](https://github.com/holochain-open-dev/holochain-client-csharp/issues)... :)**
+
+**Any other help would also be greatly appreciated, we are always looking for devs (and non devs) to join us on this exciting journey to the stars... We would love to hear from you! Thank you! :)**
+
+
 ## HoloNET Code Has Migrated
 
 This code was migrated from the main OASIS API/STAR Metaverse/HoloNET/.NET HDK code found here:
@@ -2853,7 +2866,7 @@ https://www.thejusticeleagueaccademy.icu
 
 ## Contribute
 
-Holochain is an open source project.  We welcome all sorts of participation and are actively working on increasing surface area to accept it.  Please see our [contribution guidelines](/CONTRIBUTING.md) for our general practices and protocols on participating in the community, as well as specific expectations around things like code formatting, testing practices, continuous integration, etc.
+Holochain & HoloNET are open source projects.  Just like with Holochain we at HoloNET welcome all sorts of participation and are actively working on increasing surface areas to accept it.  Please see our [contribution guidelines](/CONTRIBUTING.md) for our general practices and protocols on participating in the community, as well as specific expectations around things like code formatting, testing practices, continuous integration, etc.
 
 * Connect with us on [Discord](https://discord.gg/k55DS5dmPH)
 
@@ -2861,7 +2874,7 @@ Holochain is an open source project.  We welcome all sorts of participation and 
 
  [![License: CAL 1.0](https://img.shields.io/badge/License-CAL%201.0-blue.svg)](https://github.com/holochain/cryptographic-autonomy-license)
 
-Copyright (C) 2020-2023, Holochain Foundation
+Copyright (C) 2020-2024, Holochain Foundation
 
 This program is free software: you can redistribute it and/or modify it under the terms of the license
 provided in the LICENSE file (CAL-1.0).  This program is distributed in the hope that it will be useful,
