@@ -8,7 +8,7 @@
         xmlns:managers="clr-namespace:NextGenSoftware.Holochain.HoloNET.Manager.Managers"
         xmlns:gridAnimation="clr-namespace:NextGenSoftware.Holochain.HoloNET.Manager"
         mc:Ignorable="d"
-        Title="NextGen Software HoloNET Manager v1.1" Height="770" Width="1650">
+        Title="NextGen Software HoloNET Manager v3.1.0" Height="770" Width="1650">
 
     <Window.Resources>
         <ResourceDictionary>
@@ -41,6 +41,64 @@
             </LinearGradientBrush>
         </Grid.Background>
 
+        <DockPanel >
+            <Menu DockPanel.Dock="Top"  Background="Black" Foreground="WhiteSmoke">
+                <MenuItem Header="_HoloNET Manager" Background="Black">
+                    <MenuItem Background="Black" Header="_Reboot" Click="btnReboot_Click"/>
+                    <MenuItem Background="Black" Header="_Open DNA" x:Name="mnuOpenDna" Click="mnuOpenDna_Click" />
+                    <MenuItem Background="Black" Header="_Hide Buttons" Click="btnHideButtons_Click"/>
+                    <!--<MenuItem Background="Black" Header="_About" x:Name="mnuAbout" Click="mnuAbout_Click"/>-->
+                    <MenuItem Background="Black" Header="_Exit" x:Name="mnuExit" Click="mnuExit_Click"/>
+                </MenuItem>
+                <MenuItem Header="_ORM" Background="Black">
+                    <MenuItem Background="Black" Header="_HoloNET Entry" Click="btnHoloNETEntry_Click" Width="200" Padding="0" Margin="0"/>
+                    <MenuItem Background="Black" Header="_HoloNET Collection" Width="200" Click="btnHoloNETCollection_Click" Padding="0" Margin="0"/>
+                </MenuItem>
+                <MenuItem Header="_hApps" Background="Black">
+                    <MenuItem Background="Black" Header="_Install hApp" Click="btnInstall_Click"/>
+                    <MenuItem Background="Black" Header="_Refresh hApps" Click="btnRefreshInstalledhApps_Click"/>
+                </MenuItem>
+                <MenuItem Header="_DNA" Background="Black">
+                    <MenuItem Background="Black" Header="_Get DNA Definition" Click="btnGetDNADefinition_Click"/>
+                    <MenuItem Background="Black" Header="_Update DNA Defintion" Name="mnuUpdateDNADefintion" Click="mnuUpdateDNADefintion_Click"/>
+                </MenuItem>
+                <MenuItem Header="_Agent" Background="Black">
+                    <MenuItem Background="Black" Header="_Get Agent Info" Click="btnGetAgentInfo_Click"/>
+                    <MenuItem Background="Black" Header="_Update Agent Info" x:Name="mnuUpdaeAgentInfo" Click="mnuUpdaeAgentInfo_Click"/>
+                </MenuItem>
+                <MenuItem Header="_Misc" Background="Black">
+                    <MenuItem Background="Black" Header="_Get Storage Info" Click="btnGetStorageInfo_Click"/>
+                    <MenuItem Background="Black" Header="_Delete Cloned Cell" Click="btnDeleteCloneCell_Click"/>
+                    <MenuItem Background="Black" Header="_Graft Records" Click="btnGraftRecords_Click"/>
+                    <MenuItem Background="Black" Header="_Update Coordindators" Click="btnUpdateCoordinators_Click"/>
+                </MenuItem>
+                <MenuItem Header="_List" Background="Black">
+                    <MenuItem Background="Black" Header="_List DNAs" Click="btnListDNAs_Click"/>
+                    <MenuItem Background="Black" Header="_List CellIds" Click="btnListCellIds_Click"/>
+                    <MenuItem Background="Black" Header="_List Attached Interfaces" Click="btnListAttachedInterfaces_Click"/>
+                </MenuItem>
+                <MenuItem Header="_Dump" Background="Black">
+                    <MenuItem Background="Black" Header="_Dump Network Stats" Click="btnDumpNetWorkStats_Click"/>
+                    <MenuItem Background="Black" Header="_Dump Network Metrics" Click="btnDumpNetworkMetrics_Click"/>
+                    <MenuItem Background="Black" Header="_Dump State" Click="btnDumpState_Click"/>
+                    <MenuItem Background="Black" Header="_Dump Full State" Click="btnFullDump_Click"/>
+                </MenuItem>
+                <MenuItem Header="_Logs" Background="Black">
+                    <MenuItem Background="Black" Header="_Clear Log" Click="btnClearLog_Click"/>
+                    <!--<MenuItem Background="Black" Header="_Show Detailed Logs"/>-->
+                    <MenuItem  Background="Black" Header="_Show Detailed Logs">
+                        <CheckBox Background="Black" Foreground="WhiteSmoke">Yes</CheckBox>
+                    </MenuItem>
+                    <!--<ToggleButton x:Name="tbTest" BorderThickness="0" Background="Transparent" HorizontalContentAlignment="Stretch" HorizontalAlignment="Stretch">Show Detailed Logs</ToggleButton>-->
+                    <MenuItem Background="Black" Header="_Open Logs" Click="btnShowLog_Click"/>
+                </MenuItem>
+                <MenuItem Header="_Help" Background="Black">
+                    <MenuItem Background="Black" Header="_About" x:Name="mnuAbout" Click="mnuAbout_Click"/>
+                </MenuItem>
+            </Menu>
+            <StackPanel></StackPanel>
+        </DockPanel>
+
         <!--<Grid.Triggers>
             <EventTrigger RoutedEvent="UIElement.KeyDown">
                 <EventTrigger.Actions>
@@ -58,7 +116,7 @@
 
         <!--<Label x:Name="lblHeading" MouseDown="lblHeading_MouseDown" Grid.Row="0" HorizontalAlignment="Center" Foreground="White" FontWeight="Bold" Margin="20" FontSize="44" Content="NextGen Software HoloNET Manager v1.1" VerticalAlignment="Center">-->
         <!--<Label x:Name="lblHeading" MouseDown="lblHeading_MouseDown" Grid.Row="0" HorizontalAlignment="Center" Foreground="White" FontWeight="Bold" Margin="20" FontSize="22" Content="NextGen Software HoloNET Manager v1.1" VerticalAlignment="Center">-->
-        <Label x:Name="lblHeading" MouseDown="lblHeading_MouseDown" Grid.Row="0" HorizontalAlignment="Center" Foreground="White" FontWeight="Bold" Margin="20" FontSize="30" Content="HoloNET Manager v3.0.4" VerticalAlignment="Center">
+        <Label x:Name="lblHeading" MouseDown="lblHeading_MouseDown" Grid.Row="0" HorizontalAlignment="Center" Foreground="White" FontWeight="Bold" Margin="20" FontSize="30" Content="HoloNET Manager v3.1.0" VerticalAlignment="Center">
             <Label.Effect>
                 <DropShadowEffect BlurRadius="22" x:Name="glowEffectTitle" ShadowDepth="7" Opacity="1" 
                     Color="White"/>
@@ -1165,5 +1223,7 @@ BlurRadius="10"/>
         <uc:ucHoloNETEntryPopup x:Name="ucHoloNETEntryPopup" Grid.Row="0" Opacity="0.9" Grid.RowSpan="6" Visibility="Collapsed"></uc:ucHoloNETEntryPopup>
         <uc:ucHoloNETCollectionPopup x:Name="ucHoloNETCollectionPopup" Grid.Row="0" Opacity="0.9" Grid.RowSpan="6" Visibility="Collapsed"></uc:ucHoloNETCollectionPopup>
         <uc:ucHoloNETEntryAndCollectionSharedPopup x:Name="ucHoloNETEntryAndCollectionSharedPopup" Grid.Row="0" Opacity="0.9" Grid.RowSpan="6" Visibility="Collapsed"></uc:ucHoloNETEntryAndCollectionSharedPopup>
+        <uc:ucAboutPopup x:Name="ucAboutPopup" Grid.Row="0" Opacity="0.9" Grid.RowSpan="6" Visibility="Collapsed"></uc:ucAboutPopup>
+        <uc:ucExitPopup x:Name="ucExitPopup" Grid.Row="0" Opacity="0.9" Grid.RowSpan="6" Visibility="Collapsed"></uc:ucExitPopup>
     </Grid>
 </Window>

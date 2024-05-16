@@ -273,6 +273,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         {
             try
             {
+                base.WebSocket_OnConnected(sender, e);
+
                 //If the AgentPubKey & DnaHash have already been retrieved from the hc sandbox command (or was passed in) then raise the OnReadyForZomeCalls event.
                 if (WebSocket.State == WebSocketState.Open && !string.IsNullOrEmpty(HoloNETDNA.AgentPubKey) && !string.IsNullOrEmpty(HoloNETDNA.DnaHash))
                     SetReadyForZomeCalls("-1");
@@ -285,8 +287,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     else
                         RetrieveAgentPubKeyAndDnaHashFromConductorAsync(null, null, RetrieveAgentPubKeyAndDnaHashMode.UseCallBackEvents);
                 }
-
-                base.WebSocket_OnConnected(sender, e);
             }
             catch (Exception ex)
             {

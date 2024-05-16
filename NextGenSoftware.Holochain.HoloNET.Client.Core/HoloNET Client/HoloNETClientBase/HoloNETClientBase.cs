@@ -732,9 +732,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="disconnectedCallBackMode">If this is set to `WaitForHolochainConductorToDisconnect` (default) then it will await until it has disconnected before returning to the caller, otherwise (it is set to `UseCallBackEvents`) it will return immediately and then raise the [OnDisconnected](#ondisconnected) once it is disconnected.</param>
         /// <param name="shutdownHolochainConductorsMode">Once it has successfully disconnected it will automatically call the ShutDownAllHolochainConductors method if the `shutdownHolochainConductorsMode` flag (defaults to `UseHoloNETDNASettings`) is not set to `DoNotShutdownAnyConductors`. Other values it can be are 'ShutdownCurrentConductorOnly' or 'ShutdownAllConductors'. Please see the ShutDownConductors method below for more detail.</param>
         /// <returns></returns>
-        public virtual HoloNETDisconnectedEventArgs Disconnect(DisconnectedCallBackMode disconnectedCallBackMode = DisconnectedCallBackMode.WaitForHolochainConductorToDisconnect, ShutdownHolochainConductorsMode shutdownHolochainConductorsMode = ShutdownHolochainConductorsMode.UseHoloNETDNASettings)
+        public virtual HoloNETDisconnectedEventArgs Disconnect(ShutdownHolochainConductorsMode shutdownHolochainConductorsMode = ShutdownHolochainConductorsMode.UseHoloNETDNASettings)
         {
-            return DisconnectAsync(disconnectedCallBackMode, shutdownHolochainConductorsMode).Result;
+            return DisconnectAsync(DisconnectedCallBackMode.UseCallBackEvents, shutdownHolochainConductorsMode).Result;
         }
 
 
@@ -863,7 +863,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             _shuttingDownHoloNET = true;
 
             if (WebSocket.State != WebSocketState.Closed || WebSocket.State != WebSocketState.CloseReceived || WebSocket.State != WebSocketState.CloseSent)
-                Disconnect(DisconnectedCallBackMode.UseCallBackEvents, shutdownHolochainConductorsMode);
+                Disconnect(shutdownHolochainConductorsMode);
 
             return new HoloNETShutdownEventArgs(EndPoint, HoloNETDNA.DnaHash, HoloNETDNA.AgentPubKey, null);
         }
@@ -920,10 +920,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                                 holochainConductorsShutdownEventArgs.NumberOfHolochainExeInstancesShutdown = 1;
                         }
 
-                        List<Process> processes2 = Process.GetProcesses().Where(x => x.ProcessName == "hc.exe").ToList();
-                        List<Process> processes3 = Process.GetProcesses().Where(x => x.ProcessName == "holochain.exe").ToList();
+                        //List<Process> processes2 = Process.GetProcesses().Where(x => x.ProcessName == "hc.exe").ToList();
+                        //List<Process> processes3 = Process.GetProcesses().Where(x => x.ProcessName == "holochain.exe").ToList();
 
-                        List<Process> processes4 = Process.GetProcesses().ToList();
+                        //List<Process> processes4 = Process.GetProcesses().ToList();
 
                         Logger.Log("Holochain Conductor Successfully Shutdown.", LogType.Info);
                     }

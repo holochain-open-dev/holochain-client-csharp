@@ -160,19 +160,19 @@ namespace NextGenSoftware.Holochain.HoloNET.Manager.Managers
             {
                 case ClientOperation.CallZomeFunction:
                     {
-                        if (ZomeCallParams.ParamsObjectForZomeCall != null)
-                        {
-                            LogMessage("APP: Calling Zome Function...");
-                            ShowStatusMessage("Calling Zome Function...", StatusMessageType.Information, true);
+                        //if (ZomeCallParams.ParamsObjectForZomeCall != null)
+                        //{
+                        //    LogMessage("APP: Calling Zome Function...");
+                        //    ShowStatusMessage("Calling Zome Function...", StatusMessageType.Information, true);
 
-                            client.CallZomeFunction(ZomeCallParams.ZomeName, ZomeCallParams.ZomeFunction, ZomeCallParams.ParamsObjectForZomeCall);
-                            ZomeCallParams.ParamsObjectForZomeCall = null;
-                        }
-                        else
-                        {
-                            LogMessage("ADMIN: Error: Zome paramsObject is null! Please try again");
-                            ShowStatusMessage("Error: Zome paramsObject is null! Please try again", StatusMessageType.Error);
-                        }
+                        //    client.CallZomeFunction(ZomeCallParams.ZomeName, ZomeCallParams.ZomeFunction, ZomeCallParams.ParamsObjectForZomeCall);
+                        //    ZomeCallParams.ParamsObjectForZomeCall = null;
+                        //}
+                        //else
+                        //{
+                        //    LogMessage("ADMIN: Error: Zome paramsObject is null! Please try again");
+                        //    ShowStatusMessage("Error: Zome paramsObject is null! Please try again", StatusMessageType.Error);
+                        //}
                         ClientOperation = ClientOperation.None;
                     }
                     break;
@@ -326,6 +326,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Manager.Managers
                 LogMessage($"ADMIN: hApps Listed: \n{hApps}");
                 ShowStatusMessage("hApps Listed.", StatusMessageType.Success);
             }
+
+            ShowAppsListedInLog = true;
         }
 
         public static string ProcessZomeFunctionCallBackEventArgs(ZomeFunctionCallBackEventArgs args)
@@ -406,7 +408,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Manager.Managers
             SetCurrentAppToConnectedStatus(e.EndPoint.Port);
 
             UpdateNumerOfClientConnections();
+            ShowAppsListedInLog = false;
             ListHapps();
+           // ShowAppsListedInLog = true;
 
             HoloNETClientAppAgent client = sender as HoloNETClientAppAgent;
 
@@ -452,8 +456,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Manager.Managers
                     ZomeCallParams.ParamsObjectForZomeCall = null;
 
                     //popupMakeZomeCall.Visibility = Visibility.Collapsed;
-                    PopupManager.CurrentPopup.Visibility = Visibility.Collapsed;
-                    PopupManager.CurrentPopup = null;
+                    if (PopupManager.CurrentPopup != null)
+                    {
+                        PopupManager.CurrentPopup.Visibility = Visibility.Collapsed;
+                        PopupManager.CurrentPopup = null;
+                    }
                 }
             }
         }

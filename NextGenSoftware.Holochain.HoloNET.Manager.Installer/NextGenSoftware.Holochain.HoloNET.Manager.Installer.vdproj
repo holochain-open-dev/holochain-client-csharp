@@ -235,15 +235,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:HoloNET Manager"
-        "ProductCode" = "8:{196A57E0-AA39-4B2C-800B-C6C7EA2D6AA8}"
-        "PackageCode" = "8:{771F3055-F34D-41E8-9202-F6393EF75224}"
+        "ProductCode" = "8:{B2B07A58-216A-4314-A0EE-E45FBD1EF51B}"
+        "PackageCode" = "8:{33FAFEE0-0C96-410E-B715-735E45B5C354}"
         "UpgradeCode" = "8:{338A7AE7-A592-47E8-A973-827E3C875541}"
         "AspNetVersion" = "8:2.0.50727.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:3.0.4"
+        "ProductVersion" = "8:3.1.0"
         "Manufacturer" = "8:NextGen Software Ltd"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:http://www.holo-net.com"
@@ -785,7 +785,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_9CFCE8641E384F78BA06E2AE5AC08A77"
             {
-            "SourcePath" = "8:..\\NextGenSoftware.Holochain.HoloNET.Manager\\obj\\Release\\net8.0-windows7.0\\apphost.exe"
+            "SourcePath" = "8:..\\NextGenSoftware.Holochain.HoloNET.Manager\\obj\\Debug\\net8.0-windows7.0\\apphost.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_0D4E72D3A4B24DE4A585AB8B4E5AB899"

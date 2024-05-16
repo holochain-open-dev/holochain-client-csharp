@@ -1,0 +1,79 @@
+﻿<UserControl x:Class="NextGenSoftware.Holochain.HoloNET.Manager.UserControls.ucAboutPopup"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/NextGenSoftware.Holochain.HoloNET.Manager;component/Resources/Resources.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid Opacity="0.9" Grid.Row="0" Grid.RowSpan="6" >
+        <Grid Background="Transparent" Opacity="0.5"/>
+        <Border Padding="10,10,10,0"
+
+    Background="DarkBlue" 
+    Opacity="50"
+    BorderBrush="Black" 
+    BorderThickness="1" 
+    CornerRadius="0,55,0,55" 
+    HorizontalAlignment="Center" 
+    VerticalAlignment="Center">
+            <StackPanel>
+                <TextBlock Margin="10,10,10,20" Text="HoloNET Manager v3.1.0" HorizontalAlignment="Center" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="22"  />
+                <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="0" Grid.Column="0" Text="The UI to HoloNET that serves as multiple functions:" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
+                <TextBlock Margin="5,15,5,5" VerticalAlignment="Center" Grid.Row="0" Grid.Column="0" Text="(a) A Test Harness for HoloNET Client &amp; HoloNET ORM." Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
+                <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="0" Grid.Column="0" Text="(b) Use cases for how to build on HoloNET Client &amp; HoloNET ORM." Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
+                <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="0" Grid.Column="0" Text="(c) A handy dev tool for rapidly building &amp; tesitng hApps." Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
+                <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="0" Grid.Column="0" Text="(d) Re-usable generic UI and backend componnents that can be used to aid in the rapid development of hApps." Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
+                <TextBlock Foreground="WhiteSmoke" HorizontalAlignment="Center" Margin="0,10,0,0">           
+                    <Hyperlink Foreground="WhiteSmoke" NavigateUri="https://github.com/holochain-open-dev/holochain-client-csharp" Click="Hyperlink_Click" RequestNavigate="Hyperlink_RequestNavigate">
+                        https://github.com/holochain-open-dev/holochain-client-csharp
+                    </Hyperlink>    
+                </TextBlock>
+                <TextBlock  VerticalAlignment="Center" Grid.Row="0" Grid.Column="0" Margin="0,30,0,0" Text="Copyright © All Rights Reserved 2024 NextGen Software Ltd." Foreground="WhiteSmoke" FontWeight="Bold" HorizontalAlignment="Center"  FontSize="12"  />
+                <StackPanel Orientation="Horizontal" Margin="0,10,0,10" HorizontalAlignment="Center">
+                    <Button x:Name="btnOK" Style="{StaticResource ButtonStyle}" Cursor="Hand" Margin="5" Foreground="WhiteSmoke" Width="50" FontSize="14" Content="OK" Background="{x:Null}"  Click="btnOK_Click">
+                        <Button.Effect>
+                            <DropShadowEffect x:Name="btnOKGlowEffect" ShadowDepth="0"
+                  Color="White"
+                  Opacity="0"
+                  BlurRadius="10"/>
+                        </Button.Effect>
+
+                        <Button.Triggers>
+                            <EventTrigger RoutedEvent="Button.MouseEnter">
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation
+                            Storyboard.TargetName="btnOKGlowEffect" 
+                            Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+                            From="0.0" To="1.0" Duration="0:0:0.5" 
+                            AutoReverse="False" RepeatBehavior="1x" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger>
+                            <EventTrigger RoutedEvent="Button.MouseLeave">
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation
+                            Storyboard.TargetName="btnOKGlowEffect" 
+                            Storyboard.TargetProperty="(DropShadowEffect.Opacity)"
+                            From="1" To="0" Duration="0:0:0.5" 
+                            AutoReverse="False" RepeatBehavior="1x" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger>
+                        </Button.Triggers>
+                    </Button>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

@@ -23,7 +23,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                 response = DecodeDataReceived(dataReceivedEventArgs.RawBinaryData, dataReceivedEventArgs);
 
-                if (!response.IsError)
+                if (response != null && !response.IsError)
                 {
                     switch (response.HoloNETResponseType)
                     {
@@ -301,7 +301,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 {
                     if (appInfo.manifest.roles != null && appInfo.manifest.roles.Length > 0)
                     {
-                        string strategy = appInfo.manifest.roles[0].provisioning.strategy.ToPascalCase();
+                        //string strategy = appInfo.manifest.roles[0].provisioning.strategy.ToPascalCase();
 
                         if (appInfo.manifest.roles[0].provisioning != null)
                             appInfo.manifest.roles[0].provisioning.StrategyType = (ProvisioningStrategyType)Enum.Parse(typeof(ProvisioningStrategyType), appInfo.manifest.roles[0].provisioning.strategy.ToPascalCase());

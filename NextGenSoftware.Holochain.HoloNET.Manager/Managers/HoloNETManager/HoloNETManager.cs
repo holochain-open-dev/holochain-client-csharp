@@ -9,6 +9,7 @@ using NextGenSoftware.Holochain.HoloNET.Manager.Interfaces;
 using NextGenSoftware.Holochain.HoloNET.Manager.Models;
 using NextGenSoftware.Holochain.HoloNET.Manager.Objects;
 using NextGenSoftware.Holochain.HoloNET.Manager.UserControls;
+using System.Windows.Threading;
 
 namespace NextGenSoftware.Holochain.HoloNET.Manager.Managers
 {
@@ -17,8 +18,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Manager.Managers
         private static IHoloNETManager _instance = null;
         private const string _holoNETEntryDemoAppId = "oasis-holonet-entry-demo-app";
         private const string _holoNETCollectionDemoAppId = "oasis-holonet-collection-demo-app";
-        private const string _holoNETEntryDemoHappPath = @"E:\code\hc\holochain-holochain-0.1.5\happs\oasis\BUILD\happ\oasis.happ";
-        private const string _holoNETCollectionDemoHappPath = @"E:\code\hc\holochain-holochain-0.1.5\happs\oasis\BUILD\happ\oasis.happ";
+        //private const string _holoNETEntryDemoHappPath = @"E:\code\hc\holochain-holochain-0.1.5\happs\oasis\BUILD\happ\oasis.happ";
+        //private const string _holoNETCollectionDemoHappPath = @"E:\code\hc\holochain-holochain-0.1.5\happs\oasis\BUILD\happ\oasis.happ";
+        private const string _holoNETEntryDemoHappPath = @"OASIS_hAPP\oasis.happ";
+        private const string _holoNETCollectionDemoHappPath = @"OASIS_hAPP\oasis.happ";
         private const string _role_name = "oasis";
         private bool _rebooting = false;
         private bool _adminDisconnected = false;
@@ -310,7 +313,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Manager.Managers
             if (HoloNETClientAdmin != null)
             {
                 if (HoloNETClientAdmin.State == System.Net.WebSockets.WebSocketState.Open)
-                    HoloNETClientAdmin.Disconnect();
+                    Dispatcher.CurrentDispatcher.InvokeAsync(async () => await HoloNETClientAdmin.DisconnectAsync());
             }
         }
 

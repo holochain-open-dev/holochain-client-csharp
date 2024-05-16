@@ -24,6 +24,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Manager
             InitializeComponent();
             this.Loaded += MainWindow_Loaded;
             this.Unloaded += MainWindow_Unloaded;
+            this.Closing += MainWindow_Closing;
         }
 
         private void InitUI()
@@ -99,6 +100,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Manager
             HoloNETManager.Instance.OnStatusMessage -= HoloNETManager_OnStatusMessage;
             HoloNETManager.Instance.OnNumberOfClientConnectionsChanged -= HoloNETManager_OnNumberOfClientConnectionsChanged;
             HoloNETManager.Instance.OnInstalledAppsChanged -= HoloNETManager_OnInstalledAppsChanged;
+        }
+
+        private void MainWindow_Closing(object? sender, System.ComponentModel.CancelEventArgs e)
+        {
+            e.Cancel = true;
+            ucExitPopup.Visibility = Visibility.Visible;
+            PopupManager.CurrentPopup = ucExitPopup;
         }
 
         private void HoloNETManager_OnInstalledAppsChanged(object sender, InstalledAppsEventArgs e)
@@ -504,6 +512,34 @@ namespace NextGenSoftware.Holochain.HoloNET.Manager
             //animAnimateButtonsRowExpand.From = rowDefButtons.Height; //stkpnlButtons.ActualHeight;
             //animAnimateButtonsRowExpand.To = new GridLength(100);
             //sbAnimateButtonsRowExpand.Begin();
+        }
+
+
+        private void mnuOpenDna_Click(object sender, RoutedEventArgs e)
+        {
+            Process.Start("explorer.exe", Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "NextGenSoftware\\HoloNET\\HoloNETDNA.json"));
+        }
+
+        private void mnuExit_Click(object sender, RoutedEventArgs e)
+        {
+            ucExitPopup.Visibility = Visibility.Visible;
+            PopupManager.CurrentPopup = ucExitPopup;
+        }
+
+        private void mnuUpdateDNADefintion_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void mnuUpdaeAgentInfo_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void mnuAbout_Click(object sender, RoutedEventArgs e)
+        {
+            ucAboutPopup.Visibility = Visibility.Visible;
+            PopupManager.CurrentPopup = ucAboutPopup;
         }
     }
 }

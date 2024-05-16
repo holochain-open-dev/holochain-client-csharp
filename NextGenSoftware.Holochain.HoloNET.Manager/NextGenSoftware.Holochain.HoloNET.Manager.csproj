@@ -20,11 +20,13 @@
 	<Authors>David Ellams (NextGen Software Ltd)</Authors>
 	<PackageTags>holochain;net;unity;manager;ui</PackageTags>
 	<PackageReleaseNotes>
+		This is a very small release with minor bug fixes such as if there is a problem writing the embedded holochain.exe or hc.exe to the current working directory it will now write them to the AppData folder as a fallback, the error handling has also been improved. It also now writes the HoloNETDNA to the AppData folder as the default to avoid windows security issues.
+
 		This is a very small release with minor bug fixes such as it now will write the HoloNETEnryDNA to the AppData folder.
 
 		**NOTE: The documentation is still for the previous version, please bare with us while we update this soon... thank you!**
 
-		*Full Changelog:* https://github.com/holochain-open-dev/holochain-client-csharp/compare/v3.0.3...v3.0.4
+		*Full Changelog:* https://github.com/holochain-open-dev/holochain-client-csharp/compare/v3.0.2...v3.0.3
 
 		NuGet Packages:
 
@@ -77,7 +79,7 @@
 	<!--<PackageLicenseExpression>GNU GPLv3</PackageLicenseExpression>-->
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-	<Version>3.0.4</Version>
+	<Version>3.1.0</Version>
 	<!--<PackageLicenseFile>..\LICENSE</PackageLicenseFile>-->
 
 	<AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
@@ -92,11 +94,18 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="OASIS_hAPP\oasis.happ" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Page Remove="MainWindow - Copy.xaml" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="HoloNET2.ico" />
+    <Content Include="OASIS_hAPP\oasis.happ">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
@@ -120,6 +129,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="User Controls\Popups\ucAboutPopup.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="User Controls\Popups\ucExitPopup.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="User Controls\Popups\ucHoloNETEntryPopup.xaml.cs">
       <SubType>Code</SubType>
     </Compile>

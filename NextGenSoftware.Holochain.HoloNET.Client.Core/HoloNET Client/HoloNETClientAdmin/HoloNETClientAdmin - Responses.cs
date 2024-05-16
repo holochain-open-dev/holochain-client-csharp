@@ -1,11 +1,10 @@
 ﻿using System;
 using MessagePack;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using NextGenSoftware.Logging;
-using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects;
 using NextGenSoftware.Holochain.HoloNET.Client.Interfaces;
+using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
@@ -448,11 +447,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             try
             {
                 Logger.Log("ADMIN: DNA DEFINTION RETURNED\n", LogType.Info);
-                //DnaDefinitionResponse dnaDefinition = MessagePackSerializer.Deserialize<DnaDefinitionResponse>(response.data, messagePackSerializerOptions);
+                DnaDefinitionResponse dnaDefinition = MessagePackSerializer.Deserialize<DnaDefinitionResponse>(response.data, messagePackSerializerOptions);
                 //object dnaDefinition = MessagePackSerializer.Deserialize<object>(response.data, messagePackSerializerOptions);
-                HoloNETData data = MessagePackSerializer.Deserialize<HoloNETData>(response.data, messagePackSerializerOptions);
-                DnaDefinitionResponse dnaDefinition = MessagePackSerializer.Deserialize<HoloNETData>(data.data, messagePackSerializerOptions);
-
+                //HoloNETData data = MessagePackSerializer.Deserialize<HoloNETData>(response.data, messagePackSerializerOptions);
+                //DnaDefinitionResponse dnaDefinition = MessagePackSerializer.Deserialize<HoloNETData>(data.data, messagePackSerializerOptions);
+                //object dnaDefinition = MessagePackSerializer.Deserialize<HoloNETData>(data.data, messagePackSerializerOptions);
 
                 //if (dnaDefinition != null)
                 //    args.DnaDefinition = dnaDefinition;

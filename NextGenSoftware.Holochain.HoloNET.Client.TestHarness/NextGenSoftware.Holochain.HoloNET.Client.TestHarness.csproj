@@ -15,26 +15,9 @@
 	<Authors>David Ellams (NextGen Software Ltd)</Authors>
 	<PackageTags>holochain;net;unity</PackageTags>
 	<PackageReleaseNotes>
-		This release is a MAJOR release and milestone, HoloNET has been re-written from the ground up with many improvements, bug fixes etc. Part of this includes making it compatible with the latest beta version of Holochain. It has also been upgraded to work with the latest version of .NET (v8.0) so has even further performance improvements, bug fixes, etc.
-
-		HoloNETClient has now been split out into HoloNETClientAppAgent, HoloNETClientApp &amp; HoloNETClientAdmin so is now more in line with the rust and js clients so existing hc devs will now find it more familiar! ;-)
-
-		This release also features the new HoloNET ORM (Object Relational Maping) package. This consists of the HoloNETEntryBase, HoloNETAuditEntryBase, HoloNETCollection and HoloNETObservsableCollection classes. The first two can be extended to create your HoloNET Entry models that map directly onto your data structs in your rust hApp zome code. The second two are collections of these entries. You can then simply call basic CRUD methods on your classes such as Load, Save, Delete, etc making it very quick and easy to build hApps without having to worry about the lower complexities of Holochain or configure and use the Holochain Conductor or API's. You also get change tracking, version control &amp; rollback functionality for free. More documentation will be coming soon for this...
-
-		HoloNET ORM allows any existing .net app/website/game/service to be rapidly and quickly converted to a Holochain hApp with very little code changes (you can simply add a new attribute to the properties in your models) and it will now map to your rust hApp structs (which WEB5 STAR ODK/HDK) can also dynamically generate (it generates rust and c# code). Your hAPP will also be metaverse ready because STAR is also a interoperable metaverse generator (hence the name! ;-) ) and can also connect &amp; bridge to any web2 or web3 provider thanks to it being built on the WEB4 OASIS API.
-
-		This release also features a new HoloNET Manager UI (think Launcher/Dev Store for .net and then some!) which show cases all of the advanced features of HoloNET Client and HoloNET ORM.  This has many generic backend and UI components that can be used to allow other .net devs to rapidly construct their own .net hApps using HoloNET HDK. Yes, that is right, this client has grown so much now that it is now in a number of packages forming the official Holochain .NET HDK. This includes the WEB5 STAR ODK/HDK No/Low Code Generator allowing you to generate hApps built on top of the HoloNET Client and HoloNET ORM from simple metadata (this part is in alpha and will be shortly released). The HoloNET Manager is currently implemented in WPF but we have plans to port this to Uno, MAUI &amp; OpenSilver meaning it can run natively on Windows, Mac, Linux, TV's, IPads, tablets, android, IOS &amp; web. The work for this has already begun so expect future releases soon...
-
-		This release now fully implements the full Holochain Conductor Admin API so is now on par with the javascript and rust clients.
-
-		Finally this release also features HoloNET HyperNET allowing Unity and Unreal games to implement lag free P2P networking with near unlimited number of players to play online smashing previous limitations on classic cloud/server hosting.
-
-		This is the BIGGEST update to HoloNET to date and is pretty much a whole new product now! ;-)
+		This is a very small release with minor bug fixes such as if there is a problem writing the embedded holochain.exe or hc.exe to the current working directory it will now write them to the AppData folder as a fallback, the error handling has also been improved. It also now writes the HoloNETDNA to the AppData folder as the default to avoid windows security issues.
 
 		**NOTE: The documentation is still for the previous version, please bare with us while we update this soon... thank you!**
-
-		*Full Changes Below:*
-		Too many to list here, please view the changelog below.
 
 		*Full Changelog:* https://github.com/holochain-open-dev/holochain-client-csharp/compare/v2.2.0...v3.0.0
 
@@ -79,12 +62,12 @@
 	</PackageReleaseNotes>
 	<RepositoryType>git</RepositoryType>
 	<RepositoryUrl>https://github.com/NextGenSoftwareUK/holochain-client-csharp</RepositoryUrl>
-	<Copyright>Copyright © NextGen Software Ltd 2023</Copyright>
+	<Copyright>Copyright © NextGen Software Ltd 2024</Copyright>
 	<PackageReadmeFile>README.md</PackageReadmeFile>
 	<!--<PackageLicenseExpression>GNU GPLv3</PackageLicenseExpression>-->
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-	<Version>3.0.2</Version>
+	<Version>3.0.3</Version>
 	<!--<PackageLicenseFile>..\LICENSE</PackageLicenseFile>-->
 
 	<AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
