@@ -38,8 +38,24 @@ namespace NextGenSoftware.Holochain.HoloNET.Manager.Managers
             HoloNETClientAdmin.OnCellIdsListedCallBack += HoloNETClientAdmin_OnCellIdsListedCallBack;
             HoloNETClientAdmin.OnAppInterfacesListedCallBack += HoloNETClientAdmin_OnAppInterfacesListedCallBack;
             HoloNETClientAdmin.OnAgentInfoReturnedCallBack += HoloNETClientAdmin_OnAgentInfoReturnedCallBack;
+            HoloNETClientAdmin.OnDnaDefinitionReturnedCallBack += HoloNETClientAdmin_OnDnaDefinitionReturnedCallBack;
             HoloNETClientAdmin.OnDisconnected += _holoNETClientAdmin_OnDisconnected;
             HoloNETClientAdmin.OnError += _holoNETClientAdmin_OnError;
+        }
+
+        private void HoloNETClientAdmin_OnDnaDefinitionReturnedCallBack(object sender, DnaDefinitionReturnedCallBackEventArgs e)
+        {
+            string coordinatorZomes = "";
+            string integrityZomes = "";
+
+            foreach (ZomeDefinition zomeDef in e.DnaDefinition.CoordinatorZomes)
+                coordinatorZomes = $"{coordinatorZomes}\nZome Name: {zomeDef.ZomeName}\nDependencies: {zomeDef.Dependencies.ToString()}\nWashHash: {zomeDef.wasm_hash}\n";
+
+            foreach (ZomeDefinition zomeDef in e.DnaDefinition.IntegrityZomes)
+                integrityZomes = $"{integrityZomes}\nZome Name: {zomeDef.ZomeName}\nDependencies: {zomeDef.Dependencies.ToString()}\nWashHash: {zomeDef.wasm_hash}\n";
+
+            LogMessage($"ADMIN: DNA Defintion Returned: DNA Defintion Name: {e.DnaDefinition.Name}, CoordinatorZomes: {coordinatorZomes}IntegrityZomes:{integrityZomes}");
+            ShowStatusMessage("DNA Defintion Returned.", StatusMessageType.Success);
         }
 
         private void HoloNETClientAdmin_OnAgentInfoReturnedCallBack(object sender, AgentInfoReturnedCallBackEventArgs e)
@@ -94,13 +110,19 @@ namespace NextGenSoftware.Holochain.HoloNET.Manager.Managers
             _rebooting = false;
             _adminDisconnected = false;
 
-            if (!HoloNETClientAdmin.HoloNETDNA.AutoStartHolochainConductor)
+            //If it is already connected then disconnect before attempting to connect again...
+            if (HoloNETClientAdmin.State == System.Net.WebSockets.WebSocketState.Open)
             {
-                LogMessage($"ADMIN: Connecting to Admin WebSocket on endpoint: {HoloNETClientAdmin.HoloNETDNA.HolochainConductorAdminURI}...");
-                ShowStatusMessage($"Admin WebSocket Connecting To Endpoint {HoloNETClientAdmin.HoloNETDNA.HolochainConductorAdminURI}...", StatusMessageType.Information, true);
+                LogMessage($"ADMIN: Disconnecting From Admin WebSocket On endpoint: {HoloNETClientAdmin.HoloNETDNA.HolochainConductorAdminURI}...");
+                ShowStatusMessage($"Admin WebSocket Disconnecting From Endpoint {HoloNETClientAdmin.HoloNETDNA.HolochainConductorAdminURI}...", StatusMessageType.Information, true);
+                await HoloNETClientAdmin.DisconnectAsync();
             }
 
-            //HoloNETClientAdmin.ConnectAdmin(HoloNETClientAdmin.HoloNETDNA.HolochainConductorAdminURI);
+            if (!HoloNETClientAdmin.HoloNETDNA.AutoStartHolochainConductor)
+            {
+                LogMessage($"ADMIN: Connecting To Admin WebSocket On endpoint: {HoloNETClientAdmin.HoloNETDNA.HolochainConductorAdminURI}...");
+                ShowStatusMessage($"Admin WebSocket Connecting To Endpoint {HoloNETClientAdmin.HoloNETDNA.HolochainConductorAdminURI}...", StatusMessageType.Information, true);
+            }
 
             //If you do not pass a connection string in it will default to HoloNETDNA.HolochainConductorAdminURI
             await HoloNETClientAdmin.ConnectAsync();
@@ -171,6 +193,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Manager.Managers
             LogMessage("ADMIN: Connected");
             ShowStatusMessage($"Admin WebSocket Connected.", StatusMessageType.Success);
 
+            OnHoloNETManagerBooted?.Invoke(this);
             //ListHapps();
 
             LogMessage("ADMIN: Generating AgentPubKey...");
@@ -218,6 +241,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Manager.Managers
                 ShowStatusMessage($"Listing hApps...", StatusMessageType.Information, true);
                 HoloNETClientAdmin.ListApps(AppStatusFilter.All);
             }
+
+            //OnHoloNETManagerBooted?.Invoke(this);
         }
 
         public void _holoNETClientAdmin_OnAppsListedCallBack(object sender, AppsListedCallBackEventArgs e)
@@ -398,7 +423,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Manager.Managers
             LogMessage("ADMIN: Disconnected");
             ShowStatusMessage($"Admin WebSocket Disconnected.");
             _adminDisconnected = true;
+            CheckIfAllDisconnected();
+        }
 
+        private void CheckIfAllDisconnected()
+        {
             if (_rebooting && _adminDisconnected && _clientsDisconnected == _clientsToDisconnect)
             {
                 if (HoloNETClientAdmin != null)
@@ -426,7 +455,15 @@ namespace NextGenSoftware.Holochain.HoloNET.Manager.Managers
                 }
 
                 InitHoloNETClientAdmin();
-                Dispatcher.CurrentDispatcher.InvokeAsync(async () => { await ConnectAdminAsync(); });
+
+                Dispatcher.CurrentDispatcher.InvokeAsync(async () => 
+                {
+                    bool autoStart = HoloNETClientAdmin.HoloNETDNA.AutoStartHolochainConductor;
+                    HoloNETClientAdmin.HoloNETDNA.AutoStartHolochainConductor = false; //Need to set this to false temp so it doesnt attempt to start another conductor when the existing one is still running.
+
+                    await ConnectAdminAsync();
+                    HoloNETClientAdmin.HoloNETDNA.AutoStartHolochainConductor = autoStart;
+                });
             }
         }
 

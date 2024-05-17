@@ -81,7 +81,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
     public class DnaDefinitionReturnedCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
-        public IDnaDefinitionResponse DnaDefinition { get; set; }
+        public IDnaDefinition DnaDefinition { get; set; }
     }
 
     public class AppInterfacesListedCallBackEventArgs : HoloNETDataReceivedBaseEventArgs

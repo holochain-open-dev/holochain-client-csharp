@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System.Threading.Tasks;
+using System.Windows.Threading;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Threading.Tasks;
 using NextGenSoftware.Holochain.HoloNET.Client;
 using NextGenSoftware.Holochain.HoloNET.Client.Interfaces;
 using NextGenSoftware.Holochain.HoloNET.ORM.Collections;
@@ -9,7 +10,6 @@ using NextGenSoftware.Holochain.HoloNET.Manager.Interfaces;
 using NextGenSoftware.Holochain.HoloNET.Manager.Models;
 using NextGenSoftware.Holochain.HoloNET.Manager.Objects;
 using NextGenSoftware.Holochain.HoloNET.Manager.UserControls;
-using System.Windows.Threading;
 
 namespace NextGenSoftware.Holochain.HoloNET.Manager.Managers
 {
@@ -42,6 +42,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Manager.Managers
 
         public delegate void InstalledAppsChanged(object sender, InstalledAppsEventArgs e);
         public event InstalledAppsChanged OnInstalledAppsChanged;
+
+        public delegate void HoloNETManagerBooted(object sender);
+        public event HoloNETManagerBooted OnHoloNETManagerBooted;
 
         public IHoloNETClientAdmin? HoloNETClientAdmin { get; set; }
         public List<IHoloNETClientAppAgent> HoloNETClientAppAgentClients { get; set; } = new List<IHoloNETClientAppAgent>();
@@ -313,7 +316,18 @@ namespace NextGenSoftware.Holochain.HoloNET.Manager.Managers
             if (HoloNETClientAdmin != null)
             {
                 if (HoloNETClientAdmin.State == System.Net.WebSockets.WebSocketState.Open)
-                    Dispatcher.CurrentDispatcher.InvokeAsync(async () => await HoloNETClientAdmin.DisconnectAsync());
+                {
+                    Dispatcher.CurrentDispatcher.InvokeAsync(async () =>
+                    {
+                        HoloNETDisconnectedEventArgs disconnectedResult = await HoloNETClientAdmin.DisconnectAsync();
+
+                        if (disconnectedResult != null && disconnectedResult.IsDisconnected)
+                        {
+                            _adminDisconnected = true;
+                            CheckIfAllDisconnected();
+                        }
+                    });
+                }
             }
         }
 

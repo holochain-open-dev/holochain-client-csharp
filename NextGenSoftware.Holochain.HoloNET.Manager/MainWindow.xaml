@@ -44,51 +44,52 @@
         <DockPanel >
             <Menu DockPanel.Dock="Top"  Background="Black" Foreground="WhiteSmoke">
                 <MenuItem Header="_HoloNET Manager" Background="Black">
-                    <MenuItem Background="Black" Header="_Reboot" Click="btnReboot_Click"/>
+                    <MenuItem Background="Black" Header="_Connect" x:Name="mnuConnect" Click="mnuConnect_Click"/>
+                    <MenuItem Background="Black" x:Name="mnuReboot" IsEnabled="False" Header="_Reboot" Click="btnReboot_Click"/>
                     <MenuItem Background="Black" Header="_Open DNA" x:Name="mnuOpenDna" Click="mnuOpenDna_Click" />
                     <MenuItem Background="Black" Header="_Hide Buttons" Click="btnHideButtons_Click"/>
                     <!--<MenuItem Background="Black" Header="_About" x:Name="mnuAbout" Click="mnuAbout_Click"/>-->
                     <MenuItem Background="Black" Header="_Exit" x:Name="mnuExit" Click="mnuExit_Click"/>
                 </MenuItem>
                 <MenuItem Header="_ORM" Background="Black">
-                    <MenuItem Background="Black" Header="_HoloNET Entry" Click="btnHoloNETEntry_Click" Width="200" Padding="0" Margin="0"/>
-                    <MenuItem Background="Black" Header="_HoloNET Collection" Width="200" Click="btnHoloNETCollection_Click" Padding="0" Margin="0"/>
+                    <MenuItem Background="Black" x:Name="mnuHoloNETEntry" IsEnabled="False" Header="_HoloNET Entry" Click="btnHoloNETEntry_Click" Width="200" Padding="0" Margin="0"/>
+                    <MenuItem Background="Black" x:Name="mnuHoloNETCollection" IsEnabled="False" Header="_HoloNET Collection" Width="200" Click="btnHoloNETCollection_Click" Padding="0" Margin="0"/>
                 </MenuItem>
                 <MenuItem Header="_hApps" Background="Black">
-                    <MenuItem Background="Black" Header="_Install hApp" Click="btnInstall_Click"/>
-                    <MenuItem Background="Black" Header="_Refresh hApps" Click="btnRefreshInstalledhApps_Click"/>
+                    <MenuItem Background="Black" IsEnabled="False" x:Name="mnuInstall" Header="_Install hApp" Click="btnInstall_Click"/>
+                    <MenuItem Background="Black" IsEnabled="False" x:Name="mnuRefreshApps" Header="_Refresh hApps" Click="btnRefreshInstalledhApps_Click"/>
                 </MenuItem>
                 <MenuItem Header="_DNA" Background="Black">
-                    <MenuItem Background="Black" Header="_Get DNA Definition" Click="btnGetDNADefinition_Click"/>
-                    <MenuItem Background="Black" Header="_Update DNA Defintion" Name="mnuUpdateDNADefintion" Click="mnuUpdateDNADefintion_Click"/>
+                    <MenuItem Background="Black" IsEnabled="False" x:Name="mnuGetDNADefinition" Header="_Get DNA Definition" Click="btnGetDNADefinition_Click"/>
+                    <MenuItem Background="Black" IsEnabled="False" Header="_Update DNA Defintion" Name="mnuUpdateDNADefintion" Click="mnuUpdateDNADefintion_Click"/>
                 </MenuItem>
                 <MenuItem Header="_Agent" Background="Black">
-                    <MenuItem Background="Black" Header="_Get Agent Info" Click="btnGetAgentInfo_Click"/>
-                    <MenuItem Background="Black" Header="_Update Agent Info" x:Name="mnuUpdaeAgentInfo" Click="mnuUpdaeAgentInfo_Click"/>
+                    <MenuItem Background="Black" IsEnabled="False" x:Name="mnuGetAgentInfo" Header="_Get Agent Info" Click="btnGetAgentInfo_Click"/>
+                    <MenuItem Background="Black" IsEnabled="False" x:Name="mnuUpdateAgentInfo" Header="_Update Agent Info" Click="mnuUpdaeAgentInfo_Click"/>
                 </MenuItem>
                 <MenuItem Header="_Misc" Background="Black">
-                    <MenuItem Background="Black" Header="_Get Storage Info" Click="btnGetStorageInfo_Click"/>
-                    <MenuItem Background="Black" Header="_Delete Cloned Cell" Click="btnDeleteCloneCell_Click"/>
-                    <MenuItem Background="Black" Header="_Graft Records" Click="btnGraftRecords_Click"/>
-                    <MenuItem Background="Black" Header="_Update Coordindators" Click="btnUpdateCoordinators_Click"/>
+                    <MenuItem Background="Black" IsEnabled="False" x:Name="mnuGetStorageInfo" Header="_Get Storage Info" Click="btnGetStorageInfo_Click"/>
+                    <MenuItem Background="Black" IsEnabled="False" x:Name="mnuDeleteClonedCell" Header="_Delete Cloned Cell" Click="btnDeleteCloneCell_Click"/>
+                    <MenuItem Background="Black" IsEnabled="False" x:Name="mnuGraftRecords" Header="_Graft Records" Click="btnGraftRecords_Click"/>
+                    <MenuItem Background="Black" IsEnabled="False" x:Name="mnuUpdateCoordinates" Header="_Update Coordindators" Click="btnUpdateCoordinators_Click"/>
                 </MenuItem>
                 <MenuItem Header="_List" Background="Black">
-                    <MenuItem Background="Black" Header="_List DNAs" Click="btnListDNAs_Click"/>
-                    <MenuItem Background="Black" Header="_List CellIds" Click="btnListCellIds_Click"/>
-                    <MenuItem Background="Black" Header="_List Attached Interfaces" Click="btnListAttachedInterfaces_Click"/>
+                    <MenuItem Background="Black" IsEnabled="False" x:Name="mnuListDNAs" Header="_List DNAs" Click="btnListDNAs_Click"/>
+                    <MenuItem Background="Black" IsEnabled="False" x:Name="mnuListCellIds" Header="_List CellIds" Click="btnListCellIds_Click"/>
+                    <MenuItem Background="Black" IsEnabled="False" x:Name="mnuListAttachedInterfaces" Header="_List Attached Interfaces" Click="btnListAttachedInterfaces_Click"/>
                 </MenuItem>
                 <MenuItem Header="_Dump" Background="Black">
-                    <MenuItem Background="Black" Header="_Dump Network Stats" Click="btnDumpNetWorkStats_Click"/>
-                    <MenuItem Background="Black" Header="_Dump Network Metrics" Click="btnDumpNetworkMetrics_Click"/>
-                    <MenuItem Background="Black" Header="_Dump State" Click="btnDumpState_Click"/>
-                    <MenuItem Background="Black" Header="_Dump Full State" Click="btnFullDump_Click"/>
+                    <MenuItem Background="Black" IsEnabled="False" x:Name="mnuDumpNetWorkStats" Header="_Dump Network Stats" Click="btnDumpNetWorkStats_Click"/>
+                    <MenuItem Background="Black" IsEnabled="False" x:Name="mnuDumpNetworkMetrics" Header="_Dump Network Metrics" Click="btnDumpNetworkMetrics_Click"/>
+                    <MenuItem Background="Black" IsEnabled="False" x:Name="mnuDumpState" Header="_Dump State" Click="btnDumpState_Click"/>
+                    <MenuItem Background="Black" IsEnabled="False" x:Name="mnuDumpFullState" Header="_Dump Full State" Click="btnFullDump_Click"/>
                 </MenuItem>
                 <MenuItem Header="_Logs" Background="Black">
                     <MenuItem Background="Black" Header="_Clear Log" Click="btnClearLog_Click"/>
                     <!--<MenuItem Background="Black" Header="_Show Detailed Logs"/>-->
-                    <MenuItem  Background="Black" Header="_Show Detailed Logs">
+                    <!--<MenuItem  Background="Black" Header="_Show Detailed Logs">
                         <CheckBox Background="Black" Foreground="WhiteSmoke">Yes</CheckBox>
-                    </MenuItem>
+                    </MenuItem>-->
                     <!--<ToggleButton x:Name="tbTest" BorderThickness="0" Background="Transparent" HorizontalContentAlignment="Stretch" HorizontalAlignment="Stretch">Show Detailed Logs</ToggleButton>-->
                     <MenuItem Background="Black" Header="_Open Logs" Click="btnShowLog_Click"/>
                 </MenuItem>
@@ -156,7 +157,7 @@
                     <CheckBox x:Name="chkShowDetailedMessages" Content="Show Detailed Logs" Margin="20,10,20,0" Foreground="White" Checked="chkShowDetailedMessages_Checked" Unchecked="chkShowDetailedMessages_Unchecked"></CheckBox>
                     <CheckBox x:Name="shkShowAdvancedAdminTools" Content="Show Advanced Admin Tools" Margin="20,10,20,0" Foreground="White" Checked="shkShowAdvancedAdminTools_Checked"  Unchecked="shkShowAdvancedAdminTools_Unchecked"></CheckBox>
                 </StackPanel>
-                <Button x:Name="btnInstall" Style="{StaticResource ButtonStyleBlue}" FontSize="14" Cursor="Hand" Content="Install hApp" Margin="10" Foreground="Blue" Padding="5,2,5,2"  Background="Black" Click="btnInstall_Click" >
+                <Button x:Name="btnInstall" Style="{StaticResource ButtonStyleBlue}" IsEnabled="False" FontSize="14" Cursor="Hand" Content="Install hApp" Margin="10" Foreground="Blue" Padding="5,2,5,2"  Background="Black" Click="btnInstall_Click" >
                     <Button.Effect>
                         <DropShadowEffect x:Name="btnInstallGlowEffect" ShadowDepth="0"
                           Color="White"
@@ -189,7 +190,7 @@
                         </EventTrigger>
                     </Button.Triggers>
                 </Button>
-                <Button x:Name="btnRefreshInstalledhApps" Style="{StaticResource ButtonStyleBlue}" FontSize="14" Cursor="Hand" Content="Refresh hApps" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnRefreshInstalledhApps_Click" >
+                <Button x:Name="btnRefreshInstalledhApps" Style="{StaticResource ButtonStyleBlue}" IsEnabled="False" FontSize="14" Cursor="Hand" Content="Refresh hApps" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnRefreshInstalledhApps_Click" >
                     <Button.Effect>
                         <DropShadowEffect x:Name="btnRefreshInstalledhAppsGlowEffect" ShadowDepth="0"
                           Color="White"
@@ -222,7 +223,7 @@
                         </EventTrigger>
                     </Button.Triggers>
                 </Button>
-                <Button x:Name="btnListDNAs" Style="{StaticResource ButtonStyleBlue}" FontSize="14" Cursor="Hand" Content="List DNAs" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnListDNAs_Click" >
+                <Button x:Name="btnListDNAs" Style="{StaticResource ButtonStyleBlue}" IsEnabled="False" FontSize="14" Cursor="Hand" Content="List DNAs" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnListDNAs_Click" >
                     <Button.Effect>
                         <DropShadowEffect x:Name="btnListDNAsGlowEffect" ShadowDepth="0"
                           Color="White"
@@ -255,7 +256,7 @@
                         </EventTrigger>
                     </Button.Triggers>
                 </Button>
-                <Button x:Name="btnListCellIds" Style="{StaticResource ButtonStyleBlue}" FontSize="14" Cursor="Hand" Content="List Cell Ids" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnListCellIds_Click" >
+                <Button x:Name="btnListCellIds" Style="{StaticResource ButtonStyleBlue}" IsEnabled="False" FontSize="14" Cursor="Hand" Content="List Cell Ids" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnListCellIds_Click" >
                     <Button.Effect>
                         <DropShadowEffect x:Name="btnListCellIdsGlowEffect" ShadowDepth="0"
                           Color="White"
@@ -288,7 +289,7 @@
                         </EventTrigger>
                     </Button.Triggers>
                 </Button>
-                <Button x:Name="btnListAttachedInterfaces" Style="{StaticResource ButtonStyleBlue}" FontSize="14" Cursor="Hand" Content="List Attached Interfaces" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnListAttachedInterfaces_Click" >
+                <Button x:Name="btnListAttachedInterfaces" Style="{StaticResource ButtonStyleBlue}" IsEnabled="False" FontSize="14" Cursor="Hand" Content="List Attached Interfaces" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnListAttachedInterfaces_Click" >
                     <Button.Effect>
                         <DropShadowEffect x:Name="btnListAttachedInterfacesGlowEffect" ShadowDepth="0"
                           Color="White"
@@ -321,7 +322,7 @@
                         </EventTrigger>
                     </Button.Triggers>
                 </Button>
-                <Button x:Name="btnGetAgentInfo" Style="{StaticResource ButtonStyleBlue}" FontSize="14" Cursor="Hand" Content="Get Agent Info" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnGetAgentInfo_Click" >
+                <Button x:Name="btnGetAgentInfo" Style="{StaticResource ButtonStyleBlue}" IsEnabled="False" FontSize="14" Cursor="Hand" Content="Get Agent Info" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnGetAgentInfo_Click" >
                     <Button.Effect>
                         <DropShadowEffect x:Name="btnGetAgentInfoGlowEffect" ShadowDepth="0"
 Color="White"
@@ -355,7 +356,7 @@ BlurRadius="10"/>
                     </Button.Triggers>
                 </Button>
 
-                <Button x:Name="btnHoloNETEntry" Style="{StaticResource ButtonStyle}" FontSize="14" Cursor="Hand" Content="HoloNET Entry" Margin="10" Foreground="DarkGray"  IsEnabled="True" Padding="5,2,5,2"  Background="Black" Click="btnHoloNETEntry_Click">
+                <Button x:Name="btnHoloNETEntry" Style="{StaticResource ButtonStyle}" IsEnabled="False" FontSize="14" Cursor="Hand" Content="HoloNET Entry" Margin="10" Foreground="DarkGray"  Padding="5,2,5,2"  Background="Black" Click="btnHoloNETEntry_Click">
                     <Button.Effect>
                         <DropShadowEffect x:Name="btnHoloNETEntryGlowEffect" ShadowDepth="0"
                       Color="White"
@@ -389,7 +390,7 @@ BlurRadius="10"/>
                     </Button.Triggers>
                 </Button>
 
-                <Button x:Name="btnHoloNETCollection" Style="{StaticResource ButtonStyle}" FontSize="14" Cursor="Hand" Content="HoloNET Collection" Margin="10" Foreground="DarkGray"  IsEnabled="True" Padding="5,2,5,2"  Background="Black" Click="btnHoloNETCollection_Click">
+                <Button x:Name="btnHoloNETCollection" Style="{StaticResource ButtonStyle}" IsEnabled="False" FontSize="14" Cursor="Hand" Content="HoloNET Collection" Margin="10" Foreground="DarkGray"  Padding="5,2,5,2"  Background="Black" Click="btnHoloNETCollection_Click">
                     <Button.Effect>
                         <DropShadowEffect x:Name="btnHoloNETCollectionGlowEffect" ShadowDepth="0"
       Color="White"
@@ -488,7 +489,7 @@ BlurRadius="10"/>
                         </EventTrigger>
                     </Button.Triggers>
                 </Button>
-                <Button x:Name="btnReboot" Style="{StaticResource ButtonStyle}" FontSize="14" Cursor="Hand" Content="Reboot" Margin="10" Foreground="DarkGray"  IsEnabled="True" Padding="5,2,5,2"  Background="Black" Click="btnReboot_Click">
+                <Button x:Name="btnReboot" Style="{StaticResource ButtonStyle}" IsEnabled="False" FontSize="14" Cursor="Hand" Content="Reboot" Margin="10" Foreground="DarkGray" Padding="5,2,5,2"  Background="Black" Click="btnReboot_Click">
                     <Button.Effect>
                         <DropShadowEffect x:Name="btnRebootGlowEffect" ShadowDepth="0"
            Color="White"
@@ -557,7 +558,7 @@ BlurRadius="10"/>
             </StackPanel>
 
             <StackPanel Orientation="Horizontal">
-                <Button x:Name="btnGetStorageInfo" Visibility="Collapsed" Style="{StaticResource ButtonStyleBlue}" FontSize="14" Cursor="Hand" Content="Get Storage Info" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnGetStorageInfo_Click" >
+                <Button x:Name="btnGetStorageInfo" Visibility="Collapsed" IsEnabled="False" Style="{StaticResource ButtonStyleBlue}" FontSize="14" Cursor="Hand" Content="Get Storage Info" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnGetStorageInfo_Click" >
                     <Button.Effect>
                         <DropShadowEffect x:Name="btnGetStorageInfoGlowEffect" ShadowDepth="0"
 Color="White"
@@ -591,7 +592,7 @@ BlurRadius="10"/>
                     </Button.Triggers>
                 </Button>
 
-                <Button x:Name="btnGetDNADefinition" Visibility="Collapsed" Style="{StaticResource ButtonStyleBlue}" FontSize="14" Cursor="Hand" Content="Get DNA Definition" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnGetDNADefinition_Click">
+                <Button x:Name="btnGetDNADefinition" Visibility="Collapsed" IsEnabled="False" Style="{StaticResource ButtonStyleBlue}" FontSize="14" Cursor="Hand" Content="Get DNA Definition" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnGetDNADefinition_Click">
                     <Button.Effect>
                         <DropShadowEffect x:Name="btnGetDNADefinitionGlowEffect" ShadowDepth="0"
           Color="White"
@@ -624,7 +625,7 @@ BlurRadius="10"/>
                         </EventTrigger>
                     </Button.Triggers>
                 </Button>
-                <Button x:Name="btnAddAgentInfo" Visibility="Collapsed" Style="{StaticResource ButtonStyleBlue}" FontSize="14" Cursor="Hand" Content="Add Agent Info" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnAddAgentInfo_Click">
+                <Button x:Name="btnAddAgentInfo" Visibility="Collapsed" IsEnabled="False" Style="{StaticResource ButtonStyleBlue}" FontSize="14" Cursor="Hand" Content="Add Agent Info" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnAddAgentInfo_Click">
                     <Button.Effect>
                         <DropShadowEffect x:Name="btnAddAgentInfoGlowEffect" ShadowDepth="0"
 Color="White"
@@ -657,7 +658,7 @@ BlurRadius="10"/>
                         </EventTrigger>
                     </Button.Triggers>
                 </Button>
-                <Button x:Name="btnDeleteCloneCell" Visibility="Collapsed" Style="{StaticResource ButtonStyleBlue}" FontSize="14" Cursor="Hand" Content="Delete Clone Cell" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnDeleteCloneCell_Click">
+                <Button x:Name="btnDeleteCloneCell" Visibility="Collapsed" IsEnabled="False" Style="{StaticResource ButtonStyleBlue}" FontSize="14" Cursor="Hand" Content="Delete Clone Cell" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnDeleteCloneCell_Click">
                     <Button.Effect>
                         <DropShadowEffect x:Name="btnDeleteCloneCellGlowEffect" ShadowDepth="0"
 Color="White"
@@ -690,7 +691,7 @@ BlurRadius="10"/>
                         </EventTrigger>
                     </Button.Triggers>
                 </Button>
-                <Button x:Name="btnGraftRecords" Visibility="Collapsed" Style="{StaticResource ButtonStyleBlue}" FontSize="14" Cursor="Hand" Content="Graft Records" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnGraftRecords_Click">
+                <Button x:Name="btnGraftRecords" Visibility="Collapsed" IsEnabled="False" Style="{StaticResource ButtonStyleBlue}" FontSize="14" Cursor="Hand" Content="Graft Records" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnGraftRecords_Click">
                     <Button.Effect>
                         <DropShadowEffect x:Name="btnGraftRecordsGlowEffect" ShadowDepth="0"
 Color="White"
@@ -723,7 +724,7 @@ BlurRadius="10"/>
                         </EventTrigger>
                     </Button.Triggers>
                 </Button>
-                <Button x:Name="btnUpdateCoordinators" Visibility="Collapsed" Style="{StaticResource ButtonStyleBlue}" FontSize="14" Cursor="Hand" Content="Update Coordinators" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnUpdateCoordinators_Click">
+                <Button x:Name="btnUpdateCoordinators" Visibility="Collapsed" IsEnabled="False" Style="{StaticResource ButtonStyleBlue}" FontSize="14" Cursor="Hand" Content="Update Coordinators" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnUpdateCoordinators_Click">
                     <Button.Effect>
                         <DropShadowEffect x:Name="btnUpdateCoordinatorsGlowEffect" ShadowDepth="0"
 Color="White"
@@ -756,7 +757,7 @@ BlurRadius="10"/>
                         </EventTrigger>
                     </Button.Triggers>
                 </Button>
-                <Button x:Name="btnDumpNetWorkStats" Visibility="Collapsed" Style="{StaticResource ButtonStyleBlue}" FontSize="14" Cursor="Hand" Content="Dump Network Stats" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnDumpNetWorkStats_Click" >
+                <Button x:Name="btnDumpNetWorkStats" Visibility="Collapsed" IsEnabled="False" Style="{StaticResource ButtonStyleBlue}" FontSize="14" Cursor="Hand" Content="Dump Network Stats" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnDumpNetWorkStats_Click" >
                     <Button.Effect>
                         <DropShadowEffect x:Name="btnDumpNetWorkStatsGlowEffect" ShadowDepth="0"
           Color="White"
@@ -789,7 +790,7 @@ BlurRadius="10"/>
                         </EventTrigger>
                     </Button.Triggers>
                 </Button>
-                <Button x:Name="btnDumpNetworkMetrics" Visibility="Collapsed" Style="{StaticResource ButtonStyleBlue}" FontSize="14" Cursor="Hand" Content="Dump Network Metrics" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnDumpNetworkMetrics_Click" >
+                <Button x:Name="btnDumpNetworkMetrics" Visibility="Collapsed" IsEnabled="False" Style="{StaticResource ButtonStyleBlue}" FontSize="14" Cursor="Hand" Content="Dump Network Metrics" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnDumpNetworkMetrics_Click" >
                     <Button.Effect>
                         <DropShadowEffect x:Name="btnDumpNetworkMetricsGlowEffect" ShadowDepth="0"
 Color="White"
@@ -822,7 +823,7 @@ BlurRadius="10"/>
                         </EventTrigger>
                     </Button.Triggers>
                 </Button>
-                <Button x:Name="btnDumpState" Visibility="Collapsed" Style="{StaticResource ButtonStyleBlue}" FontSize="14" Cursor="Hand" Content="Dump State" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnDumpState_Click" >
+                <Button x:Name="btnDumpState" Visibility="Collapsed" IsEnabled="False" Style="{StaticResource ButtonStyleBlue}" FontSize="14" Cursor="Hand" Content="Dump State" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnDumpState_Click" >
                     <Button.Effect>
                         <DropShadowEffect x:Name="btnDumpStateGlowEffect" ShadowDepth="0"
 Color="White"
@@ -855,7 +856,7 @@ BlurRadius="10"/>
                         </EventTrigger>
                     </Button.Triggers>
                 </Button>
-                <Button x:Name="btnFullDump" Visibility="Collapsed" Style="{StaticResource ButtonStyleBlue}" FontSize="14" Cursor="Hand" Content="Dump Full State" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnFullDump_Click" >
+                <Button x:Name="btnFullDump" Visibility="Collapsed" IsEnabled="False" Style="{StaticResource ButtonStyleBlue}" FontSize="14" Cursor="Hand" Content="Dump Full State" Margin="10" Foreground="White" Padding="5,2,5,2"  Background="Black" Click="btnFullDump_Click" >
                     <Button.Effect>
                         <DropShadowEffect x:Name="btnFullDumpGlowEffect" ShadowDepth="0"
 Color="White"

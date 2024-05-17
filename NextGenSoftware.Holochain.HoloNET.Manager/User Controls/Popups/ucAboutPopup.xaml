@@ -26,7 +26,7 @@
     HorizontalAlignment="Center" 
     VerticalAlignment="Center">
             <StackPanel>
-                <TextBlock Margin="10,10,10,20" Text="HoloNET Manager v3.1.0" HorizontalAlignment="Center" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="22"  />
+                <TextBlock Margin="10,10,10,20" Text="About" HorizontalAlignment="Center" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="22"  />
                 <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="0" Grid.Column="0" Text="The UI to HoloNET that serves as multiple functions:" Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
                 <TextBlock Margin="5,15,5,5" VerticalAlignment="Center" Grid.Row="0" Grid.Column="0" Text="(a) A Test Harness for HoloNET Client &amp; HoloNET ORM." Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />
                 <TextBlock Margin="5" VerticalAlignment="Center" Grid.Row="0" Grid.Column="0" Text="(b) Use cases for how to build on HoloNET Client &amp; HoloNET ORM." Foreground="WhiteSmoke" FontWeight="Bold" FontSize="14"  />

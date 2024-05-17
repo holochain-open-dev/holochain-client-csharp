@@ -83,7 +83,7 @@
                             </EventTrigger>
                         </Button.Triggers>
                     </Button>
-                    <Button x:Name="btnAdminURIPopupOK" Cursor="Hand" Style="{StaticResource ButtonStyle}" Margin="10" Foreground="WhiteSmoke" Width="100" FontSize="14" Content="OK" Background="{x:Null}" Click="btnAdminURIPopupOK_Click">
+                    <Button x:Name="btnAdminURIPopupOK" Cursor="Hand" Style="{StaticResource ButtonStyle}" Margin="10" Foreground="WhiteSmoke" Width="100" FontSize="14" Content="Connect" Background="{x:Null}" Click="btnAdminURIPopupOK_Click">
                         <Button.Effect>
                             <DropShadowEffect x:Name="btnAdminURIPopupOKGlowEffect" ShadowDepth="0"
                   Color="White"

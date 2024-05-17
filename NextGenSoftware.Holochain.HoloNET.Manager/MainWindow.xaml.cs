@@ -88,9 +88,54 @@ namespace NextGenSoftware.Holochain.HoloNET.Manager
             HoloNETManager.Instance.OnStatusMessage += HoloNETManager_OnStatusMessage;
             HoloNETManager.Instance.OnNumberOfClientConnectionsChanged += HoloNETManager_OnNumberOfClientConnectionsChanged;
             HoloNETManager.Instance.OnInstalledAppsChanged += HoloNETManager_OnInstalledAppsChanged;
+            HoloNETManager.Instance.OnHoloNETManagerBooted += Instance_OnHoloNETManagerBooted;
 
             HoloNETManager.Instance.BootHoloNETManager();
             InitUI();
+        }
+
+        private void Instance_OnHoloNETManagerBooted(object sender)
+        {
+            btnAddAgentInfo.IsEnabled = true;
+            btnDeleteCloneCell.IsEnabled = true;
+            btnDumpNetworkMetrics.IsEnabled = true;
+            btnDumpNetWorkStats.IsEnabled = true;
+            btnDumpState.IsEnabled = true;
+            btnFullDump.IsEnabled = true;
+            btnGetAgentInfo.IsEnabled = true;
+            btnGetDNADefinition.IsEnabled = true;
+            btnGetStorageInfo.IsEnabled = true;
+            btnGraftRecords.IsEnabled = true;
+            btnHoloNETCollection.IsEnabled = true;
+            btnHoloNETEntry.IsEnabled = true;
+            btnInstall.IsEnabled = true;
+            btnListAttachedInterfaces.IsEnabled = true;
+            btnListCellIds.IsEnabled = true;
+            btnListDNAs.IsEnabled = true;
+            btnReboot.IsEnabled = true;
+            btnRefreshInstalledhApps.IsEnabled = true;
+            btnUpdateCoordinators.IsEnabled = true;
+
+            mnuReboot.IsEnabled = true;
+            mnuInstall.IsEnabled = true;
+            mnuGetDNADefinition.IsEnabled = true;
+            mnuUpdateAgentInfo.IsEnabled = true;
+            mnuUpdateDNADefintion.IsEnabled = true;
+            mnuDeleteClonedCell.IsEnabled = true;
+            mnuDumpFullState.IsEnabled = true;
+            mnuDumpNetworkMetrics.IsEnabled = true;
+            mnuDumpNetWorkStats.IsEnabled= true;
+            mnuDumpState.IsEnabled = true;
+            mnuGetAgentInfo.IsEnabled = true;
+            mnuGetStorageInfo.IsEnabled = true;
+            mnuGraftRecords.IsEnabled = true;
+            mnuHoloNETCollection.IsEnabled= true;
+            mnuHoloNETEntry.IsEnabled= true;
+            mnuListAttachedInterfaces.IsEnabled= true;
+            mnuListCellIds.IsEnabled= true;
+            mnuListDNAs.IsEnabled= true;
+            mnuRefreshApps.IsEnabled= true;
+            mnuUpdateCoordinates.IsEnabled= true;
         }
 
         private void MainWindow_Unloaded(object sender, RoutedEventArgs e)
@@ -540,6 +585,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Manager
         {
             ucAboutPopup.Visibility = Visibility.Visible;
             PopupManager.CurrentPopup = ucAboutPopup;
+        }
+
+        private void mnuConnect_Click(object sender, RoutedEventArgs e)
+        {
+            ucConductorSettingsPopup.Visibility = Visibility.Visible;
+            PopupManager.CurrentPopup = ucConductorSettingsPopup;
         }
     }
 }

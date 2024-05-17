@@ -447,16 +447,18 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             try
             {
                 Logger.Log("ADMIN: DNA DEFINTION RETURNED\n", LogType.Info);
-                DnaDefinitionResponse dnaDefinition = MessagePackSerializer.Deserialize<DnaDefinitionResponse>(response.data, messagePackSerializerOptions);
-                //object dnaDefinition = MessagePackSerializer.Deserialize<object>(response.data, messagePackSerializerOptions);
-                //HoloNETData data = MessagePackSerializer.Deserialize<HoloNETData>(response.data, messagePackSerializerOptions);
-                //DnaDefinitionResponse dnaDefinition = MessagePackSerializer.Deserialize<HoloNETData>(data.data, messagePackSerializerOptions);
-                //object dnaDefinition = MessagePackSerializer.Deserialize<HoloNETData>(data.data, messagePackSerializerOptions);
+                DnaDefinitionResponse dnaDefinitionResponse = MessagePackSerializer.Deserialize<DnaDefinitionResponse>(response.data, messagePackSerializerOptions);
+                DnaDefinition dnaDefinition = new DnaDefinition();
 
-                //if (dnaDefinition != null)
-                //    args.DnaDefinition = dnaDefinition;
-                //else
-                //    HandleError(args, $"{errorMessage} dnaDefinition failed to deserialize.");
+                if (dnaDefinitionResponse != null)
+                {
+                    dnaDefinition.Name = dnaDefinitionResponse.data.name;
+                    dnaDefinition.Modifiers = dnaDefinitionResponse.data.modifiers;
+                    dnaDefinition.CoordinatorZomes = DecodeZomesDef(dnaDefinitionResponse.data.coordinator_zomes_raw as object[]);
+                    dnaDefinition.IntegrityZomes = DecodeZomesDef(dnaDefinitionResponse.data.integrity_zomes_raw as object[]);
+                }
+                else
+                    HandleError(args, $"{errorMessage} dnaDefinition failed to deserialize.");
             }
             catch (Exception ex)
             {
@@ -1207,6 +1209,46 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 taskCompletionCallBack[holoNETDataReceivedBaseBaseEventArgs.Id].SetResult(holoNETDataReceivedBaseBaseEventArgs);
                 taskCompletionCallBack.Remove(holoNETDataReceivedBaseBaseEventArgs.Id);
             }
+        }
+
+        private List<ZomeDefinition> DecodeZomesDef(object[] zomesDefRaw)
+        {
+            List<ZomeDefinition> zomeDefinitions = new List<ZomeDefinition>();
+            ZomeDefinition zomeDefinition = null;
+
+            if (zomesDefRaw != null)
+            {
+                foreach (object zome in zomesDefRaw)
+                {
+                    object[] keyValuePairs = zome as object[];
+
+                    if (keyValuePairs != null)
+                    {
+                        zomeDefinition = new ZomeDefinition();
+                        zomeDefinition.ZomeName = keyValuePairs[0].ToString();
+
+                        Dictionary<object, object> zomeProps = keyValuePairs[1] as Dictionary<object, object>;
+
+                        if (zomeProps != null)
+                        {
+                            if (zomeProps.ContainsKey("dependencies"))
+                            {
+                                object[] deps = zomeProps["dependencies"] as object[];
+
+                                foreach (object dep in deps)
+                                    zomeDefinition.Dependencies.Add(dep.ToString());
+                            }
+
+                            if (zomeProps.ContainsKey("wasm_hash"))
+                                zomeDefinition.wasm_hash = zomeProps["wasm_hash"] as byte[];
+                        }
+
+                        zomeDefinitions.Add(zomeDefinition);
+                    }
+                }
+            }
+
+            return zomeDefinitions;
         }
     }
 }

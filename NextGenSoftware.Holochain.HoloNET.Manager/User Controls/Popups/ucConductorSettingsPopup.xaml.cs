@@ -21,7 +21,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Manager.UserControls
         {
             this.Visibility = Visibility.Collapsed;
             PopupManager.CurrentPopup = null;
-            Application.Current.Shutdown();
+            //Application.Current.Shutdown();
         }
 
         private void btnAdminURIPopupOK_Click(object sender, RoutedEventArgs e)

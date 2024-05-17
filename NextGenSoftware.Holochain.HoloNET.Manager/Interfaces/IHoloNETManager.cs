@@ -40,6 +40,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Manager.Interfaces
         event HoloNETManager.Log OnLogMessage;
         event HoloNETManager.NumberOfClientConnectionsChanged OnNumberOfClientConnectionsChanged;
         event HoloNETManager.StatusMessage OnStatusMessage;
+        event HoloNETManager.HoloNETManagerBooted OnHoloNETManagerBooted;
 
         Task<ZomeFunctionCallBackEventArgs> AddHoloNETEntryToCollectionAsync(IHoloNETClientAppAgent client, string firstName, string lastName, DateTime dob, string email);
         void BootHoloNETManager();

@@ -1,12 +1,13 @@
 ﻿
 using MessagePack;
 using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects;
+using NextGenSoftware.Holochain.HoloNET.Client.Interfaces;
 using System;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.AppManifest
 {
     [MessagePackObject]
-    public class DnaModifiers
+    public class DnaModifiers : IDnaModifiers
     {
         [Key("network_seed")]
         public string network_seed { get; set; }
