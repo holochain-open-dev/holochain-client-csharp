@@ -6,7 +6,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Interfaces
     {
         object coordinator_zomes_raw { get; set; }
         object integrity_zomes_raw { get; set; }
-        IDnaModifiers modifiers { get; set; }
+        DnaModifiers modifiers { get; set; }
         string name { get; set; }
     }
 }

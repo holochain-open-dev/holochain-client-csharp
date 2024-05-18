@@ -456,6 +456,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     dnaDefinition.Modifiers = dnaDefinitionResponse.data.modifiers;
                     dnaDefinition.CoordinatorZomes = DecodeZomesDef(dnaDefinitionResponse.data.coordinator_zomes_raw as object[]);
                     dnaDefinition.IntegrityZomes = DecodeZomesDef(dnaDefinitionResponse.data.integrity_zomes_raw as object[]);
+                    args.DnaDefinition = dnaDefinition;
                 }
                 else
                     HandleError(args, $"{errorMessage} dnaDefinition failed to deserialize.");

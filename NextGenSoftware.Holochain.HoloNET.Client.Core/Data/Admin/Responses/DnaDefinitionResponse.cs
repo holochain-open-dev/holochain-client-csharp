@@ -11,6 +11,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public string type { get; set; }
 
         [Key("data")]
-        public IDnaDefinitionResponseDetail data { get; set; }
+        public DnaDefinitionResponseDetail data { get; set; }
     }
 }

@@ -7,6 +7,8 @@ using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects;
 using NextGenSoftware.Holochain.HoloNET.Client.Interfaces;
 using NextGenSoftware.Holochain.HoloNET.Manager.Enums;
 using NextGenSoftware.Holochain.HoloNET.Manager.Interfaces;
+using System.Collections.Generic;
+using NextGenSoftware.Utilities;
 
 namespace NextGenSoftware.Holochain.HoloNET.Manager.Managers
 {
@@ -45,17 +47,31 @@ namespace NextGenSoftware.Holochain.HoloNET.Manager.Managers
 
         private void HoloNETClientAdmin_OnDnaDefinitionReturnedCallBack(object sender, DnaDefinitionReturnedCallBackEventArgs e)
         {
-            string coordinatorZomes = "";
-            string integrityZomes = "";
-
-            foreach (ZomeDefinition zomeDef in e.DnaDefinition.CoordinatorZomes)
-                coordinatorZomes = $"{coordinatorZomes}\nZome Name: {zomeDef.ZomeName}\nDependencies: {zomeDef.Dependencies.ToString()}\nWashHash: {zomeDef.wasm_hash}\n";
-
-            foreach (ZomeDefinition zomeDef in e.DnaDefinition.IntegrityZomes)
-                integrityZomes = $"{integrityZomes}\nZome Name: {zomeDef.ZomeName}\nDependencies: {zomeDef.Dependencies.ToString()}\nWashHash: {zomeDef.wasm_hash}\n";
-
-            LogMessage($"ADMIN: DNA Defintion Returned: DNA Defintion Name: {e.DnaDefinition.Name}, CoordinatorZomes: {coordinatorZomes}IntegrityZomes:{integrityZomes}");
+            LogMessage($"ADMIN: DNA Defintion Returned: DNA Defintion Name: {e.DnaDefinition.Name}\nCoordinator Zomes:{GetZomeDefs(e.DnaDefinition.CoordinatorZomes)}\nIntegrity Zomes:{GetZomeDefs(e.DnaDefinition.IntegrityZomes)}");
             ShowStatusMessage("DNA Defintion Returned.", StatusMessageType.Success);
+        }
+
+        private string GetZomeDefs(List<ZomeDefinition> zomeDefinitions)
+        {
+            string zomeDefs = "";
+
+            foreach (ZomeDefinition zomeDef in zomeDefinitions)
+                zomeDefs = $"{zomeDefs}\nZome Name: {zomeDef.ZomeName}\nDependencies: {GetDeps(zomeDef.Dependencies)}\nWashHash: {HoloNETClientAdmin.ConvertHoloHashToString(zomeDef.wasm_hash)}\n";
+
+            return zomeDefs;
+        }
+
+        private string GetDeps(List<string> dependencies)
+        {
+            string deps = "";
+
+            foreach (string dep in dependencies)
+                deps = $"{deps}{dep},";
+
+            if (deps.Length > 1 )
+                deps = deps.Substring(0, deps.Length - 1);
+
+            return deps;
         }
 
         private void HoloNETClientAdmin_OnAgentInfoReturnedCallBack(object sender, AgentInfoReturnedCallBackEventArgs e)

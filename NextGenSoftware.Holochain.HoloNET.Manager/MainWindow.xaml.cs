@@ -239,42 +239,52 @@ namespace NextGenSoftware.Holochain.HoloNET.Manager
 
         private void btnGetStorageInfo_Click(object sender, RoutedEventArgs e)
         {
-            LogMessage("ADMIN: Getting Storage Info...");
-            ShowStatusMessage($"Getting Storage Info...", StatusMessageType.Information, true);
-            HoloNETManager.Instance.HoloNETClientAdmin.GetStorageInfo();
+            LogMessage("ADMIN: Coming Soon...");
+            ShowStatusMessage($"Coming Soon....", StatusMessageType.Information);
+
+            //LogMessage("ADMIN: Getting Storage Info...");
+            //ShowStatusMessage($"Getting Storage Info...", StatusMessageType.Information, true);
+            //HoloNETManager.Instance.HoloNETClientAdmin.GetStorageInfo();
         }
 
         private void btnDumpNetWorkStats_Click(object sender, RoutedEventArgs e)
         {
-            LogMessage("ADMIN: Dumping Network Stats...");
-            ShowStatusMessage($"Dumping Network Stats....", StatusMessageType.Information, true);
-            HoloNETManager.Instance.HoloNETClientAdmin.DumpNetworkStats();
+            LogMessage("ADMIN: Coming Soon...");
+            ShowStatusMessage($"Coming Soon....", StatusMessageType.Information);
+
+            //LogMessage("ADMIN: Dumping Network Stats...");
+            //ShowStatusMessage($"Dumping Network Stats....", StatusMessageType.Information, true);
+            //HoloNETManager.Instance.HoloNETClientAdmin.DumpNetworkStats();
         }
 
         private void btnDumpNetworkMetrics_Click(object sender, RoutedEventArgs e)
         {
-            LogMessage("ADMIN: Dumping Network Metrics...");
-            ShowStatusMessage($"Dumping Network Metrics....", StatusMessageType.Information, true);
-            HoloNETManager.Instance.HoloNETClientAdmin.DumpNetworkMetrics();
+            LogMessage("ADMIN: Coming Soon...");
+            ShowStatusMessage($"Coming Soon....", StatusMessageType.Information);
+
+            //LogMessage("ADMIN: Dumping Network Metrics...");
+            //ShowStatusMessage($"Dumping Network Metrics....", StatusMessageType.Information, true);
+            //HoloNETManager.Instance.HoloNETClientAdmin.DumpNetworkMetrics();
         }
 
         private void btnDumpState_Click(object sender, RoutedEventArgs e)
         {
-            LogMessage("ADMIN: Dump State...");
-            ShowStatusMessage($"Dump State....", StatusMessageType.Information, true);
-            HoloNETManager.Instance.HoloNETClientAdmin.DumpState();
+            LogMessage("ADMIN: Coming Soon...");
+            ShowStatusMessage($"Coming Soon....", StatusMessageType.Information);
+
+            //LogMessage("ADMIN: Dump State...");
+            //ShowStatusMessage($"Dump State....", StatusMessageType.Information, true);
+            //HoloNETManager.Instance.HoloNETClientAdmin.DumpState();
         }
 
         private void btnFullDump_Click(object sender, RoutedEventArgs e)
         {
-            LogMessage("ADMIN: Dump Full State...");
-            ShowStatusMessage($"Dump Full State....", StatusMessageType.Information, true);
-            HoloNETManager.Instance.HoloNETClientAdmin.DumpFullState();
+            LogMessage("ADMIN: Coming Soon...");
+            ShowStatusMessage($"Coming Soon....", StatusMessageType.Information);
 
-            //HoloNETManager.Instance.HoloNETClientAdmin.AddAgentInfo
-            //HoloNETManager.Instance.HoloNETClientAdmin.DeleteCloneCellAsync()
-            //HoloNETManager.Instance.HoloNETClientAdmin.GraftRecords()
-            //HoloNETManager.Instance.HoloNETClientAdmin.UpdateCoordinators
+            //LogMessage("ADMIN: Dump Full State...");
+            //ShowStatusMessage($"Dump Full State....", StatusMessageType.Information, true);
+            //HoloNETManager.Instance.HoloNETClientAdmin.DumpFullState();
         }
 
         //private void btnGetCellId_Click(object sender, RoutedEventArgs e)
@@ -304,8 +314,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Manager
 
         private void btnAddAgentInfo_Click(object sender, RoutedEventArgs e)
         {
-            LogMessage("ADMIN: Adding Agent Info...");
-            ShowStatusMessage($"Adding Agent Info....", StatusMessageType.Information, true);
+            LogMessage("ADMIN: Coming Soon...");
+            ShowStatusMessage($"Coming Soon....", StatusMessageType.Information);
+
+            //LogMessage("ADMIN: Adding Agent Info...");
+            //ShowStatusMessage($"Adding Agent Info....", StatusMessageType.Information, true);
             //HoloNETManager.Instance.HoloNETClientAdmin.AddAgentInfo();
         }
 
@@ -313,9 +326,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Manager
         {
             if (HoloNETManager.Instance != null && HoloNETManager.Instance.CurrentApp != null)
             {
-                LogMessage("ADMIN: Deleting Clone Cell...");
-                ShowStatusMessage($"Deleting Clone Cell....", StatusMessageType.Information, true);
-                HoloNETManager.Instance.HoloNETClientAdmin.DeleteCloneCell(HoloNETManager.Instance.CurrentApp.Name, HoloNETManager.Instance.CurrentApp.AgentPubKey, HoloNETManager.Instance.CurrentApp.DnaHash);
+                LogMessage("ADMIN: Coming Soon...");
+                ShowStatusMessage($"Coming Soon....", StatusMessageType.Information);
+
+                //LogMessage("ADMIN: Deleting Clone Cell...");
+                //ShowStatusMessage($"Deleting Clone Cell....", StatusMessageType.Information, true);
+                //HoloNETManager.Instance.HoloNETClientAdmin.DeleteCloneCell(HoloNETManager.Instance.CurrentApp.Name, HoloNETManager.Instance.CurrentApp.AgentPubKey, HoloNETManager.Instance.CurrentApp.DnaHash);
             }
             else
             {
@@ -328,9 +344,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Manager
         {
             if (HoloNETManager.Instance != null && HoloNETManager.Instance.CurrentApp != null)
             {
-                LogMessage("ADMIN: Grafting Records...");
-                ShowStatusMessage($"Grafting Records....", StatusMessageType.Information, true);
-                HoloNETManager.Instance.HoloNETClientAdmin.GraftRecords(HoloNETManager.Instance.CurrentApp.CellId, true, new object[1]);
+                LogMessage("ADMIN: Coming Soon...");
+                ShowStatusMessage($"Coming Soon....", StatusMessageType.Information);
+
+                //LogMessage("ADMIN: Grafting Records...");
+                //ShowStatusMessage($"Grafting Records....", StatusMessageType.Information, true);
+                //HoloNETManager.Instance.HoloNETClientAdmin.GraftRecords(HoloNETManager.Instance.CurrentApp.CellId, true, new object[1]);
             }
             else
             {
@@ -343,10 +362,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Manager
         {
             if (HoloNETManager.Instance != null && HoloNETManager.Instance.CurrentApp != null)
             {
-                LogMessage("ADMIN: Updating Coordinator Zomes...");
-                ShowStatusMessage($"Updating Coordinator Zomes....", StatusMessageType.Information, true);
-                //HoloNETManager.Instance.HoloNETClientAdmin.UpdateCoordinators(HoloNETManager.Instance.HoloNETClientAdmin.ConvertHoloHashToBytes(HoloNETManager.Instance.CurrentApp.DnaHash), "");
-                HoloNETManager.Instance.HoloNETClientAdmin.UpdateCoordinators(HoloNETManager.Instance.CurrentApp.CellId[0], "");
+                LogMessage("ADMIN: Coming Soon...");
+                ShowStatusMessage($"Coming Soon....", StatusMessageType.Information);
+
+                //LogMessage("ADMIN: Updating Coordinator Zomes...");
+                //ShowStatusMessage($"Updating Coordinator Zomes....", StatusMessageType.Information, true);
+                ////HoloNETManager.Instance.HoloNETClientAdmin.UpdateCoordinators(HoloNETManager.Instance.HoloNETClientAdmin.ConvertHoloHashToBytes(HoloNETManager.Instance.CurrentApp.DnaHash), "");
+                //HoloNETManager.Instance.HoloNETClientAdmin.UpdateCoordinators(HoloNETManager.Instance.CurrentApp.CellId[0], "");
             }
             else
             {

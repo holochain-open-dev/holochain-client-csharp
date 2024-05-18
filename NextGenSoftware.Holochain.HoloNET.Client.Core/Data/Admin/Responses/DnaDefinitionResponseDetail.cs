@@ -12,7 +12,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public string name { get; set; }
 
         [Key("modifiers")]
-        public IDnaModifiers modifiers { get; set; }
+        public DnaModifiers modifiers { get; set; }
 
         [Key("integrity_zomes")]
         public object integrity_zomes_raw { get; set; }

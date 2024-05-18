@@ -689,6 +689,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             try
             {
+                IsConnecting = false;
+
                 if (IsDisconnecting)
                 {
                     disconnectedEventArgs.IsWarning = true;
@@ -1081,6 +1083,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         protected virtual void WebSocket_OnError(object sender, WebSocketErrorEventArgs e)
         {
+            IsConnecting = false;
             HandleError(e.Reason, e.ErrorDetails);
         }
 
