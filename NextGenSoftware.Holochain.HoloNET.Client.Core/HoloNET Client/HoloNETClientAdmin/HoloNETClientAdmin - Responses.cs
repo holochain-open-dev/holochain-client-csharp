@@ -18,105 +18,108 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             {
                 response = base.ProcessDataReceived(dataReceivedEventArgs);
 
-                if (!response.IsError)
+                if (response != null)
                 {
-                    switch (response.HoloNETResponseType)
+                    if (!response.IsError)
                     {
-                        case HoloNETResponseType.AdminAgentPubKeyGenerated:
-                            DecodeAgentPubKeyGeneratedReceived(response, dataReceivedEventArgs);
-                            break;
+                        switch (response.HoloNETResponseType)
+                        {
+                            case HoloNETResponseType.AdminAgentPubKeyGenerated:
+                                DecodeAgentPubKeyGeneratedReceived(response, dataReceivedEventArgs);
+                                break;
 
-                        case HoloNETResponseType.AdminAppInstalled:
-                            DecodeAppInstalledReceived(response, dataReceivedEventArgs);
-                            break;
+                            case HoloNETResponseType.AdminAppInstalled:
+                                DecodeAppInstalledReceived(response, dataReceivedEventArgs);
+                                break;
 
-                        case HoloNETResponseType.AdminAppUninstalled:
-                            DecodeAppUninstalledReceived(response, dataReceivedEventArgs);
-                            break;
+                            case HoloNETResponseType.AdminAppUninstalled:
+                                DecodeAppUninstalledReceived(response, dataReceivedEventArgs);
+                                break;
 
-                        case HoloNETResponseType.AdminAppEnabled:
-                            DecodeAppEnabledReceived(response, dataReceivedEventArgs);
-                            break;
+                            case HoloNETResponseType.AdminAppEnabled:
+                                DecodeAppEnabledReceived(response, dataReceivedEventArgs);
+                                break;
 
-                        case HoloNETResponseType.AdminAppDisabled:
-                            DecodeAppDisabledReceived(response, dataReceivedEventArgs);
-                            break;
+                            case HoloNETResponseType.AdminAppDisabled:
+                                DecodeAppDisabledReceived(response, dataReceivedEventArgs);
+                                break;
 
-                        case HoloNETResponseType.AdminZomeCallCapabilityGranted:
-                            DecodeZomeCallCapabilityGrantedReceived(response, dataReceivedEventArgs);
-                            break;
+                            case HoloNETResponseType.AdminZomeCallCapabilityGranted:
+                                DecodeZomeCallCapabilityGrantedReceived(response, dataReceivedEventArgs);
+                                break;
 
-                        case HoloNETResponseType.AdminAppInterfaceAttached:
-                            DecodeAppInterfaceAttachedReceived(response, dataReceivedEventArgs);
-                            break;
+                            case HoloNETResponseType.AdminAppInterfaceAttached:
+                                DecodeAppInterfaceAttachedReceived(response, dataReceivedEventArgs);
+                                break;
 
-                        case HoloNETResponseType.AdminDnaRegistered:
-                            DecodeDnaRegisteredReceived(response, dataReceivedEventArgs);
-                            break;
+                            case HoloNETResponseType.AdminDnaRegistered:
+                                DecodeDnaRegisteredReceived(response, dataReceivedEventArgs);
+                                break;
 
-                        case HoloNETResponseType.AdminDnaDefinitionReturned:
-                            DecodeDnaDefinitionReturned(response, dataReceivedEventArgs);
-                            break;
+                            case HoloNETResponseType.AdminDnaDefinitionReturned:
+                                DecodeDnaDefinitionReturned(response, dataReceivedEventArgs);
+                                break;
 
-                        case HoloNETResponseType.AdminAppInterfacesListed:
-                            DecodeAppInterfacesListedReceived(response, dataReceivedEventArgs);
-                            break;
+                            case HoloNETResponseType.AdminAppInterfacesListed:
+                                DecodeAppInterfacesListedReceived(response, dataReceivedEventArgs);
+                                break;
 
-                        case HoloNETResponseType.AdminAppsListed:
-                            DecodeAppsListedReceived(response, dataReceivedEventArgs);
-                            break;
+                            case HoloNETResponseType.AdminAppsListed:
+                                DecodeAppsListedReceived(response, dataReceivedEventArgs);
+                                break;
 
-                        case HoloNETResponseType.AdminDnasListed:
-                            DecodeDnasListedReceived(response, dataReceivedEventArgs);
-                            break;
+                            case HoloNETResponseType.AdminDnasListed:
+                                DecodeDnasListedReceived(response, dataReceivedEventArgs);
+                                break;
 
-                        case HoloNETResponseType.AdminCellIdsListed:
-                            DecodeCellIdsListedReceived(response, dataReceivedEventArgs);
-                            break;
+                            case HoloNETResponseType.AdminCellIdsListed:
+                                DecodeCellIdsListedReceived(response, dataReceivedEventArgs);
+                                break;
 
-                        case HoloNETResponseType.AdminAgentInfoReturned:
-                            DecodeAgentInfoReceived(response, dataReceivedEventArgs);
-                            break;
+                            case HoloNETResponseType.AdminAgentInfoReturned:
+                                DecodeAgentInfoReceived(response, dataReceivedEventArgs);
+                                break;
 
-                        case HoloNETResponseType.AdminAgentInfoAdded:
-                            DecodeAgentInfoAddedReceived(response, dataReceivedEventArgs);
-                            break;
+                            case HoloNETResponseType.AdminAgentInfoAdded:
+                                DecodeAgentInfoAddedReceived(response, dataReceivedEventArgs);
+                                break;
 
-                        case HoloNETResponseType.AdminCoordinatorsUpdated:
-                            DecodeCoordinatorsUpdatedReceived(response, dataReceivedEventArgs);
-                            break;
+                            case HoloNETResponseType.AdminCoordinatorsUpdated:
+                                DecodeCoordinatorsUpdatedReceived(response, dataReceivedEventArgs);
+                                break;
 
-                        case HoloNETResponseType.AdminCloneCellDeleted:
-                            DecodeCloneCellDeletedReceived(response, dataReceivedEventArgs);
-                            break;
+                            case HoloNETResponseType.AdminCloneCellDeleted:
+                                DecodeCloneCellDeletedReceived(response, dataReceivedEventArgs);
+                                break;
 
-                        case HoloNETResponseType.AdminStateDumped:
-                            DecodeStateDumpedReceived(response, dataReceivedEventArgs);
-                            break;
+                            case HoloNETResponseType.AdminStateDumped:
+                                DecodeStateDumpedReceived(response, dataReceivedEventArgs);
+                                break;
 
-                        case HoloNETResponseType.AdminFullStateDumped:
-                            DecodeStateDumpedReceived(response, dataReceivedEventArgs);
-                            break;
+                            case HoloNETResponseType.AdminFullStateDumped:
+                                DecodeStateDumpedReceived(response, dataReceivedEventArgs);
+                                break;
 
-                        case HoloNETResponseType.AdminNetworkMetricsDumped:
-                            DecodeNetworkMetricsDumpedReceived(response, dataReceivedEventArgs);
-                            break;
+                            case HoloNETResponseType.AdminNetworkMetricsDumped:
+                                DecodeNetworkMetricsDumpedReceived(response, dataReceivedEventArgs);
+                                break;
 
-                        case HoloNETResponseType.AdminNetworkStatsDumped:
-                            DecodeNetworkStatsDumpedReceived(response, dataReceivedEventArgs);
-                            break;
+                            case HoloNETResponseType.AdminNetworkStatsDumped:
+                                DecodeNetworkStatsDumpedReceived(response, dataReceivedEventArgs);
+                                break;
 
-                        case HoloNETResponseType.AdminStorageInfoReturned:
-                            DecodeStorageInfoReturned(response, dataReceivedEventArgs);
-                            break;
+                            case HoloNETResponseType.AdminStorageInfoReturned:
+                                DecodeStorageInfoReturned(response, dataReceivedEventArgs);
+                                break;
 
-                        case HoloNETResponseType.AdminRecordsGrafted:
-                            DecodeRecordsGraftedReceived(response, dataReceivedEventArgs);
-                            break;
+                            case HoloNETResponseType.AdminRecordsGrafted:
+                                DecodeRecordsGraftedReceived(response, dataReceivedEventArgs);
+                                break;
 
-                        case HoloNETResponseType.AdminAdminInterfacesAdded:
-                            DecodeAdminInterfacesAddedReceived(response, dataReceivedEventArgs);
-                            break;
+                            case HoloNETResponseType.AdminAdminInterfacesAdded:
+                                DecodeAdminInterfacesAddedReceived(response, dataReceivedEventArgs);
+                                break;
+                        }
                     }
                 }
             }
