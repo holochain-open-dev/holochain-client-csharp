@@ -23,7 +23,7 @@
 
 		  **NOTE: The documentation is still for the previous version, please bare with us while we update this soon... thank you!**
 
-		  *Full Changelog:* https://github.com/holochain-open-dev/holochain-client-csharp/compare/v3.0.2...v3.0.3
+		  *Full Changelog:* https://github.com/holochain-open-dev/holochain-client-csharp/compare/v3.0.3...v3.0.4
 
 		  NuGet Packages:
 
@@ -72,7 +72,7 @@
 	  <!--<PackageLicenseExpression>GNU GPLv3</PackageLicenseExpression>-->
 	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
 	  <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-	  <Version>3.0.4</Version>
+	  <Version>3.0.5</Version>
 	  <!--<PackageLicenseFile>..\LICENSE</PackageLicenseFile>-->
 
 	  <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>

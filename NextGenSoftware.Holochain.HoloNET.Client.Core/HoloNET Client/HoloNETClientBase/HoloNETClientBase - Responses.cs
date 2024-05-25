@@ -90,7 +90,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 string rawBinaryDataAfterMessagePackDecodeAsString = "";
                 string rawBinaryDataAfterMessagePackDecodeDecoded = "";
 
-                response = MessagePackSerializer.Deserialize<HoloNETResponse>(rawBinaryData, messagePackSerializerOptions);
+                byte[] data = rawBinaryData.ToArray();
+                rawBinaryData.CopyTo(data, 0);
+
+
+                response = MessagePackSerializer.Deserialize<HoloNETResponse>(data, messagePackSerializerOptions);
                 AppResponse appResponse = MessagePackSerializer.Deserialize<AppResponse>(response.data, messagePackSerializerOptions);
 
                 id = response.id.ToString();
