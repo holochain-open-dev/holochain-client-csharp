@@ -203,7 +203,7 @@ https://github.com/holochain-open-dev/holochain-client-csharp/releases/tag/v3.0.
 
 **This also now includes a msi installer for the HoloNET Manager so is the first real world deployment of HolonNET! Yay! :) This is a MAJOR milestone and shows and proves HoloNET working in a real world use case so you can give it a go yourself and give us vital feedback, thank you! :)**
 
-[HoloNET Manager v3.0.4](https://www.oasisweb4.com/downloads/HoloNET_Manager_v3.0.4.msi)
+[HoloNET Manager v3.1.0](https://www.oasisweb4.com/downloads/HoloNET_Manager_v3.1.0.msi)
 
 **This is the UI to HoloNET and is also used to demo and test all functionality of HoloNET Client and HoloNET ORM. Read more about this above.**
 
@@ -213,6 +213,11 @@ https://github.com/holochain-open-dev/holochain-client-csharp/releases/tag/v3.0.
 
 **Any other help would also be greatly appreciated, we are always looking for devs (and non devs) to join us on this exciting journey to the stars... We would love to hear from you! Thank you! :)**
 
+**We also REALLY need funding to keep this vital project alive, we are now out of runway so we would really appreciate your support, thank you!**
+
+https://www.gofundme.com/f/help-david-get-over-the-line-with-holonet-oasis-and-star
+
+**UPDATE: We have now opened our HoloNET Alpha Testers Programme, please get in touch on our [Telegram group](https://t.me/holonetchat) if you want to join and become one of our esteem amazing testers! You can also get early access to many exciting upcoming releases for HoloNET, STAR, OASIS & AR World/Our World before anyone else! Other perks and bonuses also available! So sign up now! Thanks!**
 
 ## HoloNET Code Has Migrated
 
