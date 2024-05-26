@@ -808,7 +808,7 @@
           "bin/placeholder/NextGenSoftware.ErrorHandling.dll": {}
         }
       },
-      "NextGenSoftware.Holochain.HoloNET.Client.Embedded/3.0.5": {
+      "NextGenSoftware.Holochain.HoloNET.Client/3.0.5": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v8.0",
         "dependencies": {
@@ -823,23 +823,23 @@
           "YamlDotNet": "13.7.1"
         },
         "compile": {
-          "bin/placeholder/NextGenSoftware.Holochain.HoloNET.Client.Embedded.dll": {}
+          "bin/placeholder/NextGenSoftware.Holochain.HoloNET.Client.dll": {}
         },
         "runtime": {
-          "bin/placeholder/NextGenSoftware.Holochain.HoloNET.Client.Embedded.dll": {}
+          "bin/placeholder/NextGenSoftware.Holochain.HoloNET.Client.dll": {}
         }
       },
-      "NextGenSoftware.Holochain.HoloNET.ORM.Embedded/3.0.5": {
+      "NextGenSoftware.Holochain.HoloNET.ORM/3.0.6": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v8.0",
         "dependencies": {
-          "NextGenSoftware.Holochain.HoloNET.Client.Embedded": "3.0.5"
+          "NextGenSoftware.Holochain.HoloNET.Client": "3.0.5"
         },
         "compile": {
-          "bin/placeholder/NextGenSoftware.Holochain.HoloNET.ORM.Embedded.dll": {}
+          "bin/placeholder/NextGenSoftware.Holochain.HoloNET.ORM.dll": {}
         },
         "runtime": {
-          "bin/placeholder/NextGenSoftware.Holochain.HoloNET.ORM.Embedded.dll": {}
+          "bin/placeholder/NextGenSoftware.Holochain.HoloNET.ORM.dll": {}
         }
       },
       "NextGenSoftware.Logging/2.0.0": {
@@ -3206,12 +3206,12 @@
       "path": "../../NextGenSoftware-Libraries/NextGenSoftware Libraries/NextGenSoftware.ErrorHandling/NextGenSoftware.ErrorHandling.csproj",
       "msbuildProject": "../../NextGenSoftware-Libraries/NextGenSoftware Libraries/NextGenSoftware.ErrorHandling/NextGenSoftware.ErrorHandling.csproj"
     },
-    "NextGenSoftware.Holochain.HoloNET.Client.Embedded/3.0.5": {
+    "NextGenSoftware.Holochain.HoloNET.Client/3.0.5": {
       "type": "project",
       "path": "../NextGenSoftware.Holochain.HoloNET.Client.Core/NextGenSoftware.Holochain.HoloNET.Client.csproj",
       "msbuildProject": "../NextGenSoftware.Holochain.HoloNET.Client.Core/NextGenSoftware.Holochain.HoloNET.Client.csproj"
     },
-    "NextGenSoftware.Holochain.HoloNET.ORM.Embedded/3.0.5": {
+    "NextGenSoftware.Holochain.HoloNET.ORM/3.0.6": {
       "type": "project",
       "path": "../NextGenSoftware.Holochain.HoloNET.ORM/NextGenSoftware.Holochain.HoloNET.ORM.csproj",
       "msbuildProject": "../NextGenSoftware.Holochain.HoloNET.ORM/NextGenSoftware.Holochain.HoloNET.ORM.csproj"
@@ -3234,8 +3234,8 @@
   },
   "projectFileDependencyGroups": {
     "net8.0": [
-      "NextGenSoftware.Holochain.HoloNET.Client.Embedded >= 3.0.5",
-      "NextGenSoftware.Holochain.HoloNET.ORM.Embedded >= 3.0.5"
+      "NextGenSoftware.Holochain.HoloNET.Client >= 3.0.5",
+      "NextGenSoftware.Holochain.HoloNET.ORM >= 3.0.6"
     ]
   },
   "packageFolders": {

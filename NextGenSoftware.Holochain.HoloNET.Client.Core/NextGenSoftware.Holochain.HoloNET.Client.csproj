@@ -3,15 +3,15 @@
   <PropertyGroup>
 	  <TargetFramework>net8.0</TargetFramework>
 	  <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-	  <PackageId>NextGenSoftware.Holochain.HoloNET.Client.Embedded</PackageId>
-	  <!--<PackageId>NextGenSoftware.Holochain.HoloNET.Client</PackageId>-->
+	  <!--<PackageId>NextGenSoftware.Holochain.HoloNET.Client.Embedded</PackageId>-->
+	  <PackageId>NextGenSoftware.Holochain.HoloNET.Client</PackageId>
 	  <Company>NextGen Software Ltd</Company>
 	  <Product>HoloNET Holochain Client</Product>
 	  <Title>HoloNET Holochain Client</Title>
-	  <!--<Summary>The world's first .NET &amp; Unity client for Holochain.</Summary>
-	  <Description>The world's first .NET &amp; Unity client for Holochain.</Description>-->
-	  <Summary>The world's first .NET &amp; Unity client for Holochain. This version comes with the Holochain binaries built in.</Summary>
-	  <Description>The world's first .NET &amp; Unity client for Holochain. This version comes with the Holochain binaries built in.</Description>
+	  <Summary>The world's first .NET &amp; Unity client for Holochain.</Summary>
+	  <Description>The world's first .NET &amp; Unity client for Holochain.</Description>
+	  <!--<Summary>The world's first .NET &amp; Unity client for Holochain. This version comes with the Holochain binaries built in.</Summary>
+	  <Description>The world's first .NET &amp; Unity client for Holochain. This version comes with the Holochain binaries built in.</Description>-->
 	  <PackageProjectUrl>https://github.com/holochain-open-dev/holochain-client-csharp</PackageProjectUrl>
 	  <PackageIcon>hc logo.png</PackageIcon>
 	  <Authors>David Ellams (NextGen Software Ltd)</Authors>
@@ -20,8 +20,24 @@
 		  - This release has multiple bug fixes.
 		  - Bug fixes for Get DNA Definition Conductor API function.
 		  - Bug fixes for Disconnect and Re-Connect issues.
-		  - Dependencies updated such as the NextGen Libs it uses.		
-			
+		  - Dependencies updated such as the NextGen Libs it uses.
+
+		  [HoloNET Manager v3.1.0](https://www.oasisweb4.com/downloads/HoloNET_Manager_v3.1.0.msi)
+
+		  **This is the UI to HoloNET and is also used to demo and test all functionality of HoloNET Client and HoloNET ORM. Read more about this above.**
+
+		  **Please leave feedback in our [Telegram group](https://t.me/holonetchat). We are aware of a few bugs we are still working on, we originally wanted to wait till we got these fixed but if we are being honest we couldn't wait any longer to get this out there to get early feedback and see where the demands were for further features, enhancements and what part of the HoloNET Family we should focus more on etc...**
+
+		  **We also REALLY need funding to keep this vital project alive, we are now out of runway so we would really appreciate your support:
+
+		  https://www.gofundme.com/f/help-david-get-over-the-line-with-holonet-oasis-and-star**
+
+		  **We also wanted help squishing these last few bugs because they have been quite tricky little buggers to track down! Please find them in our [GitHub Issues](https://github.com/holochain-open-dev/holochain-client-csharp/issues)... :)**
+
+		  **Any other help would also be greatly appreciated, we are always looking for devs (and non devs) to join us on this exciting journey to the stars... We would love to hear from you! Thank you! :)**
+
+		  **UPDATE: We have now opened our HoloNET Alpha Testers Programme, please get in touch on our [Telegram group](https://t.me/holonetchat) if you want to join and become one of our esteem amazing testers! You can also get early access to many exciting upcoming releases for HoloNET, STAR, OASIS &amp; AR World/Our World before anyone else! Other perks and bonuses also available! So sign up now! Thanks!**
+
 		  **NOTE: The documentation is still for the previous version, please bare with us while we update this soon... thank you!**
 
 		  *Full Changelog:* https://github.com/holochain-open-dev/holochain-client-csharp/compare/v3.0.3...v3.0.5
