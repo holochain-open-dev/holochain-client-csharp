@@ -104,7 +104,7 @@
       }
     },
     "C:\\Users\\USER\\source\\repos\\holochain-client-csharp\\NextGenSoftware.Holochain.HoloNET.Client.TestHarness\\NextGenSoftware.Holochain.HoloNET.Client.TestHarness.csproj": {
-      "version": "3.0.3",
+      "version": "3.0.4",
       "restore": {
         "projectUniqueName": "C:\\Users\\USER\\source\\repos\\holochain-client-csharp\\NextGenSoftware.Holochain.HoloNET.Client.TestHarness\\NextGenSoftware.Holochain.HoloNET.Client.TestHarness.csproj",
         "projectName": "NextGenSoftware.Holochain.HoloNET.Client.TestHarness",
@@ -442,7 +442,7 @@
       }
     },
     "C:\\Users\\USER\\source\\repos\\NextGenSoftware-Libraries\\NextGenSoftware Libraries\\NextGenSoftware.Utilities\\NextGenSoftware.Utilities.csproj": {
-      "version": "1.2.0",
+      "version": "1.2.1",
       "restore": {
         "projectUniqueName": "C:\\Users\\USER\\source\\repos\\NextGenSoftware-Libraries\\NextGenSoftware Libraries\\NextGenSoftware.Utilities\\NextGenSoftware.Utilities.csproj",
         "projectName": "NextGenSoftware.Utilities",
@@ -460,7 +460,7 @@
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
-          "net7.0"
+          "net8.0"
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
@@ -469,8 +469,8 @@
           "https://www.myget.org/F/opensilver/api/v3/index.json": {}
         },
         "frameworks": {
-          "net7.0": {
-            "targetAlias": "net7.0",
+          "net8.0": {
+            "targetAlias": "net8.0",
             "projectReferences": {}
           }
         },
@@ -481,8 +481,8 @@
         }
       },
       "frameworks": {
-        "net7.0": {
-          "targetAlias": "net7.0",
+        "net8.0": {
+          "targetAlias": "net8.0",
           "imports": [
             "net461",
             "net462",
@@ -494,26 +494,12 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "downloadDependencies": [
-            {
-              "name": "Microsoft.AspNetCore.App.Ref",
-              "version": "[7.0.19, 7.0.19]"
-            },
-            {
-              "name": "Microsoft.NETCore.App.Ref",
-              "version": "[7.0.19, 7.0.19]"
-            },
-            {
-              "name": "Microsoft.WindowsDesktop.App.Ref",
-              "version": "[7.0.19, 7.0.19]"
-            }
-          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.105\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.105/PortableRuntimeIdentifierGraph.json"
         }
       }
     },

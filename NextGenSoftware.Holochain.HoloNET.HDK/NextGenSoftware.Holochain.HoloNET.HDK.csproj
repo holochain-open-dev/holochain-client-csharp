@@ -22,12 +22,15 @@
 	  <Authors>David Ellams (NextGen Software Ltd)</Authors>
 	  <PackageTags>holochain;net;unity;orm</PackageTags>
 	  <PackageReleaseNotes>
-		  This release has multiple bug fixes and new features such as the Get DNA Definition Conductor API function.
+		  - This release has multiple bug fixes.
+		  - Bug fixes for Get DNA Definition Conductor API function.
+		  - Bug fixes for Disconnect and Re-Connect issues.
+		  - Dependencies updated such as the NextGen Libs it uses.
 
 		  **NOTE: The documentation is still for the previous version, please bare with us while we update this soon... thank you!**
 
-		  *Full Changelog:* https://github.com/holochain-open-dev/holochain-client-csharp/compare/v3.0.3...v3.0.4
-
+		  *Full Changelog:* https://github.com/holochain-open-dev/holochain-client-csharp/compare/v3.0.3...v3.0.5
+		  
 		  NuGet Packages:
 
 		  [NextGenSoftware.Holochain.HoloNET.Client](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.Client)

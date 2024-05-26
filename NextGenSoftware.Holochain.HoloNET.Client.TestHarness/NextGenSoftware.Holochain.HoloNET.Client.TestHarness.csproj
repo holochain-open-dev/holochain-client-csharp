@@ -15,11 +15,14 @@
 	<Authors>David Ellams (NextGen Software Ltd)</Authors>
 	<PackageTags>holochain;net;unity</PackageTags>
 	<PackageReleaseNotes>
-		This is a very small release with minor bug fixes such as if there is a problem writing the embedded holochain.exe or hc.exe to the current working directory it will now write them to the AppData folder as a fallback, the error handling has also been improved. It also now writes the HoloNETDNA to the AppData folder as the default to avoid windows security issues.
+		- This release has multiple bug fixes.
+		- Bug fixes for Get DNA Definition Conductor API function.
+		- Bug fixes for Disconnect and Re-Connect issues.
+		- Dependencies updated such as the NextGen Libs it uses.
 
 		**NOTE: The documentation is still for the previous version, please bare with us while we update this soon... thank you!**
 
-		*Full Changelog:* https://github.com/holochain-open-dev/holochain-client-csharp/compare/v2.2.0...v3.0.0
+		*Full Changelog:* https://github.com/holochain-open-dev/holochain-client-csharp/compare/v3.0.3...v3.0.5
 
 		NuGet Packages:
 
@@ -67,7 +70,7 @@
 	<!--<PackageLicenseExpression>GNU GPLv3</PackageLicenseExpression>-->
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-	<Version>3.0.3</Version>
+	<Version>3.0.4</Version>
 	<!--<PackageLicenseFile>..\LICENSE</PackageLicenseFile>-->
 
 	<AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
