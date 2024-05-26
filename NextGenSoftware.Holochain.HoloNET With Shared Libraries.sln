@@ -76,6 +76,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NextGenSoftware.Holochain.H
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "NextGenSoftware.Holochain.HoloNET.Manager.Installer", "NextGenSoftware.Holochain.HoloNET.Manager.Installer\NextGenSoftware.Holochain.HoloNET.Manager.Installer.vdproj", "{6197BC21-EFA4-477D-88FF-97606382B8C6}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NextGenSoftware.ErrorHandling", "..\NextGenSoftware-Libraries\NextGenSoftware Libraries\NextGenSoftware.ErrorHandling\NextGenSoftware.ErrorHandling.csproj", "{46645F1C-6A34-406D-9E3F-0A21E5F3D44E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -647,6 +649,22 @@ Global
 		{6197BC21-EFA4-477D-88FF-97606382B8C6}.Release|arm64.ActiveCfg = Release
 		{6197BC21-EFA4-477D-88FF-97606382B8C6}.Release|x64.ActiveCfg = Release
 		{6197BC21-EFA4-477D-88FF-97606382B8C6}.Release|x86.ActiveCfg = Release
+		{46645F1C-6A34-406D-9E3F-0A21E5F3D44E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{46645F1C-6A34-406D-9E3F-0A21E5F3D44E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{46645F1C-6A34-406D-9E3F-0A21E5F3D44E}.Debug|arm64.ActiveCfg = Debug|Any CPU
+		{46645F1C-6A34-406D-9E3F-0A21E5F3D44E}.Debug|arm64.Build.0 = Debug|Any CPU
+		{46645F1C-6A34-406D-9E3F-0A21E5F3D44E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{46645F1C-6A34-406D-9E3F-0A21E5F3D44E}.Debug|x64.Build.0 = Debug|Any CPU
+		{46645F1C-6A34-406D-9E3F-0A21E5F3D44E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{46645F1C-6A34-406D-9E3F-0A21E5F3D44E}.Debug|x86.Build.0 = Debug|Any CPU
+		{46645F1C-6A34-406D-9E3F-0A21E5F3D44E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{46645F1C-6A34-406D-9E3F-0A21E5F3D44E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{46645F1C-6A34-406D-9E3F-0A21E5F3D44E}.Release|arm64.ActiveCfg = Release|Any CPU
+		{46645F1C-6A34-406D-9E3F-0A21E5F3D44E}.Release|arm64.Build.0 = Release|Any CPU
+		{46645F1C-6A34-406D-9E3F-0A21E5F3D44E}.Release|x64.ActiveCfg = Release|Any CPU
+		{46645F1C-6A34-406D-9E3F-0A21E5F3D44E}.Release|x64.Build.0 = Release|Any CPU
+		{46645F1C-6A34-406D-9E3F-0A21E5F3D44E}.Release|x86.ActiveCfg = Release|Any CPU
+		{46645F1C-6A34-406D-9E3F-0A21E5F3D44E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -680,6 +698,7 @@ Global
 		{9868EBF4-451B-48D3-80CF-79CCEFD61109} = {FB5BB6A2-FFF6-4343-80B5-76F71B835BDF}
 		{7929AB36-2093-4621-ADE8-C52592A1AD29} = {FB5BB6A2-FFF6-4343-80B5-76F71B835BDF}
 		{CFB2B997-F858-411C-9C2F-85DD0F74331A} = {FB5BB6A2-FFF6-4343-80B5-76F71B835BDF}
+		{46645F1C-6A34-406D-9E3F-0A21E5F3D44E} = {FB5BB6A2-FFF6-4343-80B5-76F71B835BDF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {597DC6F9-2ECC-4F79-BDFB-086320E2CF0F}

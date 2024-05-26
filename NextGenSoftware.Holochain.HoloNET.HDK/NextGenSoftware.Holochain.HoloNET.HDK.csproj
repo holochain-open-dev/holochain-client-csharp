@@ -70,7 +70,7 @@
 	  </PackageReleaseNotes>
 	  <RepositoryType>git</RepositoryType>
 	  <RepositoryUrl>https://github.com/holochain-open-dev/holochain-client-csharp</RepositoryUrl>
-	  <Copyright>Copyright © NextGen Software Ltd 2024</Copyright>
+	  <Copyright>Copyright © NextGen Software Ltd 2020 - 2024</Copyright>
 	  <PackageReadmeFile>README.md</PackageReadmeFile>
 	  <!--<PackageLicenseExpression>GNU GPLv3</PackageLicenseExpression>-->
 	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
