@@ -1050,7 +1050,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         protected virtual void WebSocket_OnDataReceived(object sender, WebSocket.DataReceivedEventArgs e)
         {
-            Logger.Log(string.Concat("EVENT RAISED: DataReceived: Raw Binary Data: ", e.RawBinaryDataDecoded.Trim(), "(", e.RawBinaryDataAsString.Trim(), ")"), LogType.Debug);
+            Logger.Log(string.Concat("EVENT RAISED: DataReceived: Raw Binary Data: ", e.RawBinaryDataDecoded != null ? e.RawBinaryDataDecoded.Trim() : "", "(", e.RawBinaryDataAsString != null ? e.RawBinaryDataAsString.Trim() : "", ")"), LogType.Debug);
             ProcessDataReceived(e);
         }
 
@@ -1065,11 +1065,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     _taskCompletionDisconnected.SetResult(e);
 
                 //We need to dispose and nullify the socket in case we want to use it to connect again later.
-                if (WebSocket.ClientWebSocket != null)
-                {
-                    WebSocket.ClientWebSocket.Dispose();
-                    WebSocket.ClientWebSocket = null;
-                }
+                //if (WebSocket.ClientWebSocket != null)
+                //{
+                //    WebSocket.ClientWebSocket.Dispose();
+                //    WebSocket.ClientWebSocket = null;
+                //}
 
                 IsDisconnecting = false;
                 OnDisconnected?.Invoke(this, e);
