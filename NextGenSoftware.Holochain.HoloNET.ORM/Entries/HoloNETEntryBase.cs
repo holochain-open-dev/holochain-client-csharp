@@ -1348,7 +1348,7 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM.Entries
         //TODO: REMOVE AFTER, TEMP TILL GET ZOMECALLS WORKING AGAIN!
         public void MockData(Dictionary<string, bool> holochainFieldsIsEnabledKeyValuePairs = null, bool cachePropertyInfos = true)
         {
-            dynamic paramsObject = new ExpandoObject();
+            //dynamic paramsObject = new ExpandoObject();
             PropertyInfo[] props = null;
             Dictionary<string, object> zomeCallProps = new Dictionary<string, object>();
             Type type = GetType();
