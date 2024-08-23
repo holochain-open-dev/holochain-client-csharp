@@ -593,18 +593,35 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM.Collections
         /// This method will load the entries for this collection from the Holochain Conductor. This calls the CallZomeFunction on the HoloNET client passing in the zome function name specified in the constructor param `zomeLoadCollectionFunction` or property `ZomeLoadCollectionFunction` and then maps the data returned from the zome call onto your collection of data objects. It will then raise the OnCollectionLoaded event.
         /// </summary>
         /// <param name="collectionAnchor">The anchor of the Holochain Collection you wish to load from. This is optional.</param>
+        /// <param name="customDataKeyValuePairs">This is a optional dictionary containing keyvalue pairs of custom data you wish to inject into the params that are sent to the ZomeLoadCollectionFunction.</param>
         /// <returns></returns>
-        public virtual async Task<HoloNETCollectionLoadedResult<T>> LoadCollectionAsync(string collectionAnchor = "", bool useReflectionToMapKeyValuePairResponseOntoEntryDataObject = true)
+        //public virtual async Task<HoloNETCollectionLoadedResult<T>> LoadCollectionAsync(string collectionAnchor = "", Dictionary<string, string> customDataKeyValuePairs = null, bool useReflectionToMapKeyValuePairResponseOntoEntryDataObject = true)
+        public virtual async Task<HoloNETCollectionLoadedResult<T>> LoadCollectionAsync(string collectionAnchor = "", Dictionary<string, string> customDataKeyValuePairs = null)
         {
             HoloNETCollectionLoadedResult<T> result = new HoloNETCollectionLoadedResult<T>();
+            ZomeFunctionCallBackEventArgs zomeResult = null;
 
             try
             {
                 if (!IsInitialized && !IsInitializing)
                     await InitializeAsync();
 
-                ZomeFunctionCallBackEventArgs zomeResult = await HoloNETClient.CallZomeFunctionAsync(ZomeName, ZomeLoadCollectionFunction, collectionAnchor);
+                if (customDataKeyValuePairs != null)
+                {
+                    dynamic paramsObject = new ExpandoObject();
 
+                    foreach (string key in customDataKeyValuePairs.Keys)
+                        ExpandoObjectHelpers.AddProperty(paramsObject, key, customDataKeyValuePairs[key]);
+
+                    if (!string.IsNullOrEmpty(collectionAnchor))
+                        ExpandoObjectHelpers.AddProperty(paramsObject, "collectionAnchor", collectionAnchor);
+
+                    zomeResult = await HoloNETClient.CallZomeFunctionAsync(ZomeName, ZomeLoadCollectionFunction, paramsObject);
+                }
+                else
+                    zomeResult = await HoloNETClient.CallZomeFunctionAsync(ZomeName, ZomeLoadCollectionFunction, collectionAnchor);
+
+ 
                 if (zomeResult != null && !zomeResult.IsError)
                 {
                     foreach (Record record in zomeResult.Records)
@@ -653,10 +670,13 @@ namespace NextGenSoftware.Holochain.HoloNET.ORM.Collections
         /// This method will load the entries for this collection from the Holochain Conductor. This calls the CallZomeFunction on the HoloNET client passing in the zome function name specified in the constructor param `zomeLoadCollectionFunction` or property `ZomeLoadCollectionFunction` and then maps the data returned from the zome call onto your collection of data objects. It will then raise the OnCollectionLoaded event.
         /// </summary>
         /// <param name="collectionAnchor">The anchor of the Holochain Collection you wish to load from. This is optional.</param>
+        /// <param name="customDataKeyValuePairs">This is a optional dictionary containing keyvalue pairs of custom data you wish to inject into the params that are sent to the ZomeLoadCollectionFunction.</param>
         /// <returns></returns>
-        public virtual HoloNETCollectionLoadedResult<T> LoadCollection(string collectionAnchor = "", bool useReflectionToMapKeyValuePairResponseOntoEntryDataObject = true)
+        //public virtual HoloNETCollectionLoadedResult<T> LoadCollection(string collectionAnchor = "", Dictionary<string, string> customDataKeyValuePairs = null, bool useReflectionToMapKeyValuePairResponseOntoEntryDataObject = true)
+        public virtual HoloNETCollectionLoadedResult<T> LoadCollection(string collectionAnchor = "", Dictionary<string, string> customDataKeyValuePairs = null)
         {
-            return LoadCollectionAsync(collectionAnchor).Result;
+            //return LoadCollectionAsync(collectionAnchor, customDataKeyValuePairs, useReflectionToMapKeyValuePairResponseOntoEntryDataObject).Result;
+            return LoadCollectionAsync(collectionAnchor, customDataKeyValuePairs).Result;
         }
 
         /// <summary>

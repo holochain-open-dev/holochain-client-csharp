@@ -249,42 +249,42 @@ namespace NextGenSoftware.Holochain.HoloNET.Manager
 
         private void btnDumpNetWorkStats_Click(object sender, RoutedEventArgs e)
         {
-            LogMessage("ADMIN: Coming Soon...");
-            ShowStatusMessage($"Coming Soon....", StatusMessageType.Information);
+            //LogMessage("ADMIN: Coming Soon...");
+            //ShowStatusMessage($"Coming Soon....", StatusMessageType.Information);
 
-            //LogMessage("ADMIN: Dumping Network Stats...");
-            //ShowStatusMessage($"Dumping Network Stats....", StatusMessageType.Information, true);
-            //HoloNETManager.Instance.HoloNETClientAdmin.DumpNetworkStats();
+            LogMessage("ADMIN: Dumping Network Stats...");
+            ShowStatusMessage($"Dumping Network Stats....", StatusMessageType.Information, true);
+            HoloNETManager.Instance.HoloNETClientAdmin.DumpNetworkStats();
         }
 
         private void btnDumpNetworkMetrics_Click(object sender, RoutedEventArgs e)
         {
-            LogMessage("ADMIN: Coming Soon...");
-            ShowStatusMessage($"Coming Soon....", StatusMessageType.Information);
+            //LogMessage("ADMIN: Coming Soon...");
+            //ShowStatusMessage($"Coming Soon....", StatusMessageType.Information);
 
-            //LogMessage("ADMIN: Dumping Network Metrics...");
-            //ShowStatusMessage($"Dumping Network Metrics....", StatusMessageType.Information, true);
-            //HoloNETManager.Instance.HoloNETClientAdmin.DumpNetworkMetrics();
+            LogMessage("ADMIN: Dumping Network Metrics...");
+            ShowStatusMessage($"Dumping Network Metrics....", StatusMessageType.Information, true);
+            HoloNETManager.Instance.HoloNETClientAdmin.DumpNetworkMetrics();
         }
 
         private void btnDumpState_Click(object sender, RoutedEventArgs e)
         {
-            LogMessage("ADMIN: Coming Soon...");
-            ShowStatusMessage($"Coming Soon....", StatusMessageType.Information);
+            //LogMessage("ADMIN: Coming Soon...");
+            //ShowStatusMessage($"Coming Soon....", StatusMessageType.Information);
 
-            //LogMessage("ADMIN: Dump State...");
-            //ShowStatusMessage($"Dump State....", StatusMessageType.Information, true);
-            //HoloNETManager.Instance.HoloNETClientAdmin.DumpState();
+            LogMessage("ADMIN: Dump State...");
+            ShowStatusMessage($"Dump State....", StatusMessageType.Information, true);
+            HoloNETManager.Instance.HoloNETClientAdmin.DumpState();
         }
 
         private void btnFullDump_Click(object sender, RoutedEventArgs e)
         {
-            LogMessage("ADMIN: Coming Soon...");
-            ShowStatusMessage($"Coming Soon....", StatusMessageType.Information);
+            //LogMessage("ADMIN: Coming Soon...");
+            //ShowStatusMessage($"Coming Soon....", StatusMessageType.Information);
 
-            //LogMessage("ADMIN: Dump Full State...");
-            //ShowStatusMessage($"Dump Full State....", StatusMessageType.Information, true);
-            //HoloNETManager.Instance.HoloNETClientAdmin.DumpFullState();
+            LogMessage("ADMIN: Dump Full State...");
+            ShowStatusMessage($"Dump Full State....", StatusMessageType.Information, true);
+            HoloNETManager.Instance.HoloNETClientAdmin.DumpFullState();
         }
 
         //private void btnGetCellId_Click(object sender, RoutedEventArgs e)
