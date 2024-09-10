@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\NextGenSoftware-Libraries\NextGenSoftware Libraries\NextGenSoftware.WebSocket\NextGenSoftware.WebSocket.csproj" />
+    <ProjectReference Include="..\NextGenSoftware.Holochain.HoloNET.Client.Core\NextGenSoftware.Holochain.HoloNET.Client.csproj" />
+  </ItemGroup>
+
+</Project>

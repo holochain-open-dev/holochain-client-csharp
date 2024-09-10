@@ -78,6 +78,8 @@ Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "NextGenSoftware.Holochain.H
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NextGenSoftware.ErrorHandling", "..\NextGenSoftware-Libraries\NextGenSoftware Libraries\NextGenSoftware.ErrorHandling\NextGenSoftware.ErrorHandling.csproj", "{46645F1C-6A34-406D-9E3F-0A21E5F3D44E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NextGenSoftware.Holochain.HoloNET.API", "NextGenSoftware.Holochain.HoloNET.API\NextGenSoftware.Holochain.HoloNET.API.csproj", "{B2114DA9-7DF7-4FBE-8D50-54688E74F8F9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -665,6 +667,22 @@ Global
 		{46645F1C-6A34-406D-9E3F-0A21E5F3D44E}.Release|x64.Build.0 = Release|Any CPU
 		{46645F1C-6A34-406D-9E3F-0A21E5F3D44E}.Release|x86.ActiveCfg = Release|Any CPU
 		{46645F1C-6A34-406D-9E3F-0A21E5F3D44E}.Release|x86.Build.0 = Release|Any CPU
+		{B2114DA9-7DF7-4FBE-8D50-54688E74F8F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B2114DA9-7DF7-4FBE-8D50-54688E74F8F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B2114DA9-7DF7-4FBE-8D50-54688E74F8F9}.Debug|arm64.ActiveCfg = Debug|Any CPU
+		{B2114DA9-7DF7-4FBE-8D50-54688E74F8F9}.Debug|arm64.Build.0 = Debug|Any CPU
+		{B2114DA9-7DF7-4FBE-8D50-54688E74F8F9}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{B2114DA9-7DF7-4FBE-8D50-54688E74F8F9}.Debug|x64.Build.0 = Debug|Any CPU
+		{B2114DA9-7DF7-4FBE-8D50-54688E74F8F9}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B2114DA9-7DF7-4FBE-8D50-54688E74F8F9}.Debug|x86.Build.0 = Debug|Any CPU
+		{B2114DA9-7DF7-4FBE-8D50-54688E74F8F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B2114DA9-7DF7-4FBE-8D50-54688E74F8F9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B2114DA9-7DF7-4FBE-8D50-54688E74F8F9}.Release|arm64.ActiveCfg = Release|Any CPU
+		{B2114DA9-7DF7-4FBE-8D50-54688E74F8F9}.Release|arm64.Build.0 = Release|Any CPU
+		{B2114DA9-7DF7-4FBE-8D50-54688E74F8F9}.Release|x64.ActiveCfg = Release|Any CPU
+		{B2114DA9-7DF7-4FBE-8D50-54688E74F8F9}.Release|x64.Build.0 = Release|Any CPU
+		{B2114DA9-7DF7-4FBE-8D50-54688E74F8F9}.Release|x86.ActiveCfg = Release|Any CPU
+		{B2114DA9-7DF7-4FBE-8D50-54688E74F8F9}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
