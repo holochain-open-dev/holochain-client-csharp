@@ -2,7 +2,7 @@
 
   <PropertyGroup>
 	  <TargetFramework>net8.0</TargetFramework>
-	  <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+	  <!--<GeneratePackageOnBuild>True</GeneratePackageOnBuild>-->
 	  <!--<PackageId>NextGenSoftware.Holochain.HoloNET.Client.Embedded</PackageId>-->
 	  <PackageId>NextGenSoftware.Holochain.HoloNET.Client</PackageId>
 	  <Company>NextGen Software Ltd</Company>
@@ -101,10 +101,14 @@
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
-    <None Include="..\README.md">
+    <!--<None Include="..\README.md">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
-    </None>
+    </None>-->
+	  <!--<None Include="README.md">
+		  <Pack>True</Pack>
+		  <PackagePath>\</PackagePath>
+	  </None>-->
   </ItemGroup>
 
   <ItemGroup>
@@ -134,6 +138,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\NextGenSoftware-Libraries\NextGenSoftware Libraries\NextGenSoftware.Logging\NextGenSoftware.Logging.csproj" />
     <ProjectReference Include="..\..\NextGenSoftware-Libraries\NextGenSoftware Libraries\NextGenSoftware.Utilities\NextGenSoftware.Utilities.csproj" />
     <ProjectReference Include="..\..\NextGenSoftware-Libraries\NextGenSoftware Libraries\NextGenSoftware.WebSocket\NextGenSoftware.WebSocket.csproj" />
   </ItemGroup>

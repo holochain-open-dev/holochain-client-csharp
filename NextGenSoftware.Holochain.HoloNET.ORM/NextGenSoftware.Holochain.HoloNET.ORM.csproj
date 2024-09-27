@@ -4,7 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-	<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+	<!--<GeneratePackageOnBuild>True</GeneratePackageOnBuild>-->
 	<PackageId>NextGenSoftware.Holochain.HoloNET.ORM</PackageId>
 	<!--<PackageId>NextGenSoftware.Holochain.HoloNET.ORM.Embedded</PackageId>-->
 	<Company>NextGen Software Ltd</Company>
@@ -110,8 +110,8 @@
 		</None>
 	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\NextGenSoftware.Holochain.HoloNET.Client.Core\NextGenSoftware.Holochain.HoloNET.Client.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\NextGenSoftware.Holochain.HoloNET.Client\NextGenSoftware.Holochain.HoloNET.Client.csproj" />
+	</ItemGroup>
 
 </Project>
