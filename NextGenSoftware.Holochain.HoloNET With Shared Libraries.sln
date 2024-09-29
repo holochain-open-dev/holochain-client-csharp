@@ -62,8 +62,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NextGenSoftware.Holochain.H
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NextGenSoftware.Holochain.HoloNET.HyperNET", "NextGenSoftware.Holochain.HoloNET.HyperNET\NextGenSoftware.Holochain.HoloNET.HyperNET.csproj", "{3E841DA7-D4C3-48E9-9549-1DFD7B2BBE5F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NextGenSoftware.Holochain.HoloNET.Client", "NextGenSoftware.Holochain.HoloNET.Client.Core\NextGenSoftware.Holochain.HoloNET.Client.csproj", "{5DF9C66D-0DD7-424D-8127-BB22208E01C4}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "External Libs", "External Libs", "{FB5BB6A2-FFF6-4343-80B5-76F71B835BDF}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NextGenSoftware.Logging", "..\NextGenSoftware-Libraries\NextGenSoftware Libraries\NextGenSoftware.Logging\NextGenSoftware.Logging.csproj", "{9868EBF4-451B-48D3-80CF-79CCEFD61109}"
@@ -78,7 +76,11 @@ Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "NextGenSoftware.Holochain.H
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NextGenSoftware.ErrorHandling", "..\NextGenSoftware-Libraries\NextGenSoftware Libraries\NextGenSoftware.ErrorHandling\NextGenSoftware.ErrorHandling.csproj", "{46645F1C-6A34-406D-9E3F-0A21E5F3D44E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NextGenSoftware.Holochain.HoloNET.API", "NextGenSoftware.Holochain.HoloNET.API\NextGenSoftware.Holochain.HoloNET.API.csproj", "{B2114DA9-7DF7-4FBE-8D50-54688E74F8F9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NextGenSoftware.Holochain.HoloNET.API", "NextGenSoftware.Holochain.HoloNET.API\NextGenSoftware.Holochain.HoloNET.API.csproj", "{B2114DA9-7DF7-4FBE-8D50-54688E74F8F9}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NextGenSoftware.Holochain.HoloNET.Client", "NextGenSoftware.Holochain.HoloNET.Client\NextGenSoftware.Holochain.HoloNET.Client.csproj", "{574AC579-EEE8-49AC-97F0-1B2CCA82FC33}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NextGenSoftware.Holochain.HoloNET.API.TestHarness", "NextGenSoftware.Holochain.HoloNET.API.TestHarness\NextGenSoftware.Holochain.HoloNET.API.TestHarness.csproj", "{CEF5E73F-62BC-44E8-ACFE-B05CD555D87C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -563,22 +565,6 @@ Global
 		{3E841DA7-D4C3-48E9-9549-1DFD7B2BBE5F}.Release|x64.Build.0 = Release|Any CPU
 		{3E841DA7-D4C3-48E9-9549-1DFD7B2BBE5F}.Release|x86.ActiveCfg = Release|Any CPU
 		{3E841DA7-D4C3-48E9-9549-1DFD7B2BBE5F}.Release|x86.Build.0 = Release|Any CPU
-		{5DF9C66D-0DD7-424D-8127-BB22208E01C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5DF9C66D-0DD7-424D-8127-BB22208E01C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5DF9C66D-0DD7-424D-8127-BB22208E01C4}.Debug|arm64.ActiveCfg = Debug|Any CPU
-		{5DF9C66D-0DD7-424D-8127-BB22208E01C4}.Debug|arm64.Build.0 = Debug|Any CPU
-		{5DF9C66D-0DD7-424D-8127-BB22208E01C4}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{5DF9C66D-0DD7-424D-8127-BB22208E01C4}.Debug|x64.Build.0 = Debug|Any CPU
-		{5DF9C66D-0DD7-424D-8127-BB22208E01C4}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{5DF9C66D-0DD7-424D-8127-BB22208E01C4}.Debug|x86.Build.0 = Debug|Any CPU
-		{5DF9C66D-0DD7-424D-8127-BB22208E01C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5DF9C66D-0DD7-424D-8127-BB22208E01C4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5DF9C66D-0DD7-424D-8127-BB22208E01C4}.Release|arm64.ActiveCfg = Release|Any CPU
-		{5DF9C66D-0DD7-424D-8127-BB22208E01C4}.Release|arm64.Build.0 = Release|Any CPU
-		{5DF9C66D-0DD7-424D-8127-BB22208E01C4}.Release|x64.ActiveCfg = Release|Any CPU
-		{5DF9C66D-0DD7-424D-8127-BB22208E01C4}.Release|x64.Build.0 = Release|Any CPU
-		{5DF9C66D-0DD7-424D-8127-BB22208E01C4}.Release|x86.ActiveCfg = Release|Any CPU
-		{5DF9C66D-0DD7-424D-8127-BB22208E01C4}.Release|x86.Build.0 = Release|Any CPU
 		{9868EBF4-451B-48D3-80CF-79CCEFD61109}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9868EBF4-451B-48D3-80CF-79CCEFD61109}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9868EBF4-451B-48D3-80CF-79CCEFD61109}.Debug|arm64.ActiveCfg = Debug|Any CPU
@@ -683,6 +669,38 @@ Global
 		{B2114DA9-7DF7-4FBE-8D50-54688E74F8F9}.Release|x64.Build.0 = Release|Any CPU
 		{B2114DA9-7DF7-4FBE-8D50-54688E74F8F9}.Release|x86.ActiveCfg = Release|Any CPU
 		{B2114DA9-7DF7-4FBE-8D50-54688E74F8F9}.Release|x86.Build.0 = Release|Any CPU
+		{574AC579-EEE8-49AC-97F0-1B2CCA82FC33}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{574AC579-EEE8-49AC-97F0-1B2CCA82FC33}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{574AC579-EEE8-49AC-97F0-1B2CCA82FC33}.Debug|arm64.ActiveCfg = Debug|Any CPU
+		{574AC579-EEE8-49AC-97F0-1B2CCA82FC33}.Debug|arm64.Build.0 = Debug|Any CPU
+		{574AC579-EEE8-49AC-97F0-1B2CCA82FC33}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{574AC579-EEE8-49AC-97F0-1B2CCA82FC33}.Debug|x64.Build.0 = Debug|Any CPU
+		{574AC579-EEE8-49AC-97F0-1B2CCA82FC33}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{574AC579-EEE8-49AC-97F0-1B2CCA82FC33}.Debug|x86.Build.0 = Debug|Any CPU
+		{574AC579-EEE8-49AC-97F0-1B2CCA82FC33}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{574AC579-EEE8-49AC-97F0-1B2CCA82FC33}.Release|Any CPU.Build.0 = Release|Any CPU
+		{574AC579-EEE8-49AC-97F0-1B2CCA82FC33}.Release|arm64.ActiveCfg = Release|Any CPU
+		{574AC579-EEE8-49AC-97F0-1B2CCA82FC33}.Release|arm64.Build.0 = Release|Any CPU
+		{574AC579-EEE8-49AC-97F0-1B2CCA82FC33}.Release|x64.ActiveCfg = Release|Any CPU
+		{574AC579-EEE8-49AC-97F0-1B2CCA82FC33}.Release|x64.Build.0 = Release|Any CPU
+		{574AC579-EEE8-49AC-97F0-1B2CCA82FC33}.Release|x86.ActiveCfg = Release|Any CPU
+		{574AC579-EEE8-49AC-97F0-1B2CCA82FC33}.Release|x86.Build.0 = Release|Any CPU
+		{CEF5E73F-62BC-44E8-ACFE-B05CD555D87C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CEF5E73F-62BC-44E8-ACFE-B05CD555D87C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CEF5E73F-62BC-44E8-ACFE-B05CD555D87C}.Debug|arm64.ActiveCfg = Debug|Any CPU
+		{CEF5E73F-62BC-44E8-ACFE-B05CD555D87C}.Debug|arm64.Build.0 = Debug|Any CPU
+		{CEF5E73F-62BC-44E8-ACFE-B05CD555D87C}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{CEF5E73F-62BC-44E8-ACFE-B05CD555D87C}.Debug|x64.Build.0 = Debug|Any CPU
+		{CEF5E73F-62BC-44E8-ACFE-B05CD555D87C}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{CEF5E73F-62BC-44E8-ACFE-B05CD555D87C}.Debug|x86.Build.0 = Debug|Any CPU
+		{CEF5E73F-62BC-44E8-ACFE-B05CD555D87C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CEF5E73F-62BC-44E8-ACFE-B05CD555D87C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CEF5E73F-62BC-44E8-ACFE-B05CD555D87C}.Release|arm64.ActiveCfg = Release|Any CPU
+		{CEF5E73F-62BC-44E8-ACFE-B05CD555D87C}.Release|arm64.Build.0 = Release|Any CPU
+		{CEF5E73F-62BC-44E8-ACFE-B05CD555D87C}.Release|x64.ActiveCfg = Release|Any CPU
+		{CEF5E73F-62BC-44E8-ACFE-B05CD555D87C}.Release|x64.Build.0 = Release|Any CPU
+		{CEF5E73F-62BC-44E8-ACFE-B05CD555D87C}.Release|x86.ActiveCfg = Release|Any CPU
+		{CEF5E73F-62BC-44E8-ACFE-B05CD555D87C}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

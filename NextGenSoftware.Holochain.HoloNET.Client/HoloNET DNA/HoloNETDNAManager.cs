@@ -22,7 +22,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             try
             {
                 if (string.IsNullOrEmpty(holoNETDNAPath))
-                    throw new ArgumentNullException("holoNETDNAPath", "holoNETDNAPath cannot be null."); //TODO: Need to come back to this since this exception will always be caught below! ;-)
+                    throw new ArgumentNullException("holoNETDNAPath", "holoNETDNAPath cannot be null.");
 
                 HoloNETDNAPath = holoNETDNAPath;
 
@@ -33,6 +33,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     IsLoaded = true;
                     return HoloNETDNA;
                 }
+            }
+            catch (ArgumentNullException ex)
+            {
+                throw ex;
             }
             catch (Exception ex) 
             {
@@ -52,10 +56,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             try
             {
                 if (string.IsNullOrEmpty(holoNETDNAPath))
-                    throw new ArgumentNullException("holoNETDNA", "holoNETDNA cannot be null."); //TODO: Need to come back to this since this exception will always be caught below! ;-)
+                    throw new ArgumentNullException("holoNETDNA", "holoNETDNA cannot be null."); 
 
                 if (holoNETDNA == null)
-                    throw new ArgumentNullException("holoNETDNA", "holoNETDNA cannot be null."); //TODO: Need to come back to this since this exception will always be caught below! ;-)
+                    throw new ArgumentNullException("holoNETDNA", "holoNETDNA cannot be null.");
 
                 FileInfo fileInfo = new FileInfo(holoNETDNAPath);
 
@@ -71,6 +75,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 writer.Close();
 
                 return true;
+            }
+            catch (ArgumentNullException ex)
+            {
+                throw ex;
             }
             catch (Exception ex) 
             {

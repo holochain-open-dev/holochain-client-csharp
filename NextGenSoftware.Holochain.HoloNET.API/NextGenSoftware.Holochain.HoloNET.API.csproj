@@ -8,7 +8,13 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\NextGenSoftware-Libraries\NextGenSoftware Libraries\NextGenSoftware.WebSocket\NextGenSoftware.WebSocket.csproj" />
-    <ProjectReference Include="..\NextGenSoftware.Holochain.HoloNET.Client.Core\NextGenSoftware.Holochain.HoloNET.Client.csproj" />
+    <ProjectReference Include="..\NextGenSoftware.Holochain.HoloNET.Client\NextGenSoftware.Holochain.HoloNET.Client.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="NextGenSoftware.Holochain.HoloNET.Client">
+      <HintPath>..\NextGenSoftware.Holochain.HoloNET.Client\obj\Debug\net8.0\ref\NextGenSoftware.Holochain.HoloNET.Client.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

@@ -814,6 +814,7 @@
         "dependencies": {
           "MessagePack": "2.4.59",
           "Newtonsoft.Json": "13.0.2",
+          "NextGenSoftware.Logging": "2.0.0",
           "NextGenSoftware.Utilities": "1.2.1",
           "NextGenSoftware.WebSocket": "2.0.0",
           "Nito.AsyncEx.Context": "5.1.2",
@@ -3208,8 +3209,8 @@
     },
     "NextGenSoftware.Holochain.HoloNET.Client/3.0.5": {
       "type": "project",
-      "path": "../NextGenSoftware.Holochain.HoloNET.Client.Core/NextGenSoftware.Holochain.HoloNET.Client.csproj",
-      "msbuildProject": "../NextGenSoftware.Holochain.HoloNET.Client.Core/NextGenSoftware.Holochain.HoloNET.Client.csproj"
+      "path": "../NextGenSoftware.Holochain.HoloNET.Client/NextGenSoftware.Holochain.HoloNET.Client.csproj",
+      "msbuildProject": "../NextGenSoftware.Holochain.HoloNET.Client/NextGenSoftware.Holochain.HoloNET.Client.csproj"
     },
     "NextGenSoftware.Holochain.HoloNET.ORM/3.0.6": {
       "type": "project",
@@ -3273,8 +3274,8 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "projectReferences": {
-            "C:\\Users\\USER\\source\\repos\\holochain-client-csharp\\NextGenSoftware.Holochain.HoloNET.Client.Core\\NextGenSoftware.Holochain.HoloNET.Client.csproj": {
-              "projectPath": "C:\\Users\\USER\\source\\repos\\holochain-client-csharp\\NextGenSoftware.Holochain.HoloNET.Client.Core\\NextGenSoftware.Holochain.HoloNET.Client.csproj"
+            "C:\\Users\\USER\\source\\repos\\holochain-client-csharp\\NextGenSoftware.Holochain.HoloNET.Client\\NextGenSoftware.Holochain.HoloNET.Client.csproj": {
+              "projectPath": "C:\\Users\\USER\\source\\repos\\holochain-client-csharp\\NextGenSoftware.Holochain.HoloNET.Client\\NextGenSoftware.Holochain.HoloNET.Client.csproj"
             },
             "C:\\Users\\USER\\source\\repos\\holochain-client-csharp\\NextGenSoftware.Holochain.HoloNET.ORM\\NextGenSoftware.Holochain.HoloNET.ORM.csproj": {
               "projectPath": "C:\\Users\\USER\\source\\repos\\holochain-client-csharp\\NextGenSoftware.Holochain.HoloNET.ORM\\NextGenSoftware.Holochain.HoloNET.ORM.csproj"
