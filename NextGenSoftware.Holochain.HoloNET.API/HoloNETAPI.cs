@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
-using NextGenSoftware.Holochain.HoloNET.API.Interfaces;
 using NextGenSoftware.Holochain.HoloNET.Client;
+using NextGenSoftware.Holochain.HoloNET.API.Interfaces;
 using NextGenSoftware.Holochain.HoloNET.Client.Interfaces;
 
 namespace NextGenSoftware.Holochain.HoloNET.API
@@ -9,12 +9,19 @@ namespace NextGenSoftware.Holochain.HoloNET.API
     {
         private const string HOLONET_API_HAPP_ID = "holonet_api";
         private const string HOLONET_API_APP_PATH = "holonet_api.happ";
-        private const string HOLONET_API_HAPP_ROLE = "holonet_api";
-        
+        private const string HOLONET_API_HAPP_ROLE = "holonet_api_role";
+        private const string HOLONET_API_ZOME_NAME = "holonet_api";
+        private const string HOLONET_API_LOAD_DATA_FUNCTION = "get_latest_data";
+        private const string HOLONET_API_CREATE_DATA_FUNCTION = "create_data";
+        private const string HOLONET_API_UPDATE_DATA_FUNCTION = "update_data";
+        private const string HOLONET_API_CREATE_OBJECT_FUNCTION = "create_data"; //"create_object"; //TODO: Will update happ so object and data are stored in seperate entries rather than one.
+        private const string HOLONET_API_UPDATE_OBJECT_FUNCTION = "update_data"; //"update_object";
+
         public static IHoloNETClientAdmin HoloNETClientAdmin { get; private set; } = new HoloNETClientAdmin();
         public static IHoloNETClientAppAgent HoloNETClient { get; private set; }
         public static bool IsInitialized { get; private set; }
         public static Dictionary<string, string> Data = new Dictionary<string, string>();
+        public static Dictionary<string, object> Objects = new Dictionary<string, object>();
 
         public static IHoloNETAPIDNA HoloNETAPIDNA
         {
@@ -90,7 +97,65 @@ namespace NextGenSoftware.Holochain.HoloNET.API
             return holoNETReady;
         }
 
-        public static async Task<HoloNETAPIResult<string>> LoadDataAsync(string key, bool useCache = true, string zome = "holonet_api", string function = "load_data")
+        public static async Task<HoloNETAPIResult<Dictionary<string, string>>> LoadAllDataAsync(string zome = HOLONET_API_ZOME_NAME, string function = HOLONET_API_LOAD_DATA_FUNCTION)
+        {
+            HoloNETAPIResult<Dictionary<string, string>> result = new HoloNETAPIResult<Dictionary<string, string>>();
+
+            if (!IsInitialized)
+                await InitHoloNETAsync();
+
+            result.ZomeCallResult = await HoloNETClient.CallZomeFunctionAsync(zome, function, null);
+
+            if (result.ZomeCallResult != null && !result.ZomeCallResult.IsError && result.ZomeCallResult.ZomeReturnData != null && result.ZomeCallResult.ZomeReturnData.ContainsKey("dataJson") && result.ZomeCallResult.ZomeReturnData["dataJson"] != null)
+            {
+                Data = JsonSerializer.Deserialize<Dictionary<string, string>>(result.ZomeCallResult.ZomeReturnData["dataJson"].ToString());
+                result.Result = Data;
+                result.IsSuccess = true;
+            }
+            else
+                HandleError($"Error Occured In HoloNETAPI.LoadAllDataAsync. Reason: {result.ZomeCallResult.Message}");
+            
+            return SetHoloNETAPIResult(result);
+        }
+
+        public static async Task<HoloNETAPIResult<Dictionary<string, string>>> LoadAllDataAsync(string hAppId, string hAppPath, string hAppRole, string key, bool useCache = true, string zome = "holonet_api", string function = HOLONET_API_LOAD_DATA_FUNCTION)
+        {
+            if (!IsInitialized)
+                await InitHoloNETAsync(hAppId, hAppPath, hAppRole);
+
+            return await LoadAllDataAsync(zome, function);
+        }
+
+        public static async Task<HoloNETAPIResult<Dictionary<string, object>>> LoadAllObjectsAsync(string zome = HOLONET_API_ZOME_NAME, string function = HOLONET_API_LOAD_DATA_FUNCTION)
+        {
+            HoloNETAPIResult<Dictionary<string, object>> result = new HoloNETAPIResult<Dictionary<string, object>>();
+
+            if (!IsInitialized)
+                await InitHoloNETAsync();
+
+            result.ZomeCallResult = await HoloNETClient.CallZomeFunctionAsync(zome, function, null);
+
+            if (result.ZomeCallResult != null && !result.ZomeCallResult.IsError && result.ZomeCallResult.ZomeReturnData != null && result.ZomeCallResult.ZomeReturnData.ContainsKey("objectsJson") && result.ZomeCallResult.ZomeReturnData["objectsJson"] != null)
+            {
+                Objects = JsonSerializer.Deserialize<Dictionary<string, object>>(result.ZomeCallResult.ZomeReturnData["objectsJson"].ToString());
+                result.Result = Objects;
+                result.IsSuccess = true;
+            }
+            else
+                HandleError($"Error Occured In HoloNETAPI.LoadAllObjectsAsync. Reason: {result.ZomeCallResult.Message}");
+
+            return SetHoloNETAPIResult(result);
+        }
+
+        public static async Task<HoloNETAPIResult<Dictionary<string, object>>> LoadAllObjectsAsync(string hAppId, string hAppPath, string hAppRole, string key, bool useCache = true, string zome = "holonet_api", string function = HOLONET_API_LOAD_DATA_FUNCTION)
+        {
+            if (!IsInitialized)
+                await InitHoloNETAsync(hAppId, hAppPath, hAppRole);
+
+            return await LoadAllObjectsAsync(zome, function);
+        }
+
+        public static async Task<HoloNETAPIResult<string>> LoadDataAsync(string key, bool useCache = true, string zome = HOLONET_API_ZOME_NAME, string function = HOLONET_API_LOAD_DATA_FUNCTION)
         {
             HoloNETAPIResult<string> result = new HoloNETAPIResult<string>();
 
@@ -104,23 +169,24 @@ namespace NextGenSoftware.Holochain.HoloNET.API
             }
             else
             {
-                result.ZomeCallResult = await HoloNETClient.CallZomeFunctionAsync(zome, function, key);
+                HoloNETAPIResult<Dictionary<string, string>> allDataResult =  await LoadAllDataAsync();
 
-                if (result.ZomeCallResult != null && !result.ZomeCallResult.IsError && result.ZomeCallResult.ZomeReturnData != null && result.ZomeCallResult.ZomeReturnData.ContainsKey("result") && result.ZomeCallResult.ZomeReturnData["result"] != null)
+                if (allDataResult != null && allDataResult.IsSuccess)
                 {
-                    Data = JsonSerializer.Deserialize<Dictionary<string, string>>(result.ZomeCallResult.ZomeReturnData["result"].ToString());
-                    result.Result = Data[key];
-                    //result.Result = result.ZomeCallResult.ZomeReturnData["result"].ToString();
+                    result.Result = allDataResult.Result[key];
                     result.IsSuccess = true;
                 }
                 else
-                    HandleError($"Error Occured In HoloNETAPI.LoadDataAsync. Reason: {result.ZomeCallResult.Message}");
+                    HandleError($"Error Occured In HoloNETAPI.LoadDataAsync. Reason: {allDataResult.Message}");
+
+                result.IsSuccess = allDataResult.IsSuccess;
+                result.Message = allDataResult.Message;
             }
 
-            return SetHoloNETAPIResult(result);
+            return result;
         }
 
-        public static async Task<HoloNETAPIResult<string>> LoadDataAsync(string hAppId, string hAppPath, string hAppRole, string key, bool useCache = true, string zome = "holonet_api", string function = "load_data")
+        public static async Task<HoloNETAPIResult<string>> LoadDataAsync(string hAppId, string hAppPath, string hAppRole, string key, bool useCache = true, string zome = HOLONET_API_ZOME_NAME, string function = HOLONET_API_LOAD_DATA_FUNCTION)
         {
             if (!IsInitialized)
                 await InitHoloNETAsync(hAppId, hAppPath, hAppRole);
@@ -128,27 +194,38 @@ namespace NextGenSoftware.Holochain.HoloNET.API
             return await LoadDataAsync(key, useCache, zome, function);
         }
 
-        public static async Task<HoloNETAPIResult<T>> LoadObjectAsync<T>(string key, bool useCache = true, string zome = "holonet_api", string function = "get_latest_data") //where T : new()
+        public static async Task<HoloNETAPIResult<T>> LoadObjectAsync<T>(string key, bool useCache = true, string zome = HOLONET_API_ZOME_NAME, string function = HOLONET_API_LOAD_DATA_FUNCTION) //where T : new()
         {
             HoloNETAPIResult<T> result = new HoloNETAPIResult<T>();
 
             if (!IsInitialized)
                 await InitHoloNETAsync();
 
-            result.ZomeCallResult = await HoloNETClient.CallZomeFunctionAsync(zome, function, key);
-
-            if (result.ZomeCallResult != null && !result.ZomeCallResult.IsError && result.ZomeCallResult.ZomeReturnData != null && result.ZomeCallResult.ZomeReturnData.ContainsKey("result") && result.ZomeCallResult.ZomeReturnData["result"] != null)
+            if (useCache && Objects != null && Objects.ContainsKey(key))
             {
-                string json = result.ZomeCallResult.ZomeReturnData["result"].ToString();
-                result.Result = JsonSerializer.Deserialize<T>(json);
+                result.Result = (T)Objects[key];
+                result.IsSuccess = true;
             }
             else
-                HandleError($"Error Occured In HoloNETAPI.LoadObjectAsync. Reason: {result.ZomeCallResult.Message}");
+            {
+                HoloNETAPIResult<Dictionary<string, object>> allObjectsResult = await LoadAllObjectsAsync();
 
-            return SetHoloNETAPIResult(result);
+                if (allObjectsResult != null && allObjectsResult.IsSuccess)
+                {
+                    result.Result = (T)allObjectsResult.Result[key];
+                    result.IsSuccess = true;
+                }
+                else
+                    HandleError($"Error Occured In HoloNETAPI.LoadObjectAsync. Reason: {allObjectsResult.Message}");
+
+                result.IsSuccess = allObjectsResult.IsSuccess;
+                result.Message = allObjectsResult.Message;
+            }
+
+            return result;
         }
 
-        public static async Task<HoloNETAPIResult<T>> LoadObjectAsync<T>(string hAppId, string hAppPath, string hAppRole, string key, bool useCache = true, string zome = "holonet_api", string function = "get_latest_data")
+        public static async Task<HoloNETAPIResult<T>> LoadObjectAsync<T>(string hAppId, string hAppPath, string hAppRole, string key, bool useCache = true, string zome = HOLONET_API_ZOME_NAME, string function = HOLONET_API_LOAD_DATA_FUNCTION)
         {
             if (!IsInitialized)
                 await InitHoloNETAsync(hAppId, hAppPath, hAppRole);
@@ -156,8 +233,7 @@ namespace NextGenSoftware.Holochain.HoloNET.API
             return await LoadObjectAsync<T>(key, useCache, zome, function);
         }
 
-
-        public static async Task<HoloNETAPIResult<bool>> SaveDataAsync(string zome = "holonet_api", string createFunction = "create_data", string updateFunction = "update_data")
+        public static async Task<HoloNETAPIResult<bool>> SaveAllDataAsync(string zome = HOLONET_API_ZOME_NAME, string createFunction = HOLONET_API_CREATE_DATA_FUNCTION, string updateFunction = HOLONET_API_UPDATE_DATA_FUNCTION)
         {
             HoloNETAPIResult<bool> result = new HoloNETAPIResult<bool>();
             string zomeFunction = "";
@@ -170,7 +246,8 @@ namespace NextGenSoftware.Holochain.HoloNET.API
             else
                 zomeFunction = updateFunction;
 
-            result.ZomeCallResult = await HoloNETClient.CallZomeFunctionAsync(zome, zomeFunction, JsonSerializer.Serialize(Data));
+            //TODO: Will generate a new happ soon where Data and Objects are in seperate entries rather than in the same one as different props.
+            result.ZomeCallResult = await HoloNETClient.CallZomeFunctionAsync(zome, zomeFunction, new { dataJson = JsonSerializer.Serialize(Data), objectsJson = JsonSerializer.Serialize(Objects) });
 
             if (result.ZomeCallResult != null && !result.ZomeCallResult.IsError && result.ZomeCallResult.ZomeReturnData != null && result.ZomeCallResult.ZomeReturnData.ContainsKey("result") && result.ZomeCallResult.ZomeReturnData["result"] != null)
                 result.Result = true;
@@ -180,28 +257,29 @@ namespace NextGenSoftware.Holochain.HoloNET.API
             return SetHoloNETAPIResult(result);
         }
 
-        public static async Task<HoloNETAPIResult<bool>> SaveDataAsync(string hAppId, string hAppPath, string hAppRole, string zome = "holonet_api", string createFunction = "create_data", string updateFunction = "update_data")
+        public static async Task<HoloNETAPIResult<bool>> SaveAllDataAsync(string hAppId, string hAppPath, string hAppRole, string zome = HOLONET_API_ZOME_NAME, string createFunction = HOLONET_API_CREATE_DATA_FUNCTION, string updateFunction = HOLONET_API_UPDATE_DATA_FUNCTION)
         {
             if (!IsInitialized)
                 await InitHoloNETAsync(hAppId, hAppPath, hAppRole);
 
-            return await SaveDataAsync(zome, createFunction, updateFunction);
+            return await SaveAllDataAsync(zome, createFunction, updateFunction);
         }
 
-        //public static async Task<HoloNETAPIResult<bool>> SaveDataAsync(string key, string value, string zome = "holonet_api", string function = "save_data")
-        public static async Task<HoloNETAPIResult<bool>> SaveKeyValuePairAsync(string key, string value, string zome = "holonet_api", string createFunction = "create_data", string updateFunction = "update_data")
+        public static async Task<HoloNETAPIResult<bool>> SaveDataAsync(string key, string value, string zome = HOLONET_API_ZOME_NAME, string createFunction = HOLONET_API_CREATE_DATA_FUNCTION, string updateFunction = HOLONET_API_UPDATE_DATA_FUNCTION)
         {
+            //TODO: In future we can make this ONLY save this keyvalue pair instead of saving the full dictionary!
             Data[key] = value;
-            return await SaveDataAsync(zome, createFunction, updateFunction);
+            return await SaveAllDataAsync(zome, createFunction, updateFunction);
         }
 
-        public static async Task<HoloNETAPIResult<bool>> SaveKeyValuePairAsync(string hAppId, string hAppPath, string hAppRole, string key, string value, string zome = "holonet_api", string createFunction = "create_data", string updateFunction = "update_data")
+        public static async Task<HoloNETAPIResult<bool>> SaveDataAsync(string hAppId, string hAppPath, string hAppRole, string key, string value, string zome = HOLONET_API_ZOME_NAME, string createFunction = HOLONET_API_CREATE_DATA_FUNCTION, string updateFunction = HOLONET_API_UPDATE_DATA_FUNCTION)
         {
+            //TODO: In future we can make this ONLY save this keyvalue pair instead of saving the full dictionary!
             Data[key] = value;
-            return await SaveDataAsync(hAppId, hAppPath, hAppRole, zome, createFunction, updateFunction);
+            return await SaveAllDataAsync(hAppId, hAppPath, hAppRole, zome, createFunction, updateFunction);
         }
 
-        public static async Task<HoloNETAPIResult<bool>> SaveObjectAsync(string key, dynamic objectToSave, string zome = "holonet_api", string createFunction = "create_object_data", string updateFunction = "update_object_data")
+        public static async Task<HoloNETAPIResult<bool>> SaveAllObjectsAsync(string zome = HOLONET_API_ZOME_NAME, string createFunction = HOLONET_API_CREATE_OBJECT_FUNCTION, string updateFunction = HOLONET_API_UPDATE_OBJECT_FUNCTION)
         {
             HoloNETAPIResult<bool> result = new HoloNETAPIResult<bool>();
             string zomeFunction = "";
@@ -214,8 +292,8 @@ namespace NextGenSoftware.Holochain.HoloNET.API
             else
                 zomeFunction = updateFunction;
 
-            string json = JsonSerializer.Serialize(objectToSave);
-            result.ZomeCallResult = await HoloNETClient.CallZomeFunctionAsync(zome, zomeFunction, new { key, json });
+            //TODO: Will generate a new happ soon where Data and Objects are in seperate entries rather than in the same one as different props.
+            result.ZomeCallResult = await HoloNETClient.CallZomeFunctionAsync(zome, zomeFunction, new { dataJson = JsonSerializer.Serialize(Data), objectsJson = JsonSerializer.Serialize(Objects) });
 
             if (result.Result != null && !result.ZomeCallResult.IsError && result.ZomeCallResult.ZomeReturnData != null && result.ZomeCallResult.ZomeReturnData.ContainsKey("result") && result.ZomeCallResult.ZomeReturnData["result"] != null)
                 result.Result = true;
@@ -225,12 +303,26 @@ namespace NextGenSoftware.Holochain.HoloNET.API
             return SetHoloNETAPIResult(result);
         }
 
-        public static async Task<HoloNETAPIResult<bool>> SaveObjectAsync(string hAppId, string hAppPath, string hAppRole, string key, dynamic objectToSave, string zome = "holonet_api", string createFunction = "create_object_data", string updateFunction = "update_object_data")
+        public static async Task<HoloNETAPIResult<bool>> SaveAllObjectsAsync(string hAppId, string hAppPath, string hAppRole, string zome = HOLONET_API_ZOME_NAME, string createFunction = HOLONET_API_CREATE_OBJECT_FUNCTION, string updateFunction = HOLONET_API_UPDATE_OBJECT_FUNCTION)
         {
             if (!IsInitialized)
                 await InitHoloNETAsync(hAppId, hAppPath, hAppRole);
 
-            return await SaveObjectAsync(key, objectToSave, zome, createFunction, updateFunction);
+            return await SaveObjectAsync(zome, createFunction, updateFunction);
+        }
+
+        public static async Task<HoloNETAPIResult<bool>> SaveObjectAsync(string key, dynamic objectToSave, string zome = HOLONET_API_ZOME_NAME, string createFunction = HOLONET_API_CREATE_OBJECT_FUNCTION, string updateFunction = HOLONET_API_UPDATE_OBJECT_FUNCTION)
+        {
+            //TODO: In future we can make this ONLY save this keyvalue pair instead of saving the full dictionary!
+            Objects[key] = objectToSave;//JsonSerializer.Serialize(objectToSave);
+            return await SaveAllObjectsAsync(zome, createFunction, updateFunction);
+        }
+
+        public static async Task<HoloNETAPIResult<bool>> SaveObjectAsync(string hAppId, string hAppPath, string hAppRole, string key, dynamic objectToSave, string zome = HOLONET_API_ZOME_NAME, string createFunction = HOLONET_API_CREATE_OBJECT_FUNCTION, string updateFunction = HOLONET_API_UPDATE_OBJECT_FUNCTION)
+        {
+            //TODO: In future we can make this ONLY save this keyvalue pair instead of saving the full dictionary!
+            Objects[key] = objectToSave; //JsonSerializer.Serialize(objectToSave);
+            return await SaveAllObjectsAsync(hAppId, hAppPath, hAppRole, zome, createFunction, updateFunction);
         }
 
         public static bool SendSignal()
@@ -247,8 +339,12 @@ namespace NextGenSoftware.Holochain.HoloNET.API
 
         private static HoloNETAPIResult<T> SetHoloNETAPIResult<T>(HoloNETAPIResult<T> result)
         {
-            result.IsSuccess = !result.ZomeCallResult.IsError;
-            result.Message = result.ZomeCallResult.Message;
+            if (result.ZomeCallResult != null)
+            {
+                result.IsSuccess = !result.ZomeCallResult.IsError;
+                result.Message = result.ZomeCallResult.Message;
+            }
+
             return result;
         }
 

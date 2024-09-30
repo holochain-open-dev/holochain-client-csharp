@@ -4,17 +4,25 @@ namespace NextGenSoftware.Holochain.HoloNET.API.TestHarness
 {
     internal class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             Console.WriteLine("NextGenSoftware HoloNET API Test Harness v1.0");
             Console.WriteLine("");
-            Task.Run(RunHoloNETAPITests);
+            await RunHoloNETAPITests();
         }
 
         static async Task RunHoloNETAPITests()
         {
+            await HoloNETAPI.InitHoloNETAsync();
+            
+            //HoloNETAPI.HoloNETClientAdmin.HoloNETDNA.ConsoleLoggingMode = Logging.LoggingMode.ErrorsOnly;
+            HoloNETAPI.HoloNETClientAdmin.HoloNETDNA.LogToConsole = false;
+
+            //HoloNETAPI.HoloNETClient.HoloNETDNA.ConsoleLoggingMode = Logging.LoggingMode.ErrorsOnly;
+            HoloNETAPI.HoloNETClient.HoloNETDNA.LogToConsole = false;
+            
             CLIEngine.ShowWorkingMessage("Saving Data...");
-            HoloNETAPIResult<bool> saveResult = await HoloNETAPI.SaveKeyValuePairAsync("testkey", "testvalue");
+            HoloNETAPIResult<bool> saveResult = await HoloNETAPI.SaveDataAsync("testkey", "testvalue");
 
             if (saveResult != null && saveResult.IsSuccess)
                 CLIEngine.ShowSuccessMessage("Data Saved Successfully.");
@@ -23,7 +31,7 @@ namespace NextGenSoftware.Holochain.HoloNET.API.TestHarness
 
 
             CLIEngine.ShowWorkingMessage("Loading Data...");
-            HoloNETAPIResult<string> loadResult = await HoloNETAPI.LoadDataAsync("testkey");
+            HoloNETAPIResult<string> loadResult = await HoloNETAPI.LoadDataAsync("testkey", false);
 
             if (loadResult != null && loadResult.IsSuccess)
                 CLIEngine.ShowSuccessMessage($"Data Loaded Successfully. Data: {loadResult.Result}");
@@ -43,7 +51,7 @@ namespace NextGenSoftware.Holochain.HoloNET.API.TestHarness
 
 
             CLIEngine.ShowWorkingMessage("Loading Object...");
-            HoloNETAPIResult<TestObject> loadObjectResult = await HoloNETAPI.LoadObjectAsync<TestObject>("testobjectkey");
+            HoloNETAPIResult<TestObject> loadObjectResult = await HoloNETAPI.LoadObjectAsync<TestObject>("testobjectkey", false);
 
             if (loadObjectResult != null && loadObjectResult.IsSuccess)
                 CLIEngine.ShowSuccessMessage($"Object Loaded Successfully. FirstName: {loadObjectResult.Result.FirstName}, LastName: {loadObjectResult.Result.LastName}");
