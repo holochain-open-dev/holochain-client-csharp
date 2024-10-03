@@ -7,15 +7,31 @@ namespace NextGenSoftware.Holochain.HoloNET.API
 {
     public static class HoloNETAPI
     {
-        private const string HOLONET_API_HAPP_ID = "holonet_api";
-        private const string HOLONET_API_APP_PATH = "holonet_api.happ";
-        private const string HOLONET_API_HAPP_ROLE = "holonet_api_role";
-        private const string HOLONET_API_ZOME_NAME = "holonet_api";
-        private const string HOLONET_API_LOAD_DATA_FUNCTION = "get_latest_data";
-        private const string HOLONET_API_CREATE_DATA_FUNCTION = "create_data";
-        private const string HOLONET_API_UPDATE_DATA_FUNCTION = "update_data";
+        //private const string HOLONET_API_HAPP_ID = "holonet_api";
+        //private const string HOLONET_API_APP_PATH = "holonet_api.happ";
+        //private const string HOLONET_API_HAPP_ROLE = "holonet_api_role";
+        //private const string HOLONET_API_ZOME_NAME = "holonet_api";
+        //private const string HOLONET_API_LOAD_DATA_FUNCTION = "get_latest_data";
+        //private const string HOLONET_API_CREATE_DATA_FUNCTION = "create_data";
+        //private const string HOLONET_API_UPDATE_DATA_FUNCTION = "update_data";
+        //private const string HOLONET_API_CREATE_OBJECT_FUNCTION = "create_data"; //"create_object"; //TODO: Will update happ so object and data are stored in seperate entries rather than one.
+        //private const string HOLONET_API_UPDATE_OBJECT_FUNCTION = "update_data"; //"update_object";
+        //private const string HOLONET_API_JSON_DATA_FIELD = "dataJson";
+        //private const string HOLONET_API_JSON_OBJECT_FIELD = "objectsJson";
+
+        private const string HOLONET_API_HAPP_ID = "oasis";
+        private const string HOLONET_API_APP_PATH = "oasis.happ";
+        private const string HOLONET_API_HAPP_ROLE = "oasis";
+        private const string HOLONET_API_ZOME_NAME = "oasis";
+        private const string HOLONET_API_LOAD_DATA_FUNCTION = "get_avatar";
+        private const string HOLONET_API_CREATE_DATA_FUNCTION = "create_avatar";
+        private const string HOLONET_API_UPDATE_DATA_FUNCTION = "update_avatar";
         private const string HOLONET_API_CREATE_OBJECT_FUNCTION = "create_data"; //"create_object"; //TODO: Will update happ so object and data are stored in seperate entries rather than one.
         private const string HOLONET_API_UPDATE_OBJECT_FUNCTION = "update_data"; //"update_object";
+        //private const string HOLONET_API_JSON_DATA_FIELD = "meta_data";
+        private const string HOLONET_API_JSON_DATA_FIELD = "first_name";
+        //private const string HOLONET_API_JSON_OBJECT_FIELD = "meta_data";
+        private const string HOLONET_API_JSON_OBJECT_FIELD = "last_name";
 
         public static IHoloNETClientAdmin HoloNETClientAdmin { get; private set; } = new HoloNETClientAdmin();
         public static IHoloNETClientAppAgent HoloNETClient { get; private set; }
@@ -46,6 +62,8 @@ namespace NextGenSoftware.Holochain.HoloNET.API
             {
                 HoloNETAPIDNAManager.LoadDNA();
                 HoloNETClientAdmin.OnError += HoloNETClientAdmin_OnError;
+
+                HoloNETClientAdmin.HoloNETDNA.ShowHolochainConductorWindow = true;
 
                 if (HoloNETClientAdmin.State == System.Net.WebSockets.WebSocketState.Open)
                     adminConnected = true;
@@ -106,9 +124,9 @@ namespace NextGenSoftware.Holochain.HoloNET.API
 
             result.ZomeCallResult = await HoloNETClient.CallZomeFunctionAsync(zome, function, null);
 
-            if (result.ZomeCallResult != null && !result.ZomeCallResult.IsError && result.ZomeCallResult.ZomeReturnData != null && result.ZomeCallResult.ZomeReturnData.ContainsKey("dataJson") && result.ZomeCallResult.ZomeReturnData["dataJson"] != null)
+            if (result.ZomeCallResult != null && !result.ZomeCallResult.IsError && result.ZomeCallResult.ZomeReturnData != null && result.ZomeCallResult.ZomeReturnData.ContainsKey(HOLONET_API_JSON_DATA_FIELD) && result.ZomeCallResult.ZomeReturnData[HOLONET_API_JSON_DATA_FIELD] != null)
             {
-                Data = JsonSerializer.Deserialize<Dictionary<string, string>>(result.ZomeCallResult.ZomeReturnData["dataJson"].ToString());
+                Data = JsonSerializer.Deserialize<Dictionary<string, string>>(result.ZomeCallResult.ZomeReturnData[HOLONET_API_JSON_DATA_FIELD].ToString());
                 result.Result = Data;
                 result.IsSuccess = true;
             }
@@ -135,9 +153,9 @@ namespace NextGenSoftware.Holochain.HoloNET.API
 
             result.ZomeCallResult = await HoloNETClient.CallZomeFunctionAsync(zome, function, null);
 
-            if (result.ZomeCallResult != null && !result.ZomeCallResult.IsError && result.ZomeCallResult.ZomeReturnData != null && result.ZomeCallResult.ZomeReturnData.ContainsKey("objectsJson") && result.ZomeCallResult.ZomeReturnData["objectsJson"] != null)
+            if (result.ZomeCallResult != null && !result.ZomeCallResult.IsError && result.ZomeCallResult.ZomeReturnData != null && result.ZomeCallResult.ZomeReturnData.ContainsKey(HOLONET_API_JSON_OBJECT_FIELD) && result.ZomeCallResult.ZomeReturnData[HOLONET_API_JSON_OBJECT_FIELD] != null)
             {
-                Objects = JsonSerializer.Deserialize<Dictionary<string, object>>(result.ZomeCallResult.ZomeReturnData["objectsJson"].ToString());
+                Objects = JsonSerializer.Deserialize<Dictionary<string, object>>(result.ZomeCallResult.ZomeReturnData[HOLONET_API_JSON_OBJECT_FIELD].ToString());
                 result.Result = Objects;
                 result.IsSuccess = true;
             }
@@ -247,7 +265,14 @@ namespace NextGenSoftware.Holochain.HoloNET.API
                 zomeFunction = updateFunction;
 
             //TODO: Will generate a new happ soon where Data and Objects are in seperate entries rather than in the same one as different props.
-            result.ZomeCallResult = await HoloNETClient.CallZomeFunctionAsync(zome, zomeFunction, new { dataJson = JsonSerializer.Serialize(Data), objectsJson = JsonSerializer.Serialize(Objects) });
+            //result.ZomeCallResult = await HoloNETClient.CallZomeFunctionAsync(zome, zomeFunction, new { dataJson = JsonSerializer.Serialize(Data), objectsJson = JsonSerializer.Serialize(Objects) });
+            result.ZomeCallResult = await HoloNETClient.CallZomeFunctionAsync(zome, zomeFunction, new 
+            { 
+                first_name = JsonSerializer.Serialize(Data), 
+                last_name = JsonSerializer.Serialize(Objects),
+                email = "",
+                dob = ""
+            });
 
             if (result.ZomeCallResult != null && !result.ZomeCallResult.IsError && result.ZomeCallResult.ZomeReturnData != null && result.ZomeCallResult.ZomeReturnData.ContainsKey("result") && result.ZomeCallResult.ZomeReturnData["result"] != null)
                 result.Result = true;
