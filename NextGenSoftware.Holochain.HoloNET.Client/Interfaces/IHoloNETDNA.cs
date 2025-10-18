@@ -42,5 +42,17 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Interfaces
         bool ShowHolochainConductorWindow { get; set; }
         bool ShutDownALLHolochainConductors { get; set; }
         ConsoleColor WarningColour { get; set; }
+
+        // Holochain 0.5.6+ Enhanced Features
+        bool EnableKitsune2Networking { get; set; }
+        bool EnableQUICProtocol { get; set; }
+        bool EnableIntegratedKeystore { get; set; }
+        bool EnableCachingLayer { get; set; }
+        bool EnableWASMOptimization { get; set; }
+        Kitsune2Config Kitsune2Config { get; set; }
+        QUICConfig QUICConfig { get; set; }
+        KeystoreConfig KeystoreConfig { get; set; }
+        CacheConfig CacheConfig { get; set; }
+        WASMConfig WASMConfig { get; set; }
     }
 }

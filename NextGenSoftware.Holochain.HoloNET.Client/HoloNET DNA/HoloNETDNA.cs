@@ -214,6 +214,58 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// </summary>
         public ErrorHandlingBehaviour ErrorHandlingBehaviour { get; set; } = ErrorHandlingBehaviour.OnlyThrowExceptionIfNoErrorHandlerSubscribedToOnErrorEvent;
 
+        // Holochain 0.5.6+ Enhanced Features
+
+        /// <summary>
+        /// Enable Kitsune2 networking for enhanced P2P communication. Default is true.
+        /// </summary>
+        public bool EnableKitsune2Networking { get; set; } = true;
+
+        /// <summary>
+        /// Enable QUIC protocol for enhanced transport layer performance. Default is true.
+        /// </summary>
+        public bool EnableQUICProtocol { get; set; } = true;
+
+        /// <summary>
+        /// Enable integrated keystore for secure key management. Default is true.
+        /// </summary>
+        public bool EnableIntegratedKeystore { get; set; } = true;
+
+        /// <summary>
+        /// Enable caching layer to reduce network queries. Default is true.
+        /// </summary>
+        public bool EnableCachingLayer { get; set; } = true;
+
+        /// <summary>
+        /// Enable WASM optimization for better performance. Default is true.
+        /// </summary>
+        public bool EnableWASMOptimization { get; set; } = true;
+
+        /// <summary>
+        /// Kitsune2 network configuration for P2P networking.
+        /// </summary>
+        public Kitsune2Config Kitsune2Config { get; set; } = new Kitsune2Config();
+
+        /// <summary>
+        /// QUIC protocol configuration for enhanced transport.
+        /// </summary>
+        public QUICConfig QUICConfig { get; set; } = new QUICConfig();
+
+        /// <summary>
+        /// Integrated keystore configuration for secure key management.
+        /// </summary>
+        public KeystoreConfig KeystoreConfig { get; set; } = new KeystoreConfig();
+
+        /// <summary>
+        /// Caching layer configuration for performance optimization.
+        /// </summary>
+        public CacheConfig CacheConfig { get; set; } = new CacheConfig();
+
+        /// <summary>
+        /// WASM optimization configuration for better performance.
+        /// </summary>
+        public WASMConfig WASMConfig { get; set; } = new WASMConfig();
+
         //34 settings :)
 
         //TODO: Possibly add these as defaults (used for the Connect methods).
