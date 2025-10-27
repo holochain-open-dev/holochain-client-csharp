@@ -14,6 +14,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public bool Enabled { get; set; } = true;
 
         /// <summary>
+        /// Enable network discovery. Default is true.
+        /// </summary>
+        public bool EnableDiscovery { get; set; } = true;
+
+        /// <summary>
         /// Network topology configuration for Kitsune2.
         /// </summary>
         public NetworkTopologyConfig NetworkTopology { get; set; } = new NetworkTopologyConfig();

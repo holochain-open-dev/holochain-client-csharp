@@ -84,6 +84,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public bool EnableMultipath { get; set; } = false;
 
         /// <summary>
+        /// Enable multiplexing support.
+        /// </summary>
+        public bool EnableMultiplexing { get; set; } = true;
+
+        /// <summary>
         /// TLS configuration for QUIC.
         /// </summary>
         public TLSConfig TLS { get; set; } = new TLSConfig();

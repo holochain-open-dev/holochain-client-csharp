@@ -14,6 +14,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public bool Enabled { get; set; } = true;
 
         /// <summary>
+        /// Auto-generate keys when needed. Default is true.
+        /// </summary>
+        public bool AutoGenerateKeys { get; set; } = true;
+
+        /// <summary>
         /// Keystore type to use.
         /// </summary>
         public KeystoreType Type { get; set; } = KeystoreType.FileSystem;

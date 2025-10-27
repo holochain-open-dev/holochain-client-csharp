@@ -34,6 +34,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public int DefaultTTLSeconds { get; set; } = 3600; // 1 hour
 
         /// <summary>
+        /// Default cache duration in minutes.
+        /// </summary>
+        public int DefaultCacheDurationMinutes { get; set; } = 60; // 1 hour
+
+        /// <summary>
         /// Cache eviction policy.
         /// </summary>
         public CacheEvictionPolicy EvictionPolicy { get; set; } = CacheEvictionPolicy.LRU;

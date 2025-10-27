@@ -14,6 +14,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public bool Enabled { get; set; } = true;
 
         /// <summary>
+        /// Enable JIT compilation. Default is true.
+        /// </summary>
+        public bool EnableJITCompilation { get; set; } = true;
+
+        /// <summary>
         /// WASM optimization level.
         /// </summary>
         public WASMOptimizationLevel OptimizationLevel { get; set; } = WASMOptimizationLevel.Balanced;
