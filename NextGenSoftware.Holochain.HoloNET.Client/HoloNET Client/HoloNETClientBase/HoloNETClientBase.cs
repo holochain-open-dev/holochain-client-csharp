@@ -444,8 +444,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                         case HolochainConductorModeEnum.UseEmbedded:
                             {
-                                //throw new InvalidOperationException("You must install the Embedded version if you wish to use HolochainConductorMode.UseEmbedded.");
-
+#if !EMBEDDED
+                                throw new InvalidOperationException("You must install the NextGenSoftware.Holochain.HoloNET.Client.Embedded NuGet package if you wish to use HolochainConductorMode.UseEmbedded.");
+#else
                                 //try
                                 //{
                                 //    fullPathToHolochainExe = Path.Combine(Directory.GetCurrentDirectory(), "hc.exe");
@@ -484,6 +485,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                                     }
                                 }
                             //}
+#endif
                             break;
 
                         case HolochainConductorModeEnum.UseSystemGlobal:
@@ -501,8 +503,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                         case HolochainConductorModeEnum.UseEmbedded:
                             {
-                                //throw new InvalidOperationException("You must install the Embedded version if you wish to use HolochainConductorMode.UseEmbedded.");
-
+#if !EMBEDDED
+                                throw new InvalidOperationException("You must install the NextGenSoftware.Holochain.HoloNET.Client.Embedded NuGet package if you wish to use HolochainConductorMode.UseEmbedded.");
+#else
                                 //try
                                 //{
                                 //    fullPathToHolochainExe = Path.Combine(Directory.GetCurrentDirectory(), "holochain.exe");
@@ -557,6 +560,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                                     }
                                 }
                             //}
+#endif
                             break;
 
                         case HolochainConductorModeEnum.UseSystemGlobal:

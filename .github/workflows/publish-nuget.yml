@@ -27,6 +27,8 @@ jobs:
         run: |
           $nupkgsDir = ".\nupkgs"
           New-Item -ItemType Directory -Force -Path $nupkgsDir | Out-Null
+
+          # Non-embedded packages (standard variants)
           $projects = @(
             "NextGenSoftware.Holochain.HoloNET.Client\NextGenSoftware.Holochain.HoloNET.Client.csproj",
             "NextGenSoftware.Holochain.HoloNET.ORM\NextGenSoftware.Holochain.HoloNET.ORM.csproj",
@@ -36,10 +38,22 @@ jobs:
           )
           $succeeded = 0; $failed = 0
           foreach ($proj in $projects) {
-            Write-Host "Packing $proj..."
+            Write-Host "Packing $proj (non-embedded)..."
             dotnet pack $proj --configuration Release --output $nupkgsDir
             if ($LASTEXITCODE -eq 0) { $succeeded++ } else { $failed++; Write-Host "FAILED: $proj" }
           }
+
+          # Embedded variants for Client and ORM (include Holochain binaries, enable conductor auto-start)
+          $embeddedProjects = @(
+            "NextGenSoftware.Holochain.HoloNET.Client\NextGenSoftware.Holochain.HoloNET.Client.csproj",
+            "NextGenSoftware.Holochain.HoloNET.ORM\NextGenSoftware.Holochain.HoloNET.ORM.csproj"
+          )
+          foreach ($proj in $embeddedProjects) {
+            Write-Host "Packing $proj (embedded)..."
+            dotnet pack $proj --configuration Release --output $nupkgsDir -p:Embedded=true -p:DefineConstants=EMBEDDED
+            if ($LASTEXITCODE -eq 0) { $succeeded++ } else { $failed++; Write-Host "FAILED (embedded): $proj" }
+          }
+
           Write-Host "Pack complete: $succeeded succeeded, $failed failed"
 
       - name: Push all packages to NuGet.org
