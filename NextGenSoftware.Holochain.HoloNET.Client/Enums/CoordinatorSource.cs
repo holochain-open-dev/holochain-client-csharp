@@ -5,7 +5,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
     public enum CoordinatorSource
     {
         Path,
-        Bundle //TODO: Implement CoordinatorBundle. https://docs.rs/holochain_types/0.6.1/holochain_types/dna/struct.CoordinatorBundle.html
+        Bundle
     }
 }
 

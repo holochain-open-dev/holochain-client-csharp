@@ -56,7 +56,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
     public class AppEnabledCallBackEventArgs : AppInfoCallBackEventArgs
     {
-        public object Errors { get; set; }
+        public List<EnableAppError> Errors { get; set; }
     }
 
     public class AppDisabledCallBackEventArgs : HoloNETDataReceivedBaseEventArgs

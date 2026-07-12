@@ -16,9 +16,10 @@ using System.IO.IsolatedStorage;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
-    public abstract partial class HoloNETClientBase : IHoloNETClientBase
+    public abstract partial class HoloNETClientBase : IHoloNETClientBase, IDisposable
     {
         private bool _shuttingDownHoloNET = false;
+        private bool _disposed = false;
         private TaskCompletionSource<DisconnectedEventArgs> _taskCompletionDisconnected = new TaskCompletionSource<DisconnectedEventArgs>();
         private TaskCompletionSource<HoloNETShutdownEventArgs> _taskCompletionHoloNETShutdown = new TaskCompletionSource<HoloNETShutdownEventArgs>();
         private IHoloNETDNA _holoNETDNA = null;
@@ -483,9 +484,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                                     {
                                         HandleError($"An error occured in HoloNETClientBase.StartHolochainConductorAsync attempting to write the embedded hc.exe to the AppData directory {Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "\\NextGenSoftware\\HoloNET")}", ex2);
                                     }
-                                }
                             //}
 #endif
+                                }
                             break;
 
                         case HolochainConductorModeEnum.UseSystemGlobal:
@@ -558,9 +559,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                                         //HandleError($"An error occured in HoloNETClientBase.StartHolochainConductorAsync attempting to write the embedded holochain.exe to the AppData directory { Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "\\NextGenSoftware\\HoloNET") }", ex2);
                                         HandleError($"An error occured in HoloNETClientBase.StartHolochainConductorAsync attempting to write the embedded holochain.exe to the IsolatedStorage directory { fullPathToHolochainExe }", ex2);
                                     }
-                                }
                             //}
 #endif
+                                }
                             break;
 
                         case HolochainConductorModeEnum.UseSystemGlobal:
@@ -901,30 +902,38 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     else
                     {
                         Logger.Log("Shutting Down Holochain Conductor...", LogType.Info, true);
-                        List<Process> processes = Process.GetProcesses().Where(x => x.ProcessName == "PowerShell.exe" && x.StartInfo.Arguments.Contains("hc")).ToList();
 
-                        foreach (Process process in processes)
+                        // Kill by process name — StartInfo of external processes isn't populated on Windows,
+                        // so Process.GetProcesses() filtering on StartInfo.Arguments won't work.
+                        List<Process> hcProcesses = Process.GetProcessesByName("hc").ToList();
+                        List<Process> holochainProcesses = Process.GetProcessesByName("holochain").ToList();
+
+                        foreach (Process process in hcProcesses)
                         {
-                            if (HoloNETDNA.ShowHolochainConductorWindow)
+                            try
                             {
-                                if (process.SessionId > 0)
+                                if (HoloNETDNA.ShowHolochainConductorWindow)
                                     process.CloseMainWindow();
-                            }
-
-                            if (process.SessionId > 0)
-                            {
                                 process.Kill();
-                                process.Close();
-
-                                // _conductorProcess.WaitForExit();
+                                process.WaitForExit(3000);
                                 process.Dispose();
+                                holochainConductorsShutdownEventArgs.NumberOfHcExeInstancesShutdown++;
                             }
+                            catch { }
+                        }
 
-                            if (process.StartInfo.Arguments.Contains("hc.exe"))
-                                holochainConductorsShutdownEventArgs.NumberOfHcExeInstancesShutdown = 1;
-
-                            else if (_conductorProcess.StartInfo.Arguments.Contains("holochain.exe"))
-                                holochainConductorsShutdownEventArgs.NumberOfHolochainExeInstancesShutdown = 1;
+                        foreach (Process process in holochainProcesses)
+                        {
+                            try
+                            {
+                                if (HoloNETDNA.ShowHolochainConductorWindow)
+                                    process.CloseMainWindow();
+                                process.Kill();
+                                process.WaitForExit(3000);
+                                process.Dispose();
+                                holochainConductorsShutdownEventArgs.NumberOfHolochainExeInstancesShutdown++;
+                            }
+                            catch { }
                         }
 
                         //List<Process> processes2 = Process.GetProcesses().Where(x => x.ProcessName == "hc.exe").ToList();
@@ -993,6 +1002,30 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             return ShutDownHolochainConductorsAsync(shutdownHolochainConductorsMode).Result;
         }
 
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed) return;
+            if (disposing && WebSocket != null)
+            {
+                WebSocket.OnConnected -= WebSocket_OnConnected;
+                WebSocket.OnDataSent -= WebSocket_OnDataSent;
+                WebSocket.OnDataReceived -= WebSocket_OnDataReceived;
+                WebSocket.OnDisconnected -= WebSocket_OnDisconnected;
+                WebSocket.OnError -= WebSocket_OnError;
+
+                if (WebSocket is IDisposable disposableWs)
+                    disposableWs.Dispose();
+            }
+            _conductorProcess?.Dispose();
+            _disposed = true;
+        }
+
         protected virtual void Init(Uri holochainConductorURI)
         {
             try
@@ -1006,7 +1039,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 WebSocket = new WebSocket.WebSocket(Logger);
                 EndPoint = holochainConductorURI;
 
-                //TODO: Impplemnt IDispoasable to unsubscribe event handlers to prevent memory leaks... 
                 WebSocket.OnConnected += WebSocket_OnConnected;
                 WebSocket.OnDataSent += WebSocket_OnDataSent;
                 WebSocket.OnDataReceived += WebSocket_OnDataReceived;

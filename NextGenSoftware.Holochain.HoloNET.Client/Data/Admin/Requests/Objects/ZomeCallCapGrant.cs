@@ -17,8 +17,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects
         //public CapGrantAccess access { get; set; }
         public dynamic access { get; set; }
 
+        // Wire format: {"All": null} or {"Listed": [[zome, fn], ...]}
+        // String keys are required — the conductor rejects integer enum keys.
         [Key("functions")]
-        //public GrantedFunctions functions { get; set; }
-        public Dictionary<GrantedFunctionsType, List<(string, string)>> functions { get; set; }
+        public Dictionary<string, object> functions { get; set; }
     }
 }

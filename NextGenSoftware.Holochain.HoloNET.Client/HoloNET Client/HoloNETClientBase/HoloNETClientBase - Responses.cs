@@ -369,6 +369,17 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 args.AgentPubKey = agentPubKey;
                 args.DnaHash = dnaHash;
                 args.InstalledAppId = appInfo.installed_app_id;
+                args.AppStatus = appInfo.AppStatus;
+                args.AppStatusReason = appInfo.AppStatusReason;
+                args.AppManifest = appInfo.manifest;
+
+                if (appInfo.cell_info != null && appInfo.cell_info.Count > 0)
+                {
+                    var firstCells = appInfo.cell_info.First().Value;
+                    if (firstCells != null && firstCells.Count > 0)
+                        args.CellType = firstCells[0].CellInfoType;
+                }
+
                 appInfo.AgentPubKey = agentPubKey;
                 appInfo.DnaHash = dnaHash;
 

@@ -394,16 +394,19 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 signalCallBackEventArgs.RawSignalData = appResponse.App;
                 signalCallBackEventArgs.SignalData = signalDataDecoded;
                 signalCallBackEventArgs.SignalDataAsString = signalDataAsString;
-                signalCallBackEventArgs.SignalType = signalType; //TODO: Need to test for System SignalType... Not even sure if we want to raise this event for System signals? (the js client ignores them currently).
+                signalCallBackEventArgs.SignalType = signalType;
             }
             catch (Exception ex)
             {
                 string msg = $"An unknown error occurred in HoloNETClient.DecodeSignalDataReceived. Reason: {ex}";
                 signalCallBackEventArgs.IsError = true;
-                //signalCallBackEventArgs.IsCallSuccessful = false;
                 signalCallBackEventArgs.Message = msg;
                 HandleError(msg, ex);
             }
+
+            // Ignore System signals — they carry no app-level data (mirrors the JS client behaviour).
+            if (signalCallBackEventArgs.SignalType == SignalType.System && !signalCallBackEventArgs.IsError)
+                return;
 
             RaiseSignalReceivedEvent(signalCallBackEventArgs);
         }
@@ -415,25 +418,71 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             string id = response.id.ToString();
             ZomeFunctionCallBackEventArgs zomeFunctionCallBackArgs = new ZomeFunctionCallBackEventArgs();
 
+            zomeFunctionCallBackArgs = CreateHoloNETArgs<ZomeFunctionCallBackEventArgs>(response, dataReceivedEventArgs);
+            zomeFunctionCallBackArgs.Zome = GetItemFromCache(id, _zomeLookup);
+            zomeFunctionCallBackArgs.ZomeFunction = GetItemFromCache(id, _funcLookup);
+
             try
             {
-                Dictionary<object, object> rawAppResponseData = MessagePackSerializer.Deserialize<Dictionary<object, object>>(appResponse.data, messagePackSerializerOptions);
-                Dictionary<string, object> appResponseData = new Dictionary<string, object>();
-                Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
-                string keyValuePairsAsString = "";
-                Record record = null;
+                // Try single-record (dictionary) response first
+                Dictionary<object, object> rawAppResponseData = null;
+                List<object> rawAppResponseList = null;
 
-                zomeFunctionCallBackArgs = CreateHoloNETArgs<ZomeFunctionCallBackEventArgs>(response, dataReceivedEventArgs);
-                zomeFunctionCallBackArgs.Zome = GetItemFromCache(id, _zomeLookup);
-                zomeFunctionCallBackArgs.ZomeFunction = GetItemFromCache(id, _funcLookup);
-
-                if (rawAppResponseData != null)
+                try
                 {
+                    rawAppResponseData = MessagePackSerializer.Deserialize<Dictionary<object, object>>(appResponse.data, messagePackSerializerOptions);
+                }
+                catch
+                {
+                    // Not a map — try list (zome functions returning Vec<Record> or similar)
+                    rawAppResponseList = MessagePackSerializer.Deserialize<List<object>>(appResponse.data, messagePackSerializerOptions);
+                }
+
+                if (rawAppResponseList != null)
+                {
+                    // Multi-entry response (e.g. get_links, get_all_entries)
+                    Dictionary<string, string> allKeyValuePairs = new Dictionary<string, string>();
+                    string allKeyValuePairsAsString = "";
+
+                    foreach (object item in rawAppResponseList)
+                    {
+                        Dictionary<object, object> itemDict = item as Dictionary<object, object>;
+                        if (itemDict == null) continue;
+
+                        Dictionary<string, object> itemAppData = new Dictionary<string, object>();
+                        Dictionary<string, string> itemKeyValuePairs = new Dictionary<string, string>();
+                        string itemKeyValuePairsAsString = "";
+                        Record itemRecord = null;
+
+                        (itemAppData, itemKeyValuePairs, itemKeyValuePairsAsString, itemRecord) = DecodeRawZomeData(itemDict, itemAppData, itemKeyValuePairs, itemKeyValuePairsAsString);
+
+                        if (_entryDataObjectTypeLookup.ContainsKey(id) && _entryDataObjectTypeLookup[id] != null)
+                            itemRecord.EntryDataObject = MapEntryDataObject(_entryDataObjectTypeLookup[id], itemKeyValuePairs);
+                        else if (_entryDataObjectLookup.ContainsKey(id) && _entryDataObjectLookup[id] != null)
+                            itemRecord.EntryDataObject = MapEntryDataObject(_entryDataObjectLookup[id], itemKeyValuePairs);
+
+                        zomeFunctionCallBackArgs.Records.Add(itemRecord);
+
+                        foreach (var kv in itemKeyValuePairs)
+                            allKeyValuePairs[kv.Key] = kv.Value;
+                        allKeyValuePairsAsString += itemKeyValuePairsAsString;
+                    }
+
+                    Logger.Log($"Decoded Data ({zomeFunctionCallBackArgs.Records.Count} records):\n{allKeyValuePairsAsString}", LogType.Info);
+                    zomeFunctionCallBackArgs.KeyValuePair = allKeyValuePairs;
+                    zomeFunctionCallBackArgs.KeyValuePairAsString = allKeyValuePairsAsString;
+                }
+                else if (rawAppResponseData != null)
+                {
+                    Dictionary<string, object> appResponseData = new Dictionary<string, object>();
+                    Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
+                    string keyValuePairsAsString = "";
+                    Record record = null;
+
                     (appResponseData, keyValuePairs, keyValuePairsAsString, record) = DecodeRawZomeData(rawAppResponseData, appResponseData, keyValuePairs, keyValuePairsAsString);
 
                     if (_entryDataObjectTypeLookup.ContainsKey(id) && _entryDataObjectTypeLookup[id] != null)
                         record.EntryDataObject = MapEntryDataObject(_entryDataObjectTypeLookup[id], keyValuePairs);
-
                     else if (_entryDataObjectLookup.ContainsKey(id) && _entryDataObjectLookup[id] != null)
                         record.EntryDataObject = MapEntryDataObject(_entryDataObjectLookup[id], keyValuePairs);
 
@@ -442,7 +491,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     zomeFunctionCallBackArgs.RawZomeReturnData = rawAppResponseData;
                     zomeFunctionCallBackArgs.KeyValuePair = keyValuePairs;
                     zomeFunctionCallBackArgs.KeyValuePairAsString = keyValuePairsAsString;
-                    zomeFunctionCallBackArgs.Records.Add(record); //TODO: Need to add support for multiple entries ASAP!
+                    zomeFunctionCallBackArgs.Records.Add(record);
                 }
                 else
                 {
@@ -454,12 +503,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             {
                 try
                 {
+                    // Final fallback: plain byte[] HoloHash return value
                     object rawAppResponseData = MessagePackSerializer.Deserialize<object>(appResponse.data, messagePackSerializerOptions);
                     byte[] holoHash = rawAppResponseData as byte[];
-
-                    zomeFunctionCallBackArgs = CreateHoloNETArgs<ZomeFunctionCallBackEventArgs>(response, dataReceivedEventArgs);
-                    zomeFunctionCallBackArgs.Zome = GetItemFromCache(id, _zomeLookup);
-                    zomeFunctionCallBackArgs.ZomeFunction = GetItemFromCache(id, _funcLookup);
 
                     if (holoHash != null)
                     {
@@ -470,9 +516,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     else
                     {
                         string msg = $"An unknown response was received from the conductor for type 'Response' (Zome Response). Response Received: {rawAppResponseData}";
-
                         zomeFunctionCallBackArgs.IsError = true;
-                        //zomeFunctionCallBackArgs.IsCallSuccessful = false;
                         zomeFunctionCallBackArgs.Message = msg;
                         HandleError(msg, null);
                     }
@@ -481,7 +525,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 {
                     string msg = $"An unknown error occurred in HoloNETClient.DecodeZomeDataReceived. Reason: {ex2}";
                     zomeFunctionCallBackArgs.IsError = true;
-                    //zomeFunctionCallBackArgs.IsCallSuccessful = false;
                     zomeFunctionCallBackArgs.Message = msg;
                     HandleError(msg, ex2);
                 }

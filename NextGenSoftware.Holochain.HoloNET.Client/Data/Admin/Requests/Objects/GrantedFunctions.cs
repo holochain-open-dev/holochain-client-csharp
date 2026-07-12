@@ -1,65 +1,38 @@
-﻿
+
 using MessagePack;
-using System;
 using System.Collections.Generic;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects
 {
+    /// <summary>
+    /// Mirrors the Holochain GrantedFunctions tagged union.
+    /// Wire format (MessagePack map): {"All": null} or {"Listed": [[zome, fn], ...]}
+    /// </summary>
     [MessagePackObject]
     public class GrantedFunctions
     {
+        // String-keyed so MessagePack serialises "All"/"Listed" rather than int 0/1.
         [Key("functions")]
-        public Dictionary<GrantedFunctionsType, List<(string, string)>> Functions { get; set; }
+        public Dictionary<string, object> Functions { get; set; }
 
-        public GrantedFunctions()
+        public static GrantedFunctions All()
         {
-            Functions = new Dictionary<GrantedFunctionsType, List<(string, string)>>();
+            return new GrantedFunctions
+            {
+                Functions = new Dictionary<string, object> { { "All", null } }
+            };
+        }
+
+        public static GrantedFunctions Listed(List<(string zome, string fn)> grants)
+        {
+            var list = new List<object[]>();
+            foreach (var (zome, fn) in grants)
+                list.Add(new object[] { zome, fn });
+
+            return new GrantedFunctions
+            {
+                Functions = new Dictionary<string, object> { { "Listed", list } }
+            };
         }
     }
-
-
-    //public class GrantedFunctions
-    //{
-    //    //public Dictionary<GrantedFunctionsType, object> Functions { get; set; }
-    //    //public Dictionary<GrantedFunctionsType, List<Tuple<string, string>>> Functions { get; set; }
-    //    public Dictionary<GrantedFunctionsType, List<(string, string)>> Functions { get; set; }
-
-    //    public GrantedFunctions()
-    //    {
-    //        Functions = new Dictionary<GrantedFunctionsType, List<(string, string)>>();
-    //    }
-    //}
-
 }
-
-//public class Program
-//{
-//    public static void Main()
-//    {
-//        GrantedFunctions grantedFunctions = new GrantedFunctions();
-
-//        // Example 1: All functions granted
-//        grantedFunctions.Functions.Add(GrantedFunctionsType.All, null);
-
-//        // Example 2: Listed functions granted
-//        List<Tuple<ZomeName, FunctionName>> listedFunctions = new List<Tuple<ZomeName, FunctionName>>();
-//        listedFunctions.Add(new Tuple<ZomeName, FunctionName>(new ZomeName { Name = "Zome1" }, new FunctionName { Name = "Function1" }));
-//        listedFunctions.Add(new Tuple<ZomeName, FunctionName>(new ZomeName { Name = "Zome2" }, new FunctionName { Name = "Function2" }));
-//        grantedFunctions.Functions.Add(GrantedFunctionsType.Listed, listedFunctions);
-
-//        // Accessing the granted functions
-//        if (grantedFunctions.Functions.ContainsKey(GrantedFunctionsType.All))
-//        {
-//            Console.WriteLine("All functions granted");
-//        }
-//        else if (grantedFunctions.Functions.ContainsKey(GrantedFunctionsType.Listed))
-//        {
-//            List<Tuple<ZomeName, FunctionName>> listed = (List<Tuple<ZomeName, FunctionName>>)grantedFunctions.Functions[GrantedFunctionsType.Listed];
-//            Console.WriteLine("Listed functions granted:");
-//            foreach (var tuple in listed)
-//            {
-//                Console.WriteLine($"Zome: {tuple.Item1.Name}, Function: {tuple.Item2.Name}");
-//            }
-//        }
-//    }
-//}

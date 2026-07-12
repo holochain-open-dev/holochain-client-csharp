@@ -1181,13 +1181,19 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         {
             byte[] secret = _signingCredentialsForCell[$"{ConvertHoloHashToString(cellId[1])}:{ConvertHoloHashToString(cellId[0])}"].CapSecret;
 
+            Dictionary<string, object> wireFunctions;
+            if (grantedFunctions != null && grantedFunctions.ContainsKey(GrantedFunctionsType.Listed))
+                wireFunctions = GrantedFunctions.Listed(grantedFunctions[GrantedFunctionsType.Listed]).Functions;
+            else
+                wireFunctions = GrantedFunctions.All().Functions;
+
             GrantZomeCallCapabilityRequest request = new GrantZomeCallCapabilityRequest()
             {
                 cell_id = cellId,
                 cap_grant = new ZomeCallCapGrant()
                 {
                     tag = "zome-call-signing-key",
-                    functions = grantedFunctions,
+                    functions = wireFunctions,
                 }
             };
 

@@ -378,7 +378,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 {
                     enableAppResponse.data.app = ProcessAppInfo(enableAppResponse.data.app, args);
                     args.AppInfoResponse = new AppInfoResponse() { data = enableAppResponse.data.app };
-                    args.Errors = enableAppResponse.data.errors; //TODO: Need to find out what this contains and the correct data structure.
+                    args.Errors = enableAppResponse.data.errors;
                 }
                 else
                 {
