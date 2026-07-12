@@ -8,39 +8,32 @@
 	  <Company>NextGen Software Ltd</Company>
 	  <Product>HoloNET Holochain Client</Product>
 	  <Title>HoloNET Holochain Client</Title>
-	  <Summary Condition="'$(Embedded)' != 'true'">The world's first .NET &amp; Unity client for Holochain.</Summary>
-	  <Description Condition="'$(Embedded)' != 'true'">The world's first .NET &amp; Unity client for Holochain.</Description>
-	  <Summary Condition="'$(Embedded)' == 'true'">The world's first .NET &amp; Unity client for Holochain. This version comes with the Holochain binaries (hc.exe and holochain.exe) built in, allowing the Holochain Conductor to be auto-started and managed for you.</Summary>
-	  <Description Condition="'$(Embedded)' == 'true'">The world's first .NET &amp; Unity client for Holochain. This version comes with the Holochain binaries (hc.exe and holochain.exe) built in, allowing the Holochain Conductor to be auto-started and managed for you. Use HolochainConductorMode.UseEmbedded to activate. For the lightweight version without binaries use NextGenSoftware.Holochain.HoloNET.Client.</Description>
+	  <Summary Condition="'$(Embedded)' != 'true'">The world's first .NET &amp; Unity client for Holochain — now fully upgraded to Holochain 0.6.2 with Kitsune2 networking, QUIC transport, WebSocket handshake headers, and the new conductor config API.</Summary>
+	  <Description Condition="'$(Embedded)' != 'true'">The world's first .NET &amp; Unity client for Holochain. Fully upgraded to Holochain 0.6.2 — supports Kitsune2 networking, QUIC transport, updated AdminWebsocket and AppWebsocket conductor APIs, WebSocket handshake authentication headers, and the new conductor YAML config format. Lightweight version: does not bundle the Holochain binaries. Use NextGenSoftware.Holochain.HoloNET.Client.Embedded if you want the conductor auto-started and managed for you.</Description>
+	  <Summary Condition="'$(Embedded)' == 'true'">The world's first .NET &amp; Unity client for Holochain — upgraded to Holochain 0.6.2, with hc.exe and holochain.exe bundled so the conductor is auto-started and managed for you.</Summary>
+	  <Description Condition="'$(Embedded)' == 'true'">The world's first .NET &amp; Unity client for Holochain. Fully upgraded to Holochain 0.6.2 — supports Kitsune2 networking, QUIC transport, updated conductor APIs, and WebSocket handshake authentication headers. This version bundles hc.exe and holochain.exe (v0.6.2) so the Holochain Conductor is auto-started and managed for you. Set HolochainConductorMode.UseEmbedded to activate. For the lightweight version without binaries use NextGenSoftware.Holochain.HoloNET.Client.</Description>
 	  <PackageProjectUrl>https://github.com/holochain-open-dev/holochain-client-csharp</PackageProjectUrl>
 	  <PackageIcon>hc logo.png</PackageIcon>
 	  <Authors>David Ellams (NextGen Software Ltd)</Authors>
 	  <PackageTags>holochain;net;unity;client</PackageTags>
 	  <PackageReleaseNotes>
-		  - This release has multiple bug fixes.
-		  - Bug fixes for Get DNA Definition Conductor API function.
-		  - Bug fixes for Disconnect and Re-Connect issues.
-		  - Dependencies updated such as the NextGen Libs it uses.
+		  ## v4.0.0 — Holochain 0.6.2 Upgrade + OASIS Omniverse Reboot
 
-		  [HoloNET Manager v3.1.0](https://www.oasisweb4.com/downloads/HoloNET_Manager_v3.1.0.msi)
+		  **Full upgrade to Holochain 0.6.2** — the biggest HoloNET release since the original launch:
 
-		  **This is the UI to HoloNET and is also used to demo and test all functionality of HoloNET Client and HoloNET ORM. Read more about this above.**
+		  - Upgraded embedded Holochain binaries to v0.6.2 (hc.exe + holochain.exe).
+		  - Full Kitsune2 networking support replacing the old kitsune_p2p stack.
+		  - QUIC transport support via the new NetworkConfig/QUICConfig conductor API shape.
+		  - WebSocket handshake authentication headers now sent on connect (required by 0.6.x conductor).
+		  - Conductor YAML config completely rewritten to match holochain_conductor_api 0.6.x (ConductorConfig, KeystoreConfig, Kitsune2Config, NetworkConfig, CacheConfig, WASMConfig).
+		  - Updated AdminWebsocket and AppWebsocket wire protocol to holochain-0.6.x API shapes.
+		  - Embedded/non-embedded package split is now fully automated — no more manual csproj editing.
+		  - Non-embedded variant now correctly throws InvalidOperationException when UseEmbedded conductor mode is selected, directing users to the .Embedded package.
+		  - Part of the OASIS Omniverse Reboot and Rebrand (oasisomniverse.one).
+		  - Upgraded to .NET 8.
+		  - Miscellaneous bug fixes and stability improvements.
 
-		  **Please leave feedback in our [Telegram group](https://t.me/holonetchat). We are aware of a few bugs we are still working on, we originally wanted to wait till we got these fixed but if we are being honest we couldn't wait any longer to get this out there to get early feedback and see where the demands were for further features, enhancements and what part of the HoloNET Family we should focus more on etc...**
-
-		  **We also REALLY need funding to keep this vital project alive, we are now out of runway so we would really appreciate your support:
-
-		  https://www.gofundme.com/f/help-david-get-over-the-line-with-holonet-oasis-and-star**
-
-		  **We also wanted help squishing these last few bugs because they have been quite tricky little buggers to track down! Please find them in our [GitHub Issues](https://github.com/holochain-open-dev/holochain-client-csharp/issues)... :)**
-
-		  **Any other help would also be greatly appreciated, we are always looking for devs (and non devs) to join us on this exciting journey to the stars... We would love to hear from you! Thank you! :)**
-
-		  **UPDATE: We have now opened our HoloNET Alpha Testers Programme, please get in touch on our [Telegram group](https://t.me/holonetchat) if you want to join and become one of our esteem amazing testers! You can also get early access to many exciting upcoming releases for HoloNET, STAR, OASIS &amp; AR World/Our World before anyone else! Other perks and bonuses also available! So sign up now! Thanks!**
-
-		  **NOTE: The documentation is still for the previous version, please bare with us while we update this soon... thank you!**
-
-		  *Full Changelog:* https://github.com/holochain-open-dev/holochain-client-csharp/compare/v3.0.3...v3.0.5
+		  *Full Changelog:* https://github.com/holochain-open-dev/holochain-client-csharp/compare/v3.0.5...v4.0.0
 
 		  NuGet Packages:
 
@@ -88,7 +81,7 @@
 	  <!--<PackageLicenseExpression>GNU GPLv3</PackageLicenseExpression>-->
 	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
 	  <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-	  <Version>3.0.5</Version>
+	  <Version>4.0.0</Version>
 	  <!--<PackageLicenseFile>..\LICENSE</PackageLicenseFile>-->
 
 	  <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
