@@ -1,0 +1,54 @@
+name: Publish NuGet Packages
+
+on:
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Checkout NextGenSoftware-Libraries
+        uses: actions/checkout@v4
+        with:
+          repository: NextGenSoftwareUK/NextGenSoftware-Libraries
+          path: NextGenSoftware-Libraries
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.x'
+
+      - name: Pack all packages
+        shell: pwsh
+        run: |
+          $nupkgsDir = ".\nupkgs"
+          New-Item -ItemType Directory -Force -Path $nupkgsDir | Out-Null
+          $projects = @(
+            "NextGenSoftware.Holochain.HoloNET.Client\NextGenSoftware.Holochain.HoloNET.Client.csproj",
+            "NextGenSoftware.Holochain.HoloNET.ORM\NextGenSoftware.Holochain.HoloNET.ORM.csproj",
+            "NextGenSoftware.Holochain.HoloNET.HDK\NextGenSoftware.Holochain.HoloNET.HDK.csproj",
+            "NextGenSoftware.Holochain.HoloNET.HyperNET\NextGenSoftware.Holochain.HoloNET.HyperNET.csproj",
+            "NextGenSoftware.Holochain.HoloNET.Manager\NextGenSoftware.Holochain.HoloNET.Manager.csproj"
+          )
+          $succeeded = 0; $failed = 0
+          foreach ($proj in $projects) {
+            Write-Host "Packing $proj..."
+            dotnet pack $proj --configuration Release --output $nupkgsDir
+            if ($LASTEXITCODE -eq 0) { $succeeded++ } else { $failed++; Write-Host "FAILED: $proj" }
+          }
+          Write-Host "Pack complete: $succeeded succeeded, $failed failed"
+
+      - name: Push all packages to NuGet.org
+        shell: pwsh
+        run: |
+          Get-ChildItem -Path .\nupkgs\*.nupkg | ForEach-Object {
+            Write-Host "Pushing $($_.Name)..."
+            dotnet nuget push $_.FullName `
+              --source https://api.nuget.org/v3/index.json `
+              --api-key ${{ secrets.NUGET_API_KEY }} `
+              --skip-duplicate
+          }
