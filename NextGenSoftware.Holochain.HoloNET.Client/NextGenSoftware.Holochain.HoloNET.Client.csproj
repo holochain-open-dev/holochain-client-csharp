@@ -12,7 +12,7 @@
 	  <Description Condition="'$(Embedded)' != 'true'">The world's first .NET &amp; Unity client for Holochain. Fully upgraded to Holochain 0.6.2 — supports Kitsune2 networking, QUIC transport, updated AdminWebsocket and AppWebsocket conductor APIs, WebSocket handshake authentication headers, and the new conductor YAML config format. Lightweight version: does not bundle the Holochain binaries. Use NextGenSoftware.Holochain.HoloNET.Client.Embedded if you want the conductor auto-started and managed for you.</Description>
 	  <Summary Condition="'$(Embedded)' == 'true'">The world's first .NET &amp; Unity client for Holochain — upgraded to Holochain 0.6.2, with hc.exe and holochain.exe bundled so the conductor is auto-started and managed for you.</Summary>
 	  <Description Condition="'$(Embedded)' == 'true'">The world's first .NET &amp; Unity client for Holochain. Fully upgraded to Holochain 0.6.2 — supports Kitsune2 networking, QUIC transport, updated conductor APIs, and WebSocket handshake authentication headers. This version bundles hc.exe and holochain.exe (v0.6.2) so the Holochain Conductor is auto-started and managed for you. Set HolochainConductorMode.UseEmbedded to activate. For the lightweight version without binaries use NextGenSoftware.Holochain.HoloNET.Client.</Description>
-	  <PackageProjectUrl>https://github.com/holochain-open-dev/holochain-client-csharp</PackageProjectUrl>
+	  <PackageProjectUrl>https://holonet.oasisomniverse.one</PackageProjectUrl>
 	  <PackageIcon>hc logo.png</PackageIcon>
 	  <Authors>David Ellams (NextGen Software Ltd)</Authors>
 	  <PackageTags>holochain;net;unity;client</PackageTags>

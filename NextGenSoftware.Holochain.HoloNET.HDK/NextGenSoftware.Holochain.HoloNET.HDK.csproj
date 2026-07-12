@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -17,7 +17,7 @@
 	  <Description>Powerful .NET HDK built on top of the world's first .NET &amp; Unity Client for Holochain &amp; the WEB5 STAR ODK Omniverse Interoperable Metaverse No/Low Code Generator.</Description>
 	  <!--<Summary>Powerful .NET HDK built on top of the world's first .NET &amp; Unity Client for Holochain &amp; the WEB5 STAR ODK Omniverse Interoperable Metaverse No/Low Code Generator. This version comes with the Holochain binaries built in.</Summary>
 	  <Description>Powerful .NET HDK built on top of the world's first .NET &amp; Unity Client for Holochain &amp; the WEB5 STAR ODK Omniverse Interoperable Metaverse No/Low Code Generator. This version comes with the Holochain binaries built in.</Description>-->
-	  <PackageProjectUrl>https://github.com/holochain-open-dev/holochain-client-csharp</PackageProjectUrl>
+	  <PackageProjectUrl>https://holonet.oasisomniverse.one</PackageProjectUrl>
 	  <PackageIcon>hc logo.png</PackageIcon>
 	  <Authors>David Ellams (NextGen Software Ltd)</Authors>
 	  <PackageTags>holochain;net;unity;orm</PackageTags>

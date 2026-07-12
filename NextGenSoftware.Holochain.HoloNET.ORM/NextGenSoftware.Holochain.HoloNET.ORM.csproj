@@ -14,7 +14,7 @@
 	<Description Condition="'$(Embedded)' != 'true'">Powerful ORM built on top of HoloNET Client for Holochain. Enables rapid hApp development via HoloNETEntryBase, HoloNETAuditEntryBase, HoloNETCollection and HoloNETObservableCollection — call Load, Save, Delete with automatic change tracking and rollback. Upgraded to Holochain 0.6.2. Lightweight version: use NextGenSoftware.Holochain.HoloNET.ORM.Embedded if you want the conductor auto-started.</Description>
 	<Summary Condition="'$(Embedded)' == 'true'">Powerful ORM built on top of the world's first .NET &amp; Unity Client for Holochain, upgraded to Holochain 0.6.2, with hc.exe and holochain.exe bundled for automatic conductor management.</Summary>
 	<Description Condition="'$(Embedded)' == 'true'">Powerful ORM built on top of HoloNET Client for Holochain. Same rapid hApp development experience as NextGenSoftware.Holochain.HoloNET.ORM — HoloNETEntryBase, HoloNETAuditEntryBase, HoloNETCollection, HoloNETObservableCollection — but references NextGenSoftware.Holochain.HoloNET.Client.Embedded so the Holochain Conductor (v0.6.2) is auto-started and managed for you. For the lightweight version use NextGenSoftware.Holochain.HoloNET.ORM.</Description>
-	<PackageProjectUrl>https://github.com/holochain-open-dev/holochain-client-csharp</PackageProjectUrl>
+	<PackageProjectUrl>https://holonet.oasisomniverse.one</PackageProjectUrl>
 	<PackageIcon>hc logo.png</PackageIcon>
 	<Authors>David Ellams (NextGen Software Ltd)</Authors>
 	<PackageTags>holochain;net;unity;orm</PackageTags>
