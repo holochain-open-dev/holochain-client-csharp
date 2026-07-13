@@ -27,7 +27,7 @@
 		  - Bug fixes for Disconnect and Re-Connect issues.
 		  - Dependencies updated such as the NextGen Libs it uses.
 
-		  [HoloNET Manager v3.1.0](https://www.oasisweb4.com/downloads/HoloNET_Manager_v3.1.0.msi)
+		  [HoloNET Manager v3.1.0](https://oasisomniverse.one/downloads/HoloNET_Manager_v3.1.0.msi)
 
 		  **This is the UI to HoloNET and is also used to demo and test all functionality of HoloNET Client and HoloNET ORM. Read more about this above.**
 
@@ -89,7 +89,7 @@
 	  </PackageReleaseNotes>
 	  <RepositoryType>git</RepositoryType>
 	  <RepositoryUrl>https://github.com/holochain-open-dev/holochain-client-csharp</RepositoryUrl>
-	  <Copyright>Copyright © NextGen Software Ltd 2020 - 2024</Copyright>
+	  <Copyright>Copyright © NextGen Software Ltd 2019 - 2026</Copyright>
 	  <PackageReadmeFile>README.md</PackageReadmeFile>
 	  <!--<PackageLicenseExpression>GNU GPLv3</PackageLicenseExpression>-->
 	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
