@@ -131,9 +131,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\NextGenSoftware-Libraries\NextGenSoftware.Logging\NextGenSoftware.Logging.csproj" />
-    <ProjectReference Include="..\..\NextGenSoftware-Libraries\NextGenSoftware.Utilities\NextGenSoftware.Utilities.csproj" />
-    <ProjectReference Include="..\..\NextGenSoftware-Libraries\NextGenSoftware.WebSocket\NextGenSoftware.WebSocket.csproj" />
+    <ProjectReference Include="..\NextGenSoftware-Libraries\NextGenSoftware.Logging\NextGenSoftware.Logging.csproj" />
+    <ProjectReference Include="..\NextGenSoftware-Libraries\NextGenSoftware.Utilities\NextGenSoftware.Utilities.csproj" />
+    <ProjectReference Include="..\NextGenSoftware-Libraries\NextGenSoftware.WebSocket\NextGenSoftware.WebSocket.csproj" />
   </ItemGroup>
 
 </Project>

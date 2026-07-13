@@ -100,9 +100,9 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\NextGenSoftware.Holochain.HoloNET.Client\NextGenSoftware.Holochain.HoloNET.Client.csproj" />
-	  <ProjectReference Include="..\..\NextGenSoftware-Libraries\NextGenSoftware.Logging\NextGenSoftware.Logging.csproj" />
-	  <ProjectReference Include="..\..\NextGenSoftware-Libraries\NextGenSoftware.Utilities\NextGenSoftware.Utilities.csproj" />
-	  <ProjectReference Include="..\..\NextGenSoftware-Libraries\NextGenSoftware.WebSocket\NextGenSoftware.WebSocket.csproj" />
+	  <ProjectReference Include="..\NextGenSoftware-Libraries\NextGenSoftware.Logging\NextGenSoftware.Logging.csproj" />
+	  <ProjectReference Include="..\NextGenSoftware-Libraries\NextGenSoftware.Utilities\NextGenSoftware.Utilities.csproj" />
+	  <ProjectReference Include="..\NextGenSoftware-Libraries\NextGenSoftware.WebSocket\NextGenSoftware.WebSocket.csproj" />
 	</ItemGroup>
 
 </Project>
