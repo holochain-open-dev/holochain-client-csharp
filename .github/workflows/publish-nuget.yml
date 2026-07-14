@@ -17,6 +17,15 @@ jobs:
           repository: NextGenSoftwareUK/NextGenSoftware-Libraries
           path: NextGenSoftware-Libraries
 
+      - name: Create Libraries symlink for project references
+        shell: pwsh
+        run: |
+          # Project references use ../../NextGenSoftware-Libraries (works locally where repos are siblings).
+          # On GitHub Actions the Libraries checkout lands inside GITHUB_WORKSPACE, so we create a
+          # symlink one level up so the same relative path resolves on both local and CI.
+          New-Item -ItemType SymbolicLink -Path "..\NextGenSoftware-Libraries" -Target "$env:GITHUB_WORKSPACE\NextGenSoftware-Libraries"
+          Write-Host "Symlink created: ..\NextGenSoftware-Libraries -> $env:GITHUB_WORKSPACE\NextGenSoftware-Libraries"
+
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
