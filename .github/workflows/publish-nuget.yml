@@ -31,6 +31,24 @@ jobs:
         with:
           dotnet-version: '10.x'
 
+      - name: Build all projects
+        shell: pwsh
+        run: |
+          $projects = @(
+            "NextGenSoftware.Holochain.HoloNET.Client\NextGenSoftware.Holochain.HoloNET.Client.csproj",
+            "NextGenSoftware.Holochain.HoloNET.ORM\NextGenSoftware.Holochain.HoloNET.ORM.csproj",
+            "NextGenSoftware.Holochain.HoloNET.HDK\NextGenSoftware.Holochain.HoloNET.HDK.csproj",
+            "NextGenSoftware.Holochain.HoloNET.HyperNET\NextGenSoftware.Holochain.HoloNET.HyperNET.csproj",
+            "NextGenSoftware.Holochain.HoloNET.Manager\NextGenSoftware.Holochain.HoloNET.Manager.csproj"
+          )
+          $failed = 0
+          foreach ($proj in $projects) {
+            Write-Host "Building $proj..."
+            dotnet build $proj --configuration Release
+            if ($LASTEXITCODE -ne 0) { $failed++; Write-Host "BUILD FAILED: $proj" }
+          }
+          if ($failed -gt 0) { exit 1 }
+
       - name: Pack all packages
         shell: pwsh
         run: |
@@ -48,7 +66,7 @@ jobs:
           $succeeded = 0; $failed = 0
           foreach ($proj in $projects) {
             Write-Host "Packing $proj (non-embedded)..."
-            dotnet pack $proj --configuration Release --output $nupkgsDir
+            dotnet pack $proj --configuration Release --output $nupkgsDir --no-build
             if ($LASTEXITCODE -eq 0) { $succeeded++ } else { $failed++; Write-Host "FAILED: $proj" }
           }
 
