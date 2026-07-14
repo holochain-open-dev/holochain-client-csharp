@@ -12,8 +12,7 @@
 	  <Title>HoloNET P2P HyperNET</Title>
 	  <Summary>Lag-free P2P gaming networking for Unity and Unreal built on HoloNET -- smashes server-based player limits using Holochain's agent-centric DHT.</Summary>
 	  <Description>HoloNET HyperNET is a P2P gaming networking layer built on top of HoloNET Client and HoloNET ORM that allows Unity and Unreal games to implement near-zero-latency peer-to-peer networking with virtually unlimited concurrent players -- eliminating the scalability ceiling of traditional cloud/dedicated server architectures. Leverages Holochain's agent-centric DHT (v0.6.x, Kitsune2) for resilient mesh networking, automatic peer discovery, and distributed state. Ideal for MMO, battle royale, and co-op experiences. Part of the OASIS Omniverse ecosystem at https://holonet.oasisomniverse.one -- Source: https://github.com/holochain-open-dev/holochain-client-csharp</Description>
-	  <!--<Summary>Lag-free P2P gaming networking for Unity and Unreal built on HoloNET -- smashes server-based player limits using Holochain's agent-centric DHT.</Summary>
-	  <Description>HoloNET HyperNET is a P2P gaming networking layer built on top of HoloNET Client and HoloNET ORM that allows Unity and Unreal games to implement near-zero-latency peer-to-peer networking with virtually unlimited concurrent players -- eliminating the scalability ceiling of traditional cloud/dedicated server architectures. Leverages Holochain's agent-centric DHT (v0.6.x, Kitsune2) for resilient mesh networking, automatic peer discovery, and distributed state. Ideal for MMO, battle royale, and co-op experiences. Part of the OASIS Omniverse ecosystem at https://holonet.oasisomniverse.one -- Source: https://github.com/holochain-open-dev/holochain-client-csharp</Description>-->
+	  <!---->
 	  <PackageProjectUrl>https://holonet.oasisomniverse.one</PackageProjectUrl>
 	  <PackageIcon>hc logo.png</PackageIcon>
 	  <Authors>David Ellams (NextGen Software Ltd)</Authors>
