@@ -451,6 +451,17 @@ You can subscribe to a number of different events:
 | [OnError](#onerror)                                                             | Fired when an error occurs, check the params for the cause of the error.                                                                                                                                                                    |
 | [OnHolochainConductorsShutdownComplete](#OnHolochainConductorsShutdownComplete) | Fired when all Holochain Conductors have been shutdown.                                                                                                                                                                                     |
 | [OnHoloNETShutdownComplete](#OnHoloNETShutdownComplete)                         | Fired when HoloNET has completed shutting down (this includes closing all connections and shutting down all Holochain Conductor).                                                                                                           |
+| [OnDataSent](#ondatasent)                                                       | Fired when data is sent to the Holochain conductor over the WebSocket.                                |
+| [OnHolochainConductorStarting](#onholochainconductorstarting)                   | Fired just before HoloNET starts the Holochain Conductor process (Embedded mode).                    |
+| [OnHolochainConductorStarted](#onholochainconductorstarted)                     | Fired when the Holochain Conductor process has successfully started (Embedded mode).                  |
+| [OnCloneCellCreatedCallBack](#onclonecellcreatedcallback)                       | Fired when a clone cell has been created via CreateCloneCellAsync.                                  |
+| [OnCloneCellEnabledCallBack](#onclonecellenabledcallback)                       | Fired when a clone cell has been re-enabled via EnableCloneCellAsync.                               |
+| [OnCloneCellDisabledCallBack](#onclonecelldisabledcallback)                     | Fired when a clone cell has been disabled via DisableCloneCellAsync.                                |
+| [OnMemproofsProvidedCallBack](#onmemproofsprovided)                             | Fired when membrane proofs have been submitted via ProvideMemproofsAsync.                           |
+| [OnWasmHostFunctionsListedCallBack](#onwasmhostfunctionslistedcallback)         | Fired when the WASM host functions list has been returned via ListWasmHostFunctionsAsync.           |
+| [OnCountersigningSessionStateReturnedCallBack](#oncountersigningsessionstate)   | Fired when countersigning session state is returned via GetCountersigningSessionStateAsync.         |
+| [OnCountersigningSessionAbandonedCallBack](#oncountersigningsessionabandoned)   | Fired when a countersigning session is abandoned via AbandonCountersigningSessionAsync.             |
+| [OnPublishCountersigningSessionTriggeredCallBack](#onpublishcountersigning)     | Fired when countersigning publication is triggered via PublishCountersigningSessionAsync.           |
 
 ##### OnConnected
 Fired when the client has successfully connected to the Holochain conductor. 
@@ -925,6 +936,69 @@ private static void _holoNETClient_OnHoloNETShutdownComplete(object sender, Holo
 | IsError                                                                    | True if there was an error during the initialization, false if not.                                                                                                                                                          |
 | Message                                                                    | If there was an error this will contain the error message, this normally includes a stacktrace to help you track down the cause. If there was no error it can contain any other message such as status etc or will be blank. |
 
+<a name="ondatasent"></a>
+##### OnDataSent
+
+Fired every time raw data is sent to the Holochain conductor over the WebSocket. Useful for low-level debugging, logging wire traffic, or performance measurement.
+
+| Parameter | Description |
+|---|---|
+| EndPoint | The URI EndPoint of the Holochain conductor. |
+| RawBinaryData | The raw binary data that was sent. |
+| RawJSONData | The JSON representation of the data sent (if available). |
+| IsError | True if there was an error sending the data. |
+| Message | Error message if IsError is true. |
+
+<a name="onholochainconductorstarting"></a>
+##### OnHolochainConductorStarting
+
+Fired just before HoloNET attempts to start the Holochain Conductor process. Only raised in Embedded mode (`HolochainConductorMode = UseEmbeddedHolochainConductor` or when using `HoloNET.Client.Embedded`).
+
+<a name="onholochainconductorstarted"></a>
+##### OnHolochainConductorStarted
+
+Fired once the Holochain Conductor process has been started and HoloNET is about to connect to it. Only raised in Embedded mode. After this event fires, `OnConnected` will fire once the WebSocket connection is established.
+
+<a name="onclonecellcreatedcallback"></a>
+##### OnCloneCellCreatedCallBack
+
+Fired when a new clone cell has been created via `CreateCloneCellAsync`. Contains the new `ClonedCell` info including its `CellId`, `CloneId`, `DisabledReason`, and `OriginalDnaHash`.
+
+<a name="onclonecellenabledcallback"></a>
+##### OnCloneCellEnabledCallBack
+
+Fired when a previously disabled clone cell has been re-enabled via `EnableCloneCellAsync`.
+
+<a name="onclonecelldisabledcallback"></a>
+##### OnCloneCellDisabledCallBack
+
+Fired when a clone cell has been disabled via `DisableCloneCellAsync`.
+
+<a name="onmemproofsprovided"></a>
+##### OnMemproofsProvidedCallBack
+
+Fired when membrane proofs have been successfully submitted to the conductor via `ProvideMemproofsAsync`. Membrane proofs are used to gate entry into a DNA network — each agent must present a valid proof when joining.
+
+<a name="onwasmhostfunctionslistedcallback"></a>
+##### OnWasmHostFunctionsListedCallBack
+
+Fired when the list of host functions available to WASM zomes is returned via `ListWasmHostFunctionsAsync`. Returns `WasmHostFunctions` in the event args.
+
+<a name="oncountersigningsessionstate"></a>
+##### OnCountersigningSessionStateReturnedCallBack
+
+Fired when the current state of a countersigning session is returned via `GetCountersigningSessionStateAsync`. Countersigning allows multiple agents to co-sign a shared entry atomically.
+
+<a name="oncountersigningsessionabandoned"></a>
+##### OnCountersigningSessionAbandonedCallBack
+
+Fired when a countersigning session is abandoned via `AbandonCountersigningSessionAsync` (e.g. because a participant timed out or rejected the session).
+
+<a name="onpublishcountersigning"></a>
+##### OnPublishCountersigningSessionTriggeredCallBack
+
+Fired when publication of a completed countersigning session has been triggered via `PublishCountersigningSessionAsync`. After this the signed entry is committed to all participants' source chains.
+
 <a name="HoloNETClientMethods"></a>
 #### Methods
 
@@ -947,6 +1021,16 @@ HoloNETClient contains the following methods:
 | [ConvertHoloHashToString](#ConvertHoloHashToString)                                       | Utility method to convert from base64 bytes (Holochain Conductor format) to a friendly C# format. This is used to convert the AgentPubKey & DnaHash retrieved from the Conductor.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
 | [WaitTillReadyForZomeCallsAsync](WaitTillReadyForZomeCallsAsync)                          | This method will wait (non blocking) until HoloNET is ready to make zome calls after it has connected to the Holochain Conductor and retrived the AgentPubKey & DnaHash. It will then return to the caller with the AgentPubKey & DnaHash. This method will return the same time the [OnReadyForZomeCalls](#OnReadyForZomeCalls) event is raised. Unlike all the other methods, this one only contains an async version because the non async version would block all other threads including any UI ones etc.                                                                                                                                                                                                                                                                                                                            |
 | [MapEntryDataObject](#MapEntryDataObject)                                                 | This method maps the data returned from the Conductor zome call onto a dynamic data object passed into the [CallZomeFunction](#callzomefunction) method. Alternatively the type of the data object can be passed in, for which an instance of it will be created. Either way the now mapped and populated data object is then returned in the `ZomeFunctionCallBackEventArgs.EntryData.EntryDataObject` property during the [OnZomeFunctionCallBack](#OnZomeFunctionCallBack) event. Please see [OnZomeFunctionCallBack](#OnZomeFunctionCallBack) for more info. This method is called internally but can also be called manually and is used by the [HoloNETEntryBaseClass](#HoloNETEntryBaseClass) and [HoloNETAuditEntryBaseClass](#HoloNETAuditEntryBaseClass).                                                                       |
+| [GetAppInfoAsync](#getappinfoasync-app)                                                   | Gets AppInfo for the running hApp (role, cell ids, status). |
+| [CreateCloneCellAsync](#createclonecellasync)                                             | Creates a new clone cell from an existing role's DNA with optional modifiers. |
+| [EnableCloneCellAsync](#enableclonecellasync)                                             | Re-enables a previously disabled clone cell. |
+| [DisableCloneCellAsync](#disableclonecellasync)                                           | Disables a clone cell without deleting it. |
+| [ProvideMemproofsAsync](#providememproofsasync)                                           | Submits membrane proofs to the conductor for gated DNA networks. |
+| [ListWasmHostFunctionsAsync](#listwasmhostfunctionsasync)                                 | Returns the list of host functions exposed to WASM zomes by the conductor. |
+| [GetAppPeerMetaInfoAsync](#getapppeermetainfoasync)                                       | Returns peer meta info for a given agent URL within the app network. |
+| [GetCountersigningSessionStateAsync](#getcountersigningsessionstateasync)                 | Returns the current state of an in-progress countersigning session. |
+| [AbandonCountersigningSessionAsync](#abandoncountersigningsessionasync)                   | Abandons (cancels) an in-progress countersigning session. |
+| [PublishCountersigningSessionAsync](#publishcountersigningsessionasync)                   | Triggers publication of a completed countersigning session to the DHT. |
 
 **NOTE:** All methods contain both a non async version and async version to cater for all use case scenarios.
 
@@ -1344,6 +1428,124 @@ public dynamic MapEntryDataObject(dynamic entryDataObject, Dictionary<string, st
 | entryDataObject     | The dynamic data object to map the KeyValuePairs returned from the Holochain Conductor onto.                                                                                        |
 | keyValuePairs       | The KeyValuePairs returned from the Holochain Conductor (after they have been decoded by an internal function called `DecodeRawZomeData`) that will be mapped onto the data object. |
 
+<a name="getappinfoasync-app"></a>
+##### GetAppInfoAsync (App Client)
+
+```csharp
+public async Task<AppInfoCallBackEventArgs> GetAppInfoAsync(
+    string installedAppId = null, string roleName = null,
+    ConductorResponseCallBackMode conductorResponseCallBackMode = ...)
+public async Task<AppInfoCallBackEventArgs> GetAppInfo(
+    string installedAppId = null, string roleName = null, ...)
+```
+
+Returns the `AppInfo` for the connected hApp: status, cell IDs, agent pub key, manifest, and role info. Both sync and async variants are available. When called without arguments it uses the `InstalledAppId` from `HoloNETDNA`. Fires `OnAppInfoCallBack` when the response arrives.
+
+<a name="createclonecellasync"></a>
+##### CreateCloneCellAsync
+
+```csharp
+public async Task<CloneCellCreatedCallBackEventArgs> CreateCloneCellAsync(
+    string roleName,
+    dynamic modifiers = null,
+    byte[] membraneProof = null,
+    string name = null,
+    ConductorResponseCallBackMode conductorResponseCallBackMode = ...)
+```
+
+Creates a new clone cell from an existing role's DNA. Optionally supply `modifiers` (network seed, properties, origin time, quantum time) to produce a distinct DHT network from the same DNA. Returns the new `ClonedCell` info including its `CellId` and `CloneId`. Fires `OnCloneCellCreatedCallBack`.
+
+<a name="enableclonecellasync"></a>
+##### EnableCloneCellAsync
+
+```csharp
+public async Task<CloneCellEnabledCallBackEventArgs> EnableCloneCellAsync(
+    dynamic cloneCellId,
+    ConductorResponseCallBackMode conductorResponseCallBackMode = ...)
+```
+
+Re-enables a clone cell that was previously disabled. `cloneCellId` can be a `CloneId` string, `byte[][]` cell ID, or `CellId` object. Fires `OnCloneCellEnabledCallBack`.
+
+<a name="disableclonecellasync"></a>
+##### DisableCloneCellAsync
+
+```csharp
+public async Task<CloneCellDisabledCallBackEventArgs> DisableCloneCellAsync(
+    dynamic cloneCellId,
+    ConductorResponseCallBackMode conductorResponseCallBackMode = ...)
+```
+
+Disables a clone cell without deleting it. The cell's data is preserved; use `EnableCloneCellAsync` to bring it back, or `DeleteCloneCellAsync` (Admin) to permanently remove it. Fires `OnCloneCellDisabledCallBack`.
+
+<a name="providememproofsasync"></a>
+##### ProvideMemproofsAsync
+
+```csharp
+public async Task<MemproofsProvidedCallBackEventArgs> ProvideMemproofsAsync(
+    Dictionary<string, byte[]> membraneProofs,
+    ConductorResponseCallBackMode conductorResponseCallBackMode = ...)
+```
+
+Submits membrane proofs to the conductor keyed by role name. Required for gated DNA networks where agents must prove eligibility before they can join. Fires `OnMemproofsProvidedCallBack`.
+
+<a name="listwasmhostfunctionsasync"></a>
+##### ListWasmHostFunctionsAsync
+
+```csharp
+public async Task<WasmHostFunctionsListedCallBackEventArgs> ListWasmHostFunctionsAsync(
+    ConductorResponseCallBackMode conductorResponseCallBackMode = ...)
+```
+
+Returns the full list of host functions that the conductor exposes to WASM zomes (e.g. `hdk_entry_get`, `hdk_link_create`). Useful for diagnostics and for verifying conductor version compatibility. Fires `OnWasmHostFunctionsListedCallBack`.
+
+<a name="getapppeermetainfoasync"></a>
+##### GetAppPeerMetaInfoAsync
+
+```csharp
+public async Task<AppPeerMetaInfoReturnedCallBackEventArgs> GetAppPeerMetaInfoAsync(
+    string url,
+    List<byte[]> dnaHashes = null,
+    ConductorResponseCallBackMode conductorResponseCallBackMode = ...)
+```
+
+Returns peer meta info (agent key, agent URLs) for a specific peer identified by its URL, optionally filtered to the given DNA hashes. Fires `OnAppPeerMetaInfoReturnedCallBack`.
+
+<a name="getcountersigningsessionstateasync"></a>
+##### GetCountersigningSessionStateAsync
+
+```csharp
+public async Task<CountersigningSessionStateReturnedCallBackEventArgs>
+    GetCountersigningSessionStateAsync(
+        CellId cellId,
+        ConductorResponseCallBackMode conductorResponseCallBackMode = ...)
+```
+
+Returns the current state of an in-progress countersigning session for the given cell. Countersigning allows two or more agents to co-sign a single Holochain entry atomically — all participants must accept the session before it commits. Fires `OnCountersigningSessionStateReturnedCallBack`.
+
+<a name="abandoncountersigningsessionasync"></a>
+##### AbandonCountersigningSessionAsync
+
+```csharp
+public async Task<CountersigningSessionAbandonedCallBackEventArgs>
+    AbandonCountersigningSessionAsync(
+        CellId cellId,
+        ConductorResponseCallBackMode conductorResponseCallBackMode = ...)
+```
+
+Cancels an in-progress countersigning session. Should be called when a participant times out, rejects the entry, or needs to abort for any reason. Fires `OnCountersigningSessionAbandonedCallBack`.
+
+<a name="publishcountersigningsessionasync"></a>
+##### PublishCountersigningSessionAsync
+
+```csharp
+public async Task<PublishCountersigningSessionTriggeredCallBackEventArgs>
+    PublishCountersigningSessionAsync(
+        CellId cellId,
+        ConductorResponseCallBackMode conductorResponseCallBackMode = ...)
+```
+
+Triggers publication of a completed countersigning session. Once all participants have accepted the session, calling this method commits the co-signed entry to each participant's source chain and publishes it to the DHT. Fires `OnPublishCountersigningSessionTriggeredCallBack`.
+
 <a name="HoloNETClientProperties"></a>
 #### Properties
 
@@ -1351,7 +1553,7 @@ HoloNETClient contains the following properties:
 
 | Property                                                            | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 |---------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [Config](#config)                                                   | This property contains a struct called `HoloNETConfig` containing the sub-properties: AgentPubKey, DnaHash, FullPathToRootHappFolder, FullPathToCompiledHappFolder, HolochainConductorMode, FullPathToExternalHolochainConductorBinary, FullPathToExternalHCToolBinary, SecondsToWaitForHolochainConductorToStart, AutoStartHolochainConductor, ShowHolochainConductorWindow, AutoShutdownHolochainConductor, ShutDownALLHolochainConductors, HolochainConductorToUse, OnlyAllowOneHolochainConductorToRunAtATime, LoggingMode & ErrorHandlingBehaviour. |
+| [Config](#config)                                                   | The `HoloNETDNA` configuration object. Contains all settings for how HoloNET connects to and manages the Holochain Conductor: `AgentPubKey`, `DnaHash`, `InstalledAppId`, `HolochainConductorAdminURI` (default `ws://localhost:8000`), `HolochainConductorAppAgentURI` (default `ws://localhost:8888`), `HolochainConductorMode`, `FullPathToRootHappFolder`, `FullPathToCompiledHappFolder`, `FullPathToExternalHolochainConductorBinary`, `FullPathToExternalHCToolBinary`, `SecondsToWaitForHolochainConductorToStart`, `AutoStartHolochainConductor`, `AutoShutdownHolochainConductor`, `ShutDownALLHolochainConductors`, `OnlyAllowOneHolochainConductorToRunAtATime`, `EnforceRequestToResponseIdMatchingBehaviour`, `NetworkConfig` (Kitsune2/QUIC/bootstrap), `Kitsune2Config`, `QUICConfig`, `KeystoreConfig`, `WASMConfig`, `CacheConfig`, and all logging settings (`LogToConsole`, `LogToFile`, `LogPath`, `LogFileName`, `ShowColouredLogs`, `ErrorHandlingBehaviour`, etc.). See [Config](#config) below for full details. |
 | [WebSocket](#websocket)                                             | This property contains the internal [NextGenSoftware WebSocket](https://www.nuget.org/packages/NextGenSoftware.WebSocket) that HoloNET uses. You can use this property to access the current state of the WebSocket as well as configure more options.                                                                                                                                                                                                                                                                                                   |
 | [State](#state)                                                     | This property is a shortcut to the State property on the [WebSocket](#websocket) property above.                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
 | [EndPoint](#endpoint)                                               | This property is a shortcut to the EndPoint property on the [WebSocket](#websocket) property above.                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
@@ -1382,6 +1584,17 @@ This property contains a struct called `HoloNETConfig` containing the following 
 | LoggingMode                                | This passes through to the static LogConfig.LoggingMode property in [NextGenSoftware.Logging](https://www.nuget.org/packages/NextGenSoftware.Logging) package. It can be either `WarningsErrorsInfoAndDebug`, `WarningsErrorsAndInfo`, `WarningsAndErrors` or `ErrorsOnly`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 | ErrorHandlingBehaviour                     | An enum that specifies what to do when anm error occurs. The options are: `AlwaysThrowExceptionOnError`, `OnlyThrowExceptionIfNoErrorHandlerSubscribedToOnErrorEvent` & `NeverThrowExceptions`). The default is `OnlyThrowExceptionIfNoErrorHandlerSubscribedToOnErrorEvent` meaning it will only throw an error if the `OnError` event has not been subscribed to. This delegates error handling to the caller. If no event has been subscribed then HoloNETClient will throw an error. `AlwaysThrowExceptionOnError` will always throw an error even if the `OnError` event has been subscribed to. The `NeverThrowException` enum option will never throw an error even if the `OnError` event has not been subscribed to. Regardless of what enum is selected, the error will always be logged using whatever ILogger`s have been injected into the constructor or set on the static Logging.Loggers property.                        |
 
+| HolochainConductorAdminURI                  | The URI for the Admin WebSocket interface on the Holochain Conductor. Defaults to ws://localhost:8000. Used by HoloNETClientAdmin. |
+| HolochainConductorAppAgentURI               | The URI for the App Agent WebSocket interface on the Holochain Conductor. Defaults to ws://localhost:8888. Used by HoloNETClient for zome calls. |
+| InstalledAppId                              | The installed app ID the App Agent WebSocket connects to. Optional — if not set HoloNET uses the first available installed app. |
+| EnforceRequestToResponseIdMatchingBehaviour | Controls what happens when a conductor response ID doesn't match a pending request. Options: AlwaysError, WarnOnly (default), Ignore. |
+| NetworkConfig                               | Advanced network config: BootstrapUrl, SignalUrl, RelayUrl, WebrtcConfigJson, TargetArcFactor, DefaultTTLSeconds. Leave null for defaults. |
+| Kitsune2Config                              | Sub-configuration for Kitsune2 P2P networking (Holochain 0.4+). Leave null to use conductor defaults. |
+| QUICConfig                                  | QUIC transport configuration. Leave null for default WebSocket transport. |
+| KeystoreConfig                              | Keystore connection config — set if using an external Lair keystore over IPC instead of the built-in keystore. |
+| WASMConfig                                  | WASM compilation and runtime settings. Leave null to use conductor defaults. |
+| CacheConfig                                 | HoloNET client-side response cache: EvictionPolicy, MaxEntries, TimeoutSeconds. Not part of the conductor config — HoloNET-specific only. |
+| HolochainConductorConfigPath                | Path to the Holochain Conductor config file. Defaults to AppData\Roaming\holochain\. Used when auto-starting the conductor. |
 ##### WebSocket
 
 This property contains a refrence to the internal [NextGenSoftware WebSocket](https://www.nuget.org/packages/NextGenSoftware.WebSocket) that HoloNET uses. You can use this property to access the current state of the WebSocket as well as configure more options.
@@ -1524,6 +1737,45 @@ var admin = new HoloNETClientAdmin(holoNETConfig);
 var admin = new HoloNETClientAdmin(logger);
 var admin = new HoloNETClientAdmin(loggers);
 ```
+
+#### Events
+
+`HoloNETClientAdmin` fires all the same base events as `HoloNETClient` (`OnConnected`, `OnDisconnected`, `OnError`, etc.) plus a dedicated callback event for every admin API call:
+
+| Event | Fired by |
+|---|---|
+| `OnInstallEnableSignAndAttachHappCallBack` | `InstallEnableSignAndAttachHappAsync` |
+| `OnInstallEnableSignAttachAndConnectToHappCallBack` | `InstallEnableSignAttachAndConnectToHappAsync` |
+| `OnAgentPubKeyGeneratedCallBack` | `GenerateAgentPubKeyAsync` |
+| `OnAppInstalledCallBack` | `InstallAppAsync` |
+| `OnAppUninstalledCallBack` | `UninstallAppAsync` |
+| `OnAppEnabledCallBack` | `EnableAppAsync` |
+| `OnAppDisabledCallBack` | `DisableAppAsync` |
+| `OnAppInterfaceAttachedCallBack` | `AttachAppInterfaceAsync` |
+| `OnZomeCallCapabilityGrantedCallBack` | `AuthorizeSigningCredentialsAndGrantZomeCallCapabilityAsync` |
+| `OnZomeCallCapabilityRevokedCallBack` | `RevokeZomeCallCapabilityAsync` |
+| `OnAppsListedCallBack` | `ListAppsAsync` |
+| `OnDnasListedCallBack` | `ListDnasAsync` |
+| `OnCellIdsListedCallBack` | `ListCellIdsAsync` |
+| `OnAppInterfacesListedCallBack` | `ListInterfacesAsync` |
+| `OnCapabilityGrantsListedCallBack` | `ListCapabilityGrantsAsync` |
+| `OnAppInfoCallBack` | `GetAppInfoAsync` |
+| `OnDnaRegisteredCallBack` | `RegisterDnaAsync` |
+| `OnDnaDefinitionReturnedCallBack` | `GetDnaDefinitionAsync` |
+| `OnCoordinatorsUpdatedCallBack` | `UpdateCoordinatorsAsync` |
+| `OnStateDumpedCallBack` | `DumpStateAsync` |
+| `OnFullStateDumpedCallBack` | `DumpFullStateAsync` |
+| `OnNetworkStatsDumpedCallBack` | `DumpNetworkStatsAsync` |
+| `OnNetworkMetricsDumpedCallBack` | `DumpNetworkMetricsAsync` |
+| `OnStorageInfoReturnedCallBack` | `GetStorageInfoAsync` |
+| `OnAgentInfoReturnedCallBack` | `GetAgentInfoAsync` |
+| `OnAgentInfoAddedCallBack` | `AddAgentInfoAsync` |
+| `OnCloneCellDeletedCallBack` | `DeleteCloneCellAsync` |
+| `OnRecordsGraftedCallBack` | `GraftRecordsAsync` |
+| `OnCompatibleCellsReturnedCallBack` | `GetCompatibleCellsAsync` |
+| `OnPeerMetaInfoReturnedCallBack` | `GetPeerMetaInfoAsync` |
+| `OnAppAuthenticationTokenIssuedCallBack` | `IssueAppAuthenticationTokenAsync` |
+| `OnAppAuthenticationTokenRevokedCallBack` | `RevokeAppAuthenticationTokenAsync` |
 
 <a name="HoloNETClientAdminMethods"></a>
 #### Methods
