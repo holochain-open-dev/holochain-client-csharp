@@ -10,7 +10,7 @@
 	<Company>NextGen Software Ltd</Company>
 	<Product>HoloNET Holochain ORM</Product>
 	<Title>HoloNET Holochain ORM</Title>
-    <Description>HoloNET ORM — a powerful Object Relational Mapping layer for Holochain hApps built on HoloNET Client. Upgraded to Holochain 0.6.2. Map .NET classes directly to Rust DHT entry structs with HoloNETEntryBase and HoloNETAuditEntryBase. Batch-load entire DHT collections with HoloNETCollection<T>. Bind WPF/XAML UIs reactively with HoloNETObservableCollection<T>. Full CRUD (LoadAsync, SaveAsync, DeleteAsync), change tracking, version control, and one-method rollback — all without writing any conductor wire-protocol code. Converts any existing .NET app to a Holochain hApp with minimal changes. Ships as both lightweight (no binaries) and embedded (hc.exe + holochain.exe bundled) variants. Part of the OASIS Omniverse at https://holonet.oasisomniverse.one -- Source: https://github.com/holochain-open-dev/holochain-client-csharp</Description>
+    <Description>HoloNET ORM — a powerful Object Relational Mapping layer for Holochain hApps built on HoloNET Client. Upgraded to Holochain 0.6.2. Map .NET classes directly to Rust DHT entry structs with HoloNETEntryBase and HoloNETAuditEntryBase. Batch-load entire DHT collections with HoloNETCollection&lt;T&gt;. Bind WPF/XAML UIs reactively with HoloNETObservableCollection&lt;T&gt;. Full CRUD (LoadAsync, SaveAsync, DeleteAsync), change tracking, version control, and one-method rollback — all without writing any conductor wire-protocol code. Converts any existing .NET app to a Holochain hApp with minimal changes. Ships as both lightweight (no binaries) and embedded (hc.exe + holochain.exe bundled) variants. Part of the OASIS Omniverse at https://holonet.oasisomniverse.one -- Source: https://github.com/holochain-open-dev/holochain-client-csharp</Description>
 	<Summary Condition="'$(Embedded)' != 'true'">Powerful ORM built on top of the world's first .NET &amp; Unity Client for Holochain — now upgraded to Holochain 0.6.2 with Kitsune2 networking and the new conductor API.</Summary>
 	<Description Condition="'$(Embedded)' != 'true'">Powerful ORM built on top of HoloNET Client for Holochain. Enables rapid hApp development via HoloNETEntryBase, HoloNETAuditEntryBase, HoloNETCollection and HoloNETObservableCollection — call Load, Save, Delete with automatic change tracking and rollback. Upgraded to Holochain 0.6.2. Lightweight version: use NextGenSoftware.Holochain.HoloNET.ORM.Embedded if you want the conductor auto-started.</Description>
 	<Summary Condition="'$(Embedded)' == 'true'">Powerful ORM built on top of the world's first .NET &amp; Unity Client for Holochain, upgraded to Holochain 0.6.2, with hc.exe and holochain.exe bundled for automatic conductor management.</Summary>
@@ -31,8 +31,8 @@ The biggest HoloNET release since the original launch — full Holochain 0.6.2 c
 
 ### HoloNET ORM v4.0.0 Highlights
 - HoloNETEntryBase and HoloNETAuditEntryBase: base classes for mapping .NET models directly to Rust hApp DHT entry structs — no boilerplate
-- HoloNETCollection<T>: batch-load, save, and delete entire collections of DHT entries with a single method call
-- HoloNETObservableCollection<T>: WPF/XAML-bindable ORM collection for reactive UI apps
+- HoloNETCollection&lt;T&gt;: batch-load, save, and delete entire collections of DHT entries with a single method call
+- HoloNETObservableCollection&lt;T&gt;: WPF/XAML-bindable ORM collection for reactive UI apps
 - Full change tracking, version control, and one-method rollback on every entry
 - CRUD methods (LoadAsync, SaveAsync, DeleteAsync) handle all Holochain conductor wire protocol details for you
 - Converts any existing .NET class to a Holochain hApp entry with minimal code changes
