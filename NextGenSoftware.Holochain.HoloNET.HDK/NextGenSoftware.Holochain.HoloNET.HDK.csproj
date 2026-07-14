@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -13,10 +13,10 @@
 	  <Company>NextGen Software Ltd</Company>
 	  <Product>HoloNET HDK</Product>
 	  <Title>HoloNET HDK</Title>
-	  <Summary>Powerful .NET HDK built on top of the world's first .NET &amp; Unity Client for Holochain &amp; the WEB5 STAR ODK Omniverse Interoperable Metaverse No/Low Code Generator.</Summary>
-	  <Description>Powerful .NET HDK built on top of the world's first .NET &amp; Unity Client for Holochain &amp; the WEB5 STAR ODK Omniverse Interoperable Metaverse No/Low Code Generator.</Description>
-	  <!--<Summary>Powerful .NET HDK built on top of the world's first .NET &amp; Unity Client for Holochain &amp; the WEB5 STAR ODK Omniverse Interoperable Metaverse No/Low Code Generator. This version comes with the Holochain binaries built in.</Summary>
-	  <Description>Powerful .NET HDK built on top of the world's first .NET &amp; Unity Client for Holochain &amp; the WEB5 STAR ODK Omniverse Interoperable Metaverse No/Low Code Generator. This version comes with the Holochain binaries built in.</Description>-->
+	  <Summary>The full HoloNET .NET HDK: HoloNET Client, ORM, Manager, HyperNET and WEB5 STAR No/Low Code Generator in one meta-package. Targets Holochain 0.6.x.</Summary>
+	  <Description>The complete HoloNET .NET Holochain Development Kit -- a single meta-package that brings together HoloNET Client (zome calls, Admin API, async/event model), HoloNET ORM (HoloNETEntryBase, HoloNETAuditEntryBase, HoloNETCollection, HoloNETObservableCollection), HoloNET Manager (WPF UI showcasing all features), HyperNET (lag-free P2P gaming networking for Unity/Unreal), and the WEB5 STAR ODK No/Low Code Generator. Targets Holochain 0.6.x with Kitsune2 networking. Build hApps faster -- map C# models onto Rust structs, auto-generate Rust and C# code from metadata, and deploy to any OASIS provider. Explore the full OASIS Omniverse ecosystem at https://holonet.oasisomniverse.one -- Source: https://github.com/holochain-open-dev/holochain-client-csharp</Description>
+	  <!--<Summary>The full HoloNET .NET HDK: HoloNET Client, ORM, Manager, HyperNET and WEB5 STAR No/Low Code Generator in one meta-package. Targets Holochain 0.6.x.</Summary>
+	  <Description>The complete HoloNET .NET Holochain Development Kit -- a single meta-package that brings together HoloNET Client (zome calls, Admin API, async/event model), HoloNET ORM (HoloNETEntryBase, HoloNETAuditEntryBase, HoloNETCollection, HoloNETObservableCollection), HoloNET Manager (WPF UI showcasing all features), HyperNET (lag-free P2P gaming networking for Unity/Unreal), and the WEB5 STAR ODK No/Low Code Generator. Targets Holochain 0.6.x with Kitsune2 networking. Build hApps faster -- map C# models onto Rust structs, auto-generate Rust and C# code from metadata, and deploy to any OASIS provider. Explore the full OASIS Omniverse ecosystem at https://holonet.oasisomniverse.one -- Source: https://github.com/holochain-open-dev/holochain-client-csharp</Description>-->
 	  <PackageProjectUrl>https://holonet.oasisomniverse.one</PackageProjectUrl>
 	  <PackageIcon>hc logo.png</PackageIcon>
 	  <Authors>David Ellams (NextGen Software Ltd)</Authors>

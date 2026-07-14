@@ -1,9 +1,9 @@
-[![Project](https://img.shields.io/badge/Project-Holochain-blue.svg?style=flat-square)](http://holochain.org/)
+﻿[![Project](https://img.shields.io/badge/Project-Holochain-blue.svg?style=flat-square)](http://holochain.org/)
 [![Discord](https://img.shields.io/badge/Discord-DEV.HC-blue.svg?style=flat-square)](https://discord.gg/k55DS5dmPH)
 [![License: CAL 1.0](https://img.shields.io/badge/License-CAL%201.0-blue.svg)](https://github.com/holochain/cryptographic-autonomy-license)
 [![Twitter Follow](https://img.shields.io/twitter/follow/holochain.svg?style=social&label=Follow)](https://twitter.com/holochain)
 
-[![Project](https://img.shields.io/badge/Project-HoloNET-blue.svg?style=flat-square)](http://holo-net.com/)
+[![Project](https://img.shields.io/badge/Project-HoloNET-blue.svg?style=flat-square)](https://holonet.oasisomniverse.one/)
 [![Discord](https://img.shields.io/badge/Discord-Our_World-blue.svg?style=flat-square)](https://discord.gg/q9gMKU6)
 [![License: CAL 1.0](https://img.shields.io/badge/License-CAL%201.0-blue.svg)](https://github.com/holochain/cryptographic-autonomy-license)
 [![Twitter Follow](https://img.shields.io/twitter/follow/holochain.svg?style=social&label=Follow)](https://twitter.com/h0l0net)
@@ -63,6 +63,40 @@
         - [EndPoint](#endpoint)
       - [Logging](#logging)
         - [DefaultLogger](#defaultlogger)
+    - [HoloNETClientAdmin](#holonetclientadmin)
+      - [Methods](#HoloNETClientAdminMethods)
+        - [InstallEnableSignAndAttachHappAsync](#installenablesignandattachhappasync)
+        - [InstallEnableSignAttachAndConnectToHappAsync](#installenablesignattachandconnecttohappasync)
+        - [GenerateAgentPubKeyAsync](#generateagentpubkeyasync)
+        - [InstallAppAsync](#installappassync)
+        - [UninstallAppAsync](#uninstallappassync)
+        - [EnableAppAsync](#enableappassync)
+        - [DisableAppAsync](#disableappassync)
+        - [AttachAppInterfaceAsync](#attachappinterfaceasync)
+        - [AuthorizeSigningCredentialsAndGrantZomeCallCapabilityAsync](#authorizesigningcredentialsandgrantzomecallcapabilityasync)
+        - [RevokeZomeCallCapabilityAsync](#revokecallcapabilityasync)
+        - [ListAppsAsync](#listappsasync)
+        - [ListDnasAsync](#listdnasasync)
+        - [ListCellIdsAsync](#listcellidssasync)
+        - [ListInterfacesAsync](#listinterfacesasync)
+        - [ListCapabilityGrantsAsync](#listcapabilitygrantsasync)
+        - [GetAppInfoAsync](#getappinfoasync)
+        - [RegisterDnaAsync](#registerdnaasync)
+        - [GetDnaDefinitionAsync](#getdnadefinitionasync)
+        - [UpdateCoordinatorsAsync](#updatecoordinatorsasync)
+        - [DumpStateAsync](#dumpstateasync)
+        - [DumpFullStateAsync](#dumpfullstateasync)
+        - [DumpNetworkStatsAsync](#dumpnetworkstatsasync)
+        - [DumpNetworkMetricsAsync](#dumpnetworkmetricsasync)
+        - [GetStorageInfoAsync](#getstorageinfoasync)
+        - [GetAgentInfoAsync](#getagentinfoasync)
+        - [AddAgentInfoAsync](#addagentinfoasync)
+        - [DeleteCloneCellAsync](#deleteclonecellasync)
+        - [GraftRecordsAsync](#graftrecordsasync)
+        - [GetCompatibleCellsAsync](#getcompatiblecellsasync)
+        - [GetPeerMetaInfoAsync](#getpeermetainfoasync)
+        - [IssueAppAuthenticationTokenAsync](#issueappauthenticationtokenasync)
+        - [RevokeAppAuthenticationTokenAsync](#revokeappauthenticationtokenasync)
     - [HoloNETEntryBaseClass](#holonetentrybaseclass)
       - [Constructors](#HoloNETEntryBaseClassConstructors)
       - [Events](#HoloNETEntryBaseClassEvents)
@@ -112,6 +146,12 @@
         - [IsVersionTrackingEnabled](#IsVersionTrackingEnabled) 
         - [IsAuditTrackingEnabled](#IsAuditTrackingEnabled)
         - [IsAuditAgentCreateModifyDeleteFieldsEnabled](#IsAuditAgentCreateModifyDeleteFieldsEnabled)
+    - [HoloNETCollection](#holonetcollection)
+      - [Constructors](#HoloNETCollectionConstructors)
+      - [Events](#HoloNETCollectionEvents)
+      - [Methods](#HoloNETCollectionMethods)
+      - [Properties](#HoloNETCollectionProperties)
+    - [HoloNETObservableCollection](#holonetobservablecollection)
     - [Test Harness](#test-harness)
   - [HoloOASIS](#holooasis)
   - [HoloUnity](#holounity)
@@ -198,14 +238,14 @@ Finally this release also features HoloNET HyperNET allowing Unity and Unreal ga
 
 This is the BIGGEST update to HoloNET to date and is pretty much a whole new product now! ;-)
 
-**NOTE: The documentation is still for the previous version, please bare with us while we update this soon... thank you!**
+**NOTE:** The HoloNETClientAdmin, HoloNETCollection, and HoloNETObservableCollection sections have been fully documented below. Some older sections still reference v2/v3 behaviour — these will be updated as part of the v4 documentation refresh.
 
 Read more here:
 https://github.com/holochain-open-dev/holochain-client-csharp/releases/tag/v3.0.0
 
 **This also now includes a msi installer for the HoloNET Manager so is the first real world deployment of HolonNET! Yay! :) This is a MAJOR milestone and shows and proves HoloNET working in a real world use case so you can give it a go yourself and give us vital feedback, thank you! :)**
 
-[HoloNET Manager v3.1.0](https://www.oasisweb4.com/downloads/HoloNET_Manager_v3.1.0.msi)
+[HoloNET Manager v3.1.0](https://oasisomniverse.one/downloads/HoloNET_Manager_v3.1.0.msi)
 
 **This is the UI to HoloNET and is also used to demo and test all functionality of HoloNET Client and HoloNET ORM. Read more about this above.**
 
@@ -224,25 +264,25 @@ https://www.gofundme.com/f/help-david-get-over-the-line-with-holonet-oasis-and-s
 ## HoloNET Code Has Migrated
 
 This code was migrated from the main OASIS API/STAR Metaverse/HoloNET/.NET HDK code found here:
-https://github.com/NextGenSoftwareUK/Our-World-OASIS-API-HoloNET-HoloUnity-And-.NET-HDK
+https://github.com/NextGenSoftwareUK/OASIS
 
 ## Background
 
 Original HoloNET code was written back in 2019 and was fully operational with the previous version of Holochain (Redux), but unfortuntley had issues getting it working with RSM (Refactored State Model/latest version)
 
-https://www.ourworldthegame.com/single-post/2019/08/14/world-exclusive-holochain-talking-to-unity
+https://oasisomniverse.one/single-post/2019/08/14/world-exclusive-holochain-talking-to-unity
 
 The previous version also came bundled with the holochain conductor so it could auto-start/shutdown the conductor and be fully integrated with any .NET or Unity application. This code/fuctionaility is still in there and will now work again that we have a Windows binary again (NixOS broke this feature previously).
 
 It was featured on Dev Pulse 44 here: \
 https://medium.com/holochain/updated-quick-start-guide-the-gift-of-holonet-and-conversations-that-matter-on-the-holochain-8e08efde1f58 \
-https://www.ourworldthegame.com/single-post/2019/09/10/holonet-was-featured-in-the-latest-holochain-dev-pulse
+https://oasisomniverse.one/single-post/2019/09/10/holonet-was-featured-in-the-latest-holochain-dev-pulse
 
 ## Initial RSM Version
 
 We are pleased that after nearly 2 years we have now finally got this upgraded to work with RSM thanks to Connors help, who we are eternally grateful to! :)
 
-https://www.ourworldthegame.com/single-post/holonet-rsm-breakthrough-at-long-last
+https://oasisomniverse.one/single-post/holonet-rsm-breakthrough-at-long-last
 
 Please check out the above link, there you will find more details on what has changed from the previous Redux HoloNET version as well as some documentation on how to use it... :)
 
@@ -1461,6 +1501,375 @@ public interface ILogger
 The Shutdown method is not used by the `DefaultLogger`, and so far is only used by the [NextGenSoftware.Logging.NLog](https://www.nuget.org/packages/NextGenSoftware.Logging.Nlog) package.
 
 
+<a name="holonetclientadmin"></a>
+### HoloNETClientAdmin
+
+`HoloNETClientAdmin` is the full implementation of the **Holochain Conductor Admin API** — it is on complete parity with the official JavaScript and Rust clients. It connects to the conductor's admin interface (default `ws://localhost:8000`) and lets you install, enable, disable, and uninstall hApps; manage agent keys; register and inspect DNAs; attach app interfaces; grant and revoke capability tokens; and diagnose network/storage state — all from .NET with async/await and rich event callbacks.
+
+> **Quick-start** — for most use cases you will only need the two composite helpers `InstallEnableSignAndAttachHappAsync` and `InstallEnableSignAttachAndConnectToHappAsync`. They call all the individual steps in the right order for you.
+
+#### Constructors
+
+```csharp
+// Connect to default admin port ws://localhost:8000
+var admin = new HoloNETClientAdmin();
+
+// Specify admin websocket URI
+var admin = new HoloNETClientAdmin("ws://localhost:8000");
+
+// With custom HoloNETConfig
+var admin = new HoloNETClientAdmin(holoNETConfig);
+
+// With injected logger(s)
+var admin = new HoloNETClientAdmin(logger);
+var admin = new HoloNETClientAdmin(loggers);
+```
+
+<a name="HoloNETClientAdminMethods"></a>
+#### Methods
+
+<a name="installenablesignandattachhappasync"></a>
+##### InstallEnableSignAndAttachHappAsync
+
+```csharp
+Task<InstallEnableSignAndAttachHappEventArgs> InstallEnableSignAndAttachHappAsync(
+    string hAppId, string hAppPath, string agentKey = null, ...)
+Task<InstallEnableSignAndAttachHappEventArgs> InstallEnableSignAndAttachHappAsync(
+    string hAppId, AppBundle appBundle, string agentKey = null, ...)
+```
+
+**Composite helper** — performs in sequence: `GenerateAgentPubKey` (if no agentKey supplied) → `InstallApp` → `EnableApp` → `AuthorizeSigningCredentials` → `AttachAppInterface`. Returns a single `InstallEnableSignAndAttachHappEventArgs` with the app info, agent pub key, cell IDs, and the attached port. This is the recommended entry point for installing a new hApp.
+
+<a name="installenablesignattachandconnecttohappasync"></a>
+##### InstallEnableSignAttachAndConnectToHappAsync
+
+```csharp
+Task<InstallEnableSignAttachAndConnectToHappEventArgs> InstallEnableSignAttachAndConnectToHappAsync(
+    string hAppId, string hAppPath, string agentKey = null, ...)
+```
+
+Same as above but also creates and returns a connected `HoloNETClient` instance (app websocket) ready to make zome calls immediately. The most convenient way to go from a `.happ` file to fully connected and ready to call zomes.
+
+<a name="generateagentpubkeyasync"></a>
+##### GenerateAgentPubKeyAsync
+
+```csharp
+Task<AgentPubKeyGeneratedCallBackEventArgs> GenerateAgentPubKeyAsync(
+    ConductorResponseCallBackMode mode = ConductorResponseCallBackMode.WaitForResponse)
+```
+
+Asks the conductor to generate a new agent key pair (Ed25519). Returns the agent public key as both a byte array and a Base64 string. You need this before installing a hApp.
+
+<a name="installappassync"></a>
+##### InstallAppAsync
+
+```csharp
+Task<AppInstalledCallBackEventArgs> InstallAppAsync(
+    string installedAppId, string hAppPath, string agentKey, ...)
+Task<AppInstalledCallBackEventArgs> InstallAppAsync(
+    string installedAppId, AppBundle appBundle, string agentKey, ...)
+```
+
+Installs a hApp from a `.happ` file path or a pre-loaded `AppBundle` object. The `installedAppId` is the human-readable name you give the installation (e.g. `"my-app"`). The app is installed in the **disabled** state; call `EnableAppAsync` next.
+
+<a name="uninstallappassync"></a>
+##### UninstallAppAsync
+
+```csharp
+Task<AppUninstalledCallBackEventArgs> UninstallAppAsync(string installedAppId, ...)
+```
+
+Permanently removes a hApp installation. All cells are deleted; the DHT data remains on the network but the local agent is removed.
+
+<a name="enableappassync"></a>
+##### EnableAppAsync
+
+```csharp
+Task<AppEnabledCallBackEventArgs> EnableAppAsync(string installedAppId, ...)
+```
+
+Transitions the hApp from `Disabled` → `Enabled` (active). Must be called after `InstallAppAsync` before you can connect an app websocket or make zome calls.
+
+<a name="disableappassync"></a>
+##### DisableAppAsync
+
+```csharp
+Task<AppDisabledCallBackEventArgs> DisableAppAsync(string installedAppId, ...)
+```
+
+Pauses a hApp without uninstalling it. Useful for maintenance or temporarily suspending an agent.
+
+<a name="attachappinterfaceasync"></a>
+##### AttachAppInterfaceAsync
+
+```csharp
+Task<AppInterfaceAttachedCallBackEventArgs> AttachAppInterfaceAsync(
+    UInt16? port = null, ...)
+```
+
+Instructs the conductor to open an app WebSocket interface on the given port (or a random port if `null`). The returned event args include the actual port. You then connect a `HoloNETClient` to that port to make zome calls.
+
+<a name="authorizesigningcredentialsandgrantzomecallcapabilityasync"></a>
+##### AuthorizeSigningCredentialsAndGrantZomeCallCapabilityAsync
+
+```csharp
+Task<ZomeCallCapabilityGrantedCallBackEventArgs>
+    AuthorizeSigningCredentialsAndGrantZomeCallCapabilityAsync(
+        byte[][] cellId, GrantedFunctions grantedFunctions, ...)
+Task<ZomeCallCapabilityGrantedCallBackEventArgs>
+    AuthorizeSigningCredentialsAndGrantZomeCallCapabilityAsync(
+        string agentPubKey, string dnaHash, GrantedFunctions grantedFunctions, ...)
+```
+
+Generates a signing key pair and writes a zome-call capability grant into the conductor so the agent can sign zome calls. Call this once after `EnableAppAsync`. Pass `GrantedFunctions.All()` to grant all zomes/functions, or `GrantedFunctions.Listed(...)` to restrict to a specific set.
+
+```csharp
+// Grant access to all zome functions
+var result = await admin.AuthorizeSigningCredentialsAndGrantZomeCallCapabilityAsync(
+    agentPubKey, dnaHash, GrantedFunctions.All());
+
+// Grant access to specific zome functions only
+var result = await admin.AuthorizeSigningCredentialsAndGrantZomeCallCapabilityAsync(
+    agentPubKey, dnaHash,
+    GrantedFunctions.Listed(new List<(string, string)>
+    {
+        ("oasis", "create_entry_avatar"),
+        ("oasis", "get_entry_avatar"),
+        ("oasis", "update_entry_avatar"),
+        ("oasis", "delete_entry_avatar"),
+    }));
+```
+
+<a name="revokecallcapabilityasync"></a>
+##### RevokeZomeCallCapabilityAsync
+
+```csharp
+Task<ZomeCallCapabilityRevokedCallBackEventArgs> RevokeZomeCallCapabilityAsync(
+    byte[] actionHash, CellId cellId, ...)
+```
+
+Revokes a previously granted capability token identified by its action hash.
+
+<a name="listappsasync"></a>
+##### ListAppsAsync
+
+```csharp
+Task<AppsListedCallBackEventArgs> ListAppsAsync(AppStatusFilter appStatusFilter, ...)
+```
+
+Returns all installed hApps matching the filter (`Running`, `Stopped`, `Disabled`, `Paused`, or `All`).
+
+<a name="listdnasasync"></a>
+##### ListDnasAsync
+
+```csharp
+Task<DnasListedCallBackEventArgs> ListDnasAsync(...)
+```
+
+Returns the hashes of all DNA bundles registered with the conductor.
+
+<a name="listcellidssasync"></a>
+##### ListCellIdsAsync
+
+```csharp
+Task<CellIdsListedCallBackEventArgs> ListCellIdsAsync(...)
+```
+
+Returns all cell IDs (agentPubKey + dnaHash pairs) currently held by the conductor.
+
+<a name="listinterfacesasync"></a>
+##### ListInterfacesAsync
+
+```csharp
+Task<AppInterfacesListedCallBackEventArgs> ListInterfacesAsync(...)
+```
+
+Returns all app WebSocket interface ports currently open on the conductor.
+
+<a name="listcapabilitygrantsasync"></a>
+##### ListCapabilityGrantsAsync
+
+```csharp
+Task<CapabilityGrantsListedCallBackEventArgs> ListCapabilityGrantsAsync(
+    string installedAppId, bool includeRevoked = false, ...)
+```
+
+Lists all capability grants for a hApp, with an option to include revoked ones.
+
+<a name="getappinfoasync"></a>
+##### GetAppInfoAsync
+
+```csharp
+Task<GetAppInfoCallBackEventArgs> GetAppInfoAsync(string installedAppId, ...)
+```
+
+Returns the full `AppInfo` for the given hApp: status, cell IDs, agent pub key, manifest, and more.
+
+<a name="registerdnaasync"></a>
+##### RegisterDnaAsync
+
+```csharp
+Task<DnaRegisteredCallBackEventArgs> RegisterDnaAsync(string path, string network_seed = null, ...)
+Task<DnaRegisteredCallBackEventArgs> RegisterDnaAsync(byte[] hash, ...)
+Task<DnaRegisteredCallBackEventArgs> RegisterDnaAsync(DnaBundle bundle, ...)
+```
+
+Registers a DNA with the conductor from a `.dna` file path, hash, or pre-loaded bundle. Optionally provide a `network_seed` to create a separate DHT network for the same DNA (useful for testing isolation).
+
+<a name="getdnadefinitionasync"></a>
+##### GetDnaDefinitionAsync
+
+```csharp
+Task<DnaDefinitionReturnedCallBackEventArgs> GetDnaDefinitionAsync(byte[] dnaHash, ...)
+Task<DnaDefinitionReturnedCallBackEventArgs> GetDnaDefinitionAsync(string dnaHash, ...)
+```
+
+Returns the full DNA definition (name, network seed, properties, integrity zomes, coordinator zomes) for the given DNA hash.
+
+<a name="updatecoordinatorsasync"></a>
+##### UpdateCoordinatorsAsync
+
+```csharp
+Task<CoordinatorsUpdatedCallBackEventArgs> UpdateCoordinatorsAsync(
+    byte[] dnaHash, string path, ...)
+Task<CoordinatorsUpdatedCallBackEventArgs> UpdateCoordinatorsAsync(
+    byte[] dnaHash, CoordinatorBundle bundle, ...)
+```
+
+Hot-swaps coordinator zome bytecode without touching integrity zomes or DHT data. Enables live upgrades to hApp business logic.
+
+<a name="dumpstateasync"></a>
+##### DumpStateAsync
+
+```csharp
+Task<StateDumpedCallBackEventArgs> DumpStateAsync(byte[][] cellId, ...)
+Task<StateDumpedCallBackEventArgs> DumpStateAsync(string agentPubKey, string dnaHash, ...)
+Task<StateDumpedCallBackEventArgs> DumpStateAsync(...)  // uses current agent/dna
+```
+
+Dumps the source chain and DHT state for the given cell as JSON. Useful for debugging.
+
+<a name="dumpfullstateasync"></a>
+##### DumpFullStateAsync
+
+```csharp
+Task<FullStateDumpedCallBackEventArgs> DumpFullStateAsync(byte[][] cellId, int? dHTOpsCursor = null, ...)
+Task<FullStateDumpedCallBackEventArgs> DumpFullStateAsync(string agentPubKey, string dnaHash, ...)
+Task<FullStateDumpedCallBackEventArgs> DumpFullStateAsync(...)
+```
+
+Like `DumpStateAsync` but includes full DHT operations. Supports paging via `dHTOpsCursor`.
+
+<a name="dumpnetworkstatsasync"></a>
+##### DumpNetworkStatsAsync
+
+```csharp
+Task<NetworkStatsDumpedCallBackEventArgs> DumpNetworkStatsAsync(...)
+```
+
+Returns JSON statistics from the Kitsune2 P2P networking layer: peer counts, bandwidth, gossip metrics.
+
+<a name="dumpnetworkmetricsasync"></a>
+##### DumpNetworkMetricsAsync
+
+```csharp
+Task<NetworkMetricsDumpedCallBackEventArgs> DumpNetworkMetricsAsync(...)
+```
+
+Returns detailed timing and throughput metrics from the networking layer.
+
+<a name="getstorageinfoasync"></a>
+##### GetStorageInfoAsync
+
+```csharp
+Task<StorageInfoReturnedCallBackEventArgs> GetStorageInfoAsync(...)
+```
+
+Returns disk usage information for all cells: source chain size and DHT store size in bytes.
+
+<a name="getagentinfoasync"></a>
+##### GetAgentInfoAsync
+
+```csharp
+Task<AgentInfoReturnedCallBackEventArgs> GetAgentInfoAsync(byte[][] cellId, ...)
+Task<AgentInfoReturnedCallBackEventArgs> GetAgentInfoAsync(string agentPubKey, string dnaHash, ...)
+Task<AgentInfoReturnedCallBackEventArgs> GetAgentInfoAsync(...)
+```
+
+Returns gossip peer info for the given cell from the local node's perspective.
+
+<a name="addagentinfoasync"></a>
+##### AddAgentInfoAsync
+
+```csharp
+Task<AgentInfoAddedCallBackEventArgs> AddAgentInfoAsync(AgentInfo[] agentInfos, ...)
+```
+
+Manually injects agent peer info records, useful for bootstrapping isolated test networks or seeding known peers.
+
+<a name="deleteclonecellasync"></a>
+##### DeleteCloneCellAsync
+
+```csharp
+Task<CloneCellDeletedCallBackEventArgs> DeleteCloneCellAsync(string appId, string roleName, ...)
+Task<CloneCellDeletedCallBackEventArgs> DeleteCloneCellAsync(string appId, byte[][] cellId, ...)
+Task<CloneCellDeletedCallBackEventArgs> DeleteCloneCellAsync(string appId, string agentPubKey, string dnaHash, ...)
+Task<CloneCellDeletedCallBackEventArgs> DeleteCloneCellAsync(string appId, ...)
+```
+
+Permanently removes a clone cell from a hApp. The role can be identified by role name, cell ID, or agent/DNA hash pair.
+
+<a name="graftrecordsasync"></a>
+##### GraftRecordsAsync
+
+```csharp
+Task<RecordsGraftedCallBackEventArgs> GraftRecordsAsync(
+    byte[][] cellId, bool validate, object[] records, ...)
+```
+
+Inserts pre-existing source chain records into a cell, optionally running validation. Used for migrating or recovering data.
+
+<a name="getcompatiblecellsasync"></a>
+##### GetCompatibleCellsAsync
+
+```csharp
+Task<CompatibleCellsReturnedCallBackEventArgs> GetCompatibleCellsAsync(byte[] dnaHash, ...)
+```
+
+Returns cell IDs that share the same integrity DNA hash, indicating they can share data.
+
+<a name="getpeermetainfoasync"></a>
+##### GetPeerMetaInfoAsync
+
+```csharp
+Task<PeerMetaInfoReturnedCallBackEventArgs> GetPeerMetaInfoAsync(
+    string url, List<byte[]> dnaHashes = null, ...)
+```
+
+Returns the meta info (agent key, URLs, etc.) for a peer identified by its agent URL.
+
+<a name="issueappauthenticationtokenasync"></a>
+##### IssueAppAuthenticationTokenAsync
+
+```csharp
+Task<AppAuthenticationTokenIssuedCallBackEventArgs> IssueAppAuthenticationTokenAsync(
+    string installedAppId, ...)
+```
+
+Issues a one-time authentication token that allows an app WebSocket client to connect to the app interface without knowing the admin credentials. Used when exposing hApps to end-user clients.
+
+<a name="revokeappauthenticationtokenasync"></a>
+##### RevokeAppAuthenticationTokenAsync
+
+```csharp
+Task<AppAuthenticationTokenRevokedCallBackEventArgs> RevokeAppAuthenticationTokenAsync(
+    byte[] token, ...)
+```
+
+Invalidates a previously issued app authentication token.
+
+---
+
 ### HoloNETEntryBaseClass
 
 This is a new abstract class introduced in HoloNET 2 that wraps around the HoloNETClient so you do not need to interact with the client directly. Instead it allows very simple CRUD operations ([Load](#loadHoloNETEntryBaseClass), [Save](#saveHoloNETEntryBaseClass) & [Delete](#deleteHoloNETEntryBaseClass)) to be performed on your custom data object that extends this class. Your custom data object represents the data (Holochain Entry) returned from a zome call and HoloNET will handle the mapping onto your data object automatically.
@@ -2388,6 +2797,147 @@ Set this to true if you wish to enable Audit Tracking (the AuditEntries property
 Set this to true if you wish to update the CreatedDate, CreatedBy, ModifiedDate, ModifiedBy, DeletedData & DeletedBy properties each time the entry/object is saved or deleted (you will need to make sure your hApp rust code has the created_date, created_by, modified_date, modified_by, deleted_date & deleted_by fields in your entry struct).
 
 
+<a name="holonetcollection"></a>
+### HoloNETCollection
+
+`HoloNETCollection<T>` is a generic typed collection (extends `List<T>`) for working with sets of Holochain entries that all share the same zome. It wraps `HoloNETClient` and handles all the loading, saving, adding, and removing of entries to/from an anchor-based collection on the DHT — including batch save, change tracking, and rollback. `T` must extend `HoloNETEntryBase`.
+
+#### Example
+
+```csharp
+// Define your entry class
+public class Avatar : HoloNETEntryBaseClass
+{
+    public Avatar() : base("oasis", "get_entry_avatar", "create_entry_avatar",
+                           "update_entry_avatar", "delete_entry_avatar") { }
+
+    [HolochainFieldName("first_name")] public string FirstName { get; set; }
+    [HolochainFieldName("last_name")]  public string LastName  { get; set; }
+}
+
+// Create and use the collection
+var collection = new HoloNETCollection<Avatar>(
+    zomeName: "oasis",
+    zomeLoadCollectionFunction: "get_all_avatars",
+    zomeAddEntryToCollectionFunction: "add_avatar_to_collection",
+    zomeRemoveEntryFromCollectionFunction: "remove_avatar_from_collection",
+    zomeBatchUpdateCollectionFunction: "batch_update_avatars"
+);
+
+collection.OnInitialized += (sender, args) => Console.WriteLine("Ready!");
+collection.OnCollectionLoaded += (sender, args) =>
+    Console.WriteLine($"Loaded {args.Entries.Count} avatars");
+
+await collection.InitializeAsync();
+var result = await collection.LoadCollectionAsync();
+
+// Add a new entry and save in one call
+var newAvatar = new Avatar { FirstName = "Jane", LastName = "Doe" };
+await collection.AddHoloNETEntryToCollectionAndSaveAsync(newAvatar);
+
+// Save all pending changes (add/remove/update) in one batch call
+await collection.SaveCollectionAsync();
+```
+
+<a name="HoloNETCollectionConstructors"></a>
+#### Constructors
+
+```csharp
+// Auto-creates internal HoloNETClient (use when you have only one collection)
+public HoloNETCollection(string zomeName,
+    string zomeLoadCollectionFunction,
+    string zomeAddEntryToCollectionFunction,
+    string zomeRemoveEntryFromCollectionFunction,
+    string zomeBatchUpdateCollectionFunction,
+    bool autoCallInitialize = true,
+    string holochainConductorURI = "ws://localhost:8888",
+    HoloNETConfig holoNETConfig = null, ...)
+
+// Shares a HoloNETClient with other entries/collections
+public HoloNETCollection(string zomeName, ...,
+    HoloNETClient holoNETClient, ...)
+
+// With custom HoloNETConfig
+public HoloNETCollection(string zomeName, ...,
+    HoloNETConfig holoNETConfig, ...)
+```
+
+<a name="HoloNETCollectionEvents"></a>
+#### Events
+
+| Event | Description |
+|---|---|
+| `OnInitialized` | Fired when the collection has connected to the conductor and is ready to load/save. |
+| `OnCollectionLoaded` | Fired when `LoadCollectionAsync` completes. `args.Entries` contains the loaded items. |
+| `OnCollectionSaved` | Fired when `SaveCollectionAsync` completes. Includes lists of added, updated, and removed entries. |
+| `OnHoloNETEntryAddedToCollection` | Fired when an entry is added and saved via `AddHoloNETEntryToCollectionAndSaveAsync`. |
+| `OnHoloNETEntryRemovedFromCollection` | Fired when an entry is removed and saved via `RemoveHoloNETEntryFromCollectionAndSaveAsync`. |
+| `OnClosed` | Fired when `CloseAsync` completes. |
+| `OnError` | Fired on any error in the collection or underlying HoloNETClient. |
+
+<a name="HoloNETCollectionMethods"></a>
+#### Methods
+
+| Method | Description |
+|---|---|
+| `InitializeAsync(...)` | Connects to the conductor and retrieves AgentPubKey/DnaHash. Call once before loading. |
+| `LoadCollectionAsync(collectionAnchor, ...)` | Loads all entries for the given anchor. Returns `HoloNETCollectionLoadedResult<T>`. |
+| `SaveCollectionAsync(...)` | Sends all pending adds, updates, and removes to the conductor in one batch call. |
+| `AddHoloNETEntryToCollectionAndSaveAsync(entry, saveHoloNETEntry, collectionAnchor)` | Adds an entry to the collection and immediately persists both the entry and the anchor link. |
+| `RemoveHoloNETEntryFromCollectionAndSaveAsync(entry, deleteHoloNETEntry, collectionAnchor)` | Removes an entry from the collection and optionally soft-deletes the entry itself. |
+| `CloseAsync(...)` | Disconnects and optionally shuts down the Holochain conductor. |
+
+<a name="HoloNETCollectionProperties"></a>
+#### Properties
+
+| Property | Description |
+|---|---|
+| `HoloNETClient` | The underlying `HoloNETClient` instance. Can be shared with other collections/entries. |
+| `ZomeName` | Name of the Rust zome this collection maps onto. |
+| `ZomeLoadCollectionFunction` | Rust zome function used to load all entries in the collection. |
+| `ZomeAddEntryToCollectionFunction` | Rust zome function used to link a new entry to the anchor. |
+| `ZomeRemoveEntryFromCollectionFunction` | Rust zome function used to remove an entry link from the anchor. |
+| `ZomeBatchUpdateCollectionFunction` | Rust zome function used for batched saves of all pending changes. |
+| `IsInitializing` | `true` while the collection is connecting to the conductor. |
+| `IsInitialized` | `true` once connected and ready for zome calls. |
+| `IsChanges` | `true` if there are unsaved adds or removes since the last save/load. |
+| `EntriesAddedSinceLastSaved` | List of entries added but not yet persisted. |
+| `EntriesRemovedSinceLastSaved` | List of entries removed but not yet persisted. |
+| `OriginalEntries` | Snapshot of the entries as they were after the last load/save — used for change tracking and rollback. |
+
+---
+
+<a name="holonetobservablecollection"></a>
+### HoloNETObservableCollection
+
+`HoloNETObservableCollection<T>` is identical to [HoloNETCollection](#holonetcollection) in every way — same constructors, events, methods, and properties — but it extends `ObservableCollection<T>` instead of `List<T>`. This means it fires `INotifyCollectionChanged` and `INotifyPropertyChanged` events automatically whenever entries are added or removed, making it the right choice for **WPF, MAUI, Uno, and OpenSilver** data-binding scenarios where the UI needs to update automatically.
+
+```csharp
+// In a WPF ViewModel — bind directly to the collection in XAML
+public HoloNETObservableCollection<Avatar> Avatars { get; } =
+    new HoloNETObservableCollection<Avatar>(
+        "oasis",
+        "get_all_avatars",
+        "add_avatar_to_collection",
+        "remove_avatar_from_collection",
+        "batch_update_avatars");
+```
+
+```xml
+<!-- XAML data binding — updates automatically as entries load/save/remove -->
+<ListView ItemsSource="{Binding Avatars}">
+    <ListView.ItemTemplate>
+        <DataTemplate>
+            <TextBlock Text="{Binding FirstName}" />
+        </DataTemplate>
+    </ListView.ItemTemplate>
+</ListView>
+```
+
+The `HoloNET Manager` WPF application (see `NextGenSoftware.Holochain.HoloNET.Manager`) uses `HoloNETObservableCollection` throughout and is the reference implementation for UI-bound Holochain data in .NET.
+
+---
+
 ### Test Harness
 
 You can find the Test Harness here:
@@ -2448,22 +2998,22 @@ The External enum was to be used by any other external implementation that imple
 
 ## HoloOASIS
 
-`HoloOASIS` uses the [HoloNETClient](#how-to-use-holonet) to implement a Storage Provider ([IOASISStorage](https://github.com/NextGenSoftwareUK/Our-World-OASIS-API-HoloNET-HoloUnity-And-.NET-HDK#ioasisstorage)) for the OASIS System. It will soon also implement a Network Provider ([IOASISNET](https://github.com/NextGenSoftwareUK/Our-World-OASIS-API-HoloNET-HoloUnity-And-.NET-HDK#ioasisnet))
- for the OASIS System that will leverage Holochain to create it's own private de-centralised distributed network called `ONET` (as seen on the [OASIS Architecture Diagram](https://github.com/NextGenSoftwareUK/Our-World-OASIS-API-HoloNET-HoloUnity-And-.NET-HDK#the-oasis-architecture)).
+`HoloOASIS` uses the [HoloNETClient](#how-to-use-holonet) to implement a Storage Provider ([IOASISStorage](https://github.com/NextGenSoftwareUK/OASIS#ioasisstorage)) for the OASIS System. It will soon also implement a Network Provider ([IOASISNET](https://github.com/NextGenSoftwareUK/OASIS#ioasisnet))
+ for the OASIS System that will leverage Holochain to create it's own private de-centralised distributed network called `ONET` (as seen on the [OASIS Architecture Diagram](https://github.com/NextGenSoftwareUK/OASIS#the-oasis-architecture)).
 
 This is a good example to see how to use [HoloNETClient](#how-to-use-holonet) in a real world game/platform (OASIS/Our World).
 
-Check out the [full documentation here](https://github.com/NextGenSoftwareUK/Our-World-OASIS-API-HoloNET-HoloUnity-And-.NET-HDK/#holooasis).
+Check out the [full documentation here](https://github.com/NextGenSoftwareUK/OASIS/#holooasis).
 
 ## HoloUnity
 
 We will soon be creating a Asset for the Unity Asset Store that will include [HoloNET](#how-to-use-holonet) along with Unity wrappers and examples of how to use [HoloNET](#how-to-use-holonet) inside Unity.
 
-In the codebase you will find a project called [NextGenSoftware.OASIS.API.FrontEnd.Unity](https://github.com/NextGenSoftwareUK/Our-World-OASIS-API-HoloNET-HoloUnity-And-.NET-HDK/tree/master/NextGenSoftware.OASIS.API.FrontEnd.Unity), which shows how the `AvatarManager` found inside the `OASIS API Core` ([NextGenSoftware.OASIS.API.Core](https://github.com/NextGenSoftwareUK/Our-World-OASIS-API-HoloNET-HoloUnity-And-.NET-HDK#project-structure)) is used. When you instantiate the `AvatarManager` you inject into a Storage Provider that implements the [IOASISStorage](https://github.com/NextGenSoftwareUK/Our-World-OASIS-API-HoloNET-HoloUnity-And-.NET-HDK#ioasisstorage) interface. Currently the only provider implemented is the [HoloOASIS](https://github.com/NextGenSoftwareUK/Our-World-OASIS-API-HoloNET-HoloUnity-And-.NET-HDK#holooasis) Provider.
+In the codebase you will find a project called [NextGenSoftware.OASIS.API.FrontEnd.Unity](https://github.com/NextGenSoftwareUK/OASIS/tree/master/NextGenSoftware.OASIS.API.FrontEnd.Unity), which shows how the `AvatarManager` found inside the `OASIS API Core` ([NextGenSoftware.OASIS.API.Core](https://github.com/NextGenSoftwareUK/OASIS#project-structure)) is used. When you instantiate the `AvatarManager` you inject into a Storage Provider that implements the [IOASISStorage](https://github.com/NextGenSoftwareUK/OASIS#ioasisstorage) interface. Currently the only provider implemented is the [HoloOASIS](https://github.com/NextGenSoftwareUK/OASIS#holooasis) Provider.
 
 The actual Our World Unity code is not currently stored in this repo due to size restrictions but we may consider using GitHub LFS (Large File Storage) later on. We are also looking at GitLab and other alternatives to see if they allow greater storage capabilities free out of the box (since we are currently working on a very tight budget but you could change that by donating below! ;-) ).
 
-![alt text](https://github.com/NextGenSoftwareUK/Our-World-OASIS-API-HoloNET-HoloUnity-And-.NET-HDK/blob/master/Images/HolochainTalkingToUnity.jpg "Holochain talking to Unity")
+![alt text](https://github.com/NextGenSoftwareUK/OASIS/blob/master/Images/HolochainTalkingToUnity.jpg "Holochain talking to Unity")
 
 Here is a preview of the OASIS API/Avatar/Karma System... more to come soon... ;-)
 
@@ -2471,7 +3021,7 @@ Here is a preview of the OASIS API/Avatar/Karma System... more to come soon... ;
 
 ### Using HoloUnity
 
-You start by instantiating the `AvatarManager` class found within the [NextGenSoftware.OASIS.API.Core](#https://github.com/NextGenSoftwareUK/Our-World-OASIS-API-HoloNET-HoloUnity-And-.NET-HDK/tree/master/NextGenSoftware.OASIS.API.Core) project.
+You start by instantiating the `AvatarManager` class found within the [NextGenSoftware.OASIS.API.Core](#https://github.com/NextGenSoftwareUK/OASIS/tree/master/NextGenSoftware.OASIS.API.Core) project.
 
 ````c#
 // Inject in the HoloOASIS Storage Provider (this could be moved to a config file later so the 
@@ -2709,7 +3259,7 @@ In the meantime people can make use of this NuGet package.
 
 ### .NET HDK Low Code Generator
 
-We can then get back to the .NET HDK Low Code Generator (will migrate this [repo](https://github.com/NextGenSoftwareUK/Our-World-OASIS-API-HoloNET-HoloUnity-And-.NET-HDK/tree/master/NextGenSoftware.Holochain.HoloNET.HDK.Core) over to here soon...), this uses HoloNET to call into the dynamically generated rust and c# code. The rust code acts as a DAL (Data Access Layer) and the C# code acts as the BLL (Business Logic Layer). The generated C# code wraps around calls to HoloNET. This code has also already been written and is working with the previous version of Holochain (Redux).
+We can then get back to the .NET HDK Low Code Generator (will migrate this [repo](https://github.com/NextGenSoftwareUK/OASIS/tree/master/NextGenSoftware.Holochain.HoloNET.HDK.Core) over to here soon...), this uses HoloNET to call into the dynamically generated rust and c# code. The rust code acts as a DAL (Data Access Layer) and the C# code acts as the BLL (Business Logic Layer). The generated C# code wraps around calls to HoloNET. This code has also already been written and is working with the previous version of Holochain (Redux).
 
 This also allows devs to make use of all the libraries and resources available to them in Rust, .NET & Unity! 😊
 
@@ -2726,7 +3276,7 @@ Now HoloNET is working again, we can add support for the OASIS API, which will t
 We can now complete HOLOOASIS provider meaning we can bridge holochain to all WEB2 (dbs, clouds, etc) and WEB3 blockchains etc giving a easy migration path to holochain. 
 
 Read more here: \
-https://github.com/NextGenSoftwareUK/Our-World-OASIS-API-HoloNET-HoloUnity-And-.NET-HDK
+https://github.com/NextGenSoftwareUK/OASIS
 
 ### WEB5 STAR Omniverse Interoperable Metaverse Low Code Generator
 
@@ -2737,13 +3287,13 @@ The back-end is very close to completion and the front-end is in progress... :)
 This is an evolution of the .NET HDK Low Code Generator so works the same way in that is generates dynamic rust and c# code, except it now also generates moons, planets, stars, galaxies, universes, etc and allows them to run across any blockchain, web2 cloud/db, IPFS, Holochain, etc. Everything that the OASIS API supports. STAR integrates both the .NET HDK (containing HoloNET) as well as the OASIS API and then expresses it in a cyberspace ontology and soooooo much more! ;-) It also allows other metaverses to be integrated in the Open Omniverse, which is the game of and simulation of life...
 
 Read more here: \
-https://www.ourworldthegame.com/single-post/announcing-star-odk-hdk-cosmic \
-https://github.com/NextGenSoftwareUK/Our-World-OASIS-API-HoloNET-HoloUnity-And-.NET-HDK#web5-star-odk
+https://oasisomniverse.one/single-post/announcing-star-odk-hdk-cosmic \
+https://github.com/NextGenSoftwareUK/OASIS#web5-star-odk
 
 For all of the above you can find more info on the OASIS API main repo as well as the Our World site & blogs:
 
-http://www.ourworldthegame.com \
-https://github.com/NextGenSoftwareUK/Our-World-OASIS-API-HoloNET-HoloUnity-And-.NET-HDK
+https://oasisomniverse.one \
+https://github.com/NextGenSoftwareUK/OASIS
 
 
 ## Donations Welcome! Thank you!
@@ -2779,7 +3329,7 @@ Thank you and we hope we find interest from people to join us on this exciting i
 
 **Ready to be a hero?**
 
-If the answer is YES, then please [proceed to here](https://github.com/NextGenSoftwareUK/Our-World-OASIS-API-HoloNET-HoloUnity-And-.NET-HDK/wiki/So-You-Want-To-Get-Involved%3F-Ready-To-Be-A-Hero%3F)...
+If the answer is YES, then please [proceed to here](https://github.com/NextGenSoftwareUK/OASIS/wiki/So-You-Want-To-Get-Involved%3F-Ready-To-Be-A-Hero%3F)...
 
 
 The Future Is Bright, \
@@ -2794,7 +3344,7 @@ https://github.com/NextGenSoftwareUK/Our-World-Smartphone-Prototype-AR
 
 **Sites**
 
-http://www.ourworldthegame.com \
+https://oasisomniverse.one \
 https://oasisplatform.world \
 https://api.oasisplatform.world \
 https://opensea.io/collection/theoasisandourworld \
@@ -2819,8 +3369,8 @@ https://www.thejusticeleagueaccademy.icu
 
 **Blog/Forum**
 
-[Blog](http://www.ourworldthegame.com/blog) \
-[Forum](http://www.ourworldthegame.com/forum)
+[Blog](https://oasisomniverse.one/blog) \
+[Forum](https://oasisomniverse.one/forum)
 
 **Misc**
 

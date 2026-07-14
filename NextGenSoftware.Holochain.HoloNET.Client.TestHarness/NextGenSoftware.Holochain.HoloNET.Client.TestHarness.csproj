@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -8,8 +8,8 @@
 	<Company>NextGen Software Ltd</Company>
 	<Product>HoloNET Test Harness</Product>
 	<Title>HoloNET Test Harness</Title>
-	<Summary>Test harness for the world's first .NET &amp; Unity client for Holochain.</Summary>
-	<Description>Test harness for the world's first .NET &amp; Unity client for Holochain.</Description>
+	<Summary>Comprehensive console test harness for HoloNET -- exercises every feature of HoloNET Client and HoloNET ORM against a live Holochain 0.6.x conductor.</Summary>
+	<Description>A ready-to-run console application that exercises every major feature of HoloNET Client and HoloNET ORM against a real live Holochain conductor (v0.6.x). Covers zome calls, entry CRUD via HoloNETEntryBase/HoloNETAuditEntryBase, collection loading/saving via HoloNETCollection/HoloNETObservableCollection, Admin API (install/enable/sign/attach hApp, generate agent keys, register DNA, list apps/cells/interfaces, dump state/network stats), event callbacks, async/await patterns, and logging. An ideal starting point for understanding HoloNET and verifying your conductor setup. Source: https://github.com/holochain-open-dev/holochain-client-csharp -- Ecosystem: https://holonet.oasisomniverse.one</Description>
 	<PackageProjectUrl>https://github.com/NextGenSoftwareUK/holochain-client-csharp</PackageProjectUrl>
 	<PackageIcon>hc logo.png</PackageIcon>
 	<Authors>David Ellams (NextGen Software Ltd)</Authors>
