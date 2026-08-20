@@ -1,0 +1,3 @@
+[submodule "NextGenSoftware.Holochain.HoloNET.ORM"]
+	path = NextGenSoftware.Holochain.HoloNET.ORM
+	url = https://github.com/NextGenSoftwareUK/HoloNET-ORM.git
