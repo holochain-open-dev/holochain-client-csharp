@@ -1,3 +1,15 @@
 [submodule "NextGenSoftware.Holochain.HoloNET.ORM"]
 	path = NextGenSoftware.Holochain.HoloNET.ORM
 	url = https://github.com/NextGenSoftwareUK/HoloNET-ORM.git
+[submodule "NextGenSoftware.Holochain.HoloNET.HDK"]
+	path = NextGenSoftware.Holochain.HoloNET.HDK
+	url = https://github.com/NextGenSoftwareUK/HoloNET-HDK.git
+[submodule "NextGenSoftware.Holochain.HoloNET.HyperNET"]
+	path = NextGenSoftware.Holochain.HoloNET.HyperNET
+	url = https://github.com/NextGenSoftwareUK/HoloNET-HyperNET.git
+[submodule "HoloNET-Manager"]
+	path = HoloNET-Manager
+	url = https://github.com/NextGenSoftwareUK/HoloNET-Manager.git
+[submodule "HoloNET-API"]
+	path = HoloNET-API
+	url = https://github.com/NextGenSoftwareUK/HoloNET-API.git

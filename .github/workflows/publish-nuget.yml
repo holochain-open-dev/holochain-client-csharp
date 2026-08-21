@@ -10,6 +10,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          token: ${{ secrets.PRIVATE_SUBMODULE_PAT }}
 
       - name: Checkout NextGenSoftware-Libraries
         uses: actions/checkout@v4
@@ -39,7 +42,8 @@ jobs:
             "NextGenSoftware.Holochain.HoloNET.ORM\NextGenSoftware.Holochain.HoloNET.ORM.csproj",
             "NextGenSoftware.Holochain.HoloNET.HDK\NextGenSoftware.Holochain.HoloNET.HDK.csproj",
             "NextGenSoftware.Holochain.HoloNET.HyperNET\NextGenSoftware.Holochain.HoloNET.HyperNET.csproj",
-            "NextGenSoftware.Holochain.HoloNET.Manager\NextGenSoftware.Holochain.HoloNET.Manager.csproj"
+            "HoloNET-Manager\NextGenSoftware.Holochain.HoloNET.Manager\NextGenSoftware.Holochain.HoloNET.Manager.csproj",
+            "HoloNET-API\NextGenSoftware.Holochain.HoloNET.API\NextGenSoftware.Holochain.HoloNET.API.csproj"
           )
           $failed = 0
           foreach ($proj in $projects) {
@@ -61,7 +65,8 @@ jobs:
             "NextGenSoftware.Holochain.HoloNET.ORM\NextGenSoftware.Holochain.HoloNET.ORM.csproj",
             "NextGenSoftware.Holochain.HoloNET.HDK\NextGenSoftware.Holochain.HoloNET.HDK.csproj",
             "NextGenSoftware.Holochain.HoloNET.HyperNET\NextGenSoftware.Holochain.HoloNET.HyperNET.csproj",
-            "NextGenSoftware.Holochain.HoloNET.Manager\NextGenSoftware.Holochain.HoloNET.Manager.csproj"
+            "HoloNET-Manager\NextGenSoftware.Holochain.HoloNET.Manager\NextGenSoftware.Holochain.HoloNET.Manager.csproj",
+            "HoloNET-API\NextGenSoftware.Holochain.HoloNET.API\NextGenSoftware.Holochain.HoloNET.API.csproj"
           )
           $succeeded = 0; $failed = 0
           foreach ($proj in $projects) {
