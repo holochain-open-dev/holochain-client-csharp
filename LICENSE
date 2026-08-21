@@ -29,25 +29,20 @@ a dual-licensing model.
 SCOPE OF THIS LICENCE
 
 This licence governs only the source code, documentation and other files
-contained in repositories to which it is applied. It does not govern or
-restrict:
+contained in this repository. It does not govern or restrict:
 
-  (a) calling or consuming any publicly hosted OASIS API endpoint, service
-      or infrastructure operated by the Licensor;
+  (a) using any official HoloNET release — including compiled binaries,
+      NuGet packages, or any other pre-built distribution — obtained from
+      the Licensor's official distribution channels; or
 
-  (b) using any OASIS SDK, client library or tool obtained as a compiled
-      package (for example via NuGet) from the Licensor's official
-      distribution channels; or
+  (b) building applications, products or services that reference HoloNET
+      NuGet packages or link against official HoloNET releases.
 
-  (c) building applications, products or services that integrate with or
-      call the OASIS APIs, SDKs or tools as an end-user or subscriber.
-
-Those activities are governed solely by the applicable subscription plan or
-service agreement with the Licensor. Commercial use of the OASIS API and
-related SDKs in your own products and services is expressly permitted under
-the appropriate subscription tier, which includes a free tier. You do not
-need a Commercial Licence under this document merely because your
-application calls OASIS APIs or references OASIS NuGet packages.
+Commercial use of HoloNET in your own products and services via the
+official NuGet packages or releases is expressly permitted without a
+Commercial Licence under this document. You do not need a Commercial
+Licence merely because your application references a HoloNET NuGet
+package.
 
 This licence applies when you copy, fork, modify, or redistribute the
 source code itself.
