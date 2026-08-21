@@ -201,7 +201,7 @@ The new HoloNET ORM (Object Relational Mapping) allowing very easy &amp; rapid d
 [NextGenSoftware.Holochain.HoloNET.ORM.Embedded](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.ORM.Embedded)
 This is exactly the same as above except it is using the embedded version of the HoloNET Client so it is integrated with the Holochain Conductor binaries.
 
-[NextGenSoftware.Holochain.HoloNET.Manager](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.Manager)
+[NextGenSoftware.Holochain.HoloNET.Manager](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.Manager) | [GitHub](https://github.com/NextGenSoftwareUK/HoloNET-Manager)
 The new UI to HoloNET Client &amp; HoloNET ORM show casing all of their advanced features.  This has many generic backend and UI components that can be used to allow other .net devs to rapidly construct their own .net hApps using HoloNET HDK (HoloNET Client, HoloNET ORM, HoloNET Manager, WEB5 STAR ODK/HDK &amp; HoloNET HyperNET). The HoloNET Manager is currently implemented in WPF but we have plans to port this to Uno, MAUI &amp; OpenSilver meaning it can run natively on Windows, Mac, Linux, TV's, IPads, tablets, android, IOS &amp; web. The work for this has already begun so expect future releases soon...
 
 [NextGenSoftware.Holochain.HoloNET.Manager.Embedded](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.Manager.Embedded)
