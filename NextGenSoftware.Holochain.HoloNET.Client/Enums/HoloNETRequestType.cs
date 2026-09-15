@@ -51,5 +51,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         AppListWasmHostFunctions,
         AppProvideMemproofs,
         AppPeerMetaInfo,
+
+        // New in Holochain 0.7.0 - paginated DHT op timing inspection
+        AdminDumpOpTimings,
+        AppDumpOpTimings,
     }
 }

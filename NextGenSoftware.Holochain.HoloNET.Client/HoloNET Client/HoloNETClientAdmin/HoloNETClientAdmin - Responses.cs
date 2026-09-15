@@ -143,6 +143,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                             case HoloNETResponseType.AdminCompatibleCellsReturned:
                                 DecodeCompatibleCellsReturnedReceived(response, dataReceivedEventArgs);
                                 break;
+
+                            case HoloNETResponseType.AdminOpTimingsDumped:
+                                DecodeAdminOpTimingsDumpedReceived(response, dataReceivedEventArgs);
+                                break;
                         }
                     }
                 }
@@ -278,6 +282,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                     case HoloNETRequestType.AdminGetCompatibleCells:
                         RaiseCompatibleCellsReturnedEvent(ProcessResponeError<CompatibleCellsReturnedCallBackEventArgs>(response, dataReceivedEventArgs, "AdminGetCompatibleCells", msg));
+                        break;
+
+                    case HoloNETRequestType.AdminDumpOpTimings:
+                        RaiseAdminOpTimingsDumpedEvent(ProcessResponeError<AdminOpTimingsDumpedCallBackEventArgs>(response, dataReceivedEventArgs, "AdminDumpOpTimings", msg));
                         break;
                 }
             }
@@ -1521,6 +1529,44 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
 
             return zomeDefinitions;
+        }
+
+        // New in Holochain 0.7.0
+
+        private void DecodeAdminOpTimingsDumpedReceived(IHoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
+        {
+            string errorMessage = "An unknown error occurred in HoloNETClient.DecodeAdminOpTimingsDumpedReceived. Reason: ";
+            AdminOpTimingsDumpedCallBackEventArgs args = CreateHoloNETArgs<AdminOpTimingsDumpedCallBackEventArgs>(response, dataReceivedEventArgs);
+            args.HoloNETResponseType = HoloNETResponseType.AdminOpTimingsDumped;
+
+            try
+            {
+                if (!args.IsError)
+                {
+                    OpTimingsDump dump = MessagePackSerializer.Deserialize<OpTimingsDump>(response.data, messagePackSerializerOptions);
+
+                    if (dump != null)
+                        args.OpTimingsDump = dump;
+                }
+            }
+            catch (Exception ex)
+            {
+                HandleError(errorMessage, ex, args);
+            }
+
+            RaiseAdminOpTimingsDumpedEvent(args);
+        }
+
+        private void RaiseAdminOpTimingsDumpedEvent(AdminOpTimingsDumpedCallBackEventArgs adminOpTimingsDumpedCallBackEventArgs)
+        {
+            LogEvent("AdminOpTimingsDumped", adminOpTimingsDumpedCallBackEventArgs);
+            OnAdminOpTimingsDumpedCallBack?.Invoke(this, adminOpTimingsDumpedCallBackEventArgs);
+
+            if (_taskCompletionAdminOpTimingsDumpedCallBack != null && !string.IsNullOrEmpty(adminOpTimingsDumpedCallBackEventArgs.Id) && _taskCompletionAdminOpTimingsDumpedCallBack.ContainsKey(adminOpTimingsDumpedCallBackEventArgs.Id))
+            {
+                _taskCompletionAdminOpTimingsDumpedCallBack[adminOpTimingsDumpedCallBackEventArgs.Id].SetResult(adminOpTimingsDumpedCallBackEventArgs);
+                _taskCompletionAdminOpTimingsDumpedCallBack.Remove(adminOpTimingsDumpedCallBackEventArgs.Id);
+            }
         }
     }
 }

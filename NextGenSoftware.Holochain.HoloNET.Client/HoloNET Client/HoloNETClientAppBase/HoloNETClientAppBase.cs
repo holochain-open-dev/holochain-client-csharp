@@ -39,6 +39,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         private Dictionary<string, TaskCompletionSource<WasmHostFunctionsListedCallBackEventArgs>> _taskCompletionWasmHostFunctionsListedCallBack = new Dictionary<string, TaskCompletionSource<WasmHostFunctionsListedCallBackEventArgs>>();
         private Dictionary<string, TaskCompletionSource<MemproofsProvidedCallBackEventArgs>> _taskCompletionMemproofsProvidedCallBack = new Dictionary<string, TaskCompletionSource<MemproofsProvidedCallBackEventArgs>>();
         private Dictionary<string, TaskCompletionSource<AppPeerMetaInfoReturnedCallBackEventArgs>> _taskCompletionAppPeerMetaInfoReturnedCallBack = new Dictionary<string, TaskCompletionSource<AppPeerMetaInfoReturnedCallBackEventArgs>>();
+        private Dictionary<string, TaskCompletionSource<AppOpTimingsDumpedCallBackEventArgs>> _taskCompletionAppOpTimingsDumpedCallBack = new Dictionary<string, TaskCompletionSource<AppOpTimingsDumpedCallBackEventArgs>>();
 
         public AppInfo CachedAppInfo { get; set; }
 
@@ -149,6 +150,16 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// Fired when a response is received from the conductor after the GetAppPeerMetaInfoAsync/GetAppPeerMetaInfo method is called.
         /// </summary>
         public event AppPeerMetaInfoReturnedCallBack OnAppPeerMetaInfoReturnedCallBack;
+
+
+        // New in Holochain 0.7.0
+
+        public delegate void AppOpTimingsDumpedCallBack(object sender, AppOpTimingsDumpedCallBackEventArgs e);
+
+        /// <summary>
+        /// Fired when a response is received from the conductor after the DumpOpTimingsAsync/DumpOpTimings method is called on the app interface.
+        /// </summary>
+        public event AppOpTimingsDumpedCallBack OnAppOpTimingsDumpedCallBack;
 
 
         // Properties

@@ -11,4 +11,5 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public List<ZomeDefinition> IntegrityZomes { get; set; } = new List<ZomeDefinition>();
         public List<ZomeDefinition> CoordinatorZomes { get; set; } = new List<ZomeDefinition>();
     }
+
 }

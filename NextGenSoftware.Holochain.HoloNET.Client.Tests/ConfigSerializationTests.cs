@@ -50,12 +50,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
         [Fact]
         public void Kitsune2Config_RoundTrips_AllFields()
         {
+            // SignalUrl and WebrtcConfigJson were removed in Holochain 0.7.0 (tx5/WebRTC dropped).
             var original = new Kitsune2Config
             {
                 BootstrapUrl = "https://bootstrap.example.org",
-                SignalUrl = "wss://signal.example.org",
                 RelayUrl = "https://relay.example.org",
-                WebrtcConfigJson = "{\"iceServers\":[]}",
                 TargetArcFactor = 0,
                 AdvancedJson = "{\"tuning\":true}"
             };
@@ -64,9 +63,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
             var result = MessagePackSerializer.Deserialize<Kitsune2Config>(bytes, Options);
 
             Assert.Equal(original.BootstrapUrl, result.BootstrapUrl);
-            Assert.Equal(original.SignalUrl, result.SignalUrl);
             Assert.Equal(original.RelayUrl, result.RelayUrl);
-            Assert.Equal(original.WebrtcConfigJson, result.WebrtcConfigJson);
             Assert.Equal(original.TargetArcFactor, result.TargetArcFactor);
             Assert.Equal(original.AdvancedJson, result.AdvancedJson);
         }
@@ -77,9 +74,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
             var config = new Kitsune2Config();
 
             Assert.Equal("https://dev-test-bootstrap2.holochain.org", config.BootstrapUrl);
-            Assert.Equal("wss://dev-test-bootstrap2.holochain.org", config.SignalUrl);
             Assert.Equal("https://use1-1.relay.n0.iroh-canary.iroh.link./", config.RelayUrl);
-            Assert.Null(config.WebrtcConfigJson);
             Assert.Equal(1u, config.TargetArcFactor);
             Assert.Null(config.AdvancedJson);
         }

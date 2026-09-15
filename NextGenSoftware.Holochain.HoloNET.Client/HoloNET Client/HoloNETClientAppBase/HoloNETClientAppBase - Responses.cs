@@ -214,6 +214,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                         case HoloNETResponseType.AppPeerMetaInfoReturned:
                             DecodeAppPeerMetaInfoReturnedReceived(response, dataReceivedEventArgs);
                             break;
+
+                        case HoloNETResponseType.AppOpTimingsDumped:
+                            DecodeAppOpTimingsDumpedReceived(response, dataReceivedEventArgs);
+                            break;
                     }
                 }
             }
@@ -288,6 +292,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                     case HoloNETRequestType.AppPeerMetaInfo:
                         RaiseAppPeerMetaInfoReturnedEvent(ProcessResponeError<AppPeerMetaInfoReturnedCallBackEventArgs>(response, dataReceivedEventArgs, "AppPeerMetaInfo", msg));
+                        break;
+
+                    case HoloNETRequestType.AppDumpOpTimings:
+                        RaiseAppOpTimingsDumpedEvent(ProcessResponeError<AppOpTimingsDumpedCallBackEventArgs>(response, dataReceivedEventArgs, "AppDumpOpTimings", msg));
                         break;
                 }
             }
@@ -1023,6 +1031,41 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             {
                 _taskCompletionAppPeerMetaInfoReturnedCallBack[appPeerMetaInfoReturnedCallBackEventArgs.Id].SetResult(appPeerMetaInfoReturnedCallBackEventArgs);
                 _taskCompletionAppPeerMetaInfoReturnedCallBack.Remove(appPeerMetaInfoReturnedCallBackEventArgs.Id);
+            }
+        }
+
+        private void DecodeAppOpTimingsDumpedReceived(IHoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
+        {
+            string errorMessage = "An unknown error occurred in HoloNETClient.DecodeAppOpTimingsDumpedReceived. Reason: ";
+            AppOpTimingsDumpedCallBackEventArgs args = CreateHoloNETArgs<AppOpTimingsDumpedCallBackEventArgs>(response, dataReceivedEventArgs);
+            args.HoloNETResponseType = HoloNETResponseType.AppOpTimingsDumped;
+
+            try
+            {
+                if (!args.IsError)
+                {
+                    OpTimingsDump dump = MessagePackSerializer.Deserialize<OpTimingsDump>(response.data, messagePackSerializerOptions);
+                    if (dump != null)
+                        args.OpTimingsDump = dump;
+                }
+            }
+            catch (Exception ex)
+            {
+                HandleError(errorMessage, ex, args);
+            }
+
+            RaiseAppOpTimingsDumpedEvent(args);
+        }
+
+        private void RaiseAppOpTimingsDumpedEvent(AppOpTimingsDumpedCallBackEventArgs appOpTimingsDumpedCallBackEventArgs)
+        {
+            LogEvent("AppOpTimingsDumped", appOpTimingsDumpedCallBackEventArgs);
+            OnAppOpTimingsDumpedCallBack?.Invoke(this, appOpTimingsDumpedCallBackEventArgs);
+
+            if (_taskCompletionAppOpTimingsDumpedCallBack != null && !string.IsNullOrEmpty(appOpTimingsDumpedCallBackEventArgs.Id) && _taskCompletionAppOpTimingsDumpedCallBack.ContainsKey(appOpTimingsDumpedCallBackEventArgs.Id))
+            {
+                _taskCompletionAppOpTimingsDumpedCallBack[appOpTimingsDumpedCallBackEventArgs.Id].SetResult(appOpTimingsDumpedCallBackEventArgs);
+                _taskCompletionAppOpTimingsDumpedCallBack.Remove(appOpTimingsDumpedCallBackEventArgs.Id);
             }
         }
 
