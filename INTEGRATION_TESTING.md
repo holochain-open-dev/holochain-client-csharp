@@ -1,7 +1,7 @@
-# Integration Testing Plan — Holochain 0.6.1 Conductor
+# Integration Testing Plan — Holochain 0.7.0 Conductor
 
 This document describes what would be required to add **real integration tests** that
-exercise `NextGenSoftware.Holochain.HoloNET.Client` against a live Holochain 0.6.1
+exercise `NextGenSoftware.Holochain.HoloNET.Client` against a live Holochain 0.7.0
 conductor process, as a follow-up to the unit tests in
 `NextGenSoftware.Holochain.HoloNET.Client.Tests` (which only cover serialization
 round-trips and do not require a conductor).
@@ -9,18 +9,18 @@ round-trips and do not require a conductor).
 This is a plan only. No conductor install or live-process work has been attempted as
 part of producing this document — see "Feasibility" at the end.
 
-## 1. Installing the `holochain` conductor binary (0.6.1)
+## 1. Installing the `holochain` conductor binary (0.7.0)
 
 Three realistic options, roughly in order of CI-friendliness:
 
 1. **Prebuilt binary from the GitHub release.** The `holochain/holochain` repo publishes
-   release artifacts tagged `holochain-0.6.1`. Download the binary for the target OS/arch
+   release artifacts tagged `holochain-0.7.0`. Download the binary for the target OS/arch
    from the GitHub Releases page for that tag and put it on `PATH` (or reference its full
    path from the test fixture). This is the most CI-friendly option since it avoids a Rust
    toolchain entirely, but the artifact name/availability per-platform should be confirmed
    at https://github.com/holochain/holochain/releases when this is actually attempted.
 
-2. **`cargo install holochain --version 0.6.1`.** Requires a working Rust toolchain
+2. **`cargo install holochain --version 0.7.0`.** Requires a working Rust toolchain
    (`rustup`) and takes several minutes to compile from source. Most portable across
    platforms (anywhere Rust can run) but slow and adds a Rust toolchain as a CI
    dependency.
@@ -95,7 +95,7 @@ public class HolochainConductorFixture : IAsyncLifetime
         //    stdout/stderr to a buffer.
         // 4. Parse stdout for the actual bound admin websocket port (sandbox tooling
         //    prints "Listening on port: N" or similar - exact string must be confirmed
-        //    against the real 0.6.1 CLI output when this is implemented).
+        //    against the real 0.7.0 CLI output when this is implemented).
         // 5. Poll/retry connecting a HoloNETClientAdmin instance to
         //    ws://127.0.0.1:{port} until it succeeds or a timeout elapses (the
         //    conductor takes a moment to bind the socket after process start).
@@ -126,7 +126,7 @@ public class AdminApiIntegrationTests
 
     [Fact]
     public async Task DumpNetworkStatsAsync_ReturnsParsedResponse() { /* exercises the new
-        typed DumpNetworkStatsResponse added in the 0.6.1 upgrade against a real conductor */ }
+        typed DumpNetworkStatsResponse added in the 0.7.0 upgrade against a real conductor */ }
 }
 ```
 
@@ -151,11 +151,11 @@ Key properties this harness needs that the unit tests deliberately don't exercis
 - That the real conductor accepts HoloNET's exact wire bytes for `ZomeCallParamsSigned`,
   the new Admin/App request types, etc. — the unit tests verify *internal consistency*
   (HoloNET serializes and deserializes its own types correctly) but cannot prove the
-  *real* Holochain 0.6.1 conductor accepts those exact bytes without a live round trip.
+  *real* Holochain 0.7.0 conductor accepts those exact bytes without a live round trip.
 - Real signature verification (a real conductor-generated `AgentPubKey` + a real
   Ed25519 signature over the real `ZomeCallParams` bytes) versus the unit tests' use of
   arbitrary placeholder byte arrays.
-- Real error responses from the conductor for the new 0.6.1-only Admin/App calls (e.g.
+- Real error responses from the conductor for the new 0.7.0-only Admin/App calls (e.g.
   whether `GetCompatibleCells` is actually enabled by default or gated behind a feature
   flag in a given build — this was flagged as uncertain during the original upgrade).
 
@@ -164,8 +164,8 @@ Key properties this harness needs that the unit tests deliberately don't exercis
 I have **not** attempted to install or run a Holochain conductor as part of producing
 this plan, per instruction. Realistically:
 
-- Downloading a prebuilt 0.6.1 binary or running `cargo install holochain --version
-  0.6.1` requires outbound internet access and (for the cargo path) a multi-minute
+- Downloading a prebuilt 0.7.0 binary or running `cargo install holochain --version
+  0.7.0` requires outbound internet access and (for the cargo path) a multi-minute
   build; both are plausible to attempt with the tools available in this environment,
   but neither has been attempted here since it wasn't requested as an action — only
   the plan was.
