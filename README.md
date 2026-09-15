@@ -459,6 +459,7 @@ You can subscribe to a number of different events:
 | [OnCloneCellDisabledCallBack](#onclonecelldisabledcallback)                     | Fired when a clone cell has been disabled via DisableCloneCellAsync.                                |
 | [OnMemproofsProvidedCallBack](#onmemproofsprovided)                             | Fired when membrane proofs have been submitted via ProvideMemproofsAsync.                           |
 | [OnWasmHostFunctionsListedCallBack](#onwasmhostfunctionslistedcallback)         | Fired when the WASM host functions list has been returned via ListWasmHostFunctionsAsync.           |
+| [OnAppOpTimingsDumpedCallBack](#onappoptimingsdumpedcallback)                   | Fired when DHT op timing data is returned via DumpOpTimingsAsync (app interface, new in 0.7.0).    |
 | [OnCountersigningSessionStateReturnedCallBack](#oncountersigningsessionstate)   | Fired when countersigning session state is returned via GetCountersigningSessionStateAsync.         |
 | [OnCountersigningSessionAbandonedCallBack](#oncountersigningsessionabandoned)   | Fired when a countersigning session is abandoned via AbandonCountersigningSessionAsync.             |
 | [OnPublishCountersigningSessionTriggeredCallBack](#onpublishcountersigning)     | Fired when countersigning publication is triggered via PublishCountersigningSessionAsync.           |
@@ -1028,6 +1029,7 @@ HoloNETClient contains the following methods:
 | [ProvideMemproofsAsync](#providememproofsasync)                                           | Submits membrane proofs to the conductor for gated DNA networks. |
 | [ListWasmHostFunctionsAsync](#listwasmhostfunctionsasync)                                 | Returns the list of host functions exposed to WASM zomes by the conductor. |
 | [GetAppPeerMetaInfoAsync](#getapppeermetainfoasync)                                       | Returns peer meta info for a given agent URL within the app network. |
+| [DumpOpTimingsAsync (App)](#dumpoptimingsasync-app)                                       | Returns paginated DHT op timing data for a DNA via the app interface (new in 0.7.0). |
 | [GetCountersigningSessionStateAsync](#getcountersigningsessionstateasync)                 | Returns the current state of an in-progress countersigning session. |
 | [AbandonCountersigningSessionAsync](#abandoncountersigningsessionasync)                   | Abandons (cancels) an in-progress countersigning session. |
 | [PublishCountersigningSessionAsync](#publishcountersigningsessionasync)                   | Triggers publication of a completed countersigning session to the DHT. |
@@ -1509,6 +1511,20 @@ public async Task<AppPeerMetaInfoReturnedCallBackEventArgs> GetAppPeerMetaInfoAs
 ```
 
 Returns peer meta info (agent key, agent URLs) for a specific peer identified by its URL, optionally filtered to the given DNA hashes. Fires `OnAppPeerMetaInfoReturnedCallBack`.
+
+<a name="dumpoptimingsasync-app"></a>
+##### DumpOpTimingsAsync (App)
+
+```csharp
+Task<AppOpTimingsDumpedCallBackEventArgs> DumpOpTimingsAsync(byte[] dnaHash, OpTimingsCursor cursor = null, uint? limit = null, ...)
+```
+
+New in Holochain 0.7.0. Returns paginated DHT op timing information for a DNA via the app interface — the same data as the admin-interface variant but callable without admin privileges. Pass the `OpTimingsCursor` from one call's result as `cursor` in the next call to page through results. Fires `OnAppOpTimingsDumpedCallBack`.
+
+<a name="onappoptimingsdumpedcallback"></a>
+##### OnAppOpTimingsDumpedCallBack
+
+Fired when DHT op timing data is returned from the conductor in response to `DumpOpTimingsAsync` (app interface). The `AppOpTimingsDumpedCallBackEventArgs` carries an `OpTimingsDump` with a list of `OpTimingDump` records (op hash, receive/integrate/abandon timestamps, validation status, locally-validated flag) and an `OpTimingsCursor` for the next page.
 
 <a name="getcountersigningsessionstateasync"></a>
 ##### GetCountersigningSessionStateAsync
