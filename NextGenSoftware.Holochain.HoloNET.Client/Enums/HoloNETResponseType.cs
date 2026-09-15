@@ -50,6 +50,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         AppMemproofsProvided,
         AppPeerMetaInfoReturned,
 
+        // New in Holochain 0.7.0 - paginated DHT op timing inspection
+        AdminOpTimingsDumped,
+        AppOpTimingsDumped,
+
         Error
     }
 }

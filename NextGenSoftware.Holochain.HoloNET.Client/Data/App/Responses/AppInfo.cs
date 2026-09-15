@@ -77,6 +77,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                         return AppInfoStatusEnum.Disabled;
                     }
+
+                    // New in Holochain 0.7.0
+                    else if (status.ContainsKey("awaiting_memproofs"))
+                        return AppInfoStatusEnum.AwaitingMemproofs;
                 }
 
                 return AppInfoStatusEnum.None;

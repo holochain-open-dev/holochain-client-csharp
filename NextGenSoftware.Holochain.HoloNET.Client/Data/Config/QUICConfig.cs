@@ -7,9 +7,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
     /// https://github.com/holochain/holochain/blob/holochain-0.6.1/crates/holochain_conductor_api/src/config/conductor.rs
     /// and there is NO client-configurable QUIC transport tuning surface (no version, max
     /// concurrent streams, congestion window, TLS settings, etc.). Low-level transport details
-    /// (kitsune2/tx5/webrtc) are either fixed internally or exposed only as the single opaque
-    /// `webrtc_config` / `advanced` JSON blobs on NetworkConfig (see Kitsune2Config.WebrtcConfigJson
-    /// and Kitsune2Config.AdvancedJson in this same directory) - not as a structured, per-field
+    /// (kitsune2/iroh) are either fixed internally or exposed only as the single opaque
+    /// `advanced` JSON blob on NetworkConfig (see Kitsune2Config.AdvancedJson in this same
+    /// directory; webrtc_config and signal_url were removed in Holochain 0.7.0) - not as a structured, per-field
     /// QUIC config object like this class previously fabricated (Version = "1",
     /// MaxConcurrentStreams, MaxStreamData, congestion window tuning, a nested TLSConfig with
     /// certificate file paths, etc.). None of those fields have a real Rust counterpart in the

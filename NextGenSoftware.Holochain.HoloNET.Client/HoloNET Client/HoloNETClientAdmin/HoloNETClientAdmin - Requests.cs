@@ -1046,13 +1046,46 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <summary>
         ///  Dump the network metrics tracked by kitsune.
         /// </summary>
-        /// <param name="appId">The app id that the clone cell belongs to.</param>
-        /// <param name="cloneCellId"> The clone id or cell id of the clone cell. Can be RoleName (string) or CellId (byte[][]).</param>
-        /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
+        /// <param name=”appId”>The app id that the clone cell belongs to.</param>
+        /// <param name=”cloneCellId”> The clone id or cell id of the clone cell. Can be RoleName (string) or CellId (byte[][]).</param>
+        /// <param name=”id”>The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
         public NetworkMetricsDumpedCallBackEventArgs DumpNetworkMetrics(string id = null)
         {
             return DumpNetworkMetricsAsync(ConductorResponseCallBackMode.UseCallBackEvents, id).Result;
+        }
+
+        /// <summary>
+        /// Dump DHT op timing information for a DNA (new in Holochain 0.7.0). Results are paginated;
+        /// pass the cursor from a previous call to retrieve the next page.
+        /// </summary>
+        /// <param name=”dnaHash”>The DNA hash whose DHT arc to dump op timings for.</param>
+        /// <param name=”cursor”>Pagination cursor from a previous DumpOpTimings call, or null to start from the beginning.</param>
+        /// <param name=”limit”>Maximum number of ops to return. Null means no limit.</param>
+        /// <param name=”conductorResponseCallBackMode”>The Conductor Response CallBack Mode.</param>
+        /// <param name=”id”>The request id, leave null if you want HoloNET to manage this for you.</param>
+        /// <returns></returns>
+        public async Task<AdminOpTimingsDumpedCallBackEventArgs> DumpOpTimingsAsync(byte[] dnaHash, OpTimingsCursor cursor = null, uint? limit = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
+        {
+            return await CallFunctionAsync(HoloNETRequestType.AdminDumpOpTimings, “dump_op_timings”, new DumpOpTimingsRequest()
+            {
+                dna_hash = dnaHash,
+                cursor = cursor,
+                limit = limit
+            }, _taskCompletionAdminOpTimingsDumpedCallBack, “OnAdminOpTimingsDumpedCallBack”, conductorResponseCallBackMode, id);
+        }
+
+        /// <summary>
+        /// Dump DHT op timing information for a DNA (new in Holochain 0.7.0).
+        /// </summary>
+        /// <param name=”dnaHash”>The DNA hash whose DHT arc to dump op timings for.</param>
+        /// <param name=”cursor”>Pagination cursor from a previous DumpOpTimings call, or null to start from the beginning.</param>
+        /// <param name=”limit”>Maximum number of ops to return. Null means no limit.</param>
+        /// <param name=”id”>The request id, leave null if you want HoloNET to manage this for you.</param>
+        /// <returns></returns>
+        public AdminOpTimingsDumpedCallBackEventArgs DumpOpTimings(byte[] dnaHash, OpTimingsCursor cursor = null, uint? limit = null, string id = null)
+        {
+            return DumpOpTimingsAsync(dnaHash, cursor, limit, ConductorResponseCallBackMode.UseCallBackEvents, id).Result;
         }
 
         /// <summary>

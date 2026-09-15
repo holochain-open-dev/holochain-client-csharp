@@ -1,5 +1,42 @@
 # Changelog
 
+## Holochain 0.7.0 Wire Protocol Upgrade
+
+Upgrades HoloNET's wire protocol from Holochain 0.6.1 to 0.7.0, verified against the real Rust
+source in the [holochain](https://github.com/holochain/holochain) repo at tag `holochain-0.7.0`
+(`holochain_conductor_api`, `holochain_types`, `holochain_zome_types`).
+
+Key changes:
+
+- **tx5/WebRTC transport removed**: `signal_url` and `webrtc_config` fields removed from
+  `NetworkConfig` / `Kitsune2Config` (`Data/Config/Kitsune2Config.cs`). iroh (QUIC) is now
+  the sole network backend. `Kitsune2Config` retains `BootstrapUrl`, `RelayUrl`,
+  `TargetArcFactor`, and `AdvancedJson`.
+- **`DnaStorageInfo` fields removed** (`Data/Admin/Responses/Objects/DnaStorageInfo.cs`):
+  `authored_data_size`, `authored_data_size_on_disk`, `cache_data_size`, and
+  `cache_data_size_on_disk` were removed from the conductor wire shape in 0.7.0. Only
+  `dht_data_size`, `dht_data_size_on_disk`, and `used_by` remain.
+- **`AppStatusFilter.AwaitingMemproofs`** added (`Enums/AppStatusFilter.cs`,
+  `Enums/AppInfoStatusEnum.cs`, `Data/App/Responses/AppInfo.cs`): new app status introduced
+  in 0.7.0 for apps that have been installed but are waiting for membrane proof submission.
+- **`DnaDef` alias** (`Data/Admin/Responses/DnaDef.cs`): the Holochain JS client renamed
+  `DnaDefinition` → `DnaDef` in 0.7.0. A `DnaDef` subclass is provided for forward
+  compatibility while keeping the existing `DnaDefinition` name.
+- **`DumpOpTimings` — new paginated API** (new in 0.7.0): wired in both the admin and app
+  interfaces:
+  - New request type `DumpOpTimingsRequest` (`Data/Admin/Requests/DumpOpTimingsRequest.cs`)
+    with `dna_hash`, optional `cursor` (`OpTimingsCursor`), and optional `limit`.
+  - New response types `OpTimingsDump`, `OpTimingDump`, `OpTimingsCursor`
+    (`Data/Admin/Responses/OpTimingsDump.cs`).
+  - `HoloNETRequestType.AdminDumpOpTimings` / `AppDumpOpTimings` and
+    `HoloNETResponseType.AdminOpTimingsDumped` / `AppOpTimingsDumped` added.
+  - `AdminOpTimingsDumpedCallBackEventArgs` / `AppOpTimingsDumpedCallBackEventArgs` added
+    (`EventArgs/EventArgsAdmin.cs`).
+  - `DumpOpTimingsAsync` / `DumpOpTimings` wired in `HoloNETClientAdmin` (admin interface:
+    conductor fn `dump_op_timings`) and `HoloNETClientAppBase` (app interface).
+
+---
+
 ## Holochain 0.6.1 Wire Protocol Upgrade
 
 Earlier "version bump" work only updated version strings/comments without changing the actual

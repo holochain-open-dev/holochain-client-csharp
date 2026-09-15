@@ -178,7 +178,7 @@ This will help massively turbo charge the holochain ecosystem by opening it up t
 
 **We are a BIG fan of Holochain and are very passionate about it and see a BIG future for it! We feel this is the gateway to taking Holochain mainstream! ;-)**
 
-**Holochain Compatibility:** HoloNET's wire protocol (zome call signing shape, admin/app interface message types, conductor config) targets **Holochain 0.6.1**, verified directly against the real Rust source in the [holochain](https://github.com/holochain/holochain) repo at tag `holochain-0.6.1` (crates `holochain_conductor_api`, `holochain_types`, `holochain_zome_types`). See [CHANGELOG.md](CHANGELOG.md) for details of what changed in the 0.6.1 upgrade.
+**Holochain Compatibility:** HoloNET's wire protocol (zome call signing shape, admin/app interface message types, conductor config) targets **Holochain 0.7.0**, verified directly against the real Rust source in the [holochain](https://github.com/holochain/holochain) repo at tag `holochain-0.7.0` (crates `holochain_conductor_api`, `holochain_types`, `holochain_zome_types`). See [CHANGELOG.md](CHANGELOG.md) for details of what changed in the 0.7.0 upgrade.
 
 There are two versions of HoloNET:
 
@@ -1588,9 +1588,9 @@ This property contains a struct called `HoloNETConfig` containing the following 
 | HolochainConductorAppAgentURI               | The URI for the App Agent WebSocket interface on the Holochain Conductor. Defaults to ws://localhost:8888. Used by HoloNETClient for zome calls. |
 | InstalledAppId                              | The installed app ID the App Agent WebSocket connects to. Optional — if not set HoloNET uses the first available installed app. |
 | EnforceRequestToResponseIdMatchingBehaviour | Controls what happens when a conductor response ID doesn't match a pending request. Options: AlwaysError, WarnOnly (default), Ignore. |
-| NetworkConfig                               | Advanced network config: BootstrapUrl, SignalUrl, RelayUrl, WebrtcConfigJson, TargetArcFactor, DefaultTTLSeconds. Leave null for defaults. |
-| Kitsune2Config                              | Sub-configuration for Kitsune2 P2P networking (Holochain 0.4+). Leave null to use conductor defaults. |
-| QUICConfig                                  | QUIC transport configuration. Leave null for default WebSocket transport. |
+| NetworkConfig                               | Advanced network config: BootstrapUrl, RelayUrl, TargetArcFactor, DefaultTTLSeconds. Leave null for defaults. (SignalUrl and WebrtcConfigJson were removed in Holochain 0.7.0 when tx5/WebRTC transport was dropped.) |
+| Kitsune2Config                              | Sub-configuration for Kitsune2 P2P networking (Holochain 0.4+). Sole network backend in 0.7.0 (iroh/QUIC). Leave null to use conductor defaults. |
+| QUICConfig                                  | QUIC transport configuration (iroh backend). Leave null to use conductor defaults. |
 | KeystoreConfig                              | Keystore connection config — set if using an external Lair keystore over IPC instead of the built-in keystore. |
 | WASMConfig                                  | WASM compilation and runtime settings. Leave null to use conductor defaults. |
 | CacheConfig                                 | HoloNET client-side response cache: EvictionPolicy, MaxEntries, TimeoutSeconds. Not part of the conductor config — HoloNET-specific only. |
@@ -1776,6 +1776,7 @@ var admin = new HoloNETClientAdmin(loggers);
 | `OnPeerMetaInfoReturnedCallBack` | `GetPeerMetaInfoAsync` |
 | `OnAppAuthenticationTokenIssuedCallBack` | `IssueAppAuthenticationTokenAsync` |
 | `OnAppAuthenticationTokenRevokedCallBack` | `RevokeAppAuthenticationTokenAsync` |
+| `OnAdminOpTimingsDumpedCallBack` | `DumpOpTimingsAsync` (admin interface) |
 
 <a name="HoloNETClientAdminMethods"></a>
 #### Methods
@@ -2029,6 +2030,15 @@ Task<NetworkMetricsDumpedCallBackEventArgs> DumpNetworkMetricsAsync(...)
 ```
 
 Returns detailed timing and throughput metrics from the networking layer.
+
+<a name="dumpoptimingsasync-admin"></a>
+##### DumpOpTimingsAsync (Admin)
+
+```csharp
+Task<AdminOpTimingsDumpedCallBackEventArgs> DumpOpTimingsAsync(byte[] dnaHash, OpTimingsCursor cursor = null, uint? limit = null, ...)
+```
+
+New in Holochain 0.7.0. Returns paginated DHT op timing information for a DNA: when each op was received, integrated, or abandoned, its validation status, and whether it was locally validated. Pass the `OpTimingsCursor` from one call's result as `cursor` in the next call to page through results.
 
 <a name="getstorageinfoasync"></a>
 ##### GetStorageInfoAsync

@@ -43,6 +43,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         private Dictionary<string, TaskCompletionSource<AppAuthenticationTokenIssuedCallBackEventArgs>> _taskCompletionAppAuthenticationTokenIssuedCallBack = new Dictionary<string, TaskCompletionSource<AppAuthenticationTokenIssuedCallBackEventArgs>>();
         private Dictionary<string, TaskCompletionSource<AppAuthenticationTokenRevokedCallBackEventArgs>> _taskCompletionAppAuthenticationTokenRevokedCallBack = new Dictionary<string, TaskCompletionSource<AppAuthenticationTokenRevokedCallBackEventArgs>>();
         private Dictionary<string, TaskCompletionSource<CompatibleCellsReturnedCallBackEventArgs>> _taskCompletionCompatibleCellsReturnedCallBack = new Dictionary<string, TaskCompletionSource<CompatibleCellsReturnedCallBackEventArgs>>();
+        private Dictionary<string, TaskCompletionSource<AdminOpTimingsDumpedCallBackEventArgs>> _taskCompletionAdminOpTimingsDumpedCallBack = new Dictionary<string, TaskCompletionSource<AdminOpTimingsDumpedCallBackEventArgs>>();
 
         //Events
 
@@ -305,6 +306,16 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// Fired when a response is received from the conductor after the GetCompatibleCellsAsync/GetCompatibleCells method is called.
         /// </summary>
         public event CompatibleCellsReturnedCallBack OnCompatibleCellsReturnedCallBack;
+
+
+        // New in Holochain 0.7.0
+
+        public delegate void AdminOpTimingsDumpedCallBack(object sender, AdminOpTimingsDumpedCallBackEventArgs e);
+
+        /// <summary>
+        /// Fired when a response is received from the conductor after the DumpOpTimingsAsync/DumpOpTimings method is called.
+        /// </summary>
+        public event AdminOpTimingsDumpedCallBack OnAdminOpTimingsDumpedCallBack;
 
 
         /// <summary>

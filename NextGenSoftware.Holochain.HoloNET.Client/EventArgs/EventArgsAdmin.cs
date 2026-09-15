@@ -210,4 +210,16 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
     {
         public List<AppCompatibleCells> CompatibleCells { get; set; } = new List<AppCompatibleCells>();
     }
+
+    // New in Holochain 0.7.0
+
+    public class AdminOpTimingsDumpedCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
+    {
+        public OpTimingsDump OpTimingsDump { get; set; }
+    }
+
+    public class AppOpTimingsDumpedCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
+    {
+        public OpTimingsDump OpTimingsDump { get; set; }
+    }
 }

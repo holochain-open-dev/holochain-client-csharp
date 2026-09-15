@@ -224,8 +224,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         /// <summary>
         /// Kitsune2 networking sub-fields of ConductorConfig.network not already covered by
-        /// NetworkConfig above (bootstrap/signal/relay URLs, webrtc_config, target_arc_factor,
-        /// advanced kitsune2 JSON). See Kitsune2Config.cs for verification details. Not yet wired
+        /// NetworkConfig above (bootstrap/relay URLs, target_arc_factor, advanced kitsune2 JSON;
+        /// signal_url and webrtc_config removed in Holochain 0.7.0). See Kitsune2Config.cs. Not yet wired
         /// through to any websocket/conductor call - present in the object graph only.
         /// </summary>
         public Kitsune2Config Kitsune2Config { get; set; } = new Kitsune2Config();
