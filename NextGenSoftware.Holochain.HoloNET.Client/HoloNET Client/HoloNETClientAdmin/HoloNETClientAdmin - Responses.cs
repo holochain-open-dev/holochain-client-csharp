@@ -1551,7 +1551,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
             catch (Exception ex)
             {
-                HandleError(errorMessage, ex, args);
+                HandleError(args, $"{errorMessage} {ex}");
             }
 
             RaiseAdminOpTimingsDumpedEvent(args);
