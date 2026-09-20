@@ -1046,9 +1046,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <summary>
         ///  Dump the network metrics tracked by kitsune.
         /// </summary>
-        /// <param name=”appId”>The app id that the clone cell belongs to.</param>
-        /// <param name=”cloneCellId”> The clone id or cell id of the clone cell. Can be RoleName (string) or CellId (byte[][]).</param>
-        /// <param name=”id”>The request id, leave null if you want HoloNET to manage this for you.</param>
+        /// <param name="appId">The app id that the clone cell belongs to.</param>
+        /// <param name="cloneCellId"> The clone id or cell id of the clone cell. Can be RoleName (string) or CellId (byte[][]).</param>
+        /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
         public NetworkMetricsDumpedCallBackEventArgs DumpNetworkMetrics(string id = null)
         {
@@ -1089,7 +1089,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         }
 
         /// <summary>
-        /// “Graft” record's onto the source chain of the specified CellId.
+        /// "Graft" record's onto the source chain of the specified CellId.
         /// </summary>
         /// <param name="cellId">The cell that the records are being inserted into.</param>
         /// <param name="validate">If this is true, then the records will be validated before insertion. This is much slower but is useful for verifying the chain is valid. If this is false, then records will be inserted as is. This could lead to an invalid chain.</param>
