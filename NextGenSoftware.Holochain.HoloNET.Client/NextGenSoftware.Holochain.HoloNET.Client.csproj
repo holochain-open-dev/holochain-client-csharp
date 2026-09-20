@@ -8,16 +8,38 @@
 	  <Company>NextGen Software Ltd</Company>
 	  <Product>HoloNET Holochain Client</Product>
 	  <Title>HoloNET Holochain Client</Title>
-    <Description>The definitive Holochain .NET client — fully upgraded to Holochain 0.6.2 (Kitsune2 networking, QUIC transport, clone cells, countersigning, WASM host functions, and the full Admin conductor API). Connect any .NET app, game, or service to a Holochain hApp with a clean async/await + event-driven API. Auto-manages conductor start/stop in embedded mode (hc.exe + holochain.exe bundled). Ships as both a lightweight (no binaries) and embedded (binaries included) NuGet package. Includes HoloNETClientAdmin (33 admin events, GenerateAgentPubKey, InstallApp, EnableApp, AuthorizeSigningCredentials, and more), HoloNETClientAppAgent for zome calls, and full HoloNETConfig for Kitsune2/QUIC/keystore/WASM/cache tuning. Part of the OASIS Omniverse at https://holonet.oasisomniverse.one -- Source: https://github.com/holochain-open-dev/holochain-client-csharp</Description>
-	  <Summary Condition="'$(Embedded)' != 'true'">The world's first .NET &amp; Unity client for Holochain — now fully upgraded to Holochain 0.6.2 with Kitsune2 networking, QUIC transport, WebSocket handshake headers, and the new conductor config API.</Summary>
-	  <Description Condition="'$(Embedded)' != 'true'">The world's first .NET &amp; Unity client for Holochain. Fully upgraded to Holochain 0.6.2 — supports Kitsune2 networking, QUIC transport, updated AdminWebsocket and AppWebsocket conductor APIs, WebSocket handshake authentication headers, and the new conductor YAML config format. Lightweight version: does not bundle the Holochain binaries. Use NextGenSoftware.Holochain.HoloNET.Client.Embedded if you want the conductor auto-started and managed for you.</Description>
-	  <Summary Condition="'$(Embedded)' == 'true'">The world's first .NET &amp; Unity client for Holochain — upgraded to Holochain 0.6.2, with hc.exe and holochain.exe bundled so the conductor is auto-started and managed for you.</Summary>
-	  <Description Condition="'$(Embedded)' == 'true'">The world's first .NET &amp; Unity client for Holochain. Fully upgraded to Holochain 0.6.2 — supports Kitsune2 networking, QUIC transport, updated conductor APIs, and WebSocket handshake authentication headers. This version bundles hc.exe and holochain.exe (v0.6.2) so the Holochain Conductor is auto-started and managed for you. Set HolochainConductorMode.UseEmbedded to activate. For the lightweight version without binaries use NextGenSoftware.Holochain.HoloNET.Client.</Description>
+    <Description>The definitive Holochain .NET client — fully upgraded to Holochain 0.7.0 (Kitsune2/iroh networking, paginated DumpOpTimings, AwaitingMemproofs status, clone cells, countersigning, WASM host functions, and the full Admin conductor API). Connect any .NET app, game, or service to a Holochain hApp with a clean async/await + event-driven API. Auto-manages conductor start/stop in embedded mode (hc.exe + holochain.exe bundled). Ships as both a lightweight (no binaries) and embedded (binaries included) NuGet package. Includes HoloNETClientAdmin (full admin events, GenerateAgentPubKey, InstallApp, EnableApp, AuthorizeSigningCredentials, DumpOpTimings, and more), HoloNETClientAppAgent for zome calls, and full HoloNETConfig for Kitsune2/keystore/WASM/cache tuning. Part of the OASIS Omniverse at https://holonet.oasisomniverse.one -- Source: https://github.com/holochain-open-dev/holochain-client-csharp</Description>
+	  <Summary Condition="'$(Embedded)' != 'true'">The world's first .NET &amp; Unity client for Holochain — now fully upgraded to Holochain 0.7.0 with Kitsune2/iroh networking, paginated DumpOpTimings, AwaitingMemproofs, and the complete conductor API.</Summary>
+	  <Description Condition="'$(Embedded)' != 'true'">The world's first .NET &amp; Unity client for Holochain. Fully upgraded to Holochain 0.7.0 — Kitsune2/iroh (QUIC) as sole network backend (tx5/WebRTC removed), new paginated DumpOpTimings admin and app API, AwaitingMemproofs app status, updated AdminWebsocket and AppWebsocket conductor APIs. Lightweight version: does not bundle the Holochain binaries. Use NextGenSoftware.Holochain.HoloNET.Client.Embedded if you want the conductor auto-started and managed for you.</Description>
+	  <Summary Condition="'$(Embedded)' == 'true'">The world's first .NET &amp; Unity client for Holochain — upgraded to Holochain 0.7.0, with hc.exe and holochain.exe bundled so the conductor is auto-started and managed for you.</Summary>
+	  <Description Condition="'$(Embedded)' == 'true'">The world's first .NET &amp; Unity client for Holochain. Fully upgraded to Holochain 0.7.0 — Kitsune2/iroh (QUIC) networking, paginated DumpOpTimings, AwaitingMemproofs app status, and the complete conductor API. This version bundles hc.exe and holochain.exe (v0.7.0) so the Holochain Conductor is auto-started and managed for you. Set HolochainConductorMode.UseEmbedded to activate. For the lightweight version without binaries use NextGenSoftware.Holochain.HoloNET.Client.</Description>
 	  <PackageProjectUrl>https://holonet.oasisomniverse.one</PackageProjectUrl>
 	  <PackageIcon>hc logo.png</PackageIcon>
 	  <Authors>David Ellams (NextGen Software Ltd)</Authors>
 	  <PackageTags>holochain;net;unity;client</PackageTags>
 	  <PackageReleaseNotes>
+		  ## v4.1.0 — Holochain 0.7.0 Wire Protocol Upgrade
+
+		  **Breaking wire-protocol changes from Holochain 0.7.0:**
+
+		  - tx5/WebRTC transport removed — iroh/QUIC (Kitsune2) is now the sole network backend.
+		    SignalUrl and WebrtcConfigJson removed from Kitsune2Config.
+		  - DnaStorageInfo: authored_data_size, cache_data_size and their on_disk variants removed.
+		  - New paginated DumpOpTimings API wired in both HoloNETClientAdmin and HoloNETClientAppBase
+		    (DumpOpTimingsAsync / DumpOpTimings, OnAdminOpTimingsDumpedCallBack / OnAppOpTimingsDumpedCallBack,
+		    OpTimingsDump / OpTimingDump / OpTimingsCursor types).
+		  - New AppStatusFilter.AwaitingMemproofs and AppInfoStatusEnum.AwaitingMemproofs for apps
+		    awaiting membrane proof submission before enabling.
+		  - DnaDef alias added for forward compatibility with Holochain JS client rename.
+		  - All doc-comment source links updated to holochain-0.7.0 / holochain_types 0.7.0.
+		  - ClonedCellResponse and CreateCloneCellRequest verified against 0.7.0 Rust source.
+		  - CountersigningSessionState variants (Accepted/SignaturesCollected/Unknown) verified.
+		  - TestHarness paths now configurable via HOLONET_* environment variables.
+
+		  *Full Changelog:* https://github.com/holochain-open-dev/holochain-client-csharp/blob/main/CHANGELOG.md
+
+		  ---
+
 		  ## v4.0.0 — Holochain 0.6.2 Upgrade + OASIS Omniverse Reboot
 
 		  **Full upgrade to Holochain 0.6.2** — the biggest HoloNET release since the original launch:
@@ -26,21 +48,11 @@
 		  - Full Kitsune2 networking support replacing the old kitsune_p2p stack.
 		  - QUIC transport support via the new NetworkConfig/QUICConfig conductor API shape.
 		  - WebSocket handshake authentication headers now sent on connect (required by 0.6.x conductor).
-		  - Conductor YAML config completely rewritten to match holochain_conductor_api 0.6.x (ConductorConfig, KeystoreConfig, Kitsune2Config, NetworkConfig, CacheConfig, WASMConfig).
+		  - Conductor YAML config completely rewritten to match holochain_conductor_api 0.6.x.
 		  - Updated AdminWebsocket and AppWebsocket wire protocol to holochain-0.6.x API shapes.
-		  - Embedded/non-embedded package split is now fully automated — no more manual csproj editing.
-		  - Non-embedded variant now correctly throws InvalidOperationException when UseEmbedded conductor mode is selected, directing users to the .Embedded package.
-		  - HoloNETClientAdmin: full Conductor Admin API — GenerateAgentPubKey, InstallApp, EnableApp, DisableApp, UninstallApp, AuthorizeSigningCredentials, ListApps, ListCells, and 33 admin events.
-		  - Clone cell support: CreateCloneCellAsync, EnableCloneCellAsync, DisableCloneCellAsync.
-		  - Countersigning support: multi-agent atomic co-signing of DHT entries (GetCountersigningSessionStateAsync, PublishCountersigningSessionAsync, AbandonCountersigningSessionAsync).
-		  - WASM host functions: ListWasmHostFunctionsAsync, ProvideMemproofsAsync.
-		  - App peer meta info: GetAppPeerMetaInfoAsync.
-		  - Expanded HoloNETConfig: Kitsune2Config, QUICConfig, NetworkConfig, KeystoreConfig, WASMConfig, CacheConfig, HolochainConductorAdminURI, InstalledAppId.
-		  - Upgraded to .NET 10 for maximum performance and longevity.
-		  - Part of the OASIS Omniverse Reboot and Rebrand (oasisomniverse.one / holonet.oasisomniverse.one).
-		  - Full README overhaul: every class, event, method, and property documented with code examples.
-		  - Copyright updated: NextGen Software Ltd 2019 - 2026.
-		  - Miscellaneous bug fixes and stability improvements.
+		  - HoloNETClientAdmin: full Conductor Admin API with 33 admin events.
+		  - Clone cell, countersigning, WASM host functions, app peer meta info support.
+		  - Upgraded to .NET 10.
 
 		  *Full Changelog:* https://github.com/holochain-open-dev/holochain-client-csharp/compare/v3.0.5...v4.0.0
 
@@ -110,7 +122,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="MessagePack" Version="2.5.302" />
+    <PackageReference Include="MessagePack" Version="2.5.303" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
     <PackageReference Include="Nito.AsyncEx.Context" Version="5.1.2" />
     <PackageReference Include="SauceControl.Blake2Fast" Version="2.0.0" />
