@@ -4,7 +4,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 {
     /// <summary>
     /// Mirrors holochain_types::app::CreateCloneCellPayload, used as the payload for
-    /// AppRequest::CreateCloneCell (Holochain 0.6.1):
+    /// AppRequest::CreateCloneCell (Holochain 0.7.0):
     ///
     /// pub struct CreateCloneCellPayload {
     ///     pub role_name: RoleName,                          // String

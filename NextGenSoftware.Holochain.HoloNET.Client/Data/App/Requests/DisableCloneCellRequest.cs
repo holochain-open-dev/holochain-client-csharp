@@ -4,7 +4,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 {
     /// <summary>
     /// Mirrors holochain_types::app::DisableCloneCellPayload, used as the payload for
-    /// AppRequest::DisableCloneCell (Holochain 0.6.1):
+    /// AppRequest::DisableCloneCell (Holochain 0.7.0):
     ///
     /// pub struct DisableCloneCellPayload {
     ///     pub clone_cell_id: CloneCellId,  // enum: CloneId(CloneId) | CellId(CellId)

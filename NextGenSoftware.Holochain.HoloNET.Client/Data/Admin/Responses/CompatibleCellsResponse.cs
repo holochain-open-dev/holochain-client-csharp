@@ -5,13 +5,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 {
     /// <summary>
     /// Mirrors holochain_conductor_api::admin_interface::AdminResponse::CompatibleCells
-    /// (Holochain 0.6.1):
+    /// (Holochain 0.7.0):
     ///
     /// #[cfg(feature = "unstable-migration")]
     /// pub type CompatibleCells = BTreeSet&lt;(InstalledAppId, BTreeSet&lt;CellId&gt;)&gt;;
     /// https://github.com/holochain/holochain/blob/holochain-0.7.0/crates/holochain_conductor_api/src/admin_interface.rs
     ///
-    /// NOTE: This is gated behind the `unstable-migration` feature flag in Holochain 0.6.1 and
+    /// NOTE: This is gated behind the `unstable-migration` feature flag (unchanged in 0.7.0) and
     /// may not be present/enabled on all conductor builds.
     /// </summary>
     [MessagePackObject]

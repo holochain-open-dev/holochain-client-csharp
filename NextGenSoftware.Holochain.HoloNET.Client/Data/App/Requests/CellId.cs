@@ -3,7 +3,7 @@
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
     /// <summary>
-    /// Mirrors the Rust holochain_zome_types::cell::CellId tuple struct (Holochain 0.6.1):
+    /// Mirrors the Rust holochain_zome_types::cell::CellId tuple struct (Holochain 0.7.0):
     /// `pub struct CellId(DnaHash, AgentPubKey);`
     /// https://github.com/holochain/holochain/blob/holochain-0.7.0/crates/holochain_zome_types/src/cell.rs
     /// A Rust tuple struct (de)serializes as a positional 2-element array, so this is

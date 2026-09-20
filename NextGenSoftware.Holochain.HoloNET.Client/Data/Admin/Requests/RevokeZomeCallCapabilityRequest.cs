@@ -4,7 +4,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests
 {
     /// <summary>
     /// Mirrors holochain_conductor_api::admin_interface::AdminRequest::RevokeZomeCallCapability
-    /// (Holochain 0.6.1):
+    /// (Holochain 0.7.0):
     ///
     /// RevokeZomeCallCapability {
     ///     action_hash: ActionHash,

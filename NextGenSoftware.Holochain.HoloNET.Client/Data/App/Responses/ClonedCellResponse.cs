@@ -4,7 +4,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 {
     /// <summary>
     /// Mirrors holochain_types::app::ClonedCell, returned by AppResponse::CloneCellCreated and
-    /// AppResponse::CloneCellEnabled (Holochain 0.6.1).
+    /// AppResponse::CloneCellEnabled (Holochain 0.7.0).
     ///
     /// NOTE: Unlike most other classes added in this upgrade, the exact field list of
     /// `ClonedCell` for 0.6.1 could NOT be conclusively re-verified via docs.rs/GitHub source at

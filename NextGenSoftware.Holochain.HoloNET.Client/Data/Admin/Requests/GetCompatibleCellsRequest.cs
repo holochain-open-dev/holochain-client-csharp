@@ -4,7 +4,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests
 {
     /// <summary>
     /// Mirrors holochain_conductor_api::admin_interface::AdminRequest::GetCompatibleCells
-    /// (Holochain 0.6.1). The payload is a single DnaHash:
+    /// (Holochain 0.7.0). The payload is a single DnaHash:
     ///
     /// GetCompatibleCells(DnaHash)
     /// https://github.com/holochain/holochain/blob/holochain-0.7.0/crates/holochain_conductor_api/src/admin_interface.rs

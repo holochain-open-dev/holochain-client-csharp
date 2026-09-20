@@ -21,15 +21,16 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
         private static Stopwatch _timer = new Stopwatch(); // creating new instance of the stopwatch
         private static ConsoleColor _testHeadingColour = ConsoleColor.Yellow;
         private static AvatarEntryDataObject _avatarEntryDataObject = null;
-        private const string _hcAdminURI = "ws://localhost:65464";
-        private const string _hcAppURI = "ws://localhost:8888";
-        //private const string _oasisHappPath = @"\hApps\oasis\zomes\workdir\happ";
+        // URIs and paths are resolved from environment variables with relative-path fallbacks.
+        // See HoloNETTestHarnessConfig.cs for the full list of env vars and defaults.
+        private static readonly string _hcAdminURI = HoloNETTestHarnessConfig.HcAdminURI;
+        private static readonly string _hcAppURI = HoloNETTestHarnessConfig.HcAppURI;
         private const string _oasisHappId = "oasis";
         private const string _oasisRoleName = "oasis";
-        private const string _oasisHappPath = @"E:\Code\hc\holochain-holochain-0.7.0\happs\oasis\BUILD\happ\oasis.happ";
-        private const string _numbersHappPath = @"\hApps\happ-build-tutorial-develop\workdir\happ";
-        private const string _oasisHappFolder = @"C:\Users\USER\holochain-holochain-0.7.0\happs\oasis\BUILD\happ";
-        private const string _oasisDnaPath = @"E:\Code\hc\holochain-holochain-0.7.0\happs\oasis\BUILD\dna\oasis.dna";
+        private static readonly string _oasisHappPath = HoloNETTestHarnessConfig.OasisHappPath;
+        private static readonly string _numbersHappPath = HoloNETTestHarnessConfig.NumbersHappPath;
+        private static readonly string _oasisHappFolder = HoloNETTestHarnessConfig.OasisHappFolder;
+        private static readonly string _oasisDnaPath = HoloNETTestHarnessConfig.OasisDnaPath;
         private const string _oasisDnaHash = ""; //TODO Generate Hash here!
 
         static async Task Main(string[] args)

@@ -10,7 +10,7 @@
         "projectUniqueName": "C:\\Source\\holochain-client-csharp\\NextGenSoftware.Holochain.HoloNET.Client.TestHarness\\NextGenSoftware.Holochain.HoloNET.Client.TestHarness.csproj",
         "projectName": "NextGenSoftware.Holochain.HoloNET.Client.TestHarness",
         "projectPath": "C:\\Source\\holochain-client-csharp\\NextGenSoftware.Holochain.HoloNET.Client.TestHarness\\NextGenSoftware.Holochain.HoloNET.Client.TestHarness.csproj",
-        "packagesPath": "C:\\Users\\David\\.nuget\\packages\\",
+        "packagesPath": "C:\\Users\\david\\.nuget\\packages\\",
         "outputPath": "C:\\Source\\holochain-client-csharp\\NextGenSoftware.Holochain.HoloNET.Client.TestHarness\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
@@ -18,7 +18,7 @@
         ],
         "configFilePaths": [
           "C:\\Source\\holochain-client-csharp\\NuGet.Config",
-          "C:\\Users\\David\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\david\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -55,7 +55,7 @@
           "auditLevel": "low",
           "auditMode": "all"
         },
-        "SdkAnalysisLevel": "10.0.300"
+        "SdkAnalysisLevel": "10.0.400"
       },
       "frameworks": {
         "net10.0": {
@@ -77,7 +77,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.301/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.401/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.CSharp": "(,4.7.32767]",
             "Microsoft.VisualBasic": "(,10.4.32767]",
@@ -356,12 +356,12 @@
       }
     },
     "C:\\Source\\holochain-client-csharp\\NextGenSoftware.Holochain.HoloNET.Client\\NextGenSoftware.Holochain.HoloNET.Client.csproj": {
-      "version": "4.0.0",
+      "version": "4.1.0",
       "restore": {
         "projectUniqueName": "C:\\Source\\holochain-client-csharp\\NextGenSoftware.Holochain.HoloNET.Client\\NextGenSoftware.Holochain.HoloNET.Client.csproj",
         "projectName": "NextGenSoftware.Holochain.HoloNET.Client",
         "projectPath": "C:\\Source\\holochain-client-csharp\\NextGenSoftware.Holochain.HoloNET.Client\\NextGenSoftware.Holochain.HoloNET.Client.csproj",
-        "packagesPath": "C:\\Users\\David\\.nuget\\packages\\",
+        "packagesPath": "C:\\Users\\david\\.nuget\\packages\\",
         "outputPath": "C:\\Source\\holochain-client-csharp\\NextGenSoftware.Holochain.HoloNET.Client\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
@@ -369,7 +369,7 @@
         ],
         "configFilePaths": [
           "C:\\Source\\holochain-client-csharp\\NuGet.Config",
-          "C:\\Users\\David\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\david\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -387,14 +387,14 @@
             "framework": "net10.0",
             "targetAlias": "net10.0",
             "projectReferences": {
-              "C:\\Source\\holochain-client-csharp\\NextGenSoftware-Libraries\\NextGenSoftware.Logging\\NextGenSoftware.Logging.csproj": {
-                "projectPath": "C:\\Source\\holochain-client-csharp\\NextGenSoftware-Libraries\\NextGenSoftware.Logging\\NextGenSoftware.Logging.csproj"
+              "C:\\Source\\NextGenSoftware-Libraries\\NextGenSoftware.Logging\\NextGenSoftware.Logging.csproj": {
+                "projectPath": "C:\\Source\\NextGenSoftware-Libraries\\NextGenSoftware.Logging\\NextGenSoftware.Logging.csproj"
               },
-              "C:\\Source\\holochain-client-csharp\\NextGenSoftware-Libraries\\NextGenSoftware.Utilities\\NextGenSoftware.Utilities.csproj": {
-                "projectPath": "C:\\Source\\holochain-client-csharp\\NextGenSoftware-Libraries\\NextGenSoftware.Utilities\\NextGenSoftware.Utilities.csproj"
+              "C:\\Source\\NextGenSoftware-Libraries\\NextGenSoftware.Utilities\\NextGenSoftware.Utilities.csproj": {
+                "projectPath": "C:\\Source\\NextGenSoftware-Libraries\\NextGenSoftware.Utilities\\NextGenSoftware.Utilities.csproj"
               },
-              "C:\\Source\\holochain-client-csharp\\NextGenSoftware-Libraries\\NextGenSoftware.WebSocket\\NextGenSoftware.WebSocket.csproj": {
-                "projectPath": "C:\\Source\\holochain-client-csharp\\NextGenSoftware-Libraries\\NextGenSoftware.WebSocket\\NextGenSoftware.WebSocket.csproj"
+              "C:\\Source\\NextGenSoftware-Libraries\\NextGenSoftware.WebSocket\\NextGenSoftware.WebSocket.csproj": {
+                "projectPath": "C:\\Source\\NextGenSoftware-Libraries\\NextGenSoftware.WebSocket\\NextGenSoftware.WebSocket.csproj"
               }
             }
           }
@@ -409,7 +409,7 @@
           "auditLevel": "low",
           "auditMode": "all"
         },
-        "SdkAnalysisLevel": "10.0.300"
+        "SdkAnalysisLevel": "10.0.400"
       },
       "frameworks": {
         "net10.0": {
@@ -461,7 +461,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.301/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.401/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.CSharp": "(,4.7.32767]",
             "Microsoft.VisualBasic": "(,10.4.32767]",
@@ -740,12 +740,12 @@
       }
     },
     "C:\\Source\\holochain-client-csharp\\NextGenSoftware.Holochain.HoloNET.ORM\\NextGenSoftware.Holochain.HoloNET.ORM.csproj": {
-      "version": "3.0.6",
+      "version": "4.0.0",
       "restore": {
         "projectUniqueName": "C:\\Source\\holochain-client-csharp\\NextGenSoftware.Holochain.HoloNET.ORM\\NextGenSoftware.Holochain.HoloNET.ORM.csproj",
         "projectName": "NextGenSoftware.Holochain.HoloNET.ORM",
         "projectPath": "C:\\Source\\holochain-client-csharp\\NextGenSoftware.Holochain.HoloNET.ORM\\NextGenSoftware.Holochain.HoloNET.ORM.csproj",
-        "packagesPath": "C:\\Users\\David\\.nuget\\packages\\",
+        "packagesPath": "C:\\Users\\david\\.nuget\\packages\\",
         "outputPath": "C:\\Source\\holochain-client-csharp\\NextGenSoftware.Holochain.HoloNET.ORM\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
@@ -753,12 +753,12 @@
         ],
         "configFilePaths": [
           "C:\\Source\\holochain-client-csharp\\NuGet.Config",
-          "C:\\Users\\David\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\david\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
-          "net8.0"
+          "net10.0"
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
@@ -767,9 +767,9 @@
           "https://www.myget.org/F/opensilver/api/v3/index.json": {}
         },
         "frameworks": {
-          "net8.0": {
-            "framework": "net8.0",
-            "targetAlias": "net8.0",
+          "net10.0": {
+            "framework": "net10.0",
+            "targetAlias": "net10.0",
             "projectReferences": {
               "C:\\Source\\holochain-client-csharp\\NextGenSoftware.Holochain.HoloNET.Client\\NextGenSoftware.Holochain.HoloNET.Client.csproj": {
                 "projectPath": "C:\\Source\\holochain-client-csharp\\NextGenSoftware.Holochain.HoloNET.Client\\NextGenSoftware.Holochain.HoloNET.Client.csproj"
@@ -794,14 +794,14 @@
         "restoreAuditProperties": {
           "enableAudit": "true",
           "auditLevel": "low",
-          "auditMode": "direct"
+          "auditMode": "all"
         },
-        "SdkAnalysisLevel": "10.0.300"
+        "SdkAnalysisLevel": "10.0.400"
       },
       "frameworks": {
-        "net8.0": {
-          "framework": "net8.0",
-          "targetAlias": "net8.0",
+        "net10.0": {
+          "framework": "net10.0",
+          "targetAlias": "net10.0",
           "imports": [
             "net461",
             "net462",
@@ -818,7 +818,281 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.301/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.401/PortableRuntimeIdentifierGraph.json",
+          "packagesToPrune": {
+            "Microsoft.CSharp": "(,4.7.32767]",
+            "Microsoft.VisualBasic": "(,10.4.32767]",
+            "Microsoft.Win32.Primitives": "(,4.3.32767]",
+            "Microsoft.Win32.Registry": "(,5.0.32767]",
+            "runtime.any.System.Collections": "(,4.3.32767]",
+            "runtime.any.System.Diagnostics.Tools": "(,4.3.32767]",
+            "runtime.any.System.Diagnostics.Tracing": "(,4.3.32767]",
+            "runtime.any.System.Globalization": "(,4.3.32767]",
+            "runtime.any.System.Globalization.Calendars": "(,4.3.32767]",
+            "runtime.any.System.IO": "(,4.3.32767]",
+            "runtime.any.System.Reflection": "(,4.3.32767]",
+            "runtime.any.System.Reflection.Extensions": "(,4.3.32767]",
+            "runtime.any.System.Reflection.Primitives": "(,4.3.32767]",
+            "runtime.any.System.Resources.ResourceManager": "(,4.3.32767]",
+            "runtime.any.System.Runtime": "(,4.3.32767]",
+            "runtime.any.System.Runtime.Handles": "(,4.3.32767]",
+            "runtime.any.System.Runtime.InteropServices": "(,4.3.32767]",
+            "runtime.any.System.Text.Encoding": "(,4.3.32767]",
+            "runtime.any.System.Text.Encoding.Extensions": "(,4.3.32767]",
+            "runtime.any.System.Threading.Tasks": "(,4.3.32767]",
+            "runtime.any.System.Threading.Timer": "(,4.3.32767]",
+            "runtime.aot.System.Collections": "(,4.3.32767]",
+            "runtime.aot.System.Diagnostics.Tools": "(,4.3.32767]",
+            "runtime.aot.System.Diagnostics.Tracing": "(,4.3.32767]",
+            "runtime.aot.System.Globalization": "(,4.3.32767]",
+            "runtime.aot.System.Globalization.Calendars": "(,4.3.32767]",
+            "runtime.aot.System.IO": "(,4.3.32767]",
+            "runtime.aot.System.Reflection": "(,4.3.32767]",
+            "runtime.aot.System.Reflection.Extensions": "(,4.3.32767]",
+            "runtime.aot.System.Reflection.Primitives": "(,4.3.32767]",
+            "runtime.aot.System.Resources.ResourceManager": "(,4.3.32767]",
+            "runtime.aot.System.Runtime": "(,4.3.32767]",
+            "runtime.aot.System.Runtime.Handles": "(,4.3.32767]",
+            "runtime.aot.System.Runtime.InteropServices": "(,4.3.32767]",
+            "runtime.aot.System.Text.Encoding": "(,4.3.32767]",
+            "runtime.aot.System.Text.Encoding.Extensions": "(,4.3.32767]",
+            "runtime.aot.System.Threading.Tasks": "(,4.3.32767]",
+            "runtime.aot.System.Threading.Timer": "(,4.3.32767]",
+            "runtime.debian.8-x64.runtime.native.System": "(,4.3.32767]",
+            "runtime.debian.8-x64.runtime.native.System.IO.Compression": "(,4.3.32767]",
+            "runtime.debian.8-x64.runtime.native.System.Net.Http": "(,4.3.32767]",
+            "runtime.debian.8-x64.runtime.native.System.Net.Security": "(,4.3.32767]",
+            "runtime.debian.8-x64.runtime.native.System.Security.Cryptography": "(,4.3.32767]",
+            "runtime.debian.8-x64.runtime.native.System.Security.Cryptography.OpenSsl": "(,4.3.32767]",
+            "runtime.debian.9-x64.runtime.native.System": "(,4.3.32767]",
+            "runtime.debian.9-x64.runtime.native.System.IO.Compression": "(,4.3.32767]",
+            "runtime.debian.9-x64.runtime.native.System.Net.Http": "(,4.3.32767]",
+            "runtime.debian.9-x64.runtime.native.System.Net.Security": "(,4.3.32767]",
+            "runtime.fedora.23-x64.runtime.native.System": "(,4.3.32767]",
+            "runtime.fedora.23-x64.runtime.native.System.IO.Compression": "(,4.3.32767]",
+            "runtime.fedora.23-x64.runtime.native.System.Net.Http": "(,4.3.32767]",
+            "runtime.fedora.23-x64.runtime.native.System.Net.Security": "(,4.3.32767]",
+            "runtime.fedora.23-x64.runtime.native.System.Security.Cryptography": "(,4.3.32767]",
+            "runtime.fedora.23-x64.runtime.native.System.Security.Cryptography.OpenSsl": "(,4.3.32767]",
+            "runtime.fedora.24-x64.runtime.native.System": "(,4.3.32767]",
+            "runtime.fedora.24-x64.runtime.native.System.IO.Compression": "(,4.3.32767]",
+            "runtime.fedora.24-x64.runtime.native.System.Net.Http": "(,4.3.32767]",
+            "runtime.fedora.24-x64.runtime.native.System.Net.Security": "(,4.3.32767]",
+            "runtime.fedora.24-x64.runtime.native.System.Security.Cryptography": "(,4.3.32767]",
+            "runtime.fedora.24-x64.runtime.native.System.Security.Cryptography.OpenSsl": "(,4.3.32767]",
+            "runtime.fedora.27-x64.runtime.native.System": "(,4.3.32767]",
+            "runtime.fedora.27-x64.runtime.native.System.IO.Compression": "(,4.3.32767]",
+            "runtime.fedora.27-x64.runtime.native.System.Net.Http": "(,4.3.32767]",
+            "runtime.fedora.27-x64.runtime.native.System.Net.Security": "(,4.3.32767]",
+            "runtime.fedora.28-x64.runtime.native.System": "(,4.3.32767]",
+            "runtime.fedora.28-x64.runtime.native.System.IO.Compression": "(,4.3.32767]",
+            "runtime.fedora.28-x64.runtime.native.System.Net.Http": "(,4.3.32767]",
+            "runtime.fedora.28-x64.runtime.native.System.Net.Security": "(,4.3.32767]",
+            "runtime.opensuse.13.2-x64.runtime.native.System": "(,4.3.32767]",
+            "runtime.opensuse.13.2-x64.runtime.native.System.IO.Compression": "(,4.3.32767]",
+            "runtime.opensuse.13.2-x64.runtime.native.System.Net.Http": "(,4.3.32767]",
+            "runtime.opensuse.13.2-x64.runtime.native.System.Net.Security": "(,4.3.32767]",
+            "runtime.opensuse.13.2-x64.runtime.native.System.Security.Cryptography": "(,4.3.32767]",
+            "runtime.opensuse.13.2-x64.runtime.native.System.Security.Cryptography.OpenSsl": "(,4.3.32767]",
+            "runtime.opensuse.42.1-x64.runtime.native.System": "(,4.3.32767]",
+            "runtime.opensuse.42.1-x64.runtime.native.System.IO.Compression": "(,4.3.32767]",
+            "runtime.opensuse.42.1-x64.runtime.native.System.Net.Http": "(,4.3.32767]",
+            "runtime.opensuse.42.1-x64.runtime.native.System.Net.Security": "(,4.3.32767]",
+            "runtime.opensuse.42.1-x64.runtime.native.System.Security.Cryptography": "(,4.3.32767]",
+            "runtime.opensuse.42.1-x64.runtime.native.System.Security.Cryptography.OpenSsl": "(,4.3.32767]",
+            "runtime.opensuse.42.3-x64.runtime.native.System": "(,4.3.32767]",
+            "runtime.opensuse.42.3-x64.runtime.native.System.IO.Compression": "(,4.3.32767]",
+            "runtime.opensuse.42.3-x64.runtime.native.System.Net.Http": "(,4.3.32767]",
+            "runtime.opensuse.42.3-x64.runtime.native.System.Net.Security": "(,4.3.32767]",
+            "runtime.osx.10.10-x64.runtime.native.System": "(,4.3.32767]",
+            "runtime.osx.10.10-x64.runtime.native.System.IO.Compression": "(,4.3.32767]",
+            "runtime.osx.10.10-x64.runtime.native.System.Net.Http": "(,4.3.32767]",
+            "runtime.osx.10.10-x64.runtime.native.System.Net.Security": "(,4.3.32767]",
+            "runtime.osx.10.10-x64.runtime.native.System.Security.Cryptography": "(,4.3.32767]",
+            "runtime.osx.10.10-x64.runtime.native.System.Security.Cryptography.Apple": "(,4.3.32767]",
+            "runtime.osx.10.10-x64.runtime.native.System.Security.Cryptography.OpenSsl": "(,4.3.32767]",
+            "runtime.rhel.7-x64.runtime.native.System": "(,4.3.32767]",
+            "runtime.rhel.7-x64.runtime.native.System.IO.Compression": "(,4.3.32767]",
+            "runtime.rhel.7-x64.runtime.native.System.Net.Http": "(,4.3.32767]",
+            "runtime.rhel.7-x64.runtime.native.System.Net.Security": "(,4.3.32767]",
+            "runtime.rhel.7-x64.runtime.native.System.Security.Cryptography": "(,4.3.32767]",
+            "runtime.rhel.7-x64.runtime.native.System.Security.Cryptography.OpenSsl": "(,4.3.32767]",
+            "runtime.ubuntu.14.04-x64.runtime.native.System": "(,4.3.32767]",
+            "runtime.ubuntu.14.04-x64.runtime.native.System.IO.Compression": "(,4.3.32767]",
+            "runtime.ubuntu.14.04-x64.runtime.native.System.Net.Http": "(,4.3.32767]",
+            "runtime.ubuntu.14.04-x64.runtime.native.System.Net.Security": "(,4.3.32767]",
+            "runtime.ubuntu.14.04-x64.runtime.native.System.Security.Cryptography": "(,4.3.32767]",
+            "runtime.ubuntu.14.04-x64.runtime.native.System.Security.Cryptography.OpenSsl": "(,4.3.32767]",
+            "runtime.ubuntu.16.04-x64.runtime.native.System": "(,4.3.32767]",
+            "runtime.ubuntu.16.04-x64.runtime.native.System.IO.Compression": "(,4.3.32767]",
+            "runtime.ubuntu.16.04-x64.runtime.native.System.Net.Http": "(,4.3.32767]",
+            "runtime.ubuntu.16.04-x64.runtime.native.System.Net.Security": "(,4.3.32767]",
+            "runtime.ubuntu.16.04-x64.runtime.native.System.Security.Cryptography": "(,4.3.32767]",
+            "runtime.ubuntu.16.04-x64.runtime.native.System.Security.Cryptography.OpenSsl": "(,4.3.32767]",
+            "runtime.ubuntu.16.10-x64.runtime.native.System": "(,4.3.32767]",
+            "runtime.ubuntu.16.10-x64.runtime.native.System.IO.Compression": "(,4.3.32767]",
+            "runtime.ubuntu.16.10-x64.runtime.native.System.Net.Http": "(,4.3.32767]",
+            "runtime.ubuntu.16.10-x64.runtime.native.System.Net.Security": "(,4.3.32767]",
+            "runtime.ubuntu.16.10-x64.runtime.native.System.Security.Cryptography": "(,4.3.32767]",
+            "runtime.ubuntu.16.10-x64.runtime.native.System.Security.Cryptography.OpenSsl": "(,4.3.32767]",
+            "runtime.ubuntu.18.04-x64.runtime.native.System": "(,4.3.32767]",
+            "runtime.ubuntu.18.04-x64.runtime.native.System.IO.Compression": "(,4.3.32767]",
+            "runtime.ubuntu.18.04-x64.runtime.native.System.Net.Http": "(,4.3.32767]",
+            "runtime.ubuntu.18.04-x64.runtime.native.System.Net.Security": "(,4.3.32767]",
+            "runtime.unix.Microsoft.Win32.Primitives": "(,4.3.32767]",
+            "runtime.unix.System.Console": "(,4.3.32767]",
+            "runtime.unix.System.Diagnostics.Debug": "(,4.3.32767]",
+            "runtime.unix.System.IO.FileSystem": "(,4.3.32767]",
+            "runtime.unix.System.Net.Primitives": "(,4.3.32767]",
+            "runtime.unix.System.Net.Sockets": "(,4.3.32767]",
+            "runtime.unix.System.Private.Uri": "(,4.3.32767]",
+            "runtime.unix.System.Runtime.Extensions": "(,4.3.32767]",
+            "runtime.win.Microsoft.Win32.Primitives": "(,4.3.32767]",
+            "runtime.win.System.Console": "(,4.3.32767]",
+            "runtime.win.System.Diagnostics.Debug": "(,4.3.32767]",
+            "runtime.win.System.IO.FileSystem": "(,4.3.32767]",
+            "runtime.win.System.Net.Primitives": "(,4.3.32767]",
+            "runtime.win.System.Net.Sockets": "(,4.3.32767]",
+            "runtime.win.System.Runtime.Extensions": "(,4.3.32767]",
+            "runtime.win10-arm-aot.runtime.native.System.IO.Compression": "(,4.0.32767]",
+            "runtime.win10-arm64.runtime.native.System.IO.Compression": "(,4.3.32767]",
+            "runtime.win10-x64-aot.runtime.native.System.IO.Compression": "(,4.0.32767]",
+            "runtime.win10-x86-aot.runtime.native.System.IO.Compression": "(,4.0.32767]",
+            "runtime.win7-x64.runtime.native.System.IO.Compression": "(,4.3.32767]",
+            "runtime.win7-x86.runtime.native.System.IO.Compression": "(,4.3.32767]",
+            "runtime.win7.System.Private.Uri": "(,4.3.32767]",
+            "runtime.win8-arm.runtime.native.System.IO.Compression": "(,4.3.32767]",
+            "System.AppContext": "(,4.3.32767]",
+            "System.Buffers": "(,5.0.32767]",
+            "System.Collections": "(,4.3.32767]",
+            "System.Collections.Concurrent": "(,4.3.32767]",
+            "System.Collections.Immutable": "(,10.0.32767]",
+            "System.Collections.NonGeneric": "(,4.3.32767]",
+            "System.Collections.Specialized": "(,4.3.32767]",
+            "System.ComponentModel": "(,4.3.32767]",
+            "System.ComponentModel.Annotations": "(,4.3.32767]",
+            "System.ComponentModel.EventBasedAsync": "(,4.3.32767]",
+            "System.ComponentModel.Primitives": "(,4.3.32767]",
+            "System.ComponentModel.TypeConverter": "(,4.3.32767]",
+            "System.Console": "(,4.3.32767]",
+            "System.Data.Common": "(,4.3.32767]",
+            "System.Data.DataSetExtensions": "(,4.4.32767]",
+            "System.Diagnostics.Contracts": "(,4.3.32767]",
+            "System.Diagnostics.Debug": "(,4.3.32767]",
+            "System.Diagnostics.DiagnosticSource": "(,10.0.32767]",
+            "System.Diagnostics.FileVersionInfo": "(,4.3.32767]",
+            "System.Diagnostics.Process": "(,4.3.32767]",
+            "System.Diagnostics.StackTrace": "(,4.3.32767]",
+            "System.Diagnostics.TextWriterTraceListener": "(,4.3.32767]",
+            "System.Diagnostics.Tools": "(,4.3.32767]",
+            "System.Diagnostics.TraceSource": "(,4.3.32767]",
+            "System.Diagnostics.Tracing": "(,4.3.32767]",
+            "System.Drawing.Primitives": "(,4.3.32767]",
+            "System.Dynamic.Runtime": "(,4.3.32767]",
+            "System.Formats.Asn1": "(,10.0.32767]",
+            "System.Formats.Tar": "(,10.0.32767]",
+            "System.Globalization": "(,4.3.32767]",
+            "System.Globalization.Calendars": "(,4.3.32767]",
+            "System.Globalization.Extensions": "(,4.3.32767]",
+            "System.IO": "(,4.3.32767]",
+            "System.IO.Compression": "(,4.3.32767]",
+            "System.IO.Compression.ZipFile": "(,4.3.32767]",
+            "System.IO.FileSystem": "(,4.3.32767]",
+            "System.IO.FileSystem.AccessControl": "(,4.4.32767]",
+            "System.IO.FileSystem.DriveInfo": "(,4.3.32767]",
+            "System.IO.FileSystem.Primitives": "(,4.3.32767]",
+            "System.IO.FileSystem.Watcher": "(,4.3.32767]",
+            "System.IO.IsolatedStorage": "(,4.3.32767]",
+            "System.IO.MemoryMappedFiles": "(,4.3.32767]",
+            "System.IO.Pipelines": "(,10.0.32767]",
+            "System.IO.Pipes": "(,4.3.32767]",
+            "System.IO.Pipes.AccessControl": "(,5.0.32767]",
+            "System.IO.UnmanagedMemoryStream": "(,4.3.32767]",
+            "System.Linq": "(,4.3.32767]",
+            "System.Linq.AsyncEnumerable": "(,10.0.32767]",
+            "System.Linq.Expressions": "(,4.3.32767]",
+            "System.Linq.Parallel": "(,4.3.32767]",
+            "System.Linq.Queryable": "(,4.3.32767]",
+            "System.Memory": "(,5.0.32767]",
+            "System.Net.Http": "(,4.3.32767]",
+            "System.Net.Http.Json": "(,10.0.32767]",
+            "System.Net.NameResolution": "(,4.3.32767]",
+            "System.Net.NetworkInformation": "(,4.3.32767]",
+            "System.Net.Ping": "(,4.3.32767]",
+            "System.Net.Primitives": "(,4.3.32767]",
+            "System.Net.Requests": "(,4.3.32767]",
+            "System.Net.Security": "(,4.3.32767]",
+            "System.Net.ServerSentEvents": "(,10.0.32767]",
+            "System.Net.Sockets": "(,4.3.32767]",
+            "System.Net.WebHeaderCollection": "(,4.3.32767]",
+            "System.Net.WebSockets": "(,4.3.32767]",
+            "System.Net.WebSockets.Client": "(,4.3.32767]",
+            "System.Numerics.Vectors": "(,5.0.32767]",
+            "System.ObjectModel": "(,4.3.32767]",
+            "System.Private.DataContractSerialization": "(,4.3.32767]",
+            "System.Private.Uri": "(,4.3.32767]",
+            "System.Reflection": "(,4.3.32767]",
+            "System.Reflection.DispatchProxy": "(,6.0.32767]",
+            "System.Reflection.Emit": "(,4.7.32767]",
+            "System.Reflection.Emit.ILGeneration": "(,4.7.32767]",
+            "System.Reflection.Emit.Lightweight": "(,4.7.32767]",
+            "System.Reflection.Extensions": "(,4.3.32767]",
+            "System.Reflection.Metadata": "(,10.0.32767]",
+            "System.Reflection.Primitives": "(,4.3.32767]",
+            "System.Reflection.TypeExtensions": "(,4.3.32767]",
+            "System.Resources.Reader": "(,4.3.32767]",
+            "System.Resources.ResourceManager": "(,4.3.32767]",
+            "System.Resources.Writer": "(,4.3.32767]",
+            "System.Runtime": "(,4.3.32767]",
+            "System.Runtime.CompilerServices.Unsafe": "(,7.0.32767]",
+            "System.Runtime.CompilerServices.VisualC": "(,4.3.32767]",
+            "System.Runtime.Extensions": "(,4.3.32767]",
+            "System.Runtime.Handles": "(,4.3.32767]",
+            "System.Runtime.InteropServices": "(,4.3.32767]",
+            "System.Runtime.InteropServices.RuntimeInformation": "(,4.3.32767]",
+            "System.Runtime.Loader": "(,4.3.32767]",
+            "System.Runtime.Numerics": "(,4.3.32767]",
+            "System.Runtime.Serialization.Formatters": "(,4.3.32767]",
+            "System.Runtime.Serialization.Json": "(,4.3.32767]",
+            "System.Runtime.Serialization.Primitives": "(,4.3.32767]",
+            "System.Runtime.Serialization.Xml": "(,4.3.32767]",
+            "System.Security.AccessControl": "(,6.0.32767]",
+            "System.Security.Claims": "(,4.3.32767]",
+            "System.Security.Cryptography.Algorithms": "(,4.3.32767]",
+            "System.Security.Cryptography.Cng": "(,5.0.32767]",
+            "System.Security.Cryptography.Csp": "(,4.3.32767]",
+            "System.Security.Cryptography.Encoding": "(,4.3.32767]",
+            "System.Security.Cryptography.OpenSsl": "(,5.0.32767]",
+            "System.Security.Cryptography.Primitives": "(,4.3.32767]",
+            "System.Security.Cryptography.X509Certificates": "(,4.3.32767]",
+            "System.Security.Principal": "(,4.3.32767]",
+            "System.Security.Principal.Windows": "(,5.0.32767]",
+            "System.Security.SecureString": "(,4.3.32767]",
+            "System.Text.Encoding": "(,4.3.32767]",
+            "System.Text.Encoding.CodePages": "(,10.0.32767]",
+            "System.Text.Encoding.Extensions": "(,4.3.32767]",
+            "System.Text.Encodings.Web": "(,10.0.32767]",
+            "System.Text.Json": "(,10.0.32767]",
+            "System.Text.RegularExpressions": "(,4.3.32767]",
+            "System.Threading": "(,4.3.32767]",
+            "System.Threading.AccessControl": "(,10.0.32767]",
+            "System.Threading.Channels": "(,10.0.32767]",
+            "System.Threading.Overlapped": "(,4.3.32767]",
+            "System.Threading.Tasks": "(,4.3.32767]",
+            "System.Threading.Tasks.Dataflow": "(,10.0.32767]",
+            "System.Threading.Tasks.Extensions": "(,5.0.32767]",
+            "System.Threading.Tasks.Parallel": "(,4.3.32767]",
+            "System.Threading.Thread": "(,4.3.32767]",
+            "System.Threading.ThreadPool": "(,4.3.32767]",
+            "System.Threading.Timer": "(,4.3.32767]",
+            "System.ValueTuple": "(,4.5.32767]",
+            "System.Xml.ReaderWriter": "(,4.3.32767]",
+            "System.Xml.XDocument": "(,4.3.32767]",
+            "System.Xml.XmlDocument": "(,4.3.32767]",
+            "System.Xml.XmlSerializer": "(,4.3.32767]",
+            "System.Xml.XPath": "(,4.3.32767]",
+            "System.Xml.XPath.XDocument": "(,5.0.32767]"
+          }
         }
       }
     },
@@ -828,14 +1102,14 @@
         "projectUniqueName": "C:\\Source\\NextGenSoftware-Libraries\\NextGenSoftware.CLI.Engine\\NextGenSoftware.CLI.Engine.csproj",
         "projectName": "NextGenSoftware.CLI.Engine",
         "projectPath": "C:\\Source\\NextGenSoftware-Libraries\\NextGenSoftware.CLI.Engine\\NextGenSoftware.CLI.Engine.csproj",
-        "packagesPath": "C:\\Users\\David\\.nuget\\packages\\",
+        "packagesPath": "C:\\Users\\david\\.nuget\\packages\\",
         "outputPath": "C:\\Source\\NextGenSoftware-Libraries\\NextGenSoftware.CLI.Engine\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\David\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\david\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -871,7 +1145,7 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "10.0.300"
+        "SdkAnalysisLevel": "10.0.400"
       },
       "frameworks": {
         "net8.0": {
@@ -918,12 +1192,26 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[8.0.31, 8.0.31]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[8.0.31, 8.0.31]"
+            },
+            {
+              "name": "Microsoft.WindowsDesktop.App.Ref",
+              "version": "[8.0.31, 8.0.31]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.301/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.401/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
@@ -933,7 +1221,7 @@
         "projectUniqueName": "C:\\Source\\NextGenSoftware-Libraries\\NextGenSoftware.ErrorHandling\\NextGenSoftware.ErrorHandling.csproj",
         "projectName": "NextGenSoftware.ErrorHandling",
         "projectPath": "C:\\Source\\NextGenSoftware-Libraries\\NextGenSoftware.ErrorHandling\\NextGenSoftware.ErrorHandling.csproj",
-        "packagesPath": "C:\\Users\\David\\.nuget\\packages\\",
+        "packagesPath": "C:\\Users\\david\\.nuget\\packages\\",
         "outputPath": "C:\\Source\\NextGenSoftware-Libraries\\NextGenSoftware.ErrorHandling\\obj\\",
         "projectStyle": "PackageReference",
         "crossTargeting": true,
@@ -941,7 +1229,7 @@
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\David\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\david\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -976,7 +1264,7 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "10.0.300"
+        "SdkAnalysisLevel": "10.0.400"
       },
       "frameworks": {
         "net8.0": {
@@ -993,12 +1281,26 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[8.0.31, 8.0.31]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[8.0.31, 8.0.31]"
+            },
+            {
+              "name": "Microsoft.WindowsDesktop.App.Ref",
+              "version": "[8.0.31, 8.0.31]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.301/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.401/PortableRuntimeIdentifierGraph.json"
         },
         "net9.0": {
           "framework": "net9.0",
@@ -1014,12 +1316,26 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[9.0.20, 9.0.20]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[9.0.20, 9.0.20]"
+            },
+            {
+              "name": "Microsoft.WindowsDesktop.App.Ref",
+              "version": "[9.0.20, 9.0.20]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.301/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.401/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
@@ -1029,7 +1345,7 @@
         "projectUniqueName": "C:\\Source\\NextGenSoftware-Libraries\\NextGenSoftware.Logging\\NextGenSoftware.Logging.csproj",
         "projectName": "NextGenSoftware.Logging",
         "projectPath": "C:\\Source\\NextGenSoftware-Libraries\\NextGenSoftware.Logging\\NextGenSoftware.Logging.csproj",
-        "packagesPath": "C:\\Users\\David\\.nuget\\packages\\",
+        "packagesPath": "C:\\Users\\david\\.nuget\\packages\\",
         "outputPath": "C:\\Source\\NextGenSoftware-Libraries\\NextGenSoftware.Logging\\obj\\",
         "projectStyle": "PackageReference",
         "crossTargeting": true,
@@ -1037,7 +1353,7 @@
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\David\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\david\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -1080,7 +1396,7 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "10.0.300"
+        "SdkAnalysisLevel": "10.0.400"
       },
       "frameworks": {
         "net8.0": {
@@ -1097,12 +1413,26 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[8.0.31, 8.0.31]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[8.0.31, 8.0.31]"
+            },
+            {
+              "name": "Microsoft.WindowsDesktop.App.Ref",
+              "version": "[8.0.31, 8.0.31]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.301/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.401/PortableRuntimeIdentifierGraph.json"
         },
         "net9.0": {
           "framework": "net9.0",
@@ -1118,12 +1448,26 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[9.0.20, 9.0.20]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[9.0.20, 9.0.20]"
+            },
+            {
+              "name": "Microsoft.WindowsDesktop.App.Ref",
+              "version": "[9.0.20, 9.0.20]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.301/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.401/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
@@ -1133,14 +1477,14 @@
         "projectUniqueName": "C:\\Source\\NextGenSoftware-Libraries\\NextGenSoftware.Utilities\\NextGenSoftware.Utilities.csproj",
         "projectName": "NextGenSoftware.Utilities",
         "projectPath": "C:\\Source\\NextGenSoftware-Libraries\\NextGenSoftware.Utilities\\NextGenSoftware.Utilities.csproj",
-        "packagesPath": "C:\\Users\\David\\.nuget\\packages\\",
+        "packagesPath": "C:\\Users\\david\\.nuget\\packages\\",
         "outputPath": "C:\\Source\\NextGenSoftware-Libraries\\NextGenSoftware.Utilities\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\David\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\david\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -1169,7 +1513,7 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "10.0.300"
+        "SdkAnalysisLevel": "10.0.400"
       },
       "frameworks": {
         "net8.0": {
@@ -1200,12 +1544,26 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[8.0.31, 8.0.31]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[8.0.31, 8.0.31]"
+            },
+            {
+              "name": "Microsoft.WindowsDesktop.App.Ref",
+              "version": "[8.0.31, 8.0.31]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.301/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.401/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
@@ -1215,7 +1573,7 @@
         "projectUniqueName": "C:\\Source\\NextGenSoftware-Libraries\\NextGenSoftware.WebSocket\\NextGenSoftware.WebSocket.csproj",
         "projectName": "NextGenSoftware.WebSocket",
         "projectPath": "C:\\Source\\NextGenSoftware-Libraries\\NextGenSoftware.WebSocket\\NextGenSoftware.WebSocket.csproj",
-        "packagesPath": "C:\\Users\\David\\.nuget\\packages\\",
+        "packagesPath": "C:\\Users\\david\\.nuget\\packages\\",
         "outputPath": "C:\\Source\\NextGenSoftware-Libraries\\NextGenSoftware.WebSocket\\obj\\",
         "projectStyle": "PackageReference",
         "crossTargeting": true,
@@ -1223,7 +1581,7 @@
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\David\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\david\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -1272,7 +1630,7 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "10.0.300"
+        "SdkAnalysisLevel": "10.0.400"
       },
       "frameworks": {
         "net8.0": {
@@ -1289,12 +1647,26 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[8.0.31, 8.0.31]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[8.0.31, 8.0.31]"
+            },
+            {
+              "name": "Microsoft.WindowsDesktop.App.Ref",
+              "version": "[8.0.31, 8.0.31]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.301/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.401/PortableRuntimeIdentifierGraph.json"
         },
         "net9.0": {
           "framework": "net9.0",
@@ -1310,12 +1682,26 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[9.0.20, 9.0.20]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[9.0.20, 9.0.20]"
+            },
+            {
+              "name": "Microsoft.WindowsDesktop.App.Ref",
+              "version": "[9.0.20, 9.0.20]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.301/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.401/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

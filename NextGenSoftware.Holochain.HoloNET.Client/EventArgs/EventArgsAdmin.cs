@@ -162,7 +162,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         /// <summary>
         /// Typed representation of <see cref="NetworkStatsDumpJSON"/>, parsed into the
-        /// kitsune2_api::transport::TransportStats shape (Holochain 0.6.1). Will be null if the
+        /// kitsune2_api/0.7.0). Will be null if the
         /// JSON could not be parsed into this shape (see RawJSONData/NetworkStatsDumpJSON for
         /// the raw data in that case).
         /// </summary>
