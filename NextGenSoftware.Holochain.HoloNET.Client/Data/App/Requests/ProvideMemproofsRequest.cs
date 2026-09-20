@@ -4,7 +4,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 {
     /// <summary>
     /// Mirrors the payload of AppRequest::ProvideMemproofs(MemproofMap) (Holochain 0.6.1):
-    /// https://github.com/holochain/holochain/blob/holochain-0.6.1/crates/holochain_conductor_api/src/app_interface.rs
+    /// https://github.com/holochain/holochain/blob/holochain-0.7.0/crates/holochain_conductor_api/src/app_interface.rs
     ///
     /// NOTE: `MemproofMap`'s precise Rust definition could not be conclusively located/verified
     /// at the time of writing. Based on its usage as "a membrane proof per role name" elsewhere

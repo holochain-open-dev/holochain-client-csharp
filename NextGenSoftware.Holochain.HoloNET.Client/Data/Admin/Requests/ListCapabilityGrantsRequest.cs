@@ -10,7 +10,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests
     ///     installed_app_id: String,
     ///     include_revoked: bool,
     /// }
-    /// https://github.com/holochain/holochain/blob/holochain-0.6.1/crates/holochain_conductor_api/src/admin_interface.rs
+    /// https://github.com/holochain/holochain/blob/holochain-0.7.0/crates/holochain_conductor_api/src/admin_interface.rs
     /// </summary>
     [MessagePackObject]
     public class ListCapabilityGrantsRequest

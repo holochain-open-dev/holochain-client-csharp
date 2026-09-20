@@ -4,7 +4,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 {
     /// <summary>
     /// Mirrors the Rust holochain_zome_types::zome_io::ZomeCallParams struct (Holochain 0.6.1):
-    /// https://github.com/holochain/holochain/blob/holochain-0.6.1/crates/holochain_zome_types/src/zome_io.rs
+    /// https://github.com/holochain/holochain/blob/holochain-0.7.0/crates/holochain_zome_types/src/zome_io.rs
     ///
     /// pub struct ZomeCallParams {
     ///     pub provenance: AgentPubKey,

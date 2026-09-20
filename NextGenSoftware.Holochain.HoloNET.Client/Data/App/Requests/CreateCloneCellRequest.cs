@@ -12,7 +12,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
     ///     pub membrane_proof: Option&lt;MembraneProof&gt;,         // Option&lt;Arc&lt;SerializedBytes&gt;&gt;
     ///     pub name: Option&lt;String&gt;,
     /// }
-    /// https://docs.rs/holochain_types/0.6.1/holochain_types/app/struct.CreateCloneCellPayload.html
+    /// https://docs.rs/holochain_types/0.7.0/holochain_types/app/struct.CreateCloneCellPayload.html
     ///
     /// NOTE: `DnaModifiersOpt&lt;YamlProperties&gt;` is represented here as `dynamic` since its exact
     /// nested shape (network_seed/properties/origin_time/quantum_time, each individually

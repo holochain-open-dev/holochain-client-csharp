@@ -8,7 +8,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
     /// (also used for the equivalent AppResponse::PeerMetaInfo) in Holochain 0.6.1:
     ///
     /// PeerMetaInfo(BTreeMap&lt;DnaHash, BTreeMap&lt;String, PeerMetaInfo&gt;&gt;)
-    /// https://github.com/holochain/holochain/blob/holochain-0.6.1/crates/holochain_conductor_api/src/admin_interface.rs
+    /// https://github.com/holochain/holochain/blob/holochain-0.7.0/crates/holochain_conductor_api/src/admin_interface.rs
     ///
     /// NOTE: The inner `kitsune2_api::PeerMetaInfo` struct's exact field shape could not be
     /// located/verified against an authoritative source at the time of writing, so each entry

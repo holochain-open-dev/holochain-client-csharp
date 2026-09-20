@@ -29,7 +29,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests
         [Key("bundle")]
         public AppBundle bundle { get; set; } //Can ONLY be path OR bundle
 
-        //https://docs.rs/holochain_types/0.6.1/holochain_types/app/enum.AppBundleSource.html
+        //https://docs.rs/holochain_types/0.7.0/holochain_types/app/enum.AppBundleSource.html
         //pub enum AppBundleSource
         //{
         //    Bundle(AppBundle),

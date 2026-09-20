@@ -26,10 +26,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
         //private const string _oasisHappPath = @"\hApps\oasis\zomes\workdir\happ";
         private const string _oasisHappId = "oasis";
         private const string _oasisRoleName = "oasis";
-        private const string _oasisHappPath = @"E:\Code\hc\holochain-holochain-0.6.1\happs\oasis\BUILD\happ\oasis.happ";
+        private const string _oasisHappPath = @"E:\Code\hc\holochain-holochain-0.7.0\happs\oasis\BUILD\happ\oasis.happ";
         private const string _numbersHappPath = @"\hApps\happ-build-tutorial-develop\workdir\happ";
-        private const string _oasisHappFolder = @"C:\Users\USER\holochain-holochain-0.6.1\happs\oasis\BUILD\happ";
-        private const string _oasisDnaPath = @"E:\Code\hc\holochain-holochain-0.6.1\happs\oasis\BUILD\dna\oasis.dna";
+        private const string _oasisHappFolder = @"C:\Users\USER\holochain-holochain-0.7.0\happs\oasis\BUILD\happ";
+        private const string _oasisDnaPath = @"E:\Code\hc\holochain-holochain-0.7.0\happs\oasis\BUILD\dna\oasis.dna";
         private const string _oasisDnaHash = ""; //TODO Generate Hash here!
 
         static async Task Main(string[] args)

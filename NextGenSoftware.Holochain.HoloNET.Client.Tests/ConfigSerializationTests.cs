@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using MessagePack;
 using MessagePack.Resolvers;
 using Xunit;
@@ -141,19 +143,72 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
         [Fact]
         public void QUICConfig_DefaultEnabled_IsFalse()
         {
-            // QUICConfig is an intentionally-inert placeholder with no real Holochain wire
-            // equivalent as of 0.6.1 (see QUICConfig.cs comments) - this test exists purely to
-            // lock in the documented default-disabled behaviour.
+            // QUICConfig is an intentionally-inert placeholder — this test locks in the default.
             Assert.False(new QUICConfig().Enabled);
         }
 
         [Fact]
         public void WASMConfig_DefaultEnabled_IsFalse()
         {
-            // WASMConfig is an intentionally-inert placeholder with no real Holochain wire
-            // equivalent as of 0.6.1 (see WASMConfig.cs comments) - this test exists purely to
-            // lock in the documented default-disabled behaviour.
+            // WASMConfig is an intentionally-inert placeholder — this test locks in the default.
             Assert.False(new WASMConfig().Enabled);
+        }
+
+        // ── DnaStorageInfo (Holochain 0.7.0) ────────────────────────────────────────────────────
+
+        [Fact]
+        public void DnaStorageInfo_RoundTrips_RemainingFields()
+        {
+            // authored_data_size / cache_data_size were removed in 0.7.0.
+            // Verify the remaining fields survive a MessagePack round-trip.
+            var original = new DnaStorageInfo
+            {
+                dht_data_size = 1_234_567,
+                dht_data_size_on_disk = 2_345_678,
+                used_by = "test-app"
+            };
+
+            byte[] bytes = MessagePackSerializer.Serialize(original, MessagePackSerializerOptions.Standard);
+            var result = MessagePackSerializer.Deserialize<DnaStorageInfo>(bytes, MessagePackSerializerOptions.Standard);
+
+            Assert.Equal(original.dht_data_size, result.dht_data_size);
+            Assert.Equal(original.dht_data_size_on_disk, result.dht_data_size_on_disk);
+            Assert.Equal(original.used_by, result.used_by);
+        }
+
+        [Fact]
+        public void DnaStorageInfo_DoesNotHaveRemovedFields()
+        {
+            // Compile-time guard: ensure the 0.7.0-removed fields are gone from the type.
+            var type = typeof(DnaStorageInfo);
+            Assert.Null(type.GetProperty("authored_data_size"));
+            Assert.Null(type.GetProperty("authored_data_size_on_disk"));
+            Assert.Null(type.GetProperty("cache_data_size"));
+            Assert.Null(type.GetProperty("cache_data_size_on_disk"));
+        }
+
+        // ── AppStatusFilter / AwaitingMemproofs (Holochain 0.7.0) ───────────────────────────────
+
+        [Fact]
+        public void AppStatusFilter_ContainsAwaitingMemproofs()
+        {
+            // Lock in the new enum variant added in 0.7.0.
+            Assert.True(Enum.IsDefined(typeof(AppStatusFilter), "AwaitingMemproofs"));
+        }
+
+        [Fact]
+        public void AppStatusFilter_AwaitingMemproofs_HasDistinctValue()
+        {
+            // Ensure no accidental duplicate ordinal.
+            var values = Enum.GetValues(typeof(AppStatusFilter)).Cast<AppStatusFilter>().ToList();
+            var distinct = values.Distinct().ToList();
+            Assert.Equal(values.Count, distinct.Count);
+        }
+
+        [Fact]
+        public void AppInfoStatusEnum_ContainsAwaitingMemproofs()
+        {
+            Assert.True(Enum.IsDefined(typeof(AppInfoStatusEnum), "AwaitingMemproofs"));
         }
     }
 }

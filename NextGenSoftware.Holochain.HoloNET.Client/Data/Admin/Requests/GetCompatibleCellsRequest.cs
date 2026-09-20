@@ -7,7 +7,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests
     /// (Holochain 0.6.1). The payload is a single DnaHash:
     ///
     /// GetCompatibleCells(DnaHash)
-    /// https://github.com/holochain/holochain/blob/holochain-0.6.1/crates/holochain_conductor_api/src/admin_interface.rs
+    /// https://github.com/holochain/holochain/blob/holochain-0.7.0/crates/holochain_conductor_api/src/admin_interface.rs
     ///
     /// NOTE: This variant is gated behind the `unstable-migration` feature flag in Holochain
     /// 0.6.1 and so may not be available on all conductor builds.

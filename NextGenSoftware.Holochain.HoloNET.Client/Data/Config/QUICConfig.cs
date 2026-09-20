@@ -4,7 +4,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
     /// NOT VERIFIED / NOT WIRED against any real Holochain 0.6.1 conductor-facing config.
     ///
     /// Researched holochain_conductor_api::config::conductor::NetworkConfig at
-    /// https://github.com/holochain/holochain/blob/holochain-0.6.1/crates/holochain_conductor_api/src/config/conductor.rs
+    /// https://github.com/holochain/holochain/blob/holochain-0.7.0/crates/holochain_conductor_api/src/config/conductor.rs
     /// and there is NO client-configurable QUIC transport tuning surface (no version, max
     /// concurrent streams, congestion window, TLS settings, etc.). Low-level transport details
     /// (kitsune2/iroh) are either fixed internally or exposed only as the single opaque

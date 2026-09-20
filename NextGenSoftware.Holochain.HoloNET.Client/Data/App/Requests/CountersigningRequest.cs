@@ -11,7 +11,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
     /// GetCountersigningSessionState(Box&lt;CellId&gt;)
     /// AbandonCountersigningSession(Box&lt;CellId&gt;)
     /// PublishCountersigningSession(Box&lt;CellId&gt;)
-    /// https://github.com/holochain/holochain/blob/holochain-0.6.1/crates/holochain_conductor_api/src/app_interface.rs
+    /// https://github.com/holochain/holochain/blob/holochain-0.7.0/crates/holochain_conductor_api/src/app_interface.rs
     /// </summary>
     [MessagePackObject]
     public class CountersigningCellIdRequest
