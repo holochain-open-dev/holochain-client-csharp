@@ -685,7 +685,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                         signature = sig[0..64]
                     };
 
-                    // Holochain 0.6.1 wire shape for AppRequest::CallZome is
+                    // Holochain 0.7.0 wire shape for AppRequest::CallZome is
                     // ZomeCallParamsSigned { bytes: ExternIO, signature: Signature } where
                     // `bytes` is the holochain_serialized_bytes (msgpack struct-map) encoding of
                     // the unsigned ZomeCall/ZomeCallParams fields above (`signedPayload` minus
@@ -973,7 +973,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             return CallZomeFunctionAsync(id, zome, function, callback, paramsObject, matchIdToZomeFuncInCallback, cachReturnData, ConductorResponseCallBackMode.UseCallBackEvents).Result;
         }
 
-        // New in Holochain 0.6.1 - App API.
+        // New in Holochain 0.7.0 - App API.
 
         /// <summary>
         /// Create a new clone cell for the given role.
@@ -1063,7 +1063,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         }
 
         /// <summary>
-        /// Get the state of a countersigning session for the given cell. Gated behind the `unstable-countersigning` feature flag in Holochain 0.6.1 - may not be available on all conductor builds.
+        /// Get the state of a countersigning session for the given cell. Gated behind the `unstable-countersigning` feature flag in Holochain 0.7.0 - may not be available on all conductor builds.
         /// </summary>
         /// <param name="cellId">The CellId to get the countersigning session state for.</param>
         /// <param name="conductorResponseCallBackMode">The Concuctor Response CallBack Mode, set this to 'WaitForHolochainConductorResponse' if you want the function to wait for the Holochain Conductor response before returning that response or set it to 'UseCallBackEvents' to return from the function immediately and then raise the 'OnCountersigningSessionStateReturnedCallBack' event when the conductor responds.</param>
@@ -1078,7 +1078,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         }
 
         /// <summary>
-        /// Get the state of a countersigning session for the given cell. Gated behind the `unstable-countersigning` feature flag in Holochain 0.6.1 - may not be available on all conductor builds.
+        /// Get the state of a countersigning session for the given cell. Gated behind the `unstable-countersigning` feature flag in Holochain 0.7.0 - may not be available on all conductor builds.
         /// </summary>
         /// <param name="cellId">The CellId to get the countersigning session state for.</param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
@@ -1089,7 +1089,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         }
 
         /// <summary>
-        /// Abandon an in-progress countersigning session for the given cell. Gated behind the `unstable-countersigning` feature flag in Holochain 0.6.1 - may not be available on all conductor builds.
+        /// Abandon an in-progress countersigning session for the given cell. Gated behind the `unstable-countersigning` feature flag in Holochain 0.7.0 - may not be available on all conductor builds.
         /// </summary>
         /// <param name="cellId">The CellId to abandon the countersigning session for.</param>
         /// <param name="conductorResponseCallBackMode">The Concuctor Response CallBack Mode, set this to 'WaitForHolochainConductorResponse' if you want the function to wait for the Holochain Conductor response before returning that response or set it to 'UseCallBackEvents' to return from the function immediately and then raise the 'OnCountersigningSessionAbandonedCallBack' event when the conductor responds.</param>
@@ -1104,7 +1104,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         }
 
         /// <summary>
-        /// Abandon an in-progress countersigning session for the given cell. Gated behind the `unstable-countersigning` feature flag in Holochain 0.6.1 - may not be available on all conductor builds.
+        /// Abandon an in-progress countersigning session for the given cell. Gated behind the `unstable-countersigning` feature flag in Holochain 0.7.0 - may not be available on all conductor builds.
         /// </summary>
         /// <param name="cellId">The CellId to abandon the countersigning session for.</param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
@@ -1115,7 +1115,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         }
 
         /// <summary>
-        /// Publish (force-finalise) an in-progress countersigning session for the given cell. Gated behind the `unstable-countersigning` feature flag in Holochain 0.6.1 - may not be available on all conductor builds.
+        /// Publish (force-finalise) an in-progress countersigning session for the given cell. Gated behind the `unstable-countersigning` feature flag in Holochain 0.7.0 - may not be available on all conductor builds.
         /// </summary>
         /// <param name="cellId">The CellId to publish the countersigning session for.</param>
         /// <param name="conductorResponseCallBackMode">The Concuctor Response CallBack Mode, set this to 'WaitForHolochainConductorResponse' if you want the function to wait for the Holochain Conductor response before returning that response or set it to 'UseCallBackEvents' to return from the function immediately and then raise the 'OnPublishCountersigningSessionTriggeredCallBack' event when the conductor responds.</param>
@@ -1130,7 +1130,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         }
 
         /// <summary>
-        /// Publish (force-finalise) an in-progress countersigning session for the given cell. Gated behind the `unstable-countersigning` feature flag in Holochain 0.6.1 - may not be available on all conductor builds.
+        /// Publish (force-finalise) an in-progress countersigning session for the given cell. Gated behind the `unstable-countersigning` feature flag in Holochain 0.7.0 - may not be available on all conductor builds.
         /// </summary>
         /// <param name="cellId">The CellId to publish the countersigning session for.</param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>

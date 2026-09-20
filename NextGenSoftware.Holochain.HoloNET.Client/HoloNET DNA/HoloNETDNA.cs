@@ -215,8 +215,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public ErrorHandlingBehaviour ErrorHandlingBehaviour { get; set; } = ErrorHandlingBehaviour.OnlyThrowExceptionIfNoErrorHandlerSubscribedToOnErrorEvent;
 
         /// <summary>
-        /// Network configuration mirroring Holochain 0.6.1's ConductorConfig.network
-        /// (holochain_conductor_api::config::conductor::NetworkConfig). As of 0.6.1,
+        /// Network configuration mirroring Holochain 0.7.0's ConductorConfig.network
+        /// (holochain_conductor_api::config::conductor::NetworkConfig). As of 0.7.0,
         /// request_timeout_s lives here rather than directly on ConductorConfig.
         /// See: https://github.com/holochain/holochain/blob/holochain-0.7.0/crates/holochain_conductor_api/src/config/conductor.rs
         /// </summary>
@@ -232,7 +232,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         /// <summary>
         /// QUIC transport configuration. NOT VERIFIED - no client-facing QUIC tuning surface was
-        /// found in holochain_conductor_api as of 0.6.1; see QUICConfig.cs for details. Kept as a
+        /// found in holochain_conductor_api as of 0.7.0; see QUICConfig.cs for details. Kept as a
         /// placeholder only; has no effect on conductor behaviour.
         /// </summary>
         public QUICConfig QUICConfig { get; set; } = new QUICConfig();
@@ -248,7 +248,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         /// <summary>
         /// WASM-related configuration. NOT VERIFIED - no client-facing wasm compilation/runtime
-        /// tuning surface was found in holochain_conductor_api as of 0.6.1; see WASMConfig.cs for
+        /// tuning surface was found in holochain_conductor_api as of 0.7.0; see WASMConfig.cs for
         /// details. Kept as a placeholder only; has no effect on conductor behaviour.
         /// </summary>
         public WASMConfig WASMConfig { get; set; } = new WASMConfig();

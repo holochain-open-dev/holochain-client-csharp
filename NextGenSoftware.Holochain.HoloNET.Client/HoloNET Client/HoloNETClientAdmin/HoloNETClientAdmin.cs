@@ -36,7 +36,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         private Dictionary<string, TaskCompletionSource<RecordsGraftedCallBackEventArgs>> _taskCompletionRecordsGraftedCallBack = new Dictionary<string, TaskCompletionSource<RecordsGraftedCallBackEventArgs>>();
         private Dictionary<string, TaskCompletionSource<AdminInterfacesAddedCallBackEventArgs>> _taskCompletionAdminInterfacesAddedCallBack = new Dictionary<string, TaskCompletionSource<AdminInterfacesAddedCallBackEventArgs>>();
 
-        // New in Holochain 0.6.1 - Admin API.
+        // New in Holochain 0.7.0 - Admin API.
         private Dictionary<string, TaskCompletionSource<ZomeCallCapabilityRevokedCallBackEventArgs>> _taskCompletionZomeCallCapabilityRevokedCallBack = new Dictionary<string, TaskCompletionSource<ZomeCallCapabilityRevokedCallBackEventArgs>>();
         private Dictionary<string, TaskCompletionSource<CapabilityGrantsListedCallBackEventArgs>> _taskCompletionCapabilityGrantsListedCallBack = new Dictionary<string, TaskCompletionSource<CapabilityGrantsListedCallBackEventArgs>>();
         private Dictionary<string, TaskCompletionSource<PeerMetaInfoReturnedCallBackEventArgs>> _taskCompletionPeerMetaInfoReturnedCallBack = new Dictionary<string, TaskCompletionSource<PeerMetaInfoReturnedCallBackEventArgs>>();
@@ -258,7 +258,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public event AdminInterfacesAddedCallBack OnAdminInterfacesAddedCallBack;
 
 
-        // New in Holochain 0.6.1 - Admin API.
+        // New in Holochain 0.7.0 - Admin API.
 
         public delegate void ZomeCallCapabilityRevokedCallBack(object sender, ZomeCallCapabilityRevokedCallBackEventArgs e);
 

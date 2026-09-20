@@ -31,7 +31,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         AdminRecordsGrafted,
         AdminAdminInterfacesAdded,
 
-        // New in Holochain 0.6.1 - Admin API
+        // New in Holochain 0.7.0 - Admin API
         AdminZomeCallCapabilityRevoked,
         AdminCapabilityGrantsInfoReturned,
         AdminPeerMetaInfoReturned,
@@ -39,7 +39,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         AdminAppAuthenticationTokenRevoked,
         AdminCompatibleCellsReturned,
 
-        // New in Holochain 0.6.1 - App API
+        // New in Holochain 0.7.0 - App API
         AppCloneCellCreated,
         AppCloneCellEnabled,
         AppCloneCellDisabled,

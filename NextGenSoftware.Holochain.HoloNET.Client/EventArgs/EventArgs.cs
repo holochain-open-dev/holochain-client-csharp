@@ -166,7 +166,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public WebSocketReceiveResult WebSocketResult { get; set; }
     }
 
-    // New in Holochain 0.6.1 - App API.
+    // New in Holochain 0.7.0 - App API.
 
     public class CloneCellCreatedCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {

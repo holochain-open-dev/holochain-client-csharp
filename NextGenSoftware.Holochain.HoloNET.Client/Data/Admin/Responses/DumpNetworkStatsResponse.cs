@@ -9,7 +9,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
     /// string here, not a msgpack object, hence this is deserialized with Newtonsoft.Json from
     /// NetworkStatsDumpedCallBackEventArgs.NetworkStatsDumpJSON rather than via MessagePack).
     ///
-    /// As of Holochain 0.6.1 this wraps kitsune2_api::transport::TransportStats per connection.
+    /// As of Holochain 0.7.0 this wraps kitsune2_api::transport::TransportStats per connection.
     /// https://docs.rs/kitsune2_api/latest/kitsune2_api/struct.TransportStats.html
     /// https://docs.rs/kitsune2_api/latest/kitsune2_api/struct.TransportConnectionStats.html
     /// </summary>

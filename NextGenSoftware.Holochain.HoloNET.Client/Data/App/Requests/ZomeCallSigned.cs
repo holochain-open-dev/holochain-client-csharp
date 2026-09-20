@@ -3,7 +3,7 @@
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
     /// <summary>
-    /// NOTE: As of Holochain 0.6.1 the wire-level signed zome call sent over the app
+    /// NOTE: As of Holochain 0.7.0 the wire-level signed zome call sent over the app
     /// websocket interface is no longer a flattened struct with a trailing signature field.
     /// It is `holochain_conductor_api::app_interface::ZomeCallParamsSigned`:
     ///
@@ -16,7 +16,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
     ///
     /// This class is kept (mirroring the previous flattened shape built from <see cref="ZomeCall"/>)
     /// for backward compatibility with any code/tests that reference it, but it is no longer what
-    /// gets sent on the wire - see <see cref="ZomeCallParamsSigned"/> for the real 0.6.1 wire shape,
+    /// gets sent on the wire - see <see cref="ZomeCallParamsSigned"/> for the real 0.7.0 wire shape,
     /// which HoloNETClientAppBase now uses when constructing the `call_zome` request.
     /// </summary>
     [MessagePackObject]

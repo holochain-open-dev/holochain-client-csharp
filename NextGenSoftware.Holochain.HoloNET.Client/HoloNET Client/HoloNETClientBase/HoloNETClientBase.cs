@@ -615,7 +615,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     {
                         //If the conductor config file does not exist in the default location then we need to set the conductor up now.
                         //NOTE: As of Holochain 0.6.x the old `-i` (interactive init) flag has been removed entirely - it no longer exists on
-                        //the holochain.exe CLI (confirmed via `holochain.exe --help` against the real 0.6.1 binary, which only lists
+                        //the holochain.exe CLI (confirmed via `holochain.exe --help` against the real 0.7.0 binary, which only lists
                         //--create-config, not -i). The replacement is `--create-config`, which also no longer accepts a `-c <path>` to
                         //control where it writes the file - it always creates a new randomly-named sandbox directory (and a `.hc` file in
                         //the current working directory pointing at it) and prints a "Created config at <path>" line to stdout. There are
@@ -1128,7 +1128,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// Builds the extra headers to send on the WebSocket handshake to the Holochain Conductor. As of Holochain
         /// 0.6.x the conductor's admin/app websocket servers reject the handshake with HTTP 400 if no Origin header
         /// is present at all, even when their `allowed_origins` config is set to allow any origin - confirmed directly
-        /// against a real Holochain 0.6.1 conductor, since .NET's ClientWebSocket does not send an Origin header by
+        /// against a real Holochain 0.7.0 conductor, since .NET's ClientWebSocket does not send an Origin header by
         /// default (Origin is normally a browser-only concept). We send a generic localhost Origin here since the
         /// conductor's `allowed_origins: Any` setting means the actual value does not need to match anything specific.
         /// </summary>
@@ -1171,7 +1171,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 createConfigProcess.WaitForExit(10000);
 
                 //Checking both streams since this is undocumented CLI behaviour - verified empirically against the real
-                //0.6.1 binary that the "Created config at <path>" line currently goes to stdout, but checking stderr
+                //0.7.0 binary that the "Created config at <path>" line currently goes to stdout, but checking stderr
                 //too is a cheap safeguard against that changing in a future point release.
                 string combinedOutput = string.Concat(stdOut, "\n", stdErr);
                 const string marker = "Created config at ";

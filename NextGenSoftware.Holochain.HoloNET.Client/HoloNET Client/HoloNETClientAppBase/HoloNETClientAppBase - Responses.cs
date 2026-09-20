@@ -541,7 +541,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             RaiseZomeDataReceivedEvent(zomeFunctionCallBackArgs);
         }
 
-        // New in Holochain 0.6.1 - App API.
+        // New in Holochain 0.7.0 - App API.
 
         private void DecodeCloneCellCreatedReceived(IHoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
         {
@@ -924,7 +924,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             _taskCompletionZomeCallBack.Remove(zomeFunctionCallBackArgs.Id);
         }
 
-        // New in Holochain 0.6.1 - App API.
+        // New in Holochain 0.7.0 - App API.
 
         private void RaiseCloneCellCreatedEvent(CloneCellCreatedCallBackEventArgs cloneCellCreatedCallBackEventArgs)
         {

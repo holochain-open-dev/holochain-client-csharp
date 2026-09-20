@@ -1337,7 +1337,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }, _taskCompletionCoordinatorsUpdatedCallBack, "OnCoordinatorsUpdatedCallBack", conductorResponseCallBackMode, id);
         }
 
-        // New in Holochain 0.6.1 - Admin API.
+        // New in Holochain 0.7.0 - Admin API.
 
         /// <summary>
         /// Revoke a previously granted zome call capability.
@@ -1485,7 +1485,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         }
 
         /// <summary>
-        /// Get the cells that are compatible with (i.e. share a lineage with) the given DnaHash. Gated behind the `unstable-migration` feature flag in Holochain 0.6.1 - may not be available on all conductor builds.
+        /// Get the cells that are compatible with (i.e. share a lineage with) the given DnaHash. Gated behind the `unstable-migration` feature flag in Holochain 0.7.0 - may not be available on all conductor builds.
         /// </summary>
         /// <param name="dnaHash">The DnaHash to find compatible cells for.</param>
         /// <param name="conductorResponseCallBackMode">The Concuctor Response CallBack Mode, set this to 'WaitForHolochainConductorResponse' if you want the function to wait for the Holochain Conductor response before returning that response or set it to 'UseCallBackEvents' to return from the function immediately and then raise the 'OnCompatibleCellsReturnedCallBack' event when the conductor responds.</param>
@@ -1500,7 +1500,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         }
 
         /// <summary>
-        /// Get the cells that are compatible with (i.e. share a lineage with) the given DnaHash. Gated behind the `unstable-migration` feature flag in Holochain 0.6.1 - may not be available on all conductor builds.
+        /// Get the cells that are compatible with (i.e. share a lineage with) the given DnaHash. Gated behind the `unstable-migration` feature flag in Holochain 0.7.0 - may not be available on all conductor builds.
         /// </summary>
         /// <param name="dnaHash">The DnaHash to find compatible cells for.</param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>

@@ -14,10 +14,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
     /// }
     /// https://docs.rs/holochain_types/0.7.0/holochain_types/app/struct.CreateCloneCellPayload.html
     ///
-    /// NOTE: `DnaModifiersOpt&lt;YamlProperties&gt;` is represented here as `dynamic` since its exact
-    /// nested shape (network_seed/properties/origin_time/quantum_time, each individually
-    /// Optional) was not re-verified field-by-field for 0.6.1 - callers can supply a plain
-    /// anonymous object/dictionary with the modifier fields they need.
+    /// Verified against holochain_types/src/app.rs at holochain-0.7.0 — all four fields match.
+    /// `DnaModifiersOpt&lt;YamlProperties&gt;` is represented as `dynamic` since its sub-fields
+    /// (network_seed, properties, origin_time, quantum_time) are each individually Optional;
+    /// callers can supply a plain anonymous object/dictionary with only the fields they need.
     /// </summary>
     [MessagePackObject]
     public class CreateCloneCellRequest
