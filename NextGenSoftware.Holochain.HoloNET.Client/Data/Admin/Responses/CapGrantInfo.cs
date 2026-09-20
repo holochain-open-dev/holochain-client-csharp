@@ -13,16 +13,14 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
     /// }
     /// https://docs.rs/holochain_zome_types/0.7.0/holochain_zome_types/capability/struct.CapGrantInfo.html
     ///
-    /// NOTE: `DesensitizedZomeCallCapGrant` itself was not verified field-by-field against the
-    /// Rust source (could not locate the authoritative definition at time of writing); it is
-    /// represented here as `dynamic` so the rest of the structure can still round-trip via
-    /// MessagePack without guessing at its internal shape.
+    /// `DesensitizedZomeCallCapGrant` is verified against holochain_zome_types 0.7.0:
+    /// tag (String), access (CapAccessInfo), functions (GrantedFunctions).
     /// </summary>
     [MessagePackObject]
     public class CapGrantInfo
     {
         [Key("cap_grant")]
-        public dynamic cap_grant { get; set; }
+        public DesensitizedZomeCallCapGrant cap_grant { get; set; }
 
         [Key("action_hash")]
         public byte[] action_hash { get; set; }

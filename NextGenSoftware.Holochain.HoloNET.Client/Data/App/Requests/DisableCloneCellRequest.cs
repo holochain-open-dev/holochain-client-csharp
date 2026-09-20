@@ -15,7 +15,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
     public class DisableCloneCellRequest
     {
         /// <summary>
-        /// Either a clone id (string, e.g. "role_name.0") or a CellId (byte[][] / CellId tuple).
+        /// The CloneCellId — either a clone id string (e.g. "role_name.0") or a CellId tuple.
+        /// Wire: {"CloneId": "..."} or {"CellId": [[dna_hash], [agent_key]]}.
+        /// Kept as dynamic; use an anonymous object matching the appropriate variant.
         /// </summary>
         [Key("clone_cell_id")]
         public dynamic clone_cell_id { get; set; }
