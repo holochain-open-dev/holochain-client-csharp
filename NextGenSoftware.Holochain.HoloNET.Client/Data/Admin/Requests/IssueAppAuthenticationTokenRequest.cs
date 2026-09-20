@@ -4,7 +4,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests
 {
     /// <summary>
     /// Mirrors holochain_conductor_api::admin_interface::IssueAppAuthenticationTokenPayload,
-    /// used as the payload for AdminRequest::IssueAppAuthenticationToken (Holochain 0.6.1):
+    /// used as the payload for AdminRequest::IssueAppAuthenticationToken (Holochain 0.7.0):
     ///
     /// pub struct IssueAppAuthenticationTokenPayload {
     ///     pub installed_app_id: InstalledAppId,

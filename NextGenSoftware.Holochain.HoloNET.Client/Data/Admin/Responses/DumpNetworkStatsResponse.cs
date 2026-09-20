@@ -35,7 +35,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
     }
 
     /// <summary>
-    /// Mirrors kitsune2_api::transport::TransportConnectionStats (Holochain 0.6.1).
+    /// Mirrors kitsune2_api/0.7.0).
     /// </summary>
     public class TransportConnectionStats
     {

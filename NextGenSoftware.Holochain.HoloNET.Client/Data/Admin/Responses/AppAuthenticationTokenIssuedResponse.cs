@@ -4,7 +4,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 {
     /// <summary>
     /// Mirrors holochain_conductor_api::admin_interface::AppAuthenticationTokenIssued
-    /// (Holochain 0.6.1):
+    /// (Holochain 0.7.0):
     ///
     /// pub struct AppAuthenticationTokenIssued {
     ///     pub token: AppAuthenticationToken, // Vec&lt;u8&gt;

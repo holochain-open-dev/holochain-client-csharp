@@ -3,7 +3,7 @@ using System.Collections.Generic;
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
     /// <summary>
-    /// Mirrors the payload of AppRequest::ProvideMemproofs(MemproofMap) (Holochain 0.6.1):
+    /// Mirrors the payload of AppRequest::ProvideMemproofs(MemproofMap) (Holochain 0.7.0):
     /// https://github.com/holochain/holochain/blob/holochain-0.7.0/crates/holochain_conductor_api/src/app_interface.rs
     ///
     /// NOTE: `MemproofMap`'s precise Rust definition could not be conclusively located/verified

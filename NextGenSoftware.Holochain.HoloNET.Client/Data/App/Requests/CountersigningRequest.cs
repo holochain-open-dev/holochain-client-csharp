@@ -22,13 +22,15 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
     /// <summary>
     /// Response payload for AppResponse::CountersigningSessionState, which wraps
-    /// `Box&lt;Option&lt;CountersigningSessionState&gt;&gt;` (Holochain 0.6.1).
+    /// `Box&lt;Option&lt;CountersigningSessionState&gt;&gt;` (Holochain 0.7.0).
     ///
-    /// NOTE: The internal shape of `CountersigningSessionState` itself (an enum describing
-    /// Unknown/Accepted/SignaturesCollected variants in earlier Holochain releases) could not be
-    /// conclusively re-verified against the 0.6.1 source at the time of writing. Rather than
-    /// guess at its fields, the raw state is exposed as `dynamic` here - inspect the raw
-    /// msgpack/JSON payload directly if you need to deserialize it precisely.
+    /// NOTE: `CountersigningSessionState` is an enum with three variants verified against the
+    /// Holochain 0.7.0 source (holochain_types::countersigning::CountersigningSessionState):
+    ///   Accepted(PreflightRequest)
+    ///   SignaturesCollected { preflight_request, signature_bundles, resolution? }
+    ///   Unknown { preflight_request, resolution, force_abandon, force_publish }
+    /// The raw state is exposed as `dynamic` here — deserialize precisely from the msgpack
+    /// payload if you need to inspect individual variant fields.
     /// </summary>
     [MessagePackObject]
     public class CountersigningSessionStateResponse

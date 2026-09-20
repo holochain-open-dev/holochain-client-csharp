@@ -41,7 +41,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
     }
 
     /// <summary>
-    /// Mirrors the variants of holochain_conductor_api's KeystoreConfig enum (Holochain 0.6.1).
+    /// Mirrors the variants of holochain_conductor_api's KeystoreConfig enum (Holochain 0.7.0).
     /// </summary>
     public enum KeystoreConfigType
     {
