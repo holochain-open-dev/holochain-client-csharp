@@ -31,7 +31,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
         private static readonly string _numbersHappPath = HoloNETTestHarnessConfig.NumbersHappPath;
         private static readonly string _oasisHappFolder = HoloNETTestHarnessConfig.OasisHappFolder;
         private static readonly string _oasisDnaPath = HoloNETTestHarnessConfig.OasisDnaPath;
-        private const string _oasisDnaHash = ""; //TODO Generate Hash here!
+        private static readonly string _oasisDnaHash = HoloNETTestHarnessConfig.OasisDnaHash; // set HOLONET_OASIS_DNA_HASH env var
 
         static async Task Main(string[] args)
         {

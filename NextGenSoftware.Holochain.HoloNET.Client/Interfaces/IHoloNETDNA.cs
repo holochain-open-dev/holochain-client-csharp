@@ -44,7 +44,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Interfaces
         ConsoleColor WarningColour { get; set; }
 
         /// <summary>
-        /// Network configuration (Holochain 0.6.1 ConductorConfig.network). Currently used by
+        /// Network configuration (Holochain 0.7.0 ConductorConfig.network). Currently used by
         /// HoloNET to set the default RequestTimeoutS used for zome calls / websocket requests.
         /// </summary>
         NetworkConfig NetworkConfig { get; set; }

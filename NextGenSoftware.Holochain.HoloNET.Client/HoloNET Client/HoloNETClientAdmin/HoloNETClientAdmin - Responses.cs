@@ -780,7 +780,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             RaiseCloneCellDeletedEvent(args);
         }
 
-        // New in Holochain 0.6.1 - Admin API.
+        // New in Holochain 0.7.0 - Admin API.
 
         private void DecodeZomeCallCapabilityRevokedReceived(IHoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
         {
@@ -1395,7 +1395,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
         }
 
-        // New in Holochain 0.6.1 - Admin API.
+        // New in Holochain 0.7.0 - Admin API.
 
         private void RaiseZomeCallCapabilityRevokedEvent(ZomeCallCapabilityRevokedCallBackEventArgs zomeCallCapabilityRevokedCallBackEventArgs)
         {

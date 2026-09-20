@@ -29,7 +29,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         private Dictionary<string, PropertyInfo[]> _dictPropertyInfos = new Dictionary<string, PropertyInfo[]>();
         private TaskCompletionSource<ReadyForZomeCallsEventArgs> _taskCompletionReadyForZomeCalls = new TaskCompletionSource<ReadyForZomeCallsEventArgs>();
 
-        // New in Holochain 0.6.1 - App API.
+        // New in Holochain 0.7.0 - App API.
         private Dictionary<string, TaskCompletionSource<CloneCellCreatedCallBackEventArgs>> _taskCompletionCloneCellCreatedCallBack = new Dictionary<string, TaskCompletionSource<CloneCellCreatedCallBackEventArgs>>();
         private Dictionary<string, TaskCompletionSource<CloneCellEnabledCallBackEventArgs>> _taskCompletionCloneCellEnabledCallBack = new Dictionary<string, TaskCompletionSource<CloneCellEnabledCallBackEventArgs>>();
         private Dictionary<string, TaskCompletionSource<CloneCellDisabledCallBackEventArgs>> _taskCompletionCloneCellDisabledCallBack = new Dictionary<string, TaskCompletionSource<CloneCellDisabledCallBackEventArgs>>();
@@ -78,7 +78,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public event ReadyForZomeCalls OnReadyForZomeCalls;
 
 
-        // New in Holochain 0.6.1 - App API.
+        // New in Holochain 0.7.0 - App API.
 
         public delegate void CloneCellCreatedCallBack(object sender, CloneCellCreatedCallBackEventArgs e);
 

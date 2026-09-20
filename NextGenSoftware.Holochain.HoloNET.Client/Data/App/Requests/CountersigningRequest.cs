@@ -5,7 +5,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
     /// <summary>
     /// Mirrors the payload of AppRequest::GetCountersigningSessionState,
     /// AppRequest::AbandonCountersigningSession and AppRequest::PublishCountersigningSession,
-    /// all of which take a single `Box&lt;CellId&gt;` (Holochain 0.6.1, gated behind the
+    /// all of which take a single `Box&lt;CellId&gt;` (Holochain 0.7.0, gated behind the
     /// `unstable-countersigning` feature flag):
     ///
     /// GetCountersigningSessionState(Box&lt;CellId&gt;)

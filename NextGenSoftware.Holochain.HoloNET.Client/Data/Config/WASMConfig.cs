@@ -1,7 +1,7 @@
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
     /// <summary>
-    /// NOT VERIFIED / NOT WIRED against any real Holochain 0.6.1 conductor-facing config.
+    /// NOT VERIFIED / NOT WIRED against any real Holochain 0.7.0 conductor-facing config.
     ///
     /// Researched holochain_conductor_api's config module
     /// (https://github.com/holochain/holochain/blob/holochain-0.7.0/crates/holochain_conductor_api/src/config/conductor.rs

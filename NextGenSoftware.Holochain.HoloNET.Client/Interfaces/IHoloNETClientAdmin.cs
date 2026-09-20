@@ -35,7 +35,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Interfaces
         event HoloNETClientAdmin.StorageInfoReturnedCallBack OnStorageInfoReturnedCallBack;
         event HoloNETClientAdmin.ZomeCallCapabilityGrantedCallBack OnZomeCallCapabilityGrantedCallBack;
 
-        // New in Holochain 0.6.1 - Admin API.
+        // New in Holochain 0.7.0 - Admin API.
         event HoloNETClientAdmin.ZomeCallCapabilityRevokedCallBack OnZomeCallCapabilityRevokedCallBack;
         event HoloNETClientAdmin.CapabilityGrantsListedCallBack OnCapabilityGrantsListedCallBack;
         event HoloNETClientAdmin.PeerMetaInfoReturnedCallBack OnPeerMetaInfoReturnedCallBack;

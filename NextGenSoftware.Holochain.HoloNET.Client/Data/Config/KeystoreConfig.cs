@@ -2,7 +2,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 {
     /// <summary>
     /// Mirrors holochain_conductor_api::config::conductor::keystore_config::KeystoreConfig from
-    /// Holochain 0.6.1. This defines how the conductor connects to a keystore (lair-keystore),
+    /// Holochain 0.7.0. This defines how the conductor connects to a keystore (lair-keystore),
     /// NOT a client-configurable KDF algorithm/keystore-type as a previous, unverified pass on
     /// this file invented (KDFAlgorithm = "PBKDF2", Type = KeystoreType.FileSystem, HSM support,
     /// key rotation/backup/recovery settings, etc. - none of that exists in the real Rust struct).

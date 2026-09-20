@@ -5,7 +5,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 {
     /// <summary>
     /// Mirrors holochain_conductor_api::admin_interface::AdminResponse::PeerMetaInfo
-    /// (also used for the equivalent AppResponse::PeerMetaInfo) in Holochain 0.6.1:
+    /// (also used for the equivalent AppResponse::PeerMetaInfo) in Holochain 0.7.0:
     ///
     /// PeerMetaInfo(BTreeMap&lt;DnaHash, BTreeMap&lt;String, PeerMetaInfo&gt;&gt;)
     /// https://github.com/holochain/holochain/blob/holochain-0.7.0/crates/holochain_conductor_api/src/admin_interface.rs

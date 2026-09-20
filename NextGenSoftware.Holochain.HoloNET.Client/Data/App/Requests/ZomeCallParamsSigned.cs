@@ -5,7 +5,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
     /// <summary>
     /// Mirrors holochain_conductor_api::app_interface::ZomeCallParamsSigned (Holochain 0.7.0).
     /// This is the actual struct sent for the `call_zome` AppRequest on the app websocket
-    /// interface as of 0.6.1: `AppRequest::CallZome(Box&lt;ZomeCallParamsSigned&gt;)`.
+    /// interface as of 0.7.0: `AppRequest::CallZome(Box&lt;ZomeCallParamsSigned&gt;)`.
     ///
     /// pub struct ZomeCallParamsSigned {
     ///     /// Bytes of the serialized zome call payload (holochain_serialized_bytes::encode of

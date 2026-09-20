@@ -179,7 +179,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
     }
 
-    // New in Holochain 0.6.1 - Admin API.
+    // New in Holochain 0.7.0 - Admin API.
 
     public class ZomeCallCapabilityRevokedCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {

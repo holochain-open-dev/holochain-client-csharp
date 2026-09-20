@@ -7,7 +7,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
 {
     /// <summary>
     /// Group (b): round-trip serialization tests for the 10 newly-wired Admin/App request/response
-    /// types added in the Holochain 0.6.1 upgrade, using the exact same MessagePackSerializerOptions
+    /// types added in the Holochain 0.7.0 upgrade, using the exact same MessagePackSerializerOptions
     /// used on the real send/receive path.
     /// </summary>
     public class NewAdminAppTypesSerializationTests

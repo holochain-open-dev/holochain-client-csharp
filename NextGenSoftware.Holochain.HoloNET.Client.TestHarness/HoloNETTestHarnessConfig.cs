@@ -39,6 +39,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
             Env("HOLONET_NUMBERS_HAPP_PATH",
                 Path.Combine("hApps", "happ-build-tutorial-develop", "workdir", "happ"));
 
+        /// <summary>
+        /// Set HOLONET_OASIS_DNA_HASH to the base64-encoded DNA hash of the installed oasis DNA.
+        /// Leave unset (or empty) to skip DNA-hash-dependent test steps.
+        /// </summary>
+        public static readonly string OasisDnaHash =
+            Env("HOLONET_OASIS_DNA_HASH", "");
+
         private static string Env(string key, string fallback) =>
             Environment.GetEnvironmentVariable(key) is { Length: > 0 } v ? v : fallback;
     }

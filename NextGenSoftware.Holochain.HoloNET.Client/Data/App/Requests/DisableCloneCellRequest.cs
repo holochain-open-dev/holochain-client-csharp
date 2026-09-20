@@ -23,7 +23,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
     /// <summary>
     /// Mirrors AppRequest::EnableCloneCell's payload, EnableCloneCellPayload, which per the
-    /// Holochain 0.6.1 docs is the same shape as DisableCloneCellPayload (a type alias / same
+    /// Holochain 0.7.0 docs is the same shape as DisableCloneCellPayload (a type alias / same
     /// CloneCellId wrapper).
     /// https://docs.rs/holochain_types/0.7.0/holochain_types/app/type.EnableCloneCellPayload.html
     /// </summary>

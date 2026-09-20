@@ -215,7 +215,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                         response.HoloNETResponseType = HoloNETResponseType.AdminAdminInterfacesAdded;
                         break;
 
-                    // New in Holochain 0.6.1 - Admin API.
+                    // New in Holochain 0.7.0 - Admin API.
 
                     case "zome_call_capability_revoked":
                         response.HoloNETResponseType = HoloNETResponseType.AdminZomeCallCapabilityRevoked;
@@ -247,7 +247,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                         response.HoloNETResponseType = this is HoloNETClientAdmin ? HoloNETResponseType.AdminPeerMetaInfoReturned : HoloNETResponseType.AppPeerMetaInfoReturned;
                         break;
 
-                    // New in Holochain 0.6.1 - App API.
+                    // New in Holochain 0.7.0 - App API.
 
                     case "clone_cell_created":
                         response.HoloNETResponseType = HoloNETResponseType.AppCloneCellCreated;

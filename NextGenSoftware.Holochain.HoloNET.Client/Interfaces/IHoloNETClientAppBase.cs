@@ -15,7 +15,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Interfaces
         event HoloNETClientAppBase.SignalCallBack OnSignalCallBack;
         event HoloNETClientAppBase.ZomeFunctionCallBack OnZomeFunctionCallBack;
 
-        // New in Holochain 0.6.1 - App API.
+        // New in Holochain 0.7.0 - App API.
         event HoloNETClientAppBase.CloneCellCreatedCallBack OnCloneCellCreatedCallBack;
         event HoloNETClientAppBase.CloneCellEnabledCallBack OnCloneCellEnabledCallBack;
         event HoloNETClientAppBase.CloneCellDisabledCallBack OnCloneCellDisabledCallBack;

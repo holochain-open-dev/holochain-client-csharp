@@ -48,8 +48,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects
     //}
 }
 
-//Legacy (pre-0.6.1) reference only - kitsune_p2p::agent_store::AgentInfoInner from the 0.2.1-era conductor.
-//As of Holochain 0.6.1 the networking stack moved to kitsune2 and AgentInfoSigned is exchanged as opaque
+//Legacy (pre-0.7.0) reference only - kitsune_p2p::agent_store::AgentInfoInner from the 0.2.1-era conductor.
+//As of Holochain 0.7.0 the networking stack moved to kitsune2 and AgentInfoSigned is exchanged as opaque
 //signed/encoded bytes (agent, signature, agent_info above) rather than as a structured map, so this
 //legacy shape is kept commented out for historical reference only:
 //https://docs.rs/kitsune_p2p/0.2.1/kitsune_p2p/agent_store/struct.AgentInfoInner.html
