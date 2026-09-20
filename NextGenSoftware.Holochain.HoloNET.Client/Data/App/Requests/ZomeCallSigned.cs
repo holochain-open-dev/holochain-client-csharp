@@ -12,7 +12,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
     ///     pub signature: Signature,
     /// }
     ///
-    /// https://github.com/holochain/holochain/blob/holochain-0.6.1/crates/holochain_conductor_api/src/app_interface.rs
+    /// https://github.com/holochain/holochain/blob/holochain-0.7.0/crates/holochain_conductor_api/src/app_interface.rs
     ///
     /// This class is kept (mirroring the previous flattened shape built from <see cref="ZomeCall"/>)
     /// for backward compatibility with any code/tests that reference it, but it is no longer what

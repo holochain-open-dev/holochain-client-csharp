@@ -5,7 +5,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
     /// <summary>
     /// This is a HoloNET-CLIENT-SIDE caching layer config, NOT a mirror of any Holochain Rust
     /// conductor struct. Researched holochain_conductor_api's ConductorConfig
-    /// (https://github.com/holochain/holochain/blob/holochain-0.6.1/crates/holochain_conductor_api/src/config/conductor.rs)
+    /// (https://github.com/holochain/holochain/blob/holochain-0.7.0/crates/holochain_conductor_api/src/config/conductor.rs)
     /// and confirmed there is no generic "cache" concept exposed there at all - the conductor has
     /// an internal wasm compilation cache (see WASMConfig.cs in this directory) and SQLite-backed
     /// databases, but nothing resembling a configurable client-side response/object cache.

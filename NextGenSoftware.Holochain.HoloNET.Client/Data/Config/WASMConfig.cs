@@ -4,8 +4,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
     /// NOT VERIFIED / NOT WIRED against any real Holochain 0.6.1 conductor-facing config.
     ///
     /// Researched holochain_conductor_api's config module
-    /// (https://github.com/holochain/holochain/blob/holochain-0.6.1/crates/holochain_conductor_api/src/config/conductor.rs
-    /// and https://github.com/holochain/holochain/blob/holochain-0.6.1/crates/holochain_conductor_api/src/config/conductor/paths.rs)
+    /// (https://github.com/holochain/holochain/blob/holochain-0.7.0/crates/holochain_conductor_api/src/config/conductor.rs
+    /// and https://github.com/holochain/holochain/blob/holochain-0.7.0/crates/holochain_conductor_api/src/config/conductor/paths.rs)
     /// and found only a `WASM_DIRECTORY` constant ("wasm") - the name of the subdirectory under
     /// the conductor's data_root_path where compiled wasm is cached on disk. There is no
     /// conductor-facing struct exposing WASM compilation/optimization/profiling/security/

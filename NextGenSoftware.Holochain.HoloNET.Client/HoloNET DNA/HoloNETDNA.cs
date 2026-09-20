@@ -218,7 +218,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// Network configuration mirroring Holochain 0.6.1's ConductorConfig.network
         /// (holochain_conductor_api::config::conductor::NetworkConfig). As of 0.6.1,
         /// request_timeout_s lives here rather than directly on ConductorConfig.
-        /// See: https://github.com/holochain/holochain/blob/holochain-0.6.1/crates/holochain_conductor_api/src/config/conductor.rs
+        /// See: https://github.com/holochain/holochain/blob/holochain-0.7.0/crates/holochain_conductor_api/src/config/conductor.rs
         /// </summary>
         public NetworkConfig NetworkConfig { get; set; } = new NetworkConfig();
 

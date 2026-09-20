@@ -14,7 +14,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
     /// entrypoint, not via this config struct.
     ///
     /// Verified against:
-    /// https://github.com/holochain/holochain/blob/holochain-0.6.1/crates/holochain_conductor_api/src/config/conductor/keystore_config.rs
+    /// https://github.com/holochain/holochain/blob/holochain-0.7.0/crates/holochain_conductor_api/src/config/conductor/keystore_config.rs
     /// </summary>
     public class KeystoreConfig
     {

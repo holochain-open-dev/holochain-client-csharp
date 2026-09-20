@@ -9,7 +9,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
     ///
     /// #[cfg(feature = "unstable-migration")]
     /// pub type CompatibleCells = BTreeSet&lt;(InstalledAppId, BTreeSet&lt;CellId&gt;)&gt;;
-    /// https://github.com/holochain/holochain/blob/holochain-0.6.1/crates/holochain_conductor_api/src/admin_interface.rs
+    /// https://github.com/holochain/holochain/blob/holochain-0.7.0/crates/holochain_conductor_api/src/admin_interface.rs
     ///
     /// NOTE: This is gated behind the `unstable-migration` feature flag in Holochain 0.6.1 and
     /// may not be present/enabled on all conductor builds.

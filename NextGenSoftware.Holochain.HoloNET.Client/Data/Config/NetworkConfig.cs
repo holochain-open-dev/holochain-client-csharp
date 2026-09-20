@@ -4,7 +4,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
     /// Mirrors (the relevant part of) holochain_conductor_api::config::conductor::NetworkConfig
     /// from Holochain 0.6.1. In 0.5.x and earlier, request_timeout_s lived directly on
     /// ConductorConfig; in 0.6.1 it moved under ConductorConfig.network (NetworkConfig).
-    /// https://github.com/holochain/holochain/blob/holochain-0.6.1/crates/holochain_conductor_api/src/config/conductor.rs
+    /// https://github.com/holochain/holochain/blob/holochain-0.7.0/crates/holochain_conductor_api/src/config/conductor.rs
     ///
     /// HoloNET uses this client-side to drive the default request/response timeout used for
     /// zome calls (see CallZomeOptions.TimeoutSeconds for a per-call override) and other

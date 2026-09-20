@@ -8,7 +8,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests
     ///
     /// `pub type AppAuthenticationToken = Vec&lt;u8&gt;;`
     /// RevokeAppAuthenticationToken(AppAuthenticationToken)
-    /// https://github.com/holochain/holochain/blob/holochain-0.6.1/crates/holochain_conductor_api/src/admin_interface.rs
+    /// https://github.com/holochain/holochain/blob/holochain-0.7.0/crates/holochain_conductor_api/src/admin_interface.rs
     /// </summary>
     [MessagePackObject]
     public class RevokeAppAuthenticationTokenRequest

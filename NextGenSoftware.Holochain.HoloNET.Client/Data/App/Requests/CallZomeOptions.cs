@@ -5,7 +5,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
     ///
     /// NOTE: Unlike the other classes in this folder, this is NOT a verified 1:1 mirror of a
     /// Rust struct - a thorough search of the holochain_zome_types / holochain_conductor_api /
-    /// holochain_types crates at tag holochain-0.6.1 did not turn up a `CallZomeOptions` struct
+    /// holochain_types crates at tag holochain-0.7.0 did not turn up a `CallZomeOptions` struct
     /// on the wire protocol. The wire-level request (see <see cref="ZomeCallParamsSigned"/>) has
     /// no equivalent "options" field today. This class instead lets HoloNET callers configure
     /// client-side behaviour (currently: a per-call request timeout) without having to fall back
