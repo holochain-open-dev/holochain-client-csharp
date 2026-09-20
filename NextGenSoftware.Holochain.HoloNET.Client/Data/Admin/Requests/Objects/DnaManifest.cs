@@ -25,7 +25,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects
         public string network_seed { get; set; }
 
         /// <summary>
-        /// Any arbitrary application properties can be included in this object.
+        /// NOTE (Holochain 0.7.0): in the Rust DnaManifest, `properties` lives on the nested
+        /// IntegrityManifest (Option&lt;YamlProperties&gt;), not at the top level.  This field is
+        /// retained here for backwards compat but should be set on the integrity zome entry instead.
         /// </summary>
         [Key("properties")]
         public dynamic properties { get; set; }

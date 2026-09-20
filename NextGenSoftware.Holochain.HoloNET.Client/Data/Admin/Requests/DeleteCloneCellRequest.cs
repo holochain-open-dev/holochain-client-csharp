@@ -13,7 +13,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests
         public string app_id { get; set; }
 
         /// <summary>
-        ///  The clone id (string/rolename) or cell id (byte[][]) of the clone cell.
+        /// The CloneCellId identifying the clone cell — either a clone id string
+        /// (e.g. "role_name.0") or a CellId byte[][] tuple.
+        /// Wire: {"CloneId": "..."} or {"CellId": [[dna_hash], [agent_key]]}.
+        /// Kept as dynamic because MessagePack cannot transparently handle this Rust tagged enum.
         /// </summary>
         [Key("clone_cell_id")]
         public dynamic clone_cell_id { get; set; }
