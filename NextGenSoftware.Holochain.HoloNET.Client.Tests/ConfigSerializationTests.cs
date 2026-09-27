@@ -211,6 +211,124 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
             Assert.True(Enum.IsDefined(typeof(AppInfoStatusEnum), "AwaitingMemproofs"));
         }
 
+        // ── DumpOpTimingsRequest (Holochain 0.7.0) ──────────────────────────────────────────────
+
+        [Fact]
+        public void DumpOpTimingsRequest_RoundTrips_WithoutCursor()
+        {
+            var original = new DumpOpTimingsRequest
+            {
+                dna_hash = new byte[] { 0x01, 0x02, 0x03 },
+                cursor = null,
+                limit = 100u
+            };
+
+            byte[] bytes = MessagePackSerializer.Serialize(original, MessagePackSerializerOptions.Standard);
+            var result = MessagePackSerializer.Deserialize<DumpOpTimingsRequest>(bytes, MessagePackSerializerOptions.Standard);
+
+            Assert.Equal(original.dna_hash, result.dna_hash);
+            Assert.Null(result.cursor);
+            Assert.Equal(100u, result.limit);
+        }
+
+        [Fact]
+        public void DumpOpTimingsRequest_RoundTrips_WithCursor()
+        {
+            var original = new DumpOpTimingsRequest
+            {
+                dna_hash = new byte[] { 0xAB },
+                cursor = new OpTimingsCursor { when_received = 999L, hash = new byte[] { 0xFF } },
+                limit = null
+            };
+
+            byte[] bytes = MessagePackSerializer.Serialize(original, MessagePackSerializerOptions.Standard);
+            var result = MessagePackSerializer.Deserialize<DumpOpTimingsRequest>(bytes, MessagePackSerializerOptions.Standard);
+
+            Assert.NotNull(result.cursor);
+            Assert.Equal(999L, result.cursor.when_received);
+            Assert.Null(result.limit);
+        }
+
+        // ── IntegrityManifest / CoordinatorManifest / DnaManifest (Holochain 0.7.0) ───────────
+
+        [Fact]
+        public void IntegrityZomeManifest_RoundTrips()
+        {
+            var original = new NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects.IntegrityZomeManifest
+            {
+                name = "my_integrity",
+                hash = null,
+                bundled = "my_integrity.wasm",
+                dependencies = null
+            };
+
+            byte[] bytes = MessagePackSerializer.Serialize(original, MessagePackSerializerOptions.Standard);
+            var result = MessagePackSerializer.Deserialize<NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects.IntegrityZomeManifest>(bytes, MessagePackSerializerOptions.Standard);
+
+            Assert.Equal("my_integrity", result.name);
+            Assert.Equal("my_integrity.wasm", result.bundled);
+        }
+
+        [Fact]
+        public void CoordinatorZomeManifest_RoundTrips_WithStringDependencies()
+        {
+            var original = new NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects.CoordinatorZomeManifest
+            {
+                name = "my_coordinator",
+                bundled = "my_coordinator.wasm",
+                dependencies = new[] { "my_integrity" }
+            };
+
+            byte[] bytes = MessagePackSerializer.Serialize(original, MessagePackSerializerOptions.Standard);
+            var result = MessagePackSerializer.Deserialize<NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects.CoordinatorZomeManifest>(bytes, MessagePackSerializerOptions.Standard);
+
+            Assert.Equal("my_coordinator", result.name);
+            Assert.Single(result.dependencies);
+            Assert.Equal("my_integrity", result.dependencies[0]);
+        }
+
+        [Fact]
+        public void DnaManifest_RoundTrips_IntegrityCoordinatorSplit()
+        {
+            var original = new NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects.DnaManifest
+            {
+                manifest_version = "1",
+                name = "test_dna",
+                integrity = new NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects.IntegrityManifest
+                {
+                    zomes = new[]
+                    {
+                        new NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects.IntegrityZomeManifest
+                        {
+                            name = "integrity_zome", bundled = "integrity.wasm"
+                        }
+                    }
+                },
+                coordinator = new NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects.CoordinatorManifest
+                {
+                    zomes = new[]
+                    {
+                        new NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects.CoordinatorZomeManifest
+                        {
+                            name = "coordinator_zome",
+                            bundled = "coordinator.wasm",
+                            dependencies = new[] { "integrity_zome" }
+                        }
+                    }
+                }
+            };
+
+            byte[] bytes = MessagePackSerializer.Serialize(original, MessagePackSerializerOptions.Standard);
+            var result = MessagePackSerializer.Deserialize<NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects.DnaManifest>(bytes, MessagePackSerializerOptions.Standard);
+
+            Assert.Equal("test_dna", result.name);
+            Assert.Single(result.integrity.zomes);
+            Assert.Equal("integrity_zome", result.integrity.zomes[0].name);
+            Assert.Single(result.coordinator.zomes);
+            Assert.Equal("coordinator_zome", result.coordinator.zomes[0].name);
+            Assert.Equal("integrity_zome", result.coordinator.zomes[0].dependencies[0]);
+        }
+
         // ── OpTimingsDump / OpTimingDump / OpTimingsCursor (Holochain 0.7.0) ───────────────────
 
         [Fact]

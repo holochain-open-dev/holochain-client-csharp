@@ -33,18 +33,18 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects
         public dynamic properties { get; set; }
 
         /// <summary>
-        /// Integrity zomes for this DNA (Holochain 0.7.0+). Each carries entry/link type
-        /// definitions and optionally its own properties.
+        /// Integrity zomes container for this DNA (Holochain 0.7.0+). Single object wrapping
+        /// an array of IntegrityZomeManifest entries (see IntegrityManifest.zomes).
         /// </summary>
         [Key("integrity")]
-        public IntegrityManifest[] integrity { get; set; }
+        public IntegrityManifest integrity { get; set; }
 
         /// <summary>
-        /// Coordinator zomes for this DNA (Holochain 0.7.0+). These depend on integrity zomes
-        /// but do not define entry/link types.
+        /// Coordinator zomes container for this DNA (Holochain 0.7.0+). Single object wrapping
+        /// an array of CoordinatorZomeManifest entries (see CoordinatorManifest.zomes).
         /// </summary>
         [Key("coordinator")]
-        public CoordinatorManifest[] coordinator { get; set; }
+        public CoordinatorManifest coordinator { get; set; }
 
         /// <summary>
         /// Legacy flat zomes array — retained for backwards compatibility and DNA bundles that
