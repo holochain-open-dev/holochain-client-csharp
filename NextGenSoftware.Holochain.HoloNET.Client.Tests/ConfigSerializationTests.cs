@@ -211,6 +211,69 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
             Assert.True(Enum.IsDefined(typeof(AppInfoStatusEnum), "AwaitingMemproofs"));
         }
 
+        // ── OpTimingsDump / OpTimingDump / OpTimingsCursor (Holochain 0.7.0) ───────────────────
+
+        [Fact]
+        public void OpTimingsCursor_RoundTrips()
+        {
+            var original = new OpTimingsCursor
+            {
+                when_received = 1_700_000_000_000_000L,
+                hash = new byte[] { 0x01, 0x02, 0x03 }
+            };
+
+            byte[] bytes = MessagePackSerializer.Serialize(original, MessagePackSerializerOptions.Standard);
+            var result = MessagePackSerializer.Deserialize<OpTimingsCursor>(bytes, MessagePackSerializerOptions.Standard);
+
+            Assert.Equal(original.when_received, result.when_received);
+            Assert.Equal(original.hash, result.hash);
+        }
+
+        [Fact]
+        public void OpTimingDump_RoundTrips()
+        {
+            var original = new OpTimingDump
+            {
+                op_hash = new byte[] { 0xAB, 0xCD },
+                when_received = 1_700_000_000_000_000L,
+                when_integrated = 1_700_000_001_000_000L,
+                abandoned_at = null,
+                validation_status = "Valid",
+                locally_validated = true
+            };
+
+            byte[] bytes = MessagePackSerializer.Serialize(original, MessagePackSerializerOptions.Standard);
+            var result = MessagePackSerializer.Deserialize<OpTimingDump>(bytes, MessagePackSerializerOptions.Standard);
+
+            Assert.Equal(original.op_hash, result.op_hash);
+            Assert.Equal(original.when_received, result.when_received);
+            Assert.Equal(original.when_integrated, result.when_integrated);
+            Assert.Null(result.abandoned_at);
+            Assert.Equal("Valid", result.validation_status);
+            Assert.True(result.locally_validated);
+        }
+
+        [Fact]
+        public void OpTimingsDump_RoundTrips_WithCursor()
+        {
+            var original = new OpTimingsDump
+            {
+                timings = new System.Collections.Generic.List<OpTimingDump>
+                {
+                    new OpTimingDump { op_hash = new byte[] { 1 }, when_received = 100L }
+                },
+                cursor = new OpTimingsCursor { when_received = 100L, hash = new byte[] { 1 } }
+            };
+
+            byte[] bytes = MessagePackSerializer.Serialize(original, MessagePackSerializerOptions.Standard);
+            var result = MessagePackSerializer.Deserialize<OpTimingsDump>(bytes, MessagePackSerializerOptions.Standard);
+
+            Assert.Single(result.timings);
+            Assert.Equal(100L, result.timings[0].when_received);
+            Assert.NotNull(result.cursor);
+            Assert.Equal(100L, result.cursor.when_received);
+        }
+
         // ── CapAccessInfo / DesensitizedZomeCallCapGrant (Holochain 0.7.0) ──────────────────────
 
         [Fact]

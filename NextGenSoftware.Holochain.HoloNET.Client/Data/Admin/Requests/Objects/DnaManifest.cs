@@ -33,7 +33,22 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects
         public dynamic properties { get; set; }
 
         /// <summary>
-        /// An array of zomes associated with your DNA.  The order is significant: it determines initialization order.
+        /// Integrity zomes for this DNA (Holochain 0.7.0+). Each carries entry/link type
+        /// definitions and optionally its own properties.
+        /// </summary>
+        [Key("integrity")]
+        public IntegrityManifest[] integrity { get; set; }
+
+        /// <summary>
+        /// Coordinator zomes for this DNA (Holochain 0.7.0+). These depend on integrity zomes
+        /// but do not define entry/link types.
+        /// </summary>
+        [Key("coordinator")]
+        public CoordinatorManifest[] coordinator { get; set; }
+
+        /// <summary>
+        /// Legacy flat zomes array — retained for backwards compatibility and DNA bundles that
+        /// predate the integrity/coordinator split. Prefer `integrity` + `coordinator` for 0.7.0+.
         /// </summary>
         [Key("zomes")]
         public ZomeManifest[] zomes { get; set; }
