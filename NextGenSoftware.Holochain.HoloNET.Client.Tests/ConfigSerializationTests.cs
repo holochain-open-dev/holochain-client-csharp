@@ -210,5 +210,54 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
         {
             Assert.True(Enum.IsDefined(typeof(AppInfoStatusEnum), "AwaitingMemproofs"));
         }
+
+        // ── CapAccessInfo / DesensitizedZomeCallCapGrant (Holochain 0.7.0) ──────────────────────
+
+        [Fact]
+        public void CapAccessInfo_RoundTrips_Unrestricted()
+        {
+            var original = new CapAccessInfo { access_type = "Unrestricted", assignees = null };
+
+            byte[] bytes = MessagePackSerializer.Serialize(original, MessagePackSerializerOptions.Standard);
+            var result = MessagePackSerializer.Deserialize<CapAccessInfo>(bytes, MessagePackSerializerOptions.Standard);
+
+            Assert.Equal("Unrestricted", result.access_type);
+            Assert.Null(result.assignees);
+        }
+
+        [Fact]
+        public void CapAccessInfo_RoundTrips_Assigned()
+        {
+            var agent = new byte[] { 1, 2, 3, 4 };
+            var original = new CapAccessInfo
+            {
+                access_type = "Assigned",
+                assignees = new[] { agent }
+            };
+
+            byte[] bytes = MessagePackSerializer.Serialize(original, MessagePackSerializerOptions.Standard);
+            var result = MessagePackSerializer.Deserialize<CapAccessInfo>(bytes, MessagePackSerializerOptions.Standard);
+
+            Assert.Equal("Assigned", result.access_type);
+            Assert.Single(result.assignees);
+            Assert.Equal(agent, result.assignees[0]);
+        }
+
+        [Fact]
+        public void DesensitizedZomeCallCapGrant_RoundTrips()
+        {
+            var original = new DesensitizedZomeCallCapGrant
+            {
+                tag = "my-grant",
+                access = new CapAccessInfo { access_type = "Transferable", assignees = null },
+                functions = null
+            };
+
+            byte[] bytes = MessagePackSerializer.Serialize(original, MessagePackSerializerOptions.Standard);
+            var result = MessagePackSerializer.Deserialize<DesensitizedZomeCallCapGrant>(bytes, MessagePackSerializerOptions.Standard);
+
+            Assert.Equal("my-grant", result.tag);
+            Assert.Equal("Transferable", result.access.access_type);
+        }
     }
 }
