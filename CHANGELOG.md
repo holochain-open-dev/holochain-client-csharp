@@ -1,5 +1,31 @@
 # Changelog
 
+## Post-upgrade polish (v4.1.0 follow-on)
+
+Further hardening and completeness work on top of the 0.7.0 upgrade:
+
+- **`DesensitizedZomeCallCapGrant` and `CapAccessInfo` typed** (`Data/Admin/Responses/`):
+  `CapGrantInfo.cap_grant` is now `DesensitizedZomeCallCapGrant` (typed) instead of `dynamic`.
+  `CapAccessInfo` carries `access_type` (string) and optional `assignees` (AgentPubKey[]).
+  Verified against `holochain_zome_types` 0.7.0.
+- **`IntegrityManifest`** (`Data/Admin/Requests/Objects/IntegrityManifest.cs`): new class
+  mirroring the 0.7.0 `IntegrityManifest` struct (name, dylib, hash, dependencies, bundled/path/url,
+  and `properties: Option<YamlProperties>`). `DnaManifest.zomes` now carries
+  `IntegrityManifest[]` and `CoordinatorManifest[]` fields alongside the legacy `zomes` array.
+- **`EnableCloneCellRequest.clone_cell_id`** doc comment updated with wire-format note (matches
+  Disable/Delete treatment from the main 0.7.0 pass).
+- **`.gitattributes`** added: `* text=auto`, CRLF for `.cs`/`.csproj`/`.sln`/`.md`,
+  LF for JSON/YAML — silences persistent CRLF warnings on commit.
+- **Test count: 47** — three new `MessagePack` round-trip tests for `CapAccessInfo` (Unrestricted,
+  Assigned) and `DesensitizedZomeCallCapGrant`; three for `OpTimingsDump`/`OpTimingDump`/
+  `OpTimingsCursor`; all green.
+- **TestHarness `v4.1.0`** — Summary/Description updated to Holochain 0.7.0; conductor paths
+  configurable via `HOLONET_*` env vars noted in release notes.
+- **Sibling packages (ORM, HDK, HyperNET, Manager) bumped to v4.1.0** with updated NuGet
+  Summary/Description referencing Holochain 0.7.0 and a `v4.1.0` `PackageReleaseNotes` entry.
+
+---
+
 ## Holochain 0.7.0 Wire Protocol Upgrade
 
 Upgrades HoloNET's wire protocol from Holochain 0.6.1 to 0.7.0, verified against the real Rust
