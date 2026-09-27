@@ -8,17 +8,25 @@ Further hardening and completeness work on top of the 0.7.0 upgrade:
   `CapGrantInfo.cap_grant` is now `DesensitizedZomeCallCapGrant` (typed) instead of `dynamic`.
   `CapAccessInfo` carries `access_type` (string) and optional `assignees` (AgentPubKey[]).
   Verified against `holochain_zome_types` 0.7.0.
-- **`IntegrityManifest`** (`Data/Admin/Requests/Objects/IntegrityManifest.cs`): new class
-  mirroring the 0.7.0 `IntegrityManifest` struct (name, dylib, hash, dependencies, bundled/path/url,
-  and `properties: Option<YamlProperties>`). `DnaManifest.zomes` now carries
-  `IntegrityManifest[]` and `CoordinatorManifest[]` fields alongside the legacy `zomes` array.
+- **DNA manifest restructured for 0.7.0** (`Data/Admin/Requests/Objects/`):
+  - `IntegrityManifest` is now the correct container shape (`network_seed`, `origin_time`,
+    `quantum_time`, `properties`, `zomes: IntegrityZomeManifest[]`). `network_seed` and
+    `properties` commented out on `DnaManifest` (they moved to this container in 0.7.0).
+  - `IntegrityZomeManifest` — new per-zome entry type (name, dylib, hash,
+    `dependencies: ZomeDependency[]`, bundled/path/url, properties).
+  - `CoordinatorManifest` — updated to `CoordinatorZomeManifest[]`.
+  - `CoordinatorZomeManifest` — new per-zome entry type with `dependencies: string[]`
+    (plain `ZomeName` strings, matching 0.7.0 Rust vs. `ZomeDependency[]` for integrity).
+  - `DnaManifest.integrity` / `.coordinator` fixed from `[]` (array) to singular container
+    objects. Legacy `zomes[]` retained for backwards compatibility.
 - **`EnableCloneCellRequest.clone_cell_id`** doc comment updated with wire-format note (matches
   Disable/Delete treatment from the main 0.7.0 pass).
 - **`.gitattributes`** added: `* text=auto`, CRLF for `.cs`/`.csproj`/`.sln`/`.md`,
   LF for JSON/YAML — silences persistent CRLF warnings on commit.
-- **Test count: 47** — three new `MessagePack` round-trip tests for `CapAccessInfo` (Unrestricted,
-  Assigned) and `DesensitizedZomeCallCapGrant`; three for `OpTimingsDump`/`OpTimingDump`/
-  `OpTimingsCursor`; all green.
+- **Test count: 55** — covers `DumpOpTimingsRequest` (with/without cursor), `IntegrityZomeManifest`,
+  `CoordinatorZomeManifest` (verifies string deps), `DnaManifest` integrity+coordinator round-trip,
+  `CapAccessInfo` (Unrestricted, Assigned), `DesensitizedZomeCallCapGrant`, `OpTimingsDump` ×3;
+  all green.
 - **TestHarness `v4.1.0`** — Summary/Description updated to Holochain 0.7.0; conductor paths
   configurable via `HOLONET_*` env vars noted in release notes.
 - **Sibling packages (ORM, HDK, HyperNET, Manager) bumped to v4.1.0** with updated NuGet

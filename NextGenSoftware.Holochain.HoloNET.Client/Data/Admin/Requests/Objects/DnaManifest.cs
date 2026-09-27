@@ -18,19 +18,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects
         [Key("name")]
         public string name { get; set; }
 
-        /// <summary>
-        /// A network seed for uniquifying this DNA.
-        /// </summary>
-        [Key("network_seed")]
-        public string network_seed { get; set; }
-
-        /// <summary>
-        /// NOTE (Holochain 0.7.0): in the Rust DnaManifest, `properties` lives on the nested
-        /// IntegrityManifest (Option&lt;YamlProperties&gt;), not at the top level.  This field is
-        /// retained here for backwards compat but should be set on the integrity zome entry instead.
-        /// </summary>
-        [Key("properties")]
-        public dynamic properties { get; set; }
+        // NOTE (Holochain 0.7.0): network_seed and properties moved to IntegrityManifest.
+        // Set them on DnaManifest.integrity.network_seed / .properties instead.
+        // Kept here as commented-out reference for callers upgrading from pre-0.7.0.
+        //[Key("network_seed")] public string network_seed { get; set; }
+        //[Key("properties")]   public dynamic properties { get; set; }
 
         /// <summary>
         /// Integrity zomes container for this DNA (Holochain 0.7.0+). Single object wrapping
