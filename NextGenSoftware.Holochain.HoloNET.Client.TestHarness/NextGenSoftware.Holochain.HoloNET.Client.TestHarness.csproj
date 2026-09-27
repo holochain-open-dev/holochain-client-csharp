@@ -8,13 +8,26 @@
 	<Company>NextGen Software Ltd</Company>
 	<Product>HoloNET Test Harness</Product>
 	<Title>HoloNET Test Harness</Title>
-	<Summary>Comprehensive console test harness for HoloNET -- exercises every feature of HoloNET Client and HoloNET ORM against a live Holochain 0.6.x conductor.</Summary>
-	<Description>A ready-to-run console application that exercises every major feature of HoloNET Client and HoloNET ORM against a real live Holochain conductor (v0.6.x). Covers zome calls, entry CRUD via HoloNETEntryBase/HoloNETAuditEntryBase, collection loading/saving via HoloNETCollection/HoloNETObservableCollection, Admin API (install/enable/sign/attach hApp, generate agent keys, register DNA, list apps/cells/interfaces, dump state/network stats), event callbacks, async/await patterns, and logging. An ideal starting point for understanding HoloNET and verifying your conductor setup. Source: https://github.com/holochain-open-dev/holochain-client-csharp -- Ecosystem: https://holonet.oasisomniverse.one</Description>
+	<Summary>Comprehensive console test harness for HoloNET -- exercises every feature of HoloNET Client and HoloNET ORM against a live Holochain 0.7.0 conductor.</Summary>
+	<Description>A ready-to-run console application that exercises every major feature of HoloNET Client and HoloNET ORM against a real live Holochain conductor (v0.7.0). Covers zome calls, entry CRUD via HoloNETEntryBase/HoloNETAuditEntryBase, collection loading/saving via HoloNETCollection/HoloNETObservableCollection, Admin API (install/enable/sign/attach hApp, generate agent keys, register DNA, list apps/cells/interfaces, dump state/network stats, paginated DumpOpTimings), event callbacks, async/await patterns, and logging. Conductor paths configurable via HOLONET_* environment variables. An ideal starting point for understanding HoloNET and verifying your conductor setup. Source: https://github.com/holochain-open-dev/holochain-client-csharp -- Ecosystem: https://holonet.oasisomniverse.one</Description>
 	<PackageProjectUrl>https://github.com/NextGenSoftwareUK/holochain-client-csharp</PackageProjectUrl>
 	<PackageIcon>hc logo.png</PackageIcon>
 	<Authors>David Ellams (NextGen Software Ltd)</Authors>
 	<PackageTags>holochain;net;unity</PackageTags>
-	<PackageReleaseNotes>
+	<PackageReleaseNotes>## v4.1.0 — Holochain 0.7.0 Wire Protocol Upgrade
+
+Tracks HoloNET Client v4.1.0: full Holochain 0.7.0 conductor support.
+- Conductor paths now configurable via HOLONET_* environment variables (no more hardcoded paths).
+- Updated for Kitsune2/iroh (QUIC) sole network backend — tx5/WebRTC removed.
+- DumpOpTimings exercises new paginated op-timing API on Admin and App interfaces.
+- AwaitingMemproofs app status handled in app listing flow.
+
+*Full Changelog:* https://github.com/holochain-open-dev/holochain-client-csharp/blob/main/CHANGELOG.md
+
+---
+
+## v3.0.5 (legacy)
+
 		- This release has multiple bug fixes.
 		- Bug fixes for Get DNA Definition Conductor API function.
 		- Bug fixes for Disconnect and Re-Connect issues.
@@ -86,7 +99,7 @@
 	<!--<PackageLicenseExpression>GNU GPLv3</PackageLicenseExpression>-->
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-	<Version>4.0.0</Version>
+	<Version>4.1.0</Version>
 	<!--<PackageLicenseFile>..\LICENSE</PackageLicenseFile>-->
 
 	<AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
@@ -95,7 +108,7 @@
   <ItemGroup>
     <ProjectReference Include="..\NextGenSoftware.Holochain.HoloNET.Client\NextGenSoftware.Holochain.HoloNET.Client.csproj" />
     <ProjectReference Include="..\NextGenSoftware.Holochain.HoloNET.ORM\NextGenSoftware.Holochain.HoloNET.ORM.csproj" Condition="Exists('..\NextGenSoftware.Holochain.HoloNET.ORM\NextGenSoftware.Holochain.HoloNET.ORM.csproj')" />
-    <PackageReference Include="NextGenSoftware.Holochain.HoloNET.ORM" Version="4.0.0" Condition="!Exists('..\NextGenSoftware.Holochain.HoloNET.ORM\NextGenSoftware.Holochain.HoloNET.ORM.csproj')" />
+    <PackageReference Include="NextGenSoftware.Holochain.HoloNET.ORM" Version="4.1.0" Condition="!Exists('..\NextGenSoftware.Holochain.HoloNET.ORM\NextGenSoftware.Holochain.HoloNET.ORM.csproj')" />
   </ItemGroup>
 
 	<ItemGroup>
