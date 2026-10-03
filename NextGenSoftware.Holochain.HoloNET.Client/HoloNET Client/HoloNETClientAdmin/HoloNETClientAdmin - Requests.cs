@@ -449,7 +449,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             return await CallFunctionAsync(HoloNETRequestType.AdminListApps, "list_apps", new ListAppsRequest()
             {
-                status_filter = appStatusFilter != AppStatusFilter.All ? appStatusFilter : null
+                status_filter = appStatusFilter != AppStatusFilter.All ? (AppStatusFilter?)appStatusFilter : null
             }, _taskCompletionAppsListedCallBack, "OnAppsListedCallBack", conductorResponseCallBackMode, id);
         }
 
@@ -891,7 +891,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             return await CallFunctionAsync(HoloNETRequestType.AdminDeleteClonedCell, "delete_clone_cell", new DeleteCloneCellRequest()
             {
                 app_id = appId,
-                clone_cell_id = roleName
+                clone_cell_id = CloneCellId.Normalize(roleName)
             }, _taskCompletionCloneCellDeletedCallBack, "OnCloneCellDeletedCallBack", conductorResponseCallBackMode, id);
         }
 
@@ -920,7 +920,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             return await CallFunctionAsync(HoloNETRequestType.AdminDeleteClonedCell, "delete_clone_cell", new DeleteCloneCellRequest()
             {
                 app_id = appId,
-                clone_cell_id = cellId
+                clone_cell_id = CloneCellId.Normalize(cellId)
             }, _taskCompletionCloneCellDeletedCallBack, "OnCloneCellDeletedCallBack", conductorResponseCallBackMode, id);
         }
 
@@ -1230,40 +1230,20 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 }
             };
 
+            // Previously used CapGrantAccessAssigned/Unrestricted/Transferable, which serialised as
+            // externally-tagged {"Assigned": {...}}; the conductor expects {"type": ..., "value": ...}.
             switch (capGrantAccessType)
             {
                 case CapGrantAccessType.Assigned:
-                    {
-                        request.cap_grant.access = new CapGrantAccessAssigned()
-                        {
-                            Assigned = new CapGrantAccessAssignedDetails()
-                            {
-                                secret = secret,
-                                assignees = new byte[1][] { signingKey }
-                            }
-                        };
-                    }
+                    request.cap_grant.access = CapAccess.Assigned(secret, new byte[1][] { signingKey });
                     break;
 
                 case CapGrantAccessType.Unrestricted:
-                    {
-                        request.cap_grant.access = new CapGrantAccessUnrestricted()
-                        {
-                            Unrestricted = null
-                        };
-                    }
+                    request.cap_grant.access = CapAccess.Unrestricted();
                     break;
 
                 case CapGrantAccessType.Transferable:
-                    {
-                        request.cap_grant.access = new CapGrantAccessTransferable()
-                        {
-                            Transferable = new CapGrantAccessTransferableDetails()
-                            {
-                                secret = secret
-                            }
-                        };
-                    }
+                    request.cap_grant.access = CapAccess.Transferable(secret);
                     break;
             }
 
@@ -1293,7 +1273,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 return (new ZomeCallCapabilityGrantedCallBackEventArgs() { IsError = true, EndPoint = EndPoint, Id = id, Message = msg }, null, null);
             }
 
-            Sodium.KeyPair pair = Sodium.PublicKeyAuth.GenerateKeyPair(RandomNumberGenerator.GetBytes(32));
+            var signingSeed = new byte[32];
+            using (var random = RandomNumberGenerator.Create())
+                random.GetBytes(signingSeed);
+            Sodium.KeyPair pair = Sodium.PublicKeyAuth.GenerateKeyPair(signingSeed);
             //byte[] DHTLocation = ConvertHoloHashToBytes(HoloNETDNA.AgentPubKey).TakeLast(4).ToArray();
             //byte[] signingKey = new byte[] { 132, 32, 36 }.Concat(pair.PublicKey).Concat(DHTLocation).ToArray();
 

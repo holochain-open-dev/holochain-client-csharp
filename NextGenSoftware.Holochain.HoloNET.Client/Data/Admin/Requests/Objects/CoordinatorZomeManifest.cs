@@ -17,6 +17,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects
     /// Note: coordinator zome dependencies are plain ZomeName strings (not wrapped in ZomeDependency),
     /// unlike IntegrityZomeManifest which uses ZomeDependency objects.
     /// </summary>
+    [System.Obsolete("Not a Holochain 0.7.0 type: integrity and coordinator zomes both use ZomeManifest (name, hash, path, dependencies). Use ZomeManifest instead.")]
     [MessagePackObject]
     public class CoordinatorZomeManifest
     {

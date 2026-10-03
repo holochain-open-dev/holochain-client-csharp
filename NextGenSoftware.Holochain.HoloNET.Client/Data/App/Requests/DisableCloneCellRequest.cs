@@ -7,7 +7,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
     /// AppRequest::DisableCloneCell (Holochain 0.7.0):
     ///
     /// pub struct DisableCloneCellPayload {
-    ///     pub clone_cell_id: CloneCellId,  // enum: CloneId(CloneId) | CellId(CellId)
+    ///     pub clone_cell_id: CloneCellId,  // enum: CloneId(CloneId) | DnaHash(DnaHash)
     /// }
     /// https://docs.rs/holochain_types/0.7.0/holochain_types/app/struct.DisableCloneCellPayload.html
     /// </summary>
@@ -16,8 +16,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
     {
         /// <summary>
         /// The CloneCellId — either a clone id string (e.g. "role_name.0") or a CellId tuple.
-        /// Wire: {"CloneId": "..."} or {"CellId": [[dna_hash], [agent_key]]}.
-        /// Kept as dynamic; use an anonymous object matching the appropriate variant.
+        /// Wire (adjacently tagged): {"type": "clone_id", "value": "role.0"} or {"type": "dna_hash", "value": bytes}.
+        /// Build with CloneCellId.FromCloneId / FromDnaHash.
         /// </summary>
         [Key("clone_cell_id")]
         public dynamic clone_cell_id { get; set; }
@@ -34,8 +34,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
     {
         /// <summary>
         /// The CloneCellId — either a clone id string (e.g. "role_name.0") or a CellId tuple.
-        /// Wire: {"CloneId": "..."} or {"CellId": [[dna_hash], [agent_key]]}.
-        /// Kept as dynamic; use an anonymous object matching the appropriate variant.
+        /// Wire (adjacently tagged): {"type": "clone_id", "value": "role.0"} or {"type": "dna_hash", "value": bytes}.
+        /// Build with CloneCellId.FromCloneId / FromDnaHash.
         /// </summary>
         [Key("clone_cell_id")]
         public dynamic clone_cell_id { get; set; }

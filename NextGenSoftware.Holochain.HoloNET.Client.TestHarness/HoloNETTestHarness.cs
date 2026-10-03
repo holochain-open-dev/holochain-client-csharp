@@ -626,25 +626,26 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
 
                         await _holoNETClientAdmin.RegisterDnaAsync(new DnaBundle()
                         {
+                            // Holochain 0.7.0 shape: manifest_version "0", zomes split into integrity/coordinator.
                             manifest = new DnaManifest()
                             {
-                                manifest_version = "1",
                                 name = "oasis-test",
-                                network_seed = "1",
-                                properties = "test props",
-                                zomes = new ZomeManifest[]
+                                integrity = new IntegrityManifest()
                                 {
-                                    new ZomeManifest()
+                                    network_seed = "1",
+                                    properties = "test props",
+                                    zomes = new ZomeManifest[]
                                     {
-                                         //bundled = "", //Can ONLY be one of bundled, path or url.
-                                         path = _oasisDnaPath, //Can ONLY be one of bundled, path or url.
-                                         //url = "", //Can ONLY be one of bundled, path or url.
-                                         name = "OASIS Test",
-                                         hash = "",
-                                         dependencies = new ZomeDependency[]{ new ZomeDependency(){ name = "oasis"} }
+                                        new ZomeManifest()
+                                        {
+                                             path = _oasisDnaPath,
+                                             name = "OASIS Test",
+                                             hash = null,
+                                             dependencies = new ZomeDependency[]{ new ZomeDependency(){ name = "oasis"} }
+                                        }
                                     }
-                                }
-
+                                },
+                                coordinator = new CoordinatorManifest() { zomes = new ZomeManifest[0] }
                             },
                             resources = new Dictionary<string, byte[]>()
                         });

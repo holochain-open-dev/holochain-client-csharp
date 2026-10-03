@@ -23,7 +23,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         [Key("access")]
         public CapAccessInfo access { get; set; }
 
+        // Adjacently tagged: {"type": "all"} or {"type": "listed", "value": [[zome, fn], ...]}.
+        // Was typed as GrantedFunctions, whose single "functions" key never matches the wire shape.
         [Key("functions")]
-        public GrantedFunctions functions { get; set; }
+        public System.Collections.Generic.Dictionary<string, object> functions { get; set; }
     }
 }

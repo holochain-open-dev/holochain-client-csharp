@@ -1013,7 +1013,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <summary>
         /// Enable a previously disabled clone cell.
         /// </summary>
-        /// <param name="cloneCellId">Either the clone id (string, e.g. "role_name.0") or the CellId (byte[][]) of the clone cell to enable.</param>
+        /// <param name="cloneCellId">A clone id string (e.g. "role_name.0"), the clone DNA hash (byte[]), a CellId (byte[][], its DNA hash is used), or a CloneCellId.From* value for the clone cell to enable.</param>
         /// <param name="conductorResponseCallBackMode">The Concuctor Response CallBack Mode, set this to 'WaitForHolochainConductorResponse' if you want the function to wait for the Holochain Conductor response before returning that response or set it to 'UseCallBackEvents' to return from the function immediately and then raise the 'OnCloneCellEnabledCallBack' event when the conductor responds.</param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
@@ -1021,14 +1021,14 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         {
             return await CallFunctionAsync(HoloNETRequestType.AppEnableCloneCell, "enable_clone_cell", new EnableCloneCellRequest()
             {
-                clone_cell_id = cloneCellId
+                clone_cell_id = CloneCellId.Normalize((object)cloneCellId)
             }, _taskCompletionCloneCellEnabledCallBack, "OnCloneCellEnabledCallBack", conductorResponseCallBackMode, id);
         }
 
         /// <summary>
         /// Enable a previously disabled clone cell.
         /// </summary>
-        /// <param name="cloneCellId">Either the clone id (string, e.g. "role_name.0") or the CellId (byte[][]) of the clone cell to enable.</param>
+        /// <param name="cloneCellId">A clone id string (e.g. "role_name.0"), the clone DNA hash (byte[]), a CellId (byte[][], its DNA hash is used), or a CloneCellId.From* value for the clone cell to enable.</param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
         public CloneCellEnabledCallBackEventArgs EnableCloneCell(dynamic cloneCellId, string id = null)
@@ -1039,7 +1039,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <summary>
         /// Disable a clone cell.
         /// </summary>
-        /// <param name="cloneCellId">Either the clone id (string, e.g. "role_name.0") or the CellId (byte[][]) of the clone cell to disable.</param>
+        /// <param name="cloneCellId">A clone id string (e.g. "role_name.0"), the clone DNA hash (byte[]), a CellId (byte[][], its DNA hash is used), or a CloneCellId.From* value for the clone cell to disable.</param>
         /// <param name="conductorResponseCallBackMode">The Concuctor Response CallBack Mode, set this to 'WaitForHolochainConductorResponse' if you want the function to wait for the Holochain Conductor response before returning that response or set it to 'UseCallBackEvents' to return from the function immediately and then raise the 'OnCloneCellDisabledCallBack' event when the conductor responds.</param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
@@ -1047,14 +1047,14 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         {
             return await CallFunctionAsync(HoloNETRequestType.AppDisableCloneCell, "disable_clone_cell", new DisableCloneCellRequest()
             {
-                clone_cell_id = cloneCellId
+                clone_cell_id = CloneCellId.Normalize((object)cloneCellId)
             }, _taskCompletionCloneCellDisabledCallBack, "OnCloneCellDisabledCallBack", conductorResponseCallBackMode, id);
         }
 
         /// <summary>
         /// Disable a clone cell.
         /// </summary>
-        /// <param name="cloneCellId">Either the clone id (string, e.g. "role_name.0") or the CellId (byte[][]) of the clone cell to disable.</param>
+        /// <param name="cloneCellId">A clone id string (e.g. "role_name.0"), the clone DNA hash (byte[]), a CellId (byte[][], its DNA hash is used), or a CloneCellId.From* value for the clone cell to disable.</param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
         public CloneCellDisabledCallBackEventArgs DisableCloneCell(dynamic cloneCellId, string id = null)

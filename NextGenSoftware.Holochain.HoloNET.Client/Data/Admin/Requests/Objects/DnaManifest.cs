@@ -1,48 +1,42 @@
-﻿
+
 using MessagePack;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects
 {
+    /// <summary>
+    /// Mirrors holochain_types::dna::DnaManifest (Holochain 0.7.0), an internally tagged enum:
+    /// #[serde(tag = "manifest_version")] enum DnaManifest { #[serde(rename = "0")] V0(DnaManifestV0) }
+    ///
+    /// DnaManifestV0 (deny_unknown_fields) {
+    ///     name: String,
+    ///     integrity: IntegrityManifest,
+    ///     coordinator: CoordinatorManifest,   // #[serde(default)]
+    ///     lineage: Vec&lt;DnaHashB64&gt;,          // only with the unstable-migration feature
+    /// }
+    /// https://github.com/holochain/holochain/blob/holochain-0.7.0/crates/holochain_types/src/dna/dna_manifest.rs
+    /// </summary>
     [MessagePackObject]
     public class DnaManifest
     {
-        /// <summary>
-        ///  Currently one "1" is supported
-        /// </summary>
+        /// <summary>The manifest version tag. Must be "0" for Holochain 0.7.0.</summary>
         [Key("manifest_version")]
-        public string manifest_version { get; set; }
+        public string manifest_version { get; set; } = "0";
 
-        /// <summary>
-        /// The friendly "name" of a Holochain DNA.
-        /// </summary>
+        /// <summary>The friendly "name" of a Holochain DNA.</summary>
         [Key("name")]
         public string name { get; set; }
 
-        // NOTE (Holochain 0.7.0): network_seed and properties moved to IntegrityManifest.
-        // Set them on DnaManifest.integrity.network_seed / .properties instead.
-        // Kept here as commented-out reference for callers upgrading from pre-0.7.0.
-        //[Key("network_seed")] public string network_seed { get; set; }
-        //[Key("properties")]   public dynamic properties { get; set; }
-
-        /// <summary>
-        /// Integrity zomes container for this DNA (Holochain 0.7.0+). Single object wrapping
-        /// an array of IntegrityZomeManifest entries (see IntegrityManifest.zomes).
-        /// </summary>
         [Key("integrity")]
         public IntegrityManifest integrity { get; set; }
 
-        /// <summary>
-        /// Coordinator zomes container for this DNA (Holochain 0.7.0+). Single object wrapping
-        /// an array of CoordinatorZomeManifest entries (see CoordinatorManifest.zomes).
-        /// </summary>
         [Key("coordinator")]
         public CoordinatorManifest coordinator { get; set; }
 
-        /// <summary>
-        /// Legacy flat zomes array — retained for backwards compatibility and DNA bundles that
-        /// predate the integrity/coordinator split. Prefer `integrity` + `coordinator` for 0.7.0+.
-        /// </summary>
-        [Key("zomes")]
-        public ZomeManifest[] zomes { get; set; }
+        // Removed from DnaManifest in 0.7.0: network_seed and properties live on IntegrityManifest,
+        // and the flat zomes list is replaced by integrity/coordinator. DnaManifestV0 is
+        // deny_unknown_fields, so sending any of these keys makes the conductor reject the manifest.
+        //[Key("network_seed")] public string network_seed { get; set; }
+        //[Key("properties")]   public dynamic properties { get; set; }
+        //[Key("zomes")]        public ZomeManifest[] zomes { get; set; }
     }
 }
