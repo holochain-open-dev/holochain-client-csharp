@@ -4,6 +4,9 @@ using NextGenSoftware.Holochain.HoloNET.Client.Data.App.Responses.Objects;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects
 {
+    // The conductor sends {"type": "provisioned", "value": {...}}; the Key attributes below
+    // describe the old externally-tagged shape and are bypassed by CellInfoFormatter.
+    [MessagePackFormatter(typeof(CellInfoFormatter))]
     [MessagePackObject]
     public class CellInfo
     {

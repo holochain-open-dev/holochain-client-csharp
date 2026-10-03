@@ -301,6 +301,21 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
         }
 
         [Fact]
+        public void CellInfo_DecodesAdjacentlyTaggedConductorShape()
+        {
+            byte[] wire = MessagePackSerializer.ConvertFromJson(
+                "[{\"type\":\"provisioned\",\"value\":{\"cell_id\":null,\"dna_modifiers\":null,\"name\":\"main\"}}," +
+                " {\"type\":\"stem\",\"value\":{\"original_dna_hash\":null,\"dna_modifiers\":null,\"name\":null}}]");
+
+            var cells = MessagePackSerializer.Deserialize<System.Collections.Generic.List<NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects.CellInfo>>(
+                wire, MessagePackSerializerOptions.Standard.WithSecurity(MessagePackSecurity.UntrustedData));
+
+            Assert.Equal(CellInfoType.Provisioned, cells[0].CellInfoType);
+            Assert.Equal("main", cells[0].Provisioned.name);
+            Assert.Equal(CellInfoType.Stem, cells[1].CellInfoType);
+        }
+
+        [Fact]
         public void CloneCellId_Normalize_ProducesTaggedForms()
         {
             Assert.Equal("{\"type\":\"clone_id\",\"value\":\"role.0\"}", Json(CloneCellId.Normalize("role.0")));

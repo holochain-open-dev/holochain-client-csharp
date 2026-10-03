@@ -1,5 +1,39 @@
 # Changelog
 
+## Wire-format corrections (verified against holochain-0.7.0 source)
+
+### Breaking changes
+- **`DnaManifest`** now matches 0.7.0 `DnaManifestV0` (`deny_unknown_fields`): `manifest_version`
+  defaults to `"0"`; `network_seed`, `properties` and the flat `zomes` list are removed (set
+  `integrity.network_seed` / `integrity.properties`, and put zomes in `integrity.zomes` /
+  `coordinator.zomes`). Code that set the removed members no longer compiles.
+- **`ZomeManifest`**: `bundled` and `url` removed; `path` is the only location field.
+- **`IntegrityManifest.zomes` / `CoordinatorManifest.zomes`** are `ZomeManifest[]`.
+  `IntegrityZomeManifest` and `CoordinatorZomeManifest` (added earlier in 4.1.0 without
+  verification) are `[Obsolete]`. They are not Holochain types.
+- **`DesensitizedZomeCallCapGrant.functions`** is now `Dictionary<string, object>`.
+
+### Fixes
+- **Capability grants**: `CapAccess` and `GrantedFunctions` are serialized as
+  `{"type": ..., "value": ...}`, as the conductor expects. HoloNET previously sent
+  `{"Assigned": ...}` / `{"All": null}`. 0.6.1 used the same tagging, so this bug predates the
+  0.7.0 upgrade. New `CapAccess` builder; `CapGrantAccessUnrestricted/Transferable/Assigned`
+  are `[Obsolete]`.
+- **Clone cells**: `CloneCellId` is sent as `{"type": "clone_id" | "dna_hash", "value": ...}`.
+  The enum has no CellId variant. Existing overloads still accept a clone-id string, a DNA hash, or
+  a CellId (its DNA hash is used) via `CloneCellId.Normalize`.
+- **`CellInfo` decoding**: the conductor sends `{"type": "provisioned" | "cloned" | "stem",
+  "value": {...}}`, but `CellInfo` expected `{"provisioned": {...}}`, so every cell decoded empty.
+  `CellInfoType` came back `None`, no `CellId` was captured, and `InstallEnableSignAndAttachHapp`
+  aborted with "CellType Is Not Provisioned". Fixed with `CellInfoFormatter`.
+- Tests now assert the exact wire JSON for these types (58 tests).
+
+### Known issue
+- The bundled `holochain.exe` / `hc.exe` in `Resources/` are still **0.6.2**, so the Embedded
+  package starts a 0.6.2 conductor.
+
+---
+
 ## Post-upgrade polish (v4.1.0 follow-on)
 
 Further hardening and completeness work on top of the 0.7.0 upgrade:
