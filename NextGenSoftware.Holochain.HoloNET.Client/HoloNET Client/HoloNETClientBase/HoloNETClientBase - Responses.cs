@@ -107,6 +107,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                 switch (appResponse.type)
                 {
+                    // AppResponse::ZomeCalled serialises as "zome_called"; "zome-response" is the pre-0.2 name.
+                    case "zome_called":
                     case "zome-response":
                         response.HoloNETResponseType = HoloNETResponseType.ZomeResponse;
                         break;
@@ -203,8 +205,15 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                         response.HoloNETResponseType = HoloNETResponseType.AdminNetworkStatsDumped;
                         break;
 
+                    // AdminResponse::StorageInfo serialises as "storage_info"; kept the old name too.
+                    case "storage_info":
                     case "network_storage_info":
                         response.HoloNETResponseType = HoloNETResponseType.AdminStorageInfoReturned;
+                        break;
+
+                    // Shared by Admin and App interfaces (AdminResponse/AppResponse::OpTimingsDumped).
+                    case "op_timings_dumped":
+                        response.HoloNETResponseType = this is HoloNETClientAdmin ? HoloNETResponseType.AdminOpTimingsDumped : HoloNETResponseType.AppOpTimingsDumped;
                         break;
 
                     case "records_grafted":
