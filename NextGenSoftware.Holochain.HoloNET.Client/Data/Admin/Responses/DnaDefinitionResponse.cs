@@ -10,7 +10,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         [Key("type")]
         public string type { get; set; }
 
-        [Key("data")]
+        // AdminRequest/AdminResponse/AppRequest/AppResponse are #[serde(tag = "type", content = "value")]
+        // (holochain 0.6.1 and 0.7.0). "data" was the pre-0.4 content key and is ignored by the conductor.
+        [Key("value")]
         public DnaDefinitionResponseDetail data { get; set; }
     }
 }

@@ -224,7 +224,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public async Task<AgentPubKeyGeneratedCallBackEventArgs> GenerateAgentPubKeyAsync(ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, bool updateAgentPubKeyInHoloNETDNA = true, string id = "")
         {
             _updateDnaHashAndAgentPubKey = updateAgentPubKeyInHoloNETDNA;
-            return await CallFunctionAsync(HoloNETRequestType.AdminGrantZomeCallCapability, "generate_agent_pub_key", null, _taskCompletionAgentPubKeyGeneratedCallBack, "OnAgentPubKeyGeneratedCallBack", conductorResponseCallBackMode, id);
+            return await CallFunctionAsync(HoloNETRequestType.AdminGenerateAgentPubKey, "generate_agent_pub_key", null, _taskCompletionAgentPubKeyGeneratedCallBack, "OnAgentPubKeyGeneratedCallBack", conductorResponseCallBackMode, id);
         }
 
         //public void GenerateAgentPubKey(bool updateAgentPubKeyInHoloNETDNA = true, string id = "")
