@@ -5,13 +5,15 @@ using System.Collections.Generic;
 namespace NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects
 {
     /// <summary>
-    /// Mirrors the Holochain GrantedFunctions tagged union.
-    /// Wire format (MessagePack map): {"All": null} or {"Listed": [[zome, fn], ...]}
+    /// Builds the wire form of holochain_integrity_types::capability::GrantedFunctions.
+    /// Rust: #[serde(tag = "type", content = "value", rename_all = "snake_case")]
+    /// Wire: {"type": "all"} or {"type": "listed", "value": [[zome, fn], ...]}
+    /// Verified against holochain-0.7.0 (and 0.6.1, which uses the same tagging).
+    /// A dictionary is used so the unit variant omits the "value" key entirely.
     /// </summary>
     [MessagePackObject]
     public class GrantedFunctions
     {
-        // String-keyed so MessagePack serialises "All"/"Listed" rather than int 0/1.
         [Key("functions")]
         public Dictionary<string, object> Functions { get; set; }
 
@@ -19,7 +21,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects
         {
             return new GrantedFunctions
             {
-                Functions = new Dictionary<string, object> { { "All", null } }
+                // Previously {"All": null} (externally tagged) — the conductor expects adjacent tagging.
+                Functions = new Dictionary<string, object> { { "type", "all" } }
             };
         }
 
@@ -31,7 +34,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects
 
             return new GrantedFunctions
             {
-                Functions = new Dictionary<string, object> { { "Listed", list } }
+                // Previously {"Listed": [...]} (externally tagged) — the conductor expects adjacent tagging.
+                Functions = new Dictionary<string, object> { { "type", "listed" }, { "value", list } }
             };
         }
     }

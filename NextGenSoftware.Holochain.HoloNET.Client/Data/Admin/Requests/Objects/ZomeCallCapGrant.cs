@@ -13,14 +13,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects
         //[Key("cap_grant")]
         //public dynamic cap_grant { get; set; }
 
-        // Tagged union: use CapGrantAccessUnrestricted, CapGrantAccessTransferable, or
-        // CapGrantAccessAssigned. Kept as dynamic because MessagePack cannot transparently
-        // deserialize an externally-tagged Rust enum into a single C# type.
+        // Adjacently-tagged CapAccess: build with CapAccess.Unrestricted/Transferable/Assigned.
         [Key("access")]
         public dynamic access { get; set; }
 
-        // Wire format: {"All": null} or {"Listed": [[zome, fn], ...]}
-        // String keys are required — the conductor rejects integer enum keys.
+        // Adjacently-tagged GrantedFunctions: {"type": "all"} or {"type": "listed", "value": [[zome, fn], ...]}
         [Key("functions")]
         public Dictionary<string, object> functions { get; set; }
     }

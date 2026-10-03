@@ -251,82 +251,64 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
 
         // ── IntegrityManifest / CoordinatorManifest / DnaManifest (Holochain 0.7.0) ───────────
 
+        // These assert the exact wire keys: DnaManifestV0, IntegrityManifest, CoordinatorManifest
+        // and ZomeManifest are all deny_unknown_fields in Holochain 0.7.0.
+        private static string Json<T>(T value) =>
+            MessagePackSerializer.ConvertToJson(MessagePackSerializer.Serialize(value, MessagePackSerializerOptions.Standard));
+
         [Fact]
-        public void IntegrityZomeManifest_RoundTrips()
+        public void ZomeManifest_WireKeys_MatchHolochain070()
         {
-            var original = new NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects.IntegrityZomeManifest
+            var zome = new NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects.ZomeManifest
             {
-                name = "my_integrity",
-                hash = null,
-                bundled = "my_integrity.wasm",
-                dependencies = null
+                name = "z", path = "z.wasm",
+                dependencies = new[] { new NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects.ZomeDependency { name = "i" } }
             };
 
-            byte[] bytes = MessagePackSerializer.Serialize(original, MessagePackSerializerOptions.Standard);
-            var result = MessagePackSerializer.Deserialize<NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects.IntegrityZomeManifest>(bytes, MessagePackSerializerOptions.Standard);
-
-            Assert.Equal("my_integrity", result.name);
-            Assert.Equal("my_integrity.wasm", result.bundled);
+            Assert.Equal("{\"name\":\"z\",\"hash\":null,\"path\":\"z.wasm\",\"dependencies\":[{\"name\":\"i\"}]}", Json(zome));
         }
 
         [Fact]
-        public void CoordinatorZomeManifest_RoundTrips_WithStringDependencies()
+        public void DnaManifest_WireKeys_MatchHolochain070()
         {
-            var original = new NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects.CoordinatorZomeManifest
+            var manifest = new NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects.DnaManifest
             {
-                name = "my_coordinator",
-                bundled = "my_coordinator.wasm",
-                dependencies = new[] { "my_integrity" }
+                name = "d",
+                integrity = new NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects.IntegrityManifest { network_seed = "s", zomes = new NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects.ZomeManifest[0] },
+                coordinator = new NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects.CoordinatorManifest { zomes = new NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects.ZomeManifest[0] }
             };
 
-            byte[] bytes = MessagePackSerializer.Serialize(original, MessagePackSerializerOptions.Standard);
-            var result = MessagePackSerializer.Deserialize<NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects.CoordinatorZomeManifest>(bytes, MessagePackSerializerOptions.Standard);
-
-            Assert.Equal("my_coordinator", result.name);
-            Assert.Single(result.dependencies);
-            Assert.Equal("my_integrity", result.dependencies[0]);
+            Assert.Equal(
+                "{\"manifest_version\":\"0\",\"name\":\"d\",\"integrity\":{\"network_seed\":\"s\",\"properties\":null,\"zomes\":[]},\"coordinator\":{\"zomes\":[]}}",
+                Json(manifest));
         }
 
         [Fact]
-        public void DnaManifest_RoundTrips_IntegrityCoordinatorSplit()
+        public void GrantedFunctions_UseAdjacentTagging()
         {
-            var original = new NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects.DnaManifest
-            {
-                manifest_version = "1",
-                name = "test_dna",
-                integrity = new NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects.IntegrityManifest
-                {
-                    zomes = new[]
-                    {
-                        new NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects.IntegrityZomeManifest
-                        {
-                            name = "integrity_zome", bundled = "integrity.wasm"
-                        }
-                    }
-                },
-                coordinator = new NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects.CoordinatorManifest
-                {
-                    zomes = new[]
-                    {
-                        new NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects.CoordinatorZomeManifest
-                        {
-                            name = "coordinator_zome",
-                            bundled = "coordinator.wasm",
-                            dependencies = new[] { "integrity_zome" }
-                        }
-                    }
-                }
-            };
+            Assert.Equal("{\"type\":\"all\"}", Json(NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects.GrantedFunctions.All().Functions));
+            Assert.Equal(
+                "{\"type\":\"listed\",\"value\":[[\"zome\",\"fn\"]]}",
+                Json(NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects.GrantedFunctions.Listed(new System.Collections.Generic.List<(string, string)> { ("zome", "fn") }).Functions));
+        }
 
-            byte[] bytes = MessagePackSerializer.Serialize(original, MessagePackSerializerOptions.Standard);
-            var result = MessagePackSerializer.Deserialize<NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects.DnaManifest>(bytes, MessagePackSerializerOptions.Standard);
+        [Fact]
+        public void CapAccess_UsesAdjacentTagging()
+        {
+            Assert.Equal("{\"type\":\"unrestricted\"}", Json(NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects.CapAccess.Unrestricted()));
+            Assert.StartsWith("{\"type\":\"transferable\",\"value\":{\"secret\":", Json(NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects.CapAccess.Transferable(new byte[] { 1 })));
+            Assert.StartsWith("{\"type\":\"assigned\",\"value\":{\"secret\":", Json(NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects.CapAccess.Assigned(new byte[] { 1 }, new[] { new byte[] { 2 } })));
+        }
 
-            Assert.Equal("test_dna", result.name);
-            Assert.Single(result.integrity.zomes);
-            Assert.Equal("integrity_zome", result.integrity.zomes[0].name);
-            Assert.Single(result.coordinator.zomes);
-            Assert.Equal("coordinator_zome", result.coordinator.zomes[0].name);
-            Assert.Equal("integrity_zome", result.coordinator.zomes[0].dependencies[0]);
+        [Fact]
+        public void CloneCellId_Normalize_ProducesTaggedForms()
+        {
+            Assert.Equal("{\"type\":\"clone_id\",\"value\":\"role.0\"}", Json(CloneCellId.Normalize("role.0")));
+            Assert.StartsWith("{\"type\":\"dna_hash\",\"value\":", Json(CloneCellId.Normalize(new byte[] { 9 })));
+
+            var fromCellId = (System.Collections.Generic.Dictionary<string, object>)CloneCellId.Normalize(new[] { new byte[] { 7 }, new byte[] { 8 } });
+            Assert.Equal("dna_hash", fromCellId["type"]);
+            Assert.Equal(new byte[] { 7 }, fromCellId["value"]);
         }
 
         // ── OpTimingsDump / OpTimingDump / OpTimingsCursor (Holochain 0.7.0) ───────────────────
