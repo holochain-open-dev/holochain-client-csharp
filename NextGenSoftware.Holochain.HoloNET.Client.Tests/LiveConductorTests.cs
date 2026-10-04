@@ -152,6 +152,43 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
         }
 
         [Fact]
+        public async Task Live_InstallApp_PayloadIsParsedByConductor()
+        {
+            if (string.IsNullOrEmpty(AdminUri)) return;
+
+            // The repo's oasis.happ predates manifest_version "0", so installation must fail on the
+            // bundle itself. That proves the request shape was accepted. The old shape failed earlier,
+            // because the required `source` field was missing.
+            string happ = System.IO.Path.GetFullPath(System.IO.Path.Combine(AppContext.BaseDirectory,
+                "../../../../HoloNET-Manager/NextGenSoftware.Holochain.HoloNET.Manager/OASIS_hAPP/oasis.happ"));
+            if (!System.IO.File.Exists(happ)) return;
+
+            var request = new NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.InstallAppRequest
+            {
+                source = NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.InstallAppRequest.SourceFromPath(happ),
+                installed_app_id = "holonet-live-test"
+            };
+
+            AppResponse response = await SendAdminAsync("install_app", request);
+            string error = MessagePackSerializer.SerializeToJson(response.data);
+
+            Assert.Equal("error", response.type);
+            Assert.Contains("AppBundleError", error);
+            Assert.DoesNotContain("missing field", error);
+        }
+
+        [Fact]
+        public async Task Live_AttachAppInterface_ReturnsPort()
+        {
+            if (string.IsNullOrEmpty(AdminUri)) return;
+
+            AppResponse response = await SendAdminAsync("attach_app_interface", new NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.AttachAppInterfaceRequest());
+
+            Assert.Equal("app_interface_attached", response.type);
+            Assert.Contains("\"port\":", MessagePackSerializer.SerializeToJson(response.data));
+        }
+
+        [Fact]
         public async Task Live_ListDnas_ReturnsDnasListed()
         {
             if (string.IsNullOrEmpty(AdminUri)) return;

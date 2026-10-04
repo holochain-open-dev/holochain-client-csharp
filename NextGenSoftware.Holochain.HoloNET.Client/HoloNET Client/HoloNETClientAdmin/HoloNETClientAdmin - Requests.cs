@@ -382,31 +382,37 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             return AttachAppInterfaceAsync(port, ConductorResponseCallBackMode.UseCallBackEvents, id).Result;
         }
 
+        [System.Obsolete("Holochain 0.7.0 has no such AdminRequest; the conductor returns an error. Install DNAs via InstallApp with a hApp bundle.")]
         public async Task<DnaRegisteredCallBackEventArgs> RegisterDnaAsync(string path, string network_seed = null, object properties = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
             return await RegisterDnaAsync(path, null, null, network_seed, properties, conductorResponseCallBackMode, id);
         }
 
+        [System.Obsolete("Holochain 0.7.0 has no such AdminRequest; the conductor returns an error. Install DNAs via InstallApp with a hApp bundle.")]
         public DnaRegisteredCallBackEventArgs RegisterDna(string path, string network_seed = null, object properties = null, string id = null)
         {
             return RegisterDnaAsync(path, network_seed, properties, ConductorResponseCallBackMode.UseCallBackEvents, id).Result;
         }
 
+        [System.Obsolete("Holochain 0.7.0 has no such AdminRequest; the conductor returns an error. Install DNAs via InstallApp with a hApp bundle.")]
         public async Task<DnaRegisteredCallBackEventArgs> RegisterDnaAsync(byte[] hash, string network_seed = null, object properties = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
             return await RegisterDnaAsync(null, null, hash, network_seed, properties, conductorResponseCallBackMode, id);
         }
 
+        [System.Obsolete("Holochain 0.7.0 has no such AdminRequest; the conductor returns an error. Install DNAs via InstallApp with a hApp bundle.")]
         public DnaRegisteredCallBackEventArgs RegisterDna(byte[] hash, string network_seed = null, object properties = null, string id = null)
         {
             return RegisterDnaAsync(hash, network_seed, properties, ConductorResponseCallBackMode.UseCallBackEvents, id).Result;
         }
 
+        [System.Obsolete("Holochain 0.7.0 has no such AdminRequest; the conductor returns an error. Install DNAs via InstallApp with a hApp bundle.")]
         public async Task<DnaRegisteredCallBackEventArgs> RegisterDnaAsync(DnaBundle bundle, string network_seed = null, object properties = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
             return await RegisterDnaAsync(null, bundle, null, network_seed, properties, conductorResponseCallBackMode, id);
         }
 
+        [System.Obsolete("Holochain 0.7.0 has no such AdminRequest; the conductor returns an error. Install DNAs via InstallApp with a hApp bundle.")]
         public DnaRegisteredCallBackEventArgs RegisterDna(DnaBundle bundle, string network_seed = null, object properties = null, string id = null)
         {
             return RegisterDnaAsync(bundle, network_seed, properties, ConductorResponseCallBackMode.UseCallBackEvents, id).Result;
@@ -1097,6 +1103,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="conductorResponseCallBackMode">The Concuctor Response CallBack Mode, set this to 'WaitForHolochainConductorResponse' if you want the function to wait for the Holochain Conductor response before returning that response or set it to 'UseCallBackEvents' to return from the function immediately and then raise the 'OnDumpFullStateCallBack' event when the conductor responds.   </param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
+        [System.Obsolete("Holochain 0.7.0 has no GraftRecords AdminRequest; the conductor returns an error.")]
         public async Task<RecordsGraftedCallBackEventArgs> GraftRecordsAsync(byte[][] cellId, bool validate, object[] records, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
             return await CallFunctionAsync(HoloNETRequestType.AdminGraftRecords, "graft_records", new GraftRecordsRequest()
@@ -1115,6 +1122,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="records">The records to be inserted into the source chain.</param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
+        [System.Obsolete("Holochain 0.7.0 has no GraftRecords AdminRequest; the conductor returns an error.")]
         public RecordsGraftedCallBackEventArgs GraftRecords(byte[][] cellId, bool validate, object[] records, string id = null)
         {
             return GraftRecordsAsync(cellId, validate, records, ConductorResponseCallBackMode.UseCallBackEvents, id).Result;
@@ -1143,13 +1151,25 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             return await CallFunctionAsync(HoloNETRequestType.AdminInstallApp, "install_app", new InstallAppRequest()
             {
-                path = hAppPath,
-                bundle = appBundle,
+                source = BuildInstallAppSource(hAppPath, appBundle),
                 agent_key = ConvertHoloHashToBytes(agentKey),
                 installed_app_id = installedAppId,
-                membrane_proofs = membraneProofs,
+                roles_settings = InstallAppRequest.RolesSettingsFromMembraneProofs(membraneProofs),
                 network_seed = network_seed
             }, _taskCompletionAppInstalledCallBack, "OnAppInstalledCallBack", conductorResponseCallBackMode, id);
+        }
+
+        // AppBundleSource is Path or Bytes (raw .happ file). An in-memory AppBundle has no verified
+        // 0.7.0 packing, so callers must supply a .happ path; the old shape failed for every install anyway.
+        private static Dictionary<string, object> BuildInstallAppSource(string hAppPath, AppBundle appBundle)
+        {
+            if (!string.IsNullOrEmpty(hAppPath))
+                return InstallAppRequest.SourceFromPath(hAppPath);
+
+            if (appBundle != null)
+                throw new NotSupportedException("Installing from an in-memory AppBundle is not supported with Holochain 0.7.0. Pass the path to a .happ file instead.");
+
+            throw new ArgumentException("A .happ path is required to install an app.", nameof(hAppPath));
         }
 
         Dictionary<string, string> _installingAppId = new Dictionary<string, string>();
@@ -1184,14 +1204,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     membraneProofs = new Dictionary<string, byte[]>();
 
                 CallFunction(HoloNETRequestType.AdminInstallApp, "install_app", new InstallAppRequest()
-                {
-                    path = hAppPath,
-                    bundle = appBundle,
-                    agent_key = ConvertHoloHashToBytes(agentKey),
-                    installed_app_id = installedAppId,
-                    membrane_proofs = membraneProofs,
-                    network_seed = network_seed
-                }, id);
+            {
+                source = BuildInstallAppSource(hAppPath, appBundle),
+                agent_key = ConvertHoloHashToBytes(agentKey),
+                installed_app_id = installedAppId,
+                roles_settings = InstallAppRequest.RolesSettingsFromMembraneProofs(membraneProofs),
+                network_seed = network_seed
+            }, id);
             }
         }
 
