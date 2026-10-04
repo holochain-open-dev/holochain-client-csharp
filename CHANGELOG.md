@@ -12,8 +12,26 @@
   `IntegrityZomeManifest` and `CoordinatorZomeManifest` (added earlier in 4.1.0 without
   verification) are `[Obsolete]`. They are not Holochain types.
 - **`DesensitizedZomeCallCapGrant.functions`** is now `Dictionary<string, object>`.
+- **`ListAppsRequest.status_filter`** is now a `string`. Use `AppStatusFilter.ToWireValue()`.
 
 ### Fixes
+- **Request/response envelope (affected every call)**: `AdminRequest`/`AppRequest` and their
+  responses are `{"type": ..., "value": ...}` in Holochain 0.6.1 and 0.7.0. HoloNET sent and read
+  `"data"`, the pre-0.4 key, so the conductor returned `error` for every call. Confirmed
+  against a live 0.7.0 conductor (`Live_OldDataContentKey_IsRejectedByConductor`).
+- **Response routing**: added `zome_called`, `storage_info` and `op_timings_dumped`. Before this,
+  the DumpOpTimings callbacks never fired. `generate_agent_pub_key` is no longer tagged as a
+  capability grant.
+- **`AppStatusFilter`** was sent as an integer index, which the conductor reads as a variant
+  index (`Running` filtered by `AwaitingMemproofs`). It is now sent as `"enabled"`, `"disabled"`,
+  `"awaiting_memproofs"`, `"awaiting_restore"` or `"unrecoverable"`. `Running`/`Stopped`/`Paused`
+  are `[Obsolete]`.
+- **`EnableApp` response**: 0.6.1/0.7.0 return `AppEnabled(AppInfo)`. HoloNET decoded the old
+  `{app, errors}` shape, which left the enabled app's `AppInfo` (and so its `CellId`) null.
+- **`HoloNETDNAManager.LoadDNA`** always returned `null` (it deserialized into an interface and
+  swallowed the exception). Also fixed: `throw ex;` → `throw;`, and the `StreamWriter` is now disposed.
+- **Bundled conductor**: `Resources/holochain.exe` and `hc.exe` are now the official
+  holochain-0.7.0 Windows builds. Their SHA-256 hashes match the GitHub release digests.
 - **Capability grants**: `CapAccess` and `GrantedFunctions` are serialized as
   `{"type": ..., "value": ...}`, as the conductor expects. HoloNET previously sent
   `{"Assigned": ...}` / `{"All": null}`. 0.6.1 used the same tagging, so this bug predates the
@@ -26,11 +44,10 @@
   "value": {...}}`, but `CellInfo` expected `{"provisioned": {...}}`, so every cell decoded empty.
   `CellInfoType` came back `None`, no `CellId` was captured, and `InstallEnableSignAndAttachHapp`
   aborted with "CellType Is Not Provisioned". Fixed with `CellInfoFormatter`.
-- Tests now assert the exact wire JSON for these types (58 tests).
+- Tests now assert the exact wire JSON for these types. 76 tests in total, including
+  `LiveConductorTests` that run against a real conductor when `HOLONET_LIVE_ADMIN_URI` is set.
 
-### Known issue
-- The bundled `holochain.exe` / `hc.exe` in `Resources/` are still **0.6.2**, so the Embedded
-  package starts a 0.6.2 conductor.
+See [AUDIT.md](AUDIT.md) for the full audit, the evidence for each finding, and what remains open.
 
 ---
 

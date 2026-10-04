@@ -380,13 +380,16 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             try
             {
                 Logger.Log("ADMIN: APP ENABLED DATA DETECTED\n", LogType.Info);
-                EnableAppResponse enableAppResponse = MessagePackSerializer.Deserialize<EnableAppResponse>(response.data, messagePackSerializerOptions);
+                // Holochain 0.6.1/0.7.0: AdminResponse::AppEnabled(AppInfo) — the value is the AppInfo
+                // itself. The old {app, errors} shape (EnableAppResponse) no longer exists, so
+                // decoding with it left app null.
+                AppInfoResponse appEnabledResponse = MessagePackSerializer.Deserialize<AppInfoResponse>(response.data, messagePackSerializerOptions);
 
-                if (enableAppResponse != null)
+                if (appEnabledResponse != null)
                 {
-                    enableAppResponse.data.app = ProcessAppInfo(enableAppResponse.data.app, args);
-                    args.AppInfoResponse = new AppInfoResponse() { data = enableAppResponse.data.app };
-                    args.Errors = enableAppResponse.data.errors;
+                    appEnabledResponse.data = ProcessAppInfo(appEnabledResponse.data, args);
+                    args.AppInfoResponse = appEnabledResponse;
+                    args.Errors = new List<EnableAppError>();
                 }
                 else
                 {

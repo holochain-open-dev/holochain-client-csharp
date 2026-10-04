@@ -6,8 +6,39 @@ conductor process, as a follow-up to the unit tests in
 `NextGenSoftware.Holochain.HoloNET.Client.Tests` (which only cover serialization
 round-trips and do not require a conductor).
 
-This is a plan only. No conductor install or live-process work has been attempted as
-part of producing this document — see "Feasibility" at the end.
+> **Status (2026-10):** live tests now exist and pass. `LiveConductorTests.cs` runs against a
+> real Holochain 0.7.0 sandbox conductor on Windows. The quick start below is the procedure that
+> was used. The sections after it are the original plan; they are kept for the hApp-level
+> tests (install, zome calls) that are still to do.
+
+## Quick start: run the live tests (Windows)
+
+1. Download the official 0.7.0 Windows builds from
+   <https://github.com/holochain/holochain/releases/tag/holochain-0.7.0>:
+   `holochain-x86_64-pc-windows-msvc.exe`, `hc-x86_64-pc-windows-msvc.exe` and
+   `lair-keystore-x86_64-pc-windows-msvc.exe`. Rename them to `holochain.exe`, `hc.exe` and
+   `lair-keystore.exe`, put them in one folder, and add that folder to `PATH`. Check each file's
+   SHA-256 against the `digest` the GitHub release API reports.
+   (`holochain.exe` and `hc.exe` are also bundled in `NextGenSoftware.Holochain.HoloNET.Client/Resources/`.)
+2. Create and start a sandbox with the admin port fixed at HoloNET's default:
+   ```bash
+   echo "test-passphrase" | hc sandbox --piped create
+   echo "test-passphrase" | hc sandbox --piped -f=65464 run 0
+   ```
+3. In another shell, run the tests:
+   ```bash
+   HOLONET_LIVE_ADMIN_URI=ws://localhost:65464 dotnet test NextGenSoftware.Holochain.HoloNET.Client.Tests --filter "FullyQualifiedName~LiveConductorTests"
+   ```
+   If `HOLONET_LIVE_ADMIN_URI` is not set, these tests return immediately, so normal `dotnet test`
+   and CI runs don't need a conductor.
+
+What the live tests cover: the raw wire envelope (generate agent key, list apps, list DNAs, and a
+status-filtered list); that the conductor rejects the old `"data"` envelope; and
+`HoloNETClientAdmin` end to end (connect, generate key, list apps/DNAs, and conductor errors
+surfacing as `IsError`).
+
+Not covered yet: installing a hApp, app interfaces, zome calls and signals. These need a
+built test hApp (section 2).
 
 ## 1. Installing the `holochain` conductor binary (0.7.0)
 
