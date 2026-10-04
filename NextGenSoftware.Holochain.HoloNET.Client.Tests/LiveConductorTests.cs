@@ -123,11 +123,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
         }
 
         [Fact]
-        public async Task Live_ListApps_WithEnabledFilter_IsAccepted()
+        public async Task Live_ListApps_WithAwaitingMemproofsFilter_IsAccepted()
         {
             if (string.IsNullOrEmpty(AdminUri)) return;
 
-            AppResponse response = await SendAdminAsync("list_apps", new NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.ListAppsRequest { status_filter = AppStatusFilter.Enabled });
+            AppResponse response = await SendAdminAsync("list_apps", new NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.ListAppsRequest { status_filter = AppStatusFilter.AwaitingMemproofs.ToWireValue() });
 
             Assert.Equal("apps_listed", response.type);
         }

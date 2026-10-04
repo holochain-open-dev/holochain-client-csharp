@@ -29,14 +29,14 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 using (StreamReader r = new StreamReader(holoNETDNAPath))
                 {
                     string json = r.ReadToEnd();
-                    HoloNETDNA = JsonConvert.DeserializeObject<IHoloNETDNA>(json);
+                    HoloNETDNA = JsonConvert.DeserializeObject<global::NextGenSoftware.Holochain.HoloNET.Client.HoloNETDNA>(json); // Was <IHoloNETDNA>: Newtonsoft cannot instantiate an interface, so this always threw and LoadDNA returned null.
                     IsLoaded = true;
                     return HoloNETDNA;
                 }
             }
             catch (ArgumentNullException ex)
             {
-                throw ex;
+                throw;
             }
             catch (Exception ex) 
             {
@@ -56,7 +56,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             try
             {
                 if (string.IsNullOrEmpty(holoNETDNAPath))
-                    throw new ArgumentNullException("holoNETDNA", "holoNETDNA cannot be null."); 
+                    throw new ArgumentNullException("holoNETDNAPath", "holoNETDNAPath cannot be null."); 
 
                 if (holoNETDNA == null)
                     throw new ArgumentNullException("holoNETDNA", "holoNETDNA cannot be null.");
@@ -70,7 +70,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 HoloNETDNAPath = holoNETDNAPath;
 
                 string json = JsonConvert.SerializeObject(holoNETDNA);
-                StreamWriter writer = new StreamWriter(holoNETDNAPath);
+                using StreamWriter writer = new StreamWriter(holoNETDNAPath);
                 writer.Write(json);
                 writer.Close();
 
@@ -78,7 +78,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
             catch (ArgumentNullException ex)
             {
-                throw ex;
+                throw;
             }
             catch (Exception ex) 
             {

@@ -205,6 +205,18 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
             Assert.Equal(values.Count, distinct.Count);
         }
 
+        [Theory]
+        [InlineData(AppStatusFilter.Enabled, "enabled")]
+        [InlineData(AppStatusFilter.Disabled, "disabled")]
+        [InlineData(AppStatusFilter.AwaitingMemproofs, "awaiting_memproofs")]
+        [InlineData(AppStatusFilter.AwaitingRestore, "awaiting_restore")]
+        [InlineData(AppStatusFilter.Unrecoverable, "unrecoverable")]
+        [InlineData(AppStatusFilter.All, null)]
+        public void AppStatusFilter_SentAsSnakeCaseString(AppStatusFilter filter, string expected)
+        {
+            Assert.Equal(expected, filter.ToWireValue());
+        }
+
         [Fact]
         public void AppInfoStatusEnum_ContainsAwaitingMemproofs()
         {

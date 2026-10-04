@@ -8,7 +8,7 @@ using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.AppManifest;
 using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests;
 using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects;
 using NextGenSoftware.Holochain.HoloNET.Client.Interfaces;
-using Sodium;
+using Chaos.NaCl;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
@@ -449,7 +449,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             return await CallFunctionAsync(HoloNETRequestType.AdminListApps, "list_apps", new ListAppsRequest()
             {
-                status_filter = appStatusFilter != AppStatusFilter.All ? (AppStatusFilter?)appStatusFilter : null
+                status_filter = appStatusFilter.ToWireValue()
             }, _taskCompletionAppsListedCallBack, "OnAppsListedCallBack", conductorResponseCallBackMode, id);
         }
 
@@ -1276,13 +1276,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             var signingSeed = new byte[32];
             using (var random = RandomNumberGenerator.Create())
                 random.GetBytes(signingSeed);
-            Sodium.KeyPair pair = Sodium.PublicKeyAuth.GenerateKeyPair(signingSeed);
+            Ed25519.KeyPairFromSeed(out var signingPublicKey, out var signingPrivateKey, signingSeed);
             //byte[] DHTLocation = ConvertHoloHashToBytes(HoloNETDNA.AgentPubKey).TakeLast(4).ToArray();
             //byte[] signingKey = new byte[] { 132, 32, 36 }.Concat(pair.PublicKey).Concat(DHTLocation).ToArray();
 
             var signingKey = new byte[39];
             Buffer.BlockCopy(new byte[3] { 132, 32, 36 }, 0, signingKey, 0, 3);
-            Buffer.BlockCopy(pair.PublicKey, 0, signingKey, 3, 32);
+            Buffer.BlockCopy(signingPublicKey, 0, signingKey, 3, 32);
             Buffer.BlockCopy(new byte[4] { 0, 0, 0, 0 }, 0, signingKey, 35, 4);
 
             Dictionary<GrantedFunctionsType, List<(string, string)>> grantedFunctions = new Dictionary<GrantedFunctionsType, List<(string, string)>>();
@@ -1296,8 +1296,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             //_signingCredentialsForCell[$"{HoloNETDNA.AgentPubKey}:{HoloNETDNA.DnaHash}"] = new SigningCredentials()
             _signingCredentialsForCell[$"{ConvertHoloHashToString(cellId[1])}:{ConvertHoloHashToString(cellId[0])}"] = new SigningCredentials()
             {
-                CapSecret = SodiumCore.GetRandomBytes(64), //RandomNumberGenerator.GetBytes(64),
-                KeyPair = new Data.Admin.Requests.Objects.KeyPair() { PrivateKey = pair.PrivateKey, PublicKey = pair.PublicKey },
+                CapSecret = GetCryptographicRandomBytes(64),
+                KeyPair = new Data.Admin.Requests.Objects.KeyPair() { PrivateKey = signingPrivateKey, PublicKey = signingPublicKey },
                 SigningKey = signingKey
             };
 
@@ -1514,6 +1514,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
             else
                 return new T() { EndPoint = EndPoint, Id = id, Message = $"conductorResponseCallBackMode is set to UseCallBackEvents so please wait for {eventCallBackName} event for the result." };
+        }
+
+        private static byte[] GetCryptographicRandomBytes(int length)
+        {
+            var bytes = new byte[length];
+            using (var random = RandomNumberGenerator.Create()) random.GetBytes(bytes);
+            return bytes;
         }
 
         private void CallFunction(HoloNETRequestType requestType, string holochainConductorFunctionName, dynamic holoNETDataDetailed, string id = null)

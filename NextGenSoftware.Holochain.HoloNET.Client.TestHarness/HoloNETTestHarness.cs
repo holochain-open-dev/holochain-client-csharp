@@ -655,7 +655,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.TestHarness
                 case TestToRun.AdminListApps:
                     {
                         Console.WriteLine("Calling AdminListApps function on Admin API...\n");
-                        await _holoNETClientAdmin.ListAppsAsync(AppStatusFilter.Running);
+                        await _holoNETClientAdmin.ListAppsAsync(AppStatusFilter.Enabled);
                     }
                     break;
 
