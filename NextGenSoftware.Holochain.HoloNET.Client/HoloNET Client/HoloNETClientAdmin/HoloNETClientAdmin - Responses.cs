@@ -540,18 +540,20 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             try
             {
                 Logger.Log("ADMIN: AGENT INFO RETURNED\n", LogType.Info);
-                //AgentInfo agentInfo = MessagePackSerializer.Deserialize<AgentInfo>(response.data, messagePackSerializerOptions);
+                // Holochain 0.7.0: AdminResponse::AgentInfo(Vec<String>) — one encoded agent-info string
+                // per agent. The old {agent, signature, agent_info} map no longer exists, and indexing
+                // [0] threw on an empty list. args.AgentInfo stays null; use args.AgentInfos.
                 HoloNETData agentInfo = MessagePackSerializer.Deserialize<HoloNETData>(response.data, messagePackSerializerOptions);
-                //object agentInfo = MessagePackSerializer.Deserialize<object>(response.data, messagePackSerializerOptions);
+                args.AgentInfos = new List<string>();
 
-                object[] agentInfoObj = agentInfo.data as object[];
-                Dictionary<object, object> agentInfoDict = agentInfoObj[0] as Dictionary<object, object>;
-                args.AgentInfo = new AgentInfo()
+                if (agentInfo.data is object[] items)
                 {
-                    agent = agentInfoDict["agent"] as byte[],
-                    signature = agentInfoDict["signature"] as byte[],
-                    agent_info = agentInfoDict["agent_info"] as byte[]
-                };
+                    foreach (object item in items)
+                    {
+                        if (item is string encoded)
+                            args.AgentInfos.Add(encoded);
+                    }
+                }
 
                 //if (agentInfo != null)
                 //    args.AgentInfo = agentInfo;

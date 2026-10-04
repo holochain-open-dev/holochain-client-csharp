@@ -795,9 +795,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public async Task<AgentInfoReturnedCallBackEventArgs> GetAgentInfoAsync(byte[][] cellId, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
+            // 0.7.0 filters agent info by DNA, so only the cell's DNA hash (cellId[0]) is used.
             return await CallFunctionAsync(HoloNETRequestType.AdminAgentInfo, "agent_info", new GetAgentInfoRequest()
             {
-                cell_id = cellId
+                dna_hashes = cellId != null ? new[] { cellId[0] } : null
             }, _taskCompletionAgentInfoReturnedCallBack, "OnAgentInfoReturnedCallBack", conductorResponseCallBackMode, id);
         }
 
@@ -845,7 +846,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public async Task<AgentInfoReturnedCallBackEventArgs> GetAgentInfoAsync(ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
-            return await GetAgentInfoAsync(await GetCellIdAsync(), conductorResponseCallBackMode, id);
+            // Filters by HoloNETDNA.DnaHash when set; otherwise asks for every DNA (previously threw).
+            byte[][] cellId = string.IsNullOrEmpty(HoloNETDNA.DnaHash) ? null : await GetCellIdAsync();
+            return await GetAgentInfoAsync(cellId, conductorResponseCallBackMode, id);
         }
 
         /// <summary>

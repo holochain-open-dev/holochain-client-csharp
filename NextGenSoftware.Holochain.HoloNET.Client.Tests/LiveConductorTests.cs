@@ -189,6 +189,34 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
         }
 
         [Fact]
+        public async Task Live_HoloNETClientAdmin_InfoCalls_Decode()
+        {
+            if (string.IsNullOrEmpty(AdminUri)) return;
+
+            var admin = new HoloNETClientAdmin(new HoloNETDNA { AutoStartHolochainConductor = false, AutoShutdownHolochainConductor = false, HolochainConductorAdminURI = AdminUri });
+
+            try
+            {
+                await admin.ConnectAsync(AdminUri);
+
+                var results = new (string Name, HoloNETDataReceivedBaseEventArgs Result)[]
+                {
+                    ("list_cell_ids", await admin.ListCellIdsAsync()),
+                    ("storage_info", await admin.GetStorageInfoAsync()),
+                    ("agent_info", await admin.GetAgentInfoAsync()),
+                    // dump_network_stats / dump_network_metrics: decoders do not yet match 0.7.0 (see AUDIT.md).
+                };
+
+                foreach (var (name, result) in results)
+                    Assert.False(result.IsError, $"{name}: {result.Message}");
+            }
+            finally
+            {
+                await admin.DisconnectAsync();
+            }
+        }
+
+        [Fact]
         public async Task Live_ListDnas_ReturnsDnasListed()
         {
             if (string.IsNullOrEmpty(AdminUri)) return;

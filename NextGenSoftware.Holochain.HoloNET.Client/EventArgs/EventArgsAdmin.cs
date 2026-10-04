@@ -127,7 +127,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
     public class AgentInfoReturnedCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
         //public IAgentInfo AgentInfo { get; set; }
+        [System.Obsolete("Holochain 0.7.0 returns encoded agent-info strings; use AgentInfos. Always null.")]
         public AgentInfo AgentInfo { get; set; }
+
+        /// <summary>One encoded agent-info string per agent (AdminResponse::AgentInfo(Vec&lt;String&gt;)).</summary>
+        public List<string> AgentInfos { get; set; }
     }
 
     public class AgentInfoAddedCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
