@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-	  <TargetFramework>net10.0</TargetFramework>
+	  <TargetFrameworks>netstandard2.1;net10.0</TargetFrameworks>
 	  <!--<GeneratePackageOnBuild>True</GeneratePackageOnBuild>-->
 	  <PackageId Condition="'$(Embedded)' != 'true'">NextGenSoftware.Holochain.HoloNET.Client</PackageId>
 	  <PackageId Condition="'$(Embedded)' == 'true'">NextGenSoftware.Holochain.HoloNET.Client.Embedded</PackageId>
@@ -107,8 +107,20 @@
 
 	  <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
 
-	  <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Embedded)' == 'true'">
+    <DefineConstants>$(DefineConstants);EMBEDDED</DefineConstants>
+  </PropertyGroup>
+
+  <!-- The lightweight client must never carry desktop conductor executables.  Those resources
+       are part of the explicitly selected Embedded package only; this also keeps Unity/mobile
+       builds platform-neutral and makes HolochainConductorMode.UseEmbedded fail at its existing
+       compile-time contract boundary. -->
+  <ItemGroup Condition="'$(Embedded)' != 'true'">
+    <EmbeddedResource Remove="Properties\Resources.resx" />
+    <Compile Remove="Properties\Resources.Designer.cs" />
+  </ItemGroup>
 
   <ItemGroup>
     <None Include="..\Logos\hc logo.png">
@@ -125,16 +137,10 @@
     <PackageReference Include="MessagePack" Version="2.5.303" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
     <PackageReference Include="Nito.AsyncEx.Context" Version="5.1.2" />
-    <PackageReference Include="SauceControl.Blake2Fast" Version="2.0.0" />
-    <PackageReference Include="Sodium.Core" Version="1.3.4" />
-    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
     <PackageReference Include="YamlDotNet" Version="13.7.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="holochain_serialisation_wrapper.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Update="HolochainBinaries\hc.exe">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
@@ -148,9 +154,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Chaos.NaCl\Chaos.NaCl.Portable.Standard.csproj" />
     <ProjectReference Include="..\..\NextGenSoftware-Libraries\NextGenSoftware.Logging\NextGenSoftware.Logging.csproj" />
     <ProjectReference Include="..\..\NextGenSoftware-Libraries\NextGenSoftware.Utilities\NextGenSoftware.Utilities.csproj" />
     <ProjectReference Include="..\..\NextGenSoftware-Libraries\NextGenSoftware.WebSocket\NextGenSoftware.WebSocket.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="NextGenSoftware.Holochain.HoloNET.Client.Tests" />
   </ItemGroup>
 
 </Project>

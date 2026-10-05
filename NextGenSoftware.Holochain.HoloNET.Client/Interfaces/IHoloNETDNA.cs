@@ -22,6 +22,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Interfaces
         string FullPathToRootHappFolder { get; set; }
         string HolochainConductorAdminURI { get; set; }
         string HolochainConductorAppAgentURI { get; set; }
+        byte[] AppAuthenticationToken { get; set; }
         string HolochainConductorConfigPath { get; set; }
         HolochainConductorModeEnum HolochainConductorMode { get; set; }
         HolochainConductorEnum HolochainConductorToUse { get; set; }

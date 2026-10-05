@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>Chaos.NaCl</AssemblyName>
+    <RootNamespace>Chaos.NaCl</RootNamespace>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <Nullable>disable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="CryptoBytes.cs" />
+    <Compile Include="Contract.cs" />
+    <Compile Include="Ed25519.cs" />
+    <Compile Include="Sha512.cs" />
+    <Compile Include="Internal\**\*.cs" />
+  </ItemGroup>
+</Project>

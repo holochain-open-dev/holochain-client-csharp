@@ -23,6 +23,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public string HolochainConductorAppAgentURI { get; set; } = "ws://localhost:8888";
 
         /// <summary>
+        /// Holochain 0.7 app-interface authentication token. When supplied, app clients send the
+        /// mandatory authenticate envelope immediately after the WebSocket opens and before any
+        /// conductor request. Admin clients never use this value.
+        /// </summary>
+        public byte[] AppAuthenticationToken { get; set; }
+
+        /// <summary>
         /// The AgentPubKey to use for Zome calls. If this is not set then HoloNET will automatically retrieve this along with the DnaHash after it connects (if the Connect method defaults are not overriden).
         /// </summary>
         public string AgentPubKey { get; set; } = "";

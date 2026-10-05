@@ -7,7 +7,9 @@ using System.Diagnostics;
 using System.Linq;
 using MessagePack;
 using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects;
+#if EMBEDDED
 using NextGenSoftware.Holochain.HoloNET.Client.Properties;
+#endif
 using NextGenSoftware.Holochain.HoloNET.Client.Interfaces;
 using NextGenSoftware.Logging.Interfaces;
 using NextGenSoftware.Logging;
@@ -352,6 +354,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                         if (State == WebSocketState.Open)
                         {
+                            await AuthenticateConnectionAsync();
                             result.IsConnected = true;
                         }
                     }
@@ -1069,13 +1072,21 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         {
             try
             {
-                IsConnecting = false;
-                OnConnected?.Invoke(this, new ConnectedEventArgs { EndPoint = e.EndPoint });
+                if (!DeferConnectedNotification)
+                    NotifyConnected(e.EndPoint);
             }
             catch (Exception ex)
             {
                 HandleError("Error in HoloNETClient.WebSocket_OnConnected method.", ex);
             }
+        }
+
+        protected virtual bool DeferConnectedNotification => false;
+
+        protected void NotifyConnected(Uri endPoint)
+        {
+            IsConnecting = false;
+            OnConnected?.Invoke(this, new ConnectedEventArgs { EndPoint = endPoint });
         }
 
         protected virtual void WebSocket_OnDataSent(object sender, DataSentEventArgs e)
@@ -1139,6 +1150,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 { "Origin", "http://localhost" }
             };
         }
+
+        /// <summary>
+        /// App clients override this to perform the Holochain 0.7 authentication exchange before
+        /// the connection is reported as usable. Admin clients require no such exchange.
+        /// </summary>
+        protected virtual Task AuthenticateConnectionAsync() => Task.CompletedTask;
 
         /// <summary>
         /// Runs `holochain.exe --create-config` to generate a fresh conductor config (this replaces the old, now-removed

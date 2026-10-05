@@ -1,89 +1,74 @@
-﻿using MessagePack;
+using MessagePack;
 using System;
-using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
-   // [MessagePackObject]
     public struct ZomeCallUnsigned
     {
-        //[Key("provenance")]
         public byte[] provenance;
-
-        // CellId is a Rust tuple struct (DnaHash, AgentPubKey). These two fields are kept
-        // separate here (rather than a nested CellId object) only because the native
-        // holochain_serialisation_wrapper.dll P/Invoke signature (ZomeCallUnsignedRaw below)
-        // expects flat byte* fields - the dna_hash/agent_pub_key pair together represent the
-        // CellId tuple per holochain_zome_types::cell::CellId.
-        //[Key("cell_id_dna_hash")]
         public byte[] cell_id_dna_hash;
-
-        //[Key("cell_id_agent_pub_key")]
         public byte[] cell_id_agent_pub_key;
-
-        //[Key("zome_name")]
         public string zome_name;
-
-        //[Key("fn_name")]
         public string fn_name;
-
-        //[Key("cap_secret")]
         public byte[] cap_secret;
-
-        //[Key("payload")]
         public byte[] payload;
-
-        //[Key("nonce")]
         public byte[] nonce;
-
-        //[Key("expires_at")]
-        public Int64 expires_at;
+        public long expires_at;
     }
 
-    [StructLayout(LayoutKind.Sequential)]
-    public unsafe struct ZomeCallUnsignedRaw
+    /// <summary>
+    /// Implements Holochain 0.7's ZomeCallParams::serialize_and_hash contract in managed code.
+    /// This is the sole signing path so desktop, Unity and mobile clients sign identical
+    /// canonical bytes without a platform-specific native serialization wrapper.
+    /// </summary>
+    public static class HolochainSerialisationWrapper
     {
-        public byte* provenance;
-        public byte* cell_id_dna_hash;
-        public byte* cell_id_agent_pub_key;
-        public string zome_name;
-        public string fn_name;
-        public byte* cap_secret;
-        public byte* payload;
-        public UInt32 payload_length;
-        public byte* nonce;
-        public Int64 expires_at;
-        
-    }
+        internal const int DataToSignLength = 64;
 
-    public class HolochainSerialisationWrapper
-    {
-        [DllImport("holochain_serialisation_wrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern void get_data_to_sign([In, Out] byte[] data, ZomeCallUnsignedRaw zome_call_unsigned);
-
-        internal static void call_get_data_to_sign(byte[] data, ZomeCallUnsigned zome_call_unsigned)
+        internal static byte[] serialize_for_signing(ZomeCallUnsigned zomeCallUnsigned)
         {
-            unsafe
+            Validate(zomeCallUnsigned);
+            var call = new ZomeCall
             {
-                fixed (byte* provenance = zome_call_unsigned.provenance, cell_id_dna_hash = zome_call_unsigned.cell_id_dna_hash, cell_id_agent_pub_key = zome_call_unsigned.cell_id_agent_pub_key, cap_secret = zome_call_unsigned.cap_secret, payload = zome_call_unsigned.payload, nonce = zome_call_unsigned.nonce)
-                {
-                    var raw_call = new ZomeCallUnsignedRaw
-                    {
-                        provenance = provenance,
-                        cell_id_dna_hash = cell_id_dna_hash,
-                        cell_id_agent_pub_key = cell_id_agent_pub_key,
-                        zome_name = zome_call_unsigned.zome_name,
-                        fn_name = zome_call_unsigned.fn_name,
-                        cap_secret = cap_secret,
-                        payload = payload,
-                        payload_length = (UInt32)zome_call_unsigned.payload.Length,
-                        nonce = nonce,
-                        expires_at = zome_call_unsigned.expires_at,
-                    };
+                provenance = zomeCallUnsigned.provenance,
+                cell_id = new CellId(zomeCallUnsigned.cell_id_dna_hash, zomeCallUnsigned.cell_id_agent_pub_key),
+                zome_name = zomeCallUnsigned.zome_name,
+                fn_name = zomeCallUnsigned.fn_name,
+                cap_secret = zomeCallUnsigned.cap_secret,
+                payload = zomeCallUnsigned.payload,
+                nonce = zomeCallUnsigned.nonce,
+                expires_at = zomeCallUnsigned.expires_at
+            };
 
-                    get_data_to_sign(data, raw_call);
-                }
+            return MessagePackSerializer.Serialize(
+                call,
+                MessagePackSerializerOptions.Standard.WithSecurity(MessagePackSecurity.UntrustedData));
+        }
+
+        internal static void call_get_data_to_sign(byte[] data, ZomeCallUnsigned zomeCallUnsigned)
+        {
+            if (data == null || data.Length != DataToSignLength)
+                throw new ArgumentException(
+                    $"The Holochain 0.7 data-to-sign buffer must be {DataToSignLength} bytes.",
+                    nameof(data));
+
+            using (var sha512 = SHA512.Create())
+            {
+                var hash = sha512.ComputeHash(serialize_for_signing(zomeCallUnsigned));
+                Buffer.BlockCopy(hash, 0, data, 0, DataToSignLength);
             }
+        }
+
+        private static void Validate(ZomeCallUnsigned call)
+        {
+            if (call.provenance == null) throw new ArgumentNullException(nameof(call.provenance));
+            if (call.cell_id_dna_hash == null) throw new ArgumentNullException(nameof(call.cell_id_dna_hash));
+            if (call.cell_id_agent_pub_key == null) throw new ArgumentNullException(nameof(call.cell_id_agent_pub_key));
+            if (string.IsNullOrWhiteSpace(call.zome_name)) throw new ArgumentException("A zome name is required.", nameof(call.zome_name));
+            if (string.IsNullOrWhiteSpace(call.fn_name)) throw new ArgumentException("A function name is required.", nameof(call.fn_name));
+            if (call.payload == null) throw new ArgumentNullException(nameof(call.payload));
+            if (call.nonce == null || call.nonce.Length != 32) throw new ArgumentException("A 32-byte nonce is required.", nameof(call.nonce));
         }
     }
 }

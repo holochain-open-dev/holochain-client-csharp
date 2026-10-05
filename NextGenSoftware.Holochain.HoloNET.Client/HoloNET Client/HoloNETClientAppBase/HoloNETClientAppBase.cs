@@ -6,12 +6,49 @@ using System.Reflection;
 using NextGenSoftware.WebSocket;
 using NextGenSoftware.Logging;
 using NextGenSoftware.Holochain.HoloNET.Client.Interfaces;
+using NextGenSoftware.Holochain.HoloNET.Client.Data.App.Requests;
+using MessagePack;
 using NextGenSoftware.Logging.Interfaces;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
     public abstract partial class HoloNETClientAppBase : HoloNETClientBase, IHoloNETClientAppBase
     {
+        private bool _isAppInterfaceAuthenticated;
+        protected override bool DeferConnectedNotification =>
+            HoloNETDNA.AppAuthenticationToken?.Length > 0 && !_isAppInterfaceAuthenticated;
+
+        protected override async Task AuthenticateConnectionAsync()
+        {
+            byte[] token = HoloNETDNA.AppAuthenticationToken;
+            if (token == null || token.Length == 0)
+                return;
+
+            await WebSocket.SendRawDataAsync(CreateAuthenticationEnvelope(token));
+
+            // Holochain's app-interface protocol has no positive authentication response. It
+            // rejects an invalid token by closing the socket immediately, matching the official
+            // JavaScript client's exchange contract.
+            await Task.Delay(25).ConfigureAwait(false);
+            if (WebSocket.State != System.Net.WebSockets.WebSocketState.Open)
+                throw new HoloNETException("Holochain rejected the app-interface authentication token.");
+
+            _isAppInterfaceAuthenticated = true;
+            NotifyConnected(EndPoint);
+            BeginPostConnectInitialization();
+        }
+
+        public static byte[] CreateAuthenticationEnvelope(byte[] token)
+        {
+            if (token == null || token.Length == 0)
+                throw new ArgumentException("An app-interface authentication token is required.", nameof(token));
+
+            var request = new AppAuthenticationRequest { Token = token };
+            return MessagePackSerializer.Serialize(new AppAuthenticationEnvelope
+            {
+                Data = MessagePackSerializer.Serialize(request)
+            });
+        }
         private bool _getAgentPubKeyAndDnaHashFromConductor;
         private bool _automaticallyAttemptToGetFromSandboxIfConductorFails;
         private bool _updateDnaHashAndAgentPubKey = true;
@@ -305,6 +342,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public async Task<HoloNETConnectedEventArgs> ConnectAsync(string holochainConductorURI = "", ConnectedCallBackMode connectedCallBackMode = ConnectedCallBackMode.WaitForHolochainConductorToConnect, RetrieveAgentPubKeyAndDnaHashMode retrieveAgentPubKeyAndDnaHashMode = RetrieveAgentPubKeyAndDnaHashMode.Wait, bool retrieveAgentPubKeyAndDnaHashFromConductor = true, bool retrieveAgentPubKeyAndDnaHashFromSandbox = true, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true, bool updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved = true)
         {
+            _isAppInterfaceAuthenticated = false;
             _getAgentPubKeyAndDnaHashFromConductor = retrieveAgentPubKeyAndDnaHashFromConductor;
             _taskCompletionReadyForZomeCalls = new TaskCompletionSource<ReadyForZomeCallsEventArgs>();
            // _taskCompletionAgentPubKeyAndDnaHashRetrieved = new Dictionary<string, TaskCompletionSource<AgentPubKeyDnaHash>>(); //TODO: Need to init all of these in the code base for each call! ;-)
@@ -372,6 +410,22 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             {
                 base.WebSocket_OnConnected(sender, e);
 
+                if (DeferConnectedNotification)
+                    return;
+
+                BeginPostConnectInitialization();
+            }
+            catch (Exception ex)
+            {
+                HandleError("Error in HoloNETClient.WebSocket_OnConnected method.", ex);
+            }
+        }
+
+        private void BeginPostConnectInitialization()
+        {
+            try
+            {
+
                 //If the AgentPubKey & DnaHash have already been retrieved from the hc sandbox command (or was passed in) then raise the OnReadyForZomeCalls event.
                 if (WebSocket.State == WebSocketState.Open && !string.IsNullOrEmpty(HoloNETDNA.AgentPubKey) && !string.IsNullOrEmpty(HoloNETDNA.DnaHash))
                     SetReadyForZomeCalls("-1");
@@ -387,7 +441,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
             catch (Exception ex)
             {
-                HandleError("Error in HoloNETClient.WebSocket_OnConnected method.", ex);
+                HandleError("Error initializing the authenticated HoloNET app connection.", ex);
             }
         }
 
@@ -395,6 +449,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         {
             try
             {
+                _isAppInterfaceAuthenticated = false;
                 if (_pendingRequests.Count > 0)
                 {
                     string requests = "";

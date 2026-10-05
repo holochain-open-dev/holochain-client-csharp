@@ -6,11 +6,10 @@ using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Collections.Generic;
 using MessagePack;
-using Blake2Fast;
 using NextGenSoftware.Logging;
 using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests;
 using NextGenSoftware.Holochain.HoloNET.Client.Interfaces;
-using Sodium;
+using Chaos.NaCl;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
@@ -651,15 +650,15 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                         zome_name = zome,
                         payload = MessagePackSerializer.Serialize(paramsObject),
                         provenance = _signingCredentialsForCell[cellId].SigningKey, 
-                        nonce = SodiumCore.GetRandomBytes(32), 
+                        nonce = GetCryptographicRandomBytes(32),
                         //expires_at = DateTime.Now.AddMinutes(5).Ticks / 10
                         expires_at = (DateTimeOffset.Now.ToUnixTimeMilliseconds() + 5 * 60 * 1000) * 1000
                     };
 
-                    byte[] hash = new byte[32];
+                    byte[] hash = new byte[HolochainSerialisationWrapper.DataToSignLength];
                     try
                     {
-                        // Call into the `holochain_zome_types` crate to get a blake2b hash of the zomeCall
+                        // Holochain 0.7 signs SHA-512(canonical MessagePack(ZomeCallParams)).
                         HolochainSerialisationWrapper.call_get_data_to_sign(hash, payload);
                     }
                     catch (Exception e)
@@ -667,8 +666,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                         Console.WriteLine("Failed to get data to sign: " + e.ToString());
                     }
 
-                    //byte[] hash = Blake2b.ComputeHash(MessagePackSerializer.Serialize(payload));
-                    var sig = Sodium.PublicKeyAuth.SignDetached(hash, _signingCredentialsForCell[cellId].KeyPair.PrivateKey);
+                    var sig = Ed25519.Sign(hash, _signingCredentialsForCell[cellId].KeyPair.PrivateKey);
 
                     // Kept for backwards compatibility with any code that inspects the flattened
                     // ZomeCallSigned shape (e.g. via OnDataReceived/raw request introspection).
@@ -1245,6 +1243,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public AppOpTimingsDumpedCallBackEventArgs DumpOpTimings(byte[] dnaHash, OpTimingsCursor cursor = null, uint? limit = null, string id = null)
         {
             return DumpOpTimingsAsync(dnaHash, cursor, limit, ConductorResponseCallBackMode.UseCallBackEvents, id).Result;
+        }
+
+        private static byte[] GetCryptographicRandomBytes(int length)
+        {
+            var bytes = new byte[length];
+            using (var random = RandomNumberGenerator.Create()) random.GetBytes(bytes);
+            return bytes;
         }
 
         private async Task<T> CallFunctionAsync<T>(HoloNETRequestType requestType, string holochainConductorFunctionName, dynamic holoNETDataDetailed, Dictionary<string, TaskCompletionSource<T>> taskCompletionCallBack, string eventCallBackName, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null) where T : HoloNETDataReceivedBaseEventArgs, new()
