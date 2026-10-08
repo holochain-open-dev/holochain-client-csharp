@@ -485,7 +485,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             try
             {
                 Logger.Log("ADMIN: DNA REGISTERED\n", LogType.Info);
-                byte[] responseData = MessagePackSerializer.Deserialize<byte[]>(response.data, messagePackSerializerOptions);
+                byte[] responseData = DeserializeResponseValue<byte[]>(response.data);
 
                 if (responseData != null)
                     args.HoloHash = responseData;
@@ -814,7 +814,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             try
             {
                 Logger.Log("ADMIN: CAPABILITY GRANTS LISTED\n", LogType.Info);
-                CellCapGrantInfo[] capGrantsResponse = MessagePackSerializer.Deserialize<CellCapGrantInfo[]>(response.data, messagePackSerializerOptions);
+                CellCapGrantInfo[] capGrantsResponse = DeserializeResponseValue<CellCapGrantInfo[]>(response.data);
 
                 if (capGrantsResponse != null)
                     args.CapGrants.AddRange(capGrantsResponse);
@@ -838,7 +838,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             try
             {
                 Logger.Log("ADMIN: PEER META INFO RETURNED\n", LogType.Info);
-                PeerMetaInfoResponse peerMetaInfoResponse = MessagePackSerializer.Deserialize<PeerMetaInfoResponse>(response.data, messagePackSerializerOptions);
+                PeerMetaInfoResponse peerMetaInfoResponse = DeserializeResponseValue<PeerMetaInfoResponse>(response.data);
 
                 if (peerMetaInfoResponse != null)
                     args.PeerMetaInfo = peerMetaInfoResponse;
@@ -862,7 +862,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             try
             {
                 Logger.Log("ADMIN: APP AUTHENTICATION TOKEN ISSUED\n", LogType.Info);
-                AppAuthenticationTokenIssuedResponse tokenResponse = MessagePackSerializer.Deserialize<AppAuthenticationTokenIssuedResponse>(response.data, messagePackSerializerOptions);
+                AppAuthenticationTokenIssuedResponse tokenResponse = DeserializeResponseValue<AppAuthenticationTokenIssuedResponse>(response.data);
 
                 if (tokenResponse != null)
                     args.TokenIssued = tokenResponse;
@@ -904,7 +904,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             try
             {
                 Logger.Log("ADMIN: COMPATIBLE CELLS RETURNED\n", LogType.Info);
-                AppCompatibleCells[] compatibleCellsResponse = MessagePackSerializer.Deserialize<AppCompatibleCells[]>(response.data, messagePackSerializerOptions);
+                AppCompatibleCells[] compatibleCellsResponse = DeserializeResponseValue<AppCompatibleCells[]>(response.data);
 
                 if (compatibleCellsResponse != null)
                     args.CompatibleCells.AddRange(compatibleCellsResponse);
@@ -928,7 +928,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             try
             {
                 Logger.Log("ADMIN: STATE DUMPED\n", LogType.Info);
-                string dataResponse = MessagePackSerializer.Deserialize<string>(response.data, messagePackSerializerOptions);
+                string dataResponse = DeserializeResponseValue<string>(response.data);
 
                 if (dataResponse != null)
                     args.DumpedStateJSON = dataResponse;
@@ -952,7 +952,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             try
             {
                 Logger.Log("ADMIN: FULL STATE DUMPED\n", LogType.Info);
-                FullStateDumpedResponse fullStateDumpedResponse = MessagePackSerializer.Deserialize<FullStateDumpedResponse>(response.data, messagePackSerializerOptions);
+                FullStateDumpedResponse fullStateDumpedResponse = DeserializeResponseValue<FullStateDumpedResponse>(response.data);
 
                 if (fullStateDumpedResponse != null)
                     args.DumpedState = fullStateDumpedResponse;
@@ -976,7 +976,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             try
             {
                 Logger.Log("ADMIN: NETWORK METRICS DUMPED\n", LogType.Info);
-                string dataResponse = MessagePackSerializer.Deserialize<string>(response.data, messagePackSerializerOptions);
+                string dataResponse = DeserializeResponseValueAsJson(response.data);
 
                 if (dataResponse != null)
                     args.NetworkMetricsDumpJSON = dataResponse;
@@ -1000,7 +1000,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             try
             {
                 Logger.Log("ADMIN: NETWORK STATS DUMPED\n", LogType.Info);
-                string dataResponse = MessagePackSerializer.Deserialize<string>(response.data, messagePackSerializerOptions);
+                string dataResponse = DeserializeResponseValueAsJson(response.data);
 
                 if (dataResponse != null)
                 {
@@ -1036,7 +1036,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             try
             {
                 Logger.Log("ADMIN: STORAGE INFO RETURNED\n", LogType.Info);
-                StorageInfoResponse storageInfoResponse = MessagePackSerializer.Deserialize<StorageInfoResponse>(response.data, messagePackSerializerOptions);
+                StorageInfoResponse storageInfoResponse = DeserializeResponseValue<StorageInfoResponse>(response.data);
 
                 if (storageInfoResponse != null)
                     args.StorageInfoResponse = storageInfoResponse;
@@ -1097,7 +1097,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             try
             {
                 Logger.Log("ADMIN: RESPONSE\n", LogType.Info);
-                T dataResponse = MessagePackSerializer.Deserialize<T>(response.data, messagePackSerializerOptions);
+                T dataResponse = DeserializeResponseValue<T>(response.data);
 
                 if (dataResponse != null)
                     args.Response = dataResponse;
@@ -1548,7 +1548,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             {
                 if (!args.IsError)
                 {
-                    OpTimingsDump dump = MessagePackSerializer.Deserialize<OpTimingsDump>(response.data, messagePackSerializerOptions);
+                    OpTimingsDump dump = DeserializeResponseValue<OpTimingsDump>(response.data);
 
                     if (dump != null)
                         args.OpTimingsDump = dump;

@@ -204,11 +204,50 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
                     ("list_cell_ids", await admin.ListCellIdsAsync()),
                     ("storage_info", await admin.GetStorageInfoAsync()),
                     ("agent_info", await admin.GetAgentInfoAsync()),
-                    // dump_network_stats / dump_network_metrics: decoders do not yet match 0.7.0 (see AUDIT.md).
+                    ("dump_network_stats", await admin.DumpNetworkStatsAsync()),
+                    ("dump_network_metrics", await admin.DumpNetworkMetricsAsync()),
                 };
 
                 foreach (var (name, result) in results)
                     Assert.False(result.IsError, $"{name}: {result.Message}");
+            }
+            finally
+            {
+                await admin.DisconnectAsync();
+            }
+        }
+
+        /// <summary>
+        /// Full app flow against a 0.7.0 hApp: install → enable → sign → attach → connect → zome call.
+        /// Requires HOLONET_LIVE_HAPP_PATH (e.g. C:\Source\OASIS-Holochain-hApp\workdir\oasis.happ).
+        /// </summary>
+        [Fact]
+        public async Task Live_InstallEnableSignAttachConnect_AndCallZome()
+        {
+            string happPath = Environment.GetEnvironmentVariable("HOLONET_LIVE_HAPP_PATH");
+            if (string.IsNullOrEmpty(AdminUri) || string.IsNullOrEmpty(happPath)) return;
+
+            var admin = new HoloNETClientAdmin(new HoloNETDNA { AutoStartHolochainConductor = false, AutoShutdownHolochainConductor = false, HolochainConductorAdminURI = AdminUri });
+
+            try
+            {
+                Assert.False((await admin.ConnectAsync(AdminUri)).IsError);
+
+                string appId = "holonet-live-" + Guid.NewGuid().ToString("N").Substring(0, 8);
+                var result = await admin.InstallEnableSignAttachAndConnectToHappAsync(appId, happPath, "oasis");
+
+                Assert.True(result.IsAppInstalled, "install: " + result.Message);
+                Assert.True(result.IsAppEnabled, "enable: " + result.Message);
+                Assert.True(result.IsAppSigned, "sign: " + result.Message);
+                Assert.True(result.IsAppAttached, "attach: " + result.Message);
+                Assert.True(result.IsAppConnected, "connect: " + result.Message);
+                Assert.Equal(CellInfoType.Provisioned, result.CellType);
+                Assert.NotNull(result.CellId);
+
+                var zome = await result.HoloNETClientAppAgent.CallZomeFunctionAsync("oasis", "get_all_avatars", null);
+                Assert.False(zome.IsError, "zome call: " + zome.Message);
+
+                await result.HoloNETClientAppAgent.DisconnectAsync();
             }
             finally
             {

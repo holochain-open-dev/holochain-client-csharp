@@ -552,7 +552,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             try
             {
                 Logger.Log("APP: CLONE CELL CREATED\n", LogType.Info);
-                ClonedCellResponse clonedCellResponse = MessagePackSerializer.Deserialize<ClonedCellResponse>(response.data, messagePackSerializerOptions);
+                ClonedCellResponse clonedCellResponse = DeserializeResponseValue<ClonedCellResponse>(response.data);
 
                 if (clonedCellResponse != null)
                     args.ClonedCell = clonedCellResponse;
@@ -576,7 +576,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             try
             {
                 Logger.Log("APP: CLONE CELL ENABLED\n", LogType.Info);
-                ClonedCellResponse clonedCellResponse = MessagePackSerializer.Deserialize<ClonedCellResponse>(response.data, messagePackSerializerOptions);
+                ClonedCellResponse clonedCellResponse = DeserializeResponseValue<ClonedCellResponse>(response.data);
 
                 if (clonedCellResponse != null)
                     args.ClonedCell = clonedCellResponse;
@@ -618,7 +618,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             try
             {
                 Logger.Log("APP: COUNTERSIGNING SESSION STATE RETURNED\n", LogType.Info);
-                CountersigningSessionStateResponse sessionStateResponse = MessagePackSerializer.Deserialize<CountersigningSessionStateResponse>(response.data, messagePackSerializerOptions);
+                CountersigningSessionStateResponse sessionStateResponse = DeserializeResponseValue<CountersigningSessionStateResponse>(response.data);
 
                 if (sessionStateResponse != null)
                     args.SessionState = sessionStateResponse;
@@ -720,7 +720,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             try
             {
                 Logger.Log("APP: PEER META INFO RETURNED\n", LogType.Info);
-                PeerMetaInfoResponse peerMetaInfoResponse = MessagePackSerializer.Deserialize<PeerMetaInfoResponse>(response.data, messagePackSerializerOptions);
+                PeerMetaInfoResponse peerMetaInfoResponse = DeserializeResponseValue<PeerMetaInfoResponse>(response.data);
 
                 if (peerMetaInfoResponse != null)
                     args.PeerMetaInfo = peerMetaInfoResponse;
@@ -1044,7 +1044,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             {
                 if (!args.IsError)
                 {
-                    OpTimingsDump dump = MessagePackSerializer.Deserialize<OpTimingsDump>(response.data, messagePackSerializerOptions);
+                    OpTimingsDump dump = DeserializeResponseValue<OpTimingsDump>(response.data);
                     if (dump != null)
                         args.OpTimingsDump = dump;
                 }

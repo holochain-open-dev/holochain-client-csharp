@@ -50,12 +50,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             {
                 try
                 {
-                    AppResponse appResponse = MessagePackSerializer.Deserialize<AppResponse>(response.data, messagePackSerializerOptions);
-
-                    if (appResponse != null)
-                        msg = $"'{msg}{appResponse.type}: {appResponse.data["type"]}: {appResponse.data["data"]}.'";
-                    else
-                        msg = $"'{msg}{dataReceivedEventArgs.RawBinaryDataDecoded}'";
+                    // ExternalApiWireError is {"type": "<kind>", "value": "<detail>"}; reading ["data"] threw
+                    // KeyNotFoundException, so the conductor's message was always lost.
+                    string errorJson = DeserializeResponseValueAsJson(response.data);
+                    msg = errorJson != null ? $"'{msg}{errorJson}'" : $"'{msg}{dataReceivedEventArgs.RawBinaryDataDecoded}'";
                 }
                 catch (Exception ex)
                 {
@@ -65,7 +63,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             else
                 msg = $"'{msg}{dataReceivedEventArgs.RawBinaryDataDecoded}'";
 
-            HandleError(msg, null);
+            // Log only. HandleError can throw, which skipped the derived classes' per-request handling,
+            // so the awaiting call was never completed and hung. The overrides raise the error event
+            // (IsError = true) for the matching request.
+            Logger.Log(msg, LogType.Error);
             return msg;
         }
 
@@ -95,17 +96,18 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
 
                 response = MessagePackSerializer.Deserialize<HoloNETResponse>(data, messagePackSerializerOptions);
-                AppResponse appResponse = MessagePackSerializer.Deserialize<AppResponse>(response.data, messagePackSerializerOptions);
+                // Read only "type": deserialising the whole payload as dynamic throws for hash-keyed maps (UntrustedData).
+                string responseType = response.data != null && response.data.Length > 0 ? ReadResponseType(response.data) : null;
 
                 id = response.id.ToString();
                 rawBinaryDataAfterMessagePackDecodeAsString = DataHelper.ConvertBinaryDataToString(response.data);
                 rawBinaryDataAfterMessagePackDecodeDecoded = DataHelper.DecodeBinaryDataAsUTF8(response.data);
 
-                Logger.Log($"Id: {response.id} Type: {response.type}: {response.type} Internal Type: {appResponse.type}", LogType.Info);
+                Logger.Log($"Id: {response.id} Type: {response.type}: {response.type} Internal Type: {responseType}", LogType.Info);
                 //Logger.Log(string.Concat("Raw Data Bytes Received After MessagePack Decode: ", rawBinaryDataAfterMessagePackDecodeAsString), LogType.Debug);
                 //Logger.Log(string.Concat("Raw Data Bytes Decoded After MessagePack Decode: ", rawBinaryDataAfterMessagePackDecodeDecoded), LogType.Debug);
 
-                switch (appResponse.type)
+                switch (responseType)
                 {
                     // AppResponse::ZomeCalled serialises as "zome_called"; "zome-response" is the pre-0.2 name.
                     case "zome_called":

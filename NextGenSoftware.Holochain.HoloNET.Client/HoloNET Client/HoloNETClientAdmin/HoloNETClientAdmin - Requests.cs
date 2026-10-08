@@ -177,6 +177,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     result.AgentPubKey = installedResult.AgentPubKey;
                     result.DnaHash = installedResult.DnaHash;
                     result.CellId = installedResult.CellId;
+                    result.CellType = installedResult.CellType;
                     result.AppStatus = installedResult.AppStatus;
                     result.AppStatusReason = installedResult.AppStatusReason;
                     result.AppManifest = installedResult.AppManifest;
@@ -188,7 +189,28 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     result.ZomeCallCapabilityGrantedResult = installedResult.ZomeCallCapabilityGrantedResult;
                     result.AppInterfaceAttachedResult = installedResult.AppInterfaceAttachedResult;
 
-                    result.HoloNETClientAppAgent = new HoloNETClientAppAgent(hAppId, result.AgentPubKey);
+                    // Holochain 0.6+/0.7.0 app interfaces require an Authenticate message with an issued
+                    // token before any request; without it the conductor closes the socket on the first call.
+                    AppAuthenticationTokenIssuedCallBackEventArgs tokenResult = await IssueAppAuthenticationTokenAsync(hAppId);
+
+                    if (tokenResult == null || tokenResult.IsError || tokenResult.TokenIssued?.token == null)
+                    {
+                        HandleError(result, $"APP: Error occured in HoloNETClientAdmin.InstallEnableSignAttachAndConnectToHappAsync issuing the app authentication token. Reason: {tokenResult?.Message}", log, loggingFunction);
+                        OnInstallEnableSignAttachAndConnectToHappCallBack?.Invoke(this, result);
+                        return result;
+                    }
+
+                    // A dedicated HoloNETDNA so the token and cell details don't leak into the admin client's shared DNA.
+                    HoloNETDNA appDNA = new HoloNETDNA
+                    {
+                        AutoStartHolochainConductor = false,
+                        AutoShutdownHolochainConductor = false,
+                        AgentPubKey = result.AgentPubKey,
+                        DnaHash = result.DnaHash,
+                        AppAuthenticationToken = tokenResult.TokenIssued.token
+                    };
+
+                    result.HoloNETClientAppAgent = new HoloNETClientAppAgent(hAppId, result.AgentPubKey, appDNA);
                     result.HoloNETConnectedResult = await result.HoloNETClientAppAgent.ConnectAsync(hAppId, $"ws://127.0.0.1:{installedResult.AttachedOnPort}");
 
                     if (result.HoloNETConnectedResult != null && !result.HoloNETConnectedResult.IsError && result.HoloNETConnectedResult.IsConnected)
@@ -1049,7 +1071,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public async Task<NetworkMetricsDumpedCallBackEventArgs> DumpNetworkMetricsAsync(ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
-            return await CallFunctionAsync(HoloNETRequestType.AdminDumpNetworkMetrics, "dump_network_metrics", null, _taskCompletionNetworkMetricsDumpedCallBack, "OnNetworkMetricsDumpedCallBack", conductorResponseCallBackMode, id);
+            return await CallFunctionAsync(HoloNETRequestType.AdminDumpNetworkMetrics, "dump_network_metrics", new DumpNetworkMetricsRequest(), _taskCompletionNetworkMetricsDumpedCallBack, "OnNetworkMetricsDumpedCallBack", conductorResponseCallBackMode, id);
         }
 
         /// <summary>
