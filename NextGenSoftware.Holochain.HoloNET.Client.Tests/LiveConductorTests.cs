@@ -246,6 +246,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
 
                 var zome = await result.HoloNETClientAppAgent.CallZomeFunctionAsync("oasis", "get_all_avatars", null);
                 Assert.False(zome.IsError, "zome call: " + zome.Message);
+                // Avatars may exist in the shared DNA; when they do, real 0.7.0 Records must decode down to entry fields.
+                if (zome.Records.Count > 0)
+                    Assert.Contains("username", zome.KeyValuePair.Keys);
 
                 await result.HoloNETClientAppAgent.DisconnectAsync();
             }

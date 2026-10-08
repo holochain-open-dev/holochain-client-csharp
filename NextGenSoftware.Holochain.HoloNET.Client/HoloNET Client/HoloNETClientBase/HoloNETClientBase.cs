@@ -300,7 +300,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public virtual HoloNETConnectedEventArgs Connect(Uri holochainConductorURI, RetrieveAgentPubKeyAndDnaHashMode retrieveAgentPubKeyAndDnaHashMode = RetrieveAgentPubKeyAndDnaHashMode.Wait, bool retrieveAgentPubKeyAndDnaHashFromConductor = true, bool retrieveAgentPubKeyAndDnaHashFromSandbox = true, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true, bool updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved = true)
         {
-            return ConnectAsync(holochainConductorURI, ConnectedCallBackMode.UseCallBackEvents, retrieveAgentPubKeyAndDnaHashMode, retrieveAgentPubKeyAndDnaHashFromConductor, retrieveAgentPubKeyAndDnaHashFromSandbox, automaticallyAttemptToRetrieveFromConductorIfSandBoxFails, automaticallyAttemptToRetrieveFromSandBoxIfConductorFails, updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved).Result;
+            return Task.Run(() => ConnectAsync(holochainConductorURI, ConnectedCallBackMode.UseCallBackEvents, retrieveAgentPubKeyAndDnaHashMode, retrieveAgentPubKeyAndDnaHashFromConductor, retrieveAgentPubKeyAndDnaHashFromSandbox, automaticallyAttemptToRetrieveFromConductorIfSandBoxFails, automaticallyAttemptToRetrieveFromSandBoxIfConductorFails, updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved)).Result;
         }
 
         /// <summary>
@@ -361,7 +361,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     else
                     {
                         _connectingAsync = false;
-                        WebSocket.ConnectAsync(new Uri(holochainConductorURI), BuildWebSocketHandshakeHeaders());
+                        FireAndForget(WebSocket.ConnectAsync(new Uri(holochainConductorURI), BuildWebSocketHandshakeHeaders()), "WebSocket.ConnectAsync");
 
                         result.Message = "connectedCallBackMode is set to UseCallBackEvents so please wait for the OnConnected event for the result.";
                         result.IsWarning = true;
@@ -392,7 +392,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved">Set this to true (default) to automatically update the [HoloNETHoloNETDNA](#holonetconfig) once it has retrieved the DnaHash & AgentPubKey.</param>
         public virtual HoloNETConnectedEventArgs Connect(string holochainConductorURI = "", bool retrieveAgentPubKeyAndDnaHashFromConductor = true, bool retrieveAgentPubKeyAndDnaHashFromSandbox = false, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true, bool updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved = true)
         {
-            return ConnectAsync(holochainConductorURI, ConnectedCallBackMode.UseCallBackEvents, RetrieveAgentPubKeyAndDnaHashMode.UseCallBackEvents, retrieveAgentPubKeyAndDnaHashFromConductor, retrieveAgentPubKeyAndDnaHashFromSandbox, automaticallyAttemptToRetrieveFromConductorIfSandBoxFails, automaticallyAttemptToRetrieveFromSandBoxIfConductorFails, updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved).Result;
+            return Task.Run(() => ConnectAsync(holochainConductorURI, ConnectedCallBackMode.UseCallBackEvents, RetrieveAgentPubKeyAndDnaHashMode.UseCallBackEvents, retrieveAgentPubKeyAndDnaHashFromConductor, retrieveAgentPubKeyAndDnaHashFromSandbox, automaticallyAttemptToRetrieveFromConductorIfSandBoxFails, automaticallyAttemptToRetrieveFromSandBoxIfConductorFails, updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved)).Result;
         }
 
         /// <summary>
@@ -745,7 +745,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public virtual HoloNETDisconnectedEventArgs Disconnect(ShutdownHolochainConductorsMode shutdownHolochainConductorsMode = ShutdownHolochainConductorsMode.UseHoloNETDNASettings)
         {
-            return DisconnectAsync(DisconnectedCallBackMode.UseCallBackEvents, shutdownHolochainConductorsMode).Result;
+            return Task.Run(() => DisconnectAsync(DisconnectedCallBackMode.UseCallBackEvents, shutdownHolochainConductorsMode)).Result;
         }
 
 
@@ -1002,7 +1002,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public virtual HolochainConductorsShutdownEventArgs ShutDownHolochainConductors(ShutdownHolochainConductorsMode shutdownHolochainConductorsMode = ShutdownHolochainConductorsMode.UseHoloNETDNASettings)
         {
-            return ShutDownHolochainConductorsAsync(shutdownHolochainConductorsMode).Result;
+            return Task.Run(() => ShutDownHolochainConductorsAsync(shutdownHolochainConductorsMode)).Result;
         }
 
         public void Dispose()
@@ -1121,7 +1121,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                 IsDisconnecting = false;
                 OnDisconnected?.Invoke(this, e);
-                ShutDownHolochainConductorsAsync(_shutdownHolochainConductorsMode);
+                FireAndForget(ShutDownHolochainConductorsAsync(_shutdownHolochainConductorsMode), "ShutDownHolochainConductorsAsync");
             }
             catch (Exception ex)
             {

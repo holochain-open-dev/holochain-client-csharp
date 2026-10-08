@@ -28,7 +28,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="holoNETData">The raw data packet you wish to send to the Holochain conductor.</param>
         public virtual void SendHoloNETRequest(HoloNETData holoNETData, HoloNETRequestType requestType, string id = "")
         {
-            SendHoloNETRequestAsync(holoNETData, requestType, id);
+            FireAndForget(SendHoloNETRequestAsync(holoNETData, requestType, id), "SendHoloNETRequest");
         }
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="holoNETData">The raw data packet you wish to send to the Holochain conductor.</param>
         public virtual void SendHoloNETRequest(byte[] data, HoloNETRequestType requestType, string id = "")
         {
-            SendHoloNETRequestAsync(data, requestType, id);
+            FireAndForget(SendHoloNETRequestAsync(data, requestType, id), "SendHoloNETRequest");
         }
 
         protected virtual string GetRequestId()

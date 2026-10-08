@@ -31,7 +31,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public dynamic MapEntryDataObject(Type entryDataObjectType, Dictionary<string, string> keyValuePairs, bool cacheEntryDataObjectPropertyInfo = true)
         {
-            return MapEntryDataObjectAsync(entryDataObjectType, keyValuePairs, cacheEntryDataObjectPropertyInfo).Result;
+            return Task.Run(() => MapEntryDataObjectAsync(entryDataObjectType, keyValuePairs, cacheEntryDataObjectPropertyInfo)).Result;
         }
 
         /// <summary>
@@ -152,7 +152,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public dynamic MapEntryDataObject(dynamic entryDataObject, Dictionary<string, string> keyValuePairs, bool cacheEntryDataObjectPropertyInfos = true)
         {
-            return MapEntryDataObjectAsync(entryDataObject, keyValuePairs, cacheEntryDataObjectPropertyInfos).Result;
+            return Task.Run(() => MapEntryDataObjectAsync(entryDataObject, keyValuePairs, cacheEntryDataObjectPropertyInfos)).Result;
         }
 
         protected override IHoloNETResponse ProcessDataReceived(WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
@@ -432,6 +432,17 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             try
             {
+                // ActionHash/EntryHash results (for example delete zome functions) are
+                // MessagePack binary values, not record maps. Decode them before trying
+                // the collection paths so a byte sequence is not mistaken for a list.
+                object scalarResponse = MessagePackSerializer.Deserialize<object>(appResponse.data, messagePackSerializerOptions);
+                if (scalarResponse is byte[] scalarHash)
+                {
+                    zomeFunctionCallBackArgs.ZomeReturnHash = ConvertHoloHashToString(scalarHash);
+                    RaiseZomeDataReceivedEvent(zomeFunctionCallBackArgs);
+                    return;
+                }
+
                 // Try single-record (dictionary) response first
                 Dictionary<object, object> rawAppResponseData = null;
                 List<object> rawAppResponseList = null;
@@ -526,7 +537,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                         string msg = $"An unknown response was received from the conductor for type 'Response' (Zome Response). Response Received: {rawAppResponseData}";
                         zomeFunctionCallBackArgs.IsError = true;
                         zomeFunctionCallBackArgs.Message = msg;
-                        HandleError(msg, null);
+                        Logger.Log(msg, LogType.Error); // args carry the error; HandleError throws and skipped the raise below, hanging the caller
                     }
                 }
                 catch (Exception ex2)
@@ -534,7 +545,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     string msg = $"An unknown error occurred in HoloNETClient.DecodeZomeDataReceived. Reason: {ex2}";
                     zomeFunctionCallBackArgs.IsError = true;
                     zomeFunctionCallBackArgs.Message = msg;
-                    HandleError(msg, ex2);
+                    Logger.Log(msg, LogType.Error);
                 }
             }
 
@@ -770,9 +781,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                                 {
                                     foreach (object entryKey in entry.Keys)
                                     {
-                                        decodedEntry[entryKey.ToString()] = entry[entryKey].ToString();
-                                        keyValuePair[entryKey.ToString()] = entry[entryKey].ToString();
-                                        keyValuePairAsString = string.Concat(keyValuePairAsString, entryKey.ToString(), "=", entry[entryKey].ToString(), "\n");
+                                        decodedEntry[entryKey.ToString()] = (entry[entryKey]?.ToString() ?? "null");
+                                        keyValuePair[entryKey.ToString()] = (entry[entryKey]?.ToString() ?? "null");
+                                        keyValuePairAsString = string.Concat(keyValuePairAsString, entryKey.ToString(), "=", (entry[entryKey]?.ToString() ?? "null"), "\n");
                                     }
 
                                     record.Bytes = bytes;
@@ -859,13 +870,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                             }
                             catch (Exception ex)
                             {
-                                HandleError("Error in HoloNETClient.DecodeZomeReturnData method.", ex);
+                                Logger.Log($"Skipped a field in HoloNETClient.DecodeZomeReturnData: {ex.Message}", LogType.Warning); // one bad field must not abort the record (and hang the call)
                             }
                         }
                     }
                     catch (Exception ex)
                     {
-                        HandleError("Error in HoloNETClient.DecodeZomeReturnData method.", ex);
+                        Logger.Log($"Skipped a field in HoloNETClient.DecodeZomeReturnData: {ex.Message}", LogType.Warning);
                     }
                 }
             }

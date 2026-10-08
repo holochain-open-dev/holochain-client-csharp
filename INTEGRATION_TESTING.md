@@ -37,8 +37,19 @@ status-filtered list); that the conductor rejects the old `"data"` envelope; and
 `HoloNETClientAdmin` end to end (connect, generate key, list apps/DNAs, and conductor errors
 surfacing as `IsError`).
 
-Not covered yet: installing a hApp, app interfaces, zome calls and signals. These need a
-built test hApp (section 2).
+To also run the full app flow (install → enable → grant → attach → token → authenticate → zome
+call), point `HOLONET_LIVE_HAPP_PATH` at a hApp built for 0.7.0. The OASIS hApp works
+(`hdk 0.7.0`, coordinator zome `oasis`):
+
+```bash
+HOLONET_LIVE_ADMIN_URI=ws://localhost:65464 HOLONET_LIVE_HAPP_PATH='C:\Source\OASIS-Holochain-hApp\workdir\oasis.happ' dotnet test NextGenSoftware.Holochain.HoloNET.Client.Tests --filter "FullyQualifiedName~LiveConductorTests"
+```
+
+Older hApps such as `HoloNET-Manager/.../OASIS_hAPP/oasis.happ` use `manifest_version: "1"`, and
+0.7.0 rejects them ("unknown variant `1`, expected `0`").
+
+Not covered yet: signals, clone cells, countersigning, memproofs, and decoding zome output that
+contains records.
 
 ## 1. Installing the `holochain` conductor binary (0.7.0)
 

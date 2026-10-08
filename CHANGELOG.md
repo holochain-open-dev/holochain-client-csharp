@@ -1,5 +1,51 @@
 # Changelog
 
+## App flow verified live against Holochain 0.7.0
+
+HoloNET has now run the full flow against a real 0.7.0 conductor and the 0.7.0 OASIS hApp
+(`C:\Source\OASIS-Holochain-hApp\workdir\oasis.happ`, hdk 0.7.0): install → enable → grant
+zome-call capability → attach app interface → issue token → authenticate → zome call.
+
+### Fixes
+- **App authentication**: `InstallEnableSignAttachAndConnectToHapp` now issues an app
+  authentication token and gives it to the app agent. Without one, the conductor closes the app
+  socket on the first request.
+- **Response payloads**: about 17 decoders deserialized the whole `{"type", "value"}` envelope as
+  the payload, so their results were empty. Affected: auth token, clone cells, countersigning,
+  peer meta info, op timings, capability grants, compatible cells, state dumps, storage info and
+  others. New `DeserializeResponseValue` / `DeserializeResponseValueAsJson` helpers unwrap
+  `value`.
+- **Dispatch hang**: the dispatcher deserialized every payload as `dynamic` just to read `type`.
+  Payloads keyed by hashes (e.g. `network_metrics_dumped`) throw under
+  `MessagePackSecurity.UntrustedData`, so the response was never routed and the call hung. Dispatch
+  now reads only `type`.
+- **Conductor errors**: the message was read from `"data"` (it's `"value"`), so it was always lost.
+  The base handler also threw before the per-request error event fired, which could hang the
+  caller. It now logs, and callers get `IsError` with the conductor's message.
+- **Auth token encoding**: `AppAuthenticationToken` is a Rust `Vec<u8>`, which goes on the wire as
+  an integer array both when issued and when used to authenticate. Fixed with
+  `ByteArrayAsIntArrayFormatter`.
+- **Agent info**: the request takes `dna_hashes` (`cell_id` was ignored), and the response is a
+  list of encoded strings. New `AgentInfos`; `AgentInfo` is `[Obsolete]`.
+- **`dump_network_metrics`** sends `{dna_hash, include_dht_summary}`. Stats and metrics are
+  exposed as JSON.
+- **`install_app`** sends `source` / `roles_settings`. **`attach_app_interface`** sends the
+  required `allowed_origins` (default `"*"`).
+- **`RegisterDna` / `GraftRecords`** are `[Obsolete]`; 0.7.0 has no such admin requests.
+- **Zome results with real records**: `null` entry fields (`Option::None`) threw a
+  `NullReferenceException`, and decode errors called `HandleError` before the result event fired,
+  so the zome call hung. Now null-safe and non-fatal; live test decodes real 0.7.0 avatar
+  `Record`s down to entry fields.
+- **Sync wrappers**: the 73 `XxxAsync(...).Result` wrappers now run via `Task.Run`, so they no
+  longer deadlock on a UI `SynchronizationContext`. Unawaited calls (CS4014) go through
+  `FireAndForget`, which logs failures.
+- **Other bundled binaries**: the `holochain.exe` copies in `Templates.MAUI` and `UnoApp.Mobile`
+  were 0.1.5 and are now the verified 0.7.0 build.
+- 80 tests, including 11 live tests (`HOLONET_LIVE_ADMIN_URI`, plus `HOLONET_LIVE_HAPP_PATH` for
+  the app flow).
+
+---
+
 ## Wire-format corrections (verified against holochain-0.7.0 source)
 
 ### Breaking changes
