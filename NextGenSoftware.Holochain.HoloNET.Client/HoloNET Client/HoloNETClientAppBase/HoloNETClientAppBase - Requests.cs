@@ -639,59 +639,27 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                 string cellId = $"{HoloNETDNA.AgentPubKey}:{HoloNETDNA.DnaHash}";
 
-                if (_signingCredentialsForCell.ContainsKey(cellId) && _signingCredentialsForCell[cellId] != null)
+                ZomeCallToSign callToSign = new ZomeCallToSign()
                 {
-                    ZomeCallUnsigned payload = new ZomeCallUnsigned()
-                    {
-                        cap_secret = _signingCredentialsForCell[cellId].CapSecret,
-                        cell_id_agent_pub_key = ConvertHoloHashToBytes(HoloNETDNA.AgentPubKey),
-                        cell_id_dna_hash = ConvertHoloHashToBytes(HoloNETDNA.DnaHash),
-                        fn_name = function,
-                        zome_name = zome,
-                        payload = MessagePackSerializer.Serialize(paramsObject),
-                        provenance = _signingCredentialsForCell[cellId].SigningKey, 
-                        nonce = GetCryptographicRandomBytes(32),
-                        //expires_at = DateTime.Now.AddMinutes(5).Ticks / 10
-                        expires_at = (DateTimeOffset.Now.ToUnixTimeMilliseconds() + 5 * 60 * 1000) * 1000
-                    };
+                    CellIdDnaHash = ConvertHoloHashToBytes(HoloNETDNA.DnaHash),
+                    CellIdAgentPubKey = ConvertHoloHashToBytes(HoloNETDNA.AgentPubKey),
+                    ZomeName = zome,
+                    FnName = function,
+                    Payload = MessagePackSerializer.Serialize(paramsObject),
+                    Nonce = GetCryptographicRandomBytes(32),
+                    ExpiresAt = (DateTimeOffset.Now.ToUnixTimeMilliseconds() + 5 * 60 * 1000) * 1000
+                };
 
-                    byte[] hash = new byte[HolochainSerialisationWrapper.DataToSignLength];
-                    try
-                    {
-                        // Holochain 0.7 signs SHA-512(canonical MessagePack(ZomeCallParams)).
-                        HolochainSerialisationWrapper.call_get_data_to_sign(hash, payload);
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine("Failed to get data to sign: " + e.ToString());
-                    }
+                ZomeCallParamsSigned zomeCallParamsSigned = null;
 
-                    var sig = Ed25519.Sign(hash, _signingCredentialsForCell[cellId].KeyPair.PrivateKey);
+                if (ZomeCallSigner != null)
+                    zomeCallParamsSigned = await ZomeCallSigner.SignZomeCallAsync(callToSign);
 
-                    // Kept for backwards compatibility with any code that inspects the flattened
-                    // ZomeCallSigned shape (e.g. via OnDataReceived/raw request introspection).
-                    ZomeCallSigned signedPayload = new ZomeCallSigned()
-                    {
-                        cap_secret = payload.cap_secret,
-                        cell_id = new CellId(payload.cell_id_dna_hash, payload.cell_id_agent_pub_key),
-                        fn_name = payload.fn_name,
-                        zome_name = payload.zome_name,
-                        payload = payload.payload,
-                        provenance = payload.provenance,
-                        nonce = payload.nonce,
-                        expires_at = payload.expires_at,
-                        signature = sig[0..64]
-                    };
+                else
+                    zomeCallParamsSigned = SignZomeCallWithAuthorizedCredentials(callToSign);
 
-                    // Holochain 0.7.0 wire shape for AppRequest::CallZome is
-                    // ZomeCallParamsSigned { bytes: ExternIO, signature: Signature } where
-                    // `bytes` is the holochain_serialized_bytes (msgpack struct-map) encoding of
-                    // the unsigned ZomeCall/ZomeCallParams fields above (`signedPayload` minus
-                    // the signature). See ZomeCallParamsSigned.cs for the source reference.
-                    byte[] unsignedBytes = MessagePackSerializer.Serialize<ZomeCall>(signedPayload, MessagePackSerializerOptions.Standard.WithCompression(MessagePackCompression.None));
-
-                    ZomeCallParamsSigned zomeCallParamsSigned = new ZomeCallParamsSigned(unsignedBytes, signedPayload.signature);
-
+                if (zomeCallParamsSigned != null)
+                {
                     HoloNETData holoNETData = new HoloNETData()
                     {
                         type = "call_zome",
@@ -726,7 +694,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 }
                 else
                 {
-                    string msg = $"Error occurred in HoloNETClient.CallZomeFunctionAsync method: Cannot sign zome call when no signing credentials have been authorized for the cell (AgentPubKey: {HoloNETDNA.AgentPubKey}, DnaHash: {HoloNETDNA.DnaHash}).";
+                    string msg = ZomeCallSigner != null ? $"Error occurred in HoloNETClient.CallZomeFunctionAsync method: the configured ZomeCallSigner did not sign the call to {zome}.{function}." : $"Error occurred in HoloNETClient.CallZomeFunctionAsync method: Cannot sign zome call when no signing credentials have been authorized for the cell (AgentPubKey: {HoloNETDNA.AgentPubKey}, DnaHash: {HoloNETDNA.DnaHash}).";
                     HandleError(msg, null);
                     return new ZomeFunctionCallBackEventArgs() { EndPoint = EndPoint, Id = id, Zome = zome, ZomeFunction = function, Message = msg, IsError = true };
                 }

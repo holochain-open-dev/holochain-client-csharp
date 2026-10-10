@@ -15,6 +15,24 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
     /// </summary>
     public class LiveConductorTests
     {
+        private sealed class CountingSigner : IZomeCallSigner
+        {
+            private readonly HoloNETClientAppAgent _client;
+            public int Calls { get; private set; }
+            public CountingSigner(HoloNETClientAppAgent client) => _client = client;
+
+            public Task<ZomeCallParamsSigned> SignZomeCallAsync(ZomeCallToSign call)
+            {
+                Calls++;
+                return Task.FromResult(_client.SignZomeCallWithAuthorizedCredentials(call));
+            }
+        }
+
+        private sealed class DecliningSigner : IZomeCallSigner
+        {
+            public Task<ZomeCallParamsSigned> SignZomeCallAsync(ZomeCallToSign call) => Task.FromResult<ZomeCallParamsSigned>(null);
+        }
+
         private static readonly string AdminUri = Environment.GetEnvironmentVariable("HOLONET_LIVE_ADMIN_URI");
         private static readonly MessagePackSerializerOptions Options =
             MessagePackSerializerOptions.Standard.WithSecurity(MessagePackSecurity.UntrustedData);
@@ -249,6 +267,28 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
                 // Avatars may exist in the shared DNA; when they do, real 0.7.0 Records must decode down to entry fields.
                 if (zome.Records.Count > 0)
                     Assert.Contains("username", zome.KeyValuePair.Keys);
+
+                // Pluggable signer: the same call signed through IZomeCallSigner.
+                var app = (HoloNETClientAppAgent)result.HoloNETClientAppAgent;
+                var signer = new CountingSigner(app);
+                app.ZomeCallSigner = signer;
+                var signedExternally = await app.CallZomeFunctionAsync("oasis", "get_all_avatars", null);
+                Assert.False(signedExternally.IsError, "zome call via IZomeCallSigner: " + signedExternally.Message);
+                Assert.Equal(1, signer.Calls);
+
+                // A signer that declines must fail the call (not hang, not fall back silently). Without an
+                // OnError subscriber HoloNET reports errors by throwing, so accept either form.
+                app.ZomeCallSigner = new DecliningSigner();
+                try
+                {
+                    var declined = await app.CallZomeFunctionAsync("oasis", "get_all_avatars", null);
+                    Assert.True(declined.IsError, "a declining signer should produce an error result");
+                }
+                catch (HoloNETException ex)
+                {
+                    Assert.Contains("ZomeCallSigner did not sign", ex.ToString());
+                }
+                app.ZomeCallSigner = null;
 
                 await result.HoloNETClientAppAgent.DisconnectAsync();
             }
