@@ -97,7 +97,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                                 break;
 
                             case HoloNETResponseType.AdminFullStateDumped:
-                                DecodeStateDumpedReceived(response, dataReceivedEventArgs);
+                                DecodeFullStateDumpedReceived(response, dataReceivedEventArgs);
                                 break;
 
                             case HoloNETResponseType.AdminNetworkMetricsDumped:
@@ -952,12 +952,23 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             try
             {
                 Logger.Log("ADMIN: FULL STATE DUMPED\n", LogType.Info);
-                FullStateDumpedResponse fullStateDumpedResponse = DeserializeResponseValue<FullStateDumpedResponse>(response.data);
+                args.DumpedStateJSON = DeserializeResponseValueAsJson(response.data);
 
-                if (fullStateDumpedResponse != null)
-                    args.DumpedState = fullStateDumpedResponse;
+                if (args.DumpedStateJSON == null)
+                    HandleError(args, $"{errorMessage} the response had no value.");
                 else
-                    HandleError(args, $"{errorMessage} fullStateDumpedResponse failed to deserialize.");
+                {
+                    // FullStateDumpedResponse doesn't fully match 0.7.0's FullStateDump; keep the JSON as the
+                    // source of truth and only populate the typed view when it parses.
+                    try
+                    {
+                        args.DumpedState = DeserializeResponseValue<FullStateDumpedResponse>(response.data);
+                    }
+                    catch (Exception typedEx)
+                    {
+                        Logger.Log($"Could not map the full state dump onto FullStateDumpedResponse; use DumpedStateJSON. {typedEx.Message}", LogType.Warning);
+                    }
+                }
             }
             catch (Exception ex)
             {

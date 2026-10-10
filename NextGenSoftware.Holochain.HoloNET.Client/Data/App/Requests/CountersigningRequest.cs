@@ -14,6 +14,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
     /// https://github.com/holochain/holochain/blob/holochain-0.7.0/crates/holochain_conductor_api/src/app_interface.rs
     /// </summary>
     [MessagePackObject]
+    [System.Obsolete("The countersigning AppRequests take Box<CellId> (tuple variants): the value is the bare CellId. HoloNET no longer uses this class.")]
     public class CountersigningCellIdRequest
     {
         [Key("cell_id")]

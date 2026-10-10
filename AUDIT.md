@@ -16,7 +16,7 @@ a real 0.7.0 conductor** and the 0.7.0 OASIS hApp: install → enable → grant 
 issue token → authenticate → zome call. Signals and the less-used app APIs (clone cells,
 countersigning, memproofs) are still not exercised live.
 
-*Updated 2026-10-07 with findings 13–22 from the app-flow run.*
+*Updated 2026-10-07 with findings 13–30 from the app-flow run.*
 
 ## Method
 
@@ -59,22 +59,28 @@ unusable. **Medium** = wrong results in some cases. **Low** = quality or mainten
 | 19 | Medium | `AppAuthenticationToken` (Rust `Vec<u8>`) is an integer array on the wire, not bin, both when issued and when authenticating. | Live token response | Fixed (`ByteArrayAsIntArrayFormatter`) |
 | 20 | Medium | `agent_info` request sent `cell_id` (ignored; 0.7.0 uses `dna_hashes`); the no-arg overload threw without a DnaHash; the decoder indexed `[0]` of an old map shape and crashed on an empty list. `dump_network_metrics` sent no payload. | Live run | Fixed |
 | 22 | High | Zome-result decoding threw on `null` entry fields, and decode errors called `HandleError` before raising the result, so zome calls returning real records hung. | Live run (9–10 avatar records, hang dump) | Fixed |
+| 23 | High | Signals never reached the decoder (routed on the inner type, never `signal` in 0.7.0), and the decoder expected the pre-0.4 `{"App": …}` shape with agent/DNA swapped. | Source (`holochain_types::signal`) | Fixed; unit-tested |
+| 24 | High | Tuple-variant requests sent `{field: value}` objects: countersigning, `revoke_app_authentication_token`, `get_compatible_cells`. `get_dna_definition` sent a DNA hash; 0.7.0 takes a `CellId`. | Live: "Failed to deserialize request" | Fixed |
+| 25 | High | `dump_full_state` replies were routed to the `dump_state` decoder, so the call hung. | Live run | Fixed |
+| 26 | High | `HandleError(args, …)` threw before decoders raised their result (default `OnError` behaviour), so any decode error hung the caller. | Live run (host functions, full state) | Fixed |
+| 27 | High | `DataHelper.ConvertBinaryDataToString` (libraries repo) was O(n²) and ran on every response, so large replies never finished. | Live run (hang) | Fixed (`842296f`) |
+| 28 | Medium | Embedded mode: the hc-tool branch wrote the conductor binary out as `hc.exe` into the wrong variable, and binaries were never re-extracted, so an older cached conductor was used forever. | Code inspection | Fixed |
+| 29 | Medium | `list_wasm_host_functions` didn't unwrap the envelope; `DumpOpTimingsAsync` was missing from `IHoloNETClientAppBase`; no install-from-bytes. | Live run | Fixed |
+| 30 | Low | CS0162 unreachable `break`s in `HoloNETClientBase`; CS4014/CS0162 in the libraries repo. | Build warnings | Fixed |
 | 21 | Low | `InstallEnableSignAttachAndConnectToHapp` didn't copy `CellType` into its result. Other bundled `holochain.exe` copies (MAUI, Uno) were 0.1.5. | Live run; `--version` | Fixed |
 
 ## Still open
 
 | Item | Why it matters | Suggested next step |
 |---|---|---|
-| Signals and less-used app APIs not run live | Signals, clone cells, countersigning, memproofs and `Record`/`Action`/`Entry` decoding of real zome output are only source-checked. | Add live tests using the OASIS hApp (create/get an avatar, clone the `oasis` role, emit a signal). |
-| Unreachable code (CS0162) | Two `break;` statements in `HoloNETClientBase` after `#if`-compiled embedded-binary blocks. Harmless. | Tidy when that block is next changed. |
-| Warnings in NextGenSoftware-Libraries | CS4014 in `WebSocket.cs`/`UnityWebSocket.cs` and CS0162 in `WalletAddressHelper.cs` are in the separate libraries repo. | Fix in that repo. |
+| Signals not received live | Signal routing and decoding are fixed and unit-tested against the 0.7.0 source shape, but the OASIS hApp never calls `emit_signal`, so no signal has arrived over a real socket. | Add an `emit_signal` call to a zome (needs a Rust toolchain), then a live test. |
+| Feature-gated APIs not run live | Countersigning (`unstable-countersigning`) and `GetCompatibleCells` (`unstable-migration`) don't exist in the standard conductor; the live tests confirm they fail cleanly. | Run the `holochain-unstable` release build to exercise them. |
 | `holochain.exe` under `UnoApp.Mobile/Android/Resources` | Now 0.7.0, but a Windows `.exe` cannot run on Android at all. | Remove it, or ship an Android conductor build if one is needed. |
-| In-memory `AppBundle` install | Throws `NotSupportedException`; no verified 0.7.0 packing for `AppBundleSource::Bytes`. | Pass a `.happ` path, or add `SourceFromBytes` with the raw file bytes. |
+| In-memory `AppBundle` object install | Still throws `NotSupportedException` (no verified packing of the object). Paths and raw `.happ` bytes (`InstallAppFromBytesAsync`) both work. | Only needed if callers build bundles in memory. |
 | Pushes bypassed branch protection | Every push to `main` reported "Bypassed rule violations… must be made through a pull request". | Review these commits after the fact; use PRs from now on. |
-| Earlier CHANGELOG entries | The "Post-upgrade polish" section describes the invented manifest types as verified. | Superseded by later sections; can be edited down. |
 
 ### Resolved since the first audit
-- App-side flow now runs live (findings 13–22).
+- App-side flow now runs live (findings 13–30).
 - `RegisterDna`/`GraftRecords` marked `[Obsolete]`.
 - Sync wrappers no longer deadlock on a UI `SynchronizationContext`: all 73 `XxxAsync(...).Result` wrappers now run the call via `Task.Run`.
 - HoloNET's unawaited calls (CS4014) now go through `FireAndForget`, which logs failures instead of losing them.
@@ -83,7 +89,7 @@ unusable. **Medium** = wrong results in some cases. **Low** = quality or mainten
 
 ## Test coverage after the audit
 
-- **80 tests** in `NextGenSoftware.Holochain.HoloNET.Client.Tests`. All pass.
+- **85 tests** in `NextGenSoftware.Holochain.HoloNET.Client.Tests`. All pass.
 - **Wire-shape tests** check exact JSON for `ZomeManifest`, `DnaManifest`, `GrantedFunctions`,
   `CapAccess`, `CloneCellId` and `AppStatusFilter`, and decode conductor-shaped `CellInfo` bytes.
 - **Live tests** (`LiveConductorTests`, opt-in through `HOLONET_LIVE_ADMIN_URI`) pass against a
@@ -93,3 +99,7 @@ unusable. **Medium** = wrong results in some cases. **Low** = quality or mainten
 - **Live app flow** (`HOLONET_LIVE_HAPP_PATH`, e.g. the OASIS hApp): install → enable → grant →
   attach → token → authenticate → `oasis.get_all_avatars` zome call, plus admin info calls
   (cell ids, storage, agent info, network stats/metrics) and install/attach payload checks.
+- **Live app/admin APIs** (`HOLONET_LIVE_CLONE_HAPP_PATH`, `HOLONET_LIVE_MEMPROOFS_HAPP_PATH`: the
+  OASIS hApp repacked with `clone_limit: 3` or `allow_deferred_memproofs: true`): clone cells,
+  memproofs, host functions, op timings, DNA definitions, capability grants, state dumps, token
+  issue/revoke, install from bytes, and the feature-gated calls failing cleanly.

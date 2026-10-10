@@ -117,6 +117,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
     public class FullStateDumpedCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
         public IFullStateDumpedResponse DumpedState { get; set; }
+
+        /// <summary>The conductor's FullStateDump as JSON. Always set; DumpedState is best-effort.</summary>
+        public string DumpedStateJSON { get; set; }
     }
 
     public class CoordinatorsUpdatedCallBackEventArgs : HoloNETDataReceivedBaseEventArgs

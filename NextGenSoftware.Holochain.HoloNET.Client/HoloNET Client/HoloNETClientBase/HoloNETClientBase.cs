@@ -471,26 +471,18 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                                     try
                                     {
-                                        fullPathToHolochainExe = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "NextGenSoftware\\HoloNET\\hc.exe");
-                                        //fullPathToHolochainExe = Path.Combine(Directory.GetCurrentDirectory(), "HolochainBinaries/beta/holochain.exe");
-
-                                        if (!File.Exists(fullPathToHolochainExe))
-                                        {
-                                            using (FileStream fsDst = new FileStream(fullPathToHolochainExe, FileMode.CreateNew, FileAccess.Write))
-                                            {
-                                                byte[] bytes = Resources.holochain;
-                                                fsDst.Write(bytes, 0, bytes.Length);
-                                            }
-                                        }
+                                        // Was: set fullPathToHolochainExe and wrote Resources.holochain out as hc.exe.
+                                        fullPathToHcExe = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "NextGenSoftware\\HoloNET\\hc.exe");
+                                        ExtractEmbeddedBinary(fullPathToHcExe, Resources.hc);
                                     }
                                     catch (Exception ex2)
                                     {
                                         HandleError($"An error occured in HoloNETClientBase.StartHolochainConductorAsync attempting to write the embedded hc.exe to the AppData directory {Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "\\NextGenSoftware\\HoloNET")}", ex2);
                                     }
                             //}
+                                break; // inside #else so it isn't unreachable after the throw above (CS0162)
 #endif
                                 }
-                            break;
 
                         case HolochainConductorModeEnum.UseSystemGlobal:
                             fullPathToHcExe = "hc.exe";
@@ -535,26 +527,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                                         fullPathToHolochainExe =  Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "NextGenSoftware\\HoloNET\\holochain.exe");
                                         //Logger.Log($"fullPathToHolochainExe={fullPathToHolochainExe}", LogType.Info);
 
-                                        if (!File.Exists(fullPathToHolochainExe))
-                                        {
-                                            //using (IsolatedStorageFile isoStore = IsolatedStorageFile.GetStore(IsolatedStorageScope.User | IsolatedStorageScope.Domain | IsolatedStorageScope.Assembly, null, null))
-                                            //{
-                                            //    using (IsolatedStorageFileStream stream = isoStore.CreateFile("NextGenSoftware/HoloNET/holochain.exe"))
-                                            //    {
-                                            //        fullPathToHolochainExe = stream.Name;
-                                            //        byte[] bytes = Resources.holochain;
-                                            //        stream.Write(bytes, 0, bytes.Length);
-                                            //    }
-                                            //}
-
-                                            using (FileStream fsDst = new FileStream(fullPathToHolochainExe, FileMode.CreateNew, FileAccess.Write))
-                                            //using (StreamWriter writer = new StreamWriter(fullPathToHolochainExe, System.Text.Encoding.Default, new FileStreamOptions() { Access = FileAccess.Write, Mode = FileMode.CreateNew, Options = FileOptions.None, Share = FileShare.Read, UnixCreateMode = UnixFileMode.UserExecute }))
-                                            {
-                                                byte[] bytes = Resources.holochain;
-                                                //writer.Write(bytes, 0, bytes.Length);
-                                                fsDst.Write(bytes, 0, bytes.Length);
-                                            }
-                                        }
+                                        // Re-extracts when the cached copy differs, so an older bundled conductor is replaced.
+                                        ExtractEmbeddedBinary(fullPathToHolochainExe, Resources.holochain);
                                     }
                                     catch (Exception ex2)
                                     {
@@ -563,9 +537,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                                         HandleError($"An error occured in HoloNETClientBase.StartHolochainConductorAsync attempting to write the embedded holochain.exe to the IsolatedStorage directory { fullPathToHolochainExe }", ex2);
                                     }
                             //}
+                                break; // inside #else so it isn't unreachable after the throw above (CS0162)
 #endif
                                 }
-                            break;
 
                         case HolochainConductorModeEnum.UseSystemGlobal:
                             fullPathToHolochainExe = "holochain.exe";
@@ -1358,7 +1332,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         {
             result.IsError = true;
             result.Message = errorMessage;
-            HandleError(result.Message, exception);
+
+            // Decoders call this just before raising `result` to the awaiting caller. Throwing here (the
+            // default when nothing subscribes to OnError) skipped that raise and left the call hanging,
+            // so report the error on the result instead.
+            string message = string.Concat(errorMessage, exception != null ? $". Error Details: {exception}" : "");
+            Logger.Log(message, LogType.Error);
+            OnError?.Invoke(this, new HoloNETErrorEventArgs { EndPoint = WebSocket.EndPoint, Reason = message, ErrorDetails = exception });
         }
 
     }

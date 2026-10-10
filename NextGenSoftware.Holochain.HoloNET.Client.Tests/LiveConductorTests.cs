@@ -258,6 +258,163 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
             }
         }
 
+        /// <summary>
+        /// Clone cells, countersigning state, WASM host functions and op timings.
+        /// Requires HOLONET_LIVE_CLONE_HAPP_PATH: a 0.7.0 hApp with role "oasis", clone_limit &gt; 0
+        /// (e.g. the OASIS hApp repacked with clone_limit: 3).
+        /// </summary>
+        [Fact]
+        public async Task Live_AppApis_CloneCells_Countersigning_HostFns_OpTimings()
+        {
+            string happPath = Environment.GetEnvironmentVariable("HOLONET_LIVE_CLONE_HAPP_PATH");
+            if (string.IsNullOrEmpty(AdminUri) || string.IsNullOrEmpty(happPath)) return;
+
+            var admin = new HoloNETClientAdmin(new HoloNETDNA { AutoStartHolochainConductor = false, AutoShutdownHolochainConductor = false, HolochainConductorAdminURI = AdminUri });
+
+            try
+            {
+                await admin.ConnectAsync(AdminUri);
+                string appId = "holonet-clone-" + Guid.NewGuid().ToString("N").Substring(0, 8);
+                var installed = await admin.InstallEnableSignAttachAndConnectToHappAsync(appId, happPath, "oasis");
+                Assert.True(installed.IsAppConnected, installed.Message);
+                var app = installed.HoloNETClientAppAgent;
+
+                var created = await app.CreateCloneCellAsync("oasis", new Dictionary<string, object> { { "network_seed", Guid.NewGuid().ToString() } }, null, "test clone");
+                Assert.False(created.IsError, "create clone: " + created.Message);
+                Assert.NotNull(created.ClonedCell);
+                string cloneId = created.ClonedCell.clone_id;
+                Assert.False(string.IsNullOrEmpty(cloneId), "clone_id was not decoded");
+
+                var disabled = await app.DisableCloneCellAsync(cloneId);
+                Assert.False(disabled.IsError, "disable clone: " + disabled.Message);
+
+                var enabled = await app.EnableCloneCellAsync(cloneId);
+                Assert.False(enabled.IsError, "enable clone: " + enabled.Message);
+
+                Assert.False((await app.DisableCloneCellAsync(cloneId)).IsError);
+                var deleted = await admin.DeleteCloneCellAsync(appId, cloneId);
+                Assert.False(deleted.IsError, "delete clone: " + deleted.Message);
+
+                // The standard 0.7.0 conductor is built without unstable-countersigning, so it rejects
+                // this request. It must come back as an error, not hang.
+                var countersigning = await app.GetCountersigningSessionStateAsync(new CellId(installed.CellId[0], installed.CellId[1]));
+                Assert.True(countersigning.IsError, "countersigning is feature-gated; expected the conductor to reject it");
+
+                var hostFns = await app.ListWasmHostFunctionsAsync();
+                Assert.False(hostFns.IsError, "host fns: " + hostFns.Message);
+
+                var appTimings = await app.DumpOpTimingsAsync(installed.CellId[0]);
+                Assert.False(appTimings.IsError, "app op timings: " + appTimings.Message);
+
+                var adminTimings = await admin.DumpOpTimingsAsync(installed.CellId[0]);
+                Assert.False(adminTimings.IsError, "admin op timings: " + adminTimings.Message);
+
+                var dnaDef = await admin.GetDnaDefinitionAsync(installed.CellId);
+                Assert.False(dnaDef.IsError, "dna definition: " + dnaDef.Message);
+
+                var dnaDefByHash = await admin.GetDnaDefinitionAsync(installed.CellId[0]);
+                Assert.False(dnaDefByHash.IsError, "dna definition by hash: " + dnaDefByHash.Message);
+
+                // Feature-gated (unstable-migration) and absent from the standard 0.7.0 build: must error, not hang.
+                var compatible = await admin.GetCompatibleCellsAsync(installed.CellId[0]);
+                Assert.True(compatible.IsError, "get_compatible_cells is feature-gated; expected the conductor to reject it");
+
+                var grants = await admin.ListCapabilityGrantsAsync(appId);
+                Assert.False(grants.IsError, "capability grants: " + grants.Message);
+
+                var state = await admin.DumpStateAsync(installed.CellId);
+                Assert.False(state.IsError, "dump state: " + state.Message);
+
+                var fullState = await admin.DumpFullStateAsync(installed.CellId);
+                Assert.False(fullState.IsError, "dump full state: " + fullState.Message);
+
+                var token = await admin.IssueAppAuthenticationTokenAsync(appId);
+                Assert.False(token.IsError, "issue token: " + token.Message);
+                var revoked = await admin.RevokeAppAuthenticationTokenAsync(token.TokenIssued.token);
+                Assert.False(revoked.IsError, "revoke token: " + revoked.Message);
+
+                await app.DisconnectAsync();
+            }
+            finally
+            {
+                await admin.DisconnectAsync();
+            }
+        }
+
+        /// <summary>
+        /// Deferred membrane proofs: install without proofs → connect → provide_memproofs → enable.
+        /// Requires HOLONET_LIVE_MEMPROOFS_HAPP_PATH: a 0.7.0 hApp with allow_deferred_memproofs: true.
+        /// </summary>
+        [Fact]
+        public async Task Live_DeferredMemproofs_ProvideThenEnable()
+        {
+            string happPath = Environment.GetEnvironmentVariable("HOLONET_LIVE_MEMPROOFS_HAPP_PATH");
+            if (string.IsNullOrEmpty(AdminUri) || string.IsNullOrEmpty(happPath)) return;
+
+            var admin = new HoloNETClientAdmin(new HoloNETDNA { AutoStartHolochainConductor = false, AutoShutdownHolochainConductor = false, HolochainConductorAdminURI = AdminUri });
+
+            try
+            {
+                await admin.ConnectAsync(AdminUri);
+                string appId = "holonet-memproofs-" + Guid.NewGuid().ToString("N").Substring(0, 8);
+
+                var installed = await admin.InstallAppAsync(appId, happPath);
+                Assert.False(installed.IsError, "install: " + installed.Message);
+
+                var beforeProofs = await admin.EnableAppAsync(appId);
+                Assert.True(beforeProofs.IsError, "enabling before memproofs are provided should be rejected");
+
+                var attached = await admin.AttachAppInterfaceAsync();
+                Assert.False(attached.IsError, "attach: " + attached.Message);
+                var token = await admin.IssueAppAuthenticationTokenAsync(appId);
+                Assert.False(token.IsError, "token: " + token.Message);
+
+                var app = new HoloNETClientAppAgent(appId, installed.AgentPubKey, new HoloNETDNA
+                {
+                    AutoStartHolochainConductor = false,
+                    AutoShutdownHolochainConductor = false,
+                    AgentPubKey = installed.AgentPubKey,
+                    DnaHash = installed.DnaHash,
+                    AppAuthenticationToken = token.TokenIssued.token
+                });
+
+                var connected = await app.ConnectAsync(appId, $"ws://127.0.0.1:{attached.Port}");
+                Assert.False(connected.IsError, "connect: " + connected.Message);
+
+                var provided = await app.ProvideMemproofsAsync(new Dictionary<string, byte[]> { { "oasis", new byte[] { 1, 2, 3 } } });
+                Assert.False(provided.IsError, "provide memproofs: " + provided.Message);
+
+                var enabled = await admin.EnableAppAsync(appId);
+                Assert.False(enabled.IsError, "enable after memproofs: " + enabled.Message);
+
+                await app.DisconnectAsync();
+            }
+            finally
+            {
+                await admin.DisconnectAsync();
+            }
+        }
+
+        [Fact]
+        public async Task Live_InstallAppFromBytes_Installs()
+        {
+            string happPath = Environment.GetEnvironmentVariable("HOLONET_LIVE_HAPP_PATH");
+            if (string.IsNullOrEmpty(AdminUri) || string.IsNullOrEmpty(happPath)) return;
+
+            var admin = new HoloNETClientAdmin(new HoloNETDNA { AutoStartHolochainConductor = false, AutoShutdownHolochainConductor = false, HolochainConductorAdminURI = AdminUri });
+
+            try
+            {
+                await admin.ConnectAsync(AdminUri);
+                var installed = await admin.InstallAppFromBytesAsync("holonet-bytes-" + Guid.NewGuid().ToString("N").Substring(0, 8), System.IO.File.ReadAllBytes(happPath));
+                Assert.False(installed.IsError, "install from bytes: " + installed.Message);
+            }
+            finally
+            {
+                await admin.DisconnectAsync();
+            }
+        }
+
         [Fact]
         public async Task Live_ListDnas_ReturnsDnasListed()
         {

@@ -13,6 +13,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests
     /// 0.7.0 and so may not be available on all conductor builds.
     /// </summary>
     [MessagePackObject]
+    [System.Obsolete("AdminRequest::GetCompatibleCells(DnaHash) is a tuple variant: the value is the bare DNA hash. HoloNET no longer uses this class.")]
     public class GetCompatibleCellsRequest
     {
         [Key("dna_hash")]

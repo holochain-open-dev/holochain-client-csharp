@@ -107,7 +107,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 //Logger.Log(string.Concat("Raw Data Bytes Received After MessagePack Decode: ", rawBinaryDataAfterMessagePackDecodeAsString), LogType.Debug);
                 //Logger.Log(string.Concat("Raw Data Bytes Decoded After MessagePack Decode: ", rawBinaryDataAfterMessagePackDecodeDecoded), LogType.Debug);
 
-                switch (responseType)
+                // Signals arrive as WireMessage::Signal (outer type "signal"); the inner type is the Signal
+                // variant ("app" | "app_direct" | "system"), so they must be routed on the outer type.
+                bool isSignal = string.Equals(response.type, "signal", StringComparison.OrdinalIgnoreCase);
+
+                switch (isSignal ? "signal" : responseType)
                 {
                     // AppResponse::ZomeCalled serialises as "zome_called"; "zome-response" is the pre-0.2 name.
                     case "zome_called":
@@ -305,6 +309,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 holoNETDataReceivedEventArgs = CreateHoloNETArgs<HoloNETDataReceivedEventArgs>(response, dataReceivedEventArgs);
 
                 if (HoloNETDNA.EnforceRequestToResponseIdMatchingBehaviour != EnforceRequestToResponseIdMatchingBehaviour.Ignore
+                    && !isSignal // signals are unsolicited and carry no request id
                     && !_pendingRequests.Contains(id))
                 {
                     holoNETDataReceivedEventArgs.IsError = HoloNETDNA.EnforceRequestToResponseIdMatchingBehaviour == EnforceRequestToResponseIdMatchingBehaviour.Error;

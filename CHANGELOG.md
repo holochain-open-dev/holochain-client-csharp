@@ -1,5 +1,42 @@
 # Changelog
 
+## Remaining app/admin APIs verified live
+
+Live tests now cover every API area against a real 0.7.0 conductor: clone cells (create,
+disable, enable, delete), deferred membrane proofs (provide → enable), WASM host functions, op
+timings on both interfaces, DNA definitions, capability grants, both state dumps, token
+issue/revoke, and installing from bytes. 85 tests, 14 of them live.
+
+### Fixes
+- **Signals were never delivered**: the dispatcher routed on the inner type (which is `app`,
+  `app_direct` or `system` in 0.7.0, never `signal`), and the decoder expected the pre-0.4
+  `{"App": [cell, data]}` shape with agent and DNA hash swapped. Signals now route on the outer
+  `WireMessage` type, skip request-id matching, and decode `{"type", "value": {cell_id, zome_name,
+  signal}}` (new `SignalValue`).
+- **Tuple-variant requests** sent `{field: value}` objects where the conductor wants the bare value:
+  countersigning (`Box<CellId>`), `revoke_app_authentication_token` (token as an int array),
+  `get_compatible_cells` (`DnaHash`). `get_dna_definition` takes a `CellId` in 0.7.0; the DNA-hash
+  overload now looks up a matching cell, and a `CellId` overload was added.
+- **`dump_full_state`** was routed to the `dump_state` decoder and hung; it's now decoded properly,
+  and `DumpedStateJSON` is always set (the typed `DumpedState` is best-effort).
+- **Decoder errors no longer hang calls**: `HandleError(args, …)` threw (the default when nothing
+  subscribes to `OnError`) before decoders raised their result. It now reports the error on the result.
+- **`list_wasm_host_functions`** didn't unwrap the response envelope.
+- **`DumpOpTimingsAsync`** was missing from `IHoloNETClientAppBase`.
+- **Install from bytes**: new `InstallAppFromBytesAsync` (`AppBundleSource::Bytes`).
+- **Embedded binaries**: the hc-tool path wrote the *conductor* binary out as `hc.exe` into the wrong
+  variable, and extracted binaries were never refreshed after an upgrade (only written when
+  missing). Now `Resources.hc` is used, and stale copies are re-extracted.
+- **Large responses hung**: `DataHelper.ConvertBinaryDataToString` (NextGenSoftware-Libraries),
+  called on every response, was O(n²); a full-state dump never finished. Fixed in that repo
+  (`842296f`).
+- **Feature-gated APIs**: countersigning (`unstable-countersigning`) and `GetCompatibleCells`
+  (`unstable-migration`) don't exist in the standard 0.7.0 conductor. They're now documented on
+  the methods, and they return a clean error instead of hanging.
+- CS0162 (unreachable `break`) fixed; the libraries repo's CS4014/CS0162 warnings fixed.
+
+---
+
 ## App flow verified live against Holochain 0.7.0
 
 HoloNET has now run the full flow against a real 0.7.0 conductor and the 0.7.0 OASIS hApp
@@ -105,17 +142,10 @@ Further hardening and completeness work on top of the 0.7.0 upgrade:
   `CapGrantInfo.cap_grant` is now `DesensitizedZomeCallCapGrant` (typed) instead of `dynamic`.
   `CapAccessInfo` carries `access_type` (string) and optional `assignees` (AgentPubKey[]).
   Verified against `holochain_zome_types` 0.7.0.
-- **DNA manifest restructured for 0.7.0** (`Data/Admin/Requests/Objects/`):
-  - `IntegrityManifest` is now the correct container shape (`network_seed`, `origin_time`,
-    `quantum_time`, `properties`, `zomes: IntegrityZomeManifest[]`). `network_seed` and
-    `properties` commented out on `DnaManifest` (they moved to this container in 0.7.0).
-  - `IntegrityZomeManifest` — new per-zome entry type (name, dylib, hash,
-    `dependencies: ZomeDependency[]`, bundled/path/url, properties).
-  - `CoordinatorManifest` — updated to `CoordinatorZomeManifest[]`.
-  - `CoordinatorZomeManifest` — new per-zome entry type with `dependencies: string[]`
-    (plain `ZomeName` strings, matching 0.7.0 Rust vs. `ZomeDependency[]` for integrity).
-  - `DnaManifest.integrity` / `.coordinator` fixed from `[]` (array) to singular container
-    objects. Legacy `zomes[]` retained for backwards compatibility.
+- **DNA manifest restructured** (`Data/Admin/Requests/Objects/`). *Correction:* this was written
+  without checking the Rust source, and parts were wrong (`origin_time`/`quantum_time`,
+  `IntegrityZomeManifest`/`CoordinatorZomeManifest`, string coordinator dependencies). The verified
+  0.7.0 shape is in "Wire-format corrections" above; the invented types are `[Obsolete]`.
 - **`EnableCloneCellRequest.clone_cell_id`** doc comment updated with wire-format note (matches
   Disable/Delete treatment from the main 0.7.0 pass).
 - **`.gitattributes`** added: `* text=auto`, CRLF for `.cs`/`.csproj`/`.sln`/`.md`,

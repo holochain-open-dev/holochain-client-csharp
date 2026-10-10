@@ -1067,12 +1067,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="conductorResponseCallBackMode">The Concuctor Response CallBack Mode, set this to 'WaitForHolochainConductorResponse' if you want the function to wait for the Holochain Conductor response before returning that response or set it to 'UseCallBackEvents' to return from the function immediately and then raise the 'OnCountersigningSessionStateReturnedCallBack' event when the conductor responds.</param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
+        // Only available when the conductor is built with the unstable-countersigning feature (not the
+        // standard 0.7.0 release); otherwise the conductor answers "Failed to deserialize request".
         public async Task<CountersigningSessionStateReturnedCallBackEventArgs> GetCountersigningSessionStateAsync(CellId cellId, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
-            return await CallFunctionAsync(HoloNETRequestType.AppGetCountersigningSessionState, "get_countersigning_session_state", new CountersigningCellIdRequest()
-            {
-                cell_id = cellId
-            }, _taskCompletionCountersigningSessionStateReturnedCallBack, "OnCountersigningSessionStateReturnedCallBack", conductorResponseCallBackMode, id);
+            return await CallFunctionAsync(HoloNETRequestType.AppGetCountersigningSessionState, "get_countersigning_session_state", cellId /* tuple variant (Box<CellId>): the value is the CellId itself, not {cell_id} */, _taskCompletionCountersigningSessionStateReturnedCallBack, "OnCountersigningSessionStateReturnedCallBack", conductorResponseCallBackMode, id);
         }
 
         /// <summary>
@@ -1093,12 +1092,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="conductorResponseCallBackMode">The Concuctor Response CallBack Mode, set this to 'WaitForHolochainConductorResponse' if you want the function to wait for the Holochain Conductor response before returning that response or set it to 'UseCallBackEvents' to return from the function immediately and then raise the 'OnCountersigningSessionAbandonedCallBack' event when the conductor responds.</param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
+        // Only available when the conductor is built with the unstable-countersigning feature (not the
+        // standard 0.7.0 release); otherwise the conductor answers "Failed to deserialize request".
         public async Task<CountersigningSessionAbandonedCallBackEventArgs> AbandonCountersigningSessionAsync(CellId cellId, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
-            return await CallFunctionAsync(HoloNETRequestType.AppAbandonCountersigningSession, "abandon_countersigning_session", new CountersigningCellIdRequest()
-            {
-                cell_id = cellId
-            }, _taskCompletionCountersigningSessionAbandonedCallBack, "OnCountersigningSessionAbandonedCallBack", conductorResponseCallBackMode, id);
+            return await CallFunctionAsync(HoloNETRequestType.AppAbandonCountersigningSession, "abandon_countersigning_session", cellId /* tuple variant (Box<CellId>): the value is the CellId itself, not {cell_id} */, _taskCompletionCountersigningSessionAbandonedCallBack, "OnCountersigningSessionAbandonedCallBack", conductorResponseCallBackMode, id);
         }
 
         /// <summary>
@@ -1119,12 +1117,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="conductorResponseCallBackMode">The Concuctor Response CallBack Mode, set this to 'WaitForHolochainConductorResponse' if you want the function to wait for the Holochain Conductor response before returning that response or set it to 'UseCallBackEvents' to return from the function immediately and then raise the 'OnPublishCountersigningSessionTriggeredCallBack' event when the conductor responds.</param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
+        // Only available when the conductor is built with the unstable-countersigning feature (not the
+        // standard 0.7.0 release); otherwise the conductor answers "Failed to deserialize request".
         public async Task<PublishCountersigningSessionTriggeredCallBackEventArgs> PublishCountersigningSessionAsync(CellId cellId, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
-            return await CallFunctionAsync(HoloNETRequestType.AppPublishCountersigningSession, "publish_countersigning_session", new CountersigningCellIdRequest()
-            {
-                cell_id = cellId
-            }, _taskCompletionPublishCountersigningSessionTriggeredCallBack, "OnPublishCountersigningSessionTriggeredCallBack", conductorResponseCallBackMode, id);
+            return await CallFunctionAsync(HoloNETRequestType.AppPublishCountersigningSession, "publish_countersigning_session", cellId /* tuple variant (Box<CellId>): the value is the CellId itself, not {cell_id} */, _taskCompletionPublishCountersigningSessionTriggeredCallBack, "OnPublishCountersigningSessionTriggeredCallBack", conductorResponseCallBackMode, id);
         }
 
         /// <summary>

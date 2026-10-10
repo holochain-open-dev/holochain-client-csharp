@@ -313,6 +313,35 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
         }
 
         [Fact]
+        public void Signal_App_DecodesHolochain070Shape()
+        {
+            byte[] dna = new byte[39]; dna[0] = 0x84; dna[1] = 0x2d;
+            byte[] agent = new byte[39]; agent[0] = 0x84; agent[1] = 0x20;
+            byte[] payload = MessagePackSerializer.Serialize(new System.Collections.Generic.Dictionary<string, object> { { "msg", "hi" } });
+
+            byte[] wire = MessagePackSerializer.Serialize(new System.Collections.Generic.Dictionary<string, object>
+            {
+                { "type", "app" },
+                { "value", new System.Collections.Generic.Dictionary<string, object> { { "cell_id", new[] { dna, agent } }, { "zome_name", "oasis" }, { "signal", payload } } }
+            });
+
+            Assert.Equal("app", HoloNETClientBase.ReadResponseType(wire));
+            SignalValue value = HoloNETClientBase.DeserializeResponseValue<SignalValue>(wire, MessagePackSerializerOptions.Standard);
+            Assert.Equal("oasis", value.zome_name);
+            Assert.Equal(dna, value.cell_id[0]);
+            Assert.Equal(agent, value.cell_id[1]);
+            Assert.Equal(payload, value.signal);
+        }
+
+        [Fact]
+        public void Signal_AppDirect_AcceptsIntArrayPayload()
+        {
+            byte[] wire = MessagePackSerializer.ConvertFromJson("{\"type\":\"app_direct\",\"value\":{\"cell_id\":null,\"signal\":[1,2,255]}}");
+            SignalValue value = HoloNETClientBase.DeserializeResponseValue<SignalValue>(wire, MessagePackSerializerOptions.Standard);
+            Assert.Equal(new byte[] { 1, 2, 255 }, value.signal);
+        }
+
+        [Fact]
         public void CellInfo_DecodesAdjacentlyTaggedConductorShape()
         {
             byte[] wire = MessagePackSerializer.ConvertFromJson(

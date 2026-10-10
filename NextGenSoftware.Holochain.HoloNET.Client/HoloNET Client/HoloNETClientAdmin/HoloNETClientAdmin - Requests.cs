@@ -276,6 +276,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             InstallAppInternal(agentKey, installedAppId, hAppPath, null, membraneProofs, network_seed, id);
         }
 
+        /// <summary>Install a hApp from the raw bytes of a .happ file (AppBundleSource::Bytes).</summary>
+        public async Task<AppInstalledCallBackEventArgs> InstallAppFromBytesAsync(string installedAppId, byte[] happBytes, string agentKey = null, Dictionary<string, byte[]> membraneProofs = null, string network_seed = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
+        {
+            return await InstallAppInternalAsync(installedAppId, null, null, agentKey, membraneProofs, network_seed, conductorResponseCallBackMode, id, happBytes);
+        }
+
         public async Task<AppInstalledCallBackEventArgs> InstallAppAsync(string installedAppId, AppBundle appBundle, string agentKey = null, Dictionary<string, byte[]> membraneProofs = null, string network_seed = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
             return await InstallAppInternalAsync(installedAppId, null, appBundle, agentKey, membraneProofs, network_seed, conductorResponseCallBackMode, id);
@@ -683,7 +689,26 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public async Task<DnaDefinitionReturnedCallBackEventArgs> GetDnaDefinitionAsync(byte[] dnaHash, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
-            return await CallFunctionAsync(HoloNETRequestType.AdminGetDnaDefinition, "get_dna_definition", dnaHash, _taskCompletionDnaDefinitionReturnedCallBack, "OnDnaDefinitionReturnedCallBack", conductorResponseCallBackMode, id);
+            // 0.7.0: AdminRequest::GetDnaDefinition(Box<CellId>) takes a cell, not a DNA hash.
+            // Use any installed cell running this DNA.
+            CellIdsListedCallBackEventArgs cells = await ListCellIdsAsync();
+            byte[][] cellId = cells?.CellIds?.Find(c => c != null && c.Length == 2 && System.Linq.Enumerable.SequenceEqual(c[0], dnaHash));
+
+            if (cellId == null)
+            {
+                DnaDefinitionReturnedCallBackEventArgs notFound = new DnaDefinitionReturnedCallBackEventArgs { IsError = true, Message = "No installed cell runs this DNA; Holochain 0.7.0 needs a CellId for get_dna_definition." };
+                return notFound;
+            }
+
+            return await GetDnaDefinitionAsync(cellId, conductorResponseCallBackMode, id);
+        }
+
+        /// <summary>
+        /// Get the DNA definition for the specified cell (Holochain 0.7.0: AdminRequest::GetDnaDefinition(Box&lt;CellId&gt;)).
+        /// </summary>
+        public async Task<DnaDefinitionReturnedCallBackEventArgs> GetDnaDefinitionAsync(byte[][] cellId, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
+        {
+            return await CallFunctionAsync(HoloNETRequestType.AdminGetDnaDefinition, "get_dna_definition", cellId, _taskCompletionDnaDefinitionReturnedCallBack, "OnDnaDefinitionReturnedCallBack", conductorResponseCallBackMode, id);
         }
 
         /// <summary>
@@ -1161,7 +1186,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             return await base.GetCellIdAsync();
         }
 
-        private async Task<AppInstalledCallBackEventArgs> InstallAppInternalAsync(string installedAppId, string hAppPath = null, AppBundle appBundle = null, string agentKey = null, Dictionary<string, byte[]> membraneProofs = null, string network_seed = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
+        private async Task<AppInstalledCallBackEventArgs> InstallAppInternalAsync(string installedAppId, string hAppPath = null, AppBundle appBundle = null, string agentKey = null, Dictionary<string, byte[]> membraneProofs = null, string network_seed = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null, byte[] happBytes = null)
         {
             if (string.IsNullOrEmpty(agentKey))
             {
@@ -1176,7 +1201,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             return await CallFunctionAsync(HoloNETRequestType.AdminInstallApp, "install_app", new InstallAppRequest()
             {
-                source = BuildInstallAppSource(hAppPath, appBundle),
+                source = BuildInstallAppSource(hAppPath, appBundle, happBytes),
                 agent_key = ConvertHoloHashToBytes(agentKey),
                 installed_app_id = installedAppId,
                 roles_settings = InstallAppRequest.RolesSettingsFromMembraneProofs(membraneProofs),
@@ -1186,13 +1211,16 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         // AppBundleSource is Path or Bytes (raw .happ file). An in-memory AppBundle has no verified
         // 0.7.0 packing, so callers must supply a .happ path; the old shape failed for every install anyway.
-        private static Dictionary<string, object> BuildInstallAppSource(string hAppPath, AppBundle appBundle)
+        private static Dictionary<string, object> BuildInstallAppSource(string hAppPath, AppBundle appBundle, byte[] happBytes = null)
         {
             if (!string.IsNullOrEmpty(hAppPath))
                 return InstallAppRequest.SourceFromPath(hAppPath);
 
+            if (happBytes != null && happBytes.Length > 0)
+                return InstallAppRequest.SourceFromBytes(happBytes);
+
             if (appBundle != null)
-                throw new NotSupportedException("Installing from an in-memory AppBundle is not supported with Holochain 0.7.0. Pass the path to a .happ file instead.");
+                throw new NotSupportedException("Installing from an in-memory AppBundle is not supported with Holochain 0.7.0. Pass a .happ path, or its raw bytes via InstallAppFromBytesAsync.");
 
             throw new ArgumentException("A .happ path is required to install an app.", nameof(hAppPath));
         }
@@ -1494,10 +1522,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public async Task<AppAuthenticationTokenRevokedCallBackEventArgs> RevokeAppAuthenticationTokenAsync(byte[] token, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
-            return await CallFunctionAsync(HoloNETRequestType.AdminRevokeAppAuthenticationToken, "revoke_app_authentication_token", new RevokeAppAuthenticationTokenRequest()
-            {
-                token = token
-            }, _taskCompletionAppAuthenticationTokenRevokedCallBack, "OnAppAuthenticationTokenRevokedCallBack", conductorResponseCallBackMode, id);
+            return await CallFunctionAsync(HoloNETRequestType.AdminRevokeAppAuthenticationToken, "revoke_app_authentication_token", System.Linq.Enumerable.ToArray(System.Linq.Enumerable.Select(token, b => (int)b)) /* tuple variant; Vec<u8> token is an int array on the wire */, _taskCompletionAppAuthenticationTokenRevokedCallBack, "OnAppAuthenticationTokenRevokedCallBack", conductorResponseCallBackMode, id);
         }
 
         /// <summary>
@@ -1518,12 +1543,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="conductorResponseCallBackMode">The Concuctor Response CallBack Mode, set this to 'WaitForHolochainConductorResponse' if you want the function to wait for the Holochain Conductor response before returning that response or set it to 'UseCallBackEvents' to return from the function immediately and then raise the 'OnCompatibleCellsReturnedCallBack' event when the conductor responds.</param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
+        // Only available when the conductor is built with the unstable-migration feature (not the
+        // standard 0.7.0 release); otherwise the conductor answers "Failed to deserialize request".
         public async Task<CompatibleCellsReturnedCallBackEventArgs> GetCompatibleCellsAsync(byte[] dnaHash, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
-            return await CallFunctionAsync(HoloNETRequestType.AdminGetCompatibleCells, "get_compatible_cells", new GetCompatibleCellsRequest()
-            {
-                dna_hash = dnaHash
-            }, _taskCompletionCompatibleCellsReturnedCallBack, "OnCompatibleCellsReturnedCallBack", conductorResponseCallBackMode, id);
+            return await CallFunctionAsync(HoloNETRequestType.AdminGetCompatibleCells, "get_compatible_cells", dnaHash /* tuple variant (DnaHash) */, _taskCompletionCompatibleCellsReturnedCallBack, "OnCompatibleCellsReturnedCallBack", conductorResponseCallBackMode, id);
         }
 
         /// <summary>

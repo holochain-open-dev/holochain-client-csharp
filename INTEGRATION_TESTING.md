@@ -48,8 +48,26 @@ HOLONET_LIVE_ADMIN_URI=ws://localhost:65464 HOLONET_LIVE_HAPP_PATH='C:\Source\OA
 Older hApps such as `HoloNET-Manager/.../OASIS_hAPP/oasis.happ` use `manifest_version: "1"`, and
 0.7.0 rejects them ("unknown variant `1`, expected `0`").
 
-Not covered yet: signals, clone cells, countersigning, memproofs, and decoding zome output that
-contains records.
+Two more live tests need repacked copies of the same hApp. Only the manifest changes, so no Rust
+is needed:
+
+- `HOLONET_LIVE_CLONE_HAPP_PATH`: set `clone_limit: 3`. Covers clone cells, host functions, op
+  timings, DNA definitions, capability grants, state dumps, token issue/revoke, and the
+  feature-gated calls failing cleanly.
+- `HOLONET_LIVE_MEMPROOFS_HAPP_PATH`: set `allow_deferred_memproofs: true`. Covers deferred
+  membrane proofs.
+
+To make one, copy `workdir/happ.yaml` and `dnas/oasis/workdir/oasis.dna` into a scratch folder.
+Point the role's `dna.path` at `oasis.dna`, change the top-level `name` (not the role name,
+which must stay `oasis`), edit the flag, and run `hc app pack .` in that folder.
+
+Use a fresh sandbox now and then. A sandbox that accumulates dozens of installed test apps can
+exhaust Windows locked memory (`sqlcipher_mlock: VirtualLock() ... LastError=1453`), and the
+conductor then stops responding.
+
+Not covered live yet: signals (the OASIS hApp never calls `emit_signal`; decoding is unit-tested
+against the 0.7.0 source shape), and countersigning / `GetCompatibleCells`, which only exist in
+conductors built with `unstable-countersigning` / `unstable-migration`.
 
 ## 1. Installing the `holochain` conductor binary (0.7.0)
 

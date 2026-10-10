@@ -372,44 +372,45 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             {
                 Logger.Log("SIGNAL DATA DETECTED\n", LogType.Info);
 
-                SignalResponse appResponse = MessagePackSerializer.Deserialize<SignalResponse>(response.data, messagePackSerializerOptions);
-                Dictionary<string, object> signalDataDecoded = new Dictionary<string, object>();
-                SignalType signalType = SignalType.App;
-                string agentPublicKey = "";
-                string dnaHash = "";
-                string signalDataAsString = "";
+                // Holochain 0.7.0 Signal: {"type": "app" | "app_direct" | "system", "value": {...}}.
+                // The old {"App": [cell, data]} shape (with agent/dna swapped) no longer exists.
+                signalCallBackEventArgs = CreateHoloNETArgs<SignalCallBackEventArgs>(response, dataReceivedEventArgs);
+                string variant = ReadResponseType(response.data);
 
-                if (appResponse != null)
+                if (variant == "app" || variant == "app_direct")
                 {
-                    agentPublicKey = ConvertHoloHashToString(appResponse.App.CellData[0]);
-                    dnaHash = ConvertHoloHashToString(appResponse.App.CellData[1]);
-                    Dictionary<object, byte[]> signalData = MessagePackSerializer.Deserialize<Dictionary<object, byte[]>>(appResponse.App.Data, messagePackSerializerOptions);
+                    SignalValue value = DeserializeResponseValue<SignalValue>(response.data);
+                    Dictionary<string, object> signalDataDecoded = new Dictionary<string, object>();
+                    string signalDataAsString = "";
 
-                    foreach (object key in signalData.Keys)
+                    if (value?.signal != null && value.signal.Length > 0)
                     {
-                        signalDataDecoded[key.ToString()] = MessagePackSerializer.Deserialize<object>(signalData[key]);
-                        signalDataAsString = string.Concat(signalDataAsString, key.ToString(), "=", signalDataDecoded[key.ToString()], ",");
+                        object payload = MessagePackSerializer.Deserialize<object>(value.signal, messagePackSerializerOptions);
+
+                        if (payload is Dictionary<object, object> map)
+                        {
+                            foreach (var kv in map)
+                                signalDataDecoded[kv.Key.ToString()] = kv.Value;
+                        }
+                        else
+                            signalDataDecoded["value"] = payload;
+
+                        signalDataAsString = MessagePackSerializer.ConvertToJson(value.signal);
                     }
 
-                    signalDataAsString = signalDataAsString.Substring(0, signalDataAsString.Length - 1);
+                    signalCallBackEventArgs.DnaHash = value?.cell_id != null ? ConvertHoloHashToString(value.cell_id[0]) : "";
+                    signalCallBackEventArgs.AgentPubKey = value?.cell_id != null ? ConvertHoloHashToString(value.cell_id[1]) : "";
+                    signalCallBackEventArgs.RawSignalData = new SignalData { CellData = value?.cell_id, Data = value?.signal };
+                    signalCallBackEventArgs.SignalData = signalDataDecoded;
+                    signalCallBackEventArgs.SignalDataAsString = signalDataAsString;
+                    signalCallBackEventArgs.SignalType = SignalType.App;
                 }
                 else
-                    signalType = SignalType.System;
-
-                signalCallBackEventArgs = CreateHoloNETArgs<SignalCallBackEventArgs>(response, dataReceivedEventArgs);
-                signalCallBackEventArgs.DnaHash = dnaHash;
-                signalCallBackEventArgs.AgentPubKey = agentPublicKey;
-                signalCallBackEventArgs.RawSignalData = appResponse.App;
-                signalCallBackEventArgs.SignalData = signalDataDecoded;
-                signalCallBackEventArgs.SignalDataAsString = signalDataAsString;
-                signalCallBackEventArgs.SignalType = signalType;
+                    signalCallBackEventArgs.SignalType = SignalType.System;
             }
             catch (Exception ex)
             {
-                string msg = $"An unknown error occurred in HoloNETClient.DecodeSignalDataReceived. Reason: {ex}";
-                signalCallBackEventArgs.IsError = true;
-                signalCallBackEventArgs.Message = msg;
-                HandleError(msg, ex);
+                HandleError(signalCallBackEventArgs, "An unknown error occurred in HoloNETClient.DecodeSignalDataReceived.", ex);
             }
 
             // Ignore System signals — they carry no app-level data (mirrors the JS client behaviour).
@@ -689,7 +690,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             try
             {
                 Logger.Log("APP: WASM HOST FUNCTIONS LISTED\n", LogType.Info);
-                List<string> wasmHostFunctions = MessagePackSerializer.Deserialize<List<string>>(response.data, messagePackSerializerOptions);
+                List<string> wasmHostFunctions = DeserializeResponseValue<List<string>>(response.data);
 
                 if (wasmHostFunctions != null)
                     args.WasmHostFunctions = wasmHostFunctions;
