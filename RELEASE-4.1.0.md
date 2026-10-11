@@ -46,5 +46,4 @@ for our private submodule repos out of the shared org.
 
 - The earlier attempt to publish from `holochain-open-dev` (run 38108402563) failed for the same reason:
   `PRIVATE_SUBMODULE_PAT` doesn't exist there.
-- Local `backup/pre-attribution-cleanup` branches (old pre-cleanup history, never pushed) exist in this repo,
-  its four submodules and NextGenSoftware-Libraries. Delete them once you're happy with the cleanup.
+- The local `backup/pre-attribution-cleanup` branches were deleted on 2026-10-11.
