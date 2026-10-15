@@ -49,6 +49,33 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     }
                 }
 
+                // Was: carried on and installed the app again, which the conductor refuses (the app id is taken), so
+                // uninstallhAppIfAlreadyInstalled = false could never work. Reuse the installed app instead, keeping its agent and data.
+                if (appInfoResult != null && appInfoResult.AppInfo != null && !uninstallhAppIfAlreadyInstalled)
+                {
+                    if (log)
+                        Log($"ADMIN: App {hAppId} Is Already Installed So Using It...", LogType.Info, loggingFunction);
+
+                    IAppInfo installed = appInfoResult.AppInfo;
+                    result.IsAppInstalled = true;
+                    result.AgentPubKey = installed.AgentPubKey;
+                    result.DnaHash = installed.DnaHash;
+                    result.CellId = installed.CellId;
+                    result.AppStatus = installed.AppStatus;
+                    result.AppStatusReason = installed.AppStatusReason;
+                    result.AppManifest = installed.manifest;
+                    result.CellType = !string.IsNullOrEmpty(roleName) && installed.cell_info != null && installed.cell_info.ContainsKey(roleName) && installed.cell_info[roleName] != null && installed.cell_info[roleName].Count > 0 && installed.cell_info[roleName][0] != null
+                        ? installed.cell_info[roleName][0].CellInfoType : CellInfoType.Provisioned;
+
+                    if (result.CellType == CellInfoType.Provisioned && result.CellId != null)
+                        await EnableSignAndAttachInstalledHappAsync(result, hAppId, capGrantAccessType, grantedFunctionsType, grantedFunctions, log, loggingFunction);
+                    else
+                        HandleError(result, $"ADMIN: Error Using Installed App {hAppId}. Reason: CellType ({Enum.GetName(typeof(CellInfoType), result.CellType)}) Is Not Provisioned So Aborting.", log, loggingFunction);
+
+                    OnInstallEnableSignAndAttachHappCallBack?.Invoke(this, result);
+                    return result;
+                }
+
                 if (log)
                     Log($"ADMIN: Generating New AgentPubKey...", LogType.Info, loggingFunction);
 
@@ -150,6 +177,43 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             OnInstallEnableSignAndAttachHappCallBack?.Invoke(this, result);
             return result;
+        }
+
+        /// <summary>Enables an already installed app, signs credentials for its cell and attaches an app interface (the steps after install).</summary>
+        private async Task EnableSignAndAttachInstalledHappAsync(InstallEnableSignAndAttachHappEventArgs result, string hAppId, CapGrantAccessType capGrantAccessType, GrantedFunctionsType grantedFunctionsType, List<(string, string)> grantedFunctions, bool log, Action<string, LogType> loggingFunction)
+        {
+            result.AppEnabledResult = await EnableAppAsync(hAppId);
+
+            if (result.AppEnabledResult == null || result.AppEnabledResult.IsError)
+            {
+                HandleError(result, $"ADMIN: Error Enabling App {hAppId}. Reason: {result.AppEnabledResult?.Message}", log, loggingFunction);
+                return;
+            }
+
+            result.IsAppEnabled = true;
+            result.ZomeCallCapabilityGrantedResult = await AuthorizeSigningCredentialsAndGrantZomeCallCapabilityAsync(result.CellId, capGrantAccessType, grantedFunctionsType, grantedFunctions);
+
+            if (result.ZomeCallCapabilityGrantedResult == null || result.ZomeCallCapabilityGrantedResult.IsError)
+            {
+                HandleError(result, $"ADMIN: Error Signing Credentials For App {hAppId}. Reason: {result.ZomeCallCapabilityGrantedResult?.Message}", log, loggingFunction);
+                return;
+            }
+
+            result.IsAppSigned = true;
+            result.AppInterfaceAttachedResult = await AttachAppInterfaceAsync();
+
+            if (result.AppInterfaceAttachedResult == null || result.AppInterfaceAttachedResult.IsError)
+            {
+                HandleError(result, $"ADMIN: Error Attaching App Interface For App {hAppId}. Reason: {result.AppInterfaceAttachedResult?.Message}", log, loggingFunction);
+                return;
+            }
+
+            result.IsAppAttached = true;
+            result.IsSuccess = true;
+            result.AttachedOnPort = result.AppInterfaceAttachedResult.Port;
+
+            if (log)
+                Log($"ADMIN: {hAppId} App Interface Attached On Port {result.AppInterfaceAttachedResult.Port}.", LogType.Info, loggingFunction);
         }
 
         /// <summary>
