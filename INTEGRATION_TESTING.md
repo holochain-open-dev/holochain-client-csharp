@@ -11,6 +11,10 @@ round-trips and do not require a conductor).
 > was used. The sections after it are the original plan; they are kept for the hApp-level
 > tests (install, zome calls) that are still to do.
 
+> **Holochain 0.7.1:** the same suite runs against a 0.7.1 conductor (96/96 pass on both versions). Use 0.7.1
+> binaries and hApps built with hdk 0.7.1 / hdi 0.8.1 (OASIS hApp branch `holochain-0.7.1`); a 0.7.0-built hApp fails
+> on 0.7.1 with "callback has invalid parameters". Start a fresh sandbox per suite run.
+
 ## Quick start: run the live tests (Windows)
 
 1. Download the official 0.7.0 Windows builds from

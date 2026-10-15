@@ -1,5 +1,27 @@
 # Changelog
 
+## Holochain 0.7.0 and 0.7.1 both supported; direct signals
+
+HoloNET now works against **both Holochain 0.7.0 and 0.7.1** conductors. The full live suite (96 tests) passes on each,
+on fresh sandboxes.
+
+- **Capability grants:** 0.7.1 changed the `grant_zome_call_capability` payload (`{tag, constraint, grant: {functions}}`
+  instead of 0.7.0's `{tag, access, functions}`) with no compatibility shim, so each version rejects the other's shape.
+  HoloNET sends the 0.7.1 shape, retries once with the 0.7.0 shape on a "Failed to deserialize request" error, and
+  remembers which one the conductor accepts. Nothing changes for callers.
+- **Grant listings** (`ListCapabilityGrantsAsync`) decode both versions. Read `AccessInfo`, `Functions` and the new
+  `CapabilityType` (`"zome_call"` or `"direct_signal"`) rather than the raw `access` / `functions` fields.
+- **New (0.7.1+):** `GrantDirectSignalCapabilityAsync` on the admin and app clients lets other agents send direct
+  signals to a cell. On 0.7.0 it returns an error (the request doesn't exist there).
+- **New:** `SendDirectSignalAsync(dnaHash, agents, signal, capSecret)` on the app client. `capSecret` is only sent when
+  set, so it works on 0.7.0 too. On 0.7.1 a recipient only receives the signal if it granted direct-signal access; it
+  arrives on the recipient's `OnSignalCallBack`.
+- The generic `ok` response is now routed by request id (`send_direct_signal` vs `provide_memproofs`).
+
+**hApps must be rebuilt for 0.7.1.** 0.7.1 changed the `CapGrant` type, so an integrity zome built against hdk 0.7.0 /
+hdi 0.8.0 fails validation on a 0.7.1 conductor ("callback has invalid parameters"). Rebuild with **hdk 0.7.1 /
+hdi 0.8.1**. The OASIS hApp has a `holochain-0.7.1` branch for this.
+
 ## Synchronous methods now return the result (behaviour change)
 
 **Breaking for anyone relying on the old behaviour.** HoloNET's synchronous methods (the ones without `Async`, e.g.
