@@ -1,5 +1,21 @@
 # Changelog
 
+## Synchronous methods now return the result (behaviour change)
+
+**Breaking for anyone relying on the old behaviour.** HoloNET's synchronous methods (the ones without `Async`, e.g.
+`ListApps()`, `AttachAppInterface()`, `Connect()`, `Disconnect()`, 66 in all) used to send the request and return an
+empty placeholder straight away ("please wait for the ... event"); the real result only arrived through events. They now
+**wait for the conductor and return its result**, which is what a synchronous .NET method is expected to do.
+
+- Events (`OnAppsListedCallBack` etc.) are still raised, so event-based code keeps working; it just no longer gets an
+  early return.
+- They run on the thread pool and are awaited with `GetAwaiter().GetResult()`, so calling them from a UI or Unity main
+  thread doesn't deadlock (a live test calls them on xunit's synchronisation context).
+- Prefer the `Async` methods where you can. For fire-and-forget, call the `Async` method with
+  `ConductorResponseCallBackMode.UseCallBackEvents`.
+
+The previous line of each wrapper is kept commented out next to the new one.
+
 ## Coverage push: four more 0.7.0 bugs, shared-state fixes
 
 New live tests (`LiveConductorCoverageTests`) for paths no test reached exposed real bugs. 93 tests; all pass

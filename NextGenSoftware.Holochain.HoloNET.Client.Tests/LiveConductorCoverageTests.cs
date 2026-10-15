@@ -237,5 +237,33 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
                 catch (HoloNETException) { /* HoloNET throws when nothing subscribes to OnError */ }
             });
         }
+
+        /// <summary>
+        /// Synchronous methods wait for the conductor and return its result (they used to return an empty placeholder
+        /// straight away). Called directly on the test thread, which has a synchronisation context, so this also checks
+        /// they don't deadlock.
+        /// </summary>
+        [SkippableFact]
+        public async Task Live_SyncMethods_ReturnTheConductorsResult()
+        {
+            RequireConductorAndHapp();
+            await WithInstalledApp((admin, appId, app) =>
+            {
+                var sync = NewAdmin();
+                var connected = sync.Connect(AdminUri);
+                Assert.True(connected.IsConnected, "sync Connect: " + connected.Message);
+
+                var apps = sync.ListApps(AppStatusFilter.Enabled);
+                Assert.False(apps.IsError, "sync ListApps: " + apps.Message);
+                Assert.Contains(apps.Apps, a => a.installed_app_id == appId);
+
+                var dnas = sync.ListDnas();
+                Assert.False(dnas.IsError, "sync ListDnas: " + dnas.Message);
+                Assert.NotEmpty(dnas.Dnas);
+
+                sync.Disconnect();
+                return Task.CompletedTask;
+            });
+        }
     }
 }

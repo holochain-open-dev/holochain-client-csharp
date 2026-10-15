@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -290,7 +290,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         public AppInstalledCallBackEventArgs InstallApp(string installedAppId, AppBundle appBundle, string agentKey = null, Dictionary<string, byte[]> membraneProofs = null, string network_seed = null, string id = null)
         {
-            return Task.Run(() => InstallAppInternalAsync(installedAppId, null, appBundle, agentKey, membraneProofs, network_seed, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result;
+            //return Task.Run(() => InstallAppInternalAsync(installedAppId, null, appBundle, agentKey, membraneProofs, network_seed, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result; // returned before the conductor replied
+            return Task.Run(() => InstallAppInternalAsync(installedAppId, null, appBundle, agentKey, membraneProofs, network_seed, ConductorResponseCallBackMode.WaitForHolochainConductorResponse, id)).GetAwaiter().GetResult();
         }
 
         public async Task<AppUninstalledCallBackEventArgs> UninstallAppAsync(string installedAppId, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
@@ -308,7 +309,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         public AppUninstalledCallBackEventArgs UninstallApp(string installedAppId, string id = null)
         {
-            return Task.Run(() => UninstallAppAsync(installedAppId, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result;
+            //return Task.Run(() => UninstallAppAsync(installedAppId, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result; // returned before the conductor replied
+            return Task.Run(() => UninstallAppAsync(installedAppId, ConductorResponseCallBackMode.WaitForHolochainConductorResponse, id)).GetAwaiter().GetResult();
         }
 
         public async Task<AppEnabledCallBackEventArgs> EnableAppAsync(string installedAppId, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
@@ -321,7 +323,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         public AppEnabledCallBackEventArgs EnablelApp(string installedAppId, string id = null)
         {
-            return Task.Run(() => EnableAppAsync(installedAppId, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result;
+            //return Task.Run(() => EnableAppAsync(installedAppId, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result; // returned before the conductor replied
+            return Task.Run(() => EnableAppAsync(installedAppId, ConductorResponseCallBackMode.WaitForHolochainConductorResponse, id)).GetAwaiter().GetResult();
         }
 
         public async Task<AppDisabledCallBackEventArgs> DisableAppAsync(string installedAppId, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
@@ -339,7 +342,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         public AppDisabledCallBackEventArgs DisableApp(string installedAppId, string id = null)
         {
-            return Task.Run(() => DisableAppAsync(installedAppId, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result;
+            //return Task.Run(() => DisableAppAsync(installedAppId, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result; // returned before the conductor replied
+            return Task.Run(() => DisableAppAsync(installedAppId, ConductorResponseCallBackMode.WaitForHolochainConductorResponse, id)).GetAwaiter().GetResult();
         }
 
         public async Task<ZomeCallCapabilityGrantedCallBackEventArgs> AuthorizeSigningCredentialsAndGrantZomeCallCapabilityAsync(string AgentPubKey, string DnaHash, CapGrantAccessType capGrantAccessType, GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = "")
@@ -408,7 +412,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         public AppInterfaceAttachedCallBackEventArgs AttachAppInterface(UInt16? port = null, string id = null)
         {
-            return Task.Run(() => AttachAppInterfaceAsync(port, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result;
+            //return Task.Run(() => AttachAppInterfaceAsync(port, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result; // returned before the conductor replied
+            return Task.Run(() => AttachAppInterfaceAsync(port, ConductorResponseCallBackMode.WaitForHolochainConductorResponse, id)).GetAwaiter().GetResult();
         }
 
         [System.Obsolete("Holochain 0.7.0 has no such AdminRequest; the conductor returns an error. Install DNAs via InstallApp with a hApp bundle.")]
@@ -420,7 +425,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         [System.Obsolete("Holochain 0.7.0 has no such AdminRequest; the conductor returns an error. Install DNAs via InstallApp with a hApp bundle.")]
         public DnaRegisteredCallBackEventArgs RegisterDna(string path, string network_seed = null, object properties = null, string id = null)
         {
-            return Task.Run(() => RegisterDnaAsync(path, network_seed, properties, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result;
+            //return Task.Run(() => RegisterDnaAsync(path, network_seed, properties, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result; // returned before the conductor replied
+            return Task.Run(() => RegisterDnaAsync(path, network_seed, properties, ConductorResponseCallBackMode.WaitForHolochainConductorResponse, id)).GetAwaiter().GetResult();
         }
 
         [System.Obsolete("Holochain 0.7.0 has no such AdminRequest; the conductor returns an error. Install DNAs via InstallApp with a hApp bundle.")]
@@ -432,7 +438,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         [System.Obsolete("Holochain 0.7.0 has no such AdminRequest; the conductor returns an error. Install DNAs via InstallApp with a hApp bundle.")]
         public DnaRegisteredCallBackEventArgs RegisterDna(byte[] hash, string network_seed = null, object properties = null, string id = null)
         {
-            return Task.Run(() => RegisterDnaAsync(hash, network_seed, properties, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result;
+            //return Task.Run(() => RegisterDnaAsync(hash, network_seed, properties, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result; // returned before the conductor replied
+            return Task.Run(() => RegisterDnaAsync(hash, network_seed, properties, ConductorResponseCallBackMode.WaitForHolochainConductorResponse, id)).GetAwaiter().GetResult();
         }
 
         [System.Obsolete("Holochain 0.7.0 has no such AdminRequest; the conductor returns an error. Install DNAs via InstallApp with a hApp bundle.")]
@@ -444,7 +451,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         [System.Obsolete("Holochain 0.7.0 has no such AdminRequest; the conductor returns an error. Install DNAs via InstallApp with a hApp bundle.")]
         public DnaRegisteredCallBackEventArgs RegisterDna(DnaBundle bundle, string network_seed = null, object properties = null, string id = null)
         {
-            return Task.Run(() => RegisterDnaAsync(bundle, network_seed, properties, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result;
+            //return Task.Run(() => RegisterDnaAsync(bundle, network_seed, properties, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result; // returned before the conductor replied
+            return Task.Run(() => RegisterDnaAsync(bundle, network_seed, properties, ConductorResponseCallBackMode.WaitForHolochainConductorResponse, id)).GetAwaiter().GetResult();
         }
 
         public async Task<GetAppInfoCallBackEventArgs> GetAppInfoAsync(string installedAppId, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
@@ -475,7 +483,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         public GetAppInfoCallBackEventArgs GetAppInfo(string installedAppId, string id = null)
         {
-            return Task.Run(() => GetAppInfoAsync(installedAppId, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result;
+            //return Task.Run(() => GetAppInfoAsync(installedAppId, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result; // returned before the conductor replied
+            return Task.Run(() => GetAppInfoAsync(installedAppId, ConductorResponseCallBackMode.WaitForHolochainConductorResponse, id)).GetAwaiter().GetResult();
         }
 
         public async Task<AppsListedCallBackEventArgs> ListAppsAsync(AppStatusFilter appStatusFilter, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
@@ -490,7 +499,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         public AppsListedCallBackEventArgs ListApps(AppStatusFilter appStatusFilter, string id = null)
         {
-            return Task.Run(() => ListAppsAsync(appStatusFilter, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result;
+            //return Task.Run(() => ListAppsAsync(appStatusFilter, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result; // returned before the conductor replied
+            return Task.Run(() => ListAppsAsync(appStatusFilter, ConductorResponseCallBackMode.WaitForHolochainConductorResponse, id)).GetAwaiter().GetResult();
         }
 
         public async Task<DnasListedCallBackEventArgs> ListDnasAsync(ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
@@ -500,7 +510,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         public DnasListedCallBackEventArgs ListDnas(string id = null)
         {
-            return Task.Run(() => ListDnasAsync(ConductorResponseCallBackMode.UseCallBackEvents, id)).Result;
+            //return Task.Run(() => ListDnasAsync(ConductorResponseCallBackMode.UseCallBackEvents, id)).Result; // returned before the conductor replied
+            return Task.Run(() => ListDnasAsync(ConductorResponseCallBackMode.WaitForHolochainConductorResponse, id)).GetAwaiter().GetResult();
         }
 
         public async Task<CellIdsListedCallBackEventArgs> ListCellIdsAsync(ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
@@ -510,7 +521,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         public CellIdsListedCallBackEventArgs ListCellIds(string id = null)
         {
-            return Task.Run(() => ListCellIdsAsync(ConductorResponseCallBackMode.UseCallBackEvents, id)).Result;
+            //return Task.Run(() => ListCellIdsAsync(ConductorResponseCallBackMode.UseCallBackEvents, id)).Result; // returned before the conductor replied
+            return Task.Run(() => ListCellIdsAsync(ConductorResponseCallBackMode.WaitForHolochainConductorResponse, id)).GetAwaiter().GetResult();
         }
 
         public async Task<AppInterfacesListedCallBackEventArgs> ListInterfacesAsync(ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
@@ -520,7 +532,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         public AppInterfacesListedCallBackEventArgs ListInterfaces(string id = null)
         {
-            return Task.Run(() => ListInterfacesAsync(ConductorResponseCallBackMode.UseCallBackEvents, id)).Result;
+            //return Task.Run(() => ListInterfacesAsync(ConductorResponseCallBackMode.UseCallBackEvents, id)).Result; // returned before the conductor replied
+            return Task.Run(() => ListInterfacesAsync(ConductorResponseCallBackMode.WaitForHolochainConductorResponse, id)).GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -549,7 +562,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public FullStateDumpedCallBackEventArgs DumpFullState(byte[][] cellId, int? dHTOpsCursor = null, string id = null)
         {
-            return Task.Run(() => DumpFullStateAsync(cellId, dHTOpsCursor, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result;
+            //return Task.Run(() => DumpFullStateAsync(cellId, dHTOpsCursor, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result; // returned before the conductor replied
+            return Task.Run(() => DumpFullStateAsync(cellId, dHTOpsCursor, ConductorResponseCallBackMode.WaitForHolochainConductorResponse, id)).GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -576,7 +590,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public FullStateDumpedCallBackEventArgs DumpFullState(string agentPubKey, string dnaHash, int? dHTOpsCursor = null, string id = null)
         {
-            return Task.Run(() => DumpFullStateAsync(agentPubKey, dnaHash, dHTOpsCursor, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result;
+            //return Task.Run(() => DumpFullStateAsync(agentPubKey, dnaHash, dHTOpsCursor, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result; // returned before the conductor replied
+            return Task.Run(() => DumpFullStateAsync(agentPubKey, dnaHash, dHTOpsCursor, ConductorResponseCallBackMode.WaitForHolochainConductorResponse, id)).GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -599,7 +614,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public FullStateDumpedCallBackEventArgs DumpFullState(int? dHTOpsCursor = null, string id = null)
         {
-            return Task.Run(() => DumpFullStateAsync(dHTOpsCursor, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result;
+            //return Task.Run(() => DumpFullStateAsync(dHTOpsCursor, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result; // returned before the conductor replied
+            return Task.Run(() => DumpFullStateAsync(dHTOpsCursor, ConductorResponseCallBackMode.WaitForHolochainConductorResponse, id)).GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -627,7 +643,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public StateDumpedCallBackEventArgs DumpState(byte[][] cellId, int? dHTOpsCursor = null, string id = null)
         {
-            return Task.Run(() => DumpStateAsync(cellId, dHTOpsCursor, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result;
+            //return Task.Run(() => DumpStateAsync(cellId, dHTOpsCursor, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result; // returned before the conductor replied
+            return Task.Run(() => DumpStateAsync(cellId, dHTOpsCursor, ConductorResponseCallBackMode.WaitForHolochainConductorResponse, id)).GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -654,7 +671,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public StateDumpedCallBackEventArgs DumpState(string agentPubKey, string dnaHash, int? dHTOpsCursor = null, string id = null)
         {
-            return Task.Run(() => DumpStateAsync(agentPubKey, dnaHash, dHTOpsCursor, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result;
+            //return Task.Run(() => DumpStateAsync(agentPubKey, dnaHash, dHTOpsCursor, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result; // returned before the conductor replied
+            return Task.Run(() => DumpStateAsync(agentPubKey, dnaHash, dHTOpsCursor, ConductorResponseCallBackMode.WaitForHolochainConductorResponse, id)).GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -677,7 +695,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public StateDumpedCallBackEventArgs DumpState(int? dHTOpsCursor = null, string id = null)
         {
-            return Task.Run(() => DumpStateAsync(dHTOpsCursor, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result;
+            //return Task.Run(() => DumpStateAsync(dHTOpsCursor, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result; // returned before the conductor replied
+            return Task.Run(() => DumpStateAsync(dHTOpsCursor, ConductorResponseCallBackMode.WaitForHolochainConductorResponse, id)).GetAwaiter().GetResult();
         }
 
 
@@ -720,7 +739,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public DnaDefinitionReturnedCallBackEventArgs GetDnaDefinition(byte[] dnaHash, string id = null)
         {
-            return Task.Run(() => GetDnaDefinitionAsync(dnaHash, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result;
+            //return Task.Run(() => GetDnaDefinitionAsync(dnaHash, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result; // returned before the conductor replied
+            return Task.Run(() => GetDnaDefinitionAsync(dnaHash, ConductorResponseCallBackMode.WaitForHolochainConductorResponse, id)).GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -743,7 +763,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public DnaDefinitionReturnedCallBackEventArgs GetDnaDefinition(string dnaHash, string id = null)
         {
-            return Task.Run(() => GetDnaDefinitionAsync(dnaHash, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result;
+            //return Task.Run(() => GetDnaDefinitionAsync(dnaHash, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result; // returned before the conductor replied
+            return Task.Run(() => GetDnaDefinitionAsync(dnaHash, ConductorResponseCallBackMode.WaitForHolochainConductorResponse, id)).GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -765,7 +786,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public CoordinatorsUpdatedCallBackEventArgs UpdateCoordinators(byte[] dnaHash, string path, string id = null)
         {
-            return Task.Run(() => UpdateCoordinatorsAsync(dnaHash, path, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result;
+            //return Task.Run(() => UpdateCoordinatorsAsync(dnaHash, path, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result; // returned before the conductor replied
+            return Task.Run(() => UpdateCoordinatorsAsync(dnaHash, path, ConductorResponseCallBackMode.WaitForHolochainConductorResponse, id)).GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -787,7 +809,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public CoordinatorsUpdatedCallBackEventArgs UpdateCoordinators(string dnaHash, string path, string id = null)
         {
-            return Task.Run(() => UpdateCoordinatorsAsync(dnaHash, path, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result;
+            //return Task.Run(() => UpdateCoordinatorsAsync(dnaHash, path, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result; // returned before the conductor replied
+            return Task.Run(() => UpdateCoordinatorsAsync(dnaHash, path, ConductorResponseCallBackMode.WaitForHolochainConductorResponse, id)).GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -809,7 +832,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public CoordinatorsUpdatedCallBackEventArgs UpdateCoordinators(byte[] dnaHash, CoordinatorBundle bundle, string id = null)
         {
-            return Task.Run(() => UpdateCoordinatorsAsync(dnaHash, bundle, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result;
+            //return Task.Run(() => UpdateCoordinatorsAsync(dnaHash, bundle, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result; // returned before the conductor replied
+            return Task.Run(() => UpdateCoordinatorsAsync(dnaHash, bundle, ConductorResponseCallBackMode.WaitForHolochainConductorResponse, id)).GetAwaiter().GetResult();
         }
 
         /// Update the coordinataor zomes.
@@ -830,7 +854,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public CoordinatorsUpdatedCallBackEventArgs UpdateCoordinators(string dnaHash, CoordinatorBundle bundle, string id = null)
         {
-            return Task.Run(() => UpdateCoordinatorsAsync(dnaHash, bundle, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result;
+            //return Task.Run(() => UpdateCoordinatorsAsync(dnaHash, bundle, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result; // returned before the conductor replied
+            return Task.Run(() => UpdateCoordinatorsAsync(dnaHash, bundle, ConductorResponseCallBackMode.WaitForHolochainConductorResponse, id)).GetAwaiter().GetResult();
         }
 
 
@@ -858,7 +883,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public AgentInfoReturnedCallBackEventArgs GetAgentInfo(byte[][] cellId, string id = null)
         {
-            return Task.Run(() => GetAgentInfoAsync(cellId, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result;
+            //return Task.Run(() => GetAgentInfoAsync(cellId, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result; // returned before the conductor replied
+            return Task.Run(() => GetAgentInfoAsync(cellId, ConductorResponseCallBackMode.WaitForHolochainConductorResponse, id)).GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -883,7 +909,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public AgentInfoReturnedCallBackEventArgs GetAgentInfo(string agentPubKey, string dnaHash, string id = null)
         {
-            return Task.Run(() => GetAgentInfoAsync(agentPubKey, dnaHash, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result;
+            //return Task.Run(() => GetAgentInfoAsync(agentPubKey, dnaHash, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result; // returned before the conductor replied
+            return Task.Run(() => GetAgentInfoAsync(agentPubKey, dnaHash, ConductorResponseCallBackMode.WaitForHolochainConductorResponse, id)).GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -906,7 +933,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public AgentInfoReturnedCallBackEventArgs GetAgentInfo(string id = null)
         {
-            return Task.Run(() => GetAgentInfoAsync(ConductorResponseCallBackMode.UseCallBackEvents, id)).Result;
+            //return Task.Run(() => GetAgentInfoAsync(ConductorResponseCallBackMode.UseCallBackEvents, id)).Result; // returned before the conductor replied
+            return Task.Run(() => GetAgentInfoAsync(ConductorResponseCallBackMode.WaitForHolochainConductorResponse, id)).GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -968,7 +996,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public AgentInfoAddedCallBackEventArgs AddAgentInfo(AgentInfo[] agentInfos, string id = null)
         {
-            return Task.Run(() => AddAgentInfoAsync(agentInfos, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result;
+            //return Task.Run(() => AddAgentInfoAsync(agentInfos, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result; // returned before the conductor replied
+            return Task.Run(() => AddAgentInfoAsync(agentInfos, ConductorResponseCallBackMode.WaitForHolochainConductorResponse, id)).GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -997,7 +1026,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public CloneCellDeletedCallBackEventArgs DeleteCloneCell(string appId, string roleName, string id = null)
         {
-            return Task.Run(() => DeleteCloneCellAsync(appId, roleName, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result;
+            //return Task.Run(() => DeleteCloneCellAsync(appId, roleName, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result; // returned before the conductor replied
+            return Task.Run(() => DeleteCloneCellAsync(appId, roleName, ConductorResponseCallBackMode.WaitForHolochainConductorResponse, id)).GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -1026,7 +1056,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public CloneCellDeletedCallBackEventArgs DeleteCloneCell(string appId, byte[][] cellId, string id = null)
         {
-            return Task.Run(() => DeleteCloneCellAsync(appId, cellId, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result;
+            //return Task.Run(() => DeleteCloneCellAsync(appId, cellId, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result; // returned before the conductor replied
+            return Task.Run(() => DeleteCloneCellAsync(appId, cellId, ConductorResponseCallBackMode.WaitForHolochainConductorResponse, id)).GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -1053,7 +1084,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public CloneCellDeletedCallBackEventArgs DeleteCloneCell(string appId, string agentPubKey, string dnaHash, string id = null)
         {
-            return Task.Run(() => DeleteCloneCellAsync(appId, agentPubKey, dnaHash, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result;
+            //return Task.Run(() => DeleteCloneCellAsync(appId, agentPubKey, dnaHash, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result; // returned before the conductor replied
+            return Task.Run(() => DeleteCloneCellAsync(appId, agentPubKey, dnaHash, ConductorResponseCallBackMode.WaitForHolochainConductorResponse, id)).GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -1076,7 +1108,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public CloneCellDeletedCallBackEventArgs DeleteCloneCell(string appId, string id = null)
         {
-            return Task.Run(() => DeleteCloneCellAsync(appId, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result;
+            //return Task.Run(() => DeleteCloneCellAsync(appId, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result; // returned before the conductor replied
+            return Task.Run(() => DeleteCloneCellAsync(appId, ConductorResponseCallBackMode.WaitForHolochainConductorResponse, id)).GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -1099,7 +1132,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public StorageInfoReturnedCallBackEventArgs GetStorageInfo(string id = null)
         {
-            return Task.Run(() => GetStorageInfoAsync(ConductorResponseCallBackMode.UseCallBackEvents, id)).Result;
+            //return Task.Run(() => GetStorageInfoAsync(ConductorResponseCallBackMode.UseCallBackEvents, id)).Result; // returned before the conductor replied
+            return Task.Run(() => GetStorageInfoAsync(ConductorResponseCallBackMode.WaitForHolochainConductorResponse, id)).GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -1122,7 +1156,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public NetworkStatsDumpedCallBackEventArgs DumpNetworkStats(string id = null)
         {
-            return Task.Run(() => DumpNetworkStatsAsync(ConductorResponseCallBackMode.UseCallBackEvents, id)).Result;
+            //return Task.Run(() => DumpNetworkStatsAsync(ConductorResponseCallBackMode.UseCallBackEvents, id)).Result; // returned before the conductor replied
+            return Task.Run(() => DumpNetworkStatsAsync(ConductorResponseCallBackMode.WaitForHolochainConductorResponse, id)).GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -1145,7 +1180,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public NetworkMetricsDumpedCallBackEventArgs DumpNetworkMetrics(string id = null)
         {
-            return Task.Run(() => DumpNetworkMetricsAsync(ConductorResponseCallBackMode.UseCallBackEvents, id)).Result;
+            //return Task.Run(() => DumpNetworkMetricsAsync(ConductorResponseCallBackMode.UseCallBackEvents, id)).Result; // returned before the conductor replied
+            return Task.Run(() => DumpNetworkMetricsAsync(ConductorResponseCallBackMode.WaitForHolochainConductorResponse, id)).GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -1178,7 +1214,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public AdminOpTimingsDumpedCallBackEventArgs DumpOpTimings(byte[] dnaHash, OpTimingsCursor cursor = null, uint? limit = null, string id = null)
         {
-            return Task.Run(() => DumpOpTimingsAsync(dnaHash, cursor, limit, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result;
+            //return Task.Run(() => DumpOpTimingsAsync(dnaHash, cursor, limit, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result; // returned before the conductor replied
+            return Task.Run(() => DumpOpTimingsAsync(dnaHash, cursor, limit, ConductorResponseCallBackMode.WaitForHolochainConductorResponse, id)).GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -1212,7 +1249,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         [System.Obsolete("Holochain 0.7.0 has no GraftRecords AdminRequest; the conductor returns an error.")]
         public RecordsGraftedCallBackEventArgs GraftRecords(byte[][] cellId, bool validate, object[] records, string id = null)
         {
-            return Task.Run(() => GraftRecordsAsync(cellId, validate, records, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result;
+            //return Task.Run(() => GraftRecordsAsync(cellId, validate, records, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result; // returned before the conductor replied
+            return Task.Run(() => GraftRecordsAsync(cellId, validate, records, ConductorResponseCallBackMode.WaitForHolochainConductorResponse, id)).GetAwaiter().GetResult();
         }
 
         public override async Task<byte[][]> GetCellIdAsync()
@@ -1457,7 +1495,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public ZomeCallCapabilityRevokedCallBackEventArgs RevokeZomeCallCapability(byte[] actionHash, CellId cellId, string id = null)
         {
-            return Task.Run(() => RevokeZomeCallCapabilityAsync(actionHash, cellId, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result;
+            //return Task.Run(() => RevokeZomeCallCapabilityAsync(actionHash, cellId, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result; // returned before the conductor replied
+            return Task.Run(() => RevokeZomeCallCapabilityAsync(actionHash, cellId, ConductorResponseCallBackMode.WaitForHolochainConductorResponse, id)).GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -1498,7 +1537,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public CapabilityGrantsListedCallBackEventArgs ListCapabilityGrants(string installedAppId, bool includeRevoked = false, string id = null)
         {
-            return Task.Run(() => ListCapabilityGrantsAsync(installedAppId, includeRevoked, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result;
+            //return Task.Run(() => ListCapabilityGrantsAsync(installedAppId, includeRevoked, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result; // returned before the conductor replied
+            return Task.Run(() => ListCapabilityGrantsAsync(installedAppId, includeRevoked, ConductorResponseCallBackMode.WaitForHolochainConductorResponse, id)).GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -1527,7 +1567,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public PeerMetaInfoReturnedCallBackEventArgs GetPeerMetaInfo(string url, List<byte[]> dnaHashes = null, string id = null)
         {
-            return Task.Run(() => GetPeerMetaInfoAsync(url, dnaHashes, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result;
+            //return Task.Run(() => GetPeerMetaInfoAsync(url, dnaHashes, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result; // returned before the conductor replied
+            return Task.Run(() => GetPeerMetaInfoAsync(url, dnaHashes, ConductorResponseCallBackMode.WaitForHolochainConductorResponse, id)).GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -1559,7 +1600,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public AppAuthenticationTokenIssuedCallBackEventArgs IssueAppAuthenticationToken(string installedAppId, ulong expirySeconds = 0, bool singleUse = false, string id = null)
         {
-            return Task.Run(() => IssueAppAuthenticationTokenAsync(installedAppId, expirySeconds, singleUse, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result;
+            //return Task.Run(() => IssueAppAuthenticationTokenAsync(installedAppId, expirySeconds, singleUse, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result; // returned before the conductor replied
+            return Task.Run(() => IssueAppAuthenticationTokenAsync(installedAppId, expirySeconds, singleUse, ConductorResponseCallBackMode.WaitForHolochainConductorResponse, id)).GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -1582,7 +1624,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public AppAuthenticationTokenRevokedCallBackEventArgs RevokeAppAuthenticationToken(byte[] token, string id = null)
         {
-            return Task.Run(() => RevokeAppAuthenticationTokenAsync(token, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result;
+            //return Task.Run(() => RevokeAppAuthenticationTokenAsync(token, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result; // returned before the conductor replied
+            return Task.Run(() => RevokeAppAuthenticationTokenAsync(token, ConductorResponseCallBackMode.WaitForHolochainConductorResponse, id)).GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -1607,7 +1650,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public CompatibleCellsReturnedCallBackEventArgs GetCompatibleCells(byte[] dnaHash, string id = null)
         {
-            return Task.Run(() => GetCompatibleCellsAsync(dnaHash, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result;
+            //return Task.Run(() => GetCompatibleCellsAsync(dnaHash, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result; // returned before the conductor replied
+            return Task.Run(() => GetCompatibleCellsAsync(dnaHash, ConductorResponseCallBackMode.WaitForHolochainConductorResponse, id)).GetAwaiter().GetResult();
         }
 
         private async Task<T> CallFunctionAsync<T>(HoloNETRequestType requestType, string holochainConductorFunctionName, dynamic holoNETDataDetailed, Dictionary<string, TaskCompletionSource<T>> _taskCompletionCallBack, string eventCallBackName, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null) where T : HoloNETDataReceivedBaseEventArgs, new()
