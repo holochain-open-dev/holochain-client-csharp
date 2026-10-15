@@ -15,6 +15,28 @@ round-trips and do not require a conductor).
 > binaries and hApps built with hdk 0.7.1 / hdi 0.8.1 (OASIS hApp main; tag `holochain-0.7.0` for 0.7.0); a 0.7.0-built hApp fails
 > on 0.7.1 with "callback has invalid parameters". Start a fresh sandbox per suite run.
 
+## Running everything (both Holochain versions)
+
+```bash
+scripts/run-live-tests.sh 0.7.1
+scripts/run-live-tests.sh 0.7.0
+```
+
+Each run starts a fresh sandbox for that version (bundled `hc`, and `holochain.exe` from
+`%APPDATA%\NextGenSoftware\HoloNET\<version>\`, so Windows Firewall asks once per version), then runs the whole
+suite with coverage into `.holochain-test/coverage-<version>`. Test hApps live in `.holochain-test/happ-070*` and
+`happ-071*` (gitignored; build 0.7.1 ones from OASIS-Holochain-hApp main, 0.7.0 from its `holochain-0.7.0` tag).
+
+Conductor auto-start / auto-shutdown tests start and kill conductors, so they only run on request and with no other
+conductor running:
+
+```bash
+cd NextGenSoftware.Holochain.HoloNET.Client.Tests && HOLONET_LIVE_AUTOSTART=1 HOLONET_LIVE_EMBEDDED=1 dotnet test -p:Embedded=true --filter "FullyQualifiedName~LiveConductorAutoStartTests"
+```
+
+Coverage: merge the reports with ReportGenerator, then `python scripts/classify_uncovered.py` lists every uncovered line
+(split into defensive catch blocks and the rest).
+
 ## Quick start: run the live tests (Windows)
 
 1. Download the official 0.7.0 Windows builds from
