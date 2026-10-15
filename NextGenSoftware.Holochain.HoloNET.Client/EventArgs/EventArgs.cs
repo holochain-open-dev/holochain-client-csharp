@@ -59,6 +59,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public Dictionary<string, object> ZomeReturnData { get; set; }
         public Dictionary<object, object> RawZomeReturnData { get; set; }
         public string ZomeReturnHash { get; set; }
+
+        /// <summary>
+        /// The zome function's return value as decoded msgpack, whatever its type: null for (), a bool, number or string,
+        /// a byte[] hash, a list (e.g. Vec&lt;ActionHash&gt;) or a map. Records / KeyValuePair are also filled for record results.
+        /// </summary>
+        public object ZomeReturnValue { get; set; }
+
         public List<Record> Records { get; set; } = new List<Record>();
         public Dictionary<string, string> KeyValuePair { get; set; }
         public string KeyValuePairAsString { get; set; }

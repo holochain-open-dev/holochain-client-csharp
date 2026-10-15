@@ -34,6 +34,40 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             return Task.Run(() => MapEntryDataObjectAsync(entryDataObjectType, keyValuePairs, cacheEntryDataObjectPropertyInfo)).Result;
         }
 
+        /// <summary>Formats a decoded msgpack value with the invariant culture ("null" for null), so ConvertEntryValue round-trips it.</summary>
+        public static string ToInvariantString(object value) =>
+            value == null ? "null" : value is IFormattable formattable ? formattable.ToString(null, System.Globalization.CultureInfo.InvariantCulture) : value.ToString();
+
+        /// <summary>
+        /// Converts a decoded entry value (see DecodeRawZomeData, which formats with the invariant culture) to
+        /// <paramref name="type"/>: nullable types, enums (by name or number), Guid, DateTime / DateTimeOffset and every
+        /// IConvertible type. Unconvertible values throw, and MapEntryDataObjectAsync skips that property.
+        /// </summary>
+        public static object ConvertEntryValue(string value, Type type)
+        {
+            Type target = Nullable.GetUnderlyingType(type) ?? type;
+
+            if (value == null || (value == "null" && target != typeof(string)))
+                return type.IsValueType && Nullable.GetUnderlyingType(type) == null ? Activator.CreateInstance(type) : null;
+
+            if (target == typeof(string))
+                return value;
+
+            if (target == typeof(Guid))
+                return Guid.Parse(value);
+
+            if (target == typeof(DateTime))
+                return DateTime.Parse(value, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.RoundtripKind);
+
+            if (target == typeof(DateTimeOffset))
+                return DateTimeOffset.Parse(value, System.Globalization.CultureInfo.InvariantCulture);
+
+            if (target.IsEnum)
+                return Enum.Parse(target, value, true);
+
+            return Convert.ChangeType(value, target, System.Globalization.CultureInfo.InvariantCulture);
+        }
+
         /// <summary>
         /// This method maps the data returned from the Conductor zome call onto a dynamic data object passed into the CallZomeFunction method. Alternatively the type of the data object can be passed in, for which an instance of it will be created. Either way the now mapped and populated data object is then returned in the `ZomeFunctionCallBackEventArgs.EntryData.EntryDataObject` property during the OnZomeFunctionCallBack event. Please see OnZomeFunctionCallBack for more info. This method is called internally but can also be called manually and is used by the HoloNETEntryBaseClass and HoloNETAuditEntryBaseClass.
         /// </summary>
@@ -75,53 +109,57 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                                     {
                                         string key = data.ConstructorArguments[0].Value.ToString();
 
-                                        if (propInfo.PropertyType == typeof(Guid))
-                                            propInfo.SetValue(entryDataObject, new Guid(keyValuePairs[key]));
+                                        // The chain above set float properties from a double (rejected by reflection), and failed for nullable
+                                        // and enum properties and with non-English number formats; every failure was silently skipped.
+//                                        if (propInfo.PropertyType == typeof(Guid))
+//                                            propInfo.SetValue(entryDataObject, new Guid(keyValuePairs[key]));
 
-                                        else if (propInfo.PropertyType == typeof(bool))
-                                            propInfo.SetValue(entryDataObject, Convert.ToBoolean(keyValuePairs[key]));
+//                                        else if (propInfo.PropertyType == typeof(bool))
+//                                            propInfo.SetValue(entryDataObject, Convert.ToBoolean(keyValuePairs[key]));
 
-                                        else if (propInfo.PropertyType == typeof(DateTime))
-                                            propInfo.SetValue(entryDataObject, Convert.ToDateTime(keyValuePairs[key]));
+//                                        else if (propInfo.PropertyType == typeof(DateTime))
+//                                            propInfo.SetValue(entryDataObject, Convert.ToDateTime(keyValuePairs[key]));
 
-                                        else if (propInfo.PropertyType == typeof(int))
-                                            propInfo.SetValue(entryDataObject, Convert.ToInt32(keyValuePairs[key]));
+//                                        else if (propInfo.PropertyType == typeof(int))
+//                                            propInfo.SetValue(entryDataObject, Convert.ToInt32(keyValuePairs[key]));
 
-                                        else if (propInfo.PropertyType == typeof(long))
-                                            propInfo.SetValue(entryDataObject, Convert.ToInt64(keyValuePairs[key]));
+//                                        else if (propInfo.PropertyType == typeof(long))
+//                                            propInfo.SetValue(entryDataObject, Convert.ToInt64(keyValuePairs[key]));
 
-                                        else if (propInfo.PropertyType == typeof(float))
-                                            propInfo.SetValue(entryDataObject, Convert.ToDouble(keyValuePairs[key])); //TODO: Check if this is right?! :)
+//                                        else if (propInfo.PropertyType == typeof(float))
+//                                            propInfo.SetValue(entryDataObject, Convert.ToDouble(keyValuePairs[key])); //TODO: Check if this is right?! :)
 
-                                        else if (propInfo.PropertyType == typeof(double))
-                                            propInfo.SetValue(entryDataObject, Convert.ToDouble(keyValuePairs[key]));
+//                                        else if (propInfo.PropertyType == typeof(double))
+//                                            propInfo.SetValue(entryDataObject, Convert.ToDouble(keyValuePairs[key]));
 
-                                        else if (propInfo.PropertyType == typeof(decimal))
-                                            propInfo.SetValue(entryDataObject, Convert.ToDecimal(keyValuePairs[key]));
+//                                        else if (propInfo.PropertyType == typeof(decimal))
+//                                            propInfo.SetValue(entryDataObject, Convert.ToDecimal(keyValuePairs[key]));
 
-                                        else if (propInfo.PropertyType == typeof(UInt16))
-                                            propInfo.SetValue(entryDataObject, Convert.ToUInt16(keyValuePairs[key]));
+//                                        else if (propInfo.PropertyType == typeof(UInt16))
+//                                            propInfo.SetValue(entryDataObject, Convert.ToUInt16(keyValuePairs[key]));
 
-                                        else if (propInfo.PropertyType == typeof(UInt32))
-                                            propInfo.SetValue(entryDataObject, Convert.ToUInt32(keyValuePairs[key]));
+//                                        else if (propInfo.PropertyType == typeof(UInt32))
+//                                            propInfo.SetValue(entryDataObject, Convert.ToUInt32(keyValuePairs[key]));
 
-                                        else if (propInfo.PropertyType == typeof(UInt64))
-                                            propInfo.SetValue(entryDataObject, Convert.ToUInt64(keyValuePairs[key]));
+//                                        else if (propInfo.PropertyType == typeof(UInt64))
+//                                            propInfo.SetValue(entryDataObject, Convert.ToUInt64(keyValuePairs[key]));
 
-                                        else if (propInfo.PropertyType == typeof(Single))
-                                            propInfo.SetValue(entryDataObject, Convert.ToSingle(keyValuePairs[key]));
+//                                        else if (propInfo.PropertyType == typeof(Single))
+//                                            propInfo.SetValue(entryDataObject, Convert.ToSingle(keyValuePairs[key]));
 
-                                        else if (propInfo.PropertyType == typeof(char))
-                                            propInfo.SetValue(entryDataObject, Convert.ToChar(keyValuePairs[key]));
+//                                        else if (propInfo.PropertyType == typeof(char))
+//                                            propInfo.SetValue(entryDataObject, Convert.ToChar(keyValuePairs[key]));
 
-                                        else if (propInfo.PropertyType == typeof(byte))
-                                            propInfo.SetValue(entryDataObject, Convert.ToByte(keyValuePairs[key]));
+//                                        else if (propInfo.PropertyType == typeof(byte))
+//                                            propInfo.SetValue(entryDataObject, Convert.ToByte(keyValuePairs[key]));
 
-                                        else if (propInfo.PropertyType == typeof(sbyte))
-                                            propInfo.SetValue(entryDataObject, Convert.ToSByte(keyValuePairs[key]));
+//                                        else if (propInfo.PropertyType == typeof(sbyte))
+//                                            propInfo.SetValue(entryDataObject, Convert.ToSByte(keyValuePairs[key]));
 
-                                        else
-                                            propInfo.SetValue(entryDataObject, keyValuePairs[key]);
+//                                        else
+//                                            propInfo.SetValue(entryDataObject, keyValuePairs[key]);
+                                        if (keyValuePairs.TryGetValue(key, out string rawValue))
+                                            propInfo.SetValue(entryDataObject, ConvertEntryValue(rawValue, propInfo.PropertyType));
 
                                         break;
                                     }
@@ -521,6 +559,16 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 // MessagePack binary values, not record maps. Decode them before trying
                 // the collection paths so a byte sequence is not mistaken for a list.
                 object scalarResponse = MessagePackSerializer.Deserialize<object>(appResponse.data, messagePackSerializerOptions);
+                zomeFunctionCallBackArgs.ZomeReturnValue = scalarResponse;
+
+                // (), bool, numbers and strings are normal zome return types; they used to fall through every
+                // collection path and be reported as "an unknown response".
+                if (scalarResponse == null || scalarResponse is string || scalarResponse is bool || scalarResponse.GetType().IsPrimitive)
+                {
+                    RaiseZomeDataReceivedEvent(zomeFunctionCallBackArgs);
+                    return;
+                }
+
                 if (scalarResponse is byte[] scalarHash)
                 {
                     zomeFunctionCallBackArgs.ZomeReturnHash = ConvertHoloHashToString(scalarHash);
@@ -930,9 +978,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                                 {
                                     foreach (object entryKey in entry.Keys)
                                     {
-                                        decodedEntry[entryKey.ToString()] = (entry[entryKey]?.ToString() ?? "null");
-                                        keyValuePair[entryKey.ToString()] = (entry[entryKey]?.ToString() ?? "null");
-                                        keyValuePairAsString = string.Concat(keyValuePairAsString, entryKey.ToString(), "=", (entry[entryKey]?.ToString() ?? "null"), "\n");
+                                        //decodedEntry[entryKey.ToString()] = (entry[entryKey]?.ToString() ?? "null"); // current-culture formatting
+                                        decodedEntry[entryKey.ToString()] = ToInvariantString(entry[entryKey]);
+                                        //keyValuePair[entryKey.ToString()] = (entry[entryKey]?.ToString() ?? "null"); // current-culture formatting
+                                        keyValuePair[entryKey.ToString()] = ToInvariantString(entry[entryKey]);
+                                        //keyValuePairAsString = string.Concat(keyValuePairAsString, entryKey.ToString(), "=", (entry[entryKey]?.ToString() ?? "null"), "\n"); // current-culture formatting
+                                        keyValuePairAsString = string.Concat(keyValuePairAsString, entryKey.ToString(), "=", ToInvariantString(entry[entryKey]), "\n");
                                     }
 
                                     record.Bytes = bytes;
@@ -955,7 +1006,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                                 appResponseData[key] = tempDict;
                             }
                             else if (rawAppResponseData[key] != null)
-                                value = rawAppResponseData[key].ToString();
+                                //value = rawAppResponseData[key].ToString(); // current-culture formatting
+                                value = ToInvariantString(rawAppResponseData[key]);
                         }
 
                         if (!string.IsNullOrEmpty(value))
@@ -1004,7 +1056,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                                         {
                                             record.Timestamp = Convert.ToInt64(value);
                                             long time = record.Timestamp / 1000; // Divide by 1,000 because we need milliseconds, not microseconds.
-                                            record.DateTime = DateTimeOffset.FromUnixTimeMilliseconds(time).DateTime.AddHours(-5).AddMinutes(1);
+                                            //record.DateTime = DateTimeOffset.FromUnixTimeMilliseconds(time).DateTime.AddHours(-5).AddMinutes(1); // fixed US-Eastern offset (+1 min): wrong everywhere else and during DST
+                                            // Holochain timestamps are microseconds since the Unix epoch (UTC).
+                                            record.DateTime = DateTimeOffset.FromUnixTimeMilliseconds(time).UtcDateTime;
                                         }
                                         break;
 

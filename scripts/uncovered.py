@@ -1,22 +1,27 @@
-"""Merges Cobertura reports and lists uncovered lines per method (most first).
+"""Merges the Cobertura reports in .holochain-test/coverage-* and lists uncovered lines per method of the
+HoloNET client assembly (most first).
 Usage: python scripts/uncovered.py [class-substring] [limit]"""
 import glob, sys, collections, xml.etree.ElementTree as ET
 
+PACKAGE = 'NextGenSoftware.Holochain.HoloNET.Client'
 flt = sys.argv[1] if len(sys.argv) > 1 else ''
 limit = int(sys.argv[2]) if len(sys.argv) > 2 else 60
 hits = collections.defaultdict(int)          # (file, line) -> hits across all reports
 owner = {}                                   # (file, line) -> class::method
 for f in glob.glob('.holochain-test/coverage-*/*/coverage.cobertura.xml'):
     root = ET.parse(f).getroot()
-    for cls in root.iter('class'):
-        name, fn = cls.get('name'), cls.get('filename')
-        if flt not in name:
+    for pkg in root.iter('package'):
+        if pkg.get('name') != PACKAGE:
             continue
-        for m in cls.iter('method'):
-            for ln in m.iter('line'):
-                key = (fn, int(ln.get('number')))
-                hits[key] += int(ln.get('hits'))
-                owner[key] = name.split('.')[-1] + '::' + m.get('name')
+        for cls in pkg.iter('class'):
+            name, fn = cls.get('name'), cls.get('filename')
+            if flt not in name:
+                continue
+            for m in cls.iter('method'):
+                for ln in m.iter('line'):
+                    key = (fn, int(ln.get('number')))
+                    hits[key] += int(ln.get('hits'))
+                    owner[key] = name.split('.')[-1] + '::' + m.get('name')
 per = collections.defaultdict(list)
 for key, h in hits.items():
     if h == 0:

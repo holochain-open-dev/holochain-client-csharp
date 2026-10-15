@@ -395,6 +395,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public async Task<ZomeFunctionCallBackEventArgs> CallZomeFunctionAsync(string id, string zome, string function, object paramsObject, bool matchIdToZomeFuncInCallback = true, bool cachReturnData = false, Type entryDataObjectTypeReturnedFromZome = null, ConductorResponseCallBackMode zomeResultCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse)
         {
+            if (string.IsNullOrEmpty(id)) { _currentId++; id = _currentId.ToString(); } // a null id was used as a dictionary key (ArgumentNullException)
             _entryDataObjectTypeLookup[id] = entryDataObjectTypeReturnedFromZome;
             return await CallZomeFunctionAsync(id, zome, function, null, paramsObject, matchIdToZomeFuncInCallback, cachReturnData, zomeResultCallBackMode);
         }
@@ -413,6 +414,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public async Task<ZomeFunctionCallBackEventArgs> CallZomeFunctionAsync(string id, string zome, string function, object paramsObject, bool matchIdToZomeFuncInCallback = true, bool cachReturnData = false, dynamic entryDataObjectReturnedFromZome = null, ConductorResponseCallBackMode zomeResultCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse)
         {
+            if (string.IsNullOrEmpty(id)) { _currentId++; id = _currentId.ToString(); } // a null id was used as a dictionary key (ArgumentNullException)
             _entryDataObjectLookup[id] = entryDataObjectReturnedFromZome;
             return await CallZomeFunctionAsync(id, zome, function, null, paramsObject, matchIdToZomeFuncInCallback, cachReturnData, zomeResultCallBackMode);
         }
@@ -526,6 +528,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public async Task<ZomeFunctionCallBackEventArgs> CallZomeFunctionAsync(string id, string zome, string function, ZomeFunctionCallBack callback, object paramsObject, bool matchIdToZomeFuncInCallback = true, bool cachReturnData = false, dynamic entryDataObjectReturnedFromZome = null, ConductorResponseCallBackMode zomeResultCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse)
         {
+            if (string.IsNullOrEmpty(id)) { _currentId++; id = _currentId.ToString(); } // a null id was used as a dictionary key (ArgumentNullException)
             _entryDataObjectLookup[id] = entryDataObjectReturnedFromZome;
             return await CallZomeFunctionAsync(id, zome, function, callback, paramsObject, matchIdToZomeFuncInCallback, cachReturnData, zomeResultCallBackMode);
         }
@@ -545,6 +548,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public async Task<ZomeFunctionCallBackEventArgs> CallZomeFunctionAsync(string id, string zome, string function, ZomeFunctionCallBack callback, object paramsObject, bool matchIdToZomeFuncInCallback = true, bool cachReturnData = false, Type entryDataObjectTypeReturnedFromZome = null, ConductorResponseCallBackMode zomeResultCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse)
         {
+            if (string.IsNullOrEmpty(id)) { _currentId++; id = _currentId.ToString(); } // a null id was used as a dictionary key (ArgumentNullException)
             _entryDataObjectTypeLookup[id] = entryDataObjectTypeReturnedFromZome;
             return await CallZomeFunctionAsync(id, zome, function, callback, paramsObject, matchIdToZomeFuncInCallback, cachReturnData, zomeResultCallBackMode);
         }
@@ -564,6 +568,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public async Task<ZomeFunctionCallBackEventArgs> CallZomeFunctionAsync(string id, string zome, string function, ZomeFunctionCallBack callback, object paramsObject, bool matchIdToZomeFuncInCallback = true, bool cachReturnData = false, ConductorResponseCallBackMode zomeResultCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, CallZomeOptions callZomeOptions = null)
         {
+            if (string.IsNullOrEmpty(id)) { _currentId++; id = _currentId.ToString(); } // a null id was used as a dictionary key (ArgumentNullException)
             callZomeOptions ??= CallZomeOptions.Default;
             try
             {
@@ -782,6 +787,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public ZomeFunctionCallBackEventArgs CallZomeFunction(string id, string zome, string function, object paramsObject, Type entryDataObjectTypeReturnedFromZome = null, ConductorResponseCallBackMode zomeResultCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse)
         {
+            if (string.IsNullOrEmpty(id)) { _currentId++; id = _currentId.ToString(); } // a null id was used as a dictionary key (ArgumentNullException)
             return CallZomeFunction(id, zome, function, paramsObject, true, false, entryDataObjectTypeReturnedFromZome, zomeResultCallBackMode);
         }
 
@@ -797,7 +803,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public ZomeFunctionCallBackEventArgs CallZomeFunction(string zome, string function, object paramsObject, dynamic entryDataObjectReturnedFromZome = null, ConductorResponseCallBackMode zomeResultCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse)
         {
             _currentId++;
-            return CallZomeFunctionAsync(_currentId.ToString(), zome, function, paramsObject, entryDataObjectReturnedFromZome, zomeResultCallBackMode);
+            //return CallZomeFunctionAsync(_currentId.ToString(), zome, function, paramsObject, entryDataObjectReturnedFromZome, zomeResultCallBackMode); // returned the Task: a runtime binder error
+            object entryDataObject = entryDataObjectReturnedFromZome;
+            string id = _currentId.ToString();
+            return Task.Run(() => CallZomeFunctionAsync(id, zome, function, paramsObject, true, false, entryDataObject, zomeResultCallBackMode)).GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -812,6 +821,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public ZomeFunctionCallBackEventArgs CallZomeFunction(string id, string zome, string function, object paramsObject, dynamic entryDataObjectReturnedFromZome = null, ConductorResponseCallBackMode zomeResultCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse)
         {
+            if (string.IsNullOrEmpty(id)) { _currentId++; id = _currentId.ToString(); } // a null id was used as a dictionary key (ArgumentNullException)
             //return CallZomeFunction(id, zome, function, paramsObject, true, false, entryDataObjectReturnedFromZome, zomeResultCallBackMode); // mode was dropped
             _entryDataObjectLookup[id] = entryDataObjectReturnedFromZome;
             return CallZomeFunctionSync(id, zome, function, null, paramsObject, true, false, zomeResultCallBackMode);
@@ -831,6 +841,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public ZomeFunctionCallBackEventArgs CallZomeFunction(string id, string zome, string function, object paramsObject, bool matchIdToZomeFuncInCallback = true, bool cachReturnData = false, Type entryDataObjectTypeReturnedFromZome = null, ConductorResponseCallBackMode zomeResultCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse)
         {
+            if (string.IsNullOrEmpty(id)) { _currentId++; id = _currentId.ToString(); } // a null id was used as a dictionary key (ArgumentNullException)
             _entryDataObjectTypeLookup[id] = entryDataObjectTypeReturnedFromZome;
             //return CallZomeFunction(id, zome, function, null, paramsObject, matchIdToZomeFuncInCallback, cachReturnData, zomeResultCallBackMode); // bound the mode to a dynamic param
             return CallZomeFunctionSync(id, zome, function, null, paramsObject, matchIdToZomeFuncInCallback, cachReturnData, zomeResultCallBackMode);
@@ -849,6 +860,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public ZomeFunctionCallBackEventArgs CallZomeFunction(string id, string zome, string function, object paramsObject, bool matchIdToZomeFuncInCallback = true, bool cachReturnData = false, dynamic entryDataObjectReturnedFromZome = null)
         {
+            if (string.IsNullOrEmpty(id)) { _currentId++; id = _currentId.ToString(); } // a null id was used as a dictionary key (ArgumentNullException)
             _entryDataObjectLookup[id] = entryDataObjectReturnedFromZome;
             //return CallZomeFunction(id, zome, function, null, paramsObject, matchIdToZomeFuncInCallback, cachReturnData, ConductorResponseCallBackMode.UseCallBackEvents);
             return CallZomeFunctionSync(id, zome, function, null, paramsObject, matchIdToZomeFuncInCallback, cachReturnData, ConductorResponseCallBackMode.WaitForHolochainConductorResponse);
@@ -880,7 +892,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public ZomeFunctionCallBackEventArgs CallZomeFunction(string zome, string function, ZomeFunctionCallBack callback, object paramsObject, bool cachReturnData = false)
         {
             _currentId++;
-            return CallZomeFunction(_currentId.ToString(), zome, function, callback, paramsObject, true, cachReturnData, ConductorResponseCallBackMode.UseCallBackEvents);
+            //return CallZomeFunction(_currentId.ToString(), zome, function, callback, paramsObject, true, cachReturnData, ConductorResponseCallBackMode.UseCallBackEvents); // returned before the conductor replied
+            return CallZomeFunction(_currentId.ToString(), zome, function, callback, paramsObject, true, cachReturnData, ConductorResponseCallBackMode.WaitForHolochainConductorResponse);
         }
 
         /// <summary>
@@ -895,7 +908,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public ZomeFunctionCallBackEventArgs CallZomeFunction(string zome, string function, ZomeFunctionCallBack callback, object paramsObject, dynamic entryDataObjectReturnedFromZome = null)
         {
             _currentId++;
-            return CallZomeFunctionAsync(_currentId.ToString(), zome, function, callback, paramsObject, true, false, entryDataObjectReturnedFromZome, ConductorResponseCallBackMode.UseCallBackEvents);
+            //return CallZomeFunctionAsync(_currentId.ToString(), zome, function, callback, paramsObject, true, false, entryDataObjectReturnedFromZome, ConductorResponseCallBackMode.UseCallBackEvents); // returned the Task: a runtime binder error
+            object entryDataObject = entryDataObjectReturnedFromZome;
+            string id = _currentId.ToString();
+            return Task.Run(() => CallZomeFunctionAsync(id, zome, function, callback, paramsObject, true, false, entryDataObject, ConductorResponseCallBackMode.WaitForHolochainConductorResponse)).GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -912,6 +928,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public ZomeFunctionCallBackEventArgs CallZomeFunction(string id, string zome, string function, ZomeFunctionCallBack callback, object paramsObject, bool matchIdToZomeFuncInCallback = true, bool cachReturnData = false, dynamic entryDataObjectReturnedFromZome = null)
         {
+            if (string.IsNullOrEmpty(id)) { _currentId++; id = _currentId.ToString(); } // a null id was used as a dictionary key (ArgumentNullException)
             _entryDataObjectLookup[id] = entryDataObjectReturnedFromZome;
             //return Task.Run(() => CallZomeFunctionAsync(id, zome, function, callback, paramsObject, matchIdToZomeFuncInCallback, cachReturnData, ConductorResponseCallBackMode.UseCallBackEvents)).Result;
             return CallZomeFunctionSync(id, zome, function, callback, paramsObject, matchIdToZomeFuncInCallback, cachReturnData, ConductorResponseCallBackMode.WaitForHolochainConductorResponse);
@@ -931,6 +948,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public ZomeFunctionCallBackEventArgs CallZomeFunction(string id, string zome, string function, ZomeFunctionCallBack callback, object paramsObject, bool matchIdToZomeFuncInCallback = true, bool cachReturnData = false, Type entryDataObjectTypeReturnedFromZome = null)
         {
+            if (string.IsNullOrEmpty(id)) { _currentId++; id = _currentId.ToString(); } // a null id was used as a dictionary key (ArgumentNullException)
             _entryDataObjectTypeLookup[id] = entryDataObjectTypeReturnedFromZome;
             //return CallZomeFunction(id, zome, function, callback, paramsObject, matchIdToZomeFuncInCallback, cachReturnData, ConductorResponseCallBackMode.UseCallBackEvents); // bound the mode to a dynamic param
             return CallZomeFunctionSync(id, zome, function, callback, paramsObject, matchIdToZomeFuncInCallback, cachReturnData, ConductorResponseCallBackMode.WaitForHolochainConductorResponse);
@@ -949,6 +967,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public ZomeFunctionCallBackEventArgs CallZomeFunction(string id, string zome, string function, ZomeFunctionCallBack callback, object paramsObject, bool matchIdToZomeFuncInCallback = true, bool cachReturnData = false)
         {
+            if (string.IsNullOrEmpty(id)) { _currentId++; id = _currentId.ToString(); } // a null id was used as a dictionary key (ArgumentNullException)
             //return Task.Run(() => CallZomeFunctionAsync(id, zome, function, callback, paramsObject, matchIdToZomeFuncInCallback, cachReturnData, ConductorResponseCallBackMode.UseCallBackEvents)).Result;
             return CallZomeFunctionSync(id, zome, function, callback, paramsObject, matchIdToZomeFuncInCallback, cachReturnData, ConductorResponseCallBackMode.WaitForHolochainConductorResponse);
         }
