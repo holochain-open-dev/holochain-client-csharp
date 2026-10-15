@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using MessagePack;
 using System.Threading.Tasks;
 using System.Collections.Generic;
@@ -707,6 +707,15 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             RaiseCellIdsListedEvent(args);
         }
 
+        /// <summary>Holochain serializes AllowedOrigins as "*" or a comma-separated string; accept an array too.</summary>
+        private static string FormatAllowedOrigins(object origins) => origins switch
+        {
+            null => null,
+            string text => text,
+            System.Collections.IEnumerable list => string.Join(",", System.Linq.Enumerable.Cast<object>(list)),
+            _ => origins.ToString()
+        };
+
         private void DecodeAppInterfacesListedReceived(IHoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
         {
             string errorMessage = "An unknown error occurred in HoloNETClient.DecodeAppInterfacesListedReceived. Reason: ";
@@ -720,15 +729,30 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                 if (appResponse != null)
                 {
-                    string ports = "";
-                    foreach (ushort port in appResponse.data)
+                    // Holochain 0.7.0 returns Vec<AppInterfaceInfo> { port, allowed_origins, installed_app_id }, not bare ports.
+                    // The previous code cast each item to ushort (and Substring(-1) threw on an empty list):
+                    //foreach (ushort port in appResponse.data) { ports = $"{ports}{port},"; args.WebSocketPorts.Add(port); }
+                    //ports = ports.Substring(0, ports.Length - 1);
+                    if (appResponse.data is System.Collections.IEnumerable items)
                     {
-                        ports = $"{ports}{port},";
-                        args.WebSocketPorts.Add(port);
+                        foreach (object item in items)
+                        {
+                            var info = new AppInterfaceInfo();
+                            if (item is IDictionary<object, object> map)
+                            {
+                                info.Port = Convert.ToUInt16(map["port"]);
+                                info.AllowedOrigins = map.TryGetValue("allowed_origins", out object origins) ? FormatAllowedOrigins(origins) : null;
+                                info.InstalledAppId = map.TryGetValue("installed_app_id", out object appId) ? appId as string : null;
+                            }
+                            else
+                                info.Port = Convert.ToUInt16(item);
+
+                            args.AppInterfaces.Add(info);
+                            args.WebSocketPorts.Add(info.Port);
+                        }
                     }
 
-                    ports = ports.Substring(0, ports.Length - 1);
-                    Logger.Log($"App Interfaces Listed: {ports}", LogType.Info);
+                    Logger.Log($"App Interfaces Listed: {string.Join(",", args.WebSocketPorts)}", LogType.Info);
                 }
                 else
                     HandleError(args, $"{errorMessage} appResponse failed to deserialize.");
@@ -1130,7 +1154,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             if (_taskCompletionAgentPubKeyGeneratedCallBack != null && !string.IsNullOrEmpty(adminAgentPubKeyGeneratedCallBackEventArgs.Id) && _taskCompletionAgentPubKeyGeneratedCallBack.ContainsKey(adminAgentPubKeyGeneratedCallBackEventArgs.Id))
             {
-                _taskCompletionAgentPubKeyGeneratedCallBack[adminAgentPubKeyGeneratedCallBackEventArgs.Id].SetResult(adminAgentPubKeyGeneratedCallBackEventArgs);
+                _taskCompletionAgentPubKeyGeneratedCallBack[adminAgentPubKeyGeneratedCallBackEventArgs.Id].TrySetResult(adminAgentPubKeyGeneratedCallBackEventArgs);
                 _taskCompletionAgentPubKeyGeneratedCallBack.Remove(adminAgentPubKeyGeneratedCallBackEventArgs.Id);
             }
         }
@@ -1142,7 +1166,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             if (_taskCompletionAppInstalledCallBack != null && !string.IsNullOrEmpty(adminAppInstalledCallBackEventArgs.Id) && _taskCompletionAppInstalledCallBack.ContainsKey(adminAppInstalledCallBackEventArgs.Id))
             {
-                _taskCompletionAppInstalledCallBack[adminAppInstalledCallBackEventArgs.Id].SetResult(adminAppInstalledCallBackEventArgs);
+                _taskCompletionAppInstalledCallBack[adminAppInstalledCallBackEventArgs.Id].TrySetResult(adminAppInstalledCallBackEventArgs);
                 _taskCompletionAppInstalledCallBack.Remove(adminAppInstalledCallBackEventArgs.Id);
             }
         }
@@ -1154,7 +1178,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             if (_taskCompletionAppUninstalledCallBack != null && !string.IsNullOrEmpty(adminAppUninstalledCallBackEventArgs.Id) && _taskCompletionAppUninstalledCallBack.ContainsKey(adminAppUninstalledCallBackEventArgs.Id))
             {
-                _taskCompletionAppUninstalledCallBack[adminAppUninstalledCallBackEventArgs.Id].SetResult(adminAppUninstalledCallBackEventArgs);
+                _taskCompletionAppUninstalledCallBack[adminAppUninstalledCallBackEventArgs.Id].TrySetResult(adminAppUninstalledCallBackEventArgs);
                 _taskCompletionAppUninstalledCallBack.Remove(adminAppUninstalledCallBackEventArgs.Id);
             }
         }
@@ -1166,7 +1190,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             if (_taskCompletionAppEnabledCallBack != null && !string.IsNullOrEmpty(adminAppEnabledCallBackEventArgs.Id) && _taskCompletionAppEnabledCallBack.ContainsKey(adminAppEnabledCallBackEventArgs.Id))
             {
-                _taskCompletionAppEnabledCallBack[adminAppEnabledCallBackEventArgs.Id].SetResult(adminAppEnabledCallBackEventArgs);
+                _taskCompletionAppEnabledCallBack[adminAppEnabledCallBackEventArgs.Id].TrySetResult(adminAppEnabledCallBackEventArgs);
                 _taskCompletionAppEnabledCallBack.Remove(adminAppEnabledCallBackEventArgs.Id);
             }
         }
@@ -1178,7 +1202,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             if (_taskCompletionAppDisabledCallBack != null && !string.IsNullOrEmpty(adminAppDisabledCallBackEventArgs.Id) && _taskCompletionAppDisabledCallBack.ContainsKey(adminAppDisabledCallBackEventArgs.Id))
             {
-                _taskCompletionAppDisabledCallBack[adminAppDisabledCallBackEventArgs.Id].SetResult(adminAppDisabledCallBackEventArgs);
+                _taskCompletionAppDisabledCallBack[adminAppDisabledCallBackEventArgs.Id].TrySetResult(adminAppDisabledCallBackEventArgs);
                 _taskCompletionAppDisabledCallBack.Remove(adminAppDisabledCallBackEventArgs.Id);
             }
         }
@@ -1190,7 +1214,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             if (_taskCompletionZomeCapabilityGrantedCallBack != null && !string.IsNullOrEmpty(adminZomeCallCapabilityGrantedCallBackEventArgs.Id) && _taskCompletionZomeCapabilityGrantedCallBack.ContainsKey(adminZomeCallCapabilityGrantedCallBackEventArgs.Id))
             {
-                _taskCompletionZomeCapabilityGrantedCallBack[adminZomeCallCapabilityGrantedCallBackEventArgs.Id].SetResult(adminZomeCallCapabilityGrantedCallBackEventArgs);
+                _taskCompletionZomeCapabilityGrantedCallBack[adminZomeCallCapabilityGrantedCallBackEventArgs.Id].TrySetResult(adminZomeCallCapabilityGrantedCallBackEventArgs);
                 _taskCompletionZomeCapabilityGrantedCallBack.Remove(adminZomeCallCapabilityGrantedCallBackEventArgs.Id);
             }
         }
@@ -1202,7 +1226,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             if (_taskCompletionAppInterfaceAttachedCallBack != null && !string.IsNullOrEmpty(adminAppInterfaceAttachedCallBackEventArgs.Id) && _taskCompletionAppInterfaceAttachedCallBack.ContainsKey(adminAppInterfaceAttachedCallBackEventArgs.Id))
             {
-                _taskCompletionAppInterfaceAttachedCallBack[adminAppInterfaceAttachedCallBackEventArgs.Id].SetResult(adminAppInterfaceAttachedCallBackEventArgs);
+                _taskCompletionAppInterfaceAttachedCallBack[adminAppInterfaceAttachedCallBackEventArgs.Id].TrySetResult(adminAppInterfaceAttachedCallBackEventArgs);
                 _taskCompletionAppInterfaceAttachedCallBack.Remove(adminAppInterfaceAttachedCallBackEventArgs.Id);
             }
         }
@@ -1214,7 +1238,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             if (_taskCompletionDnaRegisteredCallBack != null && !string.IsNullOrEmpty(dnaRegisteredCallBackEventArgs.Id) && _taskCompletionDnaRegisteredCallBack.ContainsKey(dnaRegisteredCallBackEventArgs.Id))
             {
-                _taskCompletionDnaRegisteredCallBack[dnaRegisteredCallBackEventArgs.Id].SetResult(dnaRegisteredCallBackEventArgs);
+                _taskCompletionDnaRegisteredCallBack[dnaRegisteredCallBackEventArgs.Id].TrySetResult(dnaRegisteredCallBackEventArgs);
                 _taskCompletionDnaRegisteredCallBack.Remove(dnaRegisteredCallBackEventArgs.Id);
             }
         }
@@ -1226,7 +1250,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             if (_taskCompletionDnaDefinitionReturnedCallBack != null && !string.IsNullOrEmpty(dnaDefinitionReturnedCallBackEventArgs.Id) && _taskCompletionDnaDefinitionReturnedCallBack.ContainsKey(dnaDefinitionReturnedCallBackEventArgs.Id))
             {
-                _taskCompletionDnaDefinitionReturnedCallBack[dnaDefinitionReturnedCallBackEventArgs.Id].SetResult(dnaDefinitionReturnedCallBackEventArgs);
+                _taskCompletionDnaDefinitionReturnedCallBack[dnaDefinitionReturnedCallBackEventArgs.Id].TrySetResult(dnaDefinitionReturnedCallBackEventArgs);
                 _taskCompletionDnaDefinitionReturnedCallBack.Remove(dnaDefinitionReturnedCallBackEventArgs.Id);
             }
         }
@@ -1238,7 +1262,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             if (_taskCompletionAppInterfacesListedCallBack != null && !string.IsNullOrEmpty(adminAppsListedCallBackEventArgs.Id) && _taskCompletionAppInterfacesListedCallBack.ContainsKey(adminAppsListedCallBackEventArgs.Id))
             {
-                _taskCompletionAppInterfacesListedCallBack[adminAppsListedCallBackEventArgs.Id].SetResult(adminAppsListedCallBackEventArgs);
+                _taskCompletionAppInterfacesListedCallBack[adminAppsListedCallBackEventArgs.Id].TrySetResult(adminAppsListedCallBackEventArgs);
                 _taskCompletionAppInterfacesListedCallBack.Remove(adminAppsListedCallBackEventArgs.Id);
             }
         }
@@ -1250,7 +1274,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             if (_taskCompletionAppsListedCallBack != null && !string.IsNullOrEmpty(adminAppsListedCallBackEventArgs.Id) && _taskCompletionAppsListedCallBack.ContainsKey(adminAppsListedCallBackEventArgs.Id))
             {
-                _taskCompletionAppsListedCallBack[adminAppsListedCallBackEventArgs.Id].SetResult(adminAppsListedCallBackEventArgs);
+                _taskCompletionAppsListedCallBack[adminAppsListedCallBackEventArgs.Id].TrySetResult(adminAppsListedCallBackEventArgs);
                 _taskCompletionDnasListedCallBack.Remove(adminAppsListedCallBackEventArgs.Id);
             }
         }
@@ -1262,7 +1286,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             if (_taskCompletionDnasListedCallBack != null && !string.IsNullOrEmpty(dnasListedCallBackEventArgs.Id) && _taskCompletionDnasListedCallBack.ContainsKey(dnasListedCallBackEventArgs.Id))
             {
-                _taskCompletionDnasListedCallBack[dnasListedCallBackEventArgs.Id].SetResult(dnasListedCallBackEventArgs);
+                _taskCompletionDnasListedCallBack[dnasListedCallBackEventArgs.Id].TrySetResult(dnasListedCallBackEventArgs);
                 _taskCompletionDnasListedCallBack.Remove(dnasListedCallBackEventArgs.Id);
             }
         }
@@ -1274,7 +1298,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             if (_taskCompletionCellIdsListedCallBack != null && !string.IsNullOrEmpty(cellIdsListedCallBackEventArgs.Id) && _taskCompletionCellIdsListedCallBack.ContainsKey(cellIdsListedCallBackEventArgs.Id))
             {
-                _taskCompletionCellIdsListedCallBack[cellIdsListedCallBackEventArgs.Id].SetResult(cellIdsListedCallBackEventArgs);
+                _taskCompletionCellIdsListedCallBack[cellIdsListedCallBackEventArgs.Id].TrySetResult(cellIdsListedCallBackEventArgs);
                 _taskCompletionCellIdsListedCallBack.Remove(cellIdsListedCallBackEventArgs.Id);
             }
         }
@@ -1286,7 +1310,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             if (_taskCompletionAgentInfoReturnedCallBack != null && !string.IsNullOrEmpty(agentInfoReturnedCallBackEventArgs.Id) && _taskCompletionAgentInfoReturnedCallBack.ContainsKey(agentInfoReturnedCallBackEventArgs.Id))
             {
-                _taskCompletionAgentInfoReturnedCallBack[agentInfoReturnedCallBackEventArgs.Id].SetResult(agentInfoReturnedCallBackEventArgs);
+                _taskCompletionAgentInfoReturnedCallBack[agentInfoReturnedCallBackEventArgs.Id].TrySetResult(agentInfoReturnedCallBackEventArgs);
                 _taskCompletionAgentInfoReturnedCallBack.Remove(agentInfoReturnedCallBackEventArgs.Id);
             }
         }
@@ -1298,7 +1322,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             if (_taskCompletionAgentInfoAddedCallBack != null && !string.IsNullOrEmpty(agentInfoAddedCallBackEventArgs.Id) && _taskCompletionAgentInfoReturnedCallBack.ContainsKey(agentInfoAddedCallBackEventArgs.Id))
             {
-                _taskCompletionAgentInfoAddedCallBack[agentInfoAddedCallBackEventArgs.Id].SetResult(agentInfoAddedCallBackEventArgs);
+                _taskCompletionAgentInfoAddedCallBack[agentInfoAddedCallBackEventArgs.Id].TrySetResult(agentInfoAddedCallBackEventArgs);
                 _taskCompletionAgentInfoAddedCallBack.Remove(agentInfoAddedCallBackEventArgs.Id);
             }
         }
@@ -1310,7 +1334,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             if (_taskCompletionCoordinatorsUpdatedCallBack != null && !string.IsNullOrEmpty(coordinatorsUpdatedCallBackEventArgs.Id) && _taskCompletionCoordinatorsUpdatedCallBack.ContainsKey(coordinatorsUpdatedCallBackEventArgs.Id))
             {
-                _taskCompletionCoordinatorsUpdatedCallBack[coordinatorsUpdatedCallBackEventArgs.Id].SetResult(coordinatorsUpdatedCallBackEventArgs);
+                _taskCompletionCoordinatorsUpdatedCallBack[coordinatorsUpdatedCallBackEventArgs.Id].TrySetResult(coordinatorsUpdatedCallBackEventArgs);
                 _taskCompletionCloneCellDeletedCallBack.Remove(coordinatorsUpdatedCallBackEventArgs.Id);
             }
         }
@@ -1322,7 +1346,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             if (_taskCompletionCloneCellDeletedCallBack != null && !string.IsNullOrEmpty(cloneCellDeletedCallBackEventArgs.Id) && _taskCompletionCloneCellDeletedCallBack.ContainsKey(cloneCellDeletedCallBackEventArgs.Id))
             {
-                _taskCompletionCloneCellDeletedCallBack[cloneCellDeletedCallBackEventArgs.Id].SetResult(cloneCellDeletedCallBackEventArgs);
+                _taskCompletionCloneCellDeletedCallBack[cloneCellDeletedCallBackEventArgs.Id].TrySetResult(cloneCellDeletedCallBackEventArgs);
                 _taskCompletionCloneCellDeletedCallBack.Remove(cloneCellDeletedCallBackEventArgs.Id);
             }
         }
@@ -1334,7 +1358,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             if (_taskCompletionStateDumpedCallBack != null && !string.IsNullOrEmpty(stateDumpedCallBackEventArgs.Id) && _taskCompletionStateDumpedCallBack.ContainsKey(stateDumpedCallBackEventArgs.Id))
             {
-                _taskCompletionStateDumpedCallBack[stateDumpedCallBackEventArgs.Id].SetResult(stateDumpedCallBackEventArgs);
+                _taskCompletionStateDumpedCallBack[stateDumpedCallBackEventArgs.Id].TrySetResult(stateDumpedCallBackEventArgs);
                 _taskCompletionStateDumpedCallBack.Remove(stateDumpedCallBackEventArgs.Id);
             }
         }
@@ -1346,7 +1370,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             if (_taskCompletionFullStateDumpedCallBack != null && !string.IsNullOrEmpty(fullStateDumpedCallBackEventArgs.Id) && _taskCompletionFullStateDumpedCallBack.ContainsKey(fullStateDumpedCallBackEventArgs.Id))
             {
-                _taskCompletionFullStateDumpedCallBack[fullStateDumpedCallBackEventArgs.Id].SetResult(fullStateDumpedCallBackEventArgs);
+                _taskCompletionFullStateDumpedCallBack[fullStateDumpedCallBackEventArgs.Id].TrySetResult(fullStateDumpedCallBackEventArgs);
                 _taskCompletionFullStateDumpedCallBack.Remove(fullStateDumpedCallBackEventArgs.Id);
             }
         }
@@ -1358,7 +1382,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             if (_taskCompletionNetworkMetricsDumpedCallBack != null && !string.IsNullOrEmpty(networkMetricsDumpedCallBackEventArgs.Id) && _taskCompletionNetworkMetricsDumpedCallBack.ContainsKey(networkMetricsDumpedCallBackEventArgs.Id))
             {
-                _taskCompletionNetworkMetricsDumpedCallBack[networkMetricsDumpedCallBackEventArgs.Id].SetResult(networkMetricsDumpedCallBackEventArgs);
+                _taskCompletionNetworkMetricsDumpedCallBack[networkMetricsDumpedCallBackEventArgs.Id].TrySetResult(networkMetricsDumpedCallBackEventArgs);
                 _taskCompletionNetworkMetricsDumpedCallBack.Remove(networkMetricsDumpedCallBackEventArgs.Id);
             }
         }
@@ -1370,7 +1394,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             if (_taskCompletionNetworkStatsDumpedCallBack != null && !string.IsNullOrEmpty(networkStatsDumpedCallBackEventArgs.Id) && _taskCompletionNetworkStatsDumpedCallBack.ContainsKey(networkStatsDumpedCallBackEventArgs.Id))
             {
-                _taskCompletionNetworkStatsDumpedCallBack[networkStatsDumpedCallBackEventArgs.Id].SetResult(networkStatsDumpedCallBackEventArgs);
+                _taskCompletionNetworkStatsDumpedCallBack[networkStatsDumpedCallBackEventArgs.Id].TrySetResult(networkStatsDumpedCallBackEventArgs);
                 _taskCompletionNetworkStatsDumpedCallBack.Remove(networkStatsDumpedCallBackEventArgs.Id);
             }
         }
@@ -1382,7 +1406,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             if (_taskCompletionStorageInfoReturnedCallBack != null && !string.IsNullOrEmpty(storageInfoReturnedCallBackEventArgs.Id) && _taskCompletionStorageInfoReturnedCallBack.ContainsKey(storageInfoReturnedCallBackEventArgs.Id))
             {
-                _taskCompletionStorageInfoReturnedCallBack[storageInfoReturnedCallBackEventArgs.Id].SetResult(storageInfoReturnedCallBackEventArgs);
+                _taskCompletionStorageInfoReturnedCallBack[storageInfoReturnedCallBackEventArgs.Id].TrySetResult(storageInfoReturnedCallBackEventArgs);
                 _taskCompletionStorageInfoReturnedCallBack.Remove(storageInfoReturnedCallBackEventArgs.Id);
             }
         }
@@ -1394,7 +1418,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             if (_taskCompletionRecordsGraftedCallBack != null && !string.IsNullOrEmpty(recordsGraftedCallBackEventArgs.Id) && _taskCompletionRecordsGraftedCallBack.ContainsKey(recordsGraftedCallBackEventArgs.Id))
             {
-                _taskCompletionRecordsGraftedCallBack[recordsGraftedCallBackEventArgs.Id].SetResult(recordsGraftedCallBackEventArgs);
+                _taskCompletionRecordsGraftedCallBack[recordsGraftedCallBackEventArgs.Id].TrySetResult(recordsGraftedCallBackEventArgs);
                 _taskCompletionRecordsGraftedCallBack.Remove(recordsGraftedCallBackEventArgs.Id);
             }
         }
@@ -1406,7 +1430,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             if (_taskCompletionAdminInterfacesAddedCallBack != null && !string.IsNullOrEmpty(adminInterfacesAddedCallBackEvent.Id) && _taskCompletionAdminInterfacesAddedCallBack.ContainsKey(adminInterfacesAddedCallBackEvent.Id))
             {
-                _taskCompletionAdminInterfacesAddedCallBack[adminInterfacesAddedCallBackEvent.Id].SetResult(adminInterfacesAddedCallBackEvent);
+                _taskCompletionAdminInterfacesAddedCallBack[adminInterfacesAddedCallBackEvent.Id].TrySetResult(adminInterfacesAddedCallBackEvent);
                 _taskCompletionAdminInterfacesAddedCallBack.Remove(adminInterfacesAddedCallBackEvent.Id);
             }
         }
@@ -1420,7 +1444,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             if (_taskCompletionZomeCallCapabilityRevokedCallBack != null && !string.IsNullOrEmpty(zomeCallCapabilityRevokedCallBackEventArgs.Id) && _taskCompletionZomeCallCapabilityRevokedCallBack.ContainsKey(zomeCallCapabilityRevokedCallBackEventArgs.Id))
             {
-                _taskCompletionZomeCallCapabilityRevokedCallBack[zomeCallCapabilityRevokedCallBackEventArgs.Id].SetResult(zomeCallCapabilityRevokedCallBackEventArgs);
+                _taskCompletionZomeCallCapabilityRevokedCallBack[zomeCallCapabilityRevokedCallBackEventArgs.Id].TrySetResult(zomeCallCapabilityRevokedCallBackEventArgs);
                 _taskCompletionZomeCallCapabilityRevokedCallBack.Remove(zomeCallCapabilityRevokedCallBackEventArgs.Id);
             }
         }
@@ -1432,7 +1456,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             if (_taskCompletionCapabilityGrantsListedCallBack != null && !string.IsNullOrEmpty(capabilityGrantsListedCallBackEventArgs.Id) && _taskCompletionCapabilityGrantsListedCallBack.ContainsKey(capabilityGrantsListedCallBackEventArgs.Id))
             {
-                _taskCompletionCapabilityGrantsListedCallBack[capabilityGrantsListedCallBackEventArgs.Id].SetResult(capabilityGrantsListedCallBackEventArgs);
+                _taskCompletionCapabilityGrantsListedCallBack[capabilityGrantsListedCallBackEventArgs.Id].TrySetResult(capabilityGrantsListedCallBackEventArgs);
                 _taskCompletionCapabilityGrantsListedCallBack.Remove(capabilityGrantsListedCallBackEventArgs.Id);
             }
         }
@@ -1444,7 +1468,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             if (_taskCompletionPeerMetaInfoReturnedCallBack != null && !string.IsNullOrEmpty(peerMetaInfoReturnedCallBackEventArgs.Id) && _taskCompletionPeerMetaInfoReturnedCallBack.ContainsKey(peerMetaInfoReturnedCallBackEventArgs.Id))
             {
-                _taskCompletionPeerMetaInfoReturnedCallBack[peerMetaInfoReturnedCallBackEventArgs.Id].SetResult(peerMetaInfoReturnedCallBackEventArgs);
+                _taskCompletionPeerMetaInfoReturnedCallBack[peerMetaInfoReturnedCallBackEventArgs.Id].TrySetResult(peerMetaInfoReturnedCallBackEventArgs);
                 _taskCompletionPeerMetaInfoReturnedCallBack.Remove(peerMetaInfoReturnedCallBackEventArgs.Id);
             }
         }
@@ -1456,7 +1480,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             if (_taskCompletionAppAuthenticationTokenIssuedCallBack != null && !string.IsNullOrEmpty(appAuthenticationTokenIssuedCallBackEventArgs.Id) && _taskCompletionAppAuthenticationTokenIssuedCallBack.ContainsKey(appAuthenticationTokenIssuedCallBackEventArgs.Id))
             {
-                _taskCompletionAppAuthenticationTokenIssuedCallBack[appAuthenticationTokenIssuedCallBackEventArgs.Id].SetResult(appAuthenticationTokenIssuedCallBackEventArgs);
+                _taskCompletionAppAuthenticationTokenIssuedCallBack[appAuthenticationTokenIssuedCallBackEventArgs.Id].TrySetResult(appAuthenticationTokenIssuedCallBackEventArgs);
                 _taskCompletionAppAuthenticationTokenIssuedCallBack.Remove(appAuthenticationTokenIssuedCallBackEventArgs.Id);
             }
         }
@@ -1468,7 +1492,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             if (_taskCompletionAppAuthenticationTokenRevokedCallBack != null && !string.IsNullOrEmpty(appAuthenticationTokenRevokedCallBackEventArgs.Id) && _taskCompletionAppAuthenticationTokenRevokedCallBack.ContainsKey(appAuthenticationTokenRevokedCallBackEventArgs.Id))
             {
-                _taskCompletionAppAuthenticationTokenRevokedCallBack[appAuthenticationTokenRevokedCallBackEventArgs.Id].SetResult(appAuthenticationTokenRevokedCallBackEventArgs);
+                _taskCompletionAppAuthenticationTokenRevokedCallBack[appAuthenticationTokenRevokedCallBackEventArgs.Id].TrySetResult(appAuthenticationTokenRevokedCallBackEventArgs);
                 _taskCompletionAppAuthenticationTokenRevokedCallBack.Remove(appAuthenticationTokenRevokedCallBackEventArgs.Id);
             }
         }
@@ -1480,7 +1504,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             if (_taskCompletionCompatibleCellsReturnedCallBack != null && !string.IsNullOrEmpty(compatibleCellsReturnedCallBackEventArgs.Id) && _taskCompletionCompatibleCellsReturnedCallBack.ContainsKey(compatibleCellsReturnedCallBackEventArgs.Id))
             {
-                _taskCompletionCompatibleCellsReturnedCallBack[compatibleCellsReturnedCallBackEventArgs.Id].SetResult(compatibleCellsReturnedCallBackEventArgs);
+                _taskCompletionCompatibleCellsReturnedCallBack[compatibleCellsReturnedCallBackEventArgs.Id].TrySetResult(compatibleCellsReturnedCallBackEventArgs);
                 _taskCompletionCompatibleCellsReturnedCallBack.Remove(compatibleCellsReturnedCallBackEventArgs.Id);
             }
         }
@@ -1492,7 +1516,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         //    OnStateDumpedCallBack?.Invoke(this, holoNETDataReceivedBaseBaseEventArgs);
 
         //    if (taskCompletionCallBack != null && !string.IsNullOrEmpty(holoNETDataReceivedBaseBaseEventArgs.Id) && taskCompletionCallBack.ContainsKey(holoNETDataReceivedBaseBaseEventArgs.Id))
-        //        taskCompletionCallBack[holoNETDataReceivedBaseBaseEventArgs.Id].SetResult(holoNETDataReceivedBaseBaseEventArgs);
+        //        taskCompletionCallBack[holoNETDataReceivedBaseBaseEventArgs.Id].TrySetResult(holoNETDataReceivedBaseBaseEventArgs);
         //}
 
         private void RaiseResponseReceivedEvent<T>(HoloNETDataReceivedBaseBaseEventArgs<T> holoNETDataReceivedBaseBaseEventArgs, string eventName, Dictionary<string, TaskCompletionSource<HoloNETDataReceivedBaseBaseEventArgs<T>>> taskCompletionCallBack)
@@ -1502,7 +1526,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             if (taskCompletionCallBack != null && !string.IsNullOrEmpty(holoNETDataReceivedBaseBaseEventArgs.Id) && taskCompletionCallBack.ContainsKey(holoNETDataReceivedBaseBaseEventArgs.Id))
             {
-                taskCompletionCallBack[holoNETDataReceivedBaseBaseEventArgs.Id].SetResult(holoNETDataReceivedBaseBaseEventArgs);
+                taskCompletionCallBack[holoNETDataReceivedBaseBaseEventArgs.Id].TrySetResult(holoNETDataReceivedBaseBaseEventArgs);
                 taskCompletionCallBack.Remove(holoNETDataReceivedBaseBaseEventArgs.Id);
             }
         }
@@ -1580,7 +1604,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             if (_taskCompletionAdminOpTimingsDumpedCallBack != null && !string.IsNullOrEmpty(adminOpTimingsDumpedCallBackEventArgs.Id) && _taskCompletionAdminOpTimingsDumpedCallBack.ContainsKey(adminOpTimingsDumpedCallBackEventArgs.Id))
             {
-                _taskCompletionAdminOpTimingsDumpedCallBack[adminOpTimingsDumpedCallBackEventArgs.Id].SetResult(adminOpTimingsDumpedCallBackEventArgs);
+                _taskCompletionAdminOpTimingsDumpedCallBack[adminOpTimingsDumpedCallBackEventArgs.Id].TrySetResult(adminOpTimingsDumpedCallBackEventArgs);
                 _taskCompletionAdminOpTimingsDumpedCallBack.Remove(adminOpTimingsDumpedCallBackEventArgs.Id);
             }
         }

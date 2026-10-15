@@ -1,5 +1,37 @@
 # Changelog
 
+## Coverage push: four more 0.7.0 bugs, shared-state fixes
+
+New live tests (`LiveConductorCoverageTests`) for paths no test reached exposed real bugs. 89 tests; all pass
+live against a 0.7.0 conductor, repeatably. HoloNET.Client coverage with the conductor: **52.8% lines,
+47.7% branches** (it was 46.3% / 39.9%; offline-only it is 5.2%).
+
+### Fixes
+- **`app_info` was rejected** ("Failed to deserialize request"): 0.7.0 `AppRequest::AppInfo` is a unit
+  variant, but HoloNET sent the old `{ installed_app_id }` object. It now sends no value.
+- **`app_info` responses crashed decoding**: a completed `TaskCompletionSource` was completed again and
+  threw. All 51 `SetResult` calls are now `TrySetResult`, so duplicate or late responses can't crash
+  response handling (and leave callers waiting).
+- **`list_app_interfaces` crashed decoding**: 0.7.0 returns `AppInterfaceInfo { port, allowed_origins,
+  installed_app_id }`, not bare ports, and an empty list threw in `Substring`. New
+  `AppInterfacesListedCallBackEventArgs.AppInterfaces`; `WebSocketPorts` still filled.
+- **The synchronous `CallZomeFunction` always returned null** (regression from the earlier deadlock fix):
+  every overload passed `UseCallBackEvents`, and C# bound the caller's mode argument to a `dynamic`
+  parameter. All sync overloads now go through one helper that honours the mode (default: wait) and
+  runs on the thread pool, so a UI/Unity thread still can't deadlock.
+- **All clients shared one HoloNETDNA**: `HoloNETClientBase.HoloNETDNA` read and wrote the static
+  `HoloNETDNAManager.HoloNETDNA`, so creating any client replaced every other client's DNA (admin URI,
+  InstalledAppId, DnaHash, AgentPubKey). Each client now keeps its own; a client given none still
+  uses the shared, file-loaded default. `SaveDNA` saves the client's DNA.
+- **Shared signing credentials weren't thread-safe**: concurrent clients threw in
+  `Dictionary.TryInsert`. Now a `ConcurrentDictionary`.
+
+### Tests
+- Live tests now report as **skipped** without a conductor (they used to pass silently).
+- `coverlet.collector` added: `dotnet test --collect "XPlat Code Coverage"`.
+- Live test classes run one at a time (shared sandbox; concurrent installs hit conductor DB errors).
+- `RegisterDna` is checked to fail cleanly on 0.7.0 (no such admin request; already obsolete).
+
 ## Remaining app/admin APIs verified live
 
 Live tests now cover every API area against a real 0.7.0 conductor: clone cells (create,

@@ -87,6 +87,21 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
     public class AppInterfacesListedCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
         public List<ushort> WebSocketPorts { get; set; } = new List<ushort>();
+
+        /// <summary>Each app interface as Holochain 0.7.0 reports it (port, allowed origins, optional app binding).</summary>
+        public List<AppInterfaceInfo> AppInterfaces { get; set; } = new List<AppInterfaceInfo>();
+    }
+
+    /// <summary>One entry of list_app_interfaces (Holochain 0.7.0 <c>AppInterfaceInfo</c>).</summary>
+    public class AppInterfaceInfo
+    {
+        public ushort Port { get; set; }
+
+        /// <summary>"*" for any origin, otherwise a comma-separated list.</summary>
+        public string AllowedOrigins { get; set; }
+
+        /// <summary>Set when the interface is bound to one installed app.</summary>
+        public string InstalledAppId { get; set; }
     }
 
     public class AppsListedCallBackEventArgs : HoloNETDataReceivedBaseEventArgs

@@ -13,6 +13,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
     /// Runs only when HOLONET_LIVE_ADMIN_URI is set (e.g. ws://localhost:65464); otherwise each
     /// test is reported as skipped. See INTEGRATION_TESTING.md for how to start a 0.7.0 sandbox.
     /// </summary>
+    [Collection(LiveConductor.Collection)]
     public class LiveConductorTests
     {
         private sealed class CountingSigner : IZomeCallSigner

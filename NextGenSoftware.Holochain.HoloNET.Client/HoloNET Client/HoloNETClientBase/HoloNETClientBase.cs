@@ -34,7 +34,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         protected List<string> _pendingRequests = new List<string>();
         protected bool _connectingAsync = false;
         protected bool _updateDnaHashAndAgentPubKey = true;
-        protected static Dictionary<string, SigningCredentials> _signingCredentialsForCell = new Dictionary<string, SigningCredentials>();
+        // Shared on purpose (the admin client authorizes credentials that app clients sign with), so it must be thread-safe:
+        // concurrent clients writing to a plain Dictionary threw in Dictionary.TryInsert.
+        //protected static Dictionary<string, SigningCredentials> _signingCredentialsForCell = new Dictionary<string, SigningCredentials>();
+        protected static System.Collections.Concurrent.ConcurrentDictionary<string, SigningCredentials> _signingCredentialsForCell = new System.Collections.Concurrent.ConcurrentDictionary<string, SigningCredentials>();
         protected Dictionary<string, HoloNETRequestType> _requestTypeLookup = new Dictionary<string, HoloNETRequestType>();
 
         //[DllImport("Shlwapi.dll", SetLastError = true, CharSet = CharSet.Auto)]
@@ -124,10 +127,19 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <summary>
         /// This property contains a struct called HoloNETHoloNETDNA containing the sub-properties: AgentPubKey, DnaHash, FullPathToRootHappFolder, FullPathToCompiledHappFolder, HolochainConductorMode, FullPathToExternalHolochainConductorBinary, FullPathToExternalHCToolBinary, SecondsToWaitForHolochainConductorToStart, AutoStartHolochainConductor, ShowHolochainConductorWindow, AutoShutdownHolochainConductor, ShutDownALLHolochainConductors, HolochainConductorToUse, OnlyAllowOneHolochainConductorToRunAtATime, LoggingMode & ErrorHandlingBehaviour.
         /// </summary>
+        /// <remarks>
+        /// Each client has its own DNA once one is passed to its constructor or assigned here. Before, every client read and
+        /// wrote the single static <see cref="HoloNETDNAManager.HoloNETDNA"/>, so creating one client (e.g. an app agent)
+        /// replaced the DNA of every other client in the process (admin URI, InstalledAppId, DnaHash, AgentPubKey...).
+        /// A client given no DNA still uses the shared, file-loaded default.
+        /// </remarks>
         public IHoloNETDNA HoloNETDNA
         {
             get
             {
+                if (_holoNETDNA != null)
+                    return _holoNETDNA;
+
                 if (!HoloNETDNAManager.IsLoaded)
                     HoloNETDNAManager.LoadDNA();
 
@@ -141,7 +153,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             set
             {
                 //_holoNETDNAManager.HoloNETDNA = value;
-                HoloNETDNAManager.HoloNETDNA = value;
+                //HoloNETDNAManager.HoloNETDNA = value; // replaced every client's DNA, see remarks
+                _holoNETDNA = value;
             }
         }
 
@@ -260,13 +273,18 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public virtual IHoloNETDNA LoadDNA()
         {
             //return _holoNETDNAManager.LoadDNA();
-            return HoloNETDNAManager.LoadDNA();
+            //return HoloNETDNAManager.LoadDNA();
+            IHoloNETDNA loaded = HoloNETDNAManager.LoadDNA();
+            if (loaded != null)
+                _holoNETDNA = loaded;
+            return loaded;
         }
 
         public virtual bool SaveDNA()
         {
             //return _holoNETDNAManager.SaveDNA();
-            return HoloNETDNAManager.SaveDNA();
+            //return HoloNETDNAManager.SaveDNA(); // saved the shared DNA, not this client's
+            return HoloNETDNAManager.SaveDNA(HoloNETDNAManager.HoloNETDNAPath, HoloNETDNA);
         }
 
         /// <summary>
@@ -958,7 +976,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                     HoloNETShutdownEventArgs holoNETShutdownEventArgs = new HoloNETShutdownEventArgs(this.EndPoint, HoloNETDNA.DnaHash, HoloNETDNA.AgentPubKey, holochainConductorsShutdownEventArgs);
                     OnHoloNETShutdownComplete?.Invoke(this, holoNETShutdownEventArgs);
-                    _taskCompletionHoloNETShutdown.SetResult(holoNETShutdownEventArgs);
+                    _taskCompletionHoloNETShutdown.TrySetResult(holoNETShutdownEventArgs);
                 }
             }
             catch (Exception ex)
@@ -1084,7 +1102,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     _pendingRequests.Clear();
 
                 if (!_taskCompletionDisconnected.Task.IsCompleted)
-                    _taskCompletionDisconnected.SetResult(e);
+                    _taskCompletionDisconnected.TrySetResult(e);
 
                 //We need to dispose and nullify the socket in case we want to use it to connect again later.
                 //if (WebSocket.ClientWebSocket != null)

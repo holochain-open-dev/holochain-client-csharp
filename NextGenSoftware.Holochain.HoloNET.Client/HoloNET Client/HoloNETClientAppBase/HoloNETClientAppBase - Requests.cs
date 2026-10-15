@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Net.WebSockets;
 using System.Threading.Tasks;
 using System.IO;
@@ -180,10 +180,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 HoloNETData holoNETData = new HoloNETData()
                 {
                     type = "app_info",
-                    data = new AppInfoRequest()
-                    {
-                        installed_app_id = installedAppId
-                    }
+                    // Holochain 0.7.0 AppRequest::AppInfo is a unit variant: the app is the one this interface is authenticated for.
+                    // Sending the old { installed_app_id } object made the conductor reject the request ("Failed to deserialize request").
+                    //data = new AppInfoRequest() { installed_app_id = installedAppId }
+                    data = null
                 };
 
                 await SendHoloNETRequestAsync(holoNETData, HoloNETRequestType.AppInfo, _currentId.ToString());
@@ -244,10 +244,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 HoloNETData holoNETData = new HoloNETData()
                 {
                     type = "app_info",
-                    data = new AppInfoRequest()
-                    {
-                        installed_app_id = installedAppId
-                    }
+                    // Holochain 0.7.0 AppRequest::AppInfo is a unit variant: the app is the one this interface is authenticated for.
+                    // Sending the old { installed_app_id } object made the conductor reject the request ("Failed to deserialize request").
+                    //data = new AppInfoRequest() { installed_app_id = installedAppId }
+                    data = null
                 };
 
                 await SendHoloNETRequestAsync(holoNETData, HoloNETRequestType.AppInfo, _currentId.ToString());
@@ -601,7 +601,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                             callback.DynamicInvoke(this, _zomeReturnDataLookup[id]);
 
                         OnZomeFunctionCallBack?.Invoke(this, _zomeReturnDataLookup[id]);
-                        _taskCompletionZomeCallBack[id].SetResult(_zomeReturnDataLookup[id]);
+                        _taskCompletionZomeCallBack[id].TrySetResult(_zomeReturnDataLookup[id]);
 
                         Task<ZomeFunctionCallBackEventArgs> returnValue = _taskCompletionZomeCallBack[id].Task;
                         _taskCompletionZomeCallBack.Remove(id);
@@ -716,7 +716,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public ZomeFunctionCallBackEventArgs CallZomeFunction(string zome, string function, object paramsObject)
         {
             _currentId++;
-            return CallZomeFunction(_currentId.ToString(), zome, function, null, paramsObject, true, false, ConductorResponseCallBackMode.WaitForHolochainConductorResponse);
+            //return CallZomeFunction(_currentId.ToString(), zome, function, null, paramsObject, true, false, ConductorResponseCallBackMode.WaitForHolochainConductorResponse); // bound the mode to a dynamic param
+            return CallZomeFunctionSync(_currentId.ToString(), zome, function, null, paramsObject, true, false, ConductorResponseCallBackMode.WaitForHolochainConductorResponse);
         }
 
         /// <summary>
@@ -730,7 +731,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public ZomeFunctionCallBackEventArgs CallZomeFunction(string zome, string function, object paramsObject, ConductorResponseCallBackMode zomeResultCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse)
         {
             _currentId++;
-            return CallZomeFunction(_currentId.ToString(), zome, function, null, paramsObject, true, false, zomeResultCallBackMode);
+            //return CallZomeFunction(_currentId.ToString(), zome, function, null, paramsObject, true, false, zomeResultCallBackMode); // bound the mode to a dynamic param
+            return CallZomeFunctionSync(_currentId.ToString(), zome, function, null, paramsObject, true, false, zomeResultCallBackMode);
         }
 
         /// <summary>
@@ -745,7 +747,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public ZomeFunctionCallBackEventArgs CallZomeFunction(string zome, string function, object paramsObject, bool cachReturnData = false, ConductorResponseCallBackMode zomeResultCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse)
         {
             _currentId++;
-            return CallZomeFunction(_currentId.ToString(), zome, function, null, paramsObject, true, cachReturnData, zomeResultCallBackMode);
+            //return CallZomeFunction(_currentId.ToString(), zome, function, null, paramsObject, true, cachReturnData, zomeResultCallBackMode); // bound the mode to a dynamic param
+            return CallZomeFunctionSync(_currentId.ToString(), zome, function, null, paramsObject, true, cachReturnData, zomeResultCallBackMode);
         }
 
         /// <summary>
@@ -805,7 +808,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public ZomeFunctionCallBackEventArgs CallZomeFunction(string id, string zome, string function, object paramsObject, dynamic entryDataObjectReturnedFromZome = null, ConductorResponseCallBackMode zomeResultCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse)
         {
-            return CallZomeFunction(id, zome, function, paramsObject, true, false, entryDataObjectReturnedFromZome, zomeResultCallBackMode);
+            //return CallZomeFunction(id, zome, function, paramsObject, true, false, entryDataObjectReturnedFromZome, zomeResultCallBackMode); // mode was dropped
+            _entryDataObjectLookup[id] = entryDataObjectReturnedFromZome;
+            return CallZomeFunctionSync(id, zome, function, null, paramsObject, true, false, zomeResultCallBackMode);
         }
 
         /// <summary>
@@ -823,7 +828,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public ZomeFunctionCallBackEventArgs CallZomeFunction(string id, string zome, string function, object paramsObject, bool matchIdToZomeFuncInCallback = true, bool cachReturnData = false, Type entryDataObjectTypeReturnedFromZome = null, ConductorResponseCallBackMode zomeResultCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse)
         {
             _entryDataObjectTypeLookup[id] = entryDataObjectTypeReturnedFromZome;
-            return CallZomeFunction(id, zome, function, null, paramsObject, matchIdToZomeFuncInCallback, cachReturnData, zomeResultCallBackMode);
+            //return CallZomeFunction(id, zome, function, null, paramsObject, matchIdToZomeFuncInCallback, cachReturnData, zomeResultCallBackMode); // bound the mode to a dynamic param
+            return CallZomeFunctionSync(id, zome, function, null, paramsObject, matchIdToZomeFuncInCallback, cachReturnData, zomeResultCallBackMode);
         }
 
         /// <summary>
@@ -840,7 +846,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public ZomeFunctionCallBackEventArgs CallZomeFunction(string id, string zome, string function, object paramsObject, bool matchIdToZomeFuncInCallback = true, bool cachReturnData = false, dynamic entryDataObjectReturnedFromZome = null)
         {
             _entryDataObjectLookup[id] = entryDataObjectReturnedFromZome;
-            return CallZomeFunction(id, zome, function, null, paramsObject, matchIdToZomeFuncInCallback, cachReturnData, ConductorResponseCallBackMode.UseCallBackEvents);
+            //return CallZomeFunction(id, zome, function, null, paramsObject, matchIdToZomeFuncInCallback, cachReturnData, ConductorResponseCallBackMode.UseCallBackEvents);
+            return CallZomeFunctionSync(id, zome, function, null, paramsObject, matchIdToZomeFuncInCallback, cachReturnData, ConductorResponseCallBackMode.WaitForHolochainConductorResponse);
         }
 
         /// <summary>
@@ -902,7 +909,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public ZomeFunctionCallBackEventArgs CallZomeFunction(string id, string zome, string function, ZomeFunctionCallBack callback, object paramsObject, bool matchIdToZomeFuncInCallback = true, bool cachReturnData = false, dynamic entryDataObjectReturnedFromZome = null)
         {
             _entryDataObjectLookup[id] = entryDataObjectReturnedFromZome;
-            return Task.Run(() => CallZomeFunctionAsync(id, zome, function, callback, paramsObject, matchIdToZomeFuncInCallback, cachReturnData, ConductorResponseCallBackMode.UseCallBackEvents)).Result;
+            //return Task.Run(() => CallZomeFunctionAsync(id, zome, function, callback, paramsObject, matchIdToZomeFuncInCallback, cachReturnData, ConductorResponseCallBackMode.UseCallBackEvents)).Result;
+            return CallZomeFunctionSync(id, zome, function, callback, paramsObject, matchIdToZomeFuncInCallback, cachReturnData, ConductorResponseCallBackMode.WaitForHolochainConductorResponse);
         }
 
         /// <summary>
@@ -920,7 +928,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public ZomeFunctionCallBackEventArgs CallZomeFunction(string id, string zome, string function, ZomeFunctionCallBack callback, object paramsObject, bool matchIdToZomeFuncInCallback = true, bool cachReturnData = false, Type entryDataObjectTypeReturnedFromZome = null)
         {
             _entryDataObjectTypeLookup[id] = entryDataObjectTypeReturnedFromZome;
-            return CallZomeFunction(id, zome, function, callback, paramsObject, matchIdToZomeFuncInCallback, cachReturnData, ConductorResponseCallBackMode.UseCallBackEvents);
+            //return CallZomeFunction(id, zome, function, callback, paramsObject, matchIdToZomeFuncInCallback, cachReturnData, ConductorResponseCallBackMode.UseCallBackEvents); // bound the mode to a dynamic param
+            return CallZomeFunctionSync(id, zome, function, callback, paramsObject, matchIdToZomeFuncInCallback, cachReturnData, ConductorResponseCallBackMode.WaitForHolochainConductorResponse);
         }
 
         /// <summary>
@@ -936,7 +945,19 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public ZomeFunctionCallBackEventArgs CallZomeFunction(string id, string zome, string function, ZomeFunctionCallBack callback, object paramsObject, bool matchIdToZomeFuncInCallback = true, bool cachReturnData = false)
         {
-            return Task.Run(() => CallZomeFunctionAsync(id, zome, function, callback, paramsObject, matchIdToZomeFuncInCallback, cachReturnData, ConductorResponseCallBackMode.UseCallBackEvents)).Result;
+            //return Task.Run(() => CallZomeFunctionAsync(id, zome, function, callback, paramsObject, matchIdToZomeFuncInCallback, cachReturnData, ConductorResponseCallBackMode.UseCallBackEvents)).Result;
+            return CallZomeFunctionSync(id, zome, function, callback, paramsObject, matchIdToZomeFuncInCallback, cachReturnData, ConductorResponseCallBackMode.WaitForHolochainConductorResponse);
+        }
+
+        /// <summary>
+        /// Core of the synchronous CallZomeFunction overloads. Waits for the conductor's response unless the caller asked for
+        /// <see cref="ConductorResponseCallBackMode.UseCallBackEvents"/>. Runs on the thread pool so a caller with a
+        /// synchronisation context (UI thread, Unity main thread) can't deadlock on the websocket continuation.
+        /// The callback and OnZomeFunctionCallBack events are raised either way.
+        /// </summary>
+        private ZomeFunctionCallBackEventArgs CallZomeFunctionSync(string id, string zome, string function, ZomeFunctionCallBack callback, object paramsObject, bool matchIdToZomeFuncInCallback, bool cachReturnData, ConductorResponseCallBackMode zomeResultCallBackMode)
+        {
+            return Task.Run(() => CallZomeFunctionAsync(id, zome, function, callback, paramsObject, matchIdToZomeFuncInCallback, cachReturnData, zomeResultCallBackMode)).GetAwaiter().GetResult();
         }
 
         // New in Holochain 0.7.0 - App API.

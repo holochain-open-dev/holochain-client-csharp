@@ -27,9 +27,9 @@ round-trips and do not require a conductor).
    ```
 3. In another shell, run the tests:
    ```bash
-   HOLONET_LIVE_ADMIN_URI=ws://localhost:65464 dotnet test NextGenSoftware.Holochain.HoloNET.Client.Tests --filter "FullyQualifiedName~LiveConductorTests"
+   HOLONET_LIVE_ADMIN_URI=ws://localhost:65464 dotnet test NextGenSoftware.Holochain.HoloNET.Client.Tests --filter "FullyQualifiedName~LiveConductor"
    ```
-   If `HOLONET_LIVE_ADMIN_URI` is not set, these tests return immediately, so normal `dotnet test`
+   If `HOLONET_LIVE_ADMIN_URI` is not set, these tests are reported as skipped, so normal `dotnet test`
    and CI runs don't need a conductor.
 
 What the live tests cover: the raw wire envelope (generate agent key, list apps, list DNAs, and a
@@ -42,7 +42,7 @@ call), point `HOLONET_LIVE_HAPP_PATH` at a hApp built for 0.7.0. The OASIS hApp 
 (`hdk 0.7.0`, coordinator zome `oasis`):
 
 ```bash
-HOLONET_LIVE_ADMIN_URI=ws://localhost:65464 HOLONET_LIVE_HAPP_PATH='C:\Source\OASIS-Holochain-hApp\workdir\oasis.happ' dotnet test NextGenSoftware.Holochain.HoloNET.Client.Tests --filter "FullyQualifiedName~LiveConductorTests"
+HOLONET_LIVE_ADMIN_URI=ws://localhost:65464 HOLONET_LIVE_HAPP_PATH='C:\Source\OASIS-Holochain-hApp\workdir\oasis.happ' dotnet test NextGenSoftware.Holochain.HoloNET.Client.Tests --filter "FullyQualifiedName~LiveConductor"
 ```
 
 Older hApps such as `HoloNET-Manager/.../OASIS_hAPP/oasis.happ` use `manifest_version: "1"`, and
