@@ -1,4 +1,4 @@
-﻿
+
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
     public enum HoloNETRequestType
@@ -49,6 +49,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         AppAbandonCountersigningSession,
         AppPublishCountersigningSession,
         AppListWasmHostFunctions,
+        AppSendDirectSignal,
+        AppGrantDirectSignalCapability,
+        AdminGrantDirectSignalCapability,
         AppProvideMemproofs,
         AppPeerMetaInfo,
 

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Reflection;
@@ -207,6 +207,14 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                             DecodeWasmHostFunctionsListedReceived(response, dataReceivedEventArgs);
                             break;
 
+                        case HoloNETResponseType.AppDirectSignalSent:
+                            RaiseDirectSignalSentEvent(DecodeUnit<DirectSignalSentCallBackEventArgs>(response, dataReceivedEventArgs, HoloNETResponseType.AppDirectSignalSent, "APP: DIRECT SIGNAL SENT"));
+                            break;
+
+                        case HoloNETResponseType.AppDirectSignalCapabilityGranted:
+                            RaiseDirectSignalCapabilityGrantedEvent(DecodeDirectSignalCapabilityGranted(response, dataReceivedEventArgs));
+                            break;
+
                         case HoloNETResponseType.AppMemproofsProvided:
                             DecodeMemproofsProvidedReceived(response, dataReceivedEventArgs);
                             break;
@@ -284,6 +292,14 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                     case HoloNETRequestType.AppListWasmHostFunctions:
                         RaiseWasmHostFunctionsListedEvent(ProcessResponeError<WasmHostFunctionsListedCallBackEventArgs>(response, dataReceivedEventArgs, "AppListWasmHostFunctions", msg));
+                        break;
+
+                    case HoloNETRequestType.AppSendDirectSignal:
+                        RaiseDirectSignalSentEvent(ProcessResponeError<DirectSignalSentCallBackEventArgs>(response, dataReceivedEventArgs, "AppSendDirectSignal", msg));
+                        break;
+
+                    case HoloNETRequestType.AppGrantDirectSignalCapability:
+                        RaiseDirectSignalCapabilityGrantedEvent(ProcessResponeError<DirectSignalCapabilityGrantedCallBackEventArgs>(response, dataReceivedEventArgs, "AppGrantDirectSignalCapability", msg));
                         break;
 
                     case HoloNETRequestType.AppProvideMemproofs:
@@ -679,6 +695,50 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
 
             RaisePublishCountersigningSessionTriggeredEvent(args);
+        }
+
+        private T DecodeUnit<T>(IHoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs, HoloNETResponseType responseType, string logMessage) where T : HoloNETDataReceivedBaseEventArgs, new()
+        {
+            T args = CreateHoloNETArgs<T>(response, dataReceivedEventArgs);
+            args.HoloNETResponseType = responseType;
+            Logger.Log(logMessage + "\n", LogType.Info);
+            return args;
+        }
+
+        private DirectSignalCapabilityGrantedCallBackEventArgs DecodeDirectSignalCapabilityGranted(IHoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
+        {
+            var args = DecodeUnit<DirectSignalCapabilityGrantedCallBackEventArgs>(response, dataReceivedEventArgs, HoloNETResponseType.AppDirectSignalCapabilityGranted, "APP: DIRECT SIGNAL CAPABILITY GRANTED");
+            try
+            {
+                args.ActionHash = DeserializeResponseValue<byte[]>(response.data);
+            }
+            catch (Exception ex)
+            {
+                HandleError(args, $"An unknown error occurred in HoloNETClient.DecodeDirectSignalCapabilityGranted. Reason: {ex}");
+            }
+            return args;
+        }
+
+        private void RaiseDirectSignalSentEvent(DirectSignalSentCallBackEventArgs args)
+        {
+            LogEvent("AppDirectSignalSent", args);
+            OnDirectSignalSentCallBack?.Invoke(this, args);
+            if (!string.IsNullOrEmpty(args.Id) && _taskCompletionDirectSignalSentCallBack.TryGetValue(args.Id, out var completion))
+            {
+                completion.TrySetResult(args);
+                _taskCompletionDirectSignalSentCallBack.Remove(args.Id);
+            }
+        }
+
+        private void RaiseDirectSignalCapabilityGrantedEvent(DirectSignalCapabilityGrantedCallBackEventArgs args)
+        {
+            LogEvent("AppDirectSignalCapabilityGranted", args);
+            OnDirectSignalCapabilityGrantedCallBack?.Invoke(this, args);
+            if (!string.IsNullOrEmpty(args.Id) && _taskCompletionDirectSignalCapabilityGrantedCallBack.TryGetValue(args.Id, out var completion))
+            {
+                completion.TrySetResult(args);
+                _taskCompletionDirectSignalCapabilityGrantedCallBack.Remove(args.Id);
+            }
         }
 
         private void DecodeWasmHostFunctionsListedReceived(IHoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)

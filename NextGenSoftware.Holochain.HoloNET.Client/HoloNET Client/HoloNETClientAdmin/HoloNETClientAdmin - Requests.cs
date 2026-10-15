@@ -372,8 +372,28 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             if (!args.IsError)
             {
-                return await CallFunctionAsync(HoloNETRequestType.AdminGrantZomeCallCapability, "grant_zome_call_capability", CreateGrantZomeCallCapabilityRequest(cellId, capGrantAccessType, grantedFunctions, signingKey),
-                _taskCompletionZomeCapabilityGrantedCallBack, "OnZomeCallCapabilityGranted", conductorResponseCallBackMode, id);
+                //return await CallFunctionAsync(HoloNETRequestType.AdminGrantZomeCallCapability, "grant_zome_call_capability", CreateGrantZomeCallCapabilityRequest(cellId, capGrantAccessType, grantedFunctions, signingKey),
+                //_taskCompletionZomeCapabilityGrantedCallBack, "OnZomeCallCapabilityGranted", conductorResponseCallBackMode, id);
+                bool useV071 = _conductorUsesV071CapGrants ?? true;
+                var granted = await CallFunctionAsync(HoloNETRequestType.AdminGrantZomeCallCapability, "grant_zome_call_capability", CreateGrantZomeCallCapabilityRequest(cellId, capGrantAccessType, grantedFunctions, signingKey, useV071),
+                    _taskCompletionZomeCapabilityGrantedCallBack, "OnZomeCallCapabilityGranted", conductorResponseCallBackMode, id);
+
+                // Holochain 0.7.1 changed the grant payload with no compatibility shim, so each conductor version rejects the
+                // other's shape as "Failed to deserialize request". Try the other shape once and remember which one works.
+                if (conductorResponseCallBackMode == ConductorResponseCallBackMode.WaitForHolochainConductorResponse && _conductorUsesV071CapGrants == null)
+                {
+                    if (granted != null && granted.IsError && IsDeserializationError(granted.Message))
+                    {
+                        granted = await CallFunctionAsync(HoloNETRequestType.AdminGrantZomeCallCapability, "grant_zome_call_capability", CreateGrantZomeCallCapabilityRequest(cellId, capGrantAccessType, grantedFunctions, signingKey, !useV071),
+                            _taskCompletionZomeCapabilityGrantedCallBack, "OnZomeCallCapabilityGranted", conductorResponseCallBackMode, GetRequestId());
+                        if (granted != null && !granted.IsError)
+                            _conductorUsesV071CapGrants = !useV071;
+                    }
+                    else if (granted != null && !granted.IsError)
+                        _conductorUsesV071CapGrants = useV071;
+                }
+
+                return granted;
             }
             else
                 return args;
@@ -385,7 +405,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             if (!args.IsError)
             {
-                CallFunction(HoloNETRequestType.AdminGrantZomeCallCapability, "grant_zome_call_capability", CreateGrantZomeCallCapabilityRequest(cellId, capGrantAccessType, grantedFunctions, signingKey), id);
+                //CallFunction(HoloNETRequestType.AdminGrantZomeCallCapability, "grant_zome_call_capability", CreateGrantZomeCallCapabilityRequest(cellId, capGrantAccessType, grantedFunctions, signingKey), id);
+                CallFunction(HoloNETRequestType.AdminGrantZomeCallCapability, "grant_zome_call_capability", CreateGrantZomeCallCapabilityRequest(cellId, capGrantAccessType, grantedFunctions, signingKey, _conductorUsesV071CapGrants ?? true), id);
                 return new ZomeCallCapabilityGrantedCallBackEventArgs() { EndPoint = EndPoint, Id = id, Message = "The call has been sent to the conductor.  Please wait for the event 'OnZomeCallCapabilityGranted' to view the response." };
             }
             else
@@ -979,6 +1000,22 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 _taskCompletionAdminInterfacesAddedCallBack, "OnAdminInterfacesAddedCallBack", conductorResponseCallBackMode, id);
         }
 
+        /// <summary>
+        /// Holochain 0.7.1+: lets other agents send direct signals to <paramref name="cellId"/> (grant_direct_signal_capability).
+        /// Holochain 0.7.0 doesn't have this request and returns an error.
+        /// </summary>
+        public async Task<DirectSignalCapabilityGrantedCallBackEventArgs> GrantDirectSignalCapabilityAsync(byte[][] cellId, string tag, CapGrantAccessType access = CapGrantAccessType.Unrestricted, byte[] secret = null, byte[][] assignees = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
+        {
+            return await CallFunctionAsync(HoloNETRequestType.AdminGrantDirectSignalCapability, "grant_direct_signal_capability",
+                DirectSignalGrants.Request(cellId, tag, access, secret, assignees),
+                _taskCompletionDirectSignalCapabilityGrantedCallBack, "OnDirectSignalCapabilityGrantedCallBack", conductorResponseCallBackMode, id);
+        }
+
+        public DirectSignalCapabilityGrantedCallBackEventArgs GrantDirectSignalCapability(byte[][] cellId, string tag, CapGrantAccessType access = CapGrantAccessType.Unrestricted, byte[] secret = null, byte[][] assignees = null, string id = null)
+        {
+            return Task.Run(() => GrantDirectSignalCapabilityAsync(cellId, tag, access, secret, assignees, ConductorResponseCallBackMode.WaitForHolochainConductorResponse, id)).GetAwaiter().GetResult();
+        }
+
         [System.Obsolete("Holochain 0.7.0 agent infos are encoded strings; use AddAgentInfoAsync(IEnumerable<string>).")]
         public async Task<AgentInfoAddedCallBackEventArgs> AddAgentInfoAsync(AgentInfo[] agentInfos, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
@@ -1357,6 +1394,33 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }, _taskCompletionDnaRegisteredCallBack, "OnDnaRegisteredCallBack", conductorResponseCallBackMode, id);
         }
 
+        /// <summary>
+        /// Builds the grant_zome_call_capability payload. Holochain 0.7.0 wants
+        /// <c>cap_grant: { tag, access, functions }</c>; 0.7.1 wants <c>cap_grant: { tag, constraint, grant: { functions } }</c>.
+        /// <c>constraint</c> has the same <c>{ type, value }</c> shape as the old <c>access</c>.
+        /// </summary>
+        private object CreateGrantZomeCallCapabilityRequest(byte[][] cellId, CapGrantAccessType capGrantAccessType, Dictionary<GrantedFunctionsType, List<(string, string)>> grantedFunctions, byte[] signingKey, bool holochain071)
+        {
+            GrantZomeCallCapabilityRequest v070 = CreateGrantZomeCallCapabilityRequest(cellId, capGrantAccessType, grantedFunctions, signingKey);
+            if (!holochain071)
+                return v070;
+
+            return new Dictionary<string, object>
+            {
+                ["cell_id"] = cellId,
+                ["cap_grant"] = new Dictionary<string, object>
+                {
+                    ["tag"] = v070.cap_grant.tag,
+                    ["constraint"] = v070.cap_grant.access,
+                    ["grant"] = new Dictionary<string, object> { ["functions"] = v070.cap_grant.functions }
+                }
+            };
+        }
+
+        private static bool IsDeserializationError(string message) =>
+            !string.IsNullOrEmpty(message) && message.IndexOf("deserializ", StringComparison.OrdinalIgnoreCase) >= 0;
+
+        /// <summary>Holochain 0.7.0 shape (see the overload above).</summary>
         private GrantZomeCallCapabilityRequest CreateGrantZomeCallCapabilityRequest(byte[][] cellId, CapGrantAccessType capGrantAccessType, Dictionary<GrantedFunctionsType, List<(string, string)>> grantedFunctions, byte[] signingKey)
         {
             byte[] secret = _signingCredentialsForCell[$"{ConvertHoloHashToString(cellId[1])}:{ConvertHoloHashToString(cellId[0])}"].CapSecret;

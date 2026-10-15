@@ -165,6 +165,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public event PublishCountersigningSessionTriggeredCallBack OnPublishCountersigningSessionTriggeredCallBack;
 
 
+        public delegate void DirectSignalSentCallBack(object sender, DirectSignalSentCallBackEventArgs e);
+        public event DirectSignalSentCallBack OnDirectSignalSentCallBack;
+        public delegate void DirectSignalCapabilityGrantedCallBack(object sender, DirectSignalCapabilityGrantedCallBackEventArgs e);
+        public event DirectSignalCapabilityGrantedCallBack OnDirectSignalCapabilityGrantedCallBack;
+        private Dictionary<string, TaskCompletionSource<DirectSignalSentCallBackEventArgs>> _taskCompletionDirectSignalSentCallBack = new Dictionary<string, TaskCompletionSource<DirectSignalSentCallBackEventArgs>>();
+        private Dictionary<string, TaskCompletionSource<DirectSignalCapabilityGrantedCallBackEventArgs>> _taskCompletionDirectSignalCapabilityGrantedCallBack = new Dictionary<string, TaskCompletionSource<DirectSignalCapabilityGrantedCallBackEventArgs>>();
+
         public delegate void WasmHostFunctionsListedCallBack(object sender, WasmHostFunctionsListedCallBackEventArgs e);
 
         /// <summary>

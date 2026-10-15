@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using MessagePack;
 using NextGenSoftware.Logging;
@@ -298,7 +298,15 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     // AppMemproofsProvided here. If other Ok-returning AppRequest methods are wired
                     // up in future, this mapping will need to become request-id aware instead.
                     case "ok":
-                        response.HoloNETResponseType = HoloNETResponseType.AppMemproofsProvided;
+                        //response.HoloNETResponseType = HoloNETResponseType.AppMemproofsProvided;
+                        // Generic Ok: route by the request that asked for it (send_direct_signal or provide_memproofs).
+                        response.HoloNETResponseType = _requestTypeLookup.TryGetValue(response.id.ToString(), out HoloNETRequestType okRequest) && okRequest == HoloNETRequestType.AppSendDirectSignal
+                            ? HoloNETResponseType.AppDirectSignalSent
+                            : HoloNETResponseType.AppMemproofsProvided;
+                        break;
+
+                    case "direct_signal_capability_granted":
+                        response.HoloNETResponseType = this is HoloNETClientAdmin ? HoloNETResponseType.AdminDirectSignalCapabilityGranted : HoloNETResponseType.AppDirectSignalCapabilityGranted;
                         break;
 
                     case "error":

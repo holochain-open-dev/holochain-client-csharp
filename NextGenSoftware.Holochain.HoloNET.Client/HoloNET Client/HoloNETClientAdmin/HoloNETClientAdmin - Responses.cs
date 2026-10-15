@@ -48,6 +48,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                                 DecodeZomeCallCapabilityGrantedReceived(response, dataReceivedEventArgs);
                                 break;
 
+                            case HoloNETResponseType.AdminDirectSignalCapabilityGranted:
+                                RaiseDirectSignalCapabilityGrantedEvent(DecodeDirectSignalCapabilityGranted(response, dataReceivedEventArgs));
+                                break;
+
                             case HoloNETResponseType.AdminAppInterfaceAttached:
                                 DecodeAppInterfaceAttachedReceived(response, dataReceivedEventArgs);
                                 break;
@@ -190,6 +194,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                     case HoloNETRequestType.AdminGrantZomeCallCapability:
                         RaiseZomeCallCapabilityGrantedEvent(ProcessResponeError<ZomeCallCapabilityGrantedCallBackEventArgs>(response, dataReceivedEventArgs, "AdminGrantZomeCallCapability", msg));
+                        break;
+
+                    case HoloNETRequestType.AdminGrantDirectSignalCapability:
+                        RaiseDirectSignalCapabilityGrantedEvent(ProcessResponeError<DirectSignalCapabilityGrantedCallBackEventArgs>(response, dataReceivedEventArgs, "AdminGrantDirectSignalCapability", msg));
                         break;
 
                     case HoloNETRequestType.AdminAttachAppInterface:
@@ -426,6 +434,33 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
 
             RaiseAppDisabledEvent(args);
+        }
+
+        private DirectSignalCapabilityGrantedCallBackEventArgs DecodeDirectSignalCapabilityGranted(IHoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
+        {
+            var args = CreateHoloNETArgs<DirectSignalCapabilityGrantedCallBackEventArgs>(response, dataReceivedEventArgs);
+            args.HoloNETResponseType = HoloNETResponseType.AdminDirectSignalCapabilityGranted;
+            try
+            {
+                Logger.Log("ADMIN: DIRECT SIGNAL CAPABILITY GRANTED\n", LogType.Info);
+                args.ActionHash = DeserializeResponseValue<byte[]>(response.data);
+            }
+            catch (Exception ex)
+            {
+                HandleError(args, $"An unknown error occurred in HoloNETClient.DecodeDirectSignalCapabilityGranted. Reason: {ex}");
+            }
+            return args;
+        }
+
+        private void RaiseDirectSignalCapabilityGrantedEvent(DirectSignalCapabilityGrantedCallBackEventArgs args)
+        {
+            LogEvent("AdminDirectSignalCapabilityGranted", args);
+            OnDirectSignalCapabilityGrantedCallBack?.Invoke(this, args);
+            if (!string.IsNullOrEmpty(args.Id) && _taskCompletionDirectSignalCapabilityGrantedCallBack.TryGetValue(args.Id, out var completion))
+            {
+                completion.TrySetResult(args);
+                _taskCompletionDirectSignalCapabilityGrantedCallBack.Remove(args.Id);
+            }
         }
 
         private void DecodeZomeCallCapabilityGrantedReceived(IHoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)

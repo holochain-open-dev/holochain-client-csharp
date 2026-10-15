@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Net.WebSockets;
 using System.Threading.Tasks;
 using System.IO;
@@ -1139,6 +1140,50 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="conductorResponseCallBackMode">The Concuctor Response CallBack Mode, set this to 'WaitForHolochainConductorResponse' if you want the function to wait for the Holochain Conductor response before returning that response or set it to 'UseCallBackEvents' to return from the function immediately and then raise the 'OnWasmHostFunctionsListedCallBack' event when the conductor responds.</param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
+        /// <summary>
+        /// Sends <paramref name="signal"/> (opaque bytes) to <paramref name="agents"/> on the DNA <paramref name="dnaHash"/>
+        /// (send_direct_signal). Best effort: the conductor confirms it was sent, not delivered. On Holochain 0.7.1+ a recipient
+        /// only accepts it if it has a direct-signal grant for the sender (see <see cref="GrantDirectSignalCapabilityAsync"/>);
+        /// pass that grant's secret as <paramref name="capSecret"/> when it has one. Recipients get it as an app signal.
+        /// </summary>
+        public async Task<DirectSignalSentCallBackEventArgs> SendDirectSignalAsync(byte[] dnaHash, IEnumerable<byte[]> agents, byte[] signal, byte[] capSecret = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
+        {
+            var request = new Dictionary<string, object>
+            {
+                ["dna_hash"] = dnaHash,
+                ["agents"] = agents?.ToArray() ?? Array.Empty<byte[]>(),
+                // Vec<u8> without serde_bytes: a msgpack array of integers, not bin.
+                ["signal"] = (signal ?? Array.Empty<byte>()).Select(b => (int)b).ToArray()
+            };
+            // Holochain 0.7.1 field; omitted when unset so 0.7.0 conductors accept the request too.
+            if (capSecret != null)
+                request["cap_secret"] = capSecret;
+
+            return await CallFunctionAsync(HoloNETRequestType.AppSendDirectSignal, "send_direct_signal", request,
+                _taskCompletionDirectSignalSentCallBack, "OnDirectSignalSentCallBack", conductorResponseCallBackMode, id);
+        }
+
+        public DirectSignalSentCallBackEventArgs SendDirectSignal(byte[] dnaHash, IEnumerable<byte[]> agents, byte[] signal, byte[] capSecret = null, string id = null)
+        {
+            return Task.Run(() => SendDirectSignalAsync(dnaHash, agents, signal, capSecret, ConductorResponseCallBackMode.WaitForHolochainConductorResponse, id)).GetAwaiter().GetResult();
+        }
+
+        /// <summary>
+        /// Holochain 0.7.1+: lets other agents send direct signals to <paramref name="cellId"/> (a cell of this app)
+        /// (grant_direct_signal_capability). Holochain 0.7.0 doesn't have this request and returns an error.
+        /// </summary>
+        public async Task<DirectSignalCapabilityGrantedCallBackEventArgs> GrantDirectSignalCapabilityAsync(byte[][] cellId, string tag, CapGrantAccessType access = CapGrantAccessType.Unrestricted, byte[] secret = null, byte[][] assignees = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
+        {
+            return await CallFunctionAsync(HoloNETRequestType.AppGrantDirectSignalCapability, "grant_direct_signal_capability",
+                DirectSignalGrants.Request(cellId, tag, access, secret, assignees),
+                _taskCompletionDirectSignalCapabilityGrantedCallBack, "OnDirectSignalCapabilityGrantedCallBack", conductorResponseCallBackMode, id);
+        }
+
+        public DirectSignalCapabilityGrantedCallBackEventArgs GrantDirectSignalCapability(byte[][] cellId, string tag, CapGrantAccessType access = CapGrantAccessType.Unrestricted, byte[] secret = null, byte[][] assignees = null, string id = null)
+        {
+            return Task.Run(() => GrantDirectSignalCapabilityAsync(cellId, tag, access, secret, assignees, ConductorResponseCallBackMode.WaitForHolochainConductorResponse, id)).GetAwaiter().GetResult();
+        }
+
         public async Task<WasmHostFunctionsListedCallBackEventArgs> ListWasmHostFunctionsAsync(ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
             return await CallFunctionAsync(HoloNETRequestType.AppListWasmHostFunctions, "list_wasm_host_functions", null, _taskCompletionWasmHostFunctionsListedCallBack, "OnWasmHostFunctionsListedCallBack", conductorResponseCallBackMode, id);

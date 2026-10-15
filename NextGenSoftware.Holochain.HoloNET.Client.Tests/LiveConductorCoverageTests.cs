@@ -217,7 +217,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
                 var listed = await Step("list_capability_grants", admin.ListCapabilityGrantsAsync(appId));
                 Assert.False(listed.IsError, "list_capability_grants: " + listed.Message);
                 var cell = Assert.Single(listed.CapGrants);
-                string seen = string.Join(", ", (cell.cap_grants ?? Array.Empty<CapGrantInfo>()).Select(g => $"{g.cap_grant?.tag ?? "<null>"}:{g.cap_grant?.access?.GetType().Name}"));
+                string seen = string.Join(", ", (cell.cap_grants ?? Array.Empty<CapGrantInfo>()).Select(g => $"{g.cap_grant?.tag ?? "<null>"}:{g.cap_grant?.AccessInfo?.access_type}"));
                 Assert.True(cell.cap_grants?.Any(g => g.cap_grant?.tag == "zome-call-signing-key") == true, "grants seen: [" + seen + "]");
                 var grant = cell.cap_grants.First(g => g.cap_grant?.tag == "zome-call-signing-key");
                 Assert.Null(grant.revoked_at);

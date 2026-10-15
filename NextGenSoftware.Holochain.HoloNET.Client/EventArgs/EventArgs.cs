@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Net.WebSockets;
 using NextGenSoftware.Holochain.HoloNET.Client.Interfaces;
@@ -196,6 +196,17 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
     public class PublishCountersigningSessionTriggeredCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {
 
+    }
+
+    /// <summary>Result of send_direct_signal (delivery is best effort; the conductor only confirms it was sent).</summary>
+    public class DirectSignalSentCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
+    {
+    }
+
+    /// <summary>Result of grant_direct_signal_capability (Holochain 0.7.1+): the action hash of the committed grant.</summary>
+    public class DirectSignalCapabilityGrantedCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
+    {
+        public byte[] ActionHash { get; set; }
     }
 
     public class WasmHostFunctionsListedCallBackEventArgs : HoloNETDataReceivedBaseEventArgs

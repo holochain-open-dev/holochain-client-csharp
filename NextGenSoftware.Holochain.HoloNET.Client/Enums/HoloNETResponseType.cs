@@ -1,4 +1,4 @@
-﻿
+
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
     public enum HoloNETResponseType
@@ -47,6 +47,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         AppCountersigningSessionAbandoned,
         AppPublishCountersigningSessionTriggered,
         AppWasmHostFunctionsListed,
+        AppDirectSignalSent,
+        AppDirectSignalCapabilityGranted,
+        AdminDirectSignalCapabilityGranted,
         AppMemproofsProvided,
         AppPeerMetaInfoReturned,
 
