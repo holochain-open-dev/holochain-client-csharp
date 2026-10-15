@@ -1084,7 +1084,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public CloneCellCreatedCallBackEventArgs CreateCloneCell(string roleName, dynamic modifiers = null, byte[] membraneProof = null, string name = null, string id = null)
         {
             //return Task.Run(() => CreateCloneCellAsync(roleName, modifiers, membraneProof, name, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result; // returned before the conductor replied
-            return Task.Run(() => CreateCloneCellAsync(roleName, modifiers, membraneProof, name, ConductorResponseCallBackMode.WaitForHolochainConductorResponse, id)).GetAwaiter().GetResult();
+            //return Task.Run(() => CreateCloneCellAsync(roleName, modifiers, membraneProof, name, ConductorResponseCallBackMode.WaitForHolochainConductorResponse, id)).GetAwaiter().GetResult(); // dynamic argument: returned the Task (runtime binder error)
+            object modifiersObject = modifiers;
+            return Task.Run(() => CreateCloneCellAsync(roleName, modifiersObject, membraneProof, name, ConductorResponseCallBackMode.WaitForHolochainConductorResponse, id)).GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -1111,7 +1113,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public CloneCellEnabledCallBackEventArgs EnableCloneCell(dynamic cloneCellId, string id = null)
         {
             //return Task.Run(() => EnableCloneCellAsync(cloneCellId, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result; // returned before the conductor replied
-            return Task.Run(() => EnableCloneCellAsync(cloneCellId, ConductorResponseCallBackMode.WaitForHolochainConductorResponse, id)).GetAwaiter().GetResult();
+            //return Task.Run(() => EnableCloneCellAsync(cloneCellId, ConductorResponseCallBackMode.WaitForHolochainConductorResponse, id)).GetAwaiter().GetResult(); // dynamic argument: returned the Task (runtime binder error)
+            object cloneCellIdObject = cloneCellId;
+            return Task.Run(() => EnableCloneCellAsync(cloneCellIdObject, ConductorResponseCallBackMode.WaitForHolochainConductorResponse, id)).GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -1138,7 +1142,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public CloneCellDisabledCallBackEventArgs DisableCloneCell(dynamic cloneCellId, string id = null)
         {
             //return Task.Run(() => DisableCloneCellAsync(cloneCellId, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result; // returned before the conductor replied
-            return Task.Run(() => DisableCloneCellAsync(cloneCellId, ConductorResponseCallBackMode.WaitForHolochainConductorResponse, id)).GetAwaiter().GetResult();
+            //return Task.Run(() => DisableCloneCellAsync(cloneCellId, ConductorResponseCallBackMode.WaitForHolochainConductorResponse, id)).GetAwaiter().GetResult(); // dynamic argument: returned the Task (runtime binder error)
+            object cloneCellIdObject = cloneCellId;
+            return Task.Run(() => DisableCloneCellAsync(cloneCellIdObject, ConductorResponseCallBackMode.WaitForHolochainConductorResponse, id)).GetAwaiter().GetResult();
         }
 
         /// <summary>

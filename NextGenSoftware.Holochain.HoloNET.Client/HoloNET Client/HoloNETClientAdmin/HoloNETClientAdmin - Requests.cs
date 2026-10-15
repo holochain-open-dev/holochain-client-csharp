@@ -283,11 +283,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             return await InstallAppInternalAsync(installedAppId, null, null, agentKey, membraneProofs, network_seed, conductorResponseCallBackMode, id, happBytes);
         }
 
+        [System.Obsolete("Holochain 0.7 installs from a packed .happ (path or bytes); an AppBundle with only a manifest can't be packed. Use InstallAppAsync(id, hAppPath) or InstallAppFromBytesAsync.")]
         public async Task<AppInstalledCallBackEventArgs> InstallAppAsync(string installedAppId, AppBundle appBundle, string agentKey = null, Dictionary<string, byte[]> membraneProofs = null, string network_seed = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
             return await InstallAppInternalAsync(installedAppId, null, appBundle, agentKey, membraneProofs, network_seed, conductorResponseCallBackMode, id);
         }
 
+        [System.Obsolete("Holochain 0.7 installs from a packed .happ (path or bytes); an AppBundle with only a manifest can't be packed. Use InstallApp(id, hAppPath) or InstallAppFromBytesAsync.")]
         public AppInstalledCallBackEventArgs InstallApp(string installedAppId, AppBundle appBundle, string agentKey = null, Dictionary<string, byte[]> membraneProofs = null, string network_seed = null, string id = null)
         {
             //return Task.Run(() => InstallAppInternalAsync(installedAppId, null, appBundle, agentKey, membraneProofs, network_seed, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result; // returned before the conductor replied
@@ -401,16 +403,20 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         public ZomeCallCapabilityGrantedCallBackEventArgs AuthorizeSigningCredentialsAndGrantZomeCallCapability(byte[][] cellId, CapGrantAccessType capGrantAccessType, GrantedFunctionsType grantedFunctionsType, List<(string, string)> functions = null, string id = "")
         {
-            (ZomeCallCapabilityGrantedCallBackEventArgs args, Dictionary<GrantedFunctionsType, List<(string, string)>> grantedFunctions, byte[] signingKey) = AuthorizeSigningCredentials(cellId, grantedFunctionsType, functions, id);
+            //(ZomeCallCapabilityGrantedCallBackEventArgs args, Dictionary<GrantedFunctionsType, List<(string, string)>> grantedFunctions, byte[] signingKey) = AuthorizeSigningCredentials(cellId, grantedFunctionsType, functions, id);
 
-            if (!args.IsError)
-            {
-                //CallFunction(HoloNETRequestType.AdminGrantZomeCallCapability, "grant_zome_call_capability", CreateGrantZomeCallCapabilityRequest(cellId, capGrantAccessType, grantedFunctions, signingKey), id);
-                CallFunction(HoloNETRequestType.AdminGrantZomeCallCapability, "grant_zome_call_capability", CreateGrantZomeCallCapabilityRequest(cellId, capGrantAccessType, grantedFunctions, signingKey, _conductorUsesV071CapGrants ?? true), id);
-                return new ZomeCallCapabilityGrantedCallBackEventArgs() { EndPoint = EndPoint, Id = id, Message = "The call has been sent to the conductor.  Please wait for the event 'OnZomeCallCapabilityGranted' to view the response." };
-            }
-            else
-                return args;
+            //if (!args.IsError)
+            //{
+            //    //CallFunction(HoloNETRequestType.AdminGrantZomeCallCapability, "grant_zome_call_capability", CreateGrantZomeCallCapabilityRequest(cellId, capGrantAccessType, grantedFunctions, signingKey), id);
+            //    CallFunction(HoloNETRequestType.AdminGrantZomeCallCapability, "grant_zome_call_capability", CreateGrantZomeCallCapabilityRequest(cellId, capGrantAccessType, grantedFunctions, signingKey, _conductorUsesV071CapGrants ?? true), id);
+            //    return new ZomeCallCapabilityGrantedCallBackEventArgs() { EndPoint = EndPoint, Id = id, Message = "The call has been sent to the conductor.  Please wait for the event 'OnZomeCallCapabilityGranted' to view the response." };
+            //}
+            //else
+            //    return args;
+
+            // Waits like the other synchronous methods (it returned a placeholder before the conductor replied, so a rejected
+            // grant looked successful), and goes through the async path's 0.7.0 / 0.7.1 payload detection.
+            return Task.Run(() => AuthorizeSigningCredentialsAndGrantZomeCallCapabilityAsync(cellId, capGrantAccessType, grantedFunctionsType, functions, ConductorResponseCallBackMode.WaitForHolochainConductorResponse, id)).GetAwaiter().GetResult();
         }
 
         public byte[] GetCapGrantSecret(byte[][] cellId)
@@ -1366,9 +1372,21 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             if (membraneProofs == null)
                 membraneProofs = new Dictionary<string, byte[]>();
 
+            Dictionary<string, object> source;
+            try
+            {
+                source = BuildInstallAppSource(hAppPath, appBundle, happBytes);
+            }
+            catch (Exception ex) when (ex is ArgumentException || ex is NotSupportedException)
+            {
+                // Report like every other request failure instead of throwing out of the call.
+                return new AppInstalledCallBackEventArgs { EndPoint = EndPoint, Id = id, IsError = true, Message = ex.Message };
+            }
+
             return await CallFunctionAsync(HoloNETRequestType.AdminInstallApp, "install_app", new InstallAppRequest()
             {
-                source = BuildInstallAppSource(hAppPath, appBundle, happBytes),
+                //source = BuildInstallAppSource(hAppPath, appBundle, happBytes),
+                source = source,
                 agent_key = ConvertHoloHashToBytes(agentKey),
                 installed_app_id = installedAppId,
                 roles_settings = InstallAppRequest.RolesSettingsFromMembraneProofs(membraneProofs),
