@@ -158,5 +158,84 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
                 await admin.DisconnectAsync();
             }
         }
+
+        [SkippableFact]
+        public async Task Live_AgentInfo_GetThenAddBack()
+        {
+            RequireConductorAndHapp();
+            await WithInstalledApp(async (admin, appId, app) =>
+            {
+                // The conductor publishes an agent info for the new cell shortly after install.
+                List<string> infos = null;
+                for (int attempt = 0; attempt < 15 && (infos == null || infos.Count == 0); attempt++)
+                {
+                    var got = await Step("agent_info", admin.GetAgentInfoAsync());
+                    Assert.False(got.IsError, "agent_info: " + got.Message);
+                    infos = got.AgentInfos;
+                    if (infos.Count == 0) await Task.Delay(1000);
+                }
+                Assert.NotEmpty(infos);
+                Assert.All(infos, info => Assert.StartsWith("{", info.TrimStart()));
+
+                // Adding our own (already known) infos back must be accepted.
+                var added = await Step("add_agent_info", admin.AddAgentInfoAsync(infos));
+                Assert.False(added.IsError, "add_agent_info: " + added.Message);
+            });
+        }
+
+        [SkippableFact]
+        public async Task Live_AddAdminInterfaces_OpensANewAdminPort()
+        {
+            RequireConductorAndHapp();
+            ushort port = (ushort)new Random().Next(40000, 50000);
+            var admin = NewAdmin();
+            Assert.False((await admin.ConnectAsync(AdminUri)).IsError);
+            try
+            {
+                var added = await Step("add_admin_interfaces", admin.AddAdminInterfacesAsync(new[] { port }));
+                Assert.False(added.IsError, "add_admin_interfaces: " + added.Message);
+
+                // The new port is a working admin interface.
+                var second = NewAdmin();
+                Assert.False((await second.ConnectAsync($"ws://localhost:{port}")).IsError);
+                var key = await Step("generate_agent_pub_key on new port", second.GenerateAgentPubKeyAsync());
+                Assert.False(key.IsError, "generate_agent_pub_key: " + key.Message);
+                await second.DisconnectAsync();
+            }
+            finally
+            {
+                await admin.DisconnectAsync();
+            }
+        }
+
+        [SkippableFact]
+        public async Task Live_ListCapabilityGrants_ThenRevokeTheSigningGrant()
+        {
+            RequireConductorAndHapp();
+            await WithInstalledApp(async (admin, appId, app) =>
+            {
+                var listed = await Step("list_capability_grants", admin.ListCapabilityGrantsAsync(appId));
+                Assert.False(listed.IsError, "list_capability_grants: " + listed.Message);
+                var cell = Assert.Single(listed.CapGrants);
+                string seen = string.Join(", ", (cell.cap_grants ?? Array.Empty<CapGrantInfo>()).Select(g => $"{g.cap_grant?.tag ?? "<null>"}:{g.cap_grant?.access?.GetType().Name}"));
+                Assert.True(cell.cap_grants?.Any(g => g.cap_grant?.tag == "zome-call-signing-key") == true, "grants seen: [" + seen + "]");
+                var grant = cell.cap_grants.First(g => g.cap_grant?.tag == "zome-call-signing-key");
+                Assert.Null(grant.revoked_at);
+
+                var revoked = await Step("revoke_zome_call_capability", admin.RevokeZomeCallCapabilityAsync(grant.action_hash, cell.cell_id));
+                Assert.False(revoked.IsError, "revoke_zome_call_capability: " + revoked.Message);
+
+                var after = await Step("list_capability_grants (include revoked)", admin.ListCapabilityGrantsAsync(appId, includeRevoked: true));
+                Assert.NotNull(after.CapGrants.Single().cap_grants.Single(g => g.cap_grant?.tag == "zome-call-signing-key").revoked_at);
+
+                // With the grant revoked, calls signed with it are refused.
+                try
+                {
+                    var call = await Step("zome call after revoke", app.HoloNETClientAppAgent.CallZomeFunctionAsync("oasis", "get_all_avatars", null));
+                    Assert.True(call.IsError, "a call signed with a revoked grant should fail");
+                }
+                catch (HoloNETException) { /* HoloNET throws when nothing subscribes to OnError */ }
+            });
+        }
     }
 }

@@ -2,9 +2,9 @@
 
 ## Coverage push: four more 0.7.0 bugs, shared-state fixes
 
-New live tests (`LiveConductorCoverageTests`) for paths no test reached exposed real bugs. 89 tests; all pass
-live against a 0.7.0 conductor, repeatably. HoloNET.Client coverage with the conductor: **52.8% lines,
-47.7% branches** (it was 46.3% / 39.9%; offline-only it is 5.2%).
+New live tests (`LiveConductorCoverageTests`) for paths no test reached exposed real bugs. 93 tests; all pass
+live against a 0.7.0 conductor on a fresh sandbox. HoloNET.Client coverage with the conductor: **54.9% lines,
+49.6% branches** (it was 46.3% / 39.9%; offline-only it is 5.2%).
 
 ### Fixes
 - **`app_info` was rejected** ("Failed to deserialize request"): 0.7.0 `AppRequest::AppInfo` is a unit
@@ -25,6 +25,14 @@ live against a 0.7.0 conductor, repeatably. HoloNET.Client coverage with the con
   uses the shared, file-loaded default. `SaveDNA` saves the client's DNA.
 - **Shared signing credentials weren't thread-safe**: concurrent clients threw in
   `Dictionary.TryInsert`. Now a `ConcurrentDictionary`.
+
+- **`AddAgentInfoAsync` never completed**: its result handler checked the agent-info-*returned* request map
+  (copy-paste), so the waiting call was never resolved. New overload takes the encoded strings that
+  `GetAgentInfoAsync` returns (`AgentInfos`); the old `AgentInfo[]` overload is obsolete.
+- **New `AddAdminInterfacesAsync`** (`add_admin_interfaces`): the decoder existed but there was no request method.
+- **`ListCapabilityGrantsAsync` always returned no grants**: a Holochain 0.7.0 conductor bug
+  (`capability_grant_info` skips *every* grant when `include_revoked` is false, not just revoked ones).
+  HoloNET now always asks for all grants and drops revoked ones itself when `includeRevoked` is false.
 
 ### Tests
 - Live tests now report as **skipped** without a conductor (they used to pass silently).

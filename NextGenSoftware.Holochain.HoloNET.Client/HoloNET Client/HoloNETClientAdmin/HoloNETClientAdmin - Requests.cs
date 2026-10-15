@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Security.Cryptography;
 using Nito.AsyncEx.Synchronous;
@@ -915,6 +916,42 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="conductorResponseCallBackMode">The Concuctor Response CallBack Mode, set this to 'WaitForHolochainConductorResponse' if you want the function to wait for the Holochain Conductor response before returning that response or set it to 'UseCallBackEvents' to return from the function immediately and then raise the 'OnDumpFullStateCallBack' event when the conductor responds.   </param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
+        /// <summary>
+        /// Adds signed agent infos to the conductor's peer store (Holochain 0.7.0 <c>add_agent_info { agent_infos: Vec&lt;String&gt; }</c>).
+        /// Pass the encoded strings from <see cref="AgentInfoReturnedCallBackEventArgs.AgentInfos"/> (e.g. from another conductor).
+        /// </summary>
+        public async Task<AgentInfoAddedCallBackEventArgs> AddAgentInfoAsync(IEnumerable<string> agentInfos, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
+        {
+            return await CallFunctionAsync(HoloNETRequestType.AdminAddAgentInfo, "add_agent_info", new AddAgentInfoRequest()
+            {
+                agent_infos = agentInfos?.Cast<object>().ToArray() ?? Array.Empty<object>()
+            }, _taskCompletionAgentInfoAddedCallBack, "OnAgentInfoAddedCallBack", conductorResponseCallBackMode, id);
+        }
+
+        /// <summary>
+        /// Adds admin websocket interfaces (Holochain 0.7.0 <c>add_admin_interfaces</c>). Each port gets a websocket interface
+        /// accepting <paramref name="allowedOrigins"/> ("*" for any origin, or a comma-separated list).
+        /// </summary>
+        public async Task<AdminInterfacesAddedCallBackEventArgs> AddAdminInterfacesAsync(IEnumerable<ushort> ports, string allowedOrigins = "*", ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
+        {
+            // Vec<AdminInterfaceConfig { driver: InterfaceDriver::Websocket { port, danger_bind_addr, allowed_origins } }>,
+            // InterfaceDriver is internally tagged with "type". A tuple variant, so the value is the bare list.
+            var configs = ports.Select(port => new Dictionary<string, object>
+            {
+                ["driver"] = new Dictionary<string, object>
+                {
+                    ["type"] = "websocket",
+                    ["port"] = port,
+                    ["danger_bind_addr"] = null,
+                    ["allowed_origins"] = allowedOrigins
+                }
+            }).ToArray();
+
+            return await CallFunctionAsync(HoloNETRequestType.AdminAddAdminInterfaces, "add_admin_interfaces", configs,
+                _taskCompletionAdminInterfacesAddedCallBack, "OnAdminInterfacesAddedCallBack", conductorResponseCallBackMode, id);
+        }
+
+        [System.Obsolete("Holochain 0.7.0 agent infos are encoded strings; use AddAgentInfoAsync(IEnumerable<string>).")]
         public async Task<AgentInfoAddedCallBackEventArgs> AddAgentInfoAsync(AgentInfo[] agentInfos, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
             return await CallFunctionAsync(HoloNETRequestType.AdminAddAgentInfo, "add_agent_info", new AddAgentInfoRequest()
@@ -1433,11 +1470,23 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public async Task<CapabilityGrantsListedCallBackEventArgs> ListCapabilityGrantsAsync(string installedAppId, bool includeRevoked = false, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
-            return await CallFunctionAsync(HoloNETRequestType.AdminListCapabilityGrants, "list_capability_grants", new ListCapabilityGrantsRequest()
+            // Holochain 0.7.0 bug (conductor.rs capability_grant_info): with include_revoked = false it skips EVERY grant
+            // (`if !include_revoked { continue; }`), not just revoked ones, so the list is always empty. Ask for all
+            // grants and drop the revoked ones here instead. Previous request:
+            //include_revoked = includeRevoked
+            var result = await CallFunctionAsync(HoloNETRequestType.AdminListCapabilityGrants, "list_capability_grants", new ListCapabilityGrantsRequest()
             {
                 installed_app_id = installedAppId,
-                include_revoked = includeRevoked
+                include_revoked = true
             }, _taskCompletionCapabilityGrantsListedCallBack, "OnCapabilityGrantsListedCallBack", conductorResponseCallBackMode, id);
+
+            if (!includeRevoked && result?.CapGrants != null)
+            {
+                foreach (CellCapGrantInfo cell in result.CapGrants)
+                    cell.cap_grants = cell.cap_grants?.Where(grant => grant.revoked_at == null).ToArray();
+            }
+
+            return result;
         }
 
         /// <summary>

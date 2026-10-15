@@ -1320,7 +1320,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             LogEvent("AdminAgentInfoAdded", agentInfoAddedCallBackEventArgs);
             OnAgentInfoAddedCallBack?.Invoke(this, agentInfoAddedCallBackEventArgs);
 
-            if (_taskCompletionAgentInfoAddedCallBack != null && !string.IsNullOrEmpty(agentInfoAddedCallBackEventArgs.Id) && _taskCompletionAgentInfoReturnedCallBack.ContainsKey(agentInfoAddedCallBackEventArgs.Id))
+            // Checked _taskCompletionAgentInfoReturnedCallBack (copy-paste), so AddAgentInfoAsync never completed.
+            //if (_taskCompletionAgentInfoAddedCallBack != null && !string.IsNullOrEmpty(agentInfoAddedCallBackEventArgs.Id) && _taskCompletionAgentInfoReturnedCallBack.ContainsKey(agentInfoAddedCallBackEventArgs.Id))
+            if (_taskCompletionAgentInfoAddedCallBack != null && !string.IsNullOrEmpty(agentInfoAddedCallBackEventArgs.Id) && _taskCompletionAgentInfoAddedCallBack.ContainsKey(agentInfoAddedCallBackEventArgs.Id))
             {
                 _taskCompletionAgentInfoAddedCallBack[agentInfoAddedCallBackEventArgs.Id].TrySetResult(agentInfoAddedCallBackEventArgs);
                 _taskCompletionAgentInfoAddedCallBack.Remove(agentInfoAddedCallBackEventArgs.Id);
