@@ -239,9 +239,18 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <summary>
         /// Will init the hApp, which includes installing and enabling the app, signing credentials & attaching the app interface. It will then connect to the hApp and return the HoloNETClientAppAgent connection.
         /// </summary>
-        public InstallEnableSignAttachAndConnectToHappEventArgs InstallEnableSignAttachAndConnectToHapp(string hAppId, string hAppInstallPath, string roleName, CapGrantAccessType capGrantAccessType = CapGrantAccessType.Unrestricted, GrantedFunctionsType grantedFunctionsType = GrantedFunctionsType.All, List<(string, string)> grantedFunctions = null, bool uninstallhAppIfAlreadyInstalled = true, bool log = true, Action<string, LogType> loggingFunction = null)
+        /// <summary>Synchronous InstallEnableSignAndAttachHappAsync: installs and enables the app, signs credentials and attaches an app interface.</summary>
+        public InstallEnableSignAndAttachHappEventArgs InstallEnableSignAndAttachHapp(string hAppId, string hAppInstallPath, string roleName, CapGrantAccessType capGrantAccessType = CapGrantAccessType.Assigned, GrantedFunctionsType grantedFunctionsType = GrantedFunctionsType.All, List<(string, string)> grantedFunctions = null, bool uninstallhAppIfAlreadyInstalled = true, bool log = true, Action<string, LogType> loggingFunction = null)
         {
-            return Task.Run(() => InstallEnableSignAttachAndConnectToHappAsync(hAppId, hAppInstallPath, roleName, capGrantAccessType, grantedFunctionsType, grantedFunctions, uninstallhAppIfAlreadyInstalled, log, loggingFunction)).Result;
+            return Task.Run(() => InstallEnableSignAndAttachHappAsync(hAppId, hAppInstallPath, roleName, capGrantAccessType, grantedFunctionsType, grantedFunctions, uninstallhAppIfAlreadyInstalled, log, loggingFunction)).GetAwaiter().GetResult();
+        }
+
+        // Defaulted to Unrestricted while the async version defaults to Assigned, so the same call granted different access.
+        //public InstallEnableSignAttachAndConnectToHappEventArgs InstallEnableSignAttachAndConnectToHapp(string hAppId, string hAppInstallPath, string roleName, CapGrantAccessType capGrantAccessType = CapGrantAccessType.Unrestricted, GrantedFunctionsType grantedFunctionsType = GrantedFunctionsType.All, List<(string, string)> grantedFunctions = null, bool uninstallhAppIfAlreadyInstalled = true, bool log = true, Action<string, LogType> loggingFunction = null)
+        public InstallEnableSignAttachAndConnectToHappEventArgs InstallEnableSignAttachAndConnectToHapp(string hAppId, string hAppInstallPath, string roleName, CapGrantAccessType capGrantAccessType = CapGrantAccessType.Assigned, GrantedFunctionsType grantedFunctionsType = GrantedFunctionsType.All, List<(string, string)> grantedFunctions = null, bool uninstallhAppIfAlreadyInstalled = true, bool log = true, Action<string, LogType> loggingFunction = null)
+        {
+            //return Task.Run(() => InstallEnableSignAttachAndConnectToHappAsync(hAppId, hAppInstallPath, roleName, capGrantAccessType, grantedFunctionsType, grantedFunctions, uninstallhAppIfAlreadyInstalled, log, loggingFunction)).Result; // .Result wraps errors in AggregateException
+            return Task.Run(() => InstallEnableSignAttachAndConnectToHappAsync(hAppId, hAppInstallPath, roleName, capGrantAccessType, grantedFunctionsType, grantedFunctions, uninstallhAppIfAlreadyInstalled, log, loggingFunction)).GetAwaiter().GetResult();
         }
 
         public async Task<AgentPubKeyGeneratedCallBackEventArgs> GenerateAgentPubKeyAsync(ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, bool updateAgentPubKeyInHoloNETDNA = true, string id = "")

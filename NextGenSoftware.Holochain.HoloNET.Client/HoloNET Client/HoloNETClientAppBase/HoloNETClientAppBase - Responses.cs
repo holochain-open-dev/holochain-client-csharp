@@ -31,7 +31,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public dynamic MapEntryDataObject(Type entryDataObjectType, Dictionary<string, string> keyValuePairs, bool cacheEntryDataObjectPropertyInfo = true)
         {
-            return Task.Run(() => MapEntryDataObjectAsync(entryDataObjectType, keyValuePairs, cacheEntryDataObjectPropertyInfo)).Result;
+            //return Task.Run(() => MapEntryDataObjectAsync(entryDataObjectType, keyValuePairs, cacheEntryDataObjectPropertyInfo)).Result; // .Result wraps errors in AggregateException
+            return Task.Run(() => MapEntryDataObjectAsync(entryDataObjectType, keyValuePairs, cacheEntryDataObjectPropertyInfo)).GetAwaiter().GetResult();
         }
 
         /// <summary>Formats a decoded msgpack value with the invariant culture ("null" for null), so ConvertEntryValue round-trips it.</summary>
@@ -190,7 +191,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public dynamic MapEntryDataObject(dynamic entryDataObject, Dictionary<string, string> keyValuePairs, bool cacheEntryDataObjectPropertyInfos = true)
         {
-            return Task.Run(() => MapEntryDataObjectAsync(entryDataObject, keyValuePairs, cacheEntryDataObjectPropertyInfos)).Result;
+            //return Task.Run(() => MapEntryDataObjectAsync(entryDataObject, keyValuePairs, cacheEntryDataObjectPropertyInfos)).Result; // .Result wraps errors in AggregateException
+            return Task.Run(() => MapEntryDataObjectAsync(entryDataObject, keyValuePairs, cacheEntryDataObjectPropertyInfos)).GetAwaiter().GetResult();
         }
 
         protected override IHoloNETResponse ProcessDataReceived(WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
@@ -464,7 +466,28 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     SetReadyForZomeCalls(response.id.ToString());
 
                 else if (_automaticallyAttemptToGetFromSandboxIfConductorFails)
-                    RetrieveAgentPubKeyAndDnaHashFromSandbox();
+                {
+                    //RetrieveAgentPubKeyAndDnaHashFromSandbox();
+                    // Ran hc synchronously on the WebSocket receive thread, and with the default fallback back to the conductor
+                    // the two could call each other forever. Run it in the background and don't bounce back.
+                    string retrievalId = response.id.ToString();
+                    FireAndForget(Task.Run(async () =>
+                    {
+                        AgentPubKeyDnaHash fromSandbox = await RetrieveAgentPubKeyAndDnaHashFromSandboxAsync(_updateDnaHashAndAgentPubKey, false);
+                        if (_taskCompletionAgentPubKeyAndDnaHashRetrieved.TryGetValue(retrievalId, out TaskCompletionSource<AgentPubKeyDnaHash> waiting))
+                        {
+                            _taskCompletionAgentPubKeyAndDnaHashRetrieved.Remove(retrievalId);
+                            waiting.TrySetResult(fromSandbox);
+                        }
+                    }), "RetrieveAgentPubKeyAndDnaHashFromSandboxAsync");
+                }
+                else if (!string.IsNullOrEmpty(response.id.ToString()) && _taskCompletionAgentPubKeyAndDnaHashRetrieved.TryGetValue(response.id.ToString(), out TaskCompletionSource<AgentPubKeyDnaHash> noKeys))
+                {
+                    // app_info had no cell for this agent and there is no fallback: finish the retrieval rather than hang.
+                    _taskCompletionAgentPubKeyAndDnaHashRetrieved.Remove(response.id.ToString());
+                    RetrievingAgentPubKeyAndDnaHash = false;
+                    noKeys.TrySetResult(null);
+                }
             }
 
             RaiseAppInfoReceivedEvent(args);
@@ -1121,6 +1144,16 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         {
             LogEvent("AppInfoCallBack", appInfoCallBackEventArgs, string.Concat("AgentPubKey: ", appInfoCallBackEventArgs.AgentPubKey, ", DnaHash: ", appInfoCallBackEventArgs.DnaHash, ", Installed App Id: ", appInfoCallBackEventArgs.InstalledAppId));
             OnAppInfoCallBack?.Invoke(this, appInfoCallBackEventArgs);
+
+            // A retrieval waiting on this app_info (RetrieveAgentPubKeyAndDnaHashFromConductorAsync) was only completed on
+            // success (SetReadyForZomeCalls), so an error left it waiting forever. Complete it with null.
+            if (appInfoCallBackEventArgs.IsError && !string.IsNullOrEmpty(appInfoCallBackEventArgs.Id)
+                && _taskCompletionAgentPubKeyAndDnaHashRetrieved.TryGetValue(appInfoCallBackEventArgs.Id, out TaskCompletionSource<AgentPubKeyDnaHash> retrieval))
+            {
+                _taskCompletionAgentPubKeyAndDnaHashRetrieved.Remove(appInfoCallBackEventArgs.Id);
+                RetrievingAgentPubKeyAndDnaHash = false;
+                retrieval.TrySetResult(null);
+            }
 
             if (_taskCompletionAppInfoRetrieved != null && !string.IsNullOrEmpty(appInfoCallBackEventArgs.Id) && _taskCompletionAppInfoRetrieved.ContainsKey(appInfoCallBackEventArgs.Id))
             {

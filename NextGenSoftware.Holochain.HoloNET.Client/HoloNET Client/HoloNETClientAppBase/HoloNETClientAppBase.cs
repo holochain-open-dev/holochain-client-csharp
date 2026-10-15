@@ -439,7 +439,15 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 base.WebSocket_OnConnected(sender, e);
 
                 if (DeferConnectedNotification)
+                {
+                    // ConnectAsync only authenticates when it waits for the connection; in UseCallBackEvents mode nothing
+                    // sent the token, so the client never became ready. Authenticate here (it raises OnConnected and
+                    // continues the start-up once the token is accepted).
+                    if (!_connectingAsync)
+                        FireAndForget(AuthenticateConnectionAsync(), "AuthenticateConnectionAsync");
+
                     return;
+                }
 
                 BeginPostConnectInitialization();
             }

@@ -126,7 +126,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     return new AgentPubKeyDnaHash() { DnaHash = dnaHash, AgentPubKey = agentPubKey };
                 }
                 else if (automaticallyAttemptToRetrieveFromConductorIfSandBoxFails)
-                    await RetrieveAgentPubKeyAndDnaHashFromConductorAsync();
+                    //await RetrieveAgentPubKeyAndDnaHashFromConductorAsync();
+                    // Its default fallback is back to the sandbox, so a failure on both sides looped forever.
+                    return await RetrieveAgentPubKeyAndDnaHashFromConductorAsync(null, null, RetrieveAgentPubKeyAndDnaHashMode.Wait, updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved, false);
             }
             catch (Exception ex)
             {
@@ -207,7 +209,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns>The AgentPubKey and DnaHash</returns>
         public AgentPubKeyDnaHash RetrieveAgentPubKeyAndDnaHashFromSandbox(bool updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved = true, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true)
         {
-            return Task.Run(() => RetrieveAgentPubKeyAndDnaHashFromSandboxAsync(updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved, automaticallyAttemptToRetrieveFromConductorIfSandBoxFails)).Result;
+            //return Task.Run(() => RetrieveAgentPubKeyAndDnaHashFromSandboxAsync(updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved, automaticallyAttemptToRetrieveFromConductorIfSandBoxFails)).Result; // .Result wraps errors in AggregateException
+            return Task.Run(() => RetrieveAgentPubKeyAndDnaHashFromSandboxAsync(updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved, automaticallyAttemptToRetrieveFromConductorIfSandBoxFails)).GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -361,7 +364,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="roleName">If this is set then HoloNET will look up the CellType and return it in the OnAppInfoCallBack event. This field is optional.</param>
         /// <param name="conductorResponseCallBackMode">If set to `WaitForHolochainConductorResponse` (default) it will await until it has finished retrieving the AppInfo before returning, otherwise it will return immediately and then raise the OnAppInfoCallBack event once it has finished retrieving the AppInfo.</param>
         /// <returns>AppInfoCallBackEventArgs</returns>
-        public async Task<AppInfoCallBackEventArgs> GetAppInfo(string installedAppId = null, string roleName = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse)
+        //public async Task<AppInfoCallBackEventArgs> GetAppInfo(string installedAppId = null, string roleName = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse) // the sync variant returned a Task
+        public AppInfoCallBackEventArgs GetAppInfo(string installedAppId = null, string roleName = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse)
         {
             //return Task.Run(() => GetAppInfoAsync(installedAppId, roleName, ConductorResponseCallBackMode.UseCallBackEvents)).Result; // returned before the conductor replied
             return Task.Run(() => GetAppInfoAsync(installedAppId, roleName, ConductorResponseCallBackMode.WaitForHolochainConductorResponse)).GetAwaiter().GetResult();

@@ -774,7 +774,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public virtual void StartHolochainConductor()
         {
-            StartHolochainConductorAsync().Wait();
+            //StartHolochainConductorAsync().Wait(); // deadlocks on a UI / Unity synchronisation context
+            Task.Run(() => StartHolochainConductorAsync()).GetAwaiter().GetResult();
         }
 
         //TODO: Try and get this working because _conductorProcess.Id is not set by Windows when using Powershell etc so not able to shut it down correctly.
@@ -1150,7 +1151,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public virtual HolochainConductorsShutdownEventArgs ShutDownHolochainConductors(ShutdownHolochainConductorsMode shutdownHolochainConductorsMode = ShutdownHolochainConductorsMode.UseHoloNETDNASettings)
         {
-            return Task.Run(() => ShutDownHolochainConductorsAsync(shutdownHolochainConductorsMode)).Result;
+            //return Task.Run(() => ShutDownHolochainConductorsAsync(shutdownHolochainConductorsMode)).Result; // .Result wraps errors in AggregateException
+            return Task.Run(() => ShutDownHolochainConductorsAsync(shutdownHolochainConductorsMode)).GetAwaiter().GetResult();
         }
 
         public void Dispose()
