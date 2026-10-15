@@ -177,6 +177,33 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
             }
         }
 
+        /// <summary>UseSystemGlobal: holochain / hc found on the PATH (here the extracted 0.7.1 copies, so no new firewall prompt).</summary>
+        [SkippableTheory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public Task Live_AutoStart_FromThePath(bool hc)
+        {
+            string dir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "NextGenSoftware", "HoloNET", "0.7.1");
+            Skip.IfNot(File.Exists(Path.Combine(dir, "holochain.exe")) && File.Exists(Path.Combine(dir, "hc.exe")), "Run the embedded tests first so 0.7.1 is extracted.");
+            string happ = TestHapp("0.7.1");
+            Skip.If(hc && happ == null, "No 0.7.1 test hApp.");
+            string path = Environment.GetEnvironmentVariable("PATH");
+            Environment.SetEnvironmentVariable("PATH", dir + Path.PathSeparator + path);
+            string root = Path.Combine(Path.GetTempPath(), "HoloNET-path-" + Guid.NewGuid().ToString("N").Substring(0, 8));
+            Directory.CreateDirectory(root);
+            return AutoStartThenShutdown(dna =>
+            {
+                dna.HolochainConductorMode = HolochainConductorModeEnum.UseSystemGlobal;
+                if (hc)
+                {
+                    dna.HolochainConductorToUse = HolochainConductorEnum.HcDevTool;
+                    dna.FullPathToRootHappFolder = root;
+                    dna.FullPathToCompiledHappFolder = Path.GetDirectoryName(happ);
+                    dna.SecondsToWaitForHolochainConductorToStart = 90;
+                }
+            }, "0.7.1").ContinueWith(t => { Environment.SetEnvironmentVariable("PATH", path); t.GetAwaiter().GetResult(); });
+        }
+
         /// <summary>ShutdownAllConductors stops every holochain/hc process (and HoloNET's own host), and nothing else.</summary>
         [SkippableFact]
         public async Task Live_AutoShutdown_AllConductors_StopsEveryConductor()

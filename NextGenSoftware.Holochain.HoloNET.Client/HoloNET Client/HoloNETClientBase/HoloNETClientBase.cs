@@ -749,6 +749,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                             //TrueProcessStart("PowerShell.exe -NoExit -Command \"'' | {fullPathToHolochainExe} --piped\"");
                             _conductorProcess.StartInfo.Arguments = $"-NoExit -Command \"'' | {fullPathToHolochainExe} --piped -c '{HoloNETDNA.HolochainConductorConfigPath}'\"";
                         }
+                        else
+                        {
+                            // No config (holochain --create-config failed): this used to start the PowerShell host anyway, with no
+                            // command, leaving a hidden PowerShell waiting forever and no conductor.
+                            ReportError($"Error in HoloNETClient.StartConductor: no conductor config at {HoloNETDNA.HolochainConductorConfigPath}, so the conductor was not started.");
+                            return;
+                        }
                     }
 
                     _conductorProcessesBeforeStart = new HashSet<int>(Process.GetProcessesByName("holochain").Concat(Process.GetProcessesByName("hc")).Select(x => x.Id));

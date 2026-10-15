@@ -278,6 +278,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
 
                 // The retrieval flag is reset, so a second call works too.
                 Assert.NotNull(await Step("again", app.RetrieveAgentPubKeyAndDnaHashFromSandboxAsync(true, false)));
+
+                // An app id hc doesn't know falls back to list-cells (any installed cell), run from the hApp folder.
+                app.HoloNETDNA.InstalledAppId = "no-such-app";
+                app.HoloNETDNA.FullPathToRootHappFolder = System.IO.Path.GetTempPath();
+                var anyCell = await Step("hc client list-cells", app.RetrieveAgentPubKeyAndDnaHashFromSandboxAsync(false, false));
+                Assert.NotNull(anyCell);
+                Assert.StartsWith("uhC0k", anyCell.DnaHash);
             });
         }
 
