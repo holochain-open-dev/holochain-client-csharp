@@ -192,7 +192,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public dynamic MapEntryDataObject(dynamic entryDataObject, Dictionary<string, string> keyValuePairs, bool cacheEntryDataObjectPropertyInfos = true)
         {
             //return Task.Run(() => MapEntryDataObjectAsync(entryDataObject, keyValuePairs, cacheEntryDataObjectPropertyInfos)).Result; // .Result wraps errors in AggregateException
-            return Task.Run(() => MapEntryDataObjectAsync(entryDataObject, keyValuePairs, cacheEntryDataObjectPropertyInfos)).GetAwaiter().GetResult();
+            //return Task.Run(() => MapEntryDataObjectAsync(entryDataObject, keyValuePairs, cacheEntryDataObjectPropertyInfos)).GetAwaiter().GetResult();
+            // With a dynamic argument the lambda returned the Task itself, so the "mapped object" was a Task<object>.
+            object entry = entryDataObject;
+            return Task.Run(() => (Task<dynamic>)MapEntryDataObjectAsync(entry, keyValuePairs, cacheEntryDataObjectPropertyInfos)).GetAwaiter().GetResult();
         }
 
         protected override IHoloNETResponse ProcessDataReceived(WebSocket.DataReceivedEventArgs dataReceivedEventArgs)

@@ -167,6 +167,74 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
             await app.DisconnectAsync();
         }
 
+        /// <summary>Throws on the decoders' log lines (a faulty custom ILogProvider), to reach every decoder's catch block.</summary>
+        private sealed class ThrowingLogProvider : NextGenSoftware.Logging.ILogProvider
+        {
+            private static void Maybe(string message)
+            {
+                if (message != null && (message.Contains("DETECTED") || message.StartsWith("ADMIN:") || message.StartsWith("APP:") || message.Contains("RETURNED") || message.Contains("DUMPED")))
+                    throw new InvalidOperationException("log provider failure");
+            }
+            public void Log(string message, NextGenSoftware.Logging.LogType type, bool logToFile = true, bool logToConsole = true, bool showWorkingAnimation = false, bool logOnNewLine = true, bool insertExtraNewLineAfterLogMessage = false, int? indentLogMessagesBy = 1, bool nextMessageOnSameLine = false) => Maybe(message);
+            public void Log(string message, NextGenSoftware.Logging.LogType type, bool logToFile = true, bool logToConsole = true, ConsoleColor consoleColour = ConsoleColor.White, bool showWorkingAnimation = false, bool logOnNewLine = true, bool insertExtraNewLineAfterLogMessage = false, int? indentLogMessagesBy = 1, bool nextMessageOnSameLine = false) => Maybe(message);
+            public void Shutdown() { }
+        }
+
+        /// <summary>A reply decoded while the log provider throws must still complete the call (as an error), never hang.</summary>
+        private static async Task RunWithThrowingLogger(HoloNETClientBase client, FakeConductor fake, MethodInfo method, bool isApp)
+        {
+            string sig = Signature(method);
+            fake.Respond = (type, value) =>
+            {
+                string reply = isApp && type == "enable_app" ? "ok" : (ResponseFor.TryGetValue(type, out string r) ? r : type);
+                return FakeConductor.Ok(reply, null);
+            };
+            object[] args = method.GetParameters().Select(p => Argument(p, client)).ToArray();
+            Task<object> call = Task.Run(async () =>
+            {
+                object r = method.Invoke(client, args);
+                if (r is Task task) { await task; return task.GetType().GetProperty("Result").GetValue(task); }
+                return r;
+            });
+            var done = await Task.WhenAny(call, Task.Delay(15000));
+            Assert.True(done == call, sig + " hung when the log provider threw");
+            Assert.NotNull(await call);
+        }
+
+        [Theory]
+        [MemberData(nameof(AdminMethods))]
+        public async Task AdminMethod_SurvivesAThrowingLogProvider(string signature)
+        {
+            var method = Methods(typeof(HoloNETClientAdmin)).Single(m => Signature(m) == signature);
+            using var fake = new FakeConductor();
+            var admin = new HoloNETClientAdmin(new ThrowingLogProvider(), false, Dna(fake.Uri));
+            admin.OnError += (s, e) => { };
+            Assert.True((await admin.ConnectAsync(fake.Uri)).IsConnected);
+            admin.HoloNETDNA.AgentPubKey = admin.ConvertHoloHashToString(Agent());
+            admin.HoloNETDNA.DnaHash = admin.ConvertHoloHashToString(Dna());
+            await RunWithThrowingLogger(admin, fake, method, false);
+            await admin.DisconnectAsync();
+        }
+
+        [Theory]
+        [MemberData(nameof(AppMethods))]
+        public async Task AppMethod_SurvivesAThrowingLogProvider(string signature)
+        {
+            var method = Methods(typeof(HoloNETClientAppAgent)).Single(m => Signature(m) == signature);
+            using var fake = new FakeConductor();
+            var dna = Dna(fake.Uri);
+            dna.HolochainConductorAppAgentURI = fake.Uri;
+            dna.AppAuthenticationToken = new byte[] { 9 };
+            dna.AgentPubKey = null;
+            var app = new HoloNETClientAppAgent("app", null, new ThrowingLogProvider(), false, dna);
+            app.HoloNETDNA.AgentPubKey = app.ConvertHoloHashToString(Agent());
+            app.HoloNETDNA.DnaHash = app.ConvertHoloHashToString(Dna());
+            app.OnError += (s, e) => { };
+            Assert.True((await app.ConnectAsync(fake.Uri)).IsConnected);
+            await RunWithThrowingLogger(app, fake, method, true);
+            await app.DisconnectAsync();
+        }
+
         [Theory]
         [MemberData(nameof(AdminMethods))]
         public async Task AdminMethod_CompletesWithTheConductorsError(string signature)
