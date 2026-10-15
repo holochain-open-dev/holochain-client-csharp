@@ -32,6 +32,27 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         private HashSet<int> _conductorProcessesBeforeStart = new HashSet<int>();
         private string _hcHolochainPath;
 
+        /// <summary>Polls until something accepts TCP connections on <paramref name="endPoint"/>'s port, or the time runs out.</summary>
+        protected static async Task<bool> WaitForConductorPortAsync(Uri endPoint, int timeoutMs)
+        {
+            var timer = Stopwatch.StartNew();
+            while (timer.ElapsedMilliseconds < timeoutMs)
+            {
+                try
+                {
+                    using (var client = new System.Net.Sockets.TcpClient())
+                    {
+                        var connect = client.ConnectAsync(endPoint.Host == "localhost" ? "127.0.0.1" : endPoint.Host, endPoint.Port);
+                        if (await Task.WhenAny(connect, Task.Delay(1000)) == connect && client.Connected)
+                            return true;
+                    }
+                }
+                catch { }
+                await Task.Delay(250);
+            }
+            return false;
+        }
+
         private string HcHolochainPathArgument() => string.IsNullOrEmpty(_hcHolochainPath) ? "" : $" -H '{_hcHolochainPath}'";
 
         protected int _currentId = 0;
@@ -663,7 +684,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     _conductorProcess.Start();
                     _conductorProcessSessionId = _conductorProcess.Id;
 
-                    await Task.Delay(HoloNETDNA.SecondsToWaitForHolochainConductorToStart * 1000); // Give the conductor 5 (default) seconds to start up...
+                    //await Task.Delay(HoloNETDNA.SecondsToWaitForHolochainConductorToStart * 1000); // Give the conductor 5 (default) seconds to start up...
+                    // Wait until the admin port accepts connections (at most SecondsToWaitForHolochainConductorToStart): a fixed
+                    // delay was either too short (hc generate on a slow machine) or wasted time when the conductor was quicker.
+                    await WaitForConductorPortAsync(EndPoint, Math.Max(HoloNETDNA.SecondsToWaitForHolochainConductorToStart, 1) * 1000);
                     OnHolochainConductorStarted?.Invoke(this, new HolochainConductorStartedEventArgs());
                 }
             }

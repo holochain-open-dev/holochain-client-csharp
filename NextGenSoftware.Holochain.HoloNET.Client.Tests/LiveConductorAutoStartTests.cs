@@ -118,7 +118,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
                 dna.EmbeddedHolochainVersion = version;
                 dna.FullPathToRootHappFolder = root;
                 dna.FullPathToCompiledHappFolder = Path.GetDirectoryName(happ); // hc generate finds the .happ in this folder
-                dna.SecondsToWaitForHolochainConductorToStart = 25;
+                dna.SecondsToWaitForHolochainConductorToStart = 90; // upper bound; HoloNET connects as soon as the port is up
             }, expected);
         }
 
