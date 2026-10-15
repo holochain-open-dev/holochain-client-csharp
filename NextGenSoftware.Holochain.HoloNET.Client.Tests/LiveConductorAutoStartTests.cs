@@ -177,6 +177,50 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
             }
         }
 
+        /// <summary>ShutdownAllConductors stops every holochain/hc process (and HoloNET's own host), and nothing else.</summary>
+        [SkippableFact]
+        public async Task Live_AutoShutdown_AllConductors_StopsEveryConductor()
+        {
+            Skip.IfNot(Enabled, "Set HOLONET_LIVE_AUTOSTART=1 (and stop any other conductor) to run.");
+            Skip.If(!OperatingSystem.IsWindows(), "Auto-start launches the conductor through PowerShell (Windows).");
+            Skip.If(HolochainBin == null, "holochain.exe not found.");
+            Skip.If(RunningConductors() > 0, "Another holochain/hc process is running.");
+
+            int portA = FreePort(), portB = FreePort();
+            string dirA = Path.Combine(Path.GetTempPath(), "HoloNET-all-a-" + Guid.NewGuid().ToString("N").Substring(0, 8));
+            string dirB = Path.Combine(Path.GetTempPath(), "HoloNET-all-b-" + Guid.NewGuid().ToString("N").Substring(0, 8));
+            var a = new HoloNETClientAdmin(ExternalDna(portA, dirA));
+            var dnaB = ExternalDna(portB, dirB);
+            dnaB.ShutDownALLHolochainConductors = true;
+            var b = new HoloNETClientAdmin(dnaB);
+            int powerShellsBefore = Process.GetProcessesByName("powershell").Length;
+            try
+            {
+                Assert.True((await a.ConnectAsync("ws://localhost:" + portA)).IsConnected);
+                Assert.True((await b.ConnectAsync("ws://localhost:" + portB)).IsConnected);
+                Assert.Equal(2, Process.GetProcessesByName("holochain").Length);
+
+                // B's DNA says "shut down all": both conductors go.
+                var bDown = await b.DisconnectAsync();
+                Assert.Equal(2, bDown.HolochainConductorsShutdownResult.NumberOfHolochainExeInstancesShutdown);
+                for (int i = 0; i < 10 && (IsListening(portA) || IsListening(portB)); i++) await Task.Delay(500);
+                Assert.Empty(Process.GetProcessesByName("holochain"));
+
+                // The explicit mode does the same (nothing left to stop now).
+                Assert.Equal(0, (await a.ShutDownHolochainConductorsAsync(ShutdownHolochainConductorsMode.ShutdownAllConductors)).NumberOfHolochainExeInstancesShutdown);
+                Assert.Equal(0, a.ShutDownHolochainConductors(ShutdownHolochainConductorsMode.ShutdownAllConductors).NumberOfHolochainExeInstancesShutdown);
+                a.OnError += (s, e) => { };
+                await a.DisconnectAsync(DisconnectedCallBackMode.WaitForHolochainConductorToDisconnect, ShutdownHolochainConductorsMode.DoNotShutdownAnyConductors);
+                for (int i = 0; i < 10 && Process.GetProcessesByName("powershell").Length > powerShellsBefore + 1; i++) await Task.Delay(300);
+            }
+            finally
+            {
+                foreach (var p in Process.GetProcessesByName("holochain")) { try { p.Kill(); } catch { } }
+                try { Directory.Delete(dirA, true); } catch { }
+                try { Directory.Delete(dirB, true); } catch { }
+            }
+        }
+
         /// <summary>OnlyAllowOneHolochainConductorToRunAtATime: a second client reuses the running conductor instead of starting another.</summary>
         [SkippableFact]
         public async Task Live_OnlyAllowOneConductor_SecondClientReusesTheRunningOne()

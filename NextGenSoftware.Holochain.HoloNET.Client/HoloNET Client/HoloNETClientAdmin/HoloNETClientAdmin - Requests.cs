@@ -430,12 +430,14 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         public byte[] GetCapGrantSecret(byte[][] cellId)
         {
-            return _signingCredentialsForCell[$"{ConvertHoloHashToString(cellId[1])}:{ConvertHoloHashToString(cellId[0])}"].CapSecret;
+            //return _signingCredentialsForCell[$"{ConvertHoloHashToString(cellId[1])}:{ConvertHoloHashToString(cellId[0])}"].CapSecret; // threw KeyNotFoundException for a cell with no credentials
+            return _signingCredentialsForCell.TryGetValue($"{ConvertHoloHashToString(cellId[1])}:{ConvertHoloHashToString(cellId[0])}", out SigningCredentials credentials) ? credentials.CapSecret : null;
         }
 
         public byte[] GetCapGrantSecret(string agentPubKey, string dnaHash)
         {
-            return _signingCredentialsForCell[$"{agentPubKey}:{dnaHash}"].CapSecret;
+            //return _signingCredentialsForCell[$"{agentPubKey}:{dnaHash}"].CapSecret; // threw KeyNotFoundException for a cell with no credentials
+            return _signingCredentialsForCell.TryGetValue($"{agentPubKey}:{dnaHash}", out SigningCredentials credentials) ? credentials.CapSecret : null;
         }
 
         public async Task<AppInterfaceAttachedCallBackEventArgs> AttachAppInterfaceAsync(UInt16? port = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
@@ -1423,42 +1425,45 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         private void InstallAppInternal(string agentKey, string installedAppId, string hAppPath = null, AppBundle appBundle = null, Dictionary<string, byte[]> membraneProofs = null, string network_seed = null, string id = null)
         {
-            if (string.IsNullOrEmpty(agentKey))
-            {
-                if (string.IsNullOrEmpty(HoloNETDNA.AgentPubKey))
-                {
-                    //TODO: Later we may want to add the same functionality in the async version to automatically retreive the agentPubKey but for non async version would require a little more work to store the values passed in in a dictionary keyed by id (id would need to be generated first).
+            // With no agent key this silently did nothing (generating one was an unfinished TODO). The async path generates the
+            // key and installs; run it in the background, the result is raised on OnAppInstalledCallBack.
+            FireAndForget(InstallAppInternalAsync(installedAppId, hAppPath, appBundle, agentKey, membraneProofs, network_seed, ConductorResponseCallBackMode.WaitForHolochainConductorResponse, id), "InstallApp");
+//            if (string.IsNullOrEmpty(agentKey))
+//            {
+//                if (string.IsNullOrEmpty(HoloNETDNA.AgentPubKey))
+//                {
+//                    //TODO: Later we may want to add the same functionality in the async version to automatically retreive the agentPubKey but for non async version would require a little more work to store the values passed in in a dictionary keyed by id (id would need to be generated first).
 
-                    if (string.IsNullOrEmpty(id))
-                        id = GetRequestId();
+//                    if (string.IsNullOrEmpty(id))
+//                        id = GetRequestId();
 
-                    _installingAppId[id] = installedAppId;
+//                    _installingAppId[id] = installedAppId;
 
-                    //    //_installingApp = true;
-                    //    //_installedAppId = installedAppId;
-                    //    //_hAppPath = hAppPath;
-                    //    //_appBundle = appBundle;
-                    //    //_membraneProofs
-                    //    GenerateAgentPubKey();
-                }
+//                    //    //_installingApp = true;
+//                    //    //_installedAppId = installedAppId;
+//                    //    //_hAppPath = hAppPath;
+//                    //    //_appBundle = appBundle;
+//                    //    //_membraneProofs
+//                    //    GenerateAgentPubKey();
+//                }
 
-                agentKey = HoloNETDNA.AgentPubKey;
-            }
+//                agentKey = HoloNETDNA.AgentPubKey;
+//            }
 
-            if (!string.IsNullOrEmpty(agentKey))
-            {
-                if (membraneProofs == null)
-                    membraneProofs = new Dictionary<string, byte[]>();
+//            if (!string.IsNullOrEmpty(agentKey))
+//            {
+//                if (membraneProofs == null)
+//                    membraneProofs = new Dictionary<string, byte[]>();
 
-                CallFunction(HoloNETRequestType.AdminInstallApp, "install_app", new InstallAppRequest()
-            {
-                source = BuildInstallAppSource(hAppPath, appBundle),
-                agent_key = ConvertHoloHashToBytes(agentKey),
-                installed_app_id = installedAppId,
-                roles_settings = InstallAppRequest.RolesSettingsFromMembraneProofs(membraneProofs),
-                network_seed = network_seed
-            }, id);
-            }
+//                CallFunction(HoloNETRequestType.AdminInstallApp, "install_app", new InstallAppRequest()
+//            {
+//                source = BuildInstallAppSource(hAppPath, appBundle),
+//                agent_key = ConvertHoloHashToBytes(agentKey),
+//                installed_app_id = installedAppId,
+//                roles_settings = InstallAppRequest.RolesSettingsFromMembraneProofs(membraneProofs),
+//                network_seed = network_seed
+//            }, id);
+//            }
         }
 
         private async Task<DnaRegisteredCallBackEventArgs> RegisterDnaAsync(string path, DnaBundle bundle, byte[] hash, string network_seed = null, object properties = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
@@ -1842,20 +1847,21 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             return bytes;
         }
 
-        private void CallFunction(HoloNETRequestType requestType, string holochainConductorFunctionName, dynamic holoNETDataDetailed, string id = null)
-        {
-            HoloNETData holoNETData = new HoloNETData()
-            {
-                type = holochainConductorFunctionName,
-                data = holoNETDataDetailed
-            };
+        // No callers left (the fire-and-forget paths now go through CallFunctionAsync); kept for reference.
+//        private void CallFunction(HoloNETRequestType requestType, string holochainConductorFunctionName, dynamic holoNETDataDetailed, string id = null)
+//        {
+//            HoloNETData holoNETData = new HoloNETData()
+//            {
+//                type = holochainConductorFunctionName,
+//                data = holoNETDataDetailed
+//            };
 
-            if (string.IsNullOrEmpty(id))
-                id = GetRequestId();
+//            if (string.IsNullOrEmpty(id))
+//                id = GetRequestId();
 
-            //SendHoloNETRequest(holoNETData, HoloNETRequestType.ZomeCall, id);
-            SendHoloNETRequest(holoNETData, requestType, id);
-            //return new T() { EndPoint = EndPoint, Id = id, Message = $"conductorResponseCallBackMode is set to UseCallBackEvents so please wait for {eventCallBackName} event for the result." };
-        }
+//            //SendHoloNETRequest(holoNETData, HoloNETRequestType.ZomeCall, id);
+//            SendHoloNETRequest(holoNETData, requestType, id);
+//            //return new T() { EndPoint = EndPoint, Id = id, Message = $"conductorResponseCallBackMode is set to UseCallBackEvents so please wait for {eventCallBackName} event for the result." };
+//        }
     }
 }

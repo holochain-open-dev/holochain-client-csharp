@@ -1405,53 +1405,72 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             {
                 Logger.Log("Shutting Down All Holochain Conductors...", LogType.Info, false);
 
-                foreach (Process process in Process.GetProcessesByName("hc"))
+                // One process that couldn't be killed (already exited, access denied) stopped the whole sweep; each is now
+                // stopped independently.
+                int Kill(string processName)
                 {
-                    if (HoloNETDNA.ShowHolochainConductorWindow)
-                        process.CloseMainWindow();
+                    int killed = 0;
+                    foreach (Process process in Process.GetProcessesByName(processName))
+                    {
+                        try
+                        {
+                            if (HoloNETDNA.ShowHolochainConductorWindow)
+                                process.CloseMainWindow();
 
-                    process.Kill();
-                    process.Close();
-
-                    //process.WaitForExit();
-                    process.Dispose();
-                    result.NumberOfHcExeInstancesShutdown++;
+                            process.Kill();
+                            process.WaitForExit(3000);
+                            killed++;
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.Log($"Could not stop {processName} ({process.Id}): {ex.Message}", LogType.Warning);
+                        }
+                        finally
+                        {
+                            process.Dispose();
+                        }
+                    }
+                    return killed;
                 }
 
-                //conductorInfo = new FileInfo(HoloNETDNA.FullPathToExternalHolochainConductorBinary);
-                //parts = conductorInfo.Name.Split('.');
+                //foreach (Process process in Process.GetProcessesByName("hc")) { ... kill ... result.NumberOfHcExeInstancesShutdown++; }
+                result.NumberOfHcExeInstancesShutdown = Kill("hc");
 
-                foreach (Process process in Process.GetProcessesByName("holochain"))
+                //foreach (Process process in Process.GetProcessesByName("holochain")) { ... kill ... result.NumberOfHolochainExeInstancesShutdown++; }
+                result.NumberOfHolochainExeInstancesShutdown = Kill("holochain");
+
+                // This killed every rustc process on the machine, i.e. the user's own Rust/cargo builds. Not a conductor.
+                //foreach (Process process in Process.GetProcessesByName("rustc"))
+                //{
+                //    if (HoloNETDNA.ShowHolochainConductorWindow)
+                //        process.CloseMainWindow();
+                //    process.Kill();
+                //    process.Close();
+                //    process.Dispose();
+                //    result.NumberOfRustcExeInstancesShutdown++;
+                //}
+
+                // The hidden PowerShell host HoloNET started the conductor in was left running.
+                try
                 {
-                    if (HoloNETDNA.ShowHolochainConductorWindow)
-                        process.CloseMainWindow();
-
-                    process.Kill();
-                    process.Close();
-
-                    //process.WaitForExit();
-                    process.Dispose();
-                    result.NumberOfHolochainExeInstancesShutdown++;
+                    if (_conductorProcess != null && !_conductorProcess.HasExited)
+                    {
+#if NET5_0_OR_GREATER
+                        _conductorProcess.Kill(true);
+#else
+                        _conductorProcess.Kill();
+#endif
+                        _conductorProcess.WaitForExit(3000);
+                    }
                 }
-
-                foreach (Process process in Process.GetProcessesByName("rustc"))
-                {
-                    if (HoloNETDNA.ShowHolochainConductorWindow)
-                        process.CloseMainWindow();
-
-                    process.Kill();
-                    process.Close();
-
-                    //process.WaitForExit();
-                    process.Dispose();
-                    result.NumberOfRustcExeInstancesShutdown++;
-                }
+                catch { }
 
                 Logger.Log("All Holochain Conductors Successfully Shutdown.", LogType.Info);
             }
             catch (Exception ex)
             {
-                HandleError("Error occurred in HoloNETClient.ShutDownAllConductors method", ex);
+                //HandleError("Error occurred in HoloNETClient.ShutDownAllConductors method", ex);
+                ReportError("Error occurred in HoloNETClient.ShutDownAllConductors method", ex);
             }
 
             return result;
