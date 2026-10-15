@@ -88,7 +88,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             try
             {
-                await SendHoloNETRequestAsync(holoNETData, requestType, id);
+                //await SendHoloNETRequestAsync(holoNETData, requestType, id);
+                if (!await TrySendHoloNETRequestAsync(MessagePackSerializer.Serialize(holoNETData), requestType, id))
+                    FailPendingCall(id, "The request could not be sent to the Holochain conductor.");
             }
             catch (Exception ex)
             {
@@ -213,7 +215,14 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// </summary>
         public WebSocket.WebSocket WebSocket { get; set; }
 
-        public ILogger Logger { get; set; } = new Logger();
+        //public ILogger Logger { get; set; } = new Logger();
+        // Whatever logger is set is wrapped (ResilientLogger) so a faulty custom ILogger can't break HoloNET.
+        private ILogger _logger = new ResilientLogger(new Logger());
+        public ILogger Logger
+        {
+            get => _logger;
+            set => _logger = value == null || value is ResilientLogger ? value : new ResilientLogger(value);
+        }
 
         /// <summary>
         /// This property contains a struct called HoloNETHoloNETDNA containing the sub-properties: AgentPubKey, DnaHash, FullPathToRootHappFolder, FullPathToCompiledHappFolder, HolochainConductorMode, FullPathToExternalHolochainConductorBinary, FullPathToExternalHCToolBinary, SecondsToWaitForHolochainConductorToStart, AutoStartHolochainConductor, ShowHolochainConductorWindow, AutoShutdownHolochainConductor, ShutDownALLHolochainConductors, HolochainConductorToUse, OnlyAllowOneHolochainConductorToRunAtATime, LoggingMode & ErrorHandlingBehaviour.

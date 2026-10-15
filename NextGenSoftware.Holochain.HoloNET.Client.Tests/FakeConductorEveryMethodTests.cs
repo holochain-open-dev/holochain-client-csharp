@@ -235,6 +235,103 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
             await app.DisconnectAsync();
         }
 
+        /// <summary>
+        /// A custom ILogger (HoloNET accepts one) whose Info/Debug logging throws once armed: reaches the catch block of every
+        /// decoder, which must still complete the call.
+        /// </summary>
+        private sealed class ArmedThrowingLogger : NextGenSoftware.Logging.Interfaces.ILogger
+        {
+            public bool Armed;
+            public List<NextGenSoftware.Logging.ILogProvider> LogProviders { get; set; } = new List<NextGenSoftware.Logging.ILogProvider> { new NullProvider() };
+            public void AddLogProvider(NextGenSoftware.Logging.ILogProvider logProvider) => LogProviders.Add(logProvider);
+            public void AddLogProviders(IEnumerable<NextGenSoftware.Logging.ILogProvider> logProviders) => LogProviders.AddRange(logProviders);
+            private void Maybe(NextGenSoftware.Logging.LogType type)
+            {
+                if (Armed && (type == NextGenSoftware.Logging.LogType.Info || type == NextGenSoftware.Logging.LogType.Debug))
+                    throw new InvalidOperationException("logger failure");
+            }
+            public void Log(string message, NextGenSoftware.Logging.LogType type, bool logToFile = true, bool logToConsole = true, bool showWorkingAnimation = false, bool noLineBreaks = false, bool insertExtraNewLineAfterLogMessage = false, int? indentLogMessagesBy = 1, bool nextMessageOnSameLine = false) => Maybe(type);
+            public void Log(string message, NextGenSoftware.Logging.LogType type, ConsoleColor consoleColour, bool logToFile = true, bool logToConsole = true, bool showWorkingAnimation = false, bool noLineBreaks = false, bool insertExtraNewLineAfterLogMessage = false, int? indentLogMessagesBy = 1, bool nextMessageOnSameLine = false) => Maybe(type);
+            private sealed class NullProvider : NextGenSoftware.Logging.ILogProvider
+            {
+                public void Log(string message, NextGenSoftware.Logging.LogType type, bool logToFile = true, bool logToConsole = true, bool showWorkingAnimation = false, bool logOnNewLine = true, bool insertExtraNewLineAfterLogMessage = false, int? indentLogMessagesBy = 1, bool nextMessageOnSameLine = false) { }
+                public void Log(string message, NextGenSoftware.Logging.LogType type, bool logToFile = true, bool logToConsole = true, ConsoleColor consoleColour = ConsoleColor.White, bool showWorkingAnimation = false, bool logOnNewLine = true, bool insertExtraNewLineAfterLogMessage = false, int? indentLogMessagesBy = 1, bool nextMessageOnSameLine = false) { }
+                public void Shutdown() { }
+            }
+        }
+
+        public static IEnumerable<object[]> AdminThrowingLogger() => Methods(typeof(HoloNETClientAdmin)).SelectMany(m => new[] { "ok", "error" }.Select(r => new object[] { Signature(m), r }));
+        public static IEnumerable<object[]> AppThrowingLogger() => Methods(typeof(HoloNETClientAppAgent)).SelectMany(m => new[] { "ok", "error" }.Select(r => new object[] { Signature(m), r }));
+
+        private static async Task RunWithArmedLogger(HoloNETClientBase client, ArmedThrowingLogger logger, FakeConductor fake, MethodInfo method, string reply, bool isApp)
+        {
+            string sig = Signature(method);
+            fake.Respond = (type, value) =>
+            {
+                if (reply == "error") return FakeConductor.Error("internal_error", "armed");
+                string r = isApp && type == "enable_app" ? "ok" : (ResponseFor.TryGetValue(type, out string known) ? known : type);
+                return FakeConductor.Ok(r, null);
+            };
+            object[] args = method.GetParameters().Select(p => Argument(p, client)).ToArray();
+            logger.Armed = true;
+            Task<object> call = Task.Run(async () =>
+            {
+                try
+                {
+                    object r = method.Invoke(client, args);
+                    if (r is Task task) { await task; return task.GetType().GetProperty("Result").GetValue(task); }
+                    return r;
+                }
+                catch (TargetInvocationException ex) when (ex.InnerException is InvalidOperationException ioe && ioe.Message == "logger failure")
+                {
+                    return "threw before sending"; // the request-side log line failed: the call never started, which is fine
+                }
+                catch (InvalidOperationException ioe) when (ioe.Message == "logger failure")
+                {
+                    return "threw before sending";
+                }
+            });
+            var done = await Task.WhenAny(call, Task.Delay(15000));
+            logger.Armed = false;
+            Assert.True(done == call, sig + " hung when the logger threw while handling the reply");
+            Assert.NotNull(await call);
+        }
+
+        [Theory]
+        [MemberData(nameof(AdminThrowingLogger))]
+        public async Task AdminMethod_CompletesWhenACustomLoggerThrows(string signature, string reply)
+        {
+            var method = Methods(typeof(HoloNETClientAdmin)).Single(m => Signature(m) == signature);
+            using var fake = new FakeConductor();
+            var logger = new ArmedThrowingLogger();
+            var admin = new HoloNETClientAdmin(logger, Dna(fake.Uri));
+            admin.OnError += (s, e) => { };
+            Assert.True((await admin.ConnectAsync(fake.Uri)).IsConnected);
+            admin.HoloNETDNA.AgentPubKey = admin.ConvertHoloHashToString(Agent());
+            admin.HoloNETDNA.DnaHash = admin.ConvertHoloHashToString(Dna());
+            await RunWithArmedLogger(admin, logger, fake, method, reply, false);
+            await admin.DisconnectAsync();
+        }
+
+        [Theory]
+        [MemberData(nameof(AppThrowingLogger))]
+        public async Task AppMethod_CompletesWhenACustomLoggerThrows(string signature, string reply)
+        {
+            var method = Methods(typeof(HoloNETClientAppAgent)).Single(m => Signature(m) == signature);
+            using var fake = new FakeConductor();
+            var dna = Dna(fake.Uri);
+            dna.HolochainConductorAppAgentURI = fake.Uri;
+            dna.AppAuthenticationToken = new byte[] { 9 };
+            var logger = new ArmedThrowingLogger();
+            var app = new HoloNETClientAppAgent("app", null, logger, dna);
+            app.HoloNETDNA.AgentPubKey = app.ConvertHoloHashToString(Agent());
+            app.HoloNETDNA.DnaHash = app.ConvertHoloHashToString(Dna());
+            app.OnError += (s, e) => { };
+            Assert.True((await app.ConnectAsync(fake.Uri)).IsConnected);
+            await RunWithArmedLogger(app, logger, fake, method, reply, true);
+            await app.DisconnectAsync();
+        }
+
         [Theory]
         [MemberData(nameof(AdminMethods))]
         public async Task AdminMethod_CompletesWithTheConductorsError(string signature)

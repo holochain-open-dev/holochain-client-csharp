@@ -352,9 +352,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             catch (Exception ex)
             {
                 HandleError("Error occurred in HoloNETClient.GetAppInfoAsync method getting the AppInfo from hApp.", ex);
+                // Returned null, so callers reading .IsError got a NullReferenceException.
+                return new AppInfoCallBackEventArgs { EndPoint = EndPoint, IsError = true, Message = $"Error occurred in HoloNETClient.GetAppInfoAsync method getting the AppInfo from hApp. Reason: {ex.Message}", Exception = ex };
             }
 
-            return null;
+            //return null;
+            return new AppInfoCallBackEventArgs { EndPoint = EndPoint, Message = "conductorResponseCallBackMode is set to UseCallBackEvents so please wait for the OnAppInfoCallBack event for the result." };
         }
 
         /// <summary>
