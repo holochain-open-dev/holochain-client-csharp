@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
@@ -325,6 +326,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
                 Assert.NotNull(created.ClonedCell);
                 string cloneId = created.ClonedCell.clone_id;
                 Assert.False(string.IsNullOrEmpty(cloneId), "clone_id was not decoded");
+
+                // app_info now lists the cloned cell; ClonedCell.clone_id used to be a struct, which broke this decode.
+                var withClone = await app.GetAppInfoAsync();
+                Assert.False(withClone.IsError, "app_info with a clone cell: " + withClone.Message);
+                var cloned = withClone.AppInfoResponse.data.cell_info["oasis"].Where(c => c.Cloned != null).Select(c => c.Cloned).Single();
+                Assert.Equal(cloneId, cloned.clone_id);
+                Assert.Equal(CellInfoType.Cloned, withClone.AppInfoResponse.data.cell_info["oasis"].Single(c => c.Cloned != null).CellInfoType);
 
                 var disabled = await app.DisableCloneCellAsync(cloneId);
                 Assert.False(disabled.IsError, "disable clone: " + disabled.Message);
