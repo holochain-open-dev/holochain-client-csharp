@@ -93,6 +93,80 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
             Assert.True(result.IsError, sig + " did not report the conductor's error (placeholder or ignored error?)");
         }
 
+        /// <summary>Request type → the response type the conductor answers it with (Holochain 0.7 AdminResponse / AppResponse).</summary>
+        private static readonly Dictionary<string, string> ResponseFor = new Dictionary<string, string>
+        {
+            ["add_admin_interfaces"] = "admin_interfaces_added", ["add_agent_info"] = "agent_info_added", ["attach_app_interface"] = "app_interface_attached",
+            ["delete_clone_cell"] = "clone_cell_deleted", ["disable_app"] = "app_disabled", ["dump_full_state"] = "full_state_dumped",
+            ["dump_network_metrics"] = "network_metrics_dumped", ["dump_network_stats"] = "network_stats_dumped", ["dump_op_timings"] = "op_timings_dumped",
+            ["dump_state"] = "state_dumped", ["dump_conductor_state"] = "conductor_state_dumped", ["enable_app"] = "app_enabled",
+            ["generate_agent_pub_key"] = "agent_pub_key_generated", ["agent_info"] = "agent_info", ["get_compatible_cells"] = "compatible_cells",
+            ["get_dna_definition"] = "dna_definition_returned", ["peer_meta_info"] = "peer_meta_info", ["storage_info"] = "storage_info",
+            ["graft_records"] = "records_grafted", ["grant_direct_signal_capability"] = "direct_signal_capability_granted",
+            ["grant_zome_call_capability"] = "zome_call_capability_granted", ["install_app"] = "app_installed",
+            ["issue_app_authentication_token"] = "app_authentication_token_issued", ["list_apps"] = "apps_listed",
+            ["list_capability_grants"] = "capability_grants_info", ["list_cell_ids"] = "cell_ids_listed", ["list_dnas"] = "dnas_listed",
+            ["list_app_interfaces"] = "app_interfaces_listed", ["register_dna"] = "dna_registered",
+            ["revoke_app_authentication_token"] = "app_authentication_token_revoked", ["revoke_zome_call_capability"] = "zome_call_capability_revoked",
+            ["uninstall_app"] = "app_uninstalled", ["update_coordinators"] = "coordinators_updated", ["app_info"] = "app_info",
+            ["create_clone_cell"] = "clone_cell_created", ["enable_clone_cell"] = "clone_cell_enabled", ["disable_clone_cell"] = "clone_cell_disabled",
+            ["get_countersigning_session_state"] = "countersigning_session_state", ["abandon_countersigning_session"] = "countersigning_session_abandoned",
+            ["publish_countersigning_session"] = "publish_countersigning_session_triggered", ["list_wasm_host_functions"] = "list_wasm_host_functions",
+            ["provide_memproofs"] = "ok", ["send_direct_signal"] = "ok",
+        };
+
+        private static object Malformed(string shape) => shape == "number" ? (object)12345 : new Dictionary<string, object> { ["unexpected"] = new object[] { 1, "x" } };
+
+        /// <summary>A reply of the right type with a malformed payload must still complete the call (decoders report, never throw or hang).</summary>
+        private static async Task RunMalformed(HoloNETClientBase client, FakeConductor fake, MethodInfo method, string shape, bool isApp)
+        {
+            string sig = Signature(method);
+            fake.Respond = (type, value) =>
+            {
+                string reply = isApp && type == "enable_app" ? "ok" : (ResponseFor.TryGetValue(type, out string r) ? r : type);
+                return FakeConductor.Ok(reply, Malformed(shape));
+            };
+            object[] args = method.GetParameters().Select(p => Argument(p, client)).ToArray();
+            Task<object> call = Task.Run(async () =>
+            {
+                object r = method.Invoke(client, args);
+                if (r is Task task) { await task; return task.GetType().GetProperty("Result").GetValue(task); }
+                return r;
+            });
+            var done = await Task.WhenAny(call, Task.Delay(15000));
+            Assert.True(done == call, sig + " did not complete on a malformed reply");
+            Assert.NotNull(await call);
+        }
+
+        public static IEnumerable<object[]> AdminMalformed() => Methods(typeof(HoloNETClientAdmin)).SelectMany(m => new[] { "number", "map" }.Select(sh => new object[] { Signature(m), sh }));
+        public static IEnumerable<object[]> AppMalformed() => Methods(typeof(HoloNETClientAppAgent)).SelectMany(m => new[] { "number", "map" }.Select(sh => new object[] { Signature(m), sh }));
+
+        [Theory]
+        [MemberData(nameof(AdminMalformed))]
+        public async Task AdminMethod_SurvivesAMalformedReply(string signature, string shape)
+        {
+            var method = Methods(typeof(HoloNETClientAdmin)).Single(m => Signature(m) == signature);
+            var (fake, admin) = await ConnectAdmin();
+            using (fake)
+            {
+                admin.HoloNETDNA.AgentPubKey = admin.ConvertHoloHashToString(Agent());
+                admin.HoloNETDNA.DnaHash = admin.ConvertHoloHashToString(Dna());
+                await RunMalformed(admin, fake, method, shape, false);
+                await admin.DisconnectAsync();
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(AppMalformed))]
+        public async Task AppMethod_SurvivesAMalformedReply(string signature, string shape)
+        {
+            var method = Methods(typeof(HoloNETClientAppAgent)).Single(m => Signature(m) == signature);
+            using var fake = new FakeConductor();
+            var app = await FakeConductorAppErrorTests.ConnectApp(fake);
+            await RunMalformed(app, fake, method, shape, true);
+            await app.DisconnectAsync();
+        }
+
         [Theory]
         [MemberData(nameof(AdminMethods))]
         public async Task AdminMethod_CompletesWithTheConductorsError(string signature)

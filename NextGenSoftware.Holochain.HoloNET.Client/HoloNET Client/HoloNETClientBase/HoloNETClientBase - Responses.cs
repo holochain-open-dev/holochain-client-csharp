@@ -36,7 +36,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             catch (Exception ex)
             {
                 string msg = "Error in HoloNETClient.ProcessDataReceived method.";
-                HandleError(msg, ex);
+                //HandleError(msg, ex); // could throw and skip completing the call
+                ReportError(msg, ex);
             }
 
             return response;
@@ -347,7 +348,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 holoNETDataReceivedEventArgs.IsError = true;
                 holoNETDataReceivedEventArgs.Message = msg;
                 //holoNETDataReceivedEventArgs.IsCallSuccessful = false;
-                HandleError(msg, ex);
+                //HandleError(msg, ex); // could throw and skip completing the call
+                ReportError(msg, ex);
             }
 
             OnDataReceived?.Invoke(this, holoNETDataReceivedEventArgs);

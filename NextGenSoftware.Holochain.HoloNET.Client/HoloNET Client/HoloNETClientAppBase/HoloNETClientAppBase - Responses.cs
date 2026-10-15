@@ -301,7 +301,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             catch (Exception ex)
             {
                 string msg = "Error in HoloNETClient.ProcessDataReceived method.";
-                HandleError(msg, ex);
+                //HandleError(msg, ex); // could throw and skip completing the call
+                ReportError(msg, ex);
             }
 
             return response;
@@ -406,14 +407,16 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         private void DecodeAppInfoDataReceived(IHoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
         {
-            AppInfoCallBackEventArgs args = new AppInfoCallBackEventArgs();
+            //AppInfoCallBackEventArgs args = new AppInfoCallBackEventArgs();
+            // Created first so the request id is set even if decoding fails (a malformed reply left GetAppInfoAsync hanging).
+            AppInfoCallBackEventArgs args = CreateHoloNETArgs<AppInfoCallBackEventArgs>(response, dataReceivedEventArgs);
             AppInfoResponse appInfoResponse = null;
 
             try
             {
                 Logger.Log("APP INFO RESPONSE DATA DETECTED\n", LogType.Info);
                 appInfoResponse = MessagePackSerializer.Deserialize<AppInfoResponse>(response.data, messagePackSerializerOptions);
-                args = CreateHoloNETArgs<AppInfoCallBackEventArgs>(response, dataReceivedEventArgs);
+                //args = CreateHoloNETArgs<AppInfoCallBackEventArgs>(response, dataReceivedEventArgs);
 
                 if (appInfoResponse != null)
                 {
@@ -441,7 +444,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 {
                     args.Message = "Error occured in HoloNETClient.DecodeAppInfoDataReceived. appInfoResponse is null.";
                     args.IsError = true;
-                    HandleError(args.Message);
+                    //HandleError(args.Message); // could throw and skip completing the call
+                    ReportError(args.Message);
                 }
             }
             catch (Exception ex)
@@ -449,7 +453,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 string msg = $"An unknown error occurred in HoloNETClient.DecodeAppInfoDataReceived. Reason: {ex}";
                 args.IsError = true;
                 args.Message = msg;
-                HandleError(msg, ex);
+                //HandleError(msg, ex); // could throw and skip completing the call
+                ReportError(msg, ex);
             }
 
             //If either the AgentPubKey or DnaHash is empty then attempt to get from the sandbox cmd.
@@ -545,13 +550,27 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         private void DecodeZomeDataReceived(IHoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
         {
             Logger.Log("ZOME RESPONSE DATA DETECTED\n", LogType.Info);
-            AppResponse appResponse = MessagePackSerializer.Deserialize<AppResponse>(response.data, messagePackSerializerOptions);
+            //AppResponse appResponse = MessagePackSerializer.Deserialize<AppResponse>(response.data, messagePackSerializerOptions); // outside any try: a malformed reply escaped the decoder and the zome call hung
+            AppResponse appResponse = null;
             string id = response.id.ToString();
             ZomeFunctionCallBackEventArgs zomeFunctionCallBackArgs = new ZomeFunctionCallBackEventArgs();
 
             zomeFunctionCallBackArgs = CreateHoloNETArgs<ZomeFunctionCallBackEventArgs>(response, dataReceivedEventArgs);
             zomeFunctionCallBackArgs.Zome = GetItemFromCache(id, _zomeLookup);
             zomeFunctionCallBackArgs.ZomeFunction = GetItemFromCache(id, _funcLookup);
+
+            try
+            {
+                appResponse = MessagePackSerializer.Deserialize<AppResponse>(response.data, messagePackSerializerOptions);
+            }
+            catch (Exception ex)
+            {
+                zomeFunctionCallBackArgs.IsError = true;
+                zomeFunctionCallBackArgs.Message = $"The zome call response could not be decoded. Reason: {ex.Message}";
+                Logger.Log(zomeFunctionCallBackArgs.Message, LogType.Error);
+                RaiseZomeDataReceivedEvent(zomeFunctionCallBackArgs);
+                return;
+            }
 
             try
             {

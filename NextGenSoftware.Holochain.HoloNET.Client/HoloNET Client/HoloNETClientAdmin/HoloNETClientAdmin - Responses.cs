@@ -169,7 +169,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             catch (Exception ex)
             {
                 string msg = "Error in HoloNETClient.ProcessDataReceived method.";
-                HandleError(msg, ex);
+                //HandleError(msg, ex); // could throw and skip completing the call
+                ReportError(msg, ex);
             }
 
             return response;
@@ -348,7 +349,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         private void DecodeAppInstalledReceived(IHoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs)
         {
-            AppInstalledCallBackEventArgs args = new AppInstalledCallBackEventArgs();
+            //AppInstalledCallBackEventArgs args = new AppInstalledCallBackEventArgs();
+            // Created first so the request id is set even if decoding fails; it used to be set after the deserialise, so a
+            // malformed reply left the awaiting InstallApp call hanging forever.
+            AppInstalledCallBackEventArgs args = CreateHoloNETArgs<AppInstalledCallBackEventArgs>(response, dataReceivedEventArgs);
             string errorMessage = "An unknown error occurred in HoloNETClient.DecodeAppInstalledReceived. Reason: ";
             args.HoloNETResponseType = HoloNETResponseType.AdminAppInstalled;
 
@@ -357,7 +361,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 Logger.Log("ADMIN: APP INSTALLED DATA DETECTED\n", LogType.Info);
 
                 AppInfoResponse appInfoResponse = MessagePackSerializer.Deserialize<AppInfoResponse>(response.data, messagePackSerializerOptions);
-                args = CreateHoloNETArgs<AppInstalledCallBackEventArgs>(response, dataReceivedEventArgs);
+                //args = CreateHoloNETArgs<AppInstalledCallBackEventArgs>(response, dataReceivedEventArgs);
+                args.HoloNETResponseType = HoloNETResponseType.AdminAppInstalled;
 
                 if (appInfoResponse != null)
                 {

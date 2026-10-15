@@ -1403,6 +1403,17 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             Logger.Log(msg, logType);
         }
 
+        /// <summary>
+        /// Logs the error and raises OnError, but never throws. For response handling: throwing there (as HandleError can,
+        /// depending on ErrorHandlingBehaviour) runs on the WebSocket receive callback and skips completing the awaiting call.
+        /// </summary>
+        protected virtual void ReportError(string message, Exception exception = null)
+        {
+            message = string.Concat(message, exception != null ? $". Error Details: {exception}" : "");
+            Logger.Log(message, LogType.Error);
+            OnError?.Invoke(this, new HoloNETErrorEventArgs { EndPoint = WebSocket.EndPoint, Reason = message, ErrorDetails = exception });
+        }
+
         protected virtual void HandleError(string message, Exception exception = null)
         {
             message = string.Concat(message, exception != null ? $". Error Details: {exception}" : "");
