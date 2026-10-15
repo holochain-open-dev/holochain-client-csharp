@@ -184,6 +184,45 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
         }
 
         [SkippableFact]
+        public async Task Live_DirectSignal_GrantThenSendBetweenTwoAgents()
+        {
+            RequireConductorAndHapp();
+            await WithInstalledApp(async (admin, recipientId, recipient) =>
+            {
+                var recipientApp = (HoloNETClientAppBase)recipient.HoloNETClientAppAgent;
+                var received = new TaskCompletionSource<SignalCallBackEventArgs>(TaskCreationOptions.RunContinuationsAsynchronously);
+                recipientApp.OnSignalCallBack += (s, e) => received.TrySetResult(e);
+
+                // 0.7.1+: the recipient must allow direct signals. 0.7.0 has no such request and must fail cleanly.
+                var grant = await Step("grant_direct_signal_capability", recipientApp.GrantDirectSignalCapabilityAsync(recipient.CellId, "holonet-direct-signal"));
+                bool v071 = !grant.IsError;
+                if (v071)
+                    Assert.Equal(39, grant.ActionHash.Length);
+                else
+                    Assert.False(string.IsNullOrEmpty(grant.Message));
+
+                var adminGrant = await Step("admin grant_direct_signal_capability", admin.GrantDirectSignalCapabilityAsync(recipient.CellId, "holonet-direct-signal-admin"));
+                Assert.Equal(v071, !adminGrant.IsError);
+
+                await WithInstalledApp(async (admin2, senderId, sender) =>
+                {
+                    var senderApp = (HoloNETClientAppBase)sender.HoloNETClientAppAgent;
+                    byte[] payload = { 1, 2, 3, 250 };
+                    var sent = await Step("send_direct_signal", senderApp.SendDirectSignalAsync(sender.CellId[0], new[] { recipient.CellId[1] }, payload));
+                    Assert.False(sent.IsError, "send_direct_signal: " + sent.Message);
+                    Assert.Equal(HoloNETResponseType.AppDirectSignalSent, sent.HoloNETResponseType);
+
+                    if (v071)
+                    {
+                        var done = await Task.WhenAny(received.Task, Task.Delay(TimeSpan.FromSeconds(30)));
+                        Assert.True(done == received.Task, "recipient did not receive the direct signal");
+                        Assert.False(received.Task.Result.IsError, "signal decode: " + received.Task.Result.Message);
+                    }
+                });
+            });
+        }
+
+        [SkippableFact]
         public async Task Live_AddAdminInterfaces_OpensANewAdminPort()
         {
             RequireConductorAndHapp();
