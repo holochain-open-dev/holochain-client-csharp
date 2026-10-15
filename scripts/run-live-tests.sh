@@ -24,6 +24,7 @@ grep -q "Conductor launched" "$SB/conductor.log" || { echo "conductor did not st
 
 cd "$REPO/NextGenSoftware.Holochain.HoloNET.Client.Tests"
 HOLONET_LIVE_ADMIN_URI=ws://localhost:$PORT \
+HOLONET_LIVE_HC_BIN="$(cygpath -w "$HC")" \
 HOLONET_LIVE_HAPP_PATH="$(cygpath -w "$T/happ-$TAG/oasis.happ")" \
 HOLONET_LIVE_CLONE_HAPP_PATH="$(cygpath -w "$T/happ-$TAG-clone/oasis-clone.happ")" \
 HOLONET_LIVE_MEMPROOFS_HAPP_PATH="$(cygpath -w "$T/happ-$TAG-memproofs/oasis-memproofs.happ")" \

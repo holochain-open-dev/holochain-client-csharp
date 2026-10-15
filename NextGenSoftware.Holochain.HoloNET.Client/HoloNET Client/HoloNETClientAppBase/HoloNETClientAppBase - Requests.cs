@@ -83,28 +83,31 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 RetrievingAgentPubKeyAndDnaHash = true;
                 Logger.Log("Attempting To Retrieve AgentPubKey & DnaHash From hc sandbox...", LogType.Info, true);
 
-                if (string.IsNullOrEmpty(HoloNETDNA.FullPathToExternalHCToolBinary))
-                    HoloNETDNA.FullPathToExternalHCToolBinary = string.Concat(Directory.GetCurrentDirectory(), "\\HolochainBinaries\\hc.exe"); //default to the current path
+                //if (string.IsNullOrEmpty(HoloNETDNA.FullPathToExternalHCToolBinary))
+                //    HoloNETDNA.FullPathToExternalHCToolBinary = string.Concat(Directory.GetCurrentDirectory(), "\\HolochainBinaries\\hc.exe"); //default to the current path
 
-                Process pProcess = new Process();
-                pProcess.StartInfo.WorkingDirectory = HoloNETDNA.FullPathToRootHappFolder;
-                pProcess.StartInfo.FileName = "hc";
-                //pProcess.StartInfo.FileName = HoloNETDNA.FullPathToExternalHCToolBinary; //TODO: Need to get this working later (think currently has a version conflict with keylairstone? But not urgent because AgentPubKey & DnaHash are retrieved from Conductor anyway.
-                pProcess.StartInfo.Arguments = "sandbox call list-cells";
-                pProcess.StartInfo.UseShellExecute = false;
-                pProcess.StartInfo.RedirectStandardOutput = true;
-                pProcess.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
-                pProcess.StartInfo.CreateNoWindow = false;
-                pProcess.Start();
+                //Process pProcess = new Process();
+                //pProcess.StartInfo.WorkingDirectory = HoloNETDNA.FullPathToRootHappFolder;
+                //pProcess.StartInfo.FileName = "hc";
+                ////pProcess.StartInfo.FileName = HoloNETDNA.FullPathToExternalHCToolBinary; //TODO: Need to get this working later (think currently has a version conflict with keylairstone? But not urgent because AgentPubKey & DnaHash are retrieved from Conductor anyway.
+                //pProcess.StartInfo.Arguments = "sandbox call list-cells";
+                //pProcess.StartInfo.UseShellExecute = false;
+                //pProcess.StartInfo.RedirectStandardOutput = true;
+                //pProcess.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
+                //pProcess.StartInfo.CreateNoWindow = false;
+                //pProcess.Start();
 
-                string output = pProcess.StandardOutput.ReadToEnd();
-                int dnaStart = output.IndexOf("DnaHash") + 8;
-                int dnaEnd = output.IndexOf(")", dnaStart);
-                int agentStart = output.IndexOf("AgentPubKey") + 12;
-                int agentEnd = output.IndexOf(")", agentStart);
+                //string output = pProcess.StandardOutput.ReadToEnd();
+                //int dnaStart = output.IndexOf("DnaHash") + 8;
+                //int dnaEnd = output.IndexOf(")", dnaStart);
+                //int agentStart = output.IndexOf("AgentPubKey") + 12;
+                //int agentEnd = output.IndexOf(")", agentStart);
 
-                string dnaHash = output.Substring(dnaStart, dnaEnd - dnaStart);
-                string agentPubKey = output.Substring(agentStart, agentEnd - agentStart);
+                //string dnaHash = output.Substring(dnaStart, dnaEnd - dnaStart);
+                //string agentPubKey = output.Substring(agentStart, agentEnd - agentStart);
+
+                // Holochain 0.7 removed `hc sandbox call`; admin calls are `hc client call --port <admin port> ...` and print JSON.
+                (string dnaHash, string agentPubKey) = ReadCellFromHcClient();
 
                 if (!string.IsNullOrEmpty(dnaHash) && !string.IsNullOrEmpty(agentPubKey))
                 {
@@ -129,8 +132,71 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             {
                 HandleError("Error in HoloNETClient.retrieveAgentPubKeyAndDnaHashFromSandbox method getting DnaHash & AgentPubKey from hApp.", ex);
             }
+            finally
+            {
+                // Was never reset here, so after one failed attempt every later retrieval returned null.
+                RetrievingAgentPubKeyAndDnaHash = false;
+            }
 
             return null;
+        }
+
+        /// <summary>
+        /// Reads the DNA hash and agent key with hc's client: `hc client call --port &lt;admin port&gt; list-apps` (the
+        /// configured app's first provisioned cell), falling back to `list-cells`. Uses FullPathToExternalHCToolBinary when it
+        /// exists, otherwise hc from the PATH. Returns nulls when hc fails or nothing is installed.
+        /// </summary>
+        protected virtual (string dnaHash, string agentPubKey) ReadCellFromHcClient()
+        {
+            string hc = !string.IsNullOrEmpty(HoloNETDNA.FullPathToExternalHCToolBinary) && File.Exists(HoloNETDNA.FullPathToExternalHCToolBinary) ? HoloNETDNA.FullPathToExternalHCToolBinary : "hc";
+            int adminPort = new Uri(HoloNETDNA.HolochainConductorAdminURI).Port;
+
+            string Run(string command)
+            {
+                using (Process process = new Process())
+                {
+                    process.StartInfo.FileName = hc;
+                    process.StartInfo.Arguments = $"client call --port {adminPort} {command}";
+                    if (!string.IsNullOrEmpty(HoloNETDNA.FullPathToRootHappFolder) && Directory.Exists(HoloNETDNA.FullPathToRootHappFolder))
+                        process.StartInfo.WorkingDirectory = HoloNETDNA.FullPathToRootHappFolder;
+                    process.StartInfo.UseShellExecute = false;
+                    process.StartInfo.RedirectStandardOutput = true;
+                    process.StartInfo.RedirectStandardError = true;
+                    process.StartInfo.CreateNoWindow = true;
+                    process.Start();
+                    string output = process.StandardOutput.ReadToEnd();
+                    process.WaitForExit(30000);
+                    return output;
+                }
+            }
+
+            string JsonPart(string output)
+            {
+                int start = output.IndexOfAny(new[] { '[', '{' });
+                return start < 0 ? null : output.Substring(start);
+            }
+
+            if (!string.IsNullOrEmpty(HoloNETDNA.InstalledAppId))
+            {
+                string apps = JsonPart(Run("list-apps"));
+                if (apps != null)
+                {
+                    foreach (var app in Newtonsoft.Json.Linq.JArray.Parse(apps))
+                    {
+                        if ((string)app["installed_app_id"] != HoloNETDNA.InstalledAppId)
+                            continue;
+
+                        foreach (var role in (app["cell_info"] as Newtonsoft.Json.Linq.JObject)?.Properties() ?? Enumerable.Empty<Newtonsoft.Json.Linq.JProperty>())
+                            foreach (var cell in role.Value)
+                                if ((string)cell["type"] == "provisioned")
+                                    return ((string)cell["value"]["cell_id"]["dna_hash"], (string)cell["value"]["cell_id"]["agent_pub_key"]);
+                    }
+                }
+            }
+
+            string cells = JsonPart(Run("list-cells"));
+            var first = cells == null ? null : Newtonsoft.Json.Linq.JArray.Parse(cells).FirstOrDefault();
+            return first == null ? (null, null) : ((string)first["dna_hash"], (string)first["agent_pub_key"]);
         }
 
         /// <summary>

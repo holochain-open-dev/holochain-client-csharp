@@ -250,6 +250,30 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
             });
         }
 
+        /// <summary>RetrieveAgentPubKeyAndDnaHashFromSandbox via `hc client call` (Holochain 0.7 removed `hc sandbox call`).</summary>
+        [SkippableFact]
+        public async Task Live_RetrieveAgentPubKeyAndDnaHash_FromHcClient()
+        {
+            RequireConductorAndHapp();
+            string hc = Environment.GetEnvironmentVariable("HOLONET_LIVE_HC_BIN");
+            Skip.If(string.IsNullOrEmpty(hc), "Set HOLONET_LIVE_HC_BIN to the hc.exe matching the conductor.");
+            await WithInstalledApp(async (admin, appId, installed) =>
+            {
+                var app = (HoloNETClientAppBase)installed.HoloNETClientAppAgent;
+                app.HoloNETDNA.InstalledAppId = appId;
+                app.HoloNETDNA.HolochainConductorAdminURI = AdminUri;
+                app.HoloNETDNA.FullPathToExternalHCToolBinary = hc;
+
+                var keys = await Step("hc client list-apps", app.RetrieveAgentPubKeyAndDnaHashFromSandboxAsync(true, false));
+                Assert.NotNull(keys);
+                Assert.Equal(app.ConvertHoloHashToString(installed.CellId[0]), keys.DnaHash);
+                Assert.Equal(app.ConvertHoloHashToString(installed.CellId[1]), keys.AgentPubKey);
+
+                // The retrieval flag is reset, so a second call works too.
+                Assert.NotNull(await Step("again", app.RetrieveAgentPubKeyAndDnaHashFromSandboxAsync(true, false)));
+            });
+        }
+
         [SkippableFact]
         public async Task Live_DirectSignal_GrantThenSendBetweenTwoAgents()
         {
