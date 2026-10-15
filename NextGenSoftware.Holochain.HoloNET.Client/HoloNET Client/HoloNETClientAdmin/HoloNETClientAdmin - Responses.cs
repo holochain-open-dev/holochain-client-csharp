@@ -295,6 +295,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     case HoloNETRequestType.AdminDumpOpTimings:
                         RaiseAdminOpTimingsDumpedEvent(ProcessResponeError<AdminOpTimingsDumpedCallBackEventArgs>(response, dataReceivedEventArgs, "AdminDumpOpTimings", msg));
                         break;
+
+                    // Was missing, so a get_dna_definition error never completed the call (it hung forever).
+                    case HoloNETRequestType.AdminGetDnaDefinition:
+                        RaiseDnaDefinitionReturnedEvent(ProcessResponeError<DnaDefinitionReturnedCallBackEventArgs>(response, dataReceivedEventArgs, "AdminGetDnaDefinition", msg));
+                        break;
                 }
             }
 

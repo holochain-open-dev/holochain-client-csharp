@@ -496,7 +496,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             if (result.AppInfo == null)
             {
                 result.IsError = true;
-                result.Message = "App Not Found";
+                //result.Message = "App Not Found";
+                // A failed list_apps used to be reported as "App Not Found", hiding the conductor's error.
+                result.Message = listAppsResult != null && listAppsResult.IsError ? listAppsResult.Message : "App Not Found";
             }
 
             return result;
@@ -1470,9 +1472,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 return (new ZomeCallCapabilityGrantedCallBackEventArgs() { IsError = true, EndPoint = EndPoint, Id = id, Message = msg }, null, null);
             }
 
-            if (string.IsNullOrEmpty(HoloNETDNA.AgentPubKey))
+            // The cell id carries the agent key, so HoloNETDNA.AgentPubKey isn't needed here (this check rejected valid cell ids).
+            if (cellId.Length < 2 || cellId[1] == null)
             {
-                string msg = "Error occured in AuthorizeSigningCredentialsAsync function. HoloNETDNA.AgentPubKey is null. Please set or call GenerateAgentPubKey method.";
+                string msg = "Error occured in AuthorizeSigningCredentialsAsync function. cellId has no agent key.";
                 HandleError(msg, null);
                 return (new ZomeCallCapabilityGrantedCallBackEventArgs() { IsError = true, EndPoint = EndPoint, Id = id, Message = msg }, null, null);
             }
