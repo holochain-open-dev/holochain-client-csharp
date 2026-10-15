@@ -28,7 +28,7 @@ HOLONET_LIVE_HC_BIN="$(cygpath -w "$HC")" \
 HOLONET_LIVE_HAPP_PATH="$(cygpath -w "$T/happ-$TAG/oasis.happ")" \
 HOLONET_LIVE_CLONE_HAPP_PATH="$(cygpath -w "$T/happ-$TAG-clone/oasis-clone.happ")" \
 HOLONET_LIVE_MEMPROOFS_HAPP_PATH="$(cygpath -w "$T/happ-$TAG-memproofs/oasis-memproofs.happ")" \
-dotnet test -nologo --collect "XPlat Code Coverage" --results-directory "$T/coverage-$TAG" "$@" 2>&1 | grep -E "^\s*Failed |Error Message|Passed!|Failed!|error CS" -A1 | grep -v "^--"
+dotnet test -nologo --collect "XPlat Code Coverage" --results-directory "$T/coverage-$TAG" "$@" 2>&1 | if [ -n "${LIVE_VERBOSE:-}" ]; then grep -v "warning CS"; else grep -E "^\s*Failed |Error Message|Passed!|Failed!|error CS" -A1 | grep -v "^--"; fi
 RC=${PIPESTATUS[0]}
 
 taskkill //F //IM holochain.exe >/dev/null 2>&1
