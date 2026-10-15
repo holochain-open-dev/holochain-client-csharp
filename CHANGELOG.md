@@ -20,7 +20,7 @@ on fresh sandboxes.
 
 **hApps must be rebuilt for 0.7.1.** 0.7.1 changed the `CapGrant` type, so an integrity zome built against hdk 0.7.0 /
 hdi 0.8.0 fails validation on a 0.7.1 conductor ("callback has invalid parameters"). Rebuild with **hdk 0.7.1 /
-hdi 0.8.1**. The OASIS hApp has a `holochain-0.7.1` branch for this.
+hdi 0.8.1**. The OASIS hApp main branch now targets 0.7.1; the tag `holochain-0.7.0` is the last 0.7.0 build.
 
 ## Synchronous methods now return the result (behaviour change)
 
