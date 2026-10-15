@@ -1403,21 +1403,68 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         protected virtual void UpdateHolochainConductorConfigFile()
         {
             string config = File.ReadAllText(HoloNETDNA.HolochainConductorConfigPath);
-            string newConfig = "";
-
-            if (!config.Contains("port"))
-                newConfig = config.Replace("admin_interfaces: null", $"admin_interfaces:\n      - driver:\n          type: websocket\n          port: {EndPoint.Port}");
-            else
-            {
-                int portStart = config.IndexOf("port");
-                int portEnd = config.IndexOf("\n", portStart);
-
-                newConfig = config.Substring(0, portStart);
-                newConfig = string.Concat(newConfig, $"port: {EndPoint.Port}");
-                newConfig = string.Concat(newConfig, config.Substring(portEnd));
-            }
+            //string newConfig = "";
+            //if (!config.Contains("port"))
+            //    newConfig = config.Replace("admin_interfaces: null", $"admin_interfaces:\n      - driver:\n          type: websocket\n          port: {EndPoint.Port}");
+            //else
+            //{
+            //    int portStart = config.IndexOf("port");
+            //    int portEnd = config.IndexOf("\n", portStart);
+            //    newConfig = config.Substring(0, portStart);
+            //    newConfig = string.Concat(newConfig, $"port: {EndPoint.Port}");
+            //    newConfig = string.Concat(newConfig, config.Substring(portEnd));
+            //}
+            // The text "port" also occurs in "report: none" (Holochain 0.7 network section), so with admin_interfaces: null the
+            // old code rewrote that line instead and the conductor got no admin port; it only worked when the admin port came first.
+            string newConfig = SetConductorConfigAdminPort(config, EndPoint.Port);
 
             File.WriteAllText(HoloNETDNA.HolochainConductorConfigPath, newConfig);
+        }
+
+        /// <summary>
+        /// Returns <paramref name="config"/> (a conductor-config.yaml) with the first admin interface's port set to <paramref name="port"/>.
+        /// Only the "port:" inside the top-level admin_interfaces block is touched; if that block is null, empty or missing a
+        /// websocket admin interface is written in the format holochain --create-config generates.
+        /// </summary>
+        public static string SetConductorConfigAdminPort(string config, int port)
+        {
+            string nl = config.Contains("\r\n") ? "\r\n" : "\n";
+            List<string> lines = config.Split(new[] { nl }, StringSplitOptions.None).ToList();
+            string[] section = { "admin_interfaces:", "- driver:", "    type: websocket", $"    port: {port}", "    danger_bind_addr: null", "    allowed_origins: '*'" };
+
+            int header = lines.FindIndex(l => l.StartsWith("admin_interfaces:"));
+            if (header < 0)
+            {
+                lines.InsertRange(lines.Count > 0 && lines[lines.Count - 1] == "" ? lines.Count - 1 : lines.Count, section);
+                return string.Join(nl, lines);
+            }
+
+            string inline = lines[header].Substring("admin_interfaces:".Length).Trim();
+            if (inline == "null" || inline == "[]" || inline == "~")
+            {
+                lines.RemoveAt(header);
+                lines.InsertRange(header, section);
+                return string.Join(nl, lines);
+            }
+
+            // The block runs until the next top-level key (a line that doesn't start with space or '-').
+            for (int i = header + 1; i < lines.Count && (lines[i].StartsWith(" ") || lines[i].StartsWith("-") || lines[i].Length == 0); i++)
+            {
+                string trimmed = lines[i].TrimStart(' ', '-');
+                if (trimmed.StartsWith("port:"))
+                {
+                    lines[i] = lines[i].Substring(0, lines[i].IndexOf("port:")) + $"port: {port}";
+                    return string.Join(nl, lines);
+                }
+            }
+
+            // A block without a port (unexpected): replace it with a complete one.
+            int end = header + 1;
+            while (end < lines.Count && (lines[end].StartsWith(" ") || lines[end].StartsWith("-")))
+                end++;
+            lines.RemoveRange(header, end - header);
+            lines.InsertRange(header, section);
+            return string.Join(nl, lines);
         }
 
         protected virtual async Task<HolochainConductorsShutdownEventArgs> ShutDownAllHolochainConductorsAsync()
