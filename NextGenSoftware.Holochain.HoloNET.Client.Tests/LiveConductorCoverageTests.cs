@@ -129,10 +129,17 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
                 Assert.False(interfaces.IsError, "list_app_interfaces: " + interfaces.Message);
                 Assert.NotEmpty(interfaces.WebSocketPorts);
 
+                // Holochain 0.7 status {"type": "enabled"} decodes as Running.
+                var running = (await admin.ListAppsAsync(AppStatusFilter.Enabled)).Apps.Single(a => a.installed_app_id == appId);
+                Assert.Equal(AppInfoStatusEnum.Running, ((AppInfo)running).AppStatus);
+
                 var disabled = await Step("disable_app", admin.DisableAppAsync(appId));
                 Assert.False(disabled.IsError, "disable_app: " + disabled.Message);
                 var disabledApps = await admin.ListAppsAsync(AppStatusFilter.Disabled);
                 Assert.Contains(disabledApps.Apps, a => a.installed_app_id == appId);
+                var disabledApp = (AppInfo)disabledApps.Apps.Single(a => a.installed_app_id == appId);
+                Assert.Equal(AppInfoStatusEnum.Disabled, disabledApp.AppStatus);
+                Assert.Equal("User", disabledApp.AppStatusReason);
 
                 var uninstalled = await Step("uninstall_app", admin.UninstallAppAsync(appId));
                 Assert.False(uninstalled.IsError, "uninstall_app: " + uninstalled.Message);

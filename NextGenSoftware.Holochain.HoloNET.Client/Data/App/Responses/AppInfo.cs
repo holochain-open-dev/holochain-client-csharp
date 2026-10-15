@@ -1,4 +1,4 @@
-﻿using MessagePack;
+using MessagePack;
 using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.AppManifest;
 using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects;
 using NextGenSoftware.Holochain.HoloNET.Client.Interfaces;
@@ -37,6 +37,36 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         {
             get
             {
+                // Holochain 0.7 AppStatus is adjacently tagged: {"type": "enabled" | "disabled" | "awaiting_memproofs" |
+                // "awaiting_restore" | "unrecoverable", "value": ...}. The keyed form below is the pre-0.7 shape, so on 0.7 this
+                // always returned None. "enabled" maps to Running.
+                if (status != null && status.TryGetValue("type", out object statusType) && statusType is string type)
+                {
+                    status.TryGetValue("value", out object statusValue);
+                    switch (type)
+                    {
+                        case "enabled":
+                            AppStatusReason = null;
+                            return AppInfoStatusEnum.Running;
+
+                        case "disabled":
+                            AppStatusReason = DisabledReason(statusValue);
+                            return AppInfoStatusEnum.Disabled;
+
+                        case "awaiting_memproofs":
+                            return AppInfoStatusEnum.AwaitingMemproofs;
+
+                        case "awaiting_restore":
+                            return AppInfoStatusEnum.AwaitingRestore;
+
+                        case "unrecoverable":
+                            // Unrecoverable(CellId, UnrecoverableCellReason): the reason is {"type": "chain_fork_warrant" | ...}.
+                            if (statusValue is object[] parts && parts.Length > 1 && parts[1] is Dictionary<object, object> reason && reason.TryGetValue("type", out object reasonType))
+                                AppStatusReason = reasonType?.ToString();
+                            return AppInfoStatusEnum.Unrecoverable;
+                    }
+                }
+
                 if (status != null)
                 {
                     if (status.ContainsKey("running"))
@@ -89,6 +119,21 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         [IgnoreMember]
         public string AppStatusReason { get; private set; }
+
+        private static string DisabledReason(object value)
+        {
+            if (value is Dictionary<object, object> reason && reason.TryGetValue("type", out object reasonType))
+            {
+                switch (reasonType?.ToString())
+                {
+                    case "never_started": return "Never Started";
+                    case "not_started_after_providing_memproofs": return "Not Started After Providing Memproofs";
+                    case "user": return "User";
+                    case "error": return reason.TryGetValue("value", out object error) ? error?.ToString() : "Error";
+                }
+            }
+            return null;
+        }
 
 
         [Key("manifest")]
