@@ -57,6 +57,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         AdminOpTimingsDumped,
         AppOpTimingsDumped,
 
-        Error
+        Error,
+        AdminConductorStateDumped,
+        AppAgentInfoReturned,
+        AppNetworkMetricsDumped,
+        AppNetworkStatsDumped,
+        AppEnabledViaAppInterface,
     }
 }

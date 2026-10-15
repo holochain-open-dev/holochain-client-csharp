@@ -1141,6 +1141,62 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
         /// <summary>
+        /// The agent infos (encoded JSON strings) this conductor holds for this app's DNAs, or only for
+        /// <paramref name="dnaHashes"/> (app interface agent_info, Holochain 0.7).
+        /// </summary>
+        public async Task<AgentInfoReturnedCallBackEventArgs> GetAgentInfoAsync(IEnumerable<byte[]> dnaHashes = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
+        {
+            return await CallFunctionAsync(HoloNETRequestType.AppAgentInfo, "agent_info",
+                new Dictionary<string, object> { ["dna_hashes"] = dnaHashes?.ToArray() },
+                _taskCompletionAgentInfoReturnedCallBack, "OnAgentInfoReturnedCallBack", conductorResponseCallBackMode, id);
+        }
+
+        public AgentInfoReturnedCallBackEventArgs GetAgentInfo(IEnumerable<byte[]> dnaHashes = null, string id = null)
+        {
+            return Task.Run(() => GetAgentInfoAsync(dnaHashes, ConductorResponseCallBackMode.WaitForHolochainConductorResponse, id)).GetAwaiter().GetResult();
+        }
+
+        /// <summary>Kitsune network metrics for this app's DNAs (or just <paramref name="dnaHash"/>) as JSON (app interface, Holochain 0.7).</summary>
+        public async Task<NetworkMetricsDumpedCallBackEventArgs> DumpNetworkMetricsAsync(byte[] dnaHash = null, bool includeDhtSummary = false, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
+        {
+            return await CallFunctionAsync(HoloNETRequestType.AppDumpNetworkMetrics, "dump_network_metrics",
+                new Dictionary<string, object> { ["dna_hash"] = dnaHash, ["include_dht_summary"] = includeDhtSummary },
+                _taskCompletionNetworkMetricsDumpedCallBack, "OnNetworkMetricsDumpedCallBack", conductorResponseCallBackMode, id);
+        }
+
+        public NetworkMetricsDumpedCallBackEventArgs DumpNetworkMetrics(byte[] dnaHash = null, bool includeDhtSummary = false, string id = null)
+        {
+            return Task.Run(() => DumpNetworkMetricsAsync(dnaHash, includeDhtSummary, ConductorResponseCallBackMode.WaitForHolochainConductorResponse, id)).GetAwaiter().GetResult();
+        }
+
+        /// <summary>Transport statistics from the networking backend as JSON (app interface, Holochain 0.7).</summary>
+        public async Task<NetworkStatsDumpedCallBackEventArgs> DumpNetworkStatsAsync(ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
+        {
+            return await CallFunctionAsync(HoloNETRequestType.AppDumpNetworkStats, "dump_network_stats", null,
+                _taskCompletionNetworkStatsDumpedCallBack, "OnNetworkStatsDumpedCallBack", conductorResponseCallBackMode, id);
+        }
+
+        public NetworkStatsDumpedCallBackEventArgs DumpNetworkStats(string id = null)
+        {
+            return Task.Run(() => DumpNetworkStatsAsync(ConductorResponseCallBackMode.WaitForHolochainConductorResponse, id)).GetAwaiter().GetResult();
+        }
+
+        /// <summary>
+        /// Enables the app this connection is authenticated for (app interface enable_app, Holochain 0.7), e.g. once
+        /// deferred memproofs have been provided.
+        /// </summary>
+        public async Task<AppEnabledViaAppInterfaceCallBackEventArgs> EnableAppAsync(ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
+        {
+            return await CallFunctionAsync(HoloNETRequestType.AppEnableApp, "enable_app", null,
+                _taskCompletionAppEnabledCallBack, "OnAppEnabledCallBack", conductorResponseCallBackMode, id);
+        }
+
+        public AppEnabledViaAppInterfaceCallBackEventArgs EnableApp(string id = null)
+        {
+            return Task.Run(() => EnableAppAsync(ConductorResponseCallBackMode.WaitForHolochainConductorResponse, id)).GetAwaiter().GetResult();
+        }
+
+        /// <summary>
         /// Sends <paramref name="signal"/> (opaque bytes) to <paramref name="agents"/> on the DNA <paramref name="dnaHash"/>
         /// (send_direct_signal). Best effort: the conductor confirms it was sent, not delivered. On Holochain 0.7.1+ a recipient
         /// only accepts it if it has a direct-signal grant for the sender (see <see cref="GrantDirectSignalCapabilityAsync"/>);

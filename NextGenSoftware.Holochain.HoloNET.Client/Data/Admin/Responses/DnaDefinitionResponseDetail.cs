@@ -1,4 +1,4 @@
-﻿
+
 using MessagePack;
 using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.AppManifest;
 using NextGenSoftware.Holochain.HoloNET.Client.Interfaces;
@@ -19,5 +19,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         [Key("coordinator_zomes")]
         public object coordinator_zomes_raw { get; set; }
+
+        /// <summary>Holochain 0.7: DNA hashes this DNA declares as its lineage (may be empty).</summary>
+        [Key("lineage")]
+        public object lineage { get; set; }
     }
 }

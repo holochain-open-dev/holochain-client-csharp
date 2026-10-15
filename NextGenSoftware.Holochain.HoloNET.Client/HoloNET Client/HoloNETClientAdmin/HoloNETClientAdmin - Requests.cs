@@ -569,10 +569,32 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public async Task<FullStateDumpedCallBackEventArgs> DumpFullStateAsync(byte[][] cellId, int? dHTOpsCursor = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
+            //return await CallFunctionAsync(HoloNETRequestType.AdminDumpFullState, "dump_full_state", new DumpFullStateRequest()
+            //{
+            //    cell_id = cellId,
+            //    dht_ops_cursor = dHTOpsCursor
+            //}, _taskCompletionFullStateDumpedCallBack, "OnFullStateDumpedCallBack", conductorResponseCallBackMode, id);
+
+            // The cursor is a DhtOpsCursor struct, so a number can't be sent (the conductor rejected the request). Use the
+            // DhtOpsCursor overload to page; this one always starts at the first page.
+            if (dHTOpsCursor != null)
+                Logger.Log("DumpFullStateAsync: an integer dht_ops_cursor isn't valid in Holochain 0.7 and is ignored; pass a DhtOpsCursor instead.", LogType.Warning);
+
+            return await DumpFullStateAsync(cellId, (DhtOpsCursor)null, null, conductorResponseCallBackMode, id);
+        }
+
+        /// <summary>
+        /// Dumps the full state of a cell, a page at a time: pass the previous result's
+        /// <c>integration_dump.dht_ops_cursor</c> as <paramref name="cursor"/> for the next page, and
+        /// <paramref name="limit"/> to cap the DHT ops per page.
+        /// </summary>
+        public async Task<FullStateDumpedCallBackEventArgs> DumpFullStateAsync(byte[][] cellId, DhtOpsCursor cursor, uint? limit = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
+        {
             return await CallFunctionAsync(HoloNETRequestType.AdminDumpFullState, "dump_full_state", new DumpFullStateRequest()
             {
                 cell_id = cellId,
-                dht_ops_cursor = dHTOpsCursor
+                dht_ops_cursor = cursor,
+                limit = limit
             }, _taskCompletionFullStateDumpedCallBack, "OnFullStateDumpedCallBack", conductorResponseCallBackMode, id);
         }
 
@@ -649,6 +671,20 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="conductorResponseCallBackMode">The Concuctor Response CallBack Mode, set this to 'WaitForHolochainConductorResponse' if you want the function to wait for the Holochain Conductor response before returning that response or set it to 'UseCallBackEvents' to return from the function immediately and then raise the 'OnDumpFullStateCallBack' event when the conductor responds.   </param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
+        /// <summary>
+        /// Dumps a cell's source chain a page at a time: <paramref name="sourceChainCursor"/> is a <see cref="SourceChainCursor"/>
+        /// value (start after a sequence number or action) and <paramref name="limit"/> caps the records per page.
+        /// </summary>
+        public async Task<StateDumpedCallBackEventArgs> DumpStateAsync(byte[][] cellId, object sourceChainCursor, uint? limit = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
+        {
+            return await CallFunctionAsync(HoloNETRequestType.AdminDumpState, "dump_state", new DumpStateRequest()
+            {
+                cell_id = cellId,
+                source_chain_cursor = sourceChainCursor,
+                limit = limit
+            }, _taskCompletionStateDumpedCallBack, "OnStateDumpedCallBack", conductorResponseCallBackMode, id);
+        }
+
         public async Task<StateDumpedCallBackEventArgs> DumpStateAsync(byte[][] cellId, int? dHTOpsCursor = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
             return await CallFunctionAsync(HoloNETRequestType.AdminDumpState, "dump_state", new DumpStateRequest()
@@ -1208,6 +1244,23 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public async Task<NetworkMetricsDumpedCallBackEventArgs> DumpNetworkMetricsAsync(ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
         {
             return await CallFunctionAsync(HoloNETRequestType.AdminDumpNetworkMetrics, "dump_network_metrics", new DumpNetworkMetricsRequest(), _taskCompletionNetworkMetricsDumpedCallBack, "OnNetworkMetricsDumpedCallBack", conductorResponseCallBackMode, id);
+        }
+
+        /// <summary>Network metrics for one DNA (or all when <paramref name="dnaHash"/> is null), optionally with the DHT summary.</summary>
+        public async Task<NetworkMetricsDumpedCallBackEventArgs> DumpNetworkMetricsAsync(byte[] dnaHash, bool includeDhtSummary = false, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
+        {
+            return await CallFunctionAsync(HoloNETRequestType.AdminDumpNetworkMetrics, "dump_network_metrics", new DumpNetworkMetricsRequest { dna_hash = dnaHash, include_dht_summary = includeDhtSummary }, _taskCompletionNetworkMetricsDumpedCallBack, "OnNetworkMetricsDumpedCallBack", conductorResponseCallBackMode, id);
+        }
+
+        /// <summary>The conductor's own state as JSON (dump_conductor_state).</summary>
+        public async Task<ConductorStateDumpedCallBackEventArgs> DumpConductorStateAsync(ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
+        {
+            return await CallFunctionAsync(HoloNETRequestType.AdminDumpConductorState, "dump_conductor_state", null, _taskCompletionConductorStateDumpedCallBack, "OnConductorStateDumpedCallBack", conductorResponseCallBackMode, id);
+        }
+
+        public ConductorStateDumpedCallBackEventArgs DumpConductorState(string id = null)
+        {
+            return Task.Run(() => DumpConductorStateAsync(ConductorResponseCallBackMode.WaitForHolochainConductorResponse, id)).GetAwaiter().GetResult();
         }
 
         /// <summary>

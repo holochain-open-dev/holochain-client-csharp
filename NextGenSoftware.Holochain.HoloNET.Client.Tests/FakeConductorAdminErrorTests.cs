@@ -49,6 +49,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
                 ["uninstall_app"] = async a => await a.UninstallAppAsync("app"),
                 ["update_coordinators"] = async a => await a.UpdateCoordinatorsAsync(Dna(), new CoordinatorBundle()),
                 ["app_info"] = async a => await a.GetAppInfoAsync("app"),
+                ["dump_conductor_state"] = async a => await a.DumpConductorStateAsync(),
             };
 
         public static IEnumerable<object[]> Names => Calls.Keys.Select(k => new object[] { k });

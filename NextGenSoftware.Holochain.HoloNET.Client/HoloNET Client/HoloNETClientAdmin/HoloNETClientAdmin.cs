@@ -108,6 +108,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public event AppDisabledCallBack OnAppDisabledCallBack;
 
 
+        public delegate void ConductorStateDumpedCallBack(object sender, ConductorStateDumpedCallBackEventArgs e);
+        public event ConductorStateDumpedCallBack OnConductorStateDumpedCallBack;
+        private Dictionary<string, TaskCompletionSource<ConductorStateDumpedCallBackEventArgs>> _taskCompletionConductorStateDumpedCallBack = new Dictionary<string, TaskCompletionSource<ConductorStateDumpedCallBackEventArgs>>();
+
         public delegate void DirectSignalCapabilityGrantedCallBack(object sender, DirectSignalCapabilityGrantedCallBackEventArgs e);
         public event DirectSignalCapabilityGrantedCallBack OnDirectSignalCapabilityGrantedCallBack;
         private Dictionary<string, TaskCompletionSource<DirectSignalCapabilityGrantedCallBackEventArgs>> _taskCompletionDirectSignalCapabilityGrantedCallBack = new Dictionary<string, TaskCompletionSource<DirectSignalCapabilityGrantedCallBackEventArgs>>();

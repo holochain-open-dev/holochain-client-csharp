@@ -1,3 +1,4 @@
+using System.Linq;
 using System;
 using MessagePack;
 using System.Threading.Tasks;
@@ -46,6 +47,16 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                             case HoloNETResponseType.AdminZomeCallCapabilityGranted:
                                 DecodeZomeCallCapabilityGrantedReceived(response, dataReceivedEventArgs);
+                                break;
+
+                            case HoloNETResponseType.AdminConductorStateDumped:
+                                {
+                                    var args = CreateHoloNETArgs<ConductorStateDumpedCallBackEventArgs>(response, dataReceivedEventArgs);
+                                    args.HoloNETResponseType = HoloNETResponseType.AdminConductorStateDumped;
+                                    try { args.DumpedStateJSON = DeserializeResponseValue<string>(response.data); }
+                                    catch (Exception ex) { HandleError(args, $"An unknown error occurred decoding conductor_state_dumped. Reason: {ex}"); }
+                                    RaiseConductorStateDumpedEvent(args);
+                                }
                                 break;
 
                             case HoloNETResponseType.AdminDirectSignalCapabilityGranted:
@@ -194,6 +205,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                     case HoloNETRequestType.AdminGrantZomeCallCapability:
                         RaiseZomeCallCapabilityGrantedEvent(ProcessResponeError<ZomeCallCapabilityGrantedCallBackEventArgs>(response, dataReceivedEventArgs, "AdminGrantZomeCallCapability", msg));
+                        break;
+
+                    case HoloNETRequestType.AdminDumpConductorState:
+                        RaiseConductorStateDumpedEvent(ProcessResponeError<ConductorStateDumpedCallBackEventArgs>(response, dataReceivedEventArgs, "AdminDumpConductorState", msg));
                         break;
 
                     case HoloNETRequestType.AdminGrantDirectSignalCapability:
@@ -455,6 +470,17 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 HandleError(args, $"An unknown error occurred in HoloNETClient.DecodeDirectSignalCapabilityGranted. Reason: {ex}");
             }
             return args;
+        }
+
+        private void RaiseConductorStateDumpedEvent(ConductorStateDumpedCallBackEventArgs args)
+        {
+            LogEvent("AdminConductorStateDumped", args);
+            OnConductorStateDumpedCallBack?.Invoke(this, args);
+            if (!string.IsNullOrEmpty(args.Id) && _taskCompletionConductorStateDumpedCallBack.TryGetValue(args.Id, out var completion))
+            {
+                completion.TrySetResult(args);
+                _taskCompletionConductorStateDumpedCallBack.Remove(args.Id);
+            }
         }
 
         private void RaiseDirectSignalCapabilityGrantedEvent(DirectSignalCapabilityGrantedCallBackEventArgs args)
@@ -902,7 +928,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             try
             {
                 Logger.Log("ADMIN: PEER META INFO RETURNED\n", LogType.Info);
-                PeerMetaInfoResponse peerMetaInfoResponse = DeserializeResponseValue<PeerMetaInfoResponse>(response.data);
+                //PeerMetaInfoResponse peerMetaInfoResponse = DeserializeResponseValue<PeerMetaInfoResponse>(response.data);
+                PeerMetaInfoResponse peerMetaInfoResponse = DecodePeerMetaInfo(response.data);
 
                 if (peerMetaInfoResponse != null)
                     args.PeerMetaInfo = peerMetaInfoResponse;
@@ -1590,6 +1617,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                         zomeDefinition.ZomeName = keyValuePairs[0].ToString();
 
                         Dictionary<object, object> zomeProps = keyValuePairs[1] as Dictionary<object, object>;
+
+                        // ZomeDef is externally tagged: {"Wasm": {wasm_hash, dependencies}} (or "Inline"). Reading the outer map
+                        // directly meant dependencies and wasm_hash were never found.
+                        if (zomeProps != null && !zomeProps.ContainsKey("dependencies") && zomeProps.Count == 1 && zomeProps.Values.First() is Dictionary<object, object> inner)
+                            zomeProps = inner;
 
                         if (zomeProps != null)
                         {

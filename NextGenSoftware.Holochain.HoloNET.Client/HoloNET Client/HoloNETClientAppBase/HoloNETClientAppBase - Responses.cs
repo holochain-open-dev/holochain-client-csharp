@@ -207,6 +207,37 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                             DecodeWasmHostFunctionsListedReceived(response, dataReceivedEventArgs);
                             break;
 
+                        case HoloNETResponseType.AppAgentInfoReturned:
+                            {
+                                var args = DecodeUnit<AgentInfoReturnedCallBackEventArgs>(response, dataReceivedEventArgs, HoloNETResponseType.AppAgentInfoReturned, "APP: AGENT INFO RETURNED");
+                                try { args.AgentInfos = DeserializeResponseValue<List<string>>(response.data) ?? new List<string>(); }
+                                catch (Exception ex) { HandleError(args, $"An unknown error occurred decoding app agent_info. Reason: {ex}"); }
+                                RaiseAppEvent(args, OnAgentInfoReturnedCallBack, _taskCompletionAgentInfoReturnedCallBack, "AppAgentInfoReturned");
+                            }
+                            break;
+
+                        case HoloNETResponseType.AppNetworkMetricsDumped:
+                            {
+                                var args = DecodeUnit<NetworkMetricsDumpedCallBackEventArgs>(response, dataReceivedEventArgs, HoloNETResponseType.AppNetworkMetricsDumped, "APP: NETWORK METRICS DUMPED");
+                                try { args.NetworkMetricsDumpJSON = DeserializeResponseValueAsJson(response.data); }
+                                catch (Exception ex) { HandleError(args, $"An unknown error occurred decoding app network metrics. Reason: {ex}"); }
+                                RaiseAppEvent(args, OnNetworkMetricsDumpedCallBack, _taskCompletionNetworkMetricsDumpedCallBack, "AppNetworkMetricsDumped");
+                            }
+                            break;
+
+                        case HoloNETResponseType.AppNetworkStatsDumped:
+                            {
+                                var args = DecodeUnit<NetworkStatsDumpedCallBackEventArgs>(response, dataReceivedEventArgs, HoloNETResponseType.AppNetworkStatsDumped, "APP: NETWORK STATS DUMPED");
+                                try { args.NetworkStatsDumpJSON = DeserializeResponseValueAsJson(response.data); }
+                                catch (Exception ex) { HandleError(args, $"An unknown error occurred decoding app network stats. Reason: {ex}"); }
+                                RaiseAppEvent(args, OnNetworkStatsDumpedCallBack, _taskCompletionNetworkStatsDumpedCallBack, "AppNetworkStatsDumped");
+                            }
+                            break;
+
+                        case HoloNETResponseType.AppEnabledViaAppInterface:
+                            RaiseAppEvent(DecodeUnit<AppEnabledViaAppInterfaceCallBackEventArgs>(response, dataReceivedEventArgs, HoloNETResponseType.AppEnabledViaAppInterface, "APP: APP ENABLED"), OnAppEnabledCallBack, _taskCompletionAppEnabledCallBack, "AppEnabledViaAppInterface");
+                            break;
+
                         case HoloNETResponseType.AppDirectSignalSent:
                             RaiseDirectSignalSentEvent(DecodeUnit<DirectSignalSentCallBackEventArgs>(response, dataReceivedEventArgs, HoloNETResponseType.AppDirectSignalSent, "APP: DIRECT SIGNAL SENT"));
                             break;
@@ -292,6 +323,22 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                     case HoloNETRequestType.AppListWasmHostFunctions:
                         RaiseWasmHostFunctionsListedEvent(ProcessResponeError<WasmHostFunctionsListedCallBackEventArgs>(response, dataReceivedEventArgs, "AppListWasmHostFunctions", msg));
+                        break;
+
+                    case HoloNETRequestType.AppAgentInfo:
+                        RaiseAppEvent(ProcessResponeError<AgentInfoReturnedCallBackEventArgs>(response, dataReceivedEventArgs, "AppAgentInfo", msg), OnAgentInfoReturnedCallBack, _taskCompletionAgentInfoReturnedCallBack, "AppAgentInfoReturned");
+                        break;
+
+                    case HoloNETRequestType.AppDumpNetworkMetrics:
+                        RaiseAppEvent(ProcessResponeError<NetworkMetricsDumpedCallBackEventArgs>(response, dataReceivedEventArgs, "AppDumpNetworkMetrics", msg), OnNetworkMetricsDumpedCallBack, _taskCompletionNetworkMetricsDumpedCallBack, "AppNetworkMetricsDumped");
+                        break;
+
+                    case HoloNETRequestType.AppDumpNetworkStats:
+                        RaiseAppEvent(ProcessResponeError<NetworkStatsDumpedCallBackEventArgs>(response, dataReceivedEventArgs, "AppDumpNetworkStats", msg), OnNetworkStatsDumpedCallBack, _taskCompletionNetworkStatsDumpedCallBack, "AppNetworkStatsDumped");
+                        break;
+
+                    case HoloNETRequestType.AppEnableApp:
+                        RaiseAppEvent(ProcessResponeError<AppEnabledViaAppInterfaceCallBackEventArgs>(response, dataReceivedEventArgs, "AppEnableApp", msg), OnAppEnabledCallBack, _taskCompletionAppEnabledCallBack, "AppEnabledViaAppInterface");
                         break;
 
                     case HoloNETRequestType.AppSendDirectSignal:
@@ -667,12 +714,19 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             try
             {
                 Logger.Log("APP: COUNTERSIGNING SESSION STATE RETURNED\n", LogType.Info);
-                CountersigningSessionStateResponse sessionStateResponse = DeserializeResponseValue<CountersigningSessionStateResponse>(response.data);
+                //CountersigningSessionStateResponse sessionStateResponse = DeserializeResponseValue<CountersigningSessionStateResponse>(response.data);
+                //if (sessionStateResponse != null)
+                //    args.SessionState = sessionStateResponse;
+                //else
+                //    HandleError(args, $"{errorMessage} sessionStateResponse failed to deserialize.");
 
-                if (sessionStateResponse != null)
-                    args.SessionState = sessionStateResponse;
-                else
-                    HandleError(args, $"{errorMessage} sessionStateResponse failed to deserialize.");
+                // The value is Option<CountersigningSessionState> itself (null = no session in progress), not a
+                // {session_state} object, so "no session" was reported as an error.
+                byte[] raw = ReadRawValue(response.data);
+                args.SessionState = new CountersigningSessionStateResponse
+                {
+                    session_state = raw == null ? null : MessagePackSerializer.Deserialize<object>(raw, messagePackSerializerOptions)
+                };
             }
             catch (Exception ex)
             {
@@ -738,6 +792,18 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 HandleError(args, $"An unknown error occurred in HoloNETClient.DecodeDirectSignalCapabilityGranted. Reason: {ex}");
             }
             return args;
+        }
+
+        /// <summary>Logs, raises <paramref name="handler"/> and completes the awaiting call for <paramref name="args"/>.Id.</summary>
+        private void RaiseAppEvent<T>(T args, Delegate handler, Dictionary<string, TaskCompletionSource<T>> completions, string name) where T : HoloNETDataReceivedBaseEventArgs
+        {
+            LogEvent(name, args);
+            handler?.DynamicInvoke(this, args);
+            if (!string.IsNullOrEmpty(args.Id) && completions.TryGetValue(args.Id, out var completion))
+            {
+                completion.TrySetResult(args);
+                completions.Remove(args.Id);
+            }
         }
 
         private void RaiseDirectSignalSentEvent(DirectSignalSentCallBackEventArgs args)
@@ -813,7 +879,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             try
             {
                 Logger.Log("APP: PEER META INFO RETURNED\n", LogType.Info);
-                PeerMetaInfoResponse peerMetaInfoResponse = DeserializeResponseValue<PeerMetaInfoResponse>(response.data);
+                //PeerMetaInfoResponse peerMetaInfoResponse = DeserializeResponseValue<PeerMetaInfoResponse>(response.data);
+                PeerMetaInfoResponse peerMetaInfoResponse = DecodePeerMetaInfo(response.data);
 
                 if (peerMetaInfoResponse != null)
                     args.PeerMetaInfo = peerMetaInfoResponse;

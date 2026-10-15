@@ -58,5 +58,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         // New in Holochain 0.7.0 - paginated DHT op timing inspection
         AdminDumpOpTimings,
         AppDumpOpTimings,
+        AdminDumpConductorState,
+        AppAgentInfo,
+        AppDumpNetworkMetrics,
+        AppDumpNetworkStats,
+        AppEnableApp,
     }
 }

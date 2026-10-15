@@ -42,6 +42,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
                 ["provide_memproofs"] = async a => await a.ProvideMemproofsAsync(new Dictionary<string, byte[]> { ["oasis"] = new byte[] { 1 } }),
                 ["publish_countersigning_session"] = async a => await a.PublishCountersigningSessionAsync(new CellId(Dna(), Agent())),
                 ["send_direct_signal"] = async a => await a.SendDirectSignalAsync(Dna(), new[] { Agent() }, new byte[] { 1, 2 }),
+                ["agent_info"] = async a => await a.GetAgentInfoAsync(),
+                ["dump_network_metrics"] = async a => await a.DumpNetworkMetricsAsync(),
+                ["dump_network_stats"] = async a => await a.DumpNetworkStatsAsync(),
+                ["enable_app"] = async a => await a.EnableAppAsync(),
             };
 
         public static IEnumerable<object[]> Names => Calls.Keys.Select(k => new object[] { k });

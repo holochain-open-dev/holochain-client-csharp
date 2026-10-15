@@ -66,6 +66,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
             }
         }
 
+        private static string Snip(string text, string marker, int length)
+        {
+            int i = text.IndexOf(marker, StringComparison.Ordinal);
+            return i < 0 ? "(no " + marker + ")" : text.Substring(i, Math.Min(length, text.Length - i));
+        }
+
         private static Dictionary<string, object> NewAvatar(string username) => new Dictionary<string, object>
         {
             ["id"] = Guid.NewGuid().ToString(),
@@ -183,6 +189,67 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
             });
         }
 
+        /// <summary>Requests HoloNET added for full 0.7 coverage: admin dump_conductor_state; app agent_info, network metrics/stats, enable_app.</summary>
+        [SkippableFact]
+        public async Task Live_ConductorState_AndAppInterfaceAgentInfoMetricsStatsEnable()
+        {
+            RequireConductorAndHapp();
+            await WithInstalledApp(async (admin, appId, installed) =>
+            {
+                var app = (HoloNETClientAppBase)installed.HoloNETClientAppAgent;
+
+                var conductorState = await Step("dump_conductor_state", admin.DumpConductorStateAsync());
+                Assert.False(conductorState.IsError, "dump_conductor_state: " + conductorState.Message);
+                Assert.False(string.IsNullOrEmpty(conductorState.DumpedStateJSON));
+
+                AgentInfoReturnedCallBackEventArgs infos = null;
+                for (int attempt = 0; attempt < 15 && (infos == null || infos.AgentInfos.Count == 0); attempt++)
+                {
+                    infos = await Step("app agent_info", app.GetAgentInfoAsync(new[] { installed.CellId[0] }));
+                    Assert.False(infos.IsError, "app agent_info: " + infos.Message);
+                    if (infos.AgentInfos.Count == 0) await Task.Delay(1000);
+                }
+                Assert.NotEmpty(infos.AgentInfos);
+
+                var metrics = await Step("app dump_network_metrics", app.DumpNetworkMetricsAsync(installed.CellId[0], true));
+                Assert.False(metrics.IsError, "app dump_network_metrics: " + metrics.Message);
+                Assert.False(string.IsNullOrEmpty(metrics.NetworkMetricsDumpJSON));
+
+                var stats = await Step("app dump_network_stats", app.DumpNetworkStatsAsync());
+                Assert.False(stats.IsError, "app dump_network_stats: " + stats.Message);
+                Assert.False(string.IsNullOrEmpty(stats.NetworkStatsDumpJSON));
+
+                var adminMetrics = await Step("admin dump_network_metrics(dna)", admin.DumpNetworkMetricsAsync(installed.CellId[0], true));
+                Assert.False(adminMetrics.IsError, "admin dump_network_metrics(dna): " + adminMetrics.Message);
+
+                // The app is already enabled; enabling it again through its own interface must succeed.
+                var enabled = await Step("app enable_app", app.EnableAppAsync());
+                Assert.False(enabled.IsError, "app enable_app: " + enabled.Message);
+
+                var dnaDef = await Step("get_dna_definition", admin.GetDnaDefinitionAsync(installed.CellId));
+                Assert.False(dnaDef.IsError, dnaDef.Message);
+                Assert.Contains(dnaDef.DnaDefinition.CoordinatorZomes, z => z.Dependencies.Count > 0 && z.wasm_hash != null);
+
+                var fullState = await Step("dump_full_state", admin.DumpFullStateAsync(installed.CellId));
+                Assert.False(fullState.IsError, fullState.Message);
+                Assert.True(fullState.DumpedState != null, "typed full state dump did not map: " + Snip(fullState.DumpedStateJSON, "\"source_chain_dump\"", 1200) + " ... " + Snip(fullState.DumpedStateJSON, "\"integration_dump\"", 900));
+                Assert.NotEmpty(((FullStateDumpedResponse)fullState.DumpedState).source_chain_dump.records);
+
+                // Paging (0.7): one DHT op per page, then the next page from the returned cursor.
+                var page1 = await Step("dump_full_state limit 1", admin.DumpFullStateAsync(installed.CellId, (DhtOpsCursor)null, 1));
+                Assert.False(page1.IsError, page1.Message);
+                var dump1 = (FullStateDumpedResponse)page1.DumpedState;
+                Assert.True(dump1.integration_dump.integrated.Length <= 1);
+                Assert.NotNull(dump1.integration_dump.dht_ops_cursor);
+                var page2 = await Step("dump_full_state page 2", admin.DumpFullStateAsync(installed.CellId, dump1.integration_dump.dht_ops_cursor, 1));
+                Assert.False(page2.IsError, page2.Message);
+
+                var chainPage = await Step("dump_state from seq 0, limit 2", admin.DumpStateAsync(installed.CellId, SourceChainCursor.Sequence(0), 2));
+                Assert.False(chainPage.IsError, chainPage.Message);
+                Assert.False(string.IsNullOrEmpty(chainPage.DumpedStateJSON));
+            });
+        }
+
         [SkippableFact]
         public async Task Live_DirectSignal_GrantThenSendBetweenTwoAgents()
         {
@@ -217,6 +284,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
                         var done = await Task.WhenAny(received.Task, Task.Delay(TimeSpan.FromSeconds(30)));
                         Assert.True(done == received.Task, "recipient did not receive the direct signal");
                         Assert.False(received.Task.Result.IsError, "signal decode: " + received.Task.Result.Message);
+                        Assert.True(received.Task.Result.IsDirectSignal);
+                        Assert.Equal(senderApp.ConvertHoloHashToString(sender.CellId[1]), received.Task.Result.FromAgentPubKey);
+                        Assert.Equal(payload, received.Task.Result.RawSignalData.Data);
                     }
                 });
             });

@@ -210,6 +210,17 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
     }
 
+    /// <summary>Result of the app interface's enable_app (Holochain 0.7: enables the app this connection is authenticated for).</summary>
+    public class AppEnabledViaAppInterfaceCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
+    {
+    }
+
+    /// <summary>Result of the admin interface's dump_conductor_state: the conductor's state as JSON.</summary>
+    public class ConductorStateDumpedCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
+    {
+        public string DumpedStateJSON { get; set; }
+    }
+
     /// <summary>Result of send_direct_signal (delivery is best effort; the conductor only confirms it was sent).</summary>
     public class DirectSignalSentCallBackEventArgs : HoloNETDataReceivedBaseEventArgs
     {

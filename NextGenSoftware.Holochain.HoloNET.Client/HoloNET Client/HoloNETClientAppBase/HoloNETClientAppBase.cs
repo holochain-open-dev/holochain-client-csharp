@@ -171,6 +171,19 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public event PublishCountersigningSessionTriggeredCallBack OnPublishCountersigningSessionTriggeredCallBack;
 
 
+        public delegate void AppAgentInfoReturnedCallBack(object sender, AgentInfoReturnedCallBackEventArgs e);
+        public event AppAgentInfoReturnedCallBack OnAgentInfoReturnedCallBack;
+        public delegate void AppNetworkMetricsDumpedCallBack(object sender, NetworkMetricsDumpedCallBackEventArgs e);
+        public event AppNetworkMetricsDumpedCallBack OnNetworkMetricsDumpedCallBack;
+        public delegate void AppNetworkStatsDumpedCallBack(object sender, NetworkStatsDumpedCallBackEventArgs e);
+        public event AppNetworkStatsDumpedCallBack OnNetworkStatsDumpedCallBack;
+        public delegate void AppEnabledViaAppInterfaceCallBack(object sender, AppEnabledViaAppInterfaceCallBackEventArgs e);
+        public event AppEnabledViaAppInterfaceCallBack OnAppEnabledCallBack;
+        private Dictionary<string, TaskCompletionSource<AgentInfoReturnedCallBackEventArgs>> _taskCompletionAgentInfoReturnedCallBack = new Dictionary<string, TaskCompletionSource<AgentInfoReturnedCallBackEventArgs>>();
+        private Dictionary<string, TaskCompletionSource<NetworkMetricsDumpedCallBackEventArgs>> _taskCompletionNetworkMetricsDumpedCallBack = new Dictionary<string, TaskCompletionSource<NetworkMetricsDumpedCallBackEventArgs>>();
+        private Dictionary<string, TaskCompletionSource<NetworkStatsDumpedCallBackEventArgs>> _taskCompletionNetworkStatsDumpedCallBack = new Dictionary<string, TaskCompletionSource<NetworkStatsDumpedCallBackEventArgs>>();
+        private Dictionary<string, TaskCompletionSource<AppEnabledViaAppInterfaceCallBackEventArgs>> _taskCompletionAppEnabledCallBack = new Dictionary<string, TaskCompletionSource<AppEnabledViaAppInterfaceCallBackEventArgs>>();
+
         public delegate void DirectSignalSentCallBack(object sender, DirectSignalSentCallBackEventArgs e);
         public event DirectSignalSentCallBack OnDirectSignalSentCallBack;
         public delegate void DirectSignalCapabilityGrantedCallBack(object sender, DirectSignalCapabilityGrantedCallBackEventArgs e);
