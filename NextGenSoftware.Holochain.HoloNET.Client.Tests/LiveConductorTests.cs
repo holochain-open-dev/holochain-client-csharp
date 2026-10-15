@@ -11,7 +11,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
     /// <summary>
     /// Talks to a real Holochain conductor using HoloNET's own wire envelope classes.
     /// Runs only when HOLONET_LIVE_ADMIN_URI is set (e.g. ws://localhost:65464); otherwise each
-    /// test returns immediately. See INTEGRATION_TESTING.md for how to start a 0.7.0 sandbox.
+    /// test is reported as skipped. See INTEGRATION_TESTING.md for how to start a 0.7.0 sandbox.
     /// </summary>
     public class LiveConductorTests
     {
@@ -62,10 +62,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
             return MessagePackSerializer.Deserialize<AppResponse>(response.data, Options);
         }
 
-        [Fact]
+        [SkippableFact]
         public async Task Live_GenerateAgentPubKey_ReturnsAgentKey()
         {
-            if (string.IsNullOrEmpty(AdminUri)) return;
+            Skip.If(string.IsNullOrEmpty(AdminUri), "Needs a live Holochain 0.7 conductor: set HOLONET_LIVE_ADMIN_URI (see INTEGRATION_TESTING.md).");
 
             AppResponse response = await SendAdminAsync("generate_agent_pub_key", null);
 
@@ -74,20 +74,20 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
             Assert.Equal(39, key.Length);
         }
 
-        [Fact]
+        [SkippableFact]
         public async Task Live_ListApps_ReturnsAppsListed()
         {
-            if (string.IsNullOrEmpty(AdminUri)) return;
+            Skip.If(string.IsNullOrEmpty(AdminUri), "Needs a live Holochain 0.7 conductor: set HOLONET_LIVE_ADMIN_URI (see INTEGRATION_TESTING.md).");
 
             AppResponse response = await SendAdminAsync("list_apps", new Dictionary<string, object> { { "status_filter", null } });
 
             Assert.Equal("apps_listed", response.type);
         }
 
-        [Fact]
+        [SkippableFact]
         public async Task Live_OldDataContentKey_IsRejectedByConductor()
         {
-            if (string.IsNullOrEmpty(AdminUri)) return;
+            Skip.If(string.IsNullOrEmpty(AdminUri), "Needs a live Holochain 0.7 conductor: set HOLONET_LIVE_ADMIN_URI (see INTEGRATION_TESTING.md).");
 
             // The envelope HoloNET sent before the "value" fix.
             using var socket = new ClientWebSocket();
@@ -107,10 +107,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
             Assert.Equal("error", appResponse.type);
         }
 
-        [Fact]
+        [SkippableFact]
         public async Task Live_HoloNETClientAdmin_EndToEnd()
         {
-            if (string.IsNullOrEmpty(AdminUri)) return;
+            Skip.If(string.IsNullOrEmpty(AdminUri), "Needs a live Holochain 0.7 conductor: set HOLONET_LIVE_ADMIN_URI (see INTEGRATION_TESTING.md).");
 
             var admin = new HoloNETClientAdmin(new HoloNETDNA
             {
@@ -140,20 +140,20 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
             }
         }
 
-        [Fact]
+        [SkippableFact]
         public async Task Live_ListApps_WithAwaitingMemproofsFilter_IsAccepted()
         {
-            if (string.IsNullOrEmpty(AdminUri)) return;
+            Skip.If(string.IsNullOrEmpty(AdminUri), "Needs a live Holochain 0.7 conductor: set HOLONET_LIVE_ADMIN_URI (see INTEGRATION_TESTING.md).");
 
             AppResponse response = await SendAdminAsync("list_apps", new NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.ListAppsRequest { status_filter = AppStatusFilter.AwaitingMemproofs.ToWireValue() });
 
             Assert.Equal("apps_listed", response.type);
         }
 
-        [Fact]
+        [SkippableFact]
         public async Task Live_ConductorError_IsSurfacedByHoloNETClientAdmin()
         {
-            if (string.IsNullOrEmpty(AdminUri)) return;
+            Skip.If(string.IsNullOrEmpty(AdminUri), "Needs a live Holochain 0.7 conductor: set HOLONET_LIVE_ADMIN_URI (see INTEGRATION_TESTING.md).");
 
             var admin = new HoloNETClientAdmin(new HoloNETDNA { AutoStartHolochainConductor = false, AutoShutdownHolochainConductor = false, HolochainConductorAdminURI = AdminUri });
 
@@ -169,17 +169,17 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
             }
         }
 
-        [Fact]
+        [SkippableFact]
         public async Task Live_InstallApp_PayloadIsParsedByConductor()
         {
-            if (string.IsNullOrEmpty(AdminUri)) return;
+            Skip.If(string.IsNullOrEmpty(AdminUri), "Needs a live Holochain 0.7 conductor: set HOLONET_LIVE_ADMIN_URI (see INTEGRATION_TESTING.md).");
 
             // The repo's oasis.happ predates manifest_version "0", so installation must fail on the
             // bundle itself. That proves the request shape was accepted. The old shape failed earlier,
             // because the required `source` field was missing.
             string happ = System.IO.Path.GetFullPath(System.IO.Path.Combine(AppContext.BaseDirectory,
                 "../../../../HoloNET-Manager/NextGenSoftware.Holochain.HoloNET.Manager/OASIS_hAPP/oasis.happ"));
-            if (!System.IO.File.Exists(happ)) return;
+            Skip.IfNot(System.IO.File.Exists(happ), $"hApp not found: {happ}");
 
             var request = new NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.InstallAppRequest
             {
@@ -195,10 +195,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
             Assert.DoesNotContain("missing field", error);
         }
 
-        [Fact]
+        [SkippableFact]
         public async Task Live_AttachAppInterface_ReturnsPort()
         {
-            if (string.IsNullOrEmpty(AdminUri)) return;
+            Skip.If(string.IsNullOrEmpty(AdminUri), "Needs a live Holochain 0.7 conductor: set HOLONET_LIVE_ADMIN_URI (see INTEGRATION_TESTING.md).");
 
             AppResponse response = await SendAdminAsync("attach_app_interface", new NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.AttachAppInterfaceRequest());
 
@@ -206,10 +206,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
             Assert.Contains("\"port\":", MessagePackSerializer.SerializeToJson(response.data));
         }
 
-        [Fact]
+        [SkippableFact]
         public async Task Live_HoloNETClientAdmin_InfoCalls_Decode()
         {
-            if (string.IsNullOrEmpty(AdminUri)) return;
+            Skip.If(string.IsNullOrEmpty(AdminUri), "Needs a live Holochain 0.7 conductor: set HOLONET_LIVE_ADMIN_URI (see INTEGRATION_TESTING.md).");
 
             var admin = new HoloNETClientAdmin(new HoloNETDNA { AutoStartHolochainConductor = false, AutoShutdownHolochainConductor = false, HolochainConductorAdminURI = AdminUri });
 
@@ -239,11 +239,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
         /// Full app flow against a 0.7.0 hApp: install → enable → sign → attach → connect → zome call.
         /// Requires HOLONET_LIVE_HAPP_PATH (e.g. C:\Source\OASIS-Holochain-hApp\workdir\oasis.happ).
         /// </summary>
-        [Fact]
+        [SkippableFact]
         public async Task Live_InstallEnableSignAttachConnect_AndCallZome()
         {
             string happPath = Environment.GetEnvironmentVariable("HOLONET_LIVE_HAPP_PATH");
-            if (string.IsNullOrEmpty(AdminUri) || string.IsNullOrEmpty(happPath)) return;
+            Skip.If(string.IsNullOrEmpty(AdminUri) || string.IsNullOrEmpty(happPath), "Needs HOLONET_LIVE_ADMIN_URI and the hApp path variable (see INTEGRATION_TESTING.md).");
 
             var admin = new HoloNETClientAdmin(new HoloNETDNA { AutoStartHolochainConductor = false, AutoShutdownHolochainConductor = false, HolochainConductorAdminURI = AdminUri });
 
@@ -303,11 +303,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
         /// Requires HOLONET_LIVE_CLONE_HAPP_PATH: a 0.7.0 hApp with role "oasis", clone_limit &gt; 0
         /// (e.g. the OASIS hApp repacked with clone_limit: 3).
         /// </summary>
-        [Fact]
+        [SkippableFact]
         public async Task Live_AppApis_CloneCells_Countersigning_HostFns_OpTimings()
         {
             string happPath = Environment.GetEnvironmentVariable("HOLONET_LIVE_CLONE_HAPP_PATH");
-            if (string.IsNullOrEmpty(AdminUri) || string.IsNullOrEmpty(happPath)) return;
+            Skip.If(string.IsNullOrEmpty(AdminUri) || string.IsNullOrEmpty(happPath), "Needs HOLONET_LIVE_ADMIN_URI and the hApp path variable (see INTEGRATION_TESTING.md).");
 
             var admin = new HoloNETClientAdmin(new HoloNETDNA { AutoStartHolochainConductor = false, AutoShutdownHolochainConductor = false, HolochainConductorAdminURI = AdminUri });
 
@@ -385,11 +385,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
         /// Deferred membrane proofs: install without proofs → connect → provide_memproofs → enable.
         /// Requires HOLONET_LIVE_MEMPROOFS_HAPP_PATH: a 0.7.0 hApp with allow_deferred_memproofs: true.
         /// </summary>
-        [Fact]
+        [SkippableFact]
         public async Task Live_DeferredMemproofs_ProvideThenEnable()
         {
             string happPath = Environment.GetEnvironmentVariable("HOLONET_LIVE_MEMPROOFS_HAPP_PATH");
-            if (string.IsNullOrEmpty(AdminUri) || string.IsNullOrEmpty(happPath)) return;
+            Skip.If(string.IsNullOrEmpty(AdminUri) || string.IsNullOrEmpty(happPath), "Needs HOLONET_LIVE_ADMIN_URI and the hApp path variable (see INTEGRATION_TESTING.md).");
 
             var admin = new HoloNETClientAdmin(new HoloNETDNA { AutoStartHolochainConductor = false, AutoShutdownHolochainConductor = false, HolochainConductorAdminURI = AdminUri });
 
@@ -435,11 +435,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
             }
         }
 
-        [Fact]
+        [SkippableFact]
         public async Task Live_InstallAppFromBytes_Installs()
         {
             string happPath = Environment.GetEnvironmentVariable("HOLONET_LIVE_HAPP_PATH");
-            if (string.IsNullOrEmpty(AdminUri) || string.IsNullOrEmpty(happPath)) return;
+            Skip.If(string.IsNullOrEmpty(AdminUri) || string.IsNullOrEmpty(happPath), "Needs HOLONET_LIVE_ADMIN_URI and the hApp path variable (see INTEGRATION_TESTING.md).");
 
             var admin = new HoloNETClientAdmin(new HoloNETDNA { AutoStartHolochainConductor = false, AutoShutdownHolochainConductor = false, HolochainConductorAdminURI = AdminUri });
 
@@ -455,10 +455,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
             }
         }
 
-        [Fact]
+        [SkippableFact]
         public async Task Live_ListDnas_ReturnsDnasListed()
         {
-            if (string.IsNullOrEmpty(AdminUri)) return;
+            Skip.If(string.IsNullOrEmpty(AdminUri), "Needs a live Holochain 0.7 conductor: set HOLONET_LIVE_ADMIN_URI (see INTEGRATION_TESTING.md).");
 
             AppResponse response = await SendAdminAsync("list_dnas", null);
 
