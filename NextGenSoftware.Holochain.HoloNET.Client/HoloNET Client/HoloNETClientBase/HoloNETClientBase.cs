@@ -29,6 +29,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         private int _conductorProcessSessionId = 0;
         private ShutdownHolochainConductorsMode _shutdownHolochainConductorsMode = ShutdownHolochainConductorsMode.UseHoloNETDNASettings;
         private Task<HolochainConductorsShutdownEventArgs> _conductorShutdownTask;
+        private HashSet<int> _conductorProcessesBeforeStart = new HashSet<int>();
+        private string _hcHolochainPath;
+
+        private string HcHolochainPathArgument() => string.IsNullOrEmpty(_hcHolochainPath) ? "" : $" -H '{_hcHolochainPath}'";
 
         protected int _currentId = 0;
         protected MessagePackSerializerOptions messagePackSerializerOptions = MessagePackSerializerOptions.Standard.WithSecurity(MessagePackSecurity.UntrustedData);
@@ -465,6 +469,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     {
                         case HolochainConductorModeEnum.UseExternal:
                             fullPathToHcExe = HoloNETDNA.FullPathToExternalHCToolBinary;
+                            // hc starts holochain: use the external one if given, else one next to hc.exe, else PATH.
+                            if (!string.IsNullOrEmpty(HoloNETDNA.FullPathToExternalHolochainConductorBinary) && File.Exists(HoloNETDNA.FullPathToExternalHolochainConductorBinary))
+                                _hcHolochainPath = HoloNETDNA.FullPathToExternalHolochainConductorBinary;
+                            else if (File.Exists(Path.Combine(Path.GetDirectoryName(fullPathToHcExe) ?? "", "holochain.exe")))
+                                _hcHolochainPath = Path.Combine(Path.GetDirectoryName(fullPathToHcExe), "holochain.exe");
                             break;
 
                         case HolochainConductorModeEnum.UseEmbedded:
@@ -497,6 +506,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                                         //ExtractEmbeddedBinary(fullPathToHcExe, Resources.hc);
                                         fullPathToHcExe = EmbeddedBinaryPath("hc.exe");
                                         ExtractEmbeddedBinary(fullPathToHcExe, EmbeddedHc());
+                                        // hc launches holochain itself, so the matching bundled conductor has to be there too.
+                                        ExtractEmbeddedBinary(EmbeddedBinaryPath("holochain.exe"), EmbeddedHolochain());
+                                        _hcHolochainPath = EmbeddedBinaryPath("holochain.exe");
                                     }
                                     catch (Exception ex2)
                                     {
@@ -574,7 +586,14 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 }
 
                 //Make sure the condctor is not already running
-                if (!HoloNETDNA.OnlyAllowOneHolochainConductorToRunAtATime || (HoloNETDNA.OnlyAllowOneHolochainConductorToRunAtATime && !Process.GetProcesses().Any(x => x.ProcessName == _conductorProcess.StartInfo.FileName)))
+                //if (!HoloNETDNA.OnlyAllowOneHolochainConductorToRunAtATime || (HoloNETDNA.OnlyAllowOneHolochainConductorToRunAtATime && !Process.GetProcesses().Any(x => x.ProcessName == _conductorProcess.StartInfo.FileName)))
+                string conductorProcessName = Path.GetFileNameWithoutExtension(HoloNETDNA.HolochainConductorToUse == HolochainConductorEnum.HcDevTool ? fullPathToHcExe : fullPathToHolochainExe);
+                bool conductorAlreadyRunning = Process.GetProcessesByName(conductorProcessName).Length > 0;
+
+                if (HoloNETDNA.OnlyAllowOneHolochainConductorToRunAtATime && conductorAlreadyRunning)
+                    Logger.Log($"A {conductorProcessName} conductor is already running and OnlyAllowOneHolochainConductorToRunAtATime is set, so HoloNET will use it rather than start another.", LogType.Info);
+
+                if (!HoloNETDNA.OnlyAllowOneHolochainConductorToRunAtATime || !conductorAlreadyRunning)
                 {
                     Logger.Log("Starting Holochain Conductor...", LogType.Info, true);
 
@@ -582,7 +601,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     {
                         _conductorProcess.StartInfo.WorkingDirectory = HoloNETDNA.FullPathToRootHappFolder;
                         //_conductorProcess.StartInfo.Arguments = $"-NoExit -Command \"'' | {fullPathToHcExe} s  generate {HoloNETDNA.FullPathToCompiledHappFolder} --piped -f={EndPoint.Port}\"";
-                        _conductorProcess.StartInfo.Arguments = $"-NoExit -Command \"'' | {fullPathToHcExe} s --piped  generate {HoloNETDNA.FullPathToCompiledHappFolder} --run={EndPoint.Port}\"";
+                        //_conductorProcess.StartInfo.Arguments = $"-NoExit -Command \"'' | {fullPathToHcExe} s --piped  generate {HoloNETDNA.FullPathToCompiledHappFolder} --run={EndPoint.Port}\"";
+                        // `--run=<port>` only sets an *app* port (the admin port was random, so HoloNET couldn't connect);
+                        // -f fixes the admin port. hc also needs to know which holochain to launch (-H), and lair runs in-process.
+                        _conductorProcess.StartInfo.Arguments = $"-NoExit -Command \"'' | & '{fullPathToHcExe}' s --piped -f={EndPoint.Port}{HcHolochainPathArgument()} generate '{HoloNETDNA.FullPathToCompiledHappFolder}' --in-process-lair --run=0\""; // --run needs a value: 0 = one app interface on a free port
                     }
 
                     if (HoloNETDNA.ShowHolochainConductorWindow)
@@ -637,6 +659,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                         }
                     }
 
+                    _conductorProcessesBeforeStart = new HashSet<int>(Process.GetProcessesByName("holochain").Concat(Process.GetProcessesByName("hc")).Select(x => x.Id));
                     _conductorProcess.Start();
                     _conductorProcessSessionId = _conductorProcess.Id;
 
@@ -914,26 +937,16 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     {
                         Logger.Log("Shutting Down Holochain Conductor...", LogType.Info, true);
 
-                        // The conductor runs inside a hidden "PowerShell -NoExit" host that HoloNET started; killing only
-                        // holochain/hc left that host running after every shutdown. Stop the host (and its tree) as well.
-                        try
-                        {
-                            if (_conductorProcess != null && !_conductorProcess.HasExited)
-                            {
-#if NET5_0_OR_GREATER
-                                _conductorProcess.Kill(true);
-#else
-                                _conductorProcess.Kill();
-#endif
-                                _conductorProcess.WaitForExit(3000);
-                            }
-                        }
-                        catch { }
 
                         // Kill by process name — StartInfo of external processes isn't populated on Windows,
                         // so Process.GetProcesses() filtering on StartInfo.Arguments won't work.
-                        List<Process> hcProcesses = Process.GetProcessesByName("hc").ToList();
-                        List<Process> holochainProcesses = Process.GetProcessesByName("holochain").ToList();
+                        //List<Process> hcProcesses = Process.GetProcessesByName("hc").ToList();
+                        //List<Process> holochainProcesses = Process.GetProcessesByName("holochain").ToList();
+                        // "Current conductor only" used to kill every holochain/hc process on the machine. Now only the ones
+                        // HoloNET started (any that appeared after it launched its conductor); none if it didn't start one.
+                        bool startedOne = _conductorProcess != null;
+                        List<Process> hcProcesses = startedOne ? Process.GetProcessesByName("hc").Where(x => !_conductorProcessesBeforeStart.Contains(x.Id)).ToList() : new List<Process>();
+                        List<Process> holochainProcesses = startedOne ? Process.GetProcessesByName("holochain").Where(x => !_conductorProcessesBeforeStart.Contains(x.Id)).ToList() : new List<Process>();
 
                         foreach (Process process in hcProcesses)
                         {
@@ -962,6 +975,22 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                             }
                             catch { }
                         }
+
+                        // The conductor runs inside a hidden "PowerShell -NoExit" host that HoloNET started; killing only
+                        // holochain/hc left that host running after every shutdown. Stop the host (and its tree) as well.
+                        try
+                        {
+                            if (_conductorProcess != null && !_conductorProcess.HasExited)
+                            {
+#if NET5_0_OR_GREATER
+                                _conductorProcess.Kill(true);
+#else
+                                _conductorProcess.Kill();
+#endif
+                                _conductorProcess.WaitForExit(3000);
+                            }
+                        }
+                        catch { }
 
                         //List<Process> processes2 = Process.GetProcesses().Where(x => x.ProcessName == "hc.exe").ToList();
                         //List<Process> processes3 = Process.GetProcesses().Where(x => x.ProcessName == "holochain.exe").ToList();

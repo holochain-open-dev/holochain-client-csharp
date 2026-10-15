@@ -87,6 +87,135 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
             }, expected);
         }
 
+        private static string TestHapp(string version, string variant = null)
+        {
+            string tag = version.Replace(".", "");
+            string folder = "happ-" + tag + (variant == null ? "" : "-" + variant);
+            string file = variant == null ? "oasis.happ" : "oasis-" + variant + ".happ";
+            for (var dir = new DirectoryInfo(AppContext.BaseDirectory); dir != null; dir = dir.Parent)
+            {
+                string candidate = Path.Combine(dir.FullName, ".holochain-test", folder, file);
+                if (File.Exists(candidate)) return candidate;
+            }
+            return null;
+        }
+
+        /// <summary>hc sandbox (HcDevTool) mode with each bundled release: hc generates a sandbox for the hApp and runs it.</summary>
+        [SkippableTheory]
+        [InlineData(EmbeddedHolochainVersion.V0_7_1, "0.7.1")]
+        [InlineData(EmbeddedHolochainVersion.V0_7_0, "0.7.0")]
+        public Task Live_AutoStart_HcDevTool_EachBundledVersion(EmbeddedHolochainVersion version, string expected)
+        {
+            Skip.IfNot(Environment.GetEnvironmentVariable("HOLONET_LIVE_EMBEDDED") == "1", "Build with -p:Embedded=true and set HOLONET_LIVE_EMBEDDED=1.");
+            string happ = TestHapp(expected);
+            Skip.If(happ == null, "No " + expected + " test hApp in .holochain-test.");
+            string root = Path.Combine(Path.GetTempPath(), "HoloNET-hc-" + Guid.NewGuid().ToString("N").Substring(0, 8));
+            Directory.CreateDirectory(root);
+            return AutoStartThenShutdown(dna =>
+            {
+                dna.HolochainConductorToUse = HolochainConductorEnum.HcDevTool;
+                dna.HolochainConductorMode = HolochainConductorModeEnum.UseEmbedded;
+                dna.EmbeddedHolochainVersion = version;
+                dna.FullPathToRootHappFolder = root;
+                dna.FullPathToCompiledHappFolder = Path.GetDirectoryName(happ); // hc generate finds the .happ in this folder
+                dna.SecondsToWaitForHolochainConductorToStart = 25;
+            }, expected);
+        }
+
+        private static HoloNETDNA ExternalDna(int port, string configDir) => new HoloNETDNA
+        {
+            AutoStartHolochainConductor = true,
+            AutoShutdownHolochainConductor = true,
+            HolochainConductorToUse = HolochainConductorEnum.HolochainProductionConductor,
+            HolochainConductorMode = HolochainConductorModeEnum.UseExternal,
+            FullPathToExternalHolochainConductorBinary = HolochainBin,
+            HolochainConductorConfigPath = Path.Combine(configDir, "conductor-config.yaml"),
+            SecondsToWaitForHolochainConductorToStart = 8,
+            OnlyAllowOneHolochainConductorToRunAtATime = false,
+            HolochainConductorAdminURI = "ws://localhost:" + port
+        };
+
+        /// <summary>Shutting down the current conductor must leave conductors this client did not start alone.</summary>
+        [SkippableFact]
+        public async Task Live_AutoShutdown_CurrentOnly_LeavesOtherConductorsRunning()
+        {
+            Skip.IfNot(Enabled, "Set HOLONET_LIVE_AUTOSTART=1 (and stop any other conductor) to run.");
+            Skip.If(!OperatingSystem.IsWindows(), "Auto-start launches the conductor through PowerShell (Windows).");
+            Skip.If(HolochainBin == null, "holochain.exe not found.");
+            Skip.If(RunningConductors() > 0, "Another holochain/hc process is running.");
+
+            int portA = FreePort(), portB = FreePort();
+            string dirA = Path.Combine(Path.GetTempPath(), "HoloNET-a-" + Guid.NewGuid().ToString("N").Substring(0, 8));
+            string dirB = Path.Combine(Path.GetTempPath(), "HoloNET-b-" + Guid.NewGuid().ToString("N").Substring(0, 8));
+            var a = new HoloNETClientAdmin(ExternalDna(portA, dirA));
+            var b = new HoloNETClientAdmin(ExternalDna(portB, dirB));
+            try
+            {
+                Assert.True((await a.ConnectAsync("ws://localhost:" + portA)).IsConnected);
+                Assert.True((await b.ConnectAsync("ws://localhost:" + portB)).IsConnected);
+                Assert.Equal(2, Process.GetProcessesByName("holochain").Length);
+
+                var bDown = await b.DisconnectAsync(DisconnectedCallBackMode.WaitForHolochainConductorToDisconnect, ShutdownHolochainConductorsMode.ShutdownCurrentConductorOnly);
+                Assert.Equal(1, bDown.HolochainConductorsShutdownResult.NumberOfHolochainExeInstancesShutdown);
+                for (int i = 0; i < 10 && IsListening(portB); i++) await Task.Delay(500);
+                Assert.False(IsListening(portB), "conductor B still running");
+
+                // A's conductor survived and still answers.
+                Assert.True(IsListening(portA), "shutting down B killed conductor A");
+                var key = await a.GenerateAgentPubKeyAsync();
+                Assert.False(key.IsError, "conductor A after B shut down: " + key.Message);
+
+                await a.DisconnectAsync();
+                for (int i = 0; i < 10 && IsListening(portA); i++) await Task.Delay(500);
+                Assert.Empty(Process.GetProcessesByName("holochain"));
+            }
+            finally
+            {
+                foreach (var p in Process.GetProcessesByName("holochain")) { try { p.Kill(); } catch { } }
+                try { Directory.Delete(dirA, true); } catch { }
+                try { Directory.Delete(dirB, true); } catch { }
+            }
+        }
+
+        /// <summary>OnlyAllowOneHolochainConductorToRunAtATime: a second client reuses the running conductor instead of starting another.</summary>
+        [SkippableFact]
+        public async Task Live_OnlyAllowOneConductor_SecondClientReusesTheRunningOne()
+        {
+            Skip.IfNot(Enabled, "Set HOLONET_LIVE_AUTOSTART=1 (and stop any other conductor) to run.");
+            Skip.If(!OperatingSystem.IsWindows(), "Auto-start launches the conductor through PowerShell (Windows).");
+            Skip.If(HolochainBin == null, "holochain.exe not found.");
+            Skip.If(RunningConductors() > 0, "Another holochain/hc process is running.");
+
+            int port = FreePort();
+            string dir = Path.Combine(Path.GetTempPath(), "HoloNET-one-" + Guid.NewGuid().ToString("N").Substring(0, 8));
+            var first = new HoloNETClientAdmin(ExternalDna(port, dir));
+            var secondDna = ExternalDna(port, dir);
+            secondDna.OnlyAllowOneHolochainConductorToRunAtATime = true;
+            secondDna.AutoShutdownHolochainConductor = false;
+            var second = new HoloNETClientAdmin(secondDna);
+            bool secondStarted = false;
+            second.OnHolochainConductorStarted += (s, e) => secondStarted = true;
+            try
+            {
+                Assert.True((await first.ConnectAsync("ws://localhost:" + port)).IsConnected);
+                var connected = await second.ConnectAsync("ws://localhost:" + port);
+                Assert.True(connected.IsConnected, "second client: " + connected.Message);
+                Assert.False(secondStarted, "second client started another conductor");
+                Assert.Single(Process.GetProcessesByName("holochain"));
+
+                await second.DisconnectAsync();
+                Assert.True(IsListening(port), "second client's disconnect stopped the shared conductor");
+                await first.DisconnectAsync();
+                for (int i = 0; i < 10 && IsListening(port); i++) await Task.Delay(500);
+                Assert.Empty(Process.GetProcessesByName("holochain"));
+            }
+            finally
+            {
+                foreach (var p in Process.GetProcessesByName("holochain")) { try { p.Kill(); } catch { } }
+                try { Directory.Delete(dir, true); } catch { }
+            }
+        }
+
         private static async Task AutoStartThenShutdown(Action<HoloNETDNA> configure, string expectedVersion)
         {
             Skip.IfNot(Enabled, "Set HOLONET_LIVE_AUTOSTART=1 (and stop any other conductor) to run.");
