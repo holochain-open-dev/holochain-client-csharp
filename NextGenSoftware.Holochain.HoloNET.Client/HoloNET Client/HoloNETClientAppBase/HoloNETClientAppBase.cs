@@ -96,6 +96,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// </summary>
         public event SignalCallBack OnSignalCallBack;
 
+        /// <summary>
+        /// System signals from the conductor (successful_countersigning, abandoned_countersigning, restore_complete, ...).
+        /// OnSignalCallBack only carries app signals; these were previously dropped entirely.
+        /// </summary>
+        public event SignalCallBack OnSystemSignalCallBack;
+
         //public delegate void ConductorDebugCallBack(object sender, ConductorDebugCallBackEventArgs e);
         //public event ConductorDebugCallBack OnConductorDebugCallBack;
 

@@ -52,6 +52,23 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             return null;
         }
 
+        /// <summary>Returns the raw msgpack of the envelope's "value" (null when absent).</summary>
+        public static byte[] ReadRawValue(byte[] envelope)
+        {
+            var reader = new MessagePackReader(envelope);
+            int count = reader.ReadMapHeader();
+
+            for (int i = 0; i < count; i++)
+            {
+                if (reader.ReadString() == "value")
+                    return System.Buffers.BuffersExtensions.ToArray(reader.ReadRaw());
+
+                reader.Skip();
+            }
+
+            return null;
+        }
+
         /// <summary>Returns the envelope's "value" as JSON (null when absent), for payloads exposed as JSON strings.</summary>
         protected string DeserializeResponseValueAsJson(byte[] envelope)
         {

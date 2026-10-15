@@ -24,5 +24,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         [Key("signal")]
         [MessagePackFormatter(typeof(ByteArrayAsIntArrayFormatter))]
         public byte[] signal { get; set; }
+
+        /// <summary>Holochain 0.7.1+ app_direct only: the agent who sent the direct signal.</summary>
+        [Key("from_agent")]
+        public byte[] from_agent { get; set; }
     }
 }

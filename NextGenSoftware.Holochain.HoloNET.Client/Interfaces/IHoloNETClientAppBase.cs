@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -13,6 +13,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Interfaces
         event HoloNETClientAppBase.AppInfoCallBack OnAppInfoCallBack;
         event HoloNETClientAppBase.ReadyForZomeCalls OnReadyForZomeCalls;
         event HoloNETClientAppBase.SignalCallBack OnSignalCallBack;
+        event HoloNETClientAppBase.SignalCallBack OnSystemSignalCallBack;
         event HoloNETClientAppBase.ZomeFunctionCallBack OnZomeFunctionCallBack;
 
         // New in Holochain 0.7.0 - App API.

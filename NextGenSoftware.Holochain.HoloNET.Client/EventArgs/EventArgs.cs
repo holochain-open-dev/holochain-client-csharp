@@ -153,6 +153,15 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public ISignalData RawSignalData { get;set;}
         public Dictionary<string, object> SignalData { get; set; }
         public string SignalDataAsString { get; set; }
+
+        /// <summary>True for a direct signal from another agent (send_direct_signal), false for one emitted by a zome.</summary>
+        public bool IsDirectSignal { get; set; }
+
+        /// <summary>Holochain 0.7.1+: the agent who sent a direct signal (null for zome signals and on 0.7.0).</summary>
+        public string FromAgentPubKey { get; set; }
+
+        /// <summary>For system signals, the variant (e.g. "successful_countersigning", "restore_complete").</summary>
+        public string SystemSignalType { get; set; }
     }
 
     public class ConductorDebugCallBackEventArgs : CallBackBaseEventArgs

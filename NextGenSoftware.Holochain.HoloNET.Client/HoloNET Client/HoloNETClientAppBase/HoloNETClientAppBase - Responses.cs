@@ -401,17 +401,27 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                     if (value?.signal != null && value.signal.Length > 0)
                     {
-                        object payload = MessagePackSerializer.Deserialize<object>(value.signal, messagePackSerializerOptions);
-
-                        if (payload is Dictionary<object, object> map)
+                        // A direct signal is opaque bytes chosen by the sender and needn't be msgpack; decoding it as msgpack
+                        // threw and turned the whole signal into an error. Fall back to the raw bytes.
+                        try
                         {
-                            foreach (var kv in map)
-                                signalDataDecoded[kv.Key.ToString()] = kv.Value;
-                        }
-                        else
-                            signalDataDecoded["value"] = payload;
+                            object payload = MessagePackSerializer.Deserialize<object>(value.signal, messagePackSerializerOptions);
 
-                        signalDataAsString = MessagePackSerializer.ConvertToJson(value.signal);
+                            if (payload is Dictionary<object, object> map)
+                            {
+                                foreach (var kv in map)
+                                    signalDataDecoded[kv.Key.ToString()] = kv.Value;
+                            }
+                            else
+                                signalDataDecoded["value"] = payload;
+
+                            signalDataAsString = MessagePackSerializer.ConvertToJson(value.signal);
+                        }
+                        catch (MessagePackSerializationException) when (variant == "app_direct")
+                        {
+                            signalDataDecoded["value"] = value.signal;
+                            signalDataAsString = Convert.ToBase64String(value.signal);
+                        }
                     }
 
                     signalCallBackEventArgs.DnaHash = value?.cell_id != null ? ConvertHoloHashToString(value.cell_id[0]) : "";
@@ -420,9 +430,17 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     signalCallBackEventArgs.SignalData = signalDataDecoded;
                     signalCallBackEventArgs.SignalDataAsString = signalDataAsString;
                     signalCallBackEventArgs.SignalType = SignalType.App;
+                    signalCallBackEventArgs.IsDirectSignal = variant == "app_direct";
+                    signalCallBackEventArgs.FromAgentPubKey = value?.from_agent != null ? ConvertHoloHashToString(value.from_agent) : null;
                 }
                 else
+                {
                     signalCallBackEventArgs.SignalType = SignalType.System;
+                    // SystemSignal is adjacently tagged too: {"type": "system", "value": {"type": "<variant>", "value": ...}}.
+                    byte[] system = ReadRawValue(response.data);
+                    signalCallBackEventArgs.SystemSignalType = system == null ? null : ReadResponseType(system);
+                    signalCallBackEventArgs.SignalDataAsString = DeserializeResponseValueAsJson(response.data);
+                }
             }
             catch (Exception ex)
             {
@@ -431,7 +449,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             // Ignore System signals — they carry no app-level data (mirrors the JS client behaviour).
             if (signalCallBackEventArgs.SignalType == SignalType.System && !signalCallBackEventArgs.IsError)
+            {
+                OnSystemSignalCallBack?.Invoke(this, signalCallBackEventArgs);
                 return;
+            }
 
             RaiseSignalReceivedEvent(signalCallBackEventArgs);
         }
