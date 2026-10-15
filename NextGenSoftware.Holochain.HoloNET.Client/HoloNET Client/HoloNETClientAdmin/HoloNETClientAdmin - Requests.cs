@@ -1803,12 +1803,23 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             if (string.IsNullOrEmpty(id))
                 id = GetRequestId();
 
-            _taskCompletionCallBack[id] = new TaskCompletionSource<T> { };
-            await SendHoloNETRequestAsync(holoNETData, requestType, id);
+            _taskCompletionCallBack[id] = new TaskCompletionSource<T>(TaskCreationOptions.RunContinuationsAsynchronously);
+            Task<T> returnValue = _taskCompletionCallBack[id].Task;
+            TrackPendingCall(id, _taskCompletionCallBack);
+            //await SendHoloNETRequestAsync(holoNETData, requestType, id);
+            await SendTrackedRequestAsync(holoNETData, requestType, id);
 
             if (conductorResponseCallBackMode == ConductorResponseCallBackMode.WaitForHolochainConductorResponse)
             {
-                Task<T> returnValue = _taskCompletionCallBack[id].Task;
+                //Task<T> returnValue = _taskCompletionCallBack[id].Task;
+                T result = await returnValue;
+                UntrackPendingCall(id);
+                return result;
+            }
+            else if (returnValue.IsCompleted)
+            {
+                // Failed before it was sent (not connected / invalid id): report it rather than "please wait".
+                UntrackPendingCall(id);
                 return await returnValue;
             }
             else

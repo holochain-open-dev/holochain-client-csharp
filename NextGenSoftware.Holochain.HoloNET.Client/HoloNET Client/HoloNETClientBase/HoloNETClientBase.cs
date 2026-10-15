@@ -22,14 +22,79 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
     {
         private bool _shuttingDownHoloNET = false;
         private bool _disposed = false;
-        private TaskCompletionSource<DisconnectedEventArgs> _taskCompletionDisconnected = new TaskCompletionSource<DisconnectedEventArgs>();
-        private TaskCompletionSource<HoloNETShutdownEventArgs> _taskCompletionHoloNETShutdown = new TaskCompletionSource<HoloNETShutdownEventArgs>();
+        private TaskCompletionSource<DisconnectedEventArgs> _taskCompletionDisconnected = new TaskCompletionSource<DisconnectedEventArgs>(TaskCreationOptions.RunContinuationsAsynchronously);
+        private TaskCompletionSource<HoloNETShutdownEventArgs> _taskCompletionHoloNETShutdown = new TaskCompletionSource<HoloNETShutdownEventArgs>(TaskCreationOptions.RunContinuationsAsynchronously);
         private IHoloNETDNA _holoNETDNA = null;
         private Process _conductorProcess = null;
         private int _conductorProcessSessionId = 0;
         private ShutdownHolochainConductorsMode _shutdownHolochainConductorsMode = ShutdownHolochainConductorsMode.UseHoloNETDNASettings;
         private Task<HolochainConductorsShutdownEventArgs> _conductorShutdownTask;
         private HashSet<int> _conductorProcessesBeforeStart = new HashSet<int>();
+
+        // How to fail each call that is waiting for the conductor (request id -> fail with reason). A call used to wait forever
+        // if the connection dropped, it was made while disconnected, or its send threw.
+        private readonly System.Collections.Concurrent.ConcurrentDictionary<string, Action<string>> _pendingCompletions = new System.Collections.Concurrent.ConcurrentDictionary<string, Action<string>>();
+
+        /// <summary>Registers how to fail the call waiting on <paramref name="completions"/>[<paramref name="id"/>].</summary>
+        protected void TrackPendingCall<T>(string id, Dictionary<string, TaskCompletionSource<T>> completions) where T : HoloNETDataReceivedBaseEventArgs, new()
+        {
+            _pendingCompletions[id] = reason =>
+            {
+                if (completions.TryGetValue(id, out TaskCompletionSource<T> completion))
+                {
+                    completions.Remove(id);
+                    completion.TrySetResult(new T { EndPoint = EndPoint, Id = id, IsError = true, Message = reason });
+                }
+            };
+        }
+
+        /// <summary>The call finished normally; stop tracking it.</summary>
+        protected void UntrackPendingCall(string id) => _pendingCompletions.TryRemove(id, out _);
+
+        /// <summary>Fails one waiting call (e.g. its send failed).</summary>
+        protected void FailPendingCall(string id, string reason)
+        {
+            if (_pendingCompletions.TryRemove(id, out Action<string> fail))
+                fail(reason);
+        }
+
+        /// <summary>Fails every waiting call (the connection closed).</summary>
+        protected void FailAllPendingCalls(string reason)
+        {
+            foreach (string id in _pendingCompletions.Keys.ToList())
+                FailPendingCall(id, reason);
+        }
+
+        /// <summary>Request ids go on the wire as unsigned 64-bit numbers.</summary>
+        protected static bool IsValidRequestId(string id) => ulong.TryParse(id, out _);
+
+        /// <summary>
+        /// Sends the request for a call registered with <see cref="TrackPendingCall"/>; if it can't be sent (not connected,
+        /// invalid id, send error) the call is failed straight away instead of waiting forever.
+        /// </summary>
+        protected async Task SendTrackedRequestAsync(HoloNETData holoNETData, HoloNETRequestType requestType, string id)
+        {
+            if (!IsValidRequestId(id))
+            {
+                FailPendingCall(id, $"Invalid request id '{id}': Holochain request ids are unsigned 64-bit numbers.");
+                return;
+            }
+
+            if (WebSocket.State != WebSocketState.Open)
+            {
+                FailPendingCall(id, "Not connected to the Holochain conductor.");
+                return;
+            }
+
+            try
+            {
+                await SendHoloNETRequestAsync(holoNETData, requestType, id);
+            }
+            catch (Exception ex)
+            {
+                FailPendingCall(id, $"The request could not be sent: {ex.Message}");
+            }
+        }
         private string _hcHolochainPath;
 
         /// <summary>Polls until something accepts TCP connections on <paramref name="endPoint"/>'s port, or the time runs out.</summary>
@@ -402,6 +467,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                             await AuthenticateConnectionAsync();
                             result.IsConnected = true;
                         }
+                        else
+                        {
+                            // A refused / failed connection used to come back with IsConnected = false but no error.
+                            result.IsError = true;
+                            result.Message = $"Could not connect to the Holochain conductor at {holochainConductorURI} (WebSocket state: {State}).";
+                        }
                     }
                     else
                     {
@@ -757,7 +828,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 if (State == WebSocketState.Open)
                 {
                     IsDisconnecting = true;
-                    _taskCompletionDisconnected = new TaskCompletionSource<DisconnectedEventArgs>();
+                    _taskCompletionDisconnected = new TaskCompletionSource<DisconnectedEventArgs>(TaskCreationOptions.RunContinuationsAsynchronously);
 
                     _shutdownHolochainConductorsMode = shutdownHolochainConductorsMode;
                     await WebSocket.DisconnectAsync();
@@ -908,7 +979,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public virtual async Task<HoloNETShutdownEventArgs> ShutdownHoloNETAsync(DisconnectedCallBackMode disconnectedCallBackMode = DisconnectedCallBackMode.WaitForHolochainConductorToDisconnect, ShutdownHolochainConductorsMode shutdownHolochainConductorsMode = ShutdownHolochainConductorsMode.UseHoloNETDNASettings)
         {
             _shuttingDownHoloNET = true;
-            _taskCompletionHoloNETShutdown = new TaskCompletionSource<HoloNETShutdownEventArgs>();
+            _taskCompletionHoloNETShutdown = new TaskCompletionSource<HoloNETShutdownEventArgs>(TaskCreationOptions.RunContinuationsAsynchronously);
 
             if (WebSocket.State != WebSocketState.Closed || WebSocket.State != WebSocketState.CloseReceived || WebSocket.State != WebSocketState.CloseSent)
                 await DisconnectAsync(disconnectedCallBackMode, shutdownHolochainConductorsMode);
@@ -1181,6 +1252,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         protected virtual void WebSocket_OnDisconnected(object sender, DisconnectedEventArgs e)
         {
+            FailAllPendingCalls($"The connection to the Holochain conductor closed before it replied. {e?.Reason}".Trim());
+
             try
             {
                 if (_pendingRequests.Count > 0)

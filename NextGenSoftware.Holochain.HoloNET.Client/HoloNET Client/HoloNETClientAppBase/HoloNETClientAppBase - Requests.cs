@@ -235,10 +235,14 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 }
 
                 _currentId++;
-                _taskCompletionAgentPubKeyAndDnaHashRetrieved[_currentId.ToString()] = new TaskCompletionSource<AgentPubKeyDnaHash>();
+                // Kept in a local: _currentId can move on (another call) while this one awaits, and the completion entry can
+                // be removed by a fast reply before it is read.
+                string requestId = _currentId.ToString();
+                var retrieved = new TaskCompletionSource<AgentPubKeyDnaHash>(TaskCreationOptions.RunContinuationsAsynchronously);
+                _taskCompletionAgentPubKeyAndDnaHashRetrieved[requestId] = retrieved;
 
                 if (!string.IsNullOrEmpty(roleName))
-                    _roleLookup[_currentId.ToString()] = roleName;
+                    _roleLookup[requestId] = roleName;
 
                 _automaticallyAttemptToGetFromSandboxIfConductorFails = automaticallyAttemptToRetrieveFromSandBoxIfConductorFails;
                 RetrievingAgentPubKeyAndDnaHash = true;
@@ -254,10 +258,19 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     data = null
                 };
 
-                await SendHoloNETRequestAsync(holoNETData, HoloNETRequestType.AppInfo, _currentId.ToString());
+                if (WebSocket.State != WebSocketState.Open)
+                {
+                    // Nothing can answer: report failure instead of waiting forever.
+                    _taskCompletionAgentPubKeyAndDnaHashRetrieved.Remove(requestId);
+                    RetrievingAgentPubKeyAndDnaHash = false;
+                    return null;
+                }
+
+                await SendHoloNETRequestAsync(holoNETData, HoloNETRequestType.AppInfo, requestId);
 
                 if (retrieveAgentPubKeyAndDnaHashMode == RetrieveAgentPubKeyAndDnaHashMode.Wait)
-                    return await _taskCompletionAgentPubKeyAndDnaHashRetrieved[_currentId.ToString()].Task;
+                    //return await _taskCompletionAgentPubKeyAndDnaHashRetrieved[_currentId.ToString()].Task;
+                    return await retrieved.Task;
             }
             catch (Exception ex)
             {
@@ -301,10 +314,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 }
 
                 _currentId++;
-                _taskCompletionAppInfoRetrieved[_currentId.ToString()] = new TaskCompletionSource<AppInfoCallBackEventArgs>();
+                string requestId = _currentId.ToString(); // see RetrieveAgentPubKeyAndDnaHashFromConductorAsync
+                var appInfoRetrieved = new TaskCompletionSource<AppInfoCallBackEventArgs>(TaskCreationOptions.RunContinuationsAsynchronously);
+                _taskCompletionAppInfoRetrieved[requestId] = appInfoRetrieved;
+                TrackPendingCall(requestId, _taskCompletionAppInfoRetrieved);
 
                 if (!string.IsNullOrEmpty(roleName))
-                    _roleLookup[_currentId.ToString()] = roleName;
+                    _roleLookup[requestId] = roleName;
 
                 RetrievingAgentPubKeyAndDnaHash = true;
                // _updateDnaHashAndAgentPubKey = updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved;
@@ -319,10 +335,16 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     data = null
                 };
 
-                await SendHoloNETRequestAsync(holoNETData, HoloNETRequestType.AppInfo, _currentId.ToString());
+                //await SendHoloNETRequestAsync(holoNETData, HoloNETRequestType.AppInfo, _currentId.ToString());
+                await SendTrackedRequestAsync(holoNETData, HoloNETRequestType.AppInfo, requestId);
 
-                if (conductorResponseCallBackMode == ConductorResponseCallBackMode.WaitForHolochainConductorResponse)
-                    return await _taskCompletionAppInfoRetrieved[_currentId.ToString()].Task;
+                if (conductorResponseCallBackMode == ConductorResponseCallBackMode.WaitForHolochainConductorResponse || appInfoRetrieved.Task.IsCompleted)
+                {
+                    //return await _taskCompletionAppInfoRetrieved[_currentId.ToString()].Task;
+                    AppInfoCallBackEventArgs appInfo = await appInfoRetrieved.Task;
+                    UntrackPendingCall(requestId);
+                    return appInfo;
+                }
             }
             catch (Exception ex)
             {
@@ -638,7 +660,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             callZomeOptions ??= CallZomeOptions.Default;
             try
             {
-                _taskCompletionZomeCallBack[id] = new TaskCompletionSource<ZomeFunctionCallBackEventArgs>();
+                _taskCompletionZomeCallBack[id] = new TaskCompletionSource<ZomeFunctionCallBackEventArgs>(TaskCreationOptions.RunContinuationsAsynchronously);
 
                 //if (WebSocket.State == WebSocketState.Closed || WebSocket.State == WebSocketState.None)
                 if (WebSocket.State != WebSocketState.Open && WebSocket.State != WebSocketState.Connecting)
@@ -741,11 +763,18 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                         data = zomeCallParamsSigned
                     };
 
-                    await SendHoloNETRequestAsync(holoNETData, HoloNETRequestType.ZomeCall, id);
+                    // Taken before sending: a fast reply removes the entry from _taskCompletionZomeCallBack, so reading it after
+                    // the send could throw KeyNotFoundException.
+                    Task<ZomeFunctionCallBackEventArgs> zomeResultTask = _taskCompletionZomeCallBack[id].Task;
+
+                    //await SendHoloNETRequestAsync(holoNETData, HoloNETRequestType.ZomeCall, id);
+                    TrackPendingCall(id, _taskCompletionZomeCallBack);
+                    await SendTrackedRequestAsync(holoNETData, HoloNETRequestType.ZomeCall, id);
 
                     if (zomeResultCallBackMode == ConductorResponseCallBackMode.WaitForHolochainConductorResponse)
                     {
-                        Task<ZomeFunctionCallBackEventArgs> returnValue = _taskCompletionZomeCallBack[id].Task;
+                        //Task<ZomeFunctionCallBackEventArgs> returnValue = _taskCompletionZomeCallBack[id].Task;
+                        Task<ZomeFunctionCallBackEventArgs> returnValue = zomeResultTask;
                         int timeoutSeconds = callZomeOptions?.TimeoutSeconds ?? HoloNETDNA.NetworkConfig?.RequestTimeoutS ?? 60;
 
                         if (timeoutSeconds > 0)
@@ -1454,12 +1483,23 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             if (string.IsNullOrEmpty(id))
                 id = GetRequestId();
 
-            taskCompletionCallBack[id] = new TaskCompletionSource<T> { };
-            await SendHoloNETRequestAsync(holoNETData, requestType, id);
+            taskCompletionCallBack[id] = new TaskCompletionSource<T>(TaskCreationOptions.RunContinuationsAsynchronously);
+            Task<T> returnValue = taskCompletionCallBack[id].Task;
+            TrackPendingCall(id, taskCompletionCallBack);
+            //await SendHoloNETRequestAsync(holoNETData, requestType, id);
+            await SendTrackedRequestAsync(holoNETData, requestType, id);
 
             if (conductorResponseCallBackMode == ConductorResponseCallBackMode.WaitForHolochainConductorResponse)
             {
-                Task<T> returnValue = taskCompletionCallBack[id].Task;
+                //Task<T> returnValue = taskCompletionCallBack[id].Task;
+                T result = await returnValue;
+                UntrackPendingCall(id);
+                return result;
+            }
+            else if (returnValue.IsCompleted)
+            {
+                // Failed before it was sent (not connected / invalid id): report it rather than "please wait".
+                UntrackPendingCall(id);
                 return await returnValue;
             }
             else

@@ -1195,29 +1195,30 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         }
 
         //Generic version
-        private void DecodeResponseReceived<T>(IHoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs, string eventName, Dictionary<string, TaskCompletionSource<HoloNETDataReceivedBaseBaseEventArgs<T>>> taskCompletionCallBack)
-        {
-            string errorMessage = "An unknown error occurred in HoloNETClient.DecodeResponseReceived. Reason: ";
-            HoloNETDataReceivedBaseBaseEventArgs<T> args = CreateHoloNETArgs<HoloNETDataReceivedBaseBaseEventArgs<T>>(response, dataReceivedEventArgs);
-            args.HoloNETResponseType = HoloNETResponseType.AdminStateDumped;
+        // Never called (no request routes to it); kept for reference.
+//        private void DecodeResponseReceived<T>(IHoloNETResponse response, WebSocket.DataReceivedEventArgs dataReceivedEventArgs, string eventName, Dictionary<string, TaskCompletionSource<HoloNETDataReceivedBaseBaseEventArgs<T>>> taskCompletionCallBack)
+//        {
+//            string errorMessage = "An unknown error occurred in HoloNETClient.DecodeResponseReceived. Reason: ";
+//            HoloNETDataReceivedBaseBaseEventArgs<T> args = CreateHoloNETArgs<HoloNETDataReceivedBaseBaseEventArgs<T>>(response, dataReceivedEventArgs);
+//            args.HoloNETResponseType = HoloNETResponseType.AdminStateDumped;
 
-            try
-            {
-                Logger.Log("ADMIN: RESPONSE\n", LogType.Info);
-                T dataResponse = DeserializeResponseValue<T>(response.data);
+//            try
+//            {
+//                Logger.Log("ADMIN: RESPONSE\n", LogType.Info);
+//                T dataResponse = DeserializeResponseValue<T>(response.data);
 
-                if (dataResponse != null)
-                    args.Response = dataResponse;
-                else
-                    HandleError(args, $"{errorMessage} dataResponse failed to deserialize.");
-            }
-            catch (Exception ex)
-            {
-                HandleError(args, $"{errorMessage} {ex}");
-            }
+//                if (dataResponse != null)
+//                    args.Response = dataResponse;
+//                else
+//                    HandleError(args, $"{errorMessage} dataResponse failed to deserialize.");
+//            }
+//            catch (Exception ex)
+//            {
+//                HandleError(args, $"{errorMessage} {ex}");
+//            }
 
-            RaiseResponseReceivedEvent(args, eventName, taskCompletionCallBack);
-        }
+//            RaiseResponseReceivedEvent(args, eventName, taskCompletionCallBack);
+//        }
 
         private void RaiseAgentPubKeyGeneratedEvent(AgentPubKeyGeneratedCallBackEventArgs adminAgentPubKeyGeneratedCallBackEventArgs)
         {
@@ -1593,17 +1594,18 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         //        taskCompletionCallBack[holoNETDataReceivedBaseBaseEventArgs.Id].TrySetResult(holoNETDataReceivedBaseBaseEventArgs);
         //}
 
-        private void RaiseResponseReceivedEvent<T>(HoloNETDataReceivedBaseBaseEventArgs<T> holoNETDataReceivedBaseBaseEventArgs, string eventName, Dictionary<string, TaskCompletionSource<HoloNETDataReceivedBaseBaseEventArgs<T>>> taskCompletionCallBack)
-        {
-            LogEvent(eventName, holoNETDataReceivedBaseBaseEventArgs);
-            //OnStateDumpedCallBack?.Invoke(this, holoNETDataReceivedBaseBaseEventArgs);  //TODO: Need to work out how to pass an event as a param!
+        // Only used by the commented-out DecodeResponseReceived<T>; kept for reference.
+//        private void RaiseResponseReceivedEvent<T>(HoloNETDataReceivedBaseBaseEventArgs<T> holoNETDataReceivedBaseBaseEventArgs, string eventName, Dictionary<string, TaskCompletionSource<HoloNETDataReceivedBaseBaseEventArgs<T>>> taskCompletionCallBack)
+//        {
+//            LogEvent(eventName, holoNETDataReceivedBaseBaseEventArgs);
+//            //OnStateDumpedCallBack?.Invoke(this, holoNETDataReceivedBaseBaseEventArgs);  //TODO: Need to work out how to pass an event as a param!
 
-            if (taskCompletionCallBack != null && !string.IsNullOrEmpty(holoNETDataReceivedBaseBaseEventArgs.Id) && taskCompletionCallBack.ContainsKey(holoNETDataReceivedBaseBaseEventArgs.Id))
-            {
-                taskCompletionCallBack[holoNETDataReceivedBaseBaseEventArgs.Id].TrySetResult(holoNETDataReceivedBaseBaseEventArgs);
-                taskCompletionCallBack.Remove(holoNETDataReceivedBaseBaseEventArgs.Id);
-            }
-        }
+//            if (taskCompletionCallBack != null && !string.IsNullOrEmpty(holoNETDataReceivedBaseBaseEventArgs.Id) && taskCompletionCallBack.ContainsKey(holoNETDataReceivedBaseBaseEventArgs.Id))
+//            {
+//                taskCompletionCallBack[holoNETDataReceivedBaseBaseEventArgs.Id].TrySetResult(holoNETDataReceivedBaseBaseEventArgs);
+//                taskCompletionCallBack.Remove(holoNETDataReceivedBaseBaseEventArgs.Id);
+//            }
+//        }
 
         private List<ZomeDefinition> DecodeZomesDef(object[] zomesDefRaw)
         {

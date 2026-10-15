@@ -1131,30 +1131,53 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         private void RaiseZomeDataReceivedEvent(ZomeFunctionCallBackEventArgs zomeFunctionCallBackArgs)
         {
+            if (!string.IsNullOrEmpty(zomeFunctionCallBackArgs.Id))
+                UntrackPendingCall(zomeFunctionCallBackArgs.Id);
+
             LogEvent("ZomeFunctionCallBack", zomeFunctionCallBackArgs, string.Concat("Zome: ", zomeFunctionCallBackArgs.Zome, ", Zome Function: ", zomeFunctionCallBackArgs.ZomeFunction, ", Raw Zome Return Data: ", zomeFunctionCallBackArgs.RawZomeReturnData, ", Zome Return Data: ", zomeFunctionCallBackArgs.ZomeReturnData, ", Zome Return Hash: ", zomeFunctionCallBackArgs.ZomeReturnHash));
 
-            if (_callbackLookup.ContainsKey(zomeFunctionCallBackArgs.Id) && _callbackLookup[zomeFunctionCallBackArgs.Id] != null)
-                _callbackLookup[zomeFunctionCallBackArgs.Id].DynamicInvoke(this, zomeFunctionCallBackArgs);
+            //if (_callbackLookup.ContainsKey(zomeFunctionCallBackArgs.Id) && _callbackLookup[zomeFunctionCallBackArgs.Id] != null)
+            //    _callbackLookup[zomeFunctionCallBackArgs.Id].DynamicInvoke(this, zomeFunctionCallBackArgs);
+            //if (_taskCompletionZomeCallBack.ContainsKey(zomeFunctionCallBackArgs.Id) && _taskCompletionZomeCallBack[zomeFunctionCallBackArgs.Id] != null)
+            //{
+            //    _taskCompletionZomeCallBack[zomeFunctionCallBackArgs.Id].TrySetResult(zomeFunctionCallBackArgs);
+            //    _taskCompletionZomeCallBack.Remove(zomeFunctionCallBackArgs.Id);
+            //}
+            //OnZomeFunctionCallBack?.Invoke(this, zomeFunctionCallBackArgs);
+            //// If the zome call requested for this to be cached then stick it in the cache.
+            //if (_cacheZomeReturnDataLookup.ContainsKey(zomeFunctionCallBackArgs.Id) && _cacheZomeReturnDataLookup[zomeFunctionCallBackArgs.Id])
+            //    _zomeReturnDataLookup[zomeFunctionCallBackArgs.Id] = zomeFunctionCallBackArgs;
+            //_zomeLookup.Remove(zomeFunctionCallBackArgs.Id);
+            //_funcLookup.Remove(zomeFunctionCallBackArgs.Id);
+            //_callbackLookup.Remove(zomeFunctionCallBackArgs.Id);
+            //_entryDataObjectTypeLookup.Remove(zomeFunctionCallBackArgs.Id);
+            //_entryDataObjectLookup.Remove(zomeFunctionCallBackArgs.Id);
+            //_cacheZomeReturnDataLookup.Remove(zomeFunctionCallBackArgs.Id);
+            //_taskCompletionZomeCallBack.Remove(zomeFunctionCallBackArgs.Id);
 
-            if (_taskCompletionZomeCallBack.ContainsKey(zomeFunctionCallBackArgs.Id) && _taskCompletionZomeCallBack[zomeFunctionCallBackArgs.Id] != null)
-            {
-                _taskCompletionZomeCallBack[zomeFunctionCallBackArgs.Id].TrySetResult(zomeFunctionCallBackArgs);
-                _taskCompletionZomeCallBack.Remove(zomeFunctionCallBackArgs.Id);
-            }
+            // Read and clear this call's state first, then complete it. The old order cleaned up after completing, so a
+            // caller reusing the id (e.g. for cached results) had its new entries removed by the previous call's cleanup.
+            string id = zomeFunctionCallBackArgs.Id ?? "";
+            _callbackLookup.TryGetValue(id, out ZomeFunctionCallBack callback);
+            _taskCompletionZomeCallBack.TryGetValue(id, out TaskCompletionSource<ZomeFunctionCallBackEventArgs> completion);
+            bool cache = _cacheZomeReturnDataLookup.TryGetValue(id, out bool cacheFlag) && cacheFlag;
 
-            OnZomeFunctionCallBack?.Invoke(this, zomeFunctionCallBackArgs);
+            _zomeLookup.Remove(id);
+            _funcLookup.Remove(id);
+            _callbackLookup.Remove(id);
+            _entryDataObjectTypeLookup.Remove(id);
+            _entryDataObjectLookup.Remove(id);
+            _cacheZomeReturnDataLookup.Remove(id);
+            if (completion != null && _taskCompletionZomeCallBack.TryGetValue(id, out var current) && current == completion)
+                _taskCompletionZomeCallBack.Remove(id);
 
             // If the zome call requested for this to be cached then stick it in the cache.
-            if (_cacheZomeReturnDataLookup.ContainsKey(zomeFunctionCallBackArgs.Id) && _cacheZomeReturnDataLookup[zomeFunctionCallBackArgs.Id])
-                _zomeReturnDataLookup[zomeFunctionCallBackArgs.Id] = zomeFunctionCallBackArgs;
+            if (cache)
+                _zomeReturnDataLookup[id] = zomeFunctionCallBackArgs;
 
-            _zomeLookup.Remove(zomeFunctionCallBackArgs.Id);
-            _funcLookup.Remove(zomeFunctionCallBackArgs.Id);
-            _callbackLookup.Remove(zomeFunctionCallBackArgs.Id);
-            _entryDataObjectTypeLookup.Remove(zomeFunctionCallBackArgs.Id);
-            _entryDataObjectLookup.Remove(zomeFunctionCallBackArgs.Id);
-            _cacheZomeReturnDataLookup.Remove(zomeFunctionCallBackArgs.Id);
-            _taskCompletionZomeCallBack.Remove(zomeFunctionCallBackArgs.Id);
+            callback?.DynamicInvoke(this, zomeFunctionCallBackArgs);
+            completion?.TrySetResult(zomeFunctionCallBackArgs);
+            OnZomeFunctionCallBack?.Invoke(this, zomeFunctionCallBackArgs);
         }
 
         // New in Holochain 0.7.0 - App API.
@@ -1308,7 +1331,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             
             //TODO: Check this works...
             if (id == "-1")
-                _taskCompletionAgentPubKeyAndDnaHashRetrieved[id] = new TaskCompletionSource<AgentPubKeyDnaHash>();
+                _taskCompletionAgentPubKeyAndDnaHashRetrieved[id] = new TaskCompletionSource<AgentPubKeyDnaHash>(TaskCreationOptions.RunContinuationsAsynchronously);
 
             if (_taskCompletionAgentPubKeyAndDnaHashRetrieved != null && _taskCompletionAgentPubKeyAndDnaHashRetrieved.ContainsKey(id))
             {

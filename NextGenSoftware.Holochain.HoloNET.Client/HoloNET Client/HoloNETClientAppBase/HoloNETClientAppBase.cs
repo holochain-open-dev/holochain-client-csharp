@@ -64,7 +64,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         private Dictionary<string, TaskCompletionSource<AppInfoCallBackEventArgs>> _taskCompletionAppInfoRetrieved = new Dictionary<string, TaskCompletionSource<AppInfoCallBackEventArgs>>();
         private Dictionary<string, TaskCompletionSource<ZomeFunctionCallBackEventArgs>> _taskCompletionZomeCallBack = new Dictionary<string, TaskCompletionSource<ZomeFunctionCallBackEventArgs>>();
         private Dictionary<string, PropertyInfo[]> _dictPropertyInfos = new Dictionary<string, PropertyInfo[]>();
-        private TaskCompletionSource<ReadyForZomeCallsEventArgs> _taskCompletionReadyForZomeCalls = new TaskCompletionSource<ReadyForZomeCallsEventArgs>();
+        private TaskCompletionSource<ReadyForZomeCallsEventArgs> _taskCompletionReadyForZomeCalls = new TaskCompletionSource<ReadyForZomeCallsEventArgs>(TaskCreationOptions.RunContinuationsAsynchronously);
 
         // New in Holochain 0.7.0 - App API.
         private Dictionary<string, TaskCompletionSource<CloneCellCreatedCallBackEventArgs>> _taskCompletionCloneCellCreatedCallBack = new Dictionary<string, TaskCompletionSource<CloneCellCreatedCallBackEventArgs>>();
@@ -371,7 +371,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         {
             _isAppInterfaceAuthenticated = false;
             _getAgentPubKeyAndDnaHashFromConductor = retrieveAgentPubKeyAndDnaHashFromConductor;
-            _taskCompletionReadyForZomeCalls = new TaskCompletionSource<ReadyForZomeCallsEventArgs>();
+            _taskCompletionReadyForZomeCalls = new TaskCompletionSource<ReadyForZomeCallsEventArgs>(TaskCreationOptions.RunContinuationsAsynchronously);
            // _taskCompletionAgentPubKeyAndDnaHashRetrieved = new Dictionary<string, TaskCompletionSource<AgentPubKeyDnaHash>>(); //TODO: Need to init all of these in the code base for each call! ;-)
 
             if (string.IsNullOrEmpty(holochainConductorURI))
@@ -482,20 +482,27 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 {
                     string requests = "";
 
+                    // _zomeLookup[id] threw for pending non-zome requests, which skipped base.WebSocket_OnDisconnected (so
+                    // waiting calls and a waiting DisconnectAsync never completed).
                     foreach (string id in _pendingRequests)
-                        requests = string.Concat(requests, ", id: ", id, "| zome: ", _zomeLookup[id], "| function: ", _funcLookup[id]);
+                        //requests = string.Concat(requests, ", id: ", id, "| zome: ", _zomeLookup[id], "| function: ", _funcLookup[id]);
+                        requests = string.Concat(requests, ", id: ", id, "| zome: ", GetItemFromCache(id, _zomeLookup), "| function: ", GetItemFromCache(id, _funcLookup));
 
                     e.Reason = $"Error Occured. The WebSocket closed with the following requests still in progress: {requests}. Reason: {e.Reason}";
 
-                    _pendingRequests.Clear();
-                    HandleError(e.Reason, null);
+                    //_pendingRequests.Clear();
+                    //HandleError(e.Reason, null);
+                    ReportError(e.Reason, null);
                 }
-
-                base.WebSocket_OnDisconnected(sender, e);
             }
             catch (Exception ex)
             {
-                HandleError("Error in HoloNETClient.WebSocket_OnDisconnected method.", ex);
+                //HandleError("Error in HoloNETClient.WebSocket_OnDisconnected method.", ex);
+                ReportError("Error in HoloNETClient.WebSocket_OnDisconnected method.", ex);
+            }
+            finally
+            {
+                base.WebSocket_OnDisconnected(sender, e);
             }
         }
     }
