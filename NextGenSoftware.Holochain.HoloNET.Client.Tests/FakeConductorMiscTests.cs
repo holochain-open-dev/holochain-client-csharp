@@ -155,6 +155,55 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
         }
 
         [Fact]
+        public async Task AppsListed_WithABadAppInfo_IsAnError()
+        {
+            var (fake, admin) = await ConnectAdmin();
+            using (fake)
+            {
+                admin.OnError += (s, e) => { };
+                var bad = FakeConductorFlowTests.AppInfo("bad");
+                bad.Remove("agent_pub_key");
+                fake.Respond = (t, v) => FakeConductor.Ok("apps_listed", new object[] { FakeConductorFlowTests.AppInfo("good"), bad });
+                var r = await admin.ListAppsAsync(AppStatusFilter.All);
+                Assert.True(r.IsError);
+                await admin.DisconnectAsync();
+            }
+        }
+
+        [Fact]
+        public async Task InstallFlow_UsesTheGivenLoggingFunction()
+        {
+            var (fake, admin) = await ConnectAdmin();
+            using (fake)
+            {
+                admin.OnError += (s, e) => { };
+                fake.Respond = (t, v) => FakeConductor.Error("internal_error", "nope");
+                var logged = new List<string>();
+                string happ = System.IO.Path.GetTempFileName();
+                try
+                {
+                    var r = await admin.InstallEnableSignAndAttachHappAsync("x", happ, "oasis", loggingFunction: (m, t) => logged.Add(m));
+                    Assert.True(r.IsError);
+                    Assert.NotEmpty(logged);
+                }
+                finally { System.IO.File.Delete(happ); }
+                await admin.DisconnectAsync();
+            }
+        }
+
+        [Fact]
+        public void UnhandledExceptionHandler_ReportsWithoutThrowing_AndIsRemovedOnDispose()
+        {
+            var admin = new TestableAdmin(Dna("ws://127.0.0.1:1"));
+            string reported = null;
+            admin.OnError += (s, e) => reported = e.Reason;
+            var handler = typeof(HoloNETClientBase).GetMethod("CurrentDomain_UnhandledException", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            handler.Invoke(admin, new object[] { this, new UnhandledExceptionEventArgs(new Exception("boom"), false) });
+            Assert.Contains("boom", reported);
+            admin.Dispose();
+        }
+
+        [Fact]
         public void LegacyAppInfoStatus_Struct()
         {
             Assert.Equal(AppInfoStatusEnum.Paused, new Data.App.Responses.Objects.AppInfoStatus { paused = 1 }.Status);

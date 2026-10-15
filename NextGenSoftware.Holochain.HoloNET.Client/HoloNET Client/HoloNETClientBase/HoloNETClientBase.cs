@@ -1179,6 +1179,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         protected virtual void Dispose(bool disposing)
         {
             if (_disposed) return;
+            // Every client subscribes to AppDomain.UnhandledException in Init; without this a disposed client stayed referenced
+            // for the life of the process and kept reacting to every unhandled exception in the app.
+            AppDomain.CurrentDomain.UnhandledException -= CurrentDomain_UnhandledException;
+
             if (disposing && WebSocket != null)
             {
                 WebSocket.OnConnected -= WebSocket_OnConnected;
@@ -1230,7 +1234,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         protected virtual void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            HandleError("CurrentDomain_UnhandledException was raised.", (Exception)e.ExceptionObject);
+            //HandleError("CurrentDomain_UnhandledException was raised.", (Exception)e.ExceptionObject); // could throw inside the unhandled-exception handler
+            ReportError("CurrentDomain_UnhandledException was raised.", e?.ExceptionObject as Exception);
         }
 
         protected virtual void WebSocket_OnConnected(object sender, ConnectedEventArgs e)

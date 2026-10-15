@@ -115,7 +115,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
             ["provide_memproofs"] = "ok", ["send_direct_signal"] = "ok",
         };
 
-        private static object Malformed(string shape) => shape == "number" ? (object)12345 : new Dictionary<string, object> { ["unexpected"] = new object[] { 1, "x" } };
+        private static object Malformed(string shape) => shape == "none" ? null : shape == "number" ? (object)12345 : new Dictionary<string, object> { ["unexpected"] = new object[] { 1, "x" } };
 
         /// <summary>A reply of the right type with a malformed payload must still complete the call (decoders report, never throw or hang).</summary>
         private static async Task RunMalformed(HoloNETClientBase client, FakeConductor fake, MethodInfo method, string shape, bool isApp)
@@ -138,8 +138,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
             Assert.NotNull(await call);
         }
 
-        public static IEnumerable<object[]> AdminMalformed() => Methods(typeof(HoloNETClientAdmin)).SelectMany(m => new[] { "number", "map" }.Select(sh => new object[] { Signature(m), sh }));
-        public static IEnumerable<object[]> AppMalformed() => Methods(typeof(HoloNETClientAppAgent)).SelectMany(m => new[] { "number", "map" }.Select(sh => new object[] { Signature(m), sh }));
+        public static IEnumerable<object[]> AdminMalformed() => Methods(typeof(HoloNETClientAdmin)).SelectMany(m => new[] { "number", "map", "none" }.Select(sh => new object[] { Signature(m), sh }));
+        public static IEnumerable<object[]> AppMalformed() => Methods(typeof(HoloNETClientAppAgent)).SelectMany(m => new[] { "number", "map", "none" }.Select(sh => new object[] { Signature(m), sh }));
 
         [Theory]
         [MemberData(nameof(AdminMalformed))]
