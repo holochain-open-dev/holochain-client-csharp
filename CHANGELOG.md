@@ -48,7 +48,9 @@ live against a 0.7.0 conductor on a fresh sandbox. HoloNET.Client coverage with 
 - **New `AddAdminInterfacesAsync`** (`add_admin_interfaces`): the decoder existed but there was no request method.
 - **`ListCapabilityGrantsAsync` always returned no grants**: a Holochain 0.7.0 conductor bug
   (`capability_grant_info` skips *every* grant when `include_revoked` is false, not just revoked ones).
-  HoloNET now always asks for all grants and drops revoked ones itself when `includeRevoked` is false.
+  HoloNET now always asks for all grants and drops revoked ones itself when `includeRevoked` is false. Already reported upstream
+  ([holochain/holochain#5950](https://github.com/holochain/holochain/issues/5950)) and fixed in Holochain 0.7.1
+  ([#5958](https://github.com/holochain/holochain/pull/5958)); the workaround is correct on both.
 
 ### Tests
 - Live tests now report as **skipped** without a conductor (they used to pass silently).
