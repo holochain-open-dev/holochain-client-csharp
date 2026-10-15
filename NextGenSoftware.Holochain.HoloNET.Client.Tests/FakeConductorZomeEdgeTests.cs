@@ -151,9 +151,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
             Assert.False(fireAndForget.IsError);
             Assert.Contains("UseCallBackEvents", fireAndForget.Message);
 
-            // A HoloHash string parameter is sent as bytes; any other string as-is.
+            // A HoloHash string parameter is sent as bytes; any other string (even one that decodes as base64) as-is.
+            var sentPayloads = new List<string>();
+            fake.Respond = (t, v) => { sentPayloads.Add(MessagePack.MessagePackSerializer.ConvertToJson(v)); return FakeConductor.Ok("zome_called", MessagePackSerializer.Serialize(true)); };
             Assert.False((await app.CallZomeFunctionAsync("oasis", "fn", app.ConvertHoloHashToString(Action()))).IsError);
+            Assert.False((await app.CallZomeFunctionAsync("oasis", "fn", "user12345678")).IsError);
             Assert.False((await app.CallZomeFunctionAsync("oasis", "fn", "plain text")).IsError);
+            Assert.True(sentPayloads.Count >= 3);
 
             // Cached result delivered to a callback.
             ZomeFunctionCallBackEventArgs fromCallback = null;

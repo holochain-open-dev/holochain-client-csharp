@@ -903,7 +903,15 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             {
                 // return Convert.FromBase64String(hash.Replace('-', '+').Replace('_', '/').Substring(1, hash.Length - 1)); //also remove the u prefix.
                 string incoming = hash.Replace('_', '/').Replace('-', '+').Substring(1, hash.Length - 1); //also remove the u prefix.
-                switch (hash.Length % 4)
+                //switch (hash.Length % 4)
+                //{
+                //    case 2: incoming += "=="; break;
+                //    case 3: incoming += "="; break;
+                //}
+                // Padding was worked out from the length *with* the "u" prefix, so Holochain's unpadded base64url strings
+                // only decoded for 39-byte hashes (which need none); other lengths came back null.
+                incoming = incoming.TrimEnd('=');
+                switch (incoming.Length % 4)
                 {
                     case 2: incoming += "=="; break;
                     case 3: incoming += "="; break;
@@ -1256,7 +1264,18 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         protected virtual void WebSocket_OnDataReceived(object sender, WebSocket.DataReceivedEventArgs e)
         {
             Logger.Log(string.Concat("EVENT RAISED: DataReceived: Raw Binary Data: ", e.RawBinaryDataDecoded != null ? e.RawBinaryDataDecoded.Trim() : "", "(", e.RawBinaryDataAsString != null ? e.RawBinaryDataAsString.Trim() : "", ")"), LogType.Debug);
-            ProcessDataReceived(e);
+            //ProcessDataReceived(e);
+            IHoloNETResponse response = ProcessDataReceived(e);
+
+            // A reply that wasn't routed to the waiting call (a response type this client doesn't map to that request, e.g. a
+            // misbehaving conductor or a type renamed in a future Holochain) left the call waiting forever. Fail it instead.
+            // A call that was answered normally has already been completed and removed, so this is a no-op for it.
+            if (response != null && response.id != 0 && !string.Equals(response.type, "signal", StringComparison.OrdinalIgnoreCase))
+            {
+                string responseType = null;
+                try { responseType = response.data != null && response.data.Length > 0 ? ReadResponseType(response.data) : null; } catch { }
+                FailPendingCall(response.id.ToString(), $"The conductor answered request {response.id} with an unexpected '{responseType}' response.");
+            }
         }
 
         protected virtual void WebSocket_OnDisconnected(object sender, DisconnectedEventArgs e)

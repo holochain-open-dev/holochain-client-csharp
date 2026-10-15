@@ -117,6 +117,28 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
             Assert.True((await pending).IsError);
         }
 
+        /// <summary>A reply of a type the client doesn't route to the waiting call (e.g. renamed in a future Holochain) must fail it, not hang.</summary>
+        [Fact]
+        public async Task ReplyOfAnUnexpectedType_FailsTheCall()
+        {
+            var (fake, admin) = await ConnectAdmin();
+            using (fake)
+            {
+                admin.OnError += (s, e) => { };
+                fake.Respond = (t, v) => FakeConductor.Ok("some_future_response_type", new Dictionary<string, object>());
+                var call = admin.GenerateAgentPubKeyAsync();
+                Assert.True(await Task.WhenAny(call, Task.Delay(5000)) == call, "an unexpected reply left the call hanging");
+                Assert.True((await call).IsError);
+                Assert.Contains("unexpected", (await call).Message);
+
+                fake.Respond = (t, v) => FakeConductor.Ok("full_state_dumped", new Dictionary<string, object>()); // a known type, but not this request's
+                var mismatched = admin.ListDnasAsync();
+                Assert.True(await Task.WhenAny(mismatched, Task.Delay(5000)) == mismatched, "a mismatched reply left the call hanging");
+                Assert.True((await mismatched).IsError);
+                await admin.DisconnectAsync();
+            }
+        }
+
         [Fact]
         public async Task ShutdownHoloNET_DisconnectsAndRaisesShutdownComplete()
         {

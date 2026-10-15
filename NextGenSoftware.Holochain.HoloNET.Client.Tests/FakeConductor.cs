@@ -37,6 +37,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
         public ConcurrentQueue<(string Type, byte[] Value)> Requests { get; } = new ConcurrentQueue<(string, byte[])>();
         public ConcurrentQueue<byte[]> OtherMessages { get; } = new ConcurrentQueue<byte[]>();
 
+        /// <summary>Close the connection when a client sends "authenticate" (how Holochain rejects a bad app token).</summary>
+        public bool RejectAuthentication { get; set; }
+
         public FakeConductor()
         {
             _listener.Start();
@@ -135,6 +138,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
             if (!outer.TryGetValue("type", out object t) || (string)t != "request")
             {
                 OtherMessages.Enqueue(frame); // e.g. app "authenticate"
+                if (RejectAuthentication)
+                {
+                    try { await ws.CloseOutputAsync(WebSocketCloseStatus.PolicyViolation, "bad token", CancellationToken.None); } catch { }
+                }
                 return;
             }
 

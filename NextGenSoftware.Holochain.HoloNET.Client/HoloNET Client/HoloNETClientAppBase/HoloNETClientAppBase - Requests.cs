@@ -729,7 +729,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                         byte[] holoHash = null;
                         holoHash = ConvertHoloHashToBytes(paramsObject.ToString());
 
-                        if (holoHash != null)
+                        //if (holoHash != null)
+                        //    paramsObject = holoHash;
+                        // Only a real HoloHash string ("uhC...", 39 bytes, 0x84 xx 0x24 prefix) is sent as bytes. Any other string
+                        // that happened to decode as base64 after a leading 'u' (e.g. a username) was being mangled into bytes.
+                        if (holoHash != null && holoHash.Length == 39 && holoHash[0] == 0x84 && holoHash[2] == 0x24 && paramsObject.ToString().StartsWith("uhC"))
                             paramsObject = holoHash;
                     }
                 }
