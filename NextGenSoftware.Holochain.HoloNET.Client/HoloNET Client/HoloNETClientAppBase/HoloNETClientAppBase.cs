@@ -474,6 +474,15 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     else
                         FireAndForget(RetrieveAgentPubKeyAndDnaHashFromConductorAsync(null, null, RetrieveAgentPubKeyAndDnaHashMode.UseCallBackEvents), "RetrieveAgentPubKeyAndDnaHashFromConductorAsync");
                 }
+
+                // No AgentPubKey/DnaHash and nothing retrieving them: the client can never become ready, so anything awaiting
+                // WaitTillReadyForZomeCallsAsync (e.g. the ORM's WaitTillHoloNETInitializedAsync) used to wait forever.
+                else if (!RetrievingAgentPubKeyAndDnaHash)
+                {
+                    string msg = "Connected, but HoloNET can't make zome calls: the AgentPubKey and DnaHash are not set and retrieving them was turned off. Set HoloNETDNA.AgentPubKey and HoloNETDNA.DnaHash, or connect with retrieval enabled.";
+                    Logger.Log(msg, LogType.Warning);
+                    _taskCompletionReadyForZomeCalls.TrySetResult(new ReadyForZomeCallsEventArgs(EndPoint, HoloNETDNA.DnaHash, HoloNETDNA.AgentPubKey) { IsError = true, Message = msg });
+                }
             }
             catch (Exception ex)
             {

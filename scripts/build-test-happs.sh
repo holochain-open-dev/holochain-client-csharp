@@ -29,7 +29,7 @@ sed -e 's|path: "../dnas/oasis/workdir/oasis.dna"|path: "oasis.dna"|' "$SRC/work
 (cd "$D" && "$HC" dna pack . | tail -1 && "$HC" app pack . | tail -1)
 for x in clone memproofs; do
   d="$T/happ-$TAG-$x"; mkdir -p "$d"; cp "$D/oasis.dna" "$d/"
-  sed -e "s/name: oasis$/name: oasis-$x/" "$D/happ.yaml" > "$d/happ.yaml"
+  sed -e "0,/^name: oasis$/s//name: oasis-$x/" "$D/happ.yaml" > "$d/happ.yaml"  # the app name only, not the role
 done
 sed -i 's/clone_limit: 0/clone_limit: 3/' "$T/happ-$TAG-clone/happ.yaml"
 sed -i 's/allow_deferred_memproofs: false/allow_deferred_memproofs: true/' "$T/happ-$TAG-memproofs/happ.yaml"

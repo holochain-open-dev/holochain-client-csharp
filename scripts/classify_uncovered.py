@@ -6,7 +6,7 @@ hits = collections.defaultdict(int)
 owner = {}
 for f in glob.glob('.holochain-test/coverage-*/*/coverage.cobertura.xml'):
     for pkg in ET.parse(f).getroot().iter('package'):
-        if pkg.get('name') != 'NextGenSoftware.Holochain.HoloNET.Client':
+        if pkg.get('name') != os.environ.get('HOLONET_COV_PACKAGE', 'NextGenSoftware.Holochain.HoloNET.Client'):
             continue
         for c in pkg.iter('class'):
             for m in c.iter('method'):

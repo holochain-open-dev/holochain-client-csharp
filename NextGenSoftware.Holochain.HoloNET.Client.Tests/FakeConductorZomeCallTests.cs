@@ -66,7 +66,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
         };
 
         /// <summary>A connected app plus signing credentials for its cell (granted through the fake admin interface).</summary>
-        private static async Task<(FakeConductor, HoloNETClientAppAgent)> Ready()
+        internal static async Task<(FakeConductor, HoloNETClientAppAgent)> Ready()
         {
             var (adminFake, admin) = await ConnectAdmin();
             using (adminFake)

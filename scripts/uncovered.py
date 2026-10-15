@@ -3,7 +3,8 @@ HoloNET client assembly (most first).
 Usage: python scripts/uncovered.py [class-substring] [limit]"""
 import glob, sys, collections, xml.etree.ElementTree as ET
 
-PACKAGE = 'NextGenSoftware.Holochain.HoloNET.Client'
+import os
+PACKAGE = os.environ.get('HOLONET_COV_PACKAGE', 'NextGenSoftware.Holochain.HoloNET.Client')  # e.g. ...HoloNET.ORM
 flt = sys.argv[1] if len(sys.argv) > 1 else ''
 limit = int(sys.argv[2]) if len(sys.argv) > 2 else 60
 hits = collections.defaultdict(int)          # (file, line) -> hits across all reports
