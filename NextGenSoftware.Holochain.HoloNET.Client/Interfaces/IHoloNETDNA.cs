@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using NextGenSoftware.Logging;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client.Interfaces
@@ -26,6 +26,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Interfaces
         string HolochainConductorConfigPath { get; set; }
         HolochainConductorModeEnum HolochainConductorMode { get; set; }
         HolochainConductorEnum HolochainConductorToUse { get; set; }
+        EmbeddedHolochainVersion EmbeddedHolochainVersion { get; set; }
         ConsoleColor InfoColour { get; set; }
         string InstalledAppId { get; set; }
         string LogFileName { get; set; }

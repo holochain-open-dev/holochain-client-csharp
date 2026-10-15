@@ -1,4 +1,4 @@
-﻿
+
 using System;
 using NextGenSoftware.Holochain.HoloNET.Client.Interfaces;
 using NextGenSoftware.Logging;
@@ -105,6 +105,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// This is the Holochain Conductor to use for the auto-start Holochain Conductor feature. It can be either `HolochainProductionConductor` or `HcDevTool`.
         /// </summary>
         public HolochainConductorEnum HolochainConductorToUse { get; set; } = HolochainConductorEnum.HolochainProductionConductor;
+
+        /// <summary>
+        /// Which bundled Holochain release to start when `HolochainConductorMode` is `UseEmbedded` (Embedded package only).
+        /// Defaults to 0.7.1; set V0_7_0 for hApps built against hdk 0.7.0.
+        /// </summary>
+        public EmbeddedHolochainVersion EmbeddedHolochainVersion { get; set; } = EmbeddedHolochainVersion.V0_7_1;
 
         /// <summary>
         /// Set this to true if you wish HoloNET to allow only ONE Holochain Conductor to run at a time. The default is false.

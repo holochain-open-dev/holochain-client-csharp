@@ -266,3 +266,5 @@ __pycache__/
 .DS_Store
 NextGenSoftware.OASIS.API.ONODE.WebUI.HTML/react-app/yarn.lock
 *.map
+
+/.holochain-test/

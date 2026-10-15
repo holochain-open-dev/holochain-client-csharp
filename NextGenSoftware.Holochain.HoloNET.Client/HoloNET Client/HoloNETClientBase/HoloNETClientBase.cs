@@ -28,6 +28,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         private Process _conductorProcess = null;
         private int _conductorProcessSessionId = 0;
         private ShutdownHolochainConductorsMode _shutdownHolochainConductorsMode = ShutdownHolochainConductorsMode.UseHoloNETDNASettings;
+        private Task<HolochainConductorsShutdownEventArgs> _conductorShutdownTask;
 
         protected int _currentId = 0;
         protected MessagePackSerializerOptions messagePackSerializerOptions = MessagePackSerializerOptions.Standard.WithSecurity(MessagePackSecurity.UntrustedData);
@@ -493,7 +494,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                                     {
                                         // Was: set fullPathToHolochainExe and wrote Resources.holochain out as hc.exe.
                                         fullPathToHcExe = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "NextGenSoftware\\HoloNET\\hc.exe");
-                                        ExtractEmbeddedBinary(fullPathToHcExe, Resources.hc);
+                                        //ExtractEmbeddedBinary(fullPathToHcExe, Resources.hc);
+                                        fullPathToHcExe = EmbeddedBinaryPath("hc.exe");
+                                        ExtractEmbeddedBinary(fullPathToHcExe, EmbeddedHc());
                                     }
                                     catch (Exception ex2)
                                     {
@@ -514,7 +517,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     switch (HoloNETDNA.HolochainConductorMode)
                     {
                         case HolochainConductorModeEnum.UseExternal:
-                            _conductorProcess.StartInfo.FileName = HoloNETDNA.FullPathToExternalHolochainConductorBinary;
+                            //_conductorProcess.StartInfo.FileName = HoloNETDNA.FullPathToExternalHolochainConductorBinary; // overwritten with PowerShell.exe below, so the external path was never used
+                            fullPathToHolochainExe = HoloNETDNA.FullPathToExternalHolochainConductorBinary;
                             break;
 
                         case HolochainConductorModeEnum.UseEmbedded:
@@ -548,7 +552,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                                         //Logger.Log($"fullPathToHolochainExe={fullPathToHolochainExe}", LogType.Info);
 
                                         // Re-extracts when the cached copy differs, so an older bundled conductor is replaced.
-                                        ExtractEmbeddedBinary(fullPathToHolochainExe, Resources.holochain);
+                                        //ExtractEmbeddedBinary(fullPathToHolochainExe, Resources.holochain);
+                                        fullPathToHolochainExe = EmbeddedBinaryPath("holochain.exe");
+                                        ExtractEmbeddedBinary(fullPathToHolochainExe, EmbeddedHolochain());
                                     }
                                     catch (Exception ex2)
                                     {
@@ -710,7 +716,14 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     await WebSocket.DisconnectAsync();
 
                     if (disconnectedCallBackMode == DisconnectedCallBackMode.WaitForHolochainConductorToDisconnect)
+                    {
                         await _taskCompletionDisconnected.Task;
+
+                        // The disconnect handler starts the conductor shutdown; wait for it too, so the conductor is really
+                        // stopped when this returns (it used to still be running).
+                        if (_conductorShutdownTask != null)
+                            disconnectedEventArgs.HolochainConductorsShutdownResult = await _conductorShutdownTask;
+                    }
 
                     if (WebSocket.State == WebSocketState.Closed)
                         disconnectedEventArgs.IsDisconnected = true;
@@ -900,6 +913,22 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     else
                     {
                         Logger.Log("Shutting Down Holochain Conductor...", LogType.Info, true);
+
+                        // The conductor runs inside a hidden "PowerShell -NoExit" host that HoloNET started; killing only
+                        // holochain/hc left that host running after every shutdown. Stop the host (and its tree) as well.
+                        try
+                        {
+                            if (_conductorProcess != null && !_conductorProcess.HasExited)
+                            {
+#if NET5_0_OR_GREATER
+                                _conductorProcess.Kill(true);
+#else
+                                _conductorProcess.Kill();
+#endif
+                                _conductorProcess.WaitForExit(3000);
+                            }
+                        }
+                        catch { }
 
                         // Kill by process name — StartInfo of external processes isn't populated on Windows,
                         // so Process.GetProcesses() filtering on StartInfo.Arguments won't work.
@@ -1104,9 +1133,6 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 if (_pendingRequests.Count > 0)
                     _pendingRequests.Clear();
 
-                if (!_taskCompletionDisconnected.Task.IsCompleted)
-                    _taskCompletionDisconnected.TrySetResult(e);
-
                 //We need to dispose and nullify the socket in case we want to use it to connect again later.
                 //if (WebSocket.ClientWebSocket != null)
                 //{
@@ -1116,7 +1142,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                 IsDisconnecting = false;
                 OnDisconnected?.Invoke(this, e);
-                FireAndForget(ShutDownHolochainConductorsAsync(_shutdownHolochainConductorsMode), "ShutDownHolochainConductorsAsync");
+                //FireAndForget(ShutDownHolochainConductorsAsync(_shutdownHolochainConductorsMode), "ShutDownHolochainConductorsAsync");
+                // Started before completing _taskCompletionDisconnected so DisconnectAsync can await it.
+                _conductorShutdownTask = ShutDownHolochainConductorsAsync(_shutdownHolochainConductorsMode);
+                FireAndForget(_conductorShutdownTask, "ShutDownHolochainConductorsAsync");
+
+                if (!_taskCompletionDisconnected.Task.IsCompleted)
+                    _taskCompletionDisconnected.TrySetResult(e);
             }
             catch (Exception ex)
             {

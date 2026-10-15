@@ -25,6 +25,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
     public class HoloNETDisconnectedEventArgs : CallBackBaseEventArgs
     {
         public bool IsDisconnected { get; set; }
+
+        /// <summary>Result of the automatic conductor shutdown that follows a disconnect (WaitForHolochainConductorToDisconnect mode only).</summary>
+        public HolochainConductorsShutdownEventArgs HolochainConductorsShutdownResult { get; set; }
     }
 
     public class HoloNETErrorEventArgs : EventArgs
