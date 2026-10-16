@@ -8,7 +8,7 @@ using System.Linq;
 using MessagePack;
 using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects;
 #if EMBEDDED
-using NextGenSoftware.Holochain.HoloNET.Client.Properties;
+//using NextGenSoftware.Holochain.HoloNET.Client.Properties; // the conductors are embedded directly now (see HoloNETClientBase - EmbeddedBinaries.cs)
 #endif
 using NextGenSoftware.Holochain.HoloNET.Client.Interfaces;
 using NextGenSoftware.Logging.Interfaces;

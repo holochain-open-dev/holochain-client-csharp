@@ -6,6 +6,14 @@ Published to NuGet as 4.2.0 for every HoloNET package (Client, Client.Embedded, 
 Manager, and HoloNET API for the first time), with NextGenSoftware libraries 2.0.4. 4.1.0 was never published, so this
 release includes everything below, newest first.
 
+### Four Client / ORM packages
+- `NextGenSoftware.Holochain.HoloNET.Client` / `.ORM`: no conductor (connect to your own).
+- `.Embedded`: bundles Holochain 0.7.1 and 0.7.0 (choose with `HoloNETDNA.EmbeddedHolochainVersion`, default 0.7.1).
+- `.Embedded.Holochain071` / `.Embedded.Holochain070`: one version only (about half the size). Asking a single-version
+  package for the other version uses the one it has and logs a warning; `HoloNETClientBase.IsEmbeddedHolochainVersionBundled`
+  says what a build carries. The conductors are now embedded directly (build property `EmbeddedHolochain=both|0.7.1|0.7.0`)
+  instead of through Resources.resx.
+
 ### HoloNET API overloads
 - New overloads take the hApp as a `HoloNETAPIHapp` (installed app id, .happ path, role). The old `(hAppId, hAppPath, hAppRole, ...)`
   string overloads are obsolete: with three or more leading strings C# could pick the zome/function overload instead

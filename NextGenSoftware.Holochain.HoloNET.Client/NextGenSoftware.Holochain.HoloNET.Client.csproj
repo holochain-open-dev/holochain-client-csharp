@@ -4,7 +4,10 @@
 	  <TargetFrameworks>netstandard2.1;net10.0</TargetFrameworks>
 	  <!--<GeneratePackageOnBuild>True</GeneratePackageOnBuild>-->
 	  <PackageId Condition="'$(Embedded)' != 'true'">NextGenSoftware.Holochain.HoloNET.Client</PackageId>
-	  <PackageId Condition="'$(Embedded)' == 'true'">NextGenSoftware.Holochain.HoloNET.Client.Embedded</PackageId>
+	  <!-- Embedded variants: EmbeddedHolochain=both (default) | 0.7.1 | 0.7.0 chooses which conductors are bundled. -->
+	  <PackageId Condition="'$(Embedded)' == 'true' And ('$(EmbeddedHolochain)' == '' Or '$(EmbeddedHolochain)' == 'both')">NextGenSoftware.Holochain.HoloNET.Client.Embedded</PackageId>
+	  <PackageId Condition="'$(Embedded)' == 'true' And '$(EmbeddedHolochain)' == '0.7.1'">NextGenSoftware.Holochain.HoloNET.Client.Embedded.Holochain071</PackageId>
+	  <PackageId Condition="'$(Embedded)' == 'true' And '$(EmbeddedHolochain)' == '0.7.0'">NextGenSoftware.Holochain.HoloNET.Client.Embedded.Holochain070</PackageId>
 	  <Company>NextGen Software Ltd</Company>
 	  <Product>HoloNET Holochain Client</Product>
 	  <Title>HoloNET Holochain Client</Title>
@@ -18,6 +21,8 @@
 	  <Authors>David Ellams (NextGen Software Ltd)</Authors>
 	  <PackageTags>holochain;net;unity;client</PackageTags>
 	  <PackageReleaseNotes>## v4.2.0 - Holochain 0.7.0 + 0.7.1, full test coverage pass
+
+Packages: NextGenSoftware.Holochain.HoloNET.Client (no conductor), .Client.Embedded (bundles Holochain 0.7.1 and 0.7.0, choose with HoloNETDNA.EmbeddedHolochainVersion), .Client.Embedded.Holochain071 (0.7.1 only) and .Client.Embedded.Holochain070 (0.7.0 only, about half the size).
 
 Everything planned for 4.1.0 (Holochain 0.7.0 wire protocol, Kitsune2/iroh) plus:
 - Holochain 0.7.1 support (backward compatible with 0.7.0); the Embedded package bundles both conductors (HoloNETDNA.EmbeddedHolochainVersion).
@@ -131,9 +136,23 @@ Full changelog: https://github.com/holochain-open-dev/holochain-client-csharp/bl
        are part of the explicitly selected Embedded package only; this also keeps Unity/mobile
        builds platform-neutral and makes HolochainConductorMode.UseEmbedded fail at its existing
        compile-time contract boundary. -->
-  <ItemGroup Condition="'$(Embedded)' != 'true'">
+  <!-- The conductors used to come in through Properties\Resources.resx, which always bundled both versions. They are now
+       embedded directly so each Embedded variant carries only the version(s) it is for (read with
+       GetManifestResourceStream, see HoloNETClientBase - EmbeddedBinaries.cs). Resources.resx is kept but no longer built. -->
+  <!--<ItemGroup Condition="'$(Embedded)' != 'true'">-->
+  <ItemGroup>
     <EmbeddedResource Remove="Properties\Resources.resx" />
     <Compile Remove="Properties\Resources.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(Embedded)' == 'true' And '$(EmbeddedHolochain)' != '0.7.0'">
+    <EmbeddedResource Include="Resources\holochain.exe" LogicalName="HoloNET.Embedded.holochain-0.7.1.exe" />
+    <EmbeddedResource Include="Resources\hc.exe" LogicalName="HoloNET.Embedded.hc-0.7.1.exe" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(Embedded)' == 'true' And '$(EmbeddedHolochain)' != '0.7.1'">
+    <EmbeddedResource Include="Resources\holochain-0.7.0.exe" LogicalName="HoloNET.Embedded.holochain-0.7.0.exe" />
+    <EmbeddedResource Include="Resources\hc-0.7.0.exe" LogicalName="HoloNET.Embedded.hc-0.7.0.exe" />
   </ItemGroup>
 
   <ItemGroup>

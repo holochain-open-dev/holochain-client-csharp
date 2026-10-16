@@ -84,8 +84,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
             {
                 dna.HolochainConductorMode = HolochainConductorModeEnum.UseEmbedded;
                 dna.EmbeddedHolochainVersion = version;
-            }, expected);
+            }, BundledVersion(version, expected));
         }
+
+        /// <summary>The folder a run should use: the requested version, or (single-version Embedded package) the one it bundles.</summary>
+        private static string BundledVersion(EmbeddedHolochainVersion version, string expected) =>
+            HoloNETClientBase.IsEmbeddedHolochainVersionBundled(version) ? expected : (expected == "0.7.1" ? "0.7.0" : "0.7.1");
 
         private static string TestHapp(string version, string variant = null)
         {
@@ -107,6 +111,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
         public Task Live_AutoStart_HcDevTool_EachBundledVersion(EmbeddedHolochainVersion version, string expected)
         {
             Skip.IfNot(Environment.GetEnvironmentVariable("HOLONET_LIVE_EMBEDDED") == "1", "Build with -p:Embedded=true and set HOLONET_LIVE_EMBEDDED=1.");
+            expected = BundledVersion(version, expected);
             string happ = TestHapp(expected);
             Skip.If(happ == null, "No " + expected + " test hApp in .holochain-test.");
             string root = Path.Combine(Path.GetTempPath(), "HoloNET-hc-" + Guid.NewGuid().ToString("N").Substring(0, 8));
@@ -337,6 +342,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
                 for (int i = 0; i < 10 && IsListening(port); i++) await Task.Delay(500);
                 Assert.False(IsListening(port), "conductor still listening after auto-shutdown");
                 Assert.Empty(Process.GetProcessesByName("holochain"));
+                // The host is stopped with the conductor but can take a moment to exit (this flaked under load).
+                for (int i = 0; i < 10 && Process.GetProcessesByName("powershell").Length > powerShellsBefore; i++) await Task.Delay(500);
                 Assert.True(Process.GetProcessesByName("powershell").Length <= powerShellsBefore, "the PowerShell window that hosted the conductor was left running");
             }
             finally

@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
@@ -31,14 +32,64 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// </summary>
         protected string EmbeddedBinaryPath(string exe) =>
             Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData), "NextGenSoftware", "HoloNET",
-                EmbeddedHolochainVersionString(HoloNETDNA.EmbeddedHolochainVersion), exe);
+                EmbeddedHolochainVersionString(EffectiveEmbeddedHolochainVersion()), exe);
+
+        private static string EmbeddedResourceName(string exe, EmbeddedHolochainVersion version) =>
+            $"HoloNET.Embedded.{exe}-{EmbeddedHolochainVersionString(version)}.exe";
+
+        /// <summary>
+        /// True when this build of HoloNET carries that conductor version: the Embedded package carries 0.7.1 and 0.7.0,
+        /// Embedded.Holochain071 / Embedded.Holochain070 only one, and the lightweight package none.
+        /// </summary>
+        public static bool IsEmbeddedHolochainVersionBundled(EmbeddedHolochainVersion version) =>
+            typeof(HoloNETClientBase).Assembly.GetManifestResourceInfo(EmbeddedResourceName("holochain", version)) != null;
+
+        /// <summary>
+        /// HoloNETDNA.EmbeddedHolochainVersion if this build bundles it, otherwise the version it does bundle (a
+        /// single-version package asked for the other one gets the one it has, with a warning in the log).
+        /// </summary>
+        protected EmbeddedHolochainVersion EffectiveEmbeddedHolochainVersion()
+        {
+            EmbeddedHolochainVersion requested = HoloNETDNA.EmbeddedHolochainVersion;
+
+            if (IsEmbeddedHolochainVersionBundled(requested))
+                return requested;
+
+            EmbeddedHolochainVersion other = requested == EmbeddedHolochainVersion.V0_7_0 ? EmbeddedHolochainVersion.V0_7_1 : EmbeddedHolochainVersion.V0_7_0;
+
+            if (IsEmbeddedHolochainVersionBundled(other))
+            {
+                Logger.Log($"HoloNETDNA.EmbeddedHolochainVersion is {EmbeddedHolochainVersionString(requested)} but this HoloNET package only bundles Holochain {EmbeddedHolochainVersionString(other)}, so that is used.", NextGenSoftware.Logging.LogType.Warning);
+                return other;
+            }
+
+            return requested;
+        }
+
+        private static byte[] ReadEmbeddedResource(string name)
+        {
+            using (Stream stream = typeof(HoloNETClientBase).Assembly.GetManifestResourceStream(name))
+            {
+                if (stream == null)
+                    throw new InvalidOperationException($"This HoloNET package doesn't bundle {name}: use NextGenSoftware.Holochain.HoloNET.Client.Embedded (both versions) or the Embedded package for that version, or point HoloNET at your own conductor.");
+
+                using (MemoryStream memory = new MemoryStream())
+                {
+                    stream.CopyTo(memory);
+                    return memory.ToArray();
+                }
+            }
+        }
 
 #if EMBEDDED
-        protected byte[] EmbeddedHolochain() =>
-            HoloNETDNA.EmbeddedHolochainVersion == EmbeddedHolochainVersion.V0_7_0 ? Properties.Resources.holochain_0_7_0 : Properties.Resources.holochain;
+        // Were Properties.Resources.holochain / holochain_0_7_0 / hc / hc_0_7_0 (a .resx that always bundled both versions).
+        //protected byte[] EmbeddedHolochain() =>
+        //    HoloNETDNA.EmbeddedHolochainVersion == EmbeddedHolochainVersion.V0_7_0 ? Properties.Resources.holochain_0_7_0 : Properties.Resources.holochain;
+        //protected byte[] EmbeddedHc() =>
+        //    HoloNETDNA.EmbeddedHolochainVersion == EmbeddedHolochainVersion.V0_7_0 ? Properties.Resources.hc_0_7_0 : Properties.Resources.hc;
+        protected byte[] EmbeddedHolochain() => ReadEmbeddedResource(EmbeddedResourceName("holochain", EffectiveEmbeddedHolochainVersion()));
 
-        protected byte[] EmbeddedHc() =>
-            HoloNETDNA.EmbeddedHolochainVersion == EmbeddedHolochainVersion.V0_7_0 ? Properties.Resources.hc_0_7_0 : Properties.Resources.hc;
+        protected byte[] EmbeddedHc() => ReadEmbeddedResource(EmbeddedResourceName("hc", EffectiveEmbeddedHolochainVersion()));
 #endif
     }
 }
