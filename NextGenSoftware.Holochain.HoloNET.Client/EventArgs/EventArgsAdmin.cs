@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects;
 using NextGenSoftware.Holochain.HoloNET.Client.Interfaces;
@@ -6,28 +6,48 @@ using NextGenSoftware.WebSocket;
 
 namespace NextGenSoftware.Holochain.HoloNET.Client
 {
+    /// <summary>The outcome of InstallEnableSignAndAttachHappAsync: every step's result, and the installed app's agent, DNA, cell and app interface port.</summary>
     public class InstallEnableSignAndAttachHappEventArgs : CallBackBaseEventArgs
     {
+        /// <summary>True when every step worked (the hApp is installed, enabled, signed and attached).</summary>
         public bool IsSuccess { get; set; }
+        /// <summary>True when a new agent key was generated (false when an installed app and its agent were kept).</summary>
         public bool IsAgentPubKeyGenerated { get; set; }
+        /// <summary>True when the app is installed (newly, or it already was).</summary>
         public bool IsAppInstalled { get; set; }
+        /// <summary>True when the app is enabled.</summary>
         public bool IsAppEnabled { get; set; }
+        /// <summary>True when signing credentials and the zome-call capability grant were set up.</summary>
         public bool IsAppSigned { get; set; }
+        /// <summary>True when an app interface was attached (see AttachedOnPort).</summary>
         public bool IsAppAttached { get; set; }
 
+        /// <summary>The app's agent public key.</summary>
         public string AgentPubKey { get; set; }
+        /// <summary>The DNA hash of the app's cell.</summary>
         public string DnaHash { get; set; }
+        /// <summary>The app's cell id (DNA hash, agent public key).</summary>
         public byte[][] CellId { get; set; }
+        /// <summary>The kind of cell (provisioned, cloned, stem).</summary>
         public CellInfoType CellType { get; set; } = CellInfoType.None;
+        /// <summary>The app's status as the conductor reported it.</summary>
         public AppInfoStatusEnum AppStatus { get; set; }
+        /// <summary>Why the app is disabled or paused, if it is.</summary>
         public string AppStatusReason { get; set; }
+        /// <summary>The app's manifest (roles, DNAs).</summary>
         public IAppManifest AppManifest { get; set; }
+        /// <summary>The app interface port to connect app clients to.</summary>
         public UInt16? AttachedOnPort { get; set; }
 
+        /// <summary>The agent key step's raw result.</summary>
         public AgentPubKeyGeneratedCallBackEventArgs AgentPubKeyGeneratedResult { get; set; }
+        /// <summary>The install step's raw result.</summary>
         public AppInstalledCallBackEventArgs AppInstalledResult { get; set; }
+        /// <summary>The enable step's raw result.</summary>
         public AppEnabledCallBackEventArgs AppEnabledResult { get; set; }
+        /// <summary>The signing / capability grant step's raw result.</summary>
         public ZomeCallCapabilityGrantedCallBackEventArgs ZomeCallCapabilityGrantedResult { get; set; }
+        /// <summary>The attach-interface step's raw result.</summary>
         public AppInterfaceAttachedCallBackEventArgs AppInterfaceAttachedResult { get; set; }
     }
 

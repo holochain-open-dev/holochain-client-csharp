@@ -28,6 +28,8 @@ start_sandbox() {
 export HOLONET_LIVE_ADMIN_URI=ws://localhost:$PORT
 export HOLONET_LIVE_HC_BIN="$(cygpath -w "$HC")"
 export HOLONET_LIVE_HAPP_PATH="${HAPP_OVERRIDE:-$(cygpath -w "$T/happ-$TAG/oasis.happ")}"
+export HOLONET_LIVE_GENERATED_HAPP_DIR="$(cygpath -w "$T/happ-$TAG-generated")"   # scripts/build-generated-happ.sh
+export HOLONET_LIVE_GENERATED_SRC_DIR="$(cygpath -w "$T/generated-$TAG-src")"
 export HOLONET_LIVE_CLONE_HAPP_PATH="$(cygpath -w "$T/happ-$TAG-clone/oasis-clone.happ")"
 export HOLONET_LIVE_MEMPROOFS_HAPP_PATH="$(cygpath -w "$T/happ-$TAG-memproofs/oasis-memproofs.happ")"
 filter() { if [ -n "${LIVE_VERBOSE:-}" ]; then grep -v "warning CS"; else grep -E "^\s*Failed |Error Message|Passed!|Failed!|error CS" -A1 | grep -v "^--"; fi; }

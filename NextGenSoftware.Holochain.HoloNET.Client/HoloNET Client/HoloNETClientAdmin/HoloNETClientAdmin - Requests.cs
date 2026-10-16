@@ -398,6 +398,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }, _taskCompletionAppEnabledCallBack, "OnAppEnabledCallBack", conductorResponseCallBackMode, id);
         }
 
+        /// <summary>Enable an installed app (sync version of EnableAppAsync; the name keeps its original spelling for compatibility).</summary>
         public AppEnabledCallBackEventArgs EnablelApp(string installedAppId, string id = null)
         {
             //return Task.Run(() => EnableAppAsync(installedAppId, ConductorResponseCallBackMode.UseCallBackEvents, id)).Result; // returned before the conductor replied
@@ -497,12 +498,14 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             return RunSync(mode => AuthorizeSigningCredentialsAndGrantZomeCallCapabilityAsync(cellId, capGrantAccessType, grantedFunctionsType, functions, mode, id));
         }
 
+        /// <summary>The capability secret HoloNET created for this cell's zome-call grant (null if it has none).</summary>
         public byte[] GetCapGrantSecret(byte[][] cellId)
         {
             //return _signingCredentialsForCell[$"{ConvertHoloHashToString(cellId[1])}:{ConvertHoloHashToString(cellId[0])}"].CapSecret; // threw KeyNotFoundException for a cell with no credentials
             return _signingCredentialsForCell.TryGetValue($"{ConvertHoloHashToString(cellId[1])}:{ConvertHoloHashToString(cellId[0])}", out SigningCredentials credentials) ? credentials.CapSecret : null;
         }
 
+        /// <summary>The capability secret HoloNET created for this agent and DNA's zome-call grant (null if it has none).</summary>
         public byte[] GetCapGrantSecret(string agentPubKey, string dnaHash)
         {
             //return _signingCredentialsForCell[$"{agentPubKey}:{dnaHash}"].CapSecret; // threw KeyNotFoundException for a cell with no credentials

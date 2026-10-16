@@ -218,6 +218,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         //public ILogger Logger { get; set; } = new Logger();
         // Whatever logger is set is wrapped (ResilientLogger) so a faulty custom ILogger can't break HoloNET.
         private ILogger _logger = new ResilientLogger(new Logger());
+        /// <summary>The logger HoloNET writes to (the built-in DefaultLogger unless you pass your own log providers or logger).</summary>
         public ILogger Logger
         {
             get => _logger;
@@ -258,6 +259,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
         }
 
+        /// <summary>True once the settings have been loaded (or set).</summary>
         public bool IsHoloNETDNALoaded
         {
             get
@@ -279,7 +281,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
         }
 
+        /// <summary>True while ConnectAsync is in progress.</summary>
         public bool IsConnecting { get; set; }
+        /// <summary>True while DisconnectAsync is in progress.</summary>
         public bool IsDisconnecting { get; set; }
 
         /// <summary>
@@ -370,6 +374,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             Init(new Uri(HoloNETDNA.HolochainConductorAppAgentURI));
         }
 
+        /// <summary>Load the settings from HoloNETDNA.json (HoloNETDNAManager.HoloNETDNAPath).</summary>
         public virtual IHoloNETDNA LoadDNA()
         {
             //return _holoNETDNAManager.LoadDNA();
@@ -380,6 +385,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             return loaded;
         }
 
+        /// <summary>Save the current settings to HoloNETDNA.json.</summary>
         public virtual bool SaveDNA()
         {
             //return _holoNETDNAManager.SaveDNA();
@@ -951,16 +957,19 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
         }
 
+        /// <summary>Build a cell id from a DNA hash and an agent public key (both as HoloHash strings).</summary>
         public virtual byte[][] GetCellId(string DnaHash, string AgentPubKey)
         {
             return new byte[2][] { ConvertHoloHashToBytes(DnaHash), ConvertHoloHashToBytes(AgentPubKey) };
         }
 
+        /// <summary>Build a cell id from a DNA hash and an agent public key (raw bytes).</summary>
         public virtual byte[][] GetCellId(byte[] DnaHash, byte[] AgentPubKey)
         {
             return new byte[2][] { DnaHash, AgentPubKey };
         }
 
+        /// <summary>The cell id zome calls go to: HoloNETDNA.CellId, or built from its DnaHash and AgentPubKey (retrieving them from the conductor first if needed).</summary>
         public virtual async Task<byte[][]> GetCellIdAsync()
         {
             if (string.IsNullOrEmpty(HoloNETDNA.AgentPubKey))
@@ -978,6 +987,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             return GetCellId(HoloNETDNA.DnaHash, HoloNETDNA.AgentPubKey);
         }
 
+        /// <summary>Sync version of GetCellIdAsync.</summary>
         public virtual byte[][] GetCellId()
         {
             if (string.IsNullOrEmpty(HoloNETDNA.AgentPubKey))
@@ -1190,6 +1200,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             return Task.Run(() => ShutDownHolochainConductorsAsync(shutdownHolochainConductorsMode)).GetAwaiter().GetResult();
         }
 
+        /// <summary>Disconnect and release the WebSocket.</summary>
         public void Dispose()
         {
             Dispose(true);

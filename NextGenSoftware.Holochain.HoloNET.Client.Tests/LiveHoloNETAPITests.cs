@@ -1,6 +1,7 @@
 #pragma warning disable CS0618 // exercises the obsolete (string hApp) overloads on purpose
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using NextGenSoftware.Holochain.HoloNET.API;
 using Xunit;
@@ -29,6 +30,66 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
             if (await Task.WhenAny(task, Task.Delay(TimeSpan.FromSeconds(seconds))) != task)
                 throw new TimeoutException($"'{name}' did not complete within {seconds}s.");
             return await task;
+        }
+
+        private static async Task SignalsBetweenTheApiAndAnotherAgent()
+        {
+            string peerId = "holonet-api-peer-" + Guid.NewGuid().ToString("N").Substring(0, 6);
+            var admin = new HoloNETClientAdmin(new HoloNETDNA { AutoStartHolochainConductor = false, AutoShutdownHolochainConductor = false, HolochainConductorAdminURI = AdminUri });
+            await admin.ConnectAsync(AdminUri);
+            var installed = await admin.InstallEnableSignAttachAndConnectToHappAsync(peerId, HappPath, "oasis");
+            Assert.True(installed.IsAppConnected, installed.Message);
+            var peer = installed.HoloNETClientAppAgent;
+
+            var apiGot = new System.Collections.Concurrent.ConcurrentQueue<HoloNETAPISignalEventArgs>();
+            var peerGot = new System.Collections.Concurrent.ConcurrentQueue<byte[]>();
+            EventHandler<HoloNETAPISignalEventArgs> onSignal = (s, e) => apiGot.Enqueue(e);
+            HoloNETAPI.OnSignalReceived += onSignal;
+            peer.OnSignalCallBack += (s, e) => { if (e?.RawSignalData?.Data != null) peerGot.Enqueue(e.RawSignalData.Data); };
+
+            try
+            {
+                // Peer -> API, through the same zome function the API uses.
+                var sent = await peer.CallZomeFunctionAsync("oasis", "hypernet_send", new System.Collections.Generic.Dictionary<string, object>
+                {
+                    ["session"] = "holonet-api",
+                    ["payload"] = System.Text.Encoding.UTF8.GetBytes("hello api"),
+                    ["to"] = new[] { peer.ConvertHoloHashToBytes(HoloNETAPI.HoloNETClient.HoloNETDNA.AgentPubKey) }
+                });
+                Assert.False(sent.IsError, sent.Message);
+                await Until(() => !apiGot.IsEmpty);
+                Assert.True(apiGot.TryPeek(out var got));
+                Assert.Equal("hello api", got.Message);
+                Assert.Equal(peer.HoloNETDNA.AgentPubKey, got.FromAgentPubKey);
+                Assert.Equal("hello api", HoloNETAPI.ReceiveSignal());
+
+                // API -> peer.
+                var reply = await HoloNETAPI.SendSignalAsync("hello peer", new[] { got.FromAgentPubKey });
+                Assert.True(reply.IsSuccess, reply.Message);
+                Assert.Equal(1, reply.Result);
+                await Until(() => peerGot.Any(d => System.Text.Encoding.UTF8.GetString(d).Contains("hello peer")));
+
+                // Nobody to send to: nothing sent, not an error.
+                Assert.Equal(0, (await HoloNETAPI.SendSignalAsync("nobody", null)).Result);
+            }
+            finally
+            {
+                HoloNETAPI.OnSignalReceived -= onSignal;
+                await peer.DisconnectAsync();
+                await admin.UninstallAppAsync(peerId);
+                await admin.DisconnectAsync();
+            }
+        }
+
+        private static async Task Until(Func<bool> condition, int seconds = 30)
+        {
+            DateTime end = DateTime.UtcNow.AddSeconds(seconds);
+            while (!condition())
+            {
+                if (DateTime.UtcNow > end)
+                    throw new TimeoutException("Timed out waiting for a signal.");
+                await Task.Delay(50);
+            }
         }
 
         [SkippableFact]
@@ -122,6 +183,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
                 Assert.Contains(errors, e => e.Contains("no_such_function") || e.Contains("LoadAllDataAsync") || e.Contains("loading"));
                 Assert.True(HoloNETAPI.SendSignal());
                 Assert.Equal("", HoloNETAPI.ReceiveSignal());
+
+                // Signals: a second agent (its own installed app) and the API agent message each other directly.
+                await SignalsBetweenTheApiAndAnotherAgent();
             }
             finally
             {

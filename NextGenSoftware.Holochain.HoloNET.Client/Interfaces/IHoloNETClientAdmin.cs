@@ -57,6 +57,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Interfaces
         Task<CompatibleCellsReturnedCallBackEventArgs> GetCompatibleCellsAsync(byte[] dnaHash, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null);
 
         AgentInfoAddedCallBackEventArgs AddAgentInfo(AgentInfo[] agentInfos, string id = null);
+        /// <summary>Adds encoded agent infos (Holochain 0.7) to the conductor's peer store, e.g. from another conductor's GetAgentInfo.</summary>
+        Task<AgentInfoAddedCallBackEventArgs> AddAgentInfoAsync(IEnumerable<string> agentInfos, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null);
         Task<AgentInfoAddedCallBackEventArgs> AddAgentInfoAsync(AgentInfo[] agentInfos, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null);
         AppInterfaceAttachedCallBackEventArgs AttachAppInterface(ushort? port = null, string id = null);
         Task<AppInterfaceAttachedCallBackEventArgs> AttachAppInterfaceAsync(ushort? port = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null);
