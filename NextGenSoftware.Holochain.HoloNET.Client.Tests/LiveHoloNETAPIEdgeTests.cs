@@ -39,7 +39,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
             string dnaPath = Path.Combine(Path.GetTempPath(), appId + ".json");
             Point(AdminUri);
             HoloNETAPIDNAManager.HoloNETAPIDNAPath = dnaPath;
-            HoloNETAPIDNAManager.HoloNETAPIDNA = new HoloNETAPIDNA { StoreId = appId };
+            // This test covers the single-entry store (HoloNET API <= 4.4.2, and StorageMode "SingleEntry"): its entry hash,
+            // corrupt stored fields, refusing to overwrite. Per-key storage has its own tests (LiveHoloNETAPIPerKeyTests).
+            HoloNETAPIDNAManager.HoloNETAPIDNA = new HoloNETAPIDNA { StoreId = appId, StorageMode = "SingleEntry" };
+            HoloNETAPIDNAManager.SaveDNA();
 
             try
             {

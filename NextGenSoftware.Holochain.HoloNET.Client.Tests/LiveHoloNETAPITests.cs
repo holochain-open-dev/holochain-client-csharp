@@ -104,7 +104,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
             dna.AutoStartHolochainConductor = false;
             dna.AutoShutdownHolochainConductor = false;
             HoloNETAPIDNAManager.HoloNETAPIDNAPath = dnaPath;
-            HoloNETAPIDNAManager.HoloNETAPIDNA = new HoloNETAPIDNA { StoreId = appId };
+            // The single-entry store (HoloNET API <= 4.4.2, StorageMode "SingleEntry"); per-key storage: LiveHoloNETAPIPerKeyTests.
+            HoloNETAPIDNAManager.HoloNETAPIDNA = new HoloNETAPIDNA { StoreId = appId, StorageMode = "SingleEntry" };
+            HoloNETAPIDNAManager.SaveDNA();
             var errors = new System.Collections.Generic.List<string>();
             EventHandler<string> onError = (s, e) => errors.Add(e);
             HoloNETAPI.OnError += onError;
