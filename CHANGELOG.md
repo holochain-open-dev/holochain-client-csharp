@@ -9,6 +9,10 @@ HoloNET API, Manager and HDK 4.4.1. Client, ORM and HyperNET stay at 4.4.0, unch
   was never published. OASIS 2.0.6 fixes that: IPFSOASIS now ships its IPFS client inside the package, and Contracts,
   ArweaveOASIS and STAR.DNA (never published at 2.0.4) are now published. OASIS 2.0.6 also builds HoloOASIS against
   HoloNET 4.4.0, so STAR's hApp generation has the classes it needs. `-p:HdkIncludeStar=false` still gives a HoloNET-only HDK.
+- **HoloNET API: one-line deletes.** `DeleteDataAsync`, `DeleteObjectAsync`, `DeleteAllDataAsync` and `DeleteAllObjectsAsync`
+  are safe straight after a restart (the store is loaded first, so the deleted key can't be merged back in). The API also
+  remembers the hApp it was initialised with (`HoloNETAPIDNA`), so one-line calls keep using it after `ShutdownAsync` or
+  a restart. Before, they silently switched back to the bundled OASIS hApp.
 - **API and Manager bundle the current OASIS hApp,** with HyperNET. The previous bundled build predated it, so
   `HoloNETAPI.SendSignalAsync` (and HyperNET) failed with the default hApp. A live test now installs both bundled hApps
   on 0.7.0 and 0.7.1 and joins a HyperNET zone, so a stale bundled hApp can't ship again.
