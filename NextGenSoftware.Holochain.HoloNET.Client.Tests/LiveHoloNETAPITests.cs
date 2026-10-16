@@ -1,3 +1,4 @@
+#pragma warning disable CS0618 // exercises the obsolete (string hApp) overloads on purpose
 using System;
 using System.IO;
 using System.Threading.Tasks;

@@ -44,21 +44,25 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
             try
             {
                 // Every hApp overload initialises HoloNET itself when it isn't yet.
-                Assert.True((await HoloNETAPI.SaveDataAsync(appId, HappPath, "oasis", "k", "v", "oasis")).IsSuccess, HoloNETAPI.LastError);
+                var happ = new HoloNETAPIHapp(appId, HappPath, "oasis");
+                Assert.True((await HoloNETAPI.SaveDataAsync(happ, "k", "v")).IsSuccess, HoloNETAPI.LastError);
                 await HoloNETAPI.ShutdownAsync();
-                Assert.True((await HoloNETAPI.SaveObjectAsync(appId, HappPath, "oasis", "o", new ApiTestObject { FirstName = "F", Age = 3 }, "oasis")).IsSuccess, HoloNETAPI.LastError);
+                Assert.True((await HoloNETAPI.SaveObjectAsync(happ, "o", new ApiTestObject { FirstName = "F", Age = 3 })).IsSuccess, HoloNETAPI.LastError);
                 await HoloNETAPI.ShutdownAsync();
-                Assert.True((await HoloNETAPI.SaveAllDataAsync(appId, HappPath, "oasis", "oasis")).IsSuccess);
+                Assert.True((await HoloNETAPI.SaveAllDataAsync(happ)).IsSuccess);
                 await HoloNETAPI.ShutdownAsync();
-                Assert.True((await HoloNETAPI.SaveAllObjectsAsync(appId, HappPath, "oasis", "oasis")).IsSuccess);
+                Assert.True((await HoloNETAPI.SaveAllObjectsAsync(happ)).IsSuccess);
                 await HoloNETAPI.ShutdownAsync();
-                Assert.Equal("v", (await HoloNETAPI.LoadDataAsync(appId, HappPath, "oasis", "k")).Result);
+                Assert.Equal("v", (await HoloNETAPI.LoadDataAsync(happ, "k")).Result);
                 await HoloNETAPI.ShutdownAsync();
-                Assert.Equal("v", (await HoloNETAPI.LoadAllDataAsync(appId, HappPath, "oasis", null)).Result["k"]);
+                Assert.Equal("v", (await HoloNETAPI.LoadAllDataAsync(happ)).Result["k"]);
                 await HoloNETAPI.ShutdownAsync();
-                Assert.True((await HoloNETAPI.LoadAllObjectsAsync(appId, HappPath, "oasis", null)).Result.ContainsKey("o"));
+                Assert.True((await HoloNETAPI.LoadAllObjectsAsync(happ)).Result.ContainsKey("o"));
                 await HoloNETAPI.ShutdownAsync();
-                Assert.Equal(3, (await HoloNETAPI.LoadObjectAsync<ApiTestObject>(appId, HappPath, "oasis", "o")).Result.Age);
+                Assert.Equal(3, (await HoloNETAPI.LoadObjectAsync<ApiTestObject>(happ, "o")).Result.Age);
+                await HoloNETAPI.ShutdownAsync();
+                Assert.True(await HoloNETAPI.InitHoloNETAsync(happ));
+                Assert.Equal("oasis", new HoloNETAPIHapp().RoleName);
 
                 // Cached values: a string, an object saved in this session (already a T), and one that converts.
                 Assert.Equal("v", (await HoloNETAPI.LoadDataAsync("k")).Result);
@@ -69,7 +73,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
                 Assert.Equal(42L, (await HoloNETAPI.LoadObjectAsync<long>("n")).Result);
 
                 // InitHoloNETAsync when already connected, and when the app connection dropped (it reconnects).
-                Assert.True(await HoloNETAPI.InitHoloNETAsync(appId, HappPath, "oasis"));
+                Assert.True(await HoloNETAPI.InitHoloNETAsync(happ));
                 await HoloNETAPI.HoloNETClient.DisconnectAsync();
                 Assert.True(await HoloNETAPI.InitHoloNETAsync(appId, HappPath, "oasis"), HoloNETAPI.LastError);
                 Assert.Equal(System.Net.WebSockets.WebSocketState.Open, HoloNETAPI.HoloNETClient.State);

@@ -1,12 +1,24 @@
 # Changelog
 
-## HoloNET ORM, HoloNET API and HoloNET Manager working end to end on Holochain 0.7.0 and 0.7.1
+## v4.2.0 - 2026-10-16 (Holochain 0.7.0 and 0.7.1)
+
+Published to NuGet as 4.2.0 for every HoloNET package (Client, Client.Embedded, ORM, ORM.Embedded, HDK, HyperNET,
+Manager, and HoloNET API for the first time), with NextGenSoftware libraries 2.0.4. 4.1.0 was never published, so this
+release includes everything below, newest first.
+
+### HoloNET API overloads
+- New overloads take the hApp as a `HoloNETAPIHapp` (installed app id, .happ path, role). The old `(hAppId, hAppPath, hAppRole, ...)`
+  string overloads are obsolete: with three or more leading strings C# could pick the zome/function overload instead
+  (e.g. `SaveAllObjectsAsync(appId, path, role)` called `SaveAllObjectsAsync(zome, createFunction, updateFunction)`).
+
+
+### HoloNET ORM, HoloNET API and HoloNET Manager working end to end on Holochain 0.7.0 and 0.7.1
 
 All three are now tested against a real conductor of **both** versions with the OASIS hApp (live tests), plus a fake
 conductor / in-memory hApp for the error paths. 1,758 Client/ORM/API tests and 9 Manager tests pass on 0.7.0 and 0.7.1;
 line coverage: Client 93.1%, ORM 93.2%, API 93.9%, Manager logic 79% (the rest of the Manager is WPF window code). Before this pass none of them could save and reload data on 0.7.
 
-### HoloNET ORM (`HoloNETEntryBase`, `HoloNETAuditEntryBase`, `HoloNETCollection`, `HoloNETObservableCollection`)
+#### HoloNET ORM (`HoloNETEntryBase`, `HoloNETAuditEntryBase`, `HoloNETCollection`, `HoloNETObservableCollection`)
 - **Entries**: updates, `Load()` and `Delete()` used the EntryHash where Holochain needs the ActionHash, so every update
   failed; loading a hash with no record reported success; the `state` field and `IsChanged` made saved entries look
   changed; `PreviousVersionActionHash` was the source-chain previous action; `OrginalEntry` was always null.
@@ -19,14 +31,14 @@ line coverage: Client 93.1%, ORM 93.2%, API 93.9%, Manager logic 79% (the rest o
 - Events were only wired when the ORM object connected the client itself, so a shared client's `OnError` was never
   forwarded and the observable collection never tracked changes. Constructors now all take `IHoloNETClientAppBase`.
 
-### HoloNET API
+#### HoloNET API
 Rebuilt on the 0.7 OASIS hApp with the same public methods: one store entry (`StoreId`) holding Data and Objects as JSON;
 created then updated by action hash; the installed app is reused (it used to uninstall it, losing the data, on every
 start); errors reported (`OnError`, `LastError`, `Message`); loaded objects convert to `T`; `ShutdownAsync`; bundled
 `oasis.happ` rebuilt for 0.7. Note: overloads like `SaveAllObjectsAsync(hAppId, hAppPath, hAppRole)` and
 `SaveAllObjectsAsync(zome, createFn, updateFn)` take the same string types, so the hApp versions need a fourth argument.
 
-### HoloNET Manager
+#### HoloNET Manager
 - Demo models used zome functions that no longer exist and sent no `id`/`username`; every loaded record opened its
   own conductor connection; the demo hApp path was relative (the conductor couldn't find it).
 - App interface connections had no authentication token, which Holochain 0.6+ requires, so no app connection worked.
@@ -40,7 +52,7 @@ start); errors reported (`OnError`, `LastError`, `Message`); loaded objects conv
 - New test project `NextGenSoftware.Holochain.HoloNET.Manager.Tests` drives the Manager headless: boot, the HoloNET
   Entry and Collection demos, and the install → grant → attach → connect → use flow.
 
-### HoloNET Client fixes found on the way
+#### HoloNET Client fixes found on the way
 - **Sync methods called from inside a HoloNET event deadlocked** (since they were made to wait for the conductor):
   inside a conductor callback they now send and report through the matching `On...CallBack` event, as they used to.
 - `IHoloNETClientAdmin` defaulted installs to *Unrestricted* grants while the class used *Assigned*; code holding the
@@ -54,43 +66,43 @@ start); errors reported (`OnError`, `LastError`, `Message`); loaded objects conv
 - NextGenSoftware.Logging: every log line scanned the whole log folder, so with a few hundred files HoloNET calls timed
   out; the folder also grew without limit. The current file is now remembered and only `MaxLogFiles` (default 50) kept.
 
-### Tests and tools
+#### Tests and tools
 - `scripts/run-live-tests.sh <version>` now runs the Client/ORM/API project and the Manager project (`PROJECTS=client`
   or `manager` for one; `HAPP_OVERRIDE` to try another hApp).
 - `scripts/build-test-happs.sh <version>` builds the OASIS test hApps (0.7.0 from the hApp's `holochain-0.7.0-maintenance`
   branch: the `holochain-0.7.0` tag plus the collection functions).
 
-## Full Holochain 0.7 coverage pass: 1,647 tests, 95% line coverage, ~40 bugs fixed
+### Full Holochain 0.7 coverage pass: 1,647 tests, 95% line coverage, ~40 bugs fixed
 
 Every public request method, response type and connection path now has tests, against a real conductor on **both
 Holochain 0.7.0 and 0.7.1** and against a fake conductor (`FakeConductor` in the test project) that produces exact 0.7
 wire shapes, errors, malformed replies and dropped connections. Results: 1,637 tests pass on each version, plus 10
 conductor auto-start tests; HoloNET.Client line coverage 95.1%, branch 85.4%. What isn't covered is listed at the end.
 
-### Bundled conductors
+#### Bundled conductors
 - The Embedded package now carries **Holochain 0.7.1 (default) and 0.7.0**; choose with
   `HoloNETDNA.EmbeddedHolochainVersion`. Each is extracted to `%APPDATA%\NextGenSoftware\HoloNET\<version>\`.
 
-### Holochain 0.7 API (completed)
+#### Holochain 0.7 API (completed)
 - New: admin `dump_conductor_state`; app-interface `agent_info`, `dump_network_metrics`, `dump_network_stats`,
   `enable_app`; paging for `dump_state` (`SourceChainCursor`) and `dump_full_state` (`DhtOpsCursor`, `limit`).
 - 0.7.1: direct-signal sender (`SignalCallBackEventArgs.FromAgentPubKey`, `IsDirectSignal`); system signals raised on the
   new `OnSystemSignalCallBack` (they were dropped).
 - `hc sandbox call` no longer exists in 0.7: `RetrieveAgentPubKeyAndDnaHashFromSandbox` now uses `hc client call`.
 
-### Decoders that never matched the 0.7 wire format
+#### Decoders that never matched the 0.7 wire format
 `peer_meta_info` (always empty), DNA definitions (zome dependencies / wasm hash never read), the typed full state dump
 (never deserialised), `AppInfo.AppStatus` (always `None` on 0.7), clone cells in `app_info` (decode failed),
 countersigning session state ("no session" was an error), scalar zome results (`()`, bool, numbers, strings were
 "unknown responses"), HoloHash strings of lengths other than 39 bytes.
 
-### Calls that hung forever (now fail with a message)
+#### Calls that hung forever (now fail with a message)
 `get_dna_definition` errors; malformed `app_installed` / `app_info` / zome replies; a dropped connection, a call made
 while disconnected, or a send that failed; a reply of an unexpected type (e.g. one renamed in a future Holochain);
 `RetrieveAgentPubKeyAndDnaHashFromConductor` on an `app_info` error; the conductor ↔ sandbox fallback looping when both
 failed; app clients with a token connecting in callback mode; a custom logger that throws.
 
-### Conductor start / stop
+#### Conductor start / stop
 - `UseExternal` ignored `FullPathToExternalHolochainConductorBinary`; `hc` dev-tool mode used the wrong port flag;
   "only one conductor" never detected a running one; `DisconnectAsync` returned before auto-shutdown finished.
 - **Shutting down "all" conductors killed every `rustc` process on the machine** (your own builds); "current only"
@@ -98,7 +110,7 @@ failed; app clients with a token connecting in callback mode; a custom logger th
 - Failed config creation still launched an empty PowerShell host; the config port rewrite could hit `report: none`.
 - Start waits for the admin port instead of a fixed delay (faster, and no more timeouts under load).
 
-### Behaviour and API fixes
+#### Behaviour and API fixes
 - Task continuations no longer run on the WebSocket receive thread (`RunContinuationsAsynchronously`): the live suite
   went from ~35 s to ~20 s, and reused request ids (cached zome results) no longer race.
 - Sync wrappers: `GetAppInfo` returned a `Task`; several `dynamic` overloads (`CallZomeFunction`, clone cells,
@@ -116,18 +128,18 @@ failed; app clients with a token connecting in callback mode; a custom logger th
 `string`; `DumpFullStateAsync`'s cursor is a `DhtOpsCursor` (the int overload is kept and ignores the value); the
 `AppBundle` install overloads are obsolete (an AppBundle can't be packed for 0.7).
 
-### Not covered (and why)
+#### Not covered (and why)
 About 200 lines are `catch` blocks around code that can no longer throw (after the fixes above) and are kept as
 defensive handlers; the rest are the `ShowHolochainConductorWindow` branches (would open a visible window during tests),
 generated resource code, and fallbacks made unreachable by the fixes. Removing them would reach 100% but make HoloNET
 less robust, so they stay.
 
-### Running the tests
+#### Running the tests
 `scripts/run-live-tests.sh 0.7.1` (or `0.7.0`) starts a fresh sandbox and runs everything with coverage; conductor
 auto-start tests need `HOLONET_LIVE_AUTOSTART=1` (and `HOLONET_LIVE_EMBEDDED=1` with `-p:Embedded=true`). See
 INTEGRATION_TESTING.md. `scripts/classify_uncovered.py` lists what isn't covered.
 
-## Holochain 0.7.0 and 0.7.1 both supported; direct signals
+### Holochain 0.7.0 and 0.7.1 both supported; direct signals
 
 HoloNET now works against **both Holochain 0.7.0 and 0.7.1** conductors. The full live suite (96 tests) passes on each,
 on fresh sandboxes.
@@ -149,7 +161,7 @@ on fresh sandboxes.
 hdi 0.8.0 fails validation on a 0.7.1 conductor ("callback has invalid parameters"). Rebuild with **hdk 0.7.1 /
 hdi 0.8.1**. The OASIS hApp main branch now targets 0.7.1; the tag `holochain-0.7.0` is the last 0.7.0 build.
 
-## Synchronous methods now return the result (behaviour change)
+### Synchronous methods now return the result (behaviour change)
 
 **Breaking for anyone relying on the old behaviour.** HoloNET's synchronous methods (the ones without `Async`, e.g.
 `ListApps()`, `AttachAppInterface()`, `Connect()`, `Disconnect()`, 66 in all) used to send the request and return an
@@ -165,13 +177,13 @@ empty placeholder straight away ("please wait for the ... event"); the real resu
 
 The previous line of each wrapper is kept commented out next to the new one.
 
-## Coverage push: four more 0.7.0 bugs, shared-state fixes
+### Coverage push: four more 0.7.0 bugs, shared-state fixes
 
 New live tests (`LiveConductorCoverageTests`) for paths no test reached exposed real bugs. 93 tests; all pass
 live against a 0.7.0 conductor on a fresh sandbox. HoloNET.Client coverage with the conductor: **54.9% lines,
 49.6% branches** (it was 46.3% / 39.9%; offline-only it is 5.2%).
 
-### Fixes
+#### Fixes
 - **`app_info` was rejected** ("Failed to deserialize request"): 0.7.0 `AppRequest::AppInfo` is a unit
   variant, but HoloNET sent the old `{ installed_app_id }` object. It now sends no value.
 - **`app_info` responses crashed decoding**: a completed `TaskCompletionSource` was completed again and
@@ -201,20 +213,20 @@ live against a 0.7.0 conductor on a fresh sandbox. HoloNET.Client coverage with 
   ([holochain/holochain#5950](https://github.com/holochain/holochain/issues/5950)) and fixed in Holochain 0.7.1
   ([#5958](https://github.com/holochain/holochain/pull/5958)); the workaround is correct on both.
 
-### Tests
+#### Tests
 - Live tests now report as **skipped** without a conductor (they used to pass silently).
 - `coverlet.collector` added: `dotnet test --collect "XPlat Code Coverage"`.
 - Live test classes run one at a time (shared sandbox; concurrent installs hit conductor DB errors).
 - `RegisterDna` is checked to fail cleanly on 0.7.0 (no such admin request; already obsolete).
 
-## Remaining app/admin APIs verified live
+### Remaining app/admin APIs verified live
 
 Live tests now cover every API area against a real 0.7.0 conductor: clone cells (create,
 disable, enable, delete), deferred membrane proofs (provide → enable), WASM host functions, op
 timings on both interfaces, DNA definitions, capability grants, both state dumps, token
 issue/revoke, and installing from bytes. 85 tests, 14 of them live.
 
-### Fixes
+#### Fixes
 - **Signals were never delivered**: the dispatcher routed on the inner type (which is `app`,
   `app_direct` or `system` in 0.7.0, never `signal`), and the decoder expected the pre-0.4
   `{"App": [cell, data]}` shape with agent and DNA hash swapped. Signals now route on the outer
@@ -244,13 +256,13 @@ issue/revoke, and installing from bytes. 85 tests, 14 of them live.
 
 ---
 
-## App flow verified live against Holochain 0.7.0
+### App flow verified live against Holochain 0.7.0
 
 HoloNET has now run the full flow against a real 0.7.0 conductor and the 0.7.0 OASIS hApp
 (`C:\Source\OASIS-Holochain-hApp\workdir\oasis.happ`, hdk 0.7.0): install → enable → grant
 zome-call capability → attach app interface → issue token → authenticate → zome call.
 
-### Fixes
+#### Fixes
 - **App authentication**: `InstallEnableSignAttachAndConnectToHapp` now issues an app
   authentication token and gives it to the app agent. Without one, the conductor closes the app
   socket on the first request.
@@ -290,9 +302,9 @@ zome-call capability → attach app interface → issue token → authenticate �
 
 ---
 
-## Wire-format corrections (verified against holochain-0.7.0 source)
+### Wire-format corrections (verified against holochain-0.7.0 source)
 
-### Breaking changes
+#### Breaking changes
 - **`DnaManifest`** now matches 0.7.0 `DnaManifestV0` (`deny_unknown_fields`): `manifest_version`
   defaults to `"0"`; `network_seed`, `properties` and the flat `zomes` list are removed (set
   `integrity.network_seed` / `integrity.properties`, and put zomes in `integrity.zomes` /
@@ -304,7 +316,7 @@ zome-call capability → attach app interface → issue token → authenticate �
 - **`DesensitizedZomeCallCapGrant.functions`** is now `Dictionary<string, object>`.
 - **`ListAppsRequest.status_filter`** is now a `string`. Use `AppStatusFilter.ToWireValue()`.
 
-### Fixes
+#### Fixes
 - **Request/response envelope (affected every call)**: `AdminRequest`/`AppRequest` and their
   responses are `{"type": ..., "value": ...}` in Holochain 0.6.1 and 0.7.0. HoloNET sent and read
   `"data"`, the pre-0.4 key, so the conductor returned `error` for every call. Confirmed
@@ -341,7 +353,7 @@ See [AUDIT.md](AUDIT.md) for the full audit, the evidence for each finding, and 
 
 ---
 
-## Post-upgrade polish (v4.1.0 follow-on)
+### Post-upgrade polish (v4.1.0 follow-on)
 
 Further hardening and completeness work on top of the 0.7.0 upgrade:
 
@@ -368,7 +380,7 @@ Further hardening and completeness work on top of the 0.7.0 upgrade:
 
 ---
 
-## Holochain 0.7.0 Wire Protocol Upgrade
+### Holochain 0.7.0 Wire Protocol Upgrade
 
 Upgrades HoloNET's wire protocol from Holochain 0.6.1 to 0.7.0, verified against the real Rust
 source in the [holochain](https://github.com/holochain/holochain) repo at tag `holochain-0.7.0`
@@ -405,7 +417,9 @@ Key changes:
 
 ---
 
-## Holochain 0.6.1 Wire Protocol Upgrade
+## v4.0.0 - 2026-10-11 (Holochain 0.6)
+
+### Holochain 0.6.1 Wire Protocol Upgrade
 
 Earlier "version bump" work only updated version strings/comments without changing the actual
 wire protocol, leaving HoloNET's real on-the-wire shapes at roughly Holochain 0.2.x-0.3.x while
@@ -453,7 +467,7 @@ Key changes:
   `CoordinatorSource.cs`) to point at `docs.rs/holochain_types/0.6.1`, which is the matching crate
   version for the `holochain-0.6.1` release.
 
-### Not verified
+#### Not verified
 
 - No authoritative Rust struct could be found for a `CallZomeOptions`-equivalent wire type in
   `holochain_zome_types` / `holochain_conductor_api` / `holochain_types` at tag `holochain-0.6.1`;
