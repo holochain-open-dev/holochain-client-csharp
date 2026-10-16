@@ -1,5 +1,21 @@
 # Changelog
 
+## v4.4.1 - 2026-10-16
+
+HoloNET API, Manager and HDK 4.4.1. Client, ORM and HyperNET stay at 4.4.0, unchanged.
+
+- **HDK is the full metapackage now:** HoloNET Client, ORM and HyperNET, plus WEB5 STAR 2.0.6 and HoloOASIS 2.0.6.
+  STAR couldn't be installed from NuGet before, because IPFSOASIS 2.0.4 depended on `Ipfs.Http.Client` >= 0.42.0, which
+  was never published. OASIS 2.0.6 fixes that: IPFSOASIS now ships its IPFS client inside the package, and Contracts,
+  ArweaveOASIS and STAR.DNA (never published at 2.0.4) are now published. OASIS 2.0.6 also builds HoloOASIS against
+  HoloNET 4.4.0, so STAR's hApp generation has the classes it needs. `-p:HdkIncludeStar=false` still gives a HoloNET-only HDK.
+- **API and Manager bundle the current OASIS hApp,** with HyperNET. The previous bundled build predated it, so
+  `HoloNETAPI.SendSignalAsync` (and HyperNET) failed with the default hApp. A live test now installs both bundled hApps
+  on 0.7.0 and 0.7.1 and joins a HyperNET zone, so a stale bundled hApp can't ship again.
+- **Every GitHub release has its packages attached:** each `.nupkg` plus a `.zip` of its contents, including
+  v4.2.0-v4.4.0, Libraries v2.0.4 and the OASIS hApp. The OASIS `publish-holonet.yml` job's new `release_tag` input does
+  this automatically.
+
 ## v4.4.0 - 2026-10-16 (Holochain 0.7.0 and 0.7.1)
 
 Every HoloNET package is now 4.4.0: Client, ORM, API, HyperNET, Manager and HDK, including all the Embedded variants.

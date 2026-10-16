@@ -41,7 +41,7 @@ The [main README](../README.md) also has the long-form Client and ORM reference,
 
  WEB5 STAR             generates hApps (Rust zomes + C# on HoloNET) from metadata
  HoloNET Manager       desktop UI over all of the above
- HoloNET HDK           one package: Client + ORM + HyperNET
+ HoloNET HDK           one package: Client + ORM + HyperNET + STAR + HoloOASIS
 ```
 
 ## Regenerating the API reference

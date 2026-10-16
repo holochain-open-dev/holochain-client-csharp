@@ -10,7 +10,7 @@
 | Entry models and collections on top | the matching `NextGenSoftware.Holochain.HoloNET.ORM*` variant |
 | Just save and load data | `NextGenSoftware.Holochain.HoloNET.API` |
 | Multiplayer networking | `NextGenSoftware.Holochain.HoloNET.HyperNET` |
-| Client, ORM and HyperNET in one reference | `NextGenSoftware.Holochain.HoloNET.HDK` |
+| Everything in one reference (Client, ORM, HyperNET, WEB5 STAR, HoloOASIS) | `NextGenSoftware.Holochain.HoloNET.HDK` |
 
 ```bash
 dotnet add package NextGenSoftware.Holochain.HoloNET.Client.Embedded

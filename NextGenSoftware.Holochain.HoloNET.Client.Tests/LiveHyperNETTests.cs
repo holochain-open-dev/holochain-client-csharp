@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using NextGenSoftware.Holochain.HoloNET.Client.Interfaces;
@@ -182,6 +183,42 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
             finally
             {
                 await Cleanup(admin, players);
+            }
+        }
+
+        /// <summary>
+        /// The oasis.happ bundled in HoloNET API and HoloNET Manager (what users get by default) must have the HyperNET zome
+        /// functions: HoloNETAPI.SendSignalAsync and HyperNET use them. Guards against shipping a stale bundled hApp.
+        /// </summary>
+        [SkippableTheory]
+        [InlineData("HoloNET-API/NextGenSoftware.Holochain.HoloNET.API/oasis.happ")]
+        [InlineData("HoloNET-Manager/NextGenSoftware.Holochain.HoloNET.Manager/OASIS_hAPP/oasis.happ")]
+        public async Task Live_BundledOasisHapp_HasHyperNET(string relativePath)
+        {
+            Skip.If(string.IsNullOrEmpty(AdminUri), "needs a live conductor");
+            string dir = AppContext.BaseDirectory;
+            while (dir != null && !File.Exists(Path.Combine(dir, relativePath)))
+                dir = Path.GetDirectoryName(dir);
+            Assert.True(dir != null, "bundled hApp not found: " + relativePath);
+
+            string appId = "bundled-" + Guid.NewGuid().ToString("N").Substring(0, 6);
+            var admin = new HoloNETClientAdmin(new HoloNETDNA { AutoStartHolochainConductor = false, AutoShutdownHolochainConductor = false, HolochainConductorAdminURI = AdminUri });
+            await admin.ConnectAsync(AdminUri);
+            var installed = await admin.InstallEnableSignAttachAndConnectToHappAsync(appId, Path.Combine(dir, relativePath), "oasis");
+            try
+            {
+                Assert.True(installed.IsAppConnected, installed.Message);
+                var session = new HyperNETSession(installed.HoloNETClientAppAgent, "bundled-check", "checker");
+                Assert.True(await session.JoinAsync(), "the bundled hApp has no working hypernet_join");
+                await session.LeaveAsync();
+                session.Dispose();
+            }
+            finally
+            {
+                if (installed.HoloNETClientAppAgent != null)
+                    await installed.HoloNETClientAppAgent.DisconnectAsync();
+                await admin.UninstallAppAsync(appId);
+                await admin.DisconnectAsync();
             }
         }
 
