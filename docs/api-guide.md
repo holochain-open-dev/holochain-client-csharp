@@ -36,6 +36,17 @@ HoloNETAPIResult<Settings> s = await HoloNETAPI.LoadObjectAsync<Settings>("setti
 
 Objects are stored as JSON.
 
+## Deleting
+
+```csharp
+await HoloNETAPI.DeleteDataAsync("theme");      // Result: true if the key existed
+await HoloNETAPI.DeleteObjectAsync("settings");
+await HoloNETAPI.DeleteAllDataAsync();          // every value (objects are kept)
+await HoloNETAPI.DeleteAllObjectsAsync();       // every object (values are kept)
+```
+
+A delete saves a new version of the store without the key. Earlier versions stay on your source chain, as Holochain keeps history.
+
 ## How it's stored
 
 - **One entry per agent.** The whole store is one entry on your agent's source chain, with the data and the objects in two fields.
@@ -59,6 +70,8 @@ Your zome needs the same functions and fields as the OASIS avatar entry:
 - **Fields:** `holonet_api_data` and `holonet_api_objects`.
 
 The function names are optional parameters on every method, so you can point them at your own functions.
+
+Whichever hApp you initialise with is remembered in `HoloNETAPIDNA.json`, so later one-line calls use it again, even after `ShutdownAsync` or a restart.
 
 The older overloads that take the hApp as three strings (`hAppId, hAppPath, hAppRole`) still work, but they're obsolete. With three leading strings, C# could silently pick a different overload, for example treating your app id as the zome name.
 

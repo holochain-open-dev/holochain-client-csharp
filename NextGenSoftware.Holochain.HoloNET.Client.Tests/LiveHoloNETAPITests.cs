@@ -186,6 +186,28 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
 
                 // Signals: a second agent (its own installed app) and the API agent message each other directly.
                 await SignalsBetweenTheApiAndAnotherAgent();
+
+                // Deletes, including straight after a restart (nothing loaded yet: a save would otherwise merge the stored
+                // key back in), and they survive another restart.
+                Assert.True((await Step("save k1", HoloNETAPI.SaveDataAsync("del-k1", "v1"))).IsSuccess);
+                Assert.True((await Step("save k2", HoloNETAPI.SaveDataAsync("del-k2", "v2"))).IsSuccess);
+                Assert.True((await Step("save o1", HoloNETAPI.SaveObjectAsync("del-o1", new ApiTestObject { FirstName = "Del" }))).IsSuccess);
+                await HoloNETAPI.ShutdownAsync();
+                var delK1 = await Step("delete k1 after restart", HoloNETAPI.DeleteDataAsync("del-k1"));
+                Assert.True(delK1.IsSuccess, delK1.Message);
+                Assert.True(delK1.Result);
+                Assert.False((await Step("delete missing", HoloNETAPI.DeleteDataAsync("no-such-key"))).Result);
+                Assert.True((await Step("delete o1", HoloNETAPI.DeleteObjectAsync("del-o1"))).Result);
+                await HoloNETAPI.ShutdownAsync();
+                var afterDelete = await Step("reload after delete", HoloNETAPI.LoadAllDataAsync());
+                Assert.True(afterDelete.IsSuccess, afterDelete.Message);
+                Assert.False(afterDelete.Result.ContainsKey("del-k1"));
+                Assert.Equal("v2", afterDelete.Result["del-k2"]);
+                Assert.False((await Step("reload objects after delete", HoloNETAPI.LoadAllObjectsAsync())).Result.ContainsKey("del-o1"));
+                Assert.True((await Step("delete all data", HoloNETAPI.DeleteAllDataAsync())).Result);
+                await HoloNETAPI.ShutdownAsync();
+                Assert.Empty((await Step("reload after delete all", HoloNETAPI.LoadAllDataAsync())).Result);
+                Assert.True((await Step("delete all objects", HoloNETAPI.DeleteAllObjectsAsync())).IsSuccess);
             }
             finally
             {

@@ -1,4 +1,4 @@
-﻿[![Project](https://img.shields.io/badge/Project-Holochain-blue.svg?style=flat-square)](http://holochain.org/)
+[![Project](https://img.shields.io/badge/Project-Holochain-blue.svg?style=flat-square)](http://holochain.org/)
 [![Discord](https://img.shields.io/badge/Discord-DEV.HC-blue.svg?style=flat-square)](https://discord.gg/k55DS5dmPH)
 [![License: CAL 1.0](https://img.shields.io/badge/License-CAL%201.0-blue.svg)](https://github.com/holochain/cryptographic-autonomy-license)
 [![Twitter Follow](https://img.shields.io/twitter/follow/holochain.svg?style=social&label=Follow)](https://twitter.com/holochain)
@@ -197,7 +197,7 @@ The rest of the HoloNET family:
 
 [NextGenSoftware.Holochain.HoloNET.ORM](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.ORM) - HoloNET ORM (Object Relational Mapping) for very easy &amp; rapid development of hApps: HoloNETEntryBase, HoloNETAuditEntryBase, HoloNETCollection and HoloNETObservableCollection. Extend the first two to create entry models that map directly onto the structs in your Rust zome code; the other two are collections of them. Call simple CRUD methods (Load, Save, Delete, ...) and get change tracking, version control &amp; rollback for free. [WEB5 STAR](https://www.nuget.org/packages/NextGenSoftware.OASIS.STAR) can generate both the Rust and the C# side.
 
-[NextGenSoftware.Holochain.HoloNET.API](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.API) | [GitHub](https://github.com/NextGenSoftwareUK/HoloNET-API) - The simplest way in: a static key/value and object store on Holochain (`HoloNETAPI.SaveDataAsync`, `LoadDataAsync`, `SaveObjectAsync`, ...), with the hApp chosen through `HoloNETAPIHapp` (the bundled OASIS hApp by default).
+[NextGenSoftware.Holochain.HoloNET.API](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.API) | [GitHub](https://github.com/NextGenSoftwareUK/HoloNET-API) - The simplest way in: one line to save, load or delete data and objects, or message another agent, on Holochain (`HoloNETAPI.SaveDataAsync`, `LoadDataAsync`, `DeleteDataAsync`, `SaveObjectAsync`, `SendSignalAsync`, ...), with the hApp chosen through `HoloNETAPIHapp` (the bundled OASIS hApp by default).
 
 [NextGenSoftware.Holochain.HoloNET.HyperNET](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.HyperNET) - P2P multiplayer networking for games (Unity, Unreal through .NET, or any .NET app) with no game server in the middle. See [HyperNET](#hypernet) below.
 
