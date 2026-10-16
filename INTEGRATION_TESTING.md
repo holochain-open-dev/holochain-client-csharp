@@ -22,6 +22,10 @@ scripts/run-live-tests.sh 0.7.1
 scripts/run-live-tests.sh 0.7.0
 ```
 
+It runs the Client/ORM/API tests (`NextGenSoftware.Holochain.HoloNET.Client.Tests`) and the HoloNET Manager tests
+(`NextGenSoftware.Holochain.HoloNET.Manager.Tests`, WPF, Windows only); `PROJECTS=client` or `PROJECTS=manager` runs one,
+`HAPP_OVERRIDE=<absolute path>` tries another hApp. Build the test hApps with `scripts/build-test-happs.sh <version>`.
+
 Each run starts a fresh sandbox for that version (bundled `hc`, and `holochain.exe` from
 `%APPDATA%\NextGenSoftware\HoloNET\<version>\`, so Windows Firewall asks once per version), then runs the whole
 suite with coverage into `.holochain-test/coverage-<version>`. Test hApps live in `.holochain-test/happ-070*` and

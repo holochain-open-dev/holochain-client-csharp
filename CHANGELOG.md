@@ -1,5 +1,65 @@
 # Changelog
 
+## HoloNET ORM, HoloNET API and HoloNET Manager working end to end on Holochain 0.7.0 and 0.7.1
+
+All three are now tested against a real conductor of **both** versions with the OASIS hApp (live tests), plus a fake
+conductor / in-memory hApp for the error paths. 1,758 Client/ORM/API tests and 9 Manager tests pass on 0.7.0 and 0.7.1;
+line coverage: Client 93.1%, ORM 93.2%, API 93.9%, Manager logic 79% (the rest of the Manager is WPF window code). Before this pass none of them could save and reload data on 0.7.
+
+### HoloNET ORM (`HoloNETEntryBase`, `HoloNETAuditEntryBase`, `HoloNETCollection`, `HoloNETObservableCollection`)
+- **Entries**: updates, `Load()` and `Delete()` used the EntryHash where Holochain needs the ActionHash, so every update
+  failed; loading a hash with no record reported success; the `state` field and `IsChanged` made saved entries look
+  changed; `PreviousVersionActionHash` was the source-chain previous action; `OrginalEntry` was always null.
+- **Audit entries**: a new `Id` on every save, only the first modification recorded, culture-dependent dates,
+  `NullReferenceException` when a tracking flag was off, delete wiped `DeletedDate`, no audit trail on 0.7.
+- **Collections**: add/remove sent only the anchor (not which entry), the batch couldn't tell adds/removes/updates
+  apart, loads never mapped records onto `T`, reloads duplicated entries, change detection broke after the first match.
+  The zome contract is now defined (see `HoloNETCollectionCore`); the OASIS hApp has matching
+  `get/add/remove/batch_update_avatar_collection` functions (coordinator only, DNA hash unchanged).
+- Events were only wired when the ORM object connected the client itself, so a shared client's `OnError` was never
+  forwarded and the observable collection never tracked changes. Constructors now all take `IHoloNETClientAppBase`.
+
+### HoloNET API
+Rebuilt on the 0.7 OASIS hApp with the same public methods: one store entry (`StoreId`) holding Data and Objects as JSON;
+created then updated by action hash; the installed app is reused (it used to uninstall it, losing the data, on every
+start); errors reported (`OnError`, `LastError`, `Message`); loaded objects convert to `T`; `ShutdownAsync`; bundled
+`oasis.happ` rebuilt for 0.7. Note: overloads like `SaveAllObjectsAsync(hAppId, hAppPath, hAppRole)` and
+`SaveAllObjectsAsync(zome, createFn, updateFn)` take the same string types, so the hApp versions need a fourth argument.
+
+### HoloNET Manager
+- Demo models used zome functions that no longer exist and sent no `id`/`username`; every loaded record opened its
+  own conductor connection; the demo hApp path was relative (the conductor couldn't find it).
+- App interface connections had no authentication token, which Holochain 0.6+ requires, so no app connection worked.
+- Work queued from WebSocket events with `Dispatcher.CurrentDispatcher` never ran; shutdown re-subscribed handlers;
+  closing connections modified the list being iterated; recycling reconnected another app's client; status updates to a
+  closed popup threw; creating a client from the interface-attached event deadlocked; grant/attach error events were
+  treated as success (it connected twice on 0.7.0); the shared entry's hash was saved as an entry hash and couldn't be
+  loaded; reboot waited for clients that were already closed and could run twice. Bundled `oasis.happ` rebuilt for 0.7.
+- Results: Manager tests 9/9 on both versions (boot, the HoloNET Entry/Collection demos incl. re-enable/reconnect/
+  reinstall, the shared install → grant → attach → connect → use flow with the entry form, reboot, admin queries).
+- New test project `NextGenSoftware.Holochain.HoloNET.Manager.Tests` drives the Manager headless: boot, the HoloNET
+  Entry and Collection demos, and the install → grant → attach → connect → use flow.
+
+### HoloNET Client fixes found on the way
+- **Sync methods called from inside a HoloNET event deadlocked** (since they were made to wait for the conductor):
+  inside a conductor callback they now send and report through the matching `On...CallBack` event, as they used to.
+- `IHoloNETClientAdmin` defaulted installs to *Unrestricted* grants while the class used *Assigned*; code holding the
+  interface got grants Holochain 0.7 rejects (`BadCapGrant`). A test now checks every interface default.
+- `uninstallhAppIfAlreadyInstalled: false` tried to install again; it now reuses the installed app.
+- `ShutdownHoloNETAsync` on an already disconnected client never completed.
+- `WaitTillReadyForZomeCallsAsync` hung forever when the agent key/DNA hash were unknown and retrieval was off.
+- **Request ids weren't atomic**: two requests sent at once from different threads (an app call while a HoloNET event sends
+  another) could get the same id, and a reply was matched to the wrong call.
+- NextGenSoftware.WebSocket: the receive loop ran on the caller's UI thread, so in a desktop app any blocking call froze it.
+- NextGenSoftware.Logging: every log line scanned the whole log folder, so with a few hundred files HoloNET calls timed
+  out; the folder also grew without limit. The current file is now remembered and only `MaxLogFiles` (default 50) kept.
+
+### Tests and tools
+- `scripts/run-live-tests.sh <version>` now runs the Client/ORM/API project and the Manager project (`PROJECTS=client`
+  or `manager` for one; `HAPP_OVERRIDE` to try another hApp).
+- `scripts/build-test-happs.sh <version>` builds the OASIS test hApps (0.7.0 from the hApp's `holochain-0.7.0-maintenance`
+  branch: the `holochain-0.7.0` tag plus the collection functions).
+
 ## Full Holochain 0.7 coverage pass: 1,647 tests, 95% line coverage, ~40 bugs fixed
 
 Every public request method, response type and connection path now has tests, against a real conductor on **both

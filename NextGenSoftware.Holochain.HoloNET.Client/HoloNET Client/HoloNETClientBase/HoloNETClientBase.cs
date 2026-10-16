@@ -1006,8 +1006,17 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             _shuttingDownHoloNET = true;
             _taskCompletionHoloNETShutdown = new TaskCompletionSource<HoloNETShutdownEventArgs>(TaskCreationOptions.RunContinuationsAsynchronously);
 
-            if (WebSocket.State != WebSocketState.Closed || WebSocket.State != WebSocketState.CloseReceived || WebSocket.State != WebSocketState.CloseSent)
+            // Was "!= Closed || != CloseReceived || != CloseSent" (always true). On a client that was already disconnected,
+            // DisconnectAsync returns at once and nothing ever raises OnDisconnected, so the wait below never ended: finish the
+            // shutdown here instead (ShutDownHolochainConductorsAsync completes it).
+            //if (WebSocket.State != WebSocketState.Closed || WebSocket.State != WebSocketState.CloseReceived || WebSocket.State != WebSocketState.CloseSent)
+            if (WebSocket.State == WebSocketState.Open)
                 await DisconnectAsync(disconnectedCallBackMode, shutdownHolochainConductorsMode);
+            else
+            {
+                _shutdownHolochainConductorsMode = shutdownHolochainConductorsMode;
+                await ShutDownHolochainConductorsAsync(shutdownHolochainConductorsMode);
+            }
 
             if (disconnectedCallBackMode == DisconnectedCallBackMode.WaitForHolochainConductorToDisconnect)
                 return await _taskCompletionHoloNETShutdown.Task;
@@ -1024,7 +1033,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         {
             _shuttingDownHoloNET = true;
 
-            if (WebSocket.State != WebSocketState.Closed || WebSocket.State != WebSocketState.CloseReceived || WebSocket.State != WebSocketState.CloseSent)
+            // Was "!= Closed || != CloseReceived || != CloseSent" (always true); see ShutdownHoloNETAsync.
+            //if (WebSocket.State != WebSocketState.Closed || WebSocket.State != WebSocketState.CloseReceived || WebSocket.State != WebSocketState.CloseSent)
+            if (WebSocket.State == WebSocketState.Open)
                 Disconnect(shutdownHolochainConductorsMode);
 
             return new HoloNETShutdownEventArgs(EndPoint, HoloNETDNA.DnaHash, HoloNETDNA.AgentPubKey, null);
@@ -1194,11 +1205,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
             if (disposing && WebSocket != null)
             {
-                WebSocket.OnConnected -= WebSocket_OnConnected;
+                WebSocket.OnConnected -= WebSocket_OnConnected_InCallback;
                 WebSocket.OnDataSent -= WebSocket_OnDataSent;
-                WebSocket.OnDataReceived -= WebSocket_OnDataReceived;
-                WebSocket.OnDisconnected -= WebSocket_OnDisconnected;
-                WebSocket.OnError -= WebSocket_OnError;
+                WebSocket.OnDataReceived -= WebSocket_OnDataReceived_InCallback;
+                WebSocket.OnDisconnected -= WebSocket_OnDisconnected_InCallback;
+                WebSocket.OnError -= WebSocket_OnError_InCallback;
 
                 if (WebSocket is IDisposable disposableWs)
                     disposableWs.Dispose();
@@ -1220,11 +1231,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 WebSocket = new WebSocket.WebSocket(Logger);
                 EndPoint = holochainConductorURI;
 
-                WebSocket.OnConnected += WebSocket_OnConnected;
+                WebSocket.OnConnected += WebSocket_OnConnected_InCallback;
                 WebSocket.OnDataSent += WebSocket_OnDataSent;
-                WebSocket.OnDataReceived += WebSocket_OnDataReceived;
-                WebSocket.OnDisconnected += WebSocket_OnDisconnected;
-                WebSocket.OnError += WebSocket_OnError;
+                WebSocket.OnDataReceived += WebSocket_OnDataReceived_InCallback;
+                WebSocket.OnDisconnected += WebSocket_OnDisconnected_InCallback;
+                WebSocket.OnError += WebSocket_OnError_InCallback;
             }
             catch (Exception ex)
             {
@@ -1246,6 +1257,33 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             //HandleError("CurrentDomain_UnhandledException was raised.", (Exception)e.ExceptionObject); // could throw inside the unhandled-exception handler
             ReportError("CurrentDomain_UnhandledException was raised.", e?.ExceptionObject as Exception);
         }
+
+        // Set while HoloNET is handling something the WebSocket raised (a message, connect, disconnect, error), i.e. on the thread
+        // that reads the socket. A sync wrapper that waited for the conductor's reply from here (typically inside one of our
+        // events: the Manager calls GenerateAgentPubKey(), ListApps(), EnablelApp()... from its callbacks) blocked the very
+        // thread that has to read that reply, so it deadlocked. See RunSync.
+        [ThreadStatic] private static int _conductorCallbackDepth;
+
+        /// <summary>True while running on the WebSocket's callback thread (inside a HoloNET event raised for a conductor message).</summary>
+        protected static bool IsInConductorCallback => _conductorCallbackDepth > 0;
+
+        /// <summary>
+        /// Runs a sync wrapper: waits for the conductor's reply, except inside a conductor callback, where waiting would block the
+        /// reply itself; there the request is sent and the result arrives through the matching On...CallBack event instead (how the
+        /// sync methods always behaved before they were made to wait).
+        /// </summary>
+        protected static T RunSync<T>(Func<ConductorResponseCallBackMode, Task<T>> call)
+        {
+            if (IsInConductorCallback)
+                return call(ConductorResponseCallBackMode.UseCallBackEvents).GetAwaiter().GetResult();
+
+            return Task.Run(() => call(ConductorResponseCallBackMode.WaitForHolochainConductorResponse)).GetAwaiter().GetResult();
+        }
+
+        private void WebSocket_OnConnected_InCallback(object sender, ConnectedEventArgs e) { _conductorCallbackDepth++; try { WebSocket_OnConnected(sender, e); } finally { _conductorCallbackDepth--; } }
+        private void WebSocket_OnDataReceived_InCallback(object sender, WebSocket.DataReceivedEventArgs e) { _conductorCallbackDepth++; try { WebSocket_OnDataReceived(sender, e); } finally { _conductorCallbackDepth--; } }
+        private void WebSocket_OnDisconnected_InCallback(object sender, DisconnectedEventArgs e) { _conductorCallbackDepth++; try { WebSocket_OnDisconnected(sender, e); } finally { _conductorCallbackDepth--; } }
+        private void WebSocket_OnError_InCallback(object sender, WebSocketErrorEventArgs e) { _conductorCallbackDepth++; try { WebSocket_OnError(sender, e); } finally { _conductorCallbackDepth--; } }
 
         protected virtual void WebSocket_OnConnected(object sender, ConnectedEventArgs e)
         {

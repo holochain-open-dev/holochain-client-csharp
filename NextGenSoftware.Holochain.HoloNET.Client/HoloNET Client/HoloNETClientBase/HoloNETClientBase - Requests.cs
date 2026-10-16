@@ -128,8 +128,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         protected virtual string GetRequestId()
         {
-            _currentId++;
-            return _currentId.ToString();
+            // Was "_currentId++; return _currentId.ToString();": requests sent from two threads at once (e.g. one from a HoloNET
+            // event while the app sends another) could get the same id, and the replies were then matched to the wrong call.
+            //_currentId++;
+            //return _currentId.ToString();
+            return System.Threading.Interlocked.Increment(ref _currentId).ToString();
         }
     }
 }

@@ -179,9 +179,12 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
             // The repo's oasis.happ predates manifest_version "0", so installation must fail on the
             // bundle itself. That proves the request shape was accepted. The old shape failed earlier,
             // because the required `source` field was missing.
-            string happ = System.IO.Path.GetFullPath(System.IO.Path.Combine(AppContext.BaseDirectory,
-                "../../../../HoloNET-Manager/NextGenSoftware.Holochain.HoloNET.Manager/OASIS_hAPP/oasis.happ"));
-            Skip.IfNot(System.IO.File.Exists(happ), $"hApp not found: {happ}");
+            // Used the Manager's bundled oasis.happ, which was outdated; it is a valid 0.7 bundle now, so use one that isn't.
+            //string happ = System.IO.Path.GetFullPath(System.IO.Path.Combine(AppContext.BaseDirectory,
+            //    "../../../../HoloNET-Manager/NextGenSoftware.Holochain.HoloNET.Manager/OASIS_hAPP/oasis.happ"));
+            //Skip.IfNot(System.IO.File.Exists(happ), $"hApp not found: {happ}");
+            string happ = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "holonet-not-a-bundle-" + Guid.NewGuid().ToString("N") + ".happ");
+            System.IO.File.WriteAllBytes(happ, new byte[] { 0x1f, 0x8b, 8, 0, 1, 2, 3, 4, 5, 6 });
 
             var request = new NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.InstallAppRequest
             {
@@ -191,6 +194,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
 
             AppResponse response = await SendAdminAsync("install_app", request);
             string error = MessagePackSerializer.SerializeToJson(response.data);
+            System.IO.File.Delete(happ);
 
             Assert.Equal("error", response.type);
             Assert.Contains("AppBundleError", error);
