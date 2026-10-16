@@ -1,6 +1,6 @@
 # HoloNET API API reference
 
-Generated from `NextGenSoftware.Holochain.HoloNET.API` 4.4.0.0 (every public type and member, with its XML documentation where it has one). For guides and examples see the [documentation index](../README.md).
+Generated from `NextGenSoftware.Holochain.HoloNET.API` 4.4.1.0 (every public type and member, with its XML documentation where it has one). For guides and examples see the [documentation index](../README.md).
 
 - **NextGenSoftware.Holochain.HoloNET.API**: [HoloNETAPI](#nextgensoftware-holochain-holonet-api-holonetapi), [HoloNETAPIDNA](#nextgensoftware-holochain-holonet-api-holonetapidna), [HoloNETAPIDNAManager](#nextgensoftware-holochain-holonet-api-holonetapidnamanager), [HoloNETAPIHapp](#nextgensoftware-holochain-holonet-api-holonetapihapp), [HoloNETAPIResult&lt;T&gt;](#nextgensoftware-holochain-holonet-api-holonetapiresult-1), [HoloNETAPISignalEventArgs](#nextgensoftware-holochain-holonet-api-holonetapisignaleventargs)
 - **NextGenSoftware.Holochain.HoloNET.API.Interfaces**: [IHoloNETAPIDNA](#nextgensoftware-holochain-holonet-api-interfaces-iholonetapidna)
@@ -71,13 +71,13 @@ Inherits / implements: `IHoloNETAPIDNA`
 
 | Member | Kind | Description |
 |---|---|---|
-| `IHoloNETAPIDNA HoloNETAPIDNA { get; set; } (static)` | property |  |
-| `bool IsLoaded { get; } (static)` | property |  |
-| `static string HoloNETAPIDNAPath` | field |  |
-| `static IHoloNETAPIDNA LoadDNA()` | method |  |
-| `static IHoloNETAPIDNA LoadDNA(string holoNETDNAAPIPath)` | method |  |
-| `static bool SaveDNA()` | method |  |
-| `static bool SaveDNA(string holoNETAPIDNAPath, IHoloNETAPIDNA holoNETAPIDNA)` | method |  |
+| `IHoloNETAPIDNA HoloNETAPIDNA { get; set; } (static)` | property | The HoloNET API settings in use. |
+| `bool IsLoaded { get; } (static)` | property | True once the settings have been loaded. |
+| `static string HoloNETAPIDNAPath` | field | Where HoloNETAPIDNA.json is read from and saved to. |
+| `static IHoloNETAPIDNA LoadDNA()` | method | Load the settings from HoloNETDNA.json (defaults if it doesn't exist). |
+| `static IHoloNETAPIDNA LoadDNA(string holoNETDNAAPIPath)` | method | Load the settings from HoloNETDNA.json (defaults if it doesn't exist). |
+| `static bool SaveDNA()` | method | Save the settings to HoloNETDNA.json. |
+| `static bool SaveDNA(string holoNETAPIDNAPath, IHoloNETAPIDNA holoNETAPIDNA)` | method | Save the settings to HoloNETDNA.json. |
 
 <a id="nextgensoftware-holochain-holonet-api-holonetapihapp"></a>
 ### HoloNETAPIHapp (class)

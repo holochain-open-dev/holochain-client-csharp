@@ -67,6 +67,15 @@ static void WriteType(StringBuilder sb, Type t, Dictionary<string, string> docs)
     bases.AddRange(t.GetInterfaces().Where(i => i.IsPublic).Select(TypeName).Take(8));
     if (bases.Count > 0 && !t.IsEnum) { sb.AppendLine("Inherits / implements: `" + string.Join("`, `", bases) + "`"); sb.AppendLine(); }
 
+    // A delegate is just an event handler's signature: show that, not Invoke / BeginInvoke / EndInvoke / the constructor.
+    if (typeof(Delegate).IsAssignableFrom(t) && t.GetMethod("Invoke") is MethodInfo invoke)
+    {
+        string evt = t.Name.EndsWith("CallBack") ? "On" + t.Name : "On" + t.Name;
+        sb.AppendLine($"Handler signature: `{TypeName(invoke.ReturnType)} {t.Name}({Params(invoke.GetParameters())})` (the type of the `{evt}` event).");
+        sb.AppendLine();
+        return;
+    }
+
     if (t.IsEnum)
     {
         sb.AppendLine("| Value | Description |");
@@ -118,6 +127,77 @@ static void WriteType(StringBuilder sb, Type t, Dictionary<string, string> docs)
         if (found != null) rows[i] = (rows[i].Kind, rows[i].Sig, found + (rows[i].Doc ?? ""));
     }
 
+    // Reviewed one-liners for members with no XML doc (scripts/apigen/member-docs.json, "Type.Member").
+    for (int i = 0; i < rows.Count; i++)
+    {
+        if (!string.IsNullOrEmpty(rows[i].Doc)) continue;
+        string n = rows[i].Kind == "ctor" ? t.Name.Split('`')[0] : MemberName(rows[i].Sig, rows[i].Kind);
+        string key = t.Name.Split('`')[0] + "." + n;
+        if (n != null && MemberDocsHolder.Docs.Value.TryGetValue(key, out string md))
+            rows[i] = (rows[i].Kind, rows[i].Sig, md);
+        else if (n != null && t.IsInterface && MemberDocsHolder.Docs.Value.TryGetValue(t.Name.Split('`')[0].Substring(1) + "." + n, out string imd))
+            rows[i] = (rows[i].Kind, rows[i].Sig, imd);
+    }
+
+    // Members that mean the same thing on every HoloNET type.
+    var common = new Dictionary<string, string>
+    {
+        ["AgentPubKey"] = "The agent public key (HoloHash string) this applies to.",
+        ["DnaHash"] = "The DNA hash (HoloHash string) this applies to.",
+        ["CellId"] = "The cell id: [DNA hash, agent public key] as raw bytes.",
+        ["CellType"] = "The kind of cell (provisioned, cloned or stem).",
+        ["EndPoint"] = "The conductor WebSocket endpoint this came from.",
+        ["IsError"] = "True when the call or the conductor reported an error (see Message).",
+        ["Message"] = "A description of what happened, or of the error when IsError is true.",
+        ["InstalledAppId"] = "The installed app id.",
+        ["AppStatus"] = "The app's status as the conductor reports it (enabled, disabled, paused...).",
+        ["AppStatusReason"] = "Why the app is disabled or paused, if it is.",
+        ["AppManifest"] = "The app's manifest (its roles and DNAs).",
+        ["RawJSONData"] = "The raw response, as JSON (for logging and debugging).",
+        ["Type"] = "The conductor message type.",
+        ["HoloNETDNA"] = "The HoloNET settings in use (see HoloNETDNA).",
+        ["HoloNETDNAPath"] = "Where HoloNETDNA.json is read from and saved to.",
+        ["IsLoaded"] = "True once the settings have been loaded.",
+        ["LoadDNA"] = "Load the settings from HoloNETDNA.json (defaults if it doesn't exist).",
+        ["SaveDNA"] = "Save the settings to HoloNETDNA.json.",
+        ["HolochainConductorsShutdownEventArgs"] = "The result of shutting down the conductors HoloNET started.",
+        ["SignalType"] = "Whether this is an app signal (emitted by a zome) or a system signal.",
+        ["SignalData"] = "The decoded signal payload as key/value pairs.",
+        ["SignalDataAsString"] = "The decoded signal payload as text (for logging).",
+        ["RawSignalData"] = "The raw signal: its MessagePack bytes are in Data.",
+        ["AppInfoResponse"] = "The conductor's raw app_info response.",
+    };
+    for (int i = 0; i < rows.Count; i++)
+    {
+        if (!string.IsNullOrEmpty(rows[i].Doc)) continue;
+        string n = MemberName(rows[i].Sig, rows[i].Kind);
+        if (rows[i].Kind == "ctor" && (t.Namespace ?? "").Contains(".ORM") && rows[i].Sig.Contains("zomeName"))
+        {
+            // ORM entry / collection constructors differ only in how they get their connection and logging.
+            string how = rows[i].Sig.Contains("IHoloNETClientAppBase") ? "using an existing app connection (shared with your other entries and collections)"
+                : rows[i].Sig.Contains("ILogger logger") ? "creating its own connection, logging to this Logger"
+                : rows[i].Sig.Contains("IEnumerable<ILogProvider>") ? "creating its own connection, logging to these log providers"
+                : rows[i].Sig.Contains("ILogProvider") ? "creating its own connection, logging to this log provider"
+                : "creating its own connection (settings from holoNETDNA, or HoloNETDNA.json)";
+            string app = rows[i].Sig.StartsWith(t.Name.Split('`')[0] + "(string installedAppId") ? " for this installed app and agent" : "";
+            rows[i] = (rows[i].Kind, rows[i].Sig, $"Map onto the given zome and zome functions{app}, {how}.");
+        }
+        else if (rows[i].Kind == "ctor" && typeof(EventArgs).IsAssignableFrom(t))
+            rows[i] = (rows[i].Kind, rows[i].Sig, "Create the event args with these values (HoloNET raises them; you rarely construct one).");
+        else if (rows[i].Kind == "ctor" && typeof(Exception).IsAssignableFrom(t))
+            rows[i] = (rows[i].Kind, rows[i].Sig, "Create the exception with this message (and the inner exception / conductor endpoint, if given).");
+        else if (n != null && rows[i].Kind == "property" && t.Name.EndsWith("EventArgs") && !common.ContainsKey(n))
+            rows[i] = (rows[i].Kind, rows[i].Sig, $"What the conductor returned for this request ({Regex.Replace(n, "([a-z])([A-Z])", "$1 $2").ToLowerInvariant()}).");
+        else if (n is "Serialize" or "Deserialize" && t.Name.EndsWith("Formatter"))
+            rows[i] = (rows[i].Kind, rows[i].Sig, "MessagePack formatter plumbing used by HoloNET's serialiser (you don't call this).");
+        else if (n == "GetCellIdAsync")
+            rows[i] = (rows[i].Kind, rows[i].Sig, "The cell id zome calls go to: HoloNETDNA.CellId, or built from its DnaHash and AgentPubKey (retrieving them from the conductor first if needed).");
+        else if (n != null && common.TryGetValue(n, out string c))
+            rows[i] = (rows[i].Kind, rows[i].Sig, c);
+        else if (n != null && rows[i].Kind is "property" or "field" && n == n.ToLowerInvariant() && char.IsLetter(n[0]))
+            rows[i] = (rows[i].Kind, rows[i].Sig, $"Holochain's `{n}` field (sent to / received from the conductor as-is).");
+    }
+
     // Request / response objects (the .Data namespaces) mirror Holochain's conductor API structs field for field.
     if ((t.Namespace ?? "").Contains(".Data."))
         for (int i = 0; i < rows.Count; i++)
@@ -133,7 +213,8 @@ static void WriteType(StringBuilder sb, Type t, Dictionary<string, string> docs)
     if (t.IsInterface && t.Name.StartsWith("I"))
     {
         string implId = (t.Namespace ?? "") + "." + t.Name.Substring(1);
-        Type impl = t.Assembly.GetExportedTypes().FirstOrDefault(x => !x.IsInterface && x.Name == t.Name.Substring(1) && t.IsAssignableFrom(x));
+        Type impl = t.Assembly.GetExportedTypes().FirstOrDefault(x => !x.IsInterface && x.Name == t.Name.Substring(1) &&
+            (t.IsAssignableFrom(x) || x.GetInterfaces().Any(i => i.IsGenericType && t.IsGenericTypeDefinition && i.GetGenericTypeDefinition() == t)));
         if (impl != null)
         {
             string implDocId = DocId(impl);
@@ -268,8 +349,19 @@ static string Readme(string cls, string name)
     return ReadmeData.ReadmeByName.TryGetValue(name, out var l) && l.Count == 1 ? l[0] : null;
 }
 
-static class ReadmeData
+static partial class ReadmeData
 {
     internal static readonly Dictionary<(string, string), string> ReadmeByClass = new();
     internal static readonly Dictionary<string, List<string>> ReadmeByName = new();
+}
+
+static partial class ReadmeData { }
+
+static class MemberDocsHolder
+{
+    internal static readonly Lazy<Dictionary<string, string>> Docs = new Lazy<Dictionary<string, string>>(() =>
+    {
+        string p = Path.Combine(AppContext.BaseDirectory, "member-docs.json");
+        return File.Exists(p) ? System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, string>>(File.ReadAllText(p)) : new Dictionary<string, string>();
+    });
 }

@@ -159,7 +159,7 @@ Inherits / implements: `IDisposable`
 | `EventHandler<HyperNETPeerEventArgs> OnPeerMoved` | event | A player sent a new position (Peer.Position). |
 | `EventHandler<HyperNETReliableFailedEventArgs> OnReliableMessageFailed` | event | A reliable message wasn't acknowledged by everyone after ReliableMaxRetries. |
 | `Task<bool> ChangeZoneAsync(string zone)` | method | Move to another zone (e.g. you crossed a zone boundary): leave this one, join the new one. |
-| `static T Deserialize<T>(byte[] payload)` | method |  |
+| `static T Deserialize<T>(byte[] payload)` | method | Read a typed message sent with SendAsync<T> (MessagePack, contractless). |
 | `void Dispose()` | method | Stop the background maintenance and stop listening for signals (call LeaveAsync first to tell the others). |
 | `Task<bool> JoinAsync()` | method | Join the zone: announces you to the players already there and fetches who they are. |
 | `Task LeaveAsync()` | method | Leave the zone (the others get told). |

@@ -18,19 +18,14 @@ Generated from `NextGenSoftware.Holochain.HoloNET.Client` 4.4.0.0 (every public 
 
 | Member | Kind | Description |
 |---|---|---|
-| `Dna Dna { get; set; }` | property |  |
+| `Dna Dna { get; set; }` | property | The DNA action's payload (the first action of every source chain). |
 
 <a id="nextgensoftware-holochain-holonet-client-holonetclientadmin-admininterfacesaddedcallback"></a>
 ### HoloNETClientAdmin.AdminInterfacesAddedCallBack (delegate)
 
 Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
-| Member | Kind | Description |
-|---|---|---|
-| `HoloNETClientAdmin.AdminInterfacesAddedCallBack(object object, IntPtr method)` | ctor |  |
-| `IAsyncResult BeginInvoke(object sender, AdminInterfacesAddedCallBackEventArgs e, AsyncCallback callback, object object)` | method |  |
-| `void EndInvoke(IAsyncResult result)` | method |  |
-| `void Invoke(object sender, AdminInterfacesAddedCallBackEventArgs e)` | method |  |
+Handler signature: `void AdminInterfacesAddedCallBack(object sender, AdminInterfacesAddedCallBackEventArgs e)` (the type of the `OnAdminInterfacesAddedCallBack` event).
 
 <a id="nextgensoftware-holochain-holonet-client-admininterfacesaddedcallbackeventargs"></a>
 ### AdminInterfacesAddedCallBackEventArgs (class)
@@ -42,12 +37,7 @@ Inherits / implements: `HoloNETDataReceivedBaseEventArgs`
 
 Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
-| Member | Kind | Description |
-|---|---|---|
-| `HoloNETClientAdmin.AdminOpTimingsDumpedCallBack(object object, IntPtr method)` | ctor |  |
-| `IAsyncResult BeginInvoke(object sender, AdminOpTimingsDumpedCallBackEventArgs e, AsyncCallback callback, object object)` | method |  |
-| `void EndInvoke(IAsyncResult result)` | method |  |
-| `void Invoke(object sender, AdminOpTimingsDumpedCallBackEventArgs e)` | method |  |
+Handler signature: `void AdminOpTimingsDumpedCallBack(object sender, AdminOpTimingsDumpedCallBackEventArgs e)` (the type of the `OnAdminOpTimingsDumpedCallBack` event).
 
 <a id="nextgensoftware-holochain-holonet-client-adminoptimingsdumpedcallbackeventargs"></a>
 ### AdminOpTimingsDumpedCallBackEventArgs (class)
@@ -56,19 +46,14 @@ Inherits / implements: `HoloNETDataReceivedBaseEventArgs`
 
 | Member | Kind | Description |
 |---|---|---|
-| `OpTimingsDump OpTimingsDump { get; set; }` | property |  |
+| `OpTimingsDump OpTimingsDump { get; set; }` | property | What the conductor returned for this request (op timings dump). |
 
 <a id="nextgensoftware-holochain-holonet-client-holonetclientadmin-agentinfoaddedcallback"></a>
 ### HoloNETClientAdmin.AgentInfoAddedCallBack (delegate)
 
 Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
-| Member | Kind | Description |
-|---|---|---|
-| `HoloNETClientAdmin.AgentInfoAddedCallBack(object object, IntPtr method)` | ctor |  |
-| `IAsyncResult BeginInvoke(object sender, AgentInfoAddedCallBackEventArgs e, AsyncCallback callback, object object)` | method |  |
-| `void EndInvoke(IAsyncResult result)` | method |  |
-| `void Invoke(object sender, AgentInfoAddedCallBackEventArgs e)` | method |  |
+Handler signature: `void AgentInfoAddedCallBack(object sender, AgentInfoAddedCallBackEventArgs e)` (the type of the `OnAgentInfoAddedCallBack` event).
 
 <a id="nextgensoftware-holochain-holonet-client-agentinfoaddedcallbackeventargs"></a>
 ### AgentInfoAddedCallBackEventArgs (class)
@@ -80,21 +65,16 @@ Inherits / implements: `HoloNETDataReceivedBaseEventArgs`
 
 | Member | Kind | Description |
 |---|---|---|
-| `string dump { get; set; }` | property |  |
-| `string kitsune_agent { get; set; }` | property |  |
-| `string kitsune_space { get; set; }` | property |  |
+| `string dump { get; set; }` | property | Holochain's `dump` field (sent to / received from the conductor as-is). |
+| `string kitsune_agent { get; set; }` | property | Holochain's `kitsune_agent` field (sent to / received from the conductor as-is). |
+| `string kitsune_space { get; set; }` | property | Holochain's `kitsune_space` field (sent to / received from the conductor as-is). |
 
 <a id="nextgensoftware-holochain-holonet-client-holonetclientadmin-agentinforeturnedcallback"></a>
 ### HoloNETClientAdmin.AgentInfoReturnedCallBack (delegate)
 
 Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
-| Member | Kind | Description |
-|---|---|---|
-| `HoloNETClientAdmin.AgentInfoReturnedCallBack(object object, IntPtr method)` | ctor |  |
-| `IAsyncResult BeginInvoke(object sender, AgentInfoReturnedCallBackEventArgs e, AsyncCallback callback, object object)` | method |  |
-| `void EndInvoke(IAsyncResult result)` | method |  |
-| `void Invoke(object sender, AgentInfoReturnedCallBackEventArgs e)` | method |  |
+Handler signature: `void AgentInfoReturnedCallBack(object sender, AgentInfoReturnedCallBackEventArgs e)` (the type of the `OnAgentInfoReturnedCallBack` event).
 
 <a id="nextgensoftware-holochain-holonet-client-agentinforeturnedcallbackeventargs"></a>
 ### AgentInfoReturnedCallBackEventArgs (class)
@@ -103,7 +83,7 @@ Inherits / implements: `HoloNETDataReceivedBaseEventArgs`
 
 | Member | Kind | Description |
 |---|---|---|
-| `AgentInfo AgentInfo { get; set; }` | property |  |
+| `AgentInfo AgentInfo { get; set; }` | property | What the conductor returned for this request (agent info). |
 | `List<string> AgentInfos { get; set; }` | property | One encoded agent-info string per agent (AdminResponse::AgentInfo(Vec<String>)). |
 
 <a id="nextgensoftware-holochain-holonet-client-agentpubkeydnahash"></a>
@@ -111,20 +91,15 @@ Inherits / implements: `HoloNETDataReceivedBaseEventArgs`
 
 | Member | Kind | Description |
 |---|---|---|
-| `string AgentPubKey { get; set; }` | property |  |
-| `string DnaHash { get; set; }` | property |  |
+| `string AgentPubKey { get; set; }` | property | The agent public key (HoloHash string) this applies to. |
+| `string DnaHash { get; set; }` | property | The DNA hash (HoloHash string) this applies to. |
 
 <a id="nextgensoftware-holochain-holonet-client-holonetclientadmin-agentpubkeygeneratedcallback"></a>
 ### HoloNETClientAdmin.AgentPubKeyGeneratedCallBack (delegate)
 
 Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
-| Member | Kind | Description |
-|---|---|---|
-| `HoloNETClientAdmin.AgentPubKeyGeneratedCallBack(object object, IntPtr method)` | ctor |  |
-| `IAsyncResult BeginInvoke(object sender, AgentPubKeyGeneratedCallBackEventArgs e, AsyncCallback callback, object object)` | method |  |
-| `void EndInvoke(IAsyncResult result)` | method |  |
-| `void Invoke(object sender, AgentPubKeyGeneratedCallBackEventArgs e)` | method |  |
+Handler signature: `void AgentPubKeyGeneratedCallBack(object sender, AgentPubKeyGeneratedCallBackEventArgs e)` (the type of the `OnAgentPubKeyGeneratedCallBack` event).
 
 <a id="nextgensoftware-holochain-holonet-client-agentpubkeygeneratedcallbackeventargs"></a>
 ### AgentPubKeyGeneratedCallBackEventArgs (class)
@@ -133,32 +108,22 @@ Inherits / implements: `HoloNETDataReceivedBaseEventArgs`
 
 | Member | Kind | Description |
 |---|---|---|
-| `string AgentPubKey { get; set; }` | property |  |
-| `IAppResponse AppResponse { get; set; }` | property |  |
+| `string AgentPubKey { get; set; }` | property | The agent public key (HoloHash string) this applies to. |
+| `IAppResponse AppResponse { get; set; }` | property | What the conductor returned for this request (app response). |
 
 <a id="nextgensoftware-holochain-holonet-client-holonetclientappbase-appagentinforeturnedcallback"></a>
 ### HoloNETClientAppBase.AppAgentInfoReturnedCallBack (delegate)
 
 Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
-| Member | Kind | Description |
-|---|---|---|
-| `HoloNETClientAppBase.AppAgentInfoReturnedCallBack(object object, IntPtr method)` | ctor |  |
-| `IAsyncResult BeginInvoke(object sender, AgentInfoReturnedCallBackEventArgs e, AsyncCallback callback, object object)` | method |  |
-| `void EndInvoke(IAsyncResult result)` | method |  |
-| `void Invoke(object sender, AgentInfoReturnedCallBackEventArgs e)` | method |  |
+Handler signature: `void AppAgentInfoReturnedCallBack(object sender, AgentInfoReturnedCallBackEventArgs e)` (the type of the `OnAppAgentInfoReturnedCallBack` event).
 
 <a id="nextgensoftware-holochain-holonet-client-holonetclientadmin-appauthenticationtokenissuedcallback"></a>
 ### HoloNETClientAdmin.AppAuthenticationTokenIssuedCallBack (delegate)
 
 Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
-| Member | Kind | Description |
-|---|---|---|
-| `HoloNETClientAdmin.AppAuthenticationTokenIssuedCallBack(object object, IntPtr method)` | ctor |  |
-| `IAsyncResult BeginInvoke(object sender, AppAuthenticationTokenIssuedCallBackEventArgs e, AsyncCallback callback, object object)` | method |  |
-| `void EndInvoke(IAsyncResult result)` | method |  |
-| `void Invoke(object sender, AppAuthenticationTokenIssuedCallBackEventArgs e)` | method |  |
+Handler signature: `void AppAuthenticationTokenIssuedCallBack(object sender, AppAuthenticationTokenIssuedCallBackEventArgs e)` (the type of the `OnAppAuthenticationTokenIssuedCallBack` event).
 
 <a id="nextgensoftware-holochain-holonet-client-appauthenticationtokenissuedcallbackeventargs"></a>
 ### AppAuthenticationTokenIssuedCallBackEventArgs (class)
@@ -167,7 +132,7 @@ Inherits / implements: `HoloNETDataReceivedBaseEventArgs`
 
 | Member | Kind | Description |
 |---|---|---|
-| `AppAuthenticationTokenIssuedResponse TokenIssued { get; set; }` | property |  |
+| `AppAuthenticationTokenIssuedResponse TokenIssued { get; set; }` | property | What the conductor returned for this request (token issued). |
 
 <a id="nextgensoftware-holochain-holonet-client-appauthenticationtokenissuedresponse"></a>
 ### AppAuthenticationTokenIssuedResponse (class)
@@ -176,20 +141,15 @@ Mirrors holochain_conductor_api::admin_interface::AppAuthenticationTokenIssued (
 
 | Member | Kind | Description |
 |---|---|---|
-| `long? expires_at { get; set; }` | property |  |
-| `byte[] token { get; set; }` | property |  |
+| `long? expires_at { get; set; }` | property | Holochain's `expires_at` field (sent to / received from the conductor as-is). |
+| `byte[] token { get; set; }` | property | Holochain's `token` field (sent to / received from the conductor as-is). |
 
 <a id="nextgensoftware-holochain-holonet-client-holonetclientadmin-appauthenticationtokenrevokedcallback"></a>
 ### HoloNETClientAdmin.AppAuthenticationTokenRevokedCallBack (delegate)
 
 Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
-| Member | Kind | Description |
-|---|---|---|
-| `HoloNETClientAdmin.AppAuthenticationTokenRevokedCallBack(object object, IntPtr method)` | ctor |  |
-| `IAsyncResult BeginInvoke(object sender, AppAuthenticationTokenRevokedCallBackEventArgs e, AsyncCallback callback, object object)` | method |  |
-| `void EndInvoke(IAsyncResult result)` | method |  |
-| `void Invoke(object sender, AppAuthenticationTokenRevokedCallBackEventArgs e)` | method |  |
+Handler signature: `void AppAuthenticationTokenRevokedCallBack(object sender, AppAuthenticationTokenRevokedCallBackEventArgs e)` (the type of the `OnAppAuthenticationTokenRevokedCallBack` event).
 
 <a id="nextgensoftware-holochain-holonet-client-appauthenticationtokenrevokedcallbackeventargs"></a>
 ### AppAuthenticationTokenRevokedCallBackEventArgs (class)
@@ -203,20 +163,15 @@ Mirrors holochain_conductor_api::admin_interface::AdminResponse::CompatibleCells
 
 | Member | Kind | Description |
 |---|---|---|
-| `List<CellId> cell_ids { get; set; }` | property |  |
-| `string installed_app_id { get; set; }` | property |  |
+| `List<CellId> cell_ids { get; set; }` | property | Holochain's `cell_ids` field (sent to / received from the conductor as-is). |
+| `string installed_app_id { get; set; }` | property | Holochain's `installed_app_id` field (sent to / received from the conductor as-is). |
 
 <a id="nextgensoftware-holochain-holonet-client-holonetclientadmin-appdisabledcallback"></a>
 ### HoloNETClientAdmin.AppDisabledCallBack (delegate)
 
 Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
-| Member | Kind | Description |
-|---|---|---|
-| `HoloNETClientAdmin.AppDisabledCallBack(object object, IntPtr method)` | ctor |  |
-| `IAsyncResult BeginInvoke(object sender, AppDisabledCallBackEventArgs e, AsyncCallback callback, object object)` | method |  |
-| `void EndInvoke(IAsyncResult result)` | method |  |
-| `void Invoke(object sender, AppDisabledCallBackEventArgs e)` | method |  |
+Handler signature: `void AppDisabledCallBack(object sender, AppDisabledCallBackEventArgs e)` (the type of the `OnAppDisabledCallBack` event).
 
 <a id="nextgensoftware-holochain-holonet-client-appdisabledcallbackeventargs"></a>
 ### AppDisabledCallBackEventArgs (class)
@@ -225,19 +180,14 @@ Inherits / implements: `HoloNETDataReceivedBaseEventArgs`
 
 | Member | Kind | Description |
 |---|---|---|
-| `string InstalledAppId { get; set; }` | property |  |
+| `string InstalledAppId { get; set; }` | property | The installed app id. |
 
 <a id="nextgensoftware-holochain-holonet-client-holonetclientadmin-appenabledcallback"></a>
 ### HoloNETClientAdmin.AppEnabledCallBack (delegate)
 
 Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
-| Member | Kind | Description |
-|---|---|---|
-| `HoloNETClientAdmin.AppEnabledCallBack(object object, IntPtr method)` | ctor |  |
-| `IAsyncResult BeginInvoke(object sender, AppEnabledCallBackEventArgs e, AsyncCallback callback, object object)` | method |  |
-| `void EndInvoke(IAsyncResult result)` | method |  |
-| `void Invoke(object sender, AppEnabledCallBackEventArgs e)` | method |  |
+Handler signature: `void AppEnabledCallBack(object sender, AppEnabledCallBackEventArgs e)` (the type of the `OnAppEnabledCallBack` event).
 
 <a id="nextgensoftware-holochain-holonet-client-appenabledcallbackeventargs"></a>
 ### AppEnabledCallBackEventArgs (class)
@@ -246,19 +196,14 @@ Inherits / implements: `AppInfoCallBackEventArgs`
 
 | Member | Kind | Description |
 |---|---|---|
-| `List<EnableAppError> Errors { get; set; }` | property |  |
+| `List<EnableAppError> Errors { get; set; }` | property | What the conductor returned for this request (errors). |
 
 <a id="nextgensoftware-holochain-holonet-client-holonetclientappbase-appenabledviaappinterfacecallback"></a>
 ### HoloNETClientAppBase.AppEnabledViaAppInterfaceCallBack (delegate)
 
 Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
-| Member | Kind | Description |
-|---|---|---|
-| `HoloNETClientAppBase.AppEnabledViaAppInterfaceCallBack(object object, IntPtr method)` | ctor |  |
-| `IAsyncResult BeginInvoke(object sender, AppEnabledViaAppInterfaceCallBackEventArgs e, AsyncCallback callback, object object)` | method |  |
-| `void EndInvoke(IAsyncResult result)` | method |  |
-| `void Invoke(object sender, AppEnabledViaAppInterfaceCallBackEventArgs e)` | method |  |
+Handler signature: `void AppEnabledViaAppInterfaceCallBack(object sender, AppEnabledViaAppInterfaceCallBackEventArgs e)` (the type of the `OnAppEnabledViaAppInterfaceCallBack` event).
 
 <a id="nextgensoftware-holochain-holonet-client-appenabledviaappinterfacecallbackeventargs"></a>
 ### AppEnabledViaAppInterfaceCallBackEventArgs (class)
@@ -274,28 +219,23 @@ Inherits / implements: `IAppInfo`
 
 | Member | Kind | Description |
 |---|---|---|
-| `byte[] agent_pub_key { get; set; }` | property |  |
-| `string AgentPubKey { get; set; }` | property |  |
-| `AppInfoStatusEnum AppStatus { get; }` | property |  |
-| `string AppStatusReason { get; }` | property |  |
-| `Dictionary<string, List<CellInfo>> cell_info { get; set; }` | property |  |
-| `byte[][] CellId { get; set; }` | property |  |
-| `string DnaHash { get; set; }` | property |  |
-| `string installed_app_id { get; set; }` | property |  |
-| `AppManifest manifest { get; set; }` | property |  |
-| `Dictionary<string, object> status { get; set; }` | property |  |
+| `byte[] agent_pub_key { get; set; }` | property | Holochain's `agent_pub_key` field (sent to / received from the conductor as-is). |
+| `string AgentPubKey { get; set; }` | property | The agent public key (HoloHash string) this applies to. |
+| `AppInfoStatusEnum AppStatus { get; }` | property | The app's status as the conductor reports it (enabled, disabled, paused...). |
+| `string AppStatusReason { get; }` | property | Why the app is disabled or paused, if it is. |
+| `Dictionary<string, List<CellInfo>> cell_info { get; set; }` | property | Holochain's `cell_info` field (sent to / received from the conductor as-is). |
+| `byte[][] CellId { get; set; }` | property | The cell id: [DNA hash, agent public key] as raw bytes. |
+| `string DnaHash { get; set; }` | property | The DNA hash (HoloHash string) this applies to. |
+| `string installed_app_id { get; set; }` | property | Holochain's `installed_app_id` field (sent to / received from the conductor as-is). |
+| `AppManifest manifest { get; set; }` | property | Holochain's `manifest` field (sent to / received from the conductor as-is). |
+| `Dictionary<string, object> status { get; set; }` | property | Holochain's `status` field (sent to / received from the conductor as-is). |
 
 <a id="nextgensoftware-holochain-holonet-client-holonetclientappbase-appinfocallback"></a>
 ### HoloNETClientAppBase.AppInfoCallBack (delegate)
 
 Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
-| Member | Kind | Description |
-|---|---|---|
-| `HoloNETClientAppBase.AppInfoCallBack(object object, IntPtr method)` | ctor |  |
-| `IAsyncResult BeginInvoke(object sender, AppInfoCallBackEventArgs e, AsyncCallback callback, object object)` | method |  |
-| `void EndInvoke(IAsyncResult result)` | method |  |
-| `void Invoke(object sender, AppInfoCallBackEventArgs e)` | method |  |
+Handler signature: `void AppInfoCallBack(object sender, AppInfoCallBackEventArgs e)` (the type of the `OnAppInfoCallBack` event).
 
 <a id="nextgensoftware-holochain-holonet-client-appinfocallbackeventargs"></a>
 ### AppInfoCallBackEventArgs (class)
@@ -304,22 +244,22 @@ Inherits / implements: `HoloNETDataReceivedBaseEventArgs`
 
 | Member | Kind | Description |
 |---|---|---|
-| `string AgentPubKey { get; set; }` | property |  |
-| `IAppInfoResponse AppInfoResponse { get; set; }` | property |  |
-| `IAppManifest AppManifest { get; set; }` | property |  |
-| `AppInfoStatusEnum AppStatus { get; set; }` | property |  |
-| `string AppStatusReason { get; set; }` | property |  |
-| `byte[][] CellId { get; set; }` | property |  |
-| `CellInfoType CellType { get; set; }` | property |  |
-| `string DnaHash { get; set; }` | property |  |
-| `string InstalledAppId { get; set; }` | property |  |
+| `string AgentPubKey { get; set; }` | property | The agent public key (HoloHash string) this applies to. |
+| `IAppInfoResponse AppInfoResponse { get; set; }` | property | The conductor's raw app_info response. |
+| `IAppManifest AppManifest { get; set; }` | property | The app's manifest (its roles and DNAs). |
+| `AppInfoStatusEnum AppStatus { get; set; }` | property | The app's status as the conductor reports it (enabled, disabled, paused...). |
+| `string AppStatusReason { get; set; }` | property | Why the app is disabled or paused, if it is. |
+| `byte[][] CellId { get; set; }` | property | The cell id: [DNA hash, agent public key] as raw bytes. |
+| `CellInfoType CellType { get; set; }` | property | The kind of cell (provisioned, cloned or stem). |
+| `string DnaHash { get; set; }` | property | The DNA hash (HoloHash string) this applies to. |
+| `string InstalledAppId { get; set; }` | property | The installed app id. |
 
 <a id="nextgensoftware-holochain-holonet-client-appinforequest"></a>
 ### AppInfoRequest (class)
 
 | Member | Kind | Description |
 |---|---|---|
-| `string installed_app_id { get; set; }` | property |  |
+| `string installed_app_id { get; set; }` | property | Holochain's `installed_app_id` field (sent to / received from the conductor as-is). |
 
 <a id="nextgensoftware-holochain-holonet-client-appinforesponse"></a>
 ### AppInfoResponse (class)
@@ -328,8 +268,8 @@ Inherits / implements: `IAppInfoResponse`
 
 | Member | Kind | Description |
 |---|---|---|
-| `AppInfo data { get; set; }` | property |  |
-| `string type { get; set; }` | property |  |
+| `AppInfo data { get; set; }` | property | Holochain's `data` field (sent to / received from the conductor as-is). |
+| `string type { get; set; }` | property | Holochain's `type` field (sent to / received from the conductor as-is). |
 
 <a id="nextgensoftware-holochain-holonet-client-appinfostatusenum"></a>
 ### AppInfoStatusEnum (enum)
@@ -349,12 +289,7 @@ Inherits / implements: `IAppInfoResponse`
 
 Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
-| Member | Kind | Description |
-|---|---|---|
-| `HoloNETClientAdmin.AppInstalledCallBack(object object, IntPtr method)` | ctor |  |
-| `IAsyncResult BeginInvoke(object sender, AppInstalledCallBackEventArgs e, AsyncCallback callback, object object)` | method |  |
-| `void EndInvoke(IAsyncResult result)` | method |  |
-| `void Invoke(object sender, AppInstalledCallBackEventArgs e)` | method |  |
+Handler signature: `void AppInstalledCallBack(object sender, AppInstalledCallBackEventArgs e)` (the type of the `OnAppInstalledCallBack` event).
 
 <a id="nextgensoftware-holochain-holonet-client-appinstalledcallbackeventargs"></a>
 ### AppInstalledCallBackEventArgs (class)
@@ -366,12 +301,7 @@ Inherits / implements: `AppInfoCallBackEventArgs`
 
 Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
-| Member | Kind | Description |
-|---|---|---|
-| `HoloNETClientAdmin.AppInterfaceAttachedCallBack(object object, IntPtr method)` | ctor |  |
-| `IAsyncResult BeginInvoke(object sender, AppInterfaceAttachedCallBackEventArgs e, AsyncCallback callback, object object)` | method |  |
-| `void EndInvoke(IAsyncResult result)` | method |  |
-| `void Invoke(object sender, AppInterfaceAttachedCallBackEventArgs e)` | method |  |
+Handler signature: `void AppInterfaceAttachedCallBack(object sender, AppInterfaceAttachedCallBackEventArgs e)` (the type of the `OnAppInterfaceAttachedCallBack` event).
 
 <a id="nextgensoftware-holochain-holonet-client-appinterfaceattachedcallbackeventargs"></a>
 ### AppInterfaceAttachedCallBackEventArgs (class)
@@ -380,7 +310,7 @@ Inherits / implements: `HoloNETDataReceivedBaseEventArgs`
 
 | Member | Kind | Description |
 |---|---|---|
-| `ushort? Port { get; set; }` | property |  |
+| `ushort? Port { get; set; }` | property | What the conductor returned for this request (port). |
 
 <a id="nextgensoftware-holochain-holonet-client-appinterfaceinfo"></a>
 ### AppInterfaceInfo (class)
@@ -391,19 +321,14 @@ One entry of list_app_interfaces (Holochain 0.7.0 `AppInterfaceInfo`).
 |---|---|---|
 | `string AllowedOrigins { get; set; }` | property | "*" for any origin, otherwise a comma-separated list. |
 | `string InstalledAppId { get; set; }` | property | Set when the interface is bound to one installed app. |
-| `ushort Port { get; set; }` | property |  |
+| `ushort Port { get; set; }` | property | The app interface's WebSocket port. |
 
 <a id="nextgensoftware-holochain-holonet-client-holonetclientadmin-appinterfaceslistedcallback"></a>
 ### HoloNETClientAdmin.AppInterfacesListedCallBack (delegate)
 
 Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
-| Member | Kind | Description |
-|---|---|---|
-| `HoloNETClientAdmin.AppInterfacesListedCallBack(object object, IntPtr method)` | ctor |  |
-| `IAsyncResult BeginInvoke(object sender, AppInterfacesListedCallBackEventArgs e, AsyncCallback callback, object object)` | method |  |
-| `void EndInvoke(IAsyncResult result)` | method |  |
-| `void Invoke(object sender, AppInterfacesListedCallBackEventArgs e)` | method |  |
+Handler signature: `void AppInterfacesListedCallBack(object sender, AppInterfacesListedCallBackEventArgs e)` (the type of the `OnAppInterfacesListedCallBack` event).
 
 <a id="nextgensoftware-holochain-holonet-client-appinterfaceslistedcallbackeventargs"></a>
 ### AppInterfacesListedCallBackEventArgs (class)
@@ -413,43 +338,28 @@ Inherits / implements: `HoloNETDataReceivedBaseEventArgs`
 | Member | Kind | Description |
 |---|---|---|
 | `List<AppInterfaceInfo> AppInterfaces { get; set; }` | property | Each app interface as Holochain 0.7.0 reports it (port, allowed origins, optional app binding). |
-| `List<ushort> WebSocketPorts { get; set; }` | property |  |
+| `List<ushort> WebSocketPorts { get; set; }` | property | What the conductor returned for this request (web socket ports). |
 
 <a id="nextgensoftware-holochain-holonet-client-holonetclientappbase-appnetworkmetricsdumpedcallback"></a>
 ### HoloNETClientAppBase.AppNetworkMetricsDumpedCallBack (delegate)
 
 Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
-| Member | Kind | Description |
-|---|---|---|
-| `HoloNETClientAppBase.AppNetworkMetricsDumpedCallBack(object object, IntPtr method)` | ctor |  |
-| `IAsyncResult BeginInvoke(object sender, NetworkMetricsDumpedCallBackEventArgs e, AsyncCallback callback, object object)` | method |  |
-| `void EndInvoke(IAsyncResult result)` | method |  |
-| `void Invoke(object sender, NetworkMetricsDumpedCallBackEventArgs e)` | method |  |
+Handler signature: `void AppNetworkMetricsDumpedCallBack(object sender, NetworkMetricsDumpedCallBackEventArgs e)` (the type of the `OnAppNetworkMetricsDumpedCallBack` event).
 
 <a id="nextgensoftware-holochain-holonet-client-holonetclientappbase-appnetworkstatsdumpedcallback"></a>
 ### HoloNETClientAppBase.AppNetworkStatsDumpedCallBack (delegate)
 
 Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
-| Member | Kind | Description |
-|---|---|---|
-| `HoloNETClientAppBase.AppNetworkStatsDumpedCallBack(object object, IntPtr method)` | ctor |  |
-| `IAsyncResult BeginInvoke(object sender, NetworkStatsDumpedCallBackEventArgs e, AsyncCallback callback, object object)` | method |  |
-| `void EndInvoke(IAsyncResult result)` | method |  |
-| `void Invoke(object sender, NetworkStatsDumpedCallBackEventArgs e)` | method |  |
+Handler signature: `void AppNetworkStatsDumpedCallBack(object sender, NetworkStatsDumpedCallBackEventArgs e)` (the type of the `OnAppNetworkStatsDumpedCallBack` event).
 
 <a id="nextgensoftware-holochain-holonet-client-holonetclientappbase-appoptimingsdumpedcallback"></a>
 ### HoloNETClientAppBase.AppOpTimingsDumpedCallBack (delegate)
 
 Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
-| Member | Kind | Description |
-|---|---|---|
-| `HoloNETClientAppBase.AppOpTimingsDumpedCallBack(object object, IntPtr method)` | ctor |  |
-| `IAsyncResult BeginInvoke(object sender, AppOpTimingsDumpedCallBackEventArgs e, AsyncCallback callback, object object)` | method |  |
-| `void EndInvoke(IAsyncResult result)` | method |  |
-| `void Invoke(object sender, AppOpTimingsDumpedCallBackEventArgs e)` | method |  |
+Handler signature: `void AppOpTimingsDumpedCallBack(object sender, AppOpTimingsDumpedCallBackEventArgs e)` (the type of the `OnAppOpTimingsDumpedCallBack` event).
 
 <a id="nextgensoftware-holochain-holonet-client-appoptimingsdumpedcallbackeventargs"></a>
 ### AppOpTimingsDumpedCallBackEventArgs (class)
@@ -458,19 +368,14 @@ Inherits / implements: `HoloNETDataReceivedBaseEventArgs`
 
 | Member | Kind | Description |
 |---|---|---|
-| `OpTimingsDump OpTimingsDump { get; set; }` | property |  |
+| `OpTimingsDump OpTimingsDump { get; set; }` | property | What the conductor returned for this request (op timings dump). |
 
 <a id="nextgensoftware-holochain-holonet-client-holonetclientappbase-apppeermetainforeturnedcallback"></a>
 ### HoloNETClientAppBase.AppPeerMetaInfoReturnedCallBack (delegate)
 
 Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
-| Member | Kind | Description |
-|---|---|---|
-| `HoloNETClientAppBase.AppPeerMetaInfoReturnedCallBack(object object, IntPtr method)` | ctor |  |
-| `IAsyncResult BeginInvoke(object sender, AppPeerMetaInfoReturnedCallBackEventArgs e, AsyncCallback callback, object object)` | method |  |
-| `void EndInvoke(IAsyncResult result)` | method |  |
-| `void Invoke(object sender, AppPeerMetaInfoReturnedCallBackEventArgs e)` | method |  |
+Handler signature: `void AppPeerMetaInfoReturnedCallBack(object sender, AppPeerMetaInfoReturnedCallBackEventArgs e)` (the type of the `OnAppPeerMetaInfoReturnedCallBack` event).
 
 <a id="nextgensoftware-holochain-holonet-client-apppeermetainforeturnedcallbackeventargs"></a>
 ### AppPeerMetaInfoReturnedCallBackEventArgs (class)
@@ -479,7 +384,7 @@ Inherits / implements: `HoloNETDataReceivedBaseEventArgs`
 
 | Member | Kind | Description |
 |---|---|---|
-| `PeerMetaInfoResponse PeerMetaInfo { get; set; }` | property |  |
+| `PeerMetaInfoResponse PeerMetaInfo { get; set; }` | property | What the conductor returned for this request (peer meta info). |
 
 <a id="nextgensoftware-holochain-holonet-client-appresponse"></a>
 ### AppResponse (class)
@@ -488,20 +393,15 @@ Inherits / implements: `IAppResponse`
 
 | Member | Kind | Description |
 |---|---|---|
-| `object data { get; set; }` | property |  |
-| `string type { get; set; }` | property |  |
+| `object data { get; set; }` | property | Holochain's `data` field (sent to / received from the conductor as-is). |
+| `string type { get; set; }` | property | Holochain's `type` field (sent to / received from the conductor as-is). |
 
 <a id="nextgensoftware-holochain-holonet-client-holonetclientadmin-appslistedcallback"></a>
 ### HoloNETClientAdmin.AppsListedCallBack (delegate)
 
 Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
-| Member | Kind | Description |
-|---|---|---|
-| `HoloNETClientAdmin.AppsListedCallBack(object object, IntPtr method)` | ctor |  |
-| `IAsyncResult BeginInvoke(object sender, AppsListedCallBackEventArgs e, AsyncCallback callback, object object)` | method |  |
-| `void EndInvoke(IAsyncResult result)` | method |  |
-| `void Invoke(object sender, AppsListedCallBackEventArgs e)` | method |  |
+Handler signature: `void AppsListedCallBack(object sender, AppsListedCallBackEventArgs e)` (the type of the `OnAppsListedCallBack` event).
 
 <a id="nextgensoftware-holochain-holonet-client-appslistedcallbackeventargs"></a>
 ### AppsListedCallBackEventArgs (class)
@@ -510,7 +410,7 @@ Inherits / implements: `HoloNETDataReceivedBaseEventArgs`
 
 | Member | Kind | Description |
 |---|---|---|
-| `List<IAppInfo> Apps { get; set; }` | property |  |
+| `List<IAppInfo> Apps { get; set; }` | property | What the conductor returned for this request (apps). |
 
 <a id="nextgensoftware-holochain-holonet-client-appstatusfilter"></a>
 ### AppStatusFilter (enum)
@@ -541,12 +441,7 @@ Mirrors holochain_conductor_api::AppStatusFilter (Holochain 0.7.0): Enabled, Dis
 
 Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
-| Member | Kind | Description |
-|---|---|---|
-| `HoloNETClientAdmin.AppUninstalledCallBack(object object, IntPtr method)` | ctor |  |
-| `IAsyncResult BeginInvoke(object sender, AppUninstalledCallBackEventArgs e, AsyncCallback callback, object object)` | method |  |
-| `void EndInvoke(IAsyncResult result)` | method |  |
-| `void Invoke(object sender, AppUninstalledCallBackEventArgs e)` | method |  |
+Handler signature: `void AppUninstalledCallBack(object sender, AppUninstalledCallBackEventArgs e)` (the type of the `OnAppUninstalledCallBack` event).
 
 <a id="nextgensoftware-holochain-holonet-client-appuninstalledcallbackeventargs"></a>
 ### AppUninstalledCallBackEventArgs (class)
@@ -555,14 +450,14 @@ Inherits / implements: `HoloNETDataReceivedBaseEventArgs`
 
 | Member | Kind | Description |
 |---|---|---|
-| `string InstalledAppId { get; set; }` | property |  |
+| `string InstalledAppId { get; set; }` | property | The installed app id. |
 
 <a id="nextgensoftware-holochain-holonet-client-attachappinterfaceresponse"></a>
 ### AttachAppInterfaceResponse (class)
 
 | Member | Kind | Description |
 |---|---|---|
-| `ushort port { get; set; }` | property |  |
+| `ushort port { get; set; }` | property | Holochain's `port` field (sent to / received from the conductor as-is). |
 
 <a id="nextgensoftware-holochain-holonet-client-bytearrayasintarrayformatter"></a>
 ### ByteArrayAsIntArrayFormatter (class)
@@ -573,8 +468,8 @@ Inherits / implements: `IMessagePackFormatter<byte[]>`, `IMessagePackFormatter`
 
 | Member | Kind | Description |
 |---|---|---|
-| `byte[] Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options)` | method |  |
-| `void Serialize(ref MessagePackWriter writer, byte[] value, MessagePackSerializerOptions options)` | method |  |
+| `byte[] Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options)` | method | MessagePack formatter plumbing used by HoloNET's serialiser (you don't call this). |
+| `void Serialize(ref MessagePackWriter writer, byte[] value, MessagePackSerializerOptions options)` | method | MessagePack formatter plumbing used by HoloNET's serialiser (you don't call this). |
 
 <a id="nextgensoftware-holochain-holonet-client-cacheconfig"></a>
 ### CacheConfig (class)
@@ -606,7 +501,7 @@ Per-call options for CallZomeFunctionAsync. NOTE: Unlike the other classes in th
 
 | Member | Kind | Description |
 |---|---|---|
-| `CallZomeOptions Default { get; } (static)` | property |  |
+| `CallZomeOptions Default { get; } (static)` | property | The default zome call options. |
 | `int? TimeoutSeconds { get; set; }` | property | Per-call override for how long (in seconds) HoloNET should wait for a response to this zome call before timing out. If null, falls back to HoloNETDNA.NetworkConfig.RequestTimeoutS (see NetworkConfig). |
 
 <a id="nextgensoftware-holochain-holonet-client-holonetclientadmin-capabilitygrantslistedcallback"></a>
@@ -614,12 +509,7 @@ Per-call options for CallZomeFunctionAsync. NOTE: Unlike the other classes in th
 
 Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
-| Member | Kind | Description |
-|---|---|---|
-| `HoloNETClientAdmin.CapabilityGrantsListedCallBack(object object, IntPtr method)` | ctor |  |
-| `IAsyncResult BeginInvoke(object sender, CapabilityGrantsListedCallBackEventArgs e, AsyncCallback callback, object object)` | method |  |
-| `void EndInvoke(IAsyncResult result)` | method |  |
-| `void Invoke(object sender, CapabilityGrantsListedCallBackEventArgs e)` | method |  |
+Handler signature: `void CapabilityGrantsListedCallBack(object sender, CapabilityGrantsListedCallBackEventArgs e)` (the type of the `OnCapabilityGrantsListedCallBack` event).
 
 <a id="nextgensoftware-holochain-holonet-client-capabilitygrantslistedcallbackeventargs"></a>
 ### CapabilityGrantsListedCallBackEventArgs (class)
@@ -628,7 +518,7 @@ Inherits / implements: `HoloNETDataReceivedBaseEventArgs`
 
 | Member | Kind | Description |
 |---|---|---|
-| `List<CellCapGrantInfo> CapGrants { get; set; }` | property |  |
+| `List<CellCapGrantInfo> CapGrants { get; set; }` | property | What the conductor returned for this request (cap grants). |
 
 <a id="nextgensoftware-holochain-holonet-client-capaccessinfo"></a>
 ### CapAccessInfo (class)
@@ -637,8 +527,8 @@ Mirrors holochain_zome_types::capability::CapAccessInfo (Holochain 0.7.0) — th
 
 | Member | Kind | Description |
 |---|---|---|
-| `string access_type { get; set; }` | property |  |
-| `byte[][] assignees { get; set; }` | property |  |
+| `string access_type { get; set; }` | property | Holochain's `access_type` field (sent to / received from the conductor as-is). |
+| `byte[][] assignees { get; set; }` | property | Holochain's `assignees` field (sent to / received from the conductor as-is). |
 
 <a id="nextgensoftware-holochain-holonet-client-capgrantaccesstype"></a>
 ### CapGrantAccessType (enum)
@@ -656,10 +546,10 @@ Mirrors holochain_zome_types::capability::CapGrantInfo (Holochain 0.7.0): pub st
 
 | Member | Kind | Description |
 |---|---|---|
-| `byte[] action_hash { get; set; }` | property |  |
-| `DesensitizedZomeCallCapGrant cap_grant { get; set; }` | property |  |
-| `long created_at { get; set; }` | property |  |
-| `long? revoked_at { get; set; }` | property |  |
+| `byte[] action_hash { get; set; }` | property | Holochain's `action_hash` field (sent to / received from the conductor as-is). |
+| `DesensitizedZomeCallCapGrant cap_grant { get; set; }` | property | Holochain's `cap_grant` field (sent to / received from the conductor as-is). |
+| `long created_at { get; set; }` | property | Holochain's `created_at` field (sent to / received from the conductor as-is). |
+| `long? revoked_at { get; set; }` | property | Holochain's `revoked_at` field (sent to / received from the conductor as-is). |
 
 <a id="nextgensoftware-holochain-holonet-client-cellcapgrantinfo"></a>
 ### CellCapGrantInfo (class)
@@ -668,8 +558,8 @@ Mirrors holochain_conductor_api::AppCapGrantInfo (Holochain 0.7.0), a tuple stru
 
 | Member | Kind | Description |
 |---|---|---|
-| `CapGrantInfo[] cap_grants { get; set; }` | property |  |
-| `CellId cell_id { get; set; }` | property |  |
+| `CapGrantInfo[] cap_grants { get; set; }` | property | Holochain's `cap_grants` field (sent to / received from the conductor as-is). |
+| `CellId cell_id { get; set; }` | property | Holochain's `cell_id` field (sent to / received from the conductor as-is). |
 
 <a id="nextgensoftware-holochain-holonet-client-cellid"></a>
 ### CellId (class)
@@ -678,21 +568,16 @@ Mirrors the Rust holochain_zome_types::cell::CellId tuple struct (Holochain 0.7.
 
 | Member | Kind | Description |
 |---|---|---|
-| `CellId(byte[] dnaHash, byte[] agentPubKey)` | ctor |  |
-| `byte[] agent_pub_key { get; set; }` | property |  |
-| `byte[] dna_hash { get; set; }` | property |  |
+| `CellId(byte[] dnaHash, byte[] agentPubKey)` | ctor | A cell id from its DNA hash and agent public key. |
+| `byte[] agent_pub_key { get; set; }` | property | Holochain's `agent_pub_key` field (sent to / received from the conductor as-is). |
+| `byte[] dna_hash { get; set; }` | property | Holochain's `dna_hash` field (sent to / received from the conductor as-is). |
 
 <a id="nextgensoftware-holochain-holonet-client-holonetclientadmin-cellidslistedcallback"></a>
 ### HoloNETClientAdmin.CellIdsListedCallBack (delegate)
 
 Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
-| Member | Kind | Description |
-|---|---|---|
-| `HoloNETClientAdmin.CellIdsListedCallBack(object object, IntPtr method)` | ctor |  |
-| `IAsyncResult BeginInvoke(object sender, CellIdsListedCallBackEventArgs e, AsyncCallback callback, object object)` | method |  |
-| `void EndInvoke(IAsyncResult result)` | method |  |
-| `void Invoke(object sender, CellIdsListedCallBackEventArgs e)` | method |  |
+Handler signature: `void CellIdsListedCallBack(object sender, CellIdsListedCallBackEventArgs e)` (the type of the `OnCellIdsListedCallBack` event).
 
 <a id="nextgensoftware-holochain-holonet-client-cellidslistedcallbackeventargs"></a>
 ### CellIdsListedCallBackEventArgs (class)
@@ -701,7 +586,7 @@ Inherits / implements: `HoloNETDataReceivedBaseEventArgs`
 
 | Member | Kind | Description |
 |---|---|---|
-| `List<byte[][]> CellIds { get; set; }` | property |  |
+| `List<byte[][]> CellIds { get; set; }` | property | What the conductor returned for this request (cell ids). |
 
 <a id="nextgensoftware-holochain-holonet-client-cellinfotype"></a>
 ### CellInfoType (enum)
@@ -718,12 +603,7 @@ Inherits / implements: `HoloNETDataReceivedBaseEventArgs`
 
 Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
-| Member | Kind | Description |
-|---|---|---|
-| `HoloNETClientAppBase.CloneCellCreatedCallBack(object object, IntPtr method)` | ctor |  |
-| `IAsyncResult BeginInvoke(object sender, CloneCellCreatedCallBackEventArgs e, AsyncCallback callback, object object)` | method |  |
-| `void EndInvoke(IAsyncResult result)` | method |  |
-| `void Invoke(object sender, CloneCellCreatedCallBackEventArgs e)` | method |  |
+Handler signature: `void CloneCellCreatedCallBack(object sender, CloneCellCreatedCallBackEventArgs e)` (the type of the `OnCloneCellCreatedCallBack` event).
 
 <a id="nextgensoftware-holochain-holonet-client-clonecellcreatedcallbackeventargs"></a>
 ### CloneCellCreatedCallBackEventArgs (class)
@@ -732,19 +612,14 @@ Inherits / implements: `HoloNETDataReceivedBaseEventArgs`
 
 | Member | Kind | Description |
 |---|---|---|
-| `ClonedCellResponse ClonedCell { get; set; }` | property |  |
+| `ClonedCellResponse ClonedCell { get; set; }` | property | What the conductor returned for this request (cloned cell). |
 
 <a id="nextgensoftware-holochain-holonet-client-holonetclientadmin-clonecelldeletedcallback"></a>
 ### HoloNETClientAdmin.CloneCellDeletedCallBack (delegate)
 
 Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
-| Member | Kind | Description |
-|---|---|---|
-| `HoloNETClientAdmin.CloneCellDeletedCallBack(object object, IntPtr method)` | ctor |  |
-| `IAsyncResult BeginInvoke(object sender, CloneCellDeletedCallBackEventArgs e, AsyncCallback callback, object object)` | method |  |
-| `void EndInvoke(IAsyncResult result)` | method |  |
-| `void Invoke(object sender, CloneCellDeletedCallBackEventArgs e)` | method |  |
+Handler signature: `void CloneCellDeletedCallBack(object sender, CloneCellDeletedCallBackEventArgs e)` (the type of the `OnCloneCellDeletedCallBack` event).
 
 <a id="nextgensoftware-holochain-holonet-client-clonecelldeletedcallbackeventargs"></a>
 ### CloneCellDeletedCallBackEventArgs (class)
@@ -756,12 +631,7 @@ Inherits / implements: `HoloNETDataReceivedBaseEventArgs`
 
 Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
-| Member | Kind | Description |
-|---|---|---|
-| `HoloNETClientAppBase.CloneCellDisabledCallBack(object object, IntPtr method)` | ctor |  |
-| `IAsyncResult BeginInvoke(object sender, CloneCellDisabledCallBackEventArgs e, AsyncCallback callback, object object)` | method |  |
-| `void EndInvoke(IAsyncResult result)` | method |  |
-| `void Invoke(object sender, CloneCellDisabledCallBackEventArgs e)` | method |  |
+Handler signature: `void CloneCellDisabledCallBack(object sender, CloneCellDisabledCallBackEventArgs e)` (the type of the `OnCloneCellDisabledCallBack` event).
 
 <a id="nextgensoftware-holochain-holonet-client-clonecelldisabledcallbackeventargs"></a>
 ### CloneCellDisabledCallBackEventArgs (class)
@@ -773,12 +643,7 @@ Inherits / implements: `HoloNETDataReceivedBaseEventArgs`
 
 Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
-| Member | Kind | Description |
-|---|---|---|
-| `HoloNETClientAppBase.CloneCellEnabledCallBack(object object, IntPtr method)` | ctor |  |
-| `IAsyncResult BeginInvoke(object sender, CloneCellEnabledCallBackEventArgs e, AsyncCallback callback, object object)` | method |  |
-| `void EndInvoke(IAsyncResult result)` | method |  |
-| `void Invoke(object sender, CloneCellEnabledCallBackEventArgs e)` | method |  |
+Handler signature: `void CloneCellEnabledCallBack(object sender, CloneCellEnabledCallBackEventArgs e)` (the type of the `OnCloneCellEnabledCallBack` event).
 
 <a id="nextgensoftware-holochain-holonet-client-clonecellenabledcallbackeventargs"></a>
 ### CloneCellEnabledCallBackEventArgs (class)
@@ -787,7 +652,7 @@ Inherits / implements: `HoloNETDataReceivedBaseEventArgs`
 
 | Member | Kind | Description |
 |---|---|---|
-| `ClonedCellResponse ClonedCell { get; set; }` | property |  |
+| `ClonedCellResponse ClonedCell { get; set; }` | property | What the conductor returned for this request (cloned cell). |
 
 <a id="nextgensoftware-holochain-holonet-client-clonecellid"></a>
 ### CloneCellId (static class)
@@ -796,8 +661,8 @@ Builds the wire form of holochain_zome_types::clone::CloneCellId (Holochain 0.7.
 
 | Member | Kind | Description |
 |---|---|---|
-| `static Dictionary<string, object> FromCloneId(string cloneId)` | method |  |
-| `static Dictionary<string, object> FromDnaHash(byte[] dnaHash)` | method |  |
+| `static Dictionary<string, object> FromCloneId(string cloneId)` | method | Identify a clone cell by its clone id (e.g. "oasis.0"). |
+| `static Dictionary<string, object> FromDnaHash(byte[] dnaHash)` | method | Identify a clone cell by its DNA hash. |
 | `static object Normalize(object cloneCellId)` | method | Accepts the legacy inputs callers already pass and returns the tagged wire form: string → clone_id; byte[] → dna_hash; byte[][] CellId → dna_hash of cellId[0] (0.7.0 has no CellId variant; a clone cell's DNA hash identifies it within the app). An already-built dictionary is passed through unchanged. |
 
 <a id="nextgensoftware-holochain-holonet-client-clonedcellresponse"></a>
@@ -807,24 +672,19 @@ Mirrors holochain_types::app::ClonedCell, returned by AppResponse::CloneCellCrea
 
 | Member | Kind | Description |
 |---|---|---|
-| `CellId cell_id { get; set; }` | property |  |
-| `string clone_id { get; set; }` | property |  |
-| `object dna_modifiers { get; set; }` | property |  |
-| `bool enabled { get; set; }` | property |  |
-| `string name { get; set; }` | property |  |
-| `byte[] original_dna_hash { get; set; }` | property |  |
+| `CellId cell_id { get; set; }` | property | Holochain's `cell_id` field (sent to / received from the conductor as-is). |
+| `string clone_id { get; set; }` | property | Holochain's `clone_id` field (sent to / received from the conductor as-is). |
+| `object dna_modifiers { get; set; }` | property | Holochain's `dna_modifiers` field (sent to / received from the conductor as-is). |
+| `bool enabled { get; set; }` | property | Holochain's `enabled` field (sent to / received from the conductor as-is). |
+| `string name { get; set; }` | property | Holochain's `name` field (sent to / received from the conductor as-is). |
+| `byte[] original_dna_hash { get; set; }` | property | Holochain's `original_dna_hash` field (sent to / received from the conductor as-is). |
 
 <a id="nextgensoftware-holochain-holonet-client-holonetclientadmin-compatiblecellsreturnedcallback"></a>
 ### HoloNETClientAdmin.CompatibleCellsReturnedCallBack (delegate)
 
 Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
-| Member | Kind | Description |
-|---|---|---|
-| `HoloNETClientAdmin.CompatibleCellsReturnedCallBack(object object, IntPtr method)` | ctor |  |
-| `IAsyncResult BeginInvoke(object sender, CompatibleCellsReturnedCallBackEventArgs e, AsyncCallback callback, object object)` | method |  |
-| `void EndInvoke(IAsyncResult result)` | method |  |
-| `void Invoke(object sender, CompatibleCellsReturnedCallBackEventArgs e)` | method |  |
+Handler signature: `void CompatibleCellsReturnedCallBack(object sender, CompatibleCellsReturnedCallBackEventArgs e)` (the type of the `OnCompatibleCellsReturnedCallBack` event).
 
 <a id="nextgensoftware-holochain-holonet-client-compatiblecellsreturnedcallbackeventargs"></a>
 ### CompatibleCellsReturnedCallBackEventArgs (class)
@@ -833,7 +693,7 @@ Inherits / implements: `HoloNETDataReceivedBaseEventArgs`
 
 | Member | Kind | Description |
 |---|---|---|
-| `List<AppCompatibleCells> CompatibleCells { get; set; }` | property |  |
+| `List<AppCompatibleCells> CompatibleCells { get; set; }` | property | What the conductor returned for this request (compatible cells). |
 
 <a id="nextgensoftware-holochain-holonet-client-conductordebugcallbackeventargs"></a>
 ### ConductorDebugCallBackEventArgs (class)
@@ -842,15 +702,15 @@ Inherits / implements: `CallBackBaseEventArgs`
 
 | Member | Kind | Description |
 |---|---|---|
-| `string EndPoint { get; set; }` | property |  |
-| `int NumberDelayedValidations { get; set; }` | property |  |
-| `int NumberHeldAspects { get; set; }` | property |  |
-| `int NumberHeldEntries { get; set; }` | property |  |
-| `int NumberPendingValidations { get; set; }` | property |  |
-| `int NumberRunningZomeCalls { get; set; }` | property |  |
-| `bool Offline { get; set; }` | property |  |
-| `string RawJSONData { get; set; }` | property |  |
-| `string Type { get; set; }` | property |  |
+| `string EndPoint { get; set; }` | property | The conductor WebSocket endpoint this came from. |
+| `int NumberDelayedValidations { get; set; }` | property | What the conductor returned for this request (number delayed validations). |
+| `int NumberHeldAspects { get; set; }` | property | What the conductor returned for this request (number held aspects). |
+| `int NumberHeldEntries { get; set; }` | property | What the conductor returned for this request (number held entries). |
+| `int NumberPendingValidations { get; set; }` | property | What the conductor returned for this request (number pending validations). |
+| `int NumberRunningZomeCalls { get; set; }` | property | What the conductor returned for this request (number running zome calls). |
+| `bool Offline { get; set; }` | property | What the conductor returned for this request (offline). |
+| `string RawJSONData { get; set; }` | property | The raw response, as JSON (for logging and debugging). |
+| `string Type { get; set; }` | property | The conductor message type. |
 | `WebSocketReceiveResult WebSocketResult { get; set; }` | property | Contains more detailed technical information of the underlying websocket. This includes the number of bytes received, whether the message was fully received & whether the message is UTF-8 or binary. Please see here for more info. |
 
 <a id="nextgensoftware-holochain-holonet-client-conductorresponsecallbackmode"></a>
@@ -866,12 +726,7 @@ Inherits / implements: `CallBackBaseEventArgs`
 
 Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
-| Member | Kind | Description |
-|---|---|---|
-| `HoloNETClientAdmin.ConductorStateDumpedCallBack(object object, IntPtr method)` | ctor |  |
-| `IAsyncResult BeginInvoke(object sender, ConductorStateDumpedCallBackEventArgs e, AsyncCallback callback, object object)` | method |  |
-| `void EndInvoke(IAsyncResult result)` | method |  |
-| `void Invoke(object sender, ConductorStateDumpedCallBackEventArgs e)` | method |  |
+Handler signature: `void ConductorStateDumpedCallBack(object sender, ConductorStateDumpedCallBackEventArgs e)` (the type of the `OnConductorStateDumpedCallBack` event).
 
 <a id="nextgensoftware-holochain-holonet-client-conductorstatedumpedcallbackeventargs"></a>
 ### ConductorStateDumpedCallBackEventArgs (class)
@@ -882,19 +737,14 @@ Inherits / implements: `HoloNETDataReceivedBaseEventArgs`
 
 | Member | Kind | Description |
 |---|---|---|
-| `string DumpedStateJSON { get; set; }` | property |  |
+| `string DumpedStateJSON { get; set; }` | property | What the conductor returned for this request (dumped state json). |
 
 <a id="nextgensoftware-holochain-holonet-client-holonetclientbase-connected"></a>
 ### HoloNETClientBase.Connected (delegate)
 
 Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
-| Member | Kind | Description |
-|---|---|---|
-| `HoloNETClientBase.Connected(object object, IntPtr method)` | ctor |  |
-| `IAsyncResult BeginInvoke(object sender, ConnectedEventArgs e, AsyncCallback callback, object object)` | method |  |
-| `void EndInvoke(IAsyncResult result)` | method |  |
-| `void Invoke(object sender, ConnectedEventArgs e)` | method |  |
+Handler signature: `void Connected(object sender, ConnectedEventArgs e)` (the type of the `OnConnected` event).
 
 <a id="nextgensoftware-holochain-holonet-client-connectedcallbackmode"></a>
 ### ConnectedCallBackMode (enum)
@@ -917,12 +767,7 @@ Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
 Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
-| Member | Kind | Description |
-|---|---|---|
-| `HoloNETClientAdmin.CoordinatorsUpdatedCallBack(object object, IntPtr method)` | ctor |  |
-| `IAsyncResult BeginInvoke(object sender, CoordinatorsUpdatedCallBackEventArgs e, AsyncCallback callback, object object)` | method |  |
-| `void EndInvoke(IAsyncResult result)` | method |  |
-| `void Invoke(object sender, CoordinatorsUpdatedCallBackEventArgs e)` | method |  |
+Handler signature: `void CoordinatorsUpdatedCallBack(object sender, CoordinatorsUpdatedCallBackEventArgs e)` (the type of the `OnCoordinatorsUpdatedCallBack` event).
 
 <a id="nextgensoftware-holochain-holonet-client-coordinatorsupdatedcallbackeventargs"></a>
 ### CoordinatorsUpdatedCallBackEventArgs (class)
@@ -936,19 +781,14 @@ Mirrors the payload of AppRequest::GetCountersigningSessionState, AppRequest::Ab
 
 | Member | Kind | Description |
 |---|---|---|
-| `CellId cell_id { get; set; }` | property |  |
+| `CellId cell_id { get; set; }` | property | Holochain's `cell_id` field (sent to / received from the conductor as-is). |
 
 <a id="nextgensoftware-holochain-holonet-client-holonetclientappbase-countersigningsessionabandonedcallback"></a>
 ### HoloNETClientAppBase.CountersigningSessionAbandonedCallBack (delegate)
 
 Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
-| Member | Kind | Description |
-|---|---|---|
-| `HoloNETClientAppBase.CountersigningSessionAbandonedCallBack(object object, IntPtr method)` | ctor |  |
-| `IAsyncResult BeginInvoke(object sender, CountersigningSessionAbandonedCallBackEventArgs e, AsyncCallback callback, object object)` | method |  |
-| `void EndInvoke(IAsyncResult result)` | method |  |
-| `void Invoke(object sender, CountersigningSessionAbandonedCallBackEventArgs e)` | method |  |
+Handler signature: `void CountersigningSessionAbandonedCallBack(object sender, CountersigningSessionAbandonedCallBackEventArgs e)` (the type of the `OnCountersigningSessionAbandonedCallBack` event).
 
 <a id="nextgensoftware-holochain-holonet-client-countersigningsessionabandonedcallbackeventargs"></a>
 ### CountersigningSessionAbandonedCallBackEventArgs (class)
@@ -962,19 +802,14 @@ Response payload for AppResponse::CountersigningSessionState, which wraps `Box<O
 
 | Member | Kind | Description |
 |---|---|---|
-| `object session_state { get; set; }` | property |  |
+| `object session_state { get; set; }` | property | Holochain's `session_state` field (sent to / received from the conductor as-is). |
 
 <a id="nextgensoftware-holochain-holonet-client-holonetclientappbase-countersigningsessionstatereturnedcallback"></a>
 ### HoloNETClientAppBase.CountersigningSessionStateReturnedCallBack (delegate)
 
 Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
-| Member | Kind | Description |
-|---|---|---|
-| `HoloNETClientAppBase.CountersigningSessionStateReturnedCallBack(object object, IntPtr method)` | ctor |  |
-| `IAsyncResult BeginInvoke(object sender, CountersigningSessionStateReturnedCallBackEventArgs e, AsyncCallback callback, object object)` | method |  |
-| `void EndInvoke(IAsyncResult result)` | method |  |
-| `void Invoke(object sender, CountersigningSessionStateReturnedCallBackEventArgs e)` | method |  |
+Handler signature: `void CountersigningSessionStateReturnedCallBack(object sender, CountersigningSessionStateReturnedCallBackEventArgs e)` (the type of the `OnCountersigningSessionStateReturnedCallBack` event).
 
 <a id="nextgensoftware-holochain-holonet-client-countersigningsessionstatereturnedcallbackeventargs"></a>
 ### CountersigningSessionStateReturnedCallBackEventArgs (class)
@@ -983,7 +818,7 @@ Inherits / implements: `HoloNETDataReceivedBaseEventArgs`
 
 | Member | Kind | Description |
 |---|---|---|
-| `CountersigningSessionStateResponse SessionState { get; set; }` | property |  |
+| `CountersigningSessionStateResponse SessionState { get; set; }` | property | What the conductor returned for this request (session state). |
 
 <a id="nextgensoftware-holochain-holonet-client-createclonecellrequest"></a>
 ### CreateCloneCellRequest (class)
@@ -992,34 +827,24 @@ Mirrors holochain_types::app::CreateCloneCellPayload, used as the payload for Ap
 
 | Member | Kind | Description |
 |---|---|---|
-| `byte[] membrane_proof { get; set; }` | property |  |
-| `object modifiers { get; set; }` | property |  |
-| `string name { get; set; }` | property |  |
-| `string role_name { get; set; }` | property |  |
+| `byte[] membrane_proof { get; set; }` | property | Holochain's `membrane_proof` field (sent to / received from the conductor as-is). |
+| `object modifiers { get; set; }` | property | Holochain's `modifiers` field (sent to / received from the conductor as-is). |
+| `string name { get; set; }` | property | Holochain's `name` field (sent to / received from the conductor as-is). |
+| `string role_name { get; set; }` | property | Holochain's `role_name` field (sent to / received from the conductor as-is). |
 
 <a id="nextgensoftware-holochain-holonet-client-holonetclientbase-datareceived"></a>
 ### HoloNETClientBase.DataReceived (delegate)
 
 Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
-| Member | Kind | Description |
-|---|---|---|
-| `HoloNETClientBase.DataReceived(object object, IntPtr method)` | ctor |  |
-| `IAsyncResult BeginInvoke(object sender, HoloNETDataReceivedEventArgs e, AsyncCallback callback, object object)` | method |  |
-| `void EndInvoke(IAsyncResult result)` | method |  |
-| `void Invoke(object sender, HoloNETDataReceivedEventArgs e)` | method |  |
+Handler signature: `void DataReceived(object sender, HoloNETDataReceivedEventArgs e)` (the type of the `OnDataReceived` event).
 
 <a id="nextgensoftware-holochain-holonet-client-holonetclientbase-datasent"></a>
 ### HoloNETClientBase.DataSent (delegate)
 
 Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
-| Member | Kind | Description |
-|---|---|---|
-| `HoloNETClientBase.DataSent(object object, IntPtr method)` | ctor |  |
-| `IAsyncResult BeginInvoke(object sender, HoloNETDataSentEventArgs e, AsyncCallback callback, object object)` | method |  |
-| `void EndInvoke(IAsyncResult result)` | method |  |
-| `void Invoke(object sender, HoloNETDataSentEventArgs e)` | method |  |
+Handler signature: `void DataSent(object sender, HoloNETDataSentEventArgs e)` (the type of the `OnDataSent` event).
 
 <a id="nextgensoftware-holochain-holonet-client-desensitizedzomecallcapgrant"></a>
 ### DesensitizedZomeCallCapGrant (class)
@@ -1028,21 +853,21 @@ Mirrors holochain_zome_types::capability::DesensitizedZomeCallCapGrant (Holochai
 
 | Member | Kind | Description |
 |---|---|---|
-| `CapAccessInfo access { get; set; }` | property |  |
+| `CapAccessInfo access { get; set; }` | property | Holochain's `access` field (sent to / received from the conductor as-is). |
 | `CapAccessInfo AccessInfo { get; }` | property | Access info on either version. |
 | `Dictionary<string, object> capability { get; set; }` | property | Holochain 0.7.1+: what the grant allows, adjacently tagged ("zome_call" or "direct_signal"). |
 | `string CapabilityType { get; }` | property | "zome_call" or "direct_signal" (0.7.1+); "zome_call" for 0.7.0 grants. |
 | `CapAccessInfo constraint { get; set; }` | property | Holochain 0.7.1+: who may use the grant (0.7.0 sends this as `access`). |
-| `Dictionary<string, object> functions { get; set; }` | property |  |
+| `Dictionary<string, object> functions { get; set; }` | property | Holochain's `functions` field (sent to / received from the conductor as-is). |
 | `Dictionary<string, object> Functions { get; }` | property | Granted functions on either version (null for a direct-signal grant). |
-| `string tag { get; set; }` | property |  |
+| `string tag { get; set; }` | property | Holochain's `tag` field (sent to / received from the conductor as-is). |
 
 <a id="nextgensoftware-holochain-holonet-client-dhtop"></a>
 ### DhtOp (class)
 
 | Member | Kind | Description |
 |---|---|---|
-| `ValueTuple<Signature, Action, RecordEntry> StoreRecord { get; set; }` | property |  |
+| `ValueTuple<Signature, Action, RecordEntry> StoreRecord { get; set; }` | property | A StoreRecord op: the signature, the action and the entry. |
 
 <a id="nextgensoftware-holochain-holonet-client-dhtopscursor"></a>
 ### DhtOpsCursor (class)
@@ -1059,24 +884,14 @@ Pagination cursor for dump_full_state (holochain_conductor_api::state_dump::DhtO
 
 Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
-| Member | Kind | Description |
-|---|---|---|
-| `HoloNETClientAdmin.DirectSignalCapabilityGrantedCallBack(object object, IntPtr method)` | ctor |  |
-| `IAsyncResult BeginInvoke(object sender, DirectSignalCapabilityGrantedCallBackEventArgs e, AsyncCallback callback, object object)` | method |  |
-| `void EndInvoke(IAsyncResult result)` | method |  |
-| `void Invoke(object sender, DirectSignalCapabilityGrantedCallBackEventArgs e)` | method |  |
+Handler signature: `void DirectSignalCapabilityGrantedCallBack(object sender, DirectSignalCapabilityGrantedCallBackEventArgs e)` (the type of the `OnDirectSignalCapabilityGrantedCallBack` event).
 
 <a id="nextgensoftware-holochain-holonet-client-holonetclientappbase-directsignalcapabilitygrantedcallback"></a>
 ### HoloNETClientAppBase.DirectSignalCapabilityGrantedCallBack (delegate)
 
 Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
-| Member | Kind | Description |
-|---|---|---|
-| `HoloNETClientAppBase.DirectSignalCapabilityGrantedCallBack(object object, IntPtr method)` | ctor |  |
-| `IAsyncResult BeginInvoke(object sender, DirectSignalCapabilityGrantedCallBackEventArgs e, AsyncCallback callback, object object)` | method |  |
-| `void EndInvoke(IAsyncResult result)` | method |  |
-| `void Invoke(object sender, DirectSignalCapabilityGrantedCallBackEventArgs e)` | method |  |
+Handler signature: `void DirectSignalCapabilityGrantedCallBack(object sender, DirectSignalCapabilityGrantedCallBackEventArgs e)` (the type of the `OnDirectSignalCapabilityGrantedCallBack` event).
 
 <a id="nextgensoftware-holochain-holonet-client-directsignalcapabilitygrantedcallbackeventargs"></a>
 ### DirectSignalCapabilityGrantedCallBackEventArgs (class)
@@ -1087,19 +902,14 @@ Inherits / implements: `HoloNETDataReceivedBaseEventArgs`
 
 | Member | Kind | Description |
 |---|---|---|
-| `byte[] ActionHash { get; set; }` | property |  |
+| `byte[] ActionHash { get; set; }` | property | What the conductor returned for this request (action hash). |
 
 <a id="nextgensoftware-holochain-holonet-client-holonetclientappbase-directsignalsentcallback"></a>
 ### HoloNETClientAppBase.DirectSignalSentCallBack (delegate)
 
 Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
-| Member | Kind | Description |
-|---|---|---|
-| `HoloNETClientAppBase.DirectSignalSentCallBack(object object, IntPtr method)` | ctor |  |
-| `IAsyncResult BeginInvoke(object sender, DirectSignalSentCallBackEventArgs e, AsyncCallback callback, object object)` | method |  |
-| `void EndInvoke(IAsyncResult result)` | method |  |
-| `void Invoke(object sender, DirectSignalSentCallBackEventArgs e)` | method |  |
+Handler signature: `void DirectSignalSentCallBack(object sender, DirectSignalSentCallBackEventArgs e)` (the type of the `OnDirectSignalSentCallBack` event).
 
 <a id="nextgensoftware-holochain-holonet-client-directsignalsentcallbackeventargs"></a>
 ### DirectSignalSentCallBackEventArgs (class)
@@ -1131,12 +941,7 @@ Mirrors holochain_types::app::DisableCloneCellPayload, used as the payload for A
 
 Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
-| Member | Kind | Description |
-|---|---|---|
-| `HoloNETClientBase.Disconnected(object object, IntPtr method)` | ctor |  |
-| `IAsyncResult BeginInvoke(object sender, DisconnectedEventArgs e, AsyncCallback callback, object object)` | method |  |
-| `void EndInvoke(IAsyncResult result)` | method |  |
-| `void Invoke(object sender, DisconnectedEventArgs e)` | method |  |
+Handler signature: `void Disconnected(object sender, DisconnectedEventArgs e)` (the type of the `OnDisconnected` event).
 
 <a id="nextgensoftware-holochain-holonet-client-disconnectedcallbackmode"></a>
 ### DisconnectedCallBackMode (enum)
@@ -1158,10 +963,10 @@ Inherits / implements: `IDnaDefinition`
 
 | Member | Kind | Description |
 |---|---|---|
-| `List<ZomeDefinition> CoordinatorZomes { get; set; }` | property |  |
-| `List<ZomeDefinition> IntegrityZomes { get; set; }` | property |  |
-| `IDnaModifiers Modifiers { get; set; }` | property |  |
-| `string Name { get; set; }` | property |  |
+| `List<ZomeDefinition> CoordinatorZomes { get; set; }` | property | The DNA's coordinator zomes (hot-swappable with UpdateCoordinatorsAsync). |
+| `List<ZomeDefinition> IntegrityZomes { get; set; }` | property | The DNA's integrity zomes (entry/link types and validation; they define the DNA hash). |
+| `IDnaModifiers Modifiers { get; set; }` | property | The DNA modifiers (network seed, properties, origin time) that make this DNA's hash. |
+| `string Name { get; set; }` | property | The DNA's name. |
 
 <a id="nextgensoftware-holochain-holonet-client-dnadefinitionresponse"></a>
 ### DnaDefinitionResponse (class)
@@ -1170,8 +975,8 @@ Inherits / implements: `IDnaDefinitionResponse`
 
 | Member | Kind | Description |
 |---|---|---|
-| `DnaDefinitionResponseDetail data { get; set; }` | property |  |
-| `string type { get; set; }` | property |  |
+| `DnaDefinitionResponseDetail data { get; set; }` | property | Holochain's `data` field (sent to / received from the conductor as-is). |
+| `string type { get; set; }` | property | Holochain's `type` field (sent to / received from the conductor as-is). |
 
 <a id="nextgensoftware-holochain-holonet-client-dnadefinitionresponsedetail"></a>
 ### DnaDefinitionResponseDetail (class)
@@ -1180,23 +985,18 @@ Inherits / implements: `IDnaDefinitionResponseDetail`
 
 | Member | Kind | Description |
 |---|---|---|
-| `object coordinator_zomes_raw { get; set; }` | property |  |
-| `object integrity_zomes_raw { get; set; }` | property |  |
+| `object coordinator_zomes_raw { get; set; }` | property | Holochain's `coordinator_zomes_raw` field (sent to / received from the conductor as-is). |
+| `object integrity_zomes_raw { get; set; }` | property | Holochain's `integrity_zomes_raw` field (sent to / received from the conductor as-is). |
 | `object lineage { get; set; }` | property | Holochain 0.7: DNA hashes this DNA declares as its lineage (may be empty). |
-| `DnaModifiers modifiers { get; set; }` | property |  |
-| `string name { get; set; }` | property |  |
+| `DnaModifiers modifiers { get; set; }` | property | Holochain's `modifiers` field (sent to / received from the conductor as-is). |
+| `string name { get; set; }` | property | Holochain's `name` field (sent to / received from the conductor as-is). |
 
 <a id="nextgensoftware-holochain-holonet-client-holonetclientadmin-dnadefinitionreturnedcallback"></a>
 ### HoloNETClientAdmin.DnaDefinitionReturnedCallBack (delegate)
 
 Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
-| Member | Kind | Description |
-|---|---|---|
-| `HoloNETClientAdmin.DnaDefinitionReturnedCallBack(object object, IntPtr method)` | ctor |  |
-| `IAsyncResult BeginInvoke(object sender, DnaDefinitionReturnedCallBackEventArgs e, AsyncCallback callback, object object)` | method |  |
-| `void EndInvoke(IAsyncResult result)` | method |  |
-| `void Invoke(object sender, DnaDefinitionReturnedCallBackEventArgs e)` | method |  |
+Handler signature: `void DnaDefinitionReturnedCallBack(object sender, DnaDefinitionReturnedCallBackEventArgs e)` (the type of the `OnDnaDefinitionReturnedCallBack` event).
 
 <a id="nextgensoftware-holochain-holonet-client-dnadefinitionreturnedcallbackeventargs"></a>
 ### DnaDefinitionReturnedCallBackEventArgs (class)
@@ -1205,19 +1005,14 @@ Inherits / implements: `HoloNETDataReceivedBaseEventArgs`
 
 | Member | Kind | Description |
 |---|---|---|
-| `IDnaDefinition DnaDefinition { get; set; }` | property |  |
+| `IDnaDefinition DnaDefinition { get; set; }` | property | What the conductor returned for this request (dna definition). |
 
 <a id="nextgensoftware-holochain-holonet-client-holonetclientadmin-dnaregisteredcallback"></a>
 ### HoloNETClientAdmin.DnaRegisteredCallBack (delegate)
 
 Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
-| Member | Kind | Description |
-|---|---|---|
-| `HoloNETClientAdmin.DnaRegisteredCallBack(object object, IntPtr method)` | ctor |  |
-| `IAsyncResult BeginInvoke(object sender, DnaRegisteredCallBackEventArgs e, AsyncCallback callback, object object)` | method |  |
-| `void EndInvoke(IAsyncResult result)` | method |  |
-| `void Invoke(object sender, DnaRegisteredCallBackEventArgs e)` | method |  |
+Handler signature: `void DnaRegisteredCallBack(object sender, DnaRegisteredCallBackEventArgs e)` (the type of the `OnDnaRegisteredCallBack` event).
 
 <a id="nextgensoftware-holochain-holonet-client-dnaregisteredcallbackeventargs"></a>
 ### DnaRegisteredCallBackEventArgs (class)
@@ -1226,19 +1021,14 @@ Inherits / implements: `HoloNETDataReceivedBaseEventArgs`
 
 | Member | Kind | Description |
 |---|---|---|
-| `byte[] HoloHash { get; set; }` | property |  |
+| `byte[] HoloHash { get; set; }` | property | What the conductor returned for this request (holo hash). |
 
 <a id="nextgensoftware-holochain-holonet-client-holonetclientadmin-dnaslistedcallback"></a>
 ### HoloNETClientAdmin.DnasListedCallBack (delegate)
 
 Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
-| Member | Kind | Description |
-|---|---|---|
-| `HoloNETClientAdmin.DnasListedCallBack(object object, IntPtr method)` | ctor |  |
-| `IAsyncResult BeginInvoke(object sender, DnasListedCallBackEventArgs e, AsyncCallback callback, object object)` | method |  |
-| `void EndInvoke(IAsyncResult result)` | method |  |
-| `void Invoke(object sender, DnasListedCallBackEventArgs e)` | method |  |
+Handler signature: `void DnasListedCallBack(object sender, DnasListedCallBackEventArgs e)` (the type of the `OnDnasListedCallBack` event).
 
 <a id="nextgensoftware-holochain-holonet-client-dnaslistedcallbackeventargs"></a>
 ### DnasListedCallBackEventArgs (class)
@@ -1247,23 +1037,23 @@ Inherits / implements: `HoloNETDataReceivedBaseEventArgs`
 
 | Member | Kind | Description |
 |---|---|---|
-| `List<byte[]> Dnas { get; set; }` | property |  |
+| `List<byte[]> Dnas { get; set; }` | property | What the conductor returned for this request (dnas). |
 
 <a id="nextgensoftware-holochain-holonet-client-dnastorageblob"></a>
 ### DnaStorageBlob (class)
 
 | Member | Kind | Description |
 |---|---|---|
-| `DnaStorageInfo dna { get; set; }` | property |  |
+| `DnaStorageInfo dna { get; set; }` | property | Holochain's `dna` field (sent to / received from the conductor as-is). |
 
 <a id="nextgensoftware-holochain-holonet-client-dnastorageinfo"></a>
 ### DnaStorageInfo (class)
 
 | Member | Kind | Description |
 |---|---|---|
-| `int dht_data_size { get; set; }` | property |  |
-| `int dht_data_size_on_disk { get; set; }` | property |  |
-| `string used_by { get; set; }` | property |  |
+| `int dht_data_size { get; set; }` | property | Holochain's `dht_data_size` field (sent to / received from the conductor as-is). |
+| `int dht_data_size_on_disk { get; set; }` | property | Holochain's `dht_data_size_on_disk` field (sent to / received from the conductor as-is). |
+| `string used_by { get; set; }` | property | Holochain's `used_by` field (sent to / received from the conductor as-is). |
 
 <a id="nextgensoftware-holochain-holonet-client-dumpnetworkstatsresponse"></a>
 ### DumpNetworkStatsResponse (class)
@@ -1304,24 +1094,24 @@ One entry in the errors array returned by enable_app. Wire format: [CellId, erro
 
 | Member | Kind | Description |
 |---|---|---|
-| `byte[][] CellId { get; set; }` | property |  |
-| `string Error { get; set; }` | property |  |
+| `byte[][] CellId { get; set; }` | property | The cell id: [DNA hash, agent public key] as raw bytes. |
+| `string Error { get; set; }` | property | Why a cell could not be enabled. |
 
 <a id="nextgensoftware-holochain-holonet-client-enableappresponse"></a>
 ### EnableAppResponse (class)
 
 | Member | Kind | Description |
 |---|---|---|
-| `EnableAppResponseDetails data { get; set; }` | property |  |
-| `string type { get; set; }` | property |  |
+| `EnableAppResponseDetails data { get; set; }` | property | Holochain's `data` field (sent to / received from the conductor as-is). |
+| `string type { get; set; }` | property | Holochain's `type` field (sent to / received from the conductor as-is). |
 
 <a id="nextgensoftware-holochain-holonet-client-enableappresponsedetails"></a>
 ### EnableAppResponseDetails (class)
 
 | Member | Kind | Description |
 |---|---|---|
-| `AppInfo app { get; set; }` | property |  |
-| `List<EnableAppError> errors { get; set; }` | property |  |
+| `AppInfo app { get; set; }` | property | Holochain's `app` field (sent to / received from the conductor as-is). |
+| `List<EnableAppError> errors { get; set; }` | property | Holochain's `errors` field (sent to / received from the conductor as-is). |
 
 <a id="nextgensoftware-holochain-holonet-client-enableclonecellrequest"></a>
 ### EnableCloneCellRequest (class)
@@ -1346,12 +1136,7 @@ Mirrors AppRequest::EnableCloneCell's payload, EnableCloneCellPayload, which per
 
 Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
-| Member | Kind | Description |
-|---|---|---|
-| `HoloNETClientBase.Error(object object, IntPtr method)` | ctor |  |
-| `IAsyncResult BeginInvoke(object sender, HoloNETErrorEventArgs e, AsyncCallback callback, object object)` | method |  |
-| `void EndInvoke(IAsyncResult result)` | method |  |
-| `void Invoke(object sender, HoloNETErrorEventArgs e)` | method |  |
+Handler signature: `void Error(object sender, HoloNETErrorEventArgs e)` (the type of the `OnError` event).
 
 <a id="nextgensoftware-holochain-holonet-client-errorhandlingbehaviour"></a>
 ### ErrorHandlingBehaviour (enum)
@@ -1367,22 +1152,17 @@ Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
 | Member | Kind | Description |
 |---|---|---|
-| `DhtOpsCursor dht_ops_cursor { get; set; }` | property |  |
-| `object[] integrated { get; set; }` | property |  |
-| `object[] integration_limbo { get; set; }` | property |  |
-| `object[] validation_limbo { get; set; }` | property |  |
+| `DhtOpsCursor dht_ops_cursor { get; set; }` | property | Holochain's `dht_ops_cursor` field (sent to / received from the conductor as-is). |
+| `object[] integrated { get; set; }` | property | Holochain's `integrated` field (sent to / received from the conductor as-is). |
+| `object[] integration_limbo { get; set; }` | property | Holochain's `integration_limbo` field (sent to / received from the conductor as-is). |
+| `object[] validation_limbo { get; set; }` | property | Holochain's `validation_limbo` field (sent to / received from the conductor as-is). |
 
 <a id="nextgensoftware-holochain-holonet-client-holonetclientadmin-fullstatedumpedcallback"></a>
 ### HoloNETClientAdmin.FullStateDumpedCallBack (delegate)
 
 Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
-| Member | Kind | Description |
-|---|---|---|
-| `HoloNETClientAdmin.FullStateDumpedCallBack(object object, IntPtr method)` | ctor |  |
-| `IAsyncResult BeginInvoke(object sender, FullStateDumpedCallBackEventArgs e, AsyncCallback callback, object object)` | method |  |
-| `void EndInvoke(IAsyncResult result)` | method |  |
-| `void Invoke(object sender, FullStateDumpedCallBackEventArgs e)` | method |  |
+Handler signature: `void FullStateDumpedCallBack(object sender, FullStateDumpedCallBackEventArgs e)` (the type of the `OnFullStateDumpedCallBack` event).
 
 <a id="nextgensoftware-holochain-holonet-client-fullstatedumpedcallbackeventargs"></a>
 ### FullStateDumpedCallBackEventArgs (class)
@@ -1391,7 +1171,7 @@ Inherits / implements: `HoloNETDataReceivedBaseEventArgs`
 
 | Member | Kind | Description |
 |---|---|---|
-| `IFullStateDumpedResponse DumpedState { get; set; }` | property |  |
+| `IFullStateDumpedResponse DumpedState { get; set; }` | property | What the conductor returned for this request (dumped state). |
 | `string DumpedStateJSON { get; set; }` | property | The conductor's FullStateDump as JSON. Always set; DumpedState is best-effort. |
 
 <a id="nextgensoftware-holochain-holonet-client-fullstatedumpedresponse"></a>
@@ -1401,9 +1181,9 @@ Inherits / implements: `IFullStateDumpedResponse`
 
 | Member | Kind | Description |
 |---|---|---|
-| `FullIntegrationStateDump integration_dump { get; set; }` | property |  |
-| `P2pAgentsDump peer_dump { get; set; }` | property |  |
-| `SourceChainJsonDump source_chain_dump { get; set; }` | property |  |
+| `FullIntegrationStateDump integration_dump { get; set; }` | property | Holochain's `integration_dump` field (sent to / received from the conductor as-is). |
+| `P2pAgentsDump peer_dump { get; set; }` | property | Holochain's `peer_dump` field (sent to / received from the conductor as-is). |
+| `SourceChainJsonDump source_chain_dump { get; set; }` | property | Holochain's `source_chain_dump` field (sent to / received from the conductor as-is). |
 
 <a id="nextgensoftware-holochain-holonet-client-getappinfocallbackeventargs"></a>
 ### GetAppInfoCallBackEventArgs (class)
@@ -1412,7 +1192,7 @@ Inherits / implements: `HoloNETDataReceivedBaseEventArgs`
 
 | Member | Kind | Description |
 |---|---|---|
-| `IAppInfo AppInfo { get; set; }` | property |  |
+| `IAppInfo AppInfo { get; set; }` | property | What the conductor returned for this request (app info). |
 
 <a id="nextgensoftware-holochain-holonet-client-holochainconductorenum"></a>
 ### HolochainConductorEnum (enum)
@@ -1436,12 +1216,7 @@ Inherits / implements: `HoloNETDataReceivedBaseEventArgs`
 
 Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
-| Member | Kind | Description |
-|---|---|---|
-| `HoloNETClientBase.HolochainConductorsShutdownComplete(object object, IntPtr method)` | ctor |  |
-| `IAsyncResult BeginInvoke(object sender, HolochainConductorsShutdownEventArgs e, AsyncCallback callback, object object)` | method |  |
-| `void EndInvoke(IAsyncResult result)` | method |  |
-| `void Invoke(object sender, HolochainConductorsShutdownEventArgs e)` | method |  |
+Handler signature: `void HolochainConductorsShutdownComplete(object sender, HolochainConductorsShutdownEventArgs e)` (the type of the `OnHolochainConductorsShutdownComplete` event).
 
 <a id="nextgensoftware-holochain-holonet-client-holochainconductorsshutdowneventargs"></a>
 ### HolochainConductorsShutdownEventArgs (class)
@@ -1450,9 +1225,9 @@ Inherits / implements: `CallBackBaseEventArgs`
 
 | Member | Kind | Description |
 |---|---|---|
-| `string AgentPubKey { get; set; }` | property |  |
-| `string DnaHash { get; set; }` | property |  |
-| `Uri EndPoint { get; set; }` | property |  |
+| `string AgentPubKey { get; set; }` | property | The agent public key (HoloHash string) this applies to. |
+| `string DnaHash { get; set; }` | property | The DNA hash (HoloHash string) this applies to. |
+| `Uri EndPoint { get; set; }` | property | The conductor WebSocket endpoint this came from. |
 | `int NumberOfHcExeInstancesShutdown { get; set; }` | property | The number of hc.exe instances that were shutdown. |
 | `int NumberOfHolochainExeInstancesShutdown { get; set; }` | property | The number of holochain.exe instances that were shutdown. |
 | `int NumberOfRustcExeInstancesShutdown { get; set; }` | property | The number of rustc.exe instances that were shutdown. |
@@ -1462,12 +1237,7 @@ Inherits / implements: `CallBackBaseEventArgs`
 
 Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
-| Member | Kind | Description |
-|---|---|---|
-| `HoloNETClientBase.HolochainConductorStarted(object object, IntPtr method)` | ctor |  |
-| `IAsyncResult BeginInvoke(object sender, HolochainConductorStartedEventArgs e, AsyncCallback callback, object object)` | method |  |
-| `void EndInvoke(IAsyncResult result)` | method |  |
-| `void Invoke(object sender, HolochainConductorStartedEventArgs e)` | method |  |
+Handler signature: `void HolochainConductorStarted(object sender, HolochainConductorStartedEventArgs e)` (the type of the `OnHolochainConductorStarted` event).
 
 <a id="nextgensoftware-holochain-holonet-client-holochainconductorstartedeventargs"></a>
 ### HolochainConductorStartedEventArgs (class)
@@ -1479,12 +1249,7 @@ Inherits / implements: `CallBackBaseEventArgs`
 
 Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
-| Member | Kind | Description |
-|---|---|---|
-| `HoloNETClientBase.HolochainConductorStarting(object object, IntPtr method)` | ctor |  |
-| `IAsyncResult BeginInvoke(object sender, HolochainConductorStartingEventArgs e, AsyncCallback callback, object object)` | method |  |
-| `void EndInvoke(IAsyncResult result)` | method |  |
-| `void Invoke(object sender, HolochainConductorStartingEventArgs e)` | method |  |
+Handler signature: `void HolochainConductorStarting(object sender, HolochainConductorStartingEventArgs e)` (the type of the `OnHolochainConductorStarting` event).
 
 <a id="nextgensoftware-holochain-holonet-client-holochainconductorstartingeventargs"></a>
 ### HolochainConductorStartingEventArgs (class)
@@ -1623,7 +1388,7 @@ Inherits / implements: `HoloNETClientBase`, `IHoloNETClientBase`, `IDisposable`,
 | `Task<GetAppInfoCallBackEventArgs> GetAppInfoAsync(string installedAppId, ConductorResponseCallBackMode conductorResponseCallBackMode = WaitForHolochainConductorResponse, string id = null)` | method | Returns the full `AppInfo` for the given hApp: status, cell IDs, agent pub key, manifest, and more. |
 | `byte[] GetCapGrantSecret(byte[][] cellId)` | method | The capability secret HoloNET created for this cell's zome-call grant (null if it has none). |
 | `byte[] GetCapGrantSecret(string agentPubKey, string dnaHash)` | method | The capability secret HoloNET created for this agent and DNA's zome-call grant (null if it has none). |
-| `Task<byte[][]> GetCellIdAsync()` | method |  |
+| `Task<byte[][]> GetCellIdAsync()` | method | The cell id zome calls go to: HoloNETDNA.CellId, or built from its DnaHash and AgentPubKey (retrieving them from the conductor first if needed). |
 | `CompatibleCellsReturnedCallBackEventArgs GetCompatibleCells(byte[] dnaHash, string id = null)` | method | Get the cells that are compatible with (i.e. share a lineage with) the given DnaHash. Gated behind the `unstable-migration` feature flag in Holochain 0.7.0 - may not be available on all conductor builds. |
 | `Task<CompatibleCellsReturnedCallBackEventArgs> GetCompatibleCellsAsync(byte[] dnaHash, ConductorResponseCallBackMode conductorResponseCallBackMode = WaitForHolochainConductorResponse, string id = null)` | method | Get the cells that are compatible with (i.e. share a lineage with) the given DnaHash. Gated behind the `unstable-migration` feature flag in Holochain 0.7.0 - may not be available on all conductor builds. |
 | `DnaDefinitionReturnedCallBackEventArgs GetDnaDefinition(byte[] dnaHash, string id = null)` | method | Get the DNA definition for the specified DNA hash. |
@@ -1720,12 +1485,12 @@ Inherits / implements: `HoloNETClientBase`, `IHoloNETClientBase`, `IDisposable`,
 | `HoloNETClientAppBase(ILogProvider logProvider, bool alsoUseDefaultLogger = false, IHoloNETDNA holoNETDNA = null)` | ctor | This constructor allows you to inject in (DI) your own implementation (logProvider) of the ILogProvider interface, which will be added to the Logger.LogProviders collection. This Logger instance is also passed to the WebSocket library. HoloNET will then log to each of these logProviders contained within the Logger. It will also use the settings contained in the HoloNETDNA. |
 | `HoloNETClientAppBase(IEnumerable<ILogProvider> logProviders, bool alsoUseDefaultLogger = false, IHoloNETDNA holoNETDNA = null)` | ctor | This constructor allows you to inject in (DI) multiple implementations (logProviders) of the ILogProvider interface, which will be added to the Logger.LogProviders collection. This Logger instance is also passed to the WebSocket library. HoloNET will then log to each of these logProviders contained within the Logger. It will also use the settings contained in the HoloNETDNA. |
 | `HoloNETClientAppBase(ILogger logger, IHoloNETDNA holoNETDNA = null)` | ctor | This constructor allows you to inject in (DI) a Logger instance (which could contain multiple logProviders). This will then override the default Logger found on the Logger property. This Logger instance is also passed to the WebSocket library. HoloNET will then log to each of these logProviders contained within the Logger. It will also use the settings contained in the HoloNETDNA. |
-| `AppInfo CachedAppInfo { get; set; }` | property |  |
+| `AppInfo CachedAppInfo { get; set; }` | property | The last app_info this client received (agent, DNA, cells, status). |
 | `bool IsReadyForZomesCalls { get; }` | property | This property is a boolean and will return true when HoloNET is ready for zome calls after the OnReadyForZomeCalls event is raised. |
 | `bool RetrievingAgentPubKeyAndDnaHash { get; }` | property | This property is a boolean and will return true when HoloNET is retrieving the AgentPubKey & DnaHash using one of the RetrieveAgentPubKeyAndDnaHash, RetrieveAgentPubKeyAndDnaHashFromSandbox or RetrieveAgentPubKeyAndDnaHashFromConductor methods (by default this will occur automatically after it has connected to the Holochain Conductor). |
 | `IZomeCallSigner ZomeCallSigner { get; set; }` | property | Optional external signer. When set, every zome call is signed by it instead of by the local credentials from AuthorizeSigningCredentials (e.g. the shared Android runtime's signZomeCall). |
-| `HoloNETClientAppBase.AppAgentInfoReturnedCallBack OnAgentInfoReturnedCallBack` | event |  |
-| `HoloNETClientAppBase.AppEnabledViaAppInterfaceCallBack OnAppEnabledCallBack` | event |  |
+| `HoloNETClientAppBase.AppAgentInfoReturnedCallBack OnAgentInfoReturnedCallBack` | event | Fired when a response arrives for GetAgentInfoAsync (app interface). |
+| `HoloNETClientAppBase.AppEnabledViaAppInterfaceCallBack OnAppEnabledCallBack` | event | Fired when a response arrives for EnableAppAsync (app interface, e.g. after providing membrane proofs). |
 | `HoloNETClientAppBase.AppInfoCallBack OnAppInfoCallBack` | event | Fired when the client receives AppInfo from the conductor containing the cell id for the running hApp (which in itself contains the AgentPubKey & DnaHash). It also contains the AppId and other info. |
 | `HoloNETClientAppBase.AppOpTimingsDumpedCallBack OnAppOpTimingsDumpedCallBack` | event | Fired when a response is received from the conductor after the DumpOpTimingsAsync/DumpOpTimings method is called on the app interface. |
 | `HoloNETClientAppBase.AppPeerMetaInfoReturnedCallBack OnAppPeerMetaInfoReturnedCallBack` | event | Fired when a response is received from the conductor after the GetAppPeerMetaInfoAsync/GetAppPeerMetaInfo method is called. |
@@ -1734,11 +1499,11 @@ Inherits / implements: `HoloNETClientBase`, `IHoloNETClientBase`, `IDisposable`,
 | `HoloNETClientAppBase.CloneCellEnabledCallBack OnCloneCellEnabledCallBack` | event | Fired when a response is received from the conductor after the EnableCloneCellAsync/EnableCloneCell method is called. |
 | `HoloNETClientAppBase.CountersigningSessionAbandonedCallBack OnCountersigningSessionAbandonedCallBack` | event | Fired when a response is received from the conductor after the AbandonCountersigningSessionAsync/AbandonCountersigningSession method is called. |
 | `HoloNETClientAppBase.CountersigningSessionStateReturnedCallBack OnCountersigningSessionStateReturnedCallBack` | event | Fired when a response is received from the conductor after the GetCountersigningSessionStateAsync/GetCountersigningSessionState method is called. |
-| `HoloNETClientAppBase.DirectSignalCapabilityGrantedCallBack OnDirectSignalCapabilityGrantedCallBack` | event |  |
-| `HoloNETClientAppBase.DirectSignalSentCallBack OnDirectSignalSentCallBack` | event |  |
+| `HoloNETClientAppBase.DirectSignalCapabilityGrantedCallBack OnDirectSignalCapabilityGrantedCallBack` | event | Fired when a response arrives for GrantDirectSignalCapabilityAsync. |
+| `HoloNETClientAppBase.DirectSignalSentCallBack OnDirectSignalSentCallBack` | event | Fired when a response arrives for SendDirectSignalAsync. |
 | `HoloNETClientAppBase.MemproofsProvidedCallBack OnMemproofsProvidedCallBack` | event | Fired when a response is received from the conductor after the ProvideMemproofsAsync/ProvideMemproofs method is called. |
-| `HoloNETClientAppBase.AppNetworkMetricsDumpedCallBack OnNetworkMetricsDumpedCallBack` | event |  |
-| `HoloNETClientAppBase.AppNetworkStatsDumpedCallBack OnNetworkStatsDumpedCallBack` | event |  |
+| `HoloNETClientAppBase.AppNetworkMetricsDumpedCallBack OnNetworkMetricsDumpedCallBack` | event | Fired when a response arrives for DumpNetworkMetricsAsync (app interface). |
+| `HoloNETClientAppBase.AppNetworkStatsDumpedCallBack OnNetworkStatsDumpedCallBack` | event | Fired when a response arrives for DumpNetworkStatsAsync (app interface). |
 | `HoloNETClientAppBase.PublishCountersigningSessionTriggeredCallBack OnPublishCountersigningSessionTriggeredCallBack` | event | Fired when a response is received from the conductor after the PublishCountersigningSessionAsync/PublishCountersigningSession method is called. |
 | `HoloNETClientAppBase.ReadyForZomeCalls OnReadyForZomeCalls` | event | Fired when the client has successfully connected and reteived the AgentPubKey & DnaHash, meaning it is ready to make zome calls to the Holochain conductor. |
 | `HoloNETClientAppBase.SignalCallBack OnSignalCallBack` | event | Fired when the Holochain conductor sends signals data. |
@@ -1786,7 +1551,7 @@ Inherits / implements: `HoloNETClientBase`, `IHoloNETClientBase`, `IDisposable`,
 | `Task<HoloNETConnectedEventArgs> ConnectAsync(string holochainConductorURI = "", ConnectedCallBackMode connectedCallBackMode = WaitForHolochainConductorToConnect, RetrieveAgentPubKeyAndDnaHashMode retrieveAgentPubKeyAndDnaHashMode = Wait, bool retrieveAgentPubKeyAndDnaHashFromConductor = true, bool retrieveAgentPubKeyAndDnaHashFromSandbox = true, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true, bool updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved = true)` | method | This method simply connects to the Holochain conductor. It raises the OnConnected event once it is has successfully established a connection. It then calls the RetrieveAgentPubKeyAndDnaHash method to retrieve the AgentPubKey & DnaHash. If the `connectedCallBackMode` flag is set to `WaitForHolochainConductorToConnect` (default) it will await until it is connected before returning, otherwise it will return immediately and then call the OnConnected event once it has finished connecting. |
 | `Task<HoloNETConnectedEventArgs> ConnectAsync(string installedAppId, Uri holochainConductorURI, ConnectedCallBackMode connectedCallBackMode = WaitForHolochainConductorToConnect, RetrieveAgentPubKeyAndDnaHashMode retrieveAgentPubKeyAndDnaHashMode = Wait, bool retrieveAgentPubKeyAndDnaHashFromConductor = true, bool retrieveAgentPubKeyAndDnaHashFromSandbox = true, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true, bool updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved = true)` | method | This method simply connects to the Holochain conductor. It raises the OnConnected event once it is has successfully established a connection. It then calls the RetrieveAgentPubKeyAndDnaHash method to retrieve the AgentPubKey & DnaHash. If the `connectedCallBackMode` flag is set to `WaitForHolochainConductorToConnect` (default) it will await until it is connected before returning, otherwise it will return immediately and then call the OnConnected event once it has finished connecting. |
 | `static object ConvertEntryValue(string value, Type type)` | method | Converts a decoded entry value (see DecodeRawZomeData, which formats with the invariant culture) to : nullable types, enums (by name or number), Guid, DateTime / DateTimeOffset and every IConvertible type. Unconvertible values throw, and MapEntryDataObjectAsync skips that property. |
-| `static byte[] CreateAuthenticationEnvelope(byte[] token)` | method |  |
+| `static byte[] CreateAuthenticationEnvelope(byte[] token)` | method | The authenticate message HoloNET sends first on an app interface, carrying the app authentication token. |
 | `CloneCellCreatedCallBackEventArgs CreateCloneCell(string roleName, object modifiers = null, byte[] membraneProof = null, string name = null, string id = null)` | method | Create a new clone cell for the given role. |
 | `Task<CloneCellCreatedCallBackEventArgs> CreateCloneCellAsync(string roleName, object modifiers = null, byte[] membraneProof = null, string name = null, ConductorResponseCallBackMode conductorResponseCallBackMode = WaitForHolochainConductorResponse, string id = null)` | method | Create a new clone cell for the given role. |
 | `CloneCellDisabledCallBackEventArgs DisableCloneCell(object cloneCellId, string id = null)` | method | Disable a clone cell. |
@@ -1807,7 +1572,7 @@ Inherits / implements: `HoloNETClientBase`, `IHoloNETClientBase`, `IDisposable`,
 | `Task<AppInfoCallBackEventArgs> GetAppInfoAsync(string installedAppId = null, string roleName = null, ConductorResponseCallBackMode conductorResponseCallBackMode = WaitForHolochainConductorResponse)` | method | This method gets the AppInfo from the Holochain Conductor. |
 | `AppPeerMetaInfoReturnedCallBackEventArgs GetAppPeerMetaInfo(string url, List<byte[]> dnaHashes = null, string id = null)` | method | Get meta info about a peer that is known via the networking layer (kitsune2), via the app interface. |
 | `Task<AppPeerMetaInfoReturnedCallBackEventArgs> GetAppPeerMetaInfoAsync(string url, List<byte[]> dnaHashes = null, ConductorResponseCallBackMode conductorResponseCallBackMode = WaitForHolochainConductorResponse, string id = null)` | method | Get meta info about a peer that is known via the networking layer (kitsune2), via the app interface. |
-| `Task<byte[][]> GetCellIdAsync()` | method |  |
+| `Task<byte[][]> GetCellIdAsync()` | method | The cell id zome calls go to: HoloNETDNA.CellId, or built from its DnaHash and AgentPubKey (retrieving them from the conductor first if needed). |
 | `CountersigningSessionStateReturnedCallBackEventArgs GetCountersigningSessionState(CellId cellId, string id = null)` | method | Get the state of a countersigning session for the given cell. Gated behind the `unstable-countersigning` feature flag in Holochain 0.7.0 - may not be available on all conductor builds. |
 | `Task<CountersigningSessionStateReturnedCallBackEventArgs> GetCountersigningSessionStateAsync(CellId cellId, ConductorResponseCallBackMode conductorResponseCallBackMode = WaitForHolochainConductorResponse, string id = null)` | method | Get the state of a countersigning session for the given cell. Gated behind the `unstable-countersigning` feature flag in Holochain 0.7.0 - may not be available on all conductor builds. |
 | `DirectSignalCapabilityGrantedCallBackEventArgs GrantDirectSignalCapability(byte[][] cellId, string tag, CapGrantAccessType access = Unrestricted, byte[] secret = null, byte[][] assignees = null, string id = null)` | method | Holochain 0.7.1+: lets other agents send direct signals to (a cell of this app) (grant_direct_signal_capability). Holochain 0.7.0 doesn't have this request and returns an error. |
@@ -1847,7 +1612,7 @@ Inherits / implements: `IHoloNETClientBase`, `IDisposable`
 | `HoloNETClientBase(IEnumerable<ILogProvider> logProviders, bool alsoUseDefaultLogger = false, IHoloNETDNA holoNETDNA = null)` | ctor | This constructor allows you to inject in (DI) multiple implementations (logProviders) of the ILogProvider interface, which will be added to the Logger.LogProviders collection. This Logger instance is also passed to the WebSocket library. HoloNET will then log to each of these logProviders contained within the Logger. It will also use the settings contained in the HoloNETDNA. |
 | `HoloNETClientBase(ILogger logger, IHoloNETDNA holoNETDNA = null)` | ctor | This constructor allows you to inject in (DI) a Logger instance (which could contain multiple logProviders). This will then override the default Logger found on the Logger property. This Logger instance is also passed to the WebSocket library. HoloNET will then log to each of these logProviders contained within the Logger. It will also use the settings contained in the HoloNETDNA. |
 | `Uri EndPoint { get; set; }` | property | This property is a shortcut to the EndPoint property on the WebSocket property. |
-| `IHoloNETDNA HoloNETDNA { get; set; }` | property |  |
+| `IHoloNETDNA HoloNETDNA { get; set; }` | property | The HoloNET settings in use (see HoloNETDNA). |
 | `bool IsConnecting { get; set; }` | property | True while ConnectAsync is in progress. |
 | `bool IsDisconnecting { get; set; }` | property | True while DisconnectAsync is in progress. |
 | `bool IsHoloNETDNALoaded { get; }` | property | True once the settings have been loaded (or set). |
@@ -1870,7 +1635,7 @@ Inherits / implements: `IHoloNETClientBase`, `IDisposable`
 | `Task<HoloNETConnectedEventArgs> ConnectAsync(string holochainConductorURI = "", ConnectedCallBackMode connectedCallBackMode = WaitForHolochainConductorToConnect, RetrieveAgentPubKeyAndDnaHashMode retrieveAgentPubKeyAndDnaHashMode = Wait, bool retrieveAgentPubKeyAndDnaHashFromConductor = true, bool retrieveAgentPubKeyAndDnaHashFromSandbox = true, bool automaticallyAttemptToRetrieveFromConductorIfSandBoxFails = true, bool automaticallyAttemptToRetrieveFromSandBoxIfConductorFails = true, bool updateHoloNETDNAWithAgentPubKeyAndDnaHashOnceRetrieved = true)` | method | This method simply connects to the Holochain conductor. It raises the OnConnected event once it is has successfully established a connection. It then calls the RetrieveAgentPubKeyAndDnaHash method to retrieve the AgentPubKey & DnaHash. If the `connectedCallBackMode` flag is set to `WaitForHolochainConductorToConnect` (default) it will await until it is connected before returning, otherwise it will return immediately and then call the OnConnected event once it has finished connecting. Please see the Events section above for more info on how to use this event. |
 | `byte[] ConvertHoloHashToBytes(string hash)` | method | Utility method to convert a string to base64 encoded bytes (Holochain Conductor format). This is used to convert the AgentPubKey & DnaHash when making a zome call.\| |
 | `string ConvertHoloHashToString(byte[] bytes)` | method | Utility method to convert from base64 bytes (Holochain Conductor format) to a friendly C# format. This is used to convert the AgentPubKey & DnaHash retrieved from the Conductor.\| |
-| `static T DeserializeResponseValue<T>(byte[] envelope, MessagePackSerializerOptions options)` | method |  |
+| `static T DeserializeResponseValue<T>(byte[] envelope, MessagePackSerializerOptions options)` | method | Decode a conductor response envelope's value as T (MessagePack). |
 | `HoloNETDisconnectedEventArgs Disconnect(ShutdownHolochainConductorsMode shutdownHolochainConductorsMode = UseHoloNETDNASettings)` | method | This method disconnects the client from the Holochain conductor. It raises the OnDisconnected event once it is has successfully disconnected. It will then automatically call the ShutDownAllHolochainConductors method (if the `shutdownHolochainConductorsMode` flag (defaults to `UseHoloNETDNASettings`) is not set to `DoNotShutdownAnyConductors`). If the `disconnectedCallBackMode` flag is set to `WaitForHolochainConductorToDisconnect` (default) then it will await until it has disconnected before returning to the caller, otherwise it will return immediately and then raise the OnDisconnected event once it is disconnected. |
 | `Task<HoloNETDisconnectedEventArgs> DisconnectAsync(DisconnectedCallBackMode disconnectedCallBackMode = WaitForHolochainConductorToDisconnect, ShutdownHolochainConductorsMode shutdownHolochainConductorsMode = UseHoloNETDNASettings)` | method | This method disconnects the client from the Holochain conductor. It raises the OnDisconnected event once it is has successfully disconnected. It will then automatically call the ShutDownAllHolochainConductors method (if the `shutdownHolochainConductorsMode` flag (defaults to `UseHoloNETDNASettings`) is not set to `DoNotShutdownAnyConductors`). If the `disconnectedCallBackMode` flag is set to `WaitForHolochainConductorToDisconnect` (default) then it will await until it has disconnected before returning to the caller, otherwise it will return immediately and then raise the OnDisconnected event once it is disconnected. |
 | `void Dispose()` | method | Disconnect and release the WebSocket. |
@@ -1903,7 +1668,7 @@ Inherits / implements: `CallBackBaseEventArgs`
 
 | Member | Kind | Description |
 |---|---|---|
-| `bool IsConnected { get; set; }` | property |  |
+| `bool IsConnected { get; set; }` | property | What the conductor returned for this request (is connected). |
 
 <a id="nextgensoftware-holochain-holonet-client-holonetdata"></a>
 ### HoloNETData (class)
@@ -1912,8 +1677,8 @@ Inherits / implements: `IHoloNETData`
 
 | Member | Kind | Description |
 |---|---|---|
-| `object data { get; set; }` | property |  |
-| `string type { get; set; }` | property |  |
+| `object data { get; set; }` | property | Holochain's `data` field (sent to / received from the conductor as-is). |
+| `string type { get; set; }` | property | Holochain's `type` field (sent to / received from the conductor as-is). |
 
 <a id="nextgensoftware-holochain-holonet-client-holonetdatareceivedbasebaseeventargs-1"></a>
 ### HoloNETDataReceivedBaseBaseEventArgs&lt;T&gt; (class)
@@ -1922,7 +1687,7 @@ Inherits / implements: `HoloNETDataReceivedBaseEventArgs`
 
 | Member | Kind | Description |
 |---|---|---|
-| `T Response { get; set; }` | property |  |
+| `T Response { get; set; }` | property | The decoded conductor response. |
 
 <a id="nextgensoftware-holochain-holonet-client-holonetdatareceivedbaseeventargs"></a>
 ### HoloNETDataReceivedBaseEventArgs (class)
@@ -1931,8 +1696,8 @@ Inherits / implements: `CallBackBaseEventArgsWithDataAndId`
 
 | Member | Kind | Description |
 |---|---|---|
-| `HoloNETResponseType HoloNETResponseType { get; set; }` | property |  |
-| `string Type { get; set; }` | property |  |
+| `HoloNETResponseType HoloNETResponseType { get; set; }` | property | What the conductor returned for this request (holo netresponse type). |
+| `string Type { get; set; }` | property | The conductor message type. |
 
 <a id="nextgensoftware-holochain-holonet-client-holonetdatareceivedeventargs"></a>
 ### HoloNETDataReceivedEventArgs (class)
@@ -1941,7 +1706,7 @@ Inherits / implements: `HoloNETDataReceivedBaseEventArgs`
 
 | Member | Kind | Description |
 |---|---|---|
-| `bool IsConductorDebugInfo { get; set; }` | property |  |
+| `bool IsConductorDebugInfo { get; set; }` | property | What the conductor returned for this request (is conductor debug info). |
 
 <a id="nextgensoftware-holochain-holonet-client-holonetdatasenteventargs"></a>
 ### HoloNETDataSentEventArgs (class)
@@ -1956,7 +1721,7 @@ Inherits / implements: `CallBackBaseEventArgs`
 | Member | Kind | Description |
 |---|---|---|
 | `HolochainConductorsShutdownEventArgs HolochainConductorsShutdownResult { get; set; }` | property | Result of the automatic conductor shutdown that follows a disconnect (WaitForHolochainConductorToDisconnect mode only). |
-| `bool IsDisconnected { get; set; }` | property |  |
+| `bool IsDisconnected { get; set; }` | property | What the conductor returned for this request (is disconnected). |
 
 <a id="nextgensoftware-holochain-holonet-client-holonetdna"></a>
 ### HoloNETDNA (class)
@@ -1977,7 +1742,7 @@ Inherits / implements: `IHoloNETDNA`
 | `EmbeddedHolochainVersion EmbeddedHolochainVersion { get; set; }` | property | Which bundled Holochain release to start when `HolochainConductorMode` is `UseEmbedded` (Embedded package only). Defaults to 0.7.1; set V0_7_0 for hApps built against hdk 0.7.0. |
 | `EnforceRequestToResponseIdMatchingBehaviour EnforceRequestToResponseIdMatchingBehaviour { get; set; }` | property | Set whether you wish to ignore, warn or error when the response id received does not have a matching request id. If it is Ignore it will do nothing, if it is Warn it will give a warning in the Message property of responses returned but still continue, if it is Error it will give a message in the Message property, set the IsError flag and abort the request. |
 | `ConsoleColor ErrorColour { get; set; }` | property | The colour to use for `Error` log entries to the console. NOTE: This is only relevant if the built-in DefaultLogger is used. |
-| `ErrorHandlingBehaviour ErrorHandlingBehaviour { get; set; }` | property |  |
+| `ErrorHandlingBehaviour ErrorHandlingBehaviour { get; set; }` | property | Whether errors only raise OnError (the default) or also throw. |
 | `LoggingMode FileLoggingMode { get; set; }` | property | This passes through to the static LogConfig.FileLoggingMode property in [NextGenSoftware.Logging](https://www.nuget.org/packages/NextGenSoftware.Logging) package. It can be either `WarningsErrorsInfoAndDebug`, `WarningsErrorsAndInfo`, `WarningsAndErrors` or `ErrorsOnly`. |
 | `string FullPathToCompiledHappFolder { get; set; }` | property | The full path to the compiled hApp that HoloNET will start the Holochain Conductor (currenty uses hc.exe) with and then make zome calls to. |
 | `string FullPathToExternalHCToolBinary { get; set; }` | property | The full path to the Holochain Conductor exe (holochain.exe) that HoloNET will auto-start if `HolochainConductorToUse` is set to `Holochain`. |
@@ -2016,13 +1781,13 @@ Inherits / implements: `IHoloNETDNA`
 
 | Member | Kind | Description |
 |---|---|---|
-| `IHoloNETDNA HoloNETDNA { get; set; } (static)` | property |  |
-| `bool IsLoaded { get; } (static)` | property |  |
-| `static string HoloNETDNAPath` | field |  |
-| `static IHoloNETDNA LoadDNA()` | method |  |
-| `static IHoloNETDNA LoadDNA(string holoNETDNAPath)` | method |  |
-| `static bool SaveDNA()` | method |  |
-| `static bool SaveDNA(string holoNETDNAPath, IHoloNETDNA holoNETDNA)` | method |  |
+| `IHoloNETDNA HoloNETDNA { get; set; } (static)` | property | The HoloNET settings in use (see HoloNETDNA). |
+| `bool IsLoaded { get; } (static)` | property | True once the settings have been loaded. |
+| `static string HoloNETDNAPath` | field | Where HoloNETDNA.json is read from and saved to. |
+| `static IHoloNETDNA LoadDNA()` | method | Load the settings from HoloNETDNA.json (defaults if it doesn't exist). |
+| `static IHoloNETDNA LoadDNA(string holoNETDNAPath)` | method | Load the settings from HoloNETDNA.json (defaults if it doesn't exist). |
+| `static bool SaveDNA()` | method | Save the settings to HoloNETDNA.json. |
+| `static bool SaveDNA(string holoNETDNAPath, IHoloNETDNA holoNETDNA)` | method | Save the settings to HoloNETDNA.json. |
 
 <a id="nextgensoftware-holochain-holonet-client-holoneterroreventargs"></a>
 ### HoloNETErrorEventArgs (class)
@@ -2031,9 +1796,9 @@ Inherits / implements: `EventArgs`
 
 | Member | Kind | Description |
 |---|---|---|
-| `Uri EndPoint { get; set; }` | property |  |
+| `Uri EndPoint { get; set; }` | property | The conductor WebSocket endpoint this came from. |
 | `Exception ErrorDetails { get; set; }` | property | A more detailed description of the error, this normally includes a stacktrace to help you track down the cause. |
-| `string Reason { get; set; }` | property |  |
+| `string Reason { get; set; }` | property | What the conductor returned for this request (reason). |
 
 <a id="nextgensoftware-holochain-holonet-client-holonetexception"></a>
 ### HoloNETException (class)
@@ -2042,10 +1807,10 @@ Inherits / implements: `Exception`, `ISerializable`
 
 | Member | Kind | Description |
 |---|---|---|
-| `HoloNETException(string message)` | ctor |  |
-| `HoloNETException(string message, Exception innerException)` | ctor |  |
-| `HoloNETException(string message, Exception innerException, Uri endPoint)` | ctor |  |
-| `Uri EndPoint { get; set; }` | property |  |
+| `HoloNETException(string message)` | ctor | Create the exception with this message (and the inner exception / conductor endpoint, if given). |
+| `HoloNETException(string message, Exception innerException)` | ctor | Create the exception with this message (and the inner exception / conductor endpoint, if given). |
+| `HoloNETException(string message, Exception innerException, Uri endPoint)` | ctor | Create the exception with this message (and the inner exception / conductor endpoint, if given). |
+| `Uri EndPoint { get; set; }` | property | The conductor WebSocket endpoint this came from. |
 
 <a id="nextgensoftware-holochain-holonet-client-holonetrequest"></a>
 ### HoloNETRequest (class)
@@ -2054,9 +1819,9 @@ Inherits / implements: `IHoloNETRequest`
 
 | Member | Kind | Description |
 |---|---|---|
-| `byte[] data { get; set; }` | property |  |
-| `ulong id { get; set; }` | property |  |
-| `string type { get; set; }` | property |  |
+| `byte[] data { get; set; }` | property | Holochain's `data` field (sent to / received from the conductor as-is). |
+| `ulong id { get; set; }` | property | Holochain's `id` field (sent to / received from the conductor as-is). |
+| `string type { get; set; }` | property | Holochain's `type` field (sent to / received from the conductor as-is). |
 
 <a id="nextgensoftware-holochain-holonet-client-holonetrequesttype"></a>
 ### HoloNETRequestType (enum)
@@ -2123,11 +1888,11 @@ Inherits / implements: `IHoloNETResponse`
 
 | Member | Kind | Description |
 |---|---|---|
-| `byte[] data { get; set; }` | property |  |
-| `HoloNETResponseType HoloNETResponseType { get; set; }` | property |  |
-| `ulong id { get; set; }` | property |  |
-| `bool IsError { get; set; }` | property |  |
-| `string type { get; set; }` | property |  |
+| `byte[] data { get; set; }` | property | Holochain's `data` field (sent to / received from the conductor as-is). |
+| `HoloNETResponseType HoloNETResponseType { get; set; }` | property | Which kind of message this is (zome call response, signal, admin response...). |
+| `ulong id { get; set; }` | property | Holochain's `id` field (sent to / received from the conductor as-is). |
+| `bool IsError { get; set; }` | property | True when the call or the conductor reported an error (see Message). |
+| `string type { get; set; }` | property | Holochain's `type` field (sent to / received from the conductor as-is). |
 
 <a id="nextgensoftware-holochain-holonet-client-holonetresponsetype"></a>
 ### HoloNETResponseType (enum)
@@ -2193,12 +1958,7 @@ Inherits / implements: `IHoloNETResponse`
 
 Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
-| Member | Kind | Description |
-|---|---|---|
-| `HoloNETClientBase.HoloNETShutdownComplete(object object, IntPtr method)` | ctor |  |
-| `IAsyncResult BeginInvoke(object sender, HoloNETShutdownEventArgs e, AsyncCallback callback, object object)` | method |  |
-| `void EndInvoke(IAsyncResult result)` | method |  |
-| `void Invoke(object sender, HoloNETShutdownEventArgs e)` | method |  |
+Handler signature: `void HoloNETShutdownComplete(object sender, HoloNETShutdownEventArgs e)` (the type of the `OnHoloNETShutdownComplete` event).
 
 <a id="nextgensoftware-holochain-holonet-client-holonetshutdowneventargs"></a>
 ### HoloNETShutdownEventArgs (class)
@@ -2207,31 +1967,26 @@ Inherits / implements: `CallBackBaseEventArgs`
 
 | Member | Kind | Description |
 |---|---|---|
-| `HoloNETShutdownEventArgs(Uri endPoint, string dnaHash, string agentPubKey, HolochainConductorsShutdownEventArgs holochainConductorsShutdownEventArgs)` | ctor |  |
-| `string AgentPubKey { get; set; }` | property |  |
-| `string DnaHash { get; set; }` | property |  |
-| `Uri EndPoint { get; set; }` | property |  |
-| `HolochainConductorsShutdownEventArgs HolochainConductorsShutdownEventArgs { get; }` | property |  |
+| `HoloNETShutdownEventArgs(Uri endPoint, string dnaHash, string agentPubKey, HolochainConductorsShutdownEventArgs holochainConductorsShutdownEventArgs)` | ctor | Create the event args with these values (HoloNET raises them; you rarely construct one). |
+| `string AgentPubKey { get; set; }` | property | The agent public key (HoloHash string) this applies to. |
+| `string DnaHash { get; set; }` | property | The DNA hash (HoloHash string) this applies to. |
+| `Uri EndPoint { get; set; }` | property | The conductor WebSocket endpoint this came from. |
+| `HolochainConductorsShutdownEventArgs HolochainConductorsShutdownEventArgs { get; }` | property | The result of shutting down the conductors HoloNET started. |
 
 <a id="nextgensoftware-holochain-holonet-client-installedcell"></a>
 ### InstalledCell (class)
 
 | Member | Kind | Description |
 |---|---|---|
-| `byte[][] cell_id { get; set; }` | property |  |
-| `string role_id { get; set; }` | property |  |
+| `byte[][] cell_id { get; set; }` | property | Holochain's `cell_id` field (sent to / received from the conductor as-is). |
+| `string role_id { get; set; }` | property | Holochain's `role_id` field (sent to / received from the conductor as-is). |
 
 <a id="nextgensoftware-holochain-holonet-client-holonetclientadmin-installenablesignandattachhappcallback"></a>
 ### HoloNETClientAdmin.InstallEnableSignAndAttachHappCallBack (delegate)
 
 Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
-| Member | Kind | Description |
-|---|---|---|
-| `HoloNETClientAdmin.InstallEnableSignAndAttachHappCallBack(object object, IntPtr method)` | ctor |  |
-| `IAsyncResult BeginInvoke(object sender, InstallEnableSignAndAttachHappEventArgs e, AsyncCallback callback, object object)` | method |  |
-| `void EndInvoke(IAsyncResult result)` | method |  |
-| `void Invoke(object sender, InstallEnableSignAndAttachHappEventArgs e)` | method |  |
+Handler signature: `void InstallEnableSignAndAttachHappCallBack(object sender, InstallEnableSignAndAttachHappEventArgs e)` (the type of the `OnInstallEnableSignAndAttachHappCallBack` event).
 
 <a id="nextgensoftware-holochain-holonet-client-installenablesignandattachhappeventargs"></a>
 ### InstallEnableSignAndAttachHappEventArgs (class)
@@ -2267,12 +2022,7 @@ Inherits / implements: `CallBackBaseEventArgs`
 
 Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
-| Member | Kind | Description |
-|---|---|---|
-| `HoloNETClientAdmin.InstallEnableSignAttachAndConnectToHappCallBack(object object, IntPtr method)` | ctor |  |
-| `IAsyncResult BeginInvoke(object sender, InstallEnableSignAttachAndConnectToHappEventArgs e, AsyncCallback callback, object object)` | method |  |
-| `void EndInvoke(IAsyncResult result)` | method |  |
-| `void Invoke(object sender, InstallEnableSignAttachAndConnectToHappEventArgs e)` | method |  |
+Handler signature: `void InstallEnableSignAttachAndConnectToHappCallBack(object sender, InstallEnableSignAttachAndConnectToHappEventArgs e)` (the type of the `OnInstallEnableSignAttachAndConnectToHappCallBack` event).
 
 <a id="nextgensoftware-holochain-holonet-client-installenablesignattachandconnecttohappeventargs"></a>
 ### InstallEnableSignAttachAndConnectToHappEventArgs (class)
@@ -2281,9 +2031,9 @@ Inherits / implements: `InstallEnableSignAndAttachHappEventArgs`
 
 | Member | Kind | Description |
 |---|---|---|
-| `IHoloNETClientAppAgent HoloNETClientAppAgent { get; set; }` | property |  |
-| `HoloNETConnectedEventArgs HoloNETConnectedResult { get; set; }` | property |  |
-| `bool IsAppConnected { get; set; }` | property |  |
+| `IHoloNETClientAppAgent HoloNETClientAppAgent { get; set; }` | property | What the conductor returned for this request (holo netclient app agent). |
+| `HoloNETConnectedEventArgs HoloNETConnectedResult { get; set; }` | property | What the conductor returned for this request (holo netconnected result). |
+| `bool IsAppConnected { get; set; }` | property | What the conductor returned for this request (is app connected). |
 
 <a id="nextgensoftware-holochain-holonet-client-izomecallsigner"></a>
 ### IZomeCallSigner (interface)
@@ -2292,7 +2042,7 @@ Signs zome calls on HoloNET's behalf. Set `HoloNETClientAppBase.ZomeCallSigner` 
 
 | Member | Kind | Description |
 |---|---|---|
-| `Task<ZomeCallParamsSigned> SignZomeCallAsync(ZomeCallToSign call)` | method |  |
+| `Task<ZomeCallParamsSigned> SignZomeCallAsync(ZomeCallToSign call)` | method | Sign a zome call (implement this to sign with an external key store, e.g. a mobile runtime). |
 
 <a id="nextgensoftware-holochain-holonet-client-keystoreconfig"></a>
 ### KeystoreConfig (class)
@@ -2333,20 +2083,15 @@ Mirrors the Kitsune2-related fields of holochain_conductor_api::config::conducto
 
 | Member | Kind | Description |
 |---|---|---|
-| `AppInfo[] Apps { get; set; }` | property |  |
-| `string type { get; set; }` | property |  |
+| `AppInfo[] Apps { get; set; }` | property | The installed apps. |
+| `string type { get; set; }` | property | Holochain's `type` field (sent to / received from the conductor as-is). |
 
 <a id="nextgensoftware-holochain-holonet-client-holonetclientappbase-memproofsprovidedcallback"></a>
 ### HoloNETClientAppBase.MemproofsProvidedCallBack (delegate)
 
 Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
-| Member | Kind | Description |
-|---|---|---|
-| `HoloNETClientAppBase.MemproofsProvidedCallBack(object object, IntPtr method)` | ctor |  |
-| `IAsyncResult BeginInvoke(object sender, MemproofsProvidedCallBackEventArgs e, AsyncCallback callback, object object)` | method |  |
-| `void EndInvoke(IAsyncResult result)` | method |  |
-| `void Invoke(object sender, MemproofsProvidedCallBackEventArgs e)` | method |  |
+Handler signature: `void MemproofsProvidedCallBack(object sender, MemproofsProvidedCallBackEventArgs e)` (the type of the `OnMemproofsProvidedCallBack` event).
 
 <a id="nextgensoftware-holochain-holonet-client-memproofsprovidedcallbackeventargs"></a>
 ### MemproofsProvidedCallBackEventArgs (class)
@@ -2367,12 +2112,7 @@ Mirrors (the relevant part of) holochain_conductor_api::config::conductor::Netwo
 
 Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
-| Member | Kind | Description |
-|---|---|---|
-| `HoloNETClientAdmin.NetworkMetricsDumpedCallBack(object object, IntPtr method)` | ctor |  |
-| `IAsyncResult BeginInvoke(object sender, NetworkMetricsDumpedCallBackEventArgs e, AsyncCallback callback, object object)` | method |  |
-| `void EndInvoke(IAsyncResult result)` | method |  |
-| `void Invoke(object sender, NetworkMetricsDumpedCallBackEventArgs e)` | method |  |
+Handler signature: `void NetworkMetricsDumpedCallBack(object sender, NetworkMetricsDumpedCallBackEventArgs e)` (the type of the `OnNetworkMetricsDumpedCallBack` event).
 
 <a id="nextgensoftware-holochain-holonet-client-networkmetricsdumpedcallbackeventargs"></a>
 ### NetworkMetricsDumpedCallBackEventArgs (class)
@@ -2381,19 +2121,14 @@ Inherits / implements: `HoloNETDataReceivedBaseEventArgs`
 
 | Member | Kind | Description |
 |---|---|---|
-| `string NetworkMetricsDumpJSON { get; set; }` | property |  |
+| `string NetworkMetricsDumpJSON { get; set; }` | property | What the conductor returned for this request (network metrics dump json). |
 
 <a id="nextgensoftware-holochain-holonet-client-holonetclientadmin-networkstatsdumpedcallback"></a>
 ### HoloNETClientAdmin.NetworkStatsDumpedCallBack (delegate)
 
 Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
-| Member | Kind | Description |
-|---|---|---|
-| `HoloNETClientAdmin.NetworkStatsDumpedCallBack(object object, IntPtr method)` | ctor |  |
-| `IAsyncResult BeginInvoke(object sender, NetworkStatsDumpedCallBackEventArgs e, AsyncCallback callback, object object)` | method |  |
-| `void EndInvoke(IAsyncResult result)` | method |  |
-| `void Invoke(object sender, NetworkStatsDumpedCallBackEventArgs e)` | method |  |
+Handler signature: `void NetworkStatsDumpedCallBack(object sender, NetworkStatsDumpedCallBackEventArgs e)` (the type of the `OnNetworkStatsDumpedCallBack` event).
 
 <a id="nextgensoftware-holochain-holonet-client-networkstatsdumpedcallbackeventargs"></a>
 ### NetworkStatsDumpedCallBackEventArgs (class)
@@ -2447,9 +2182,9 @@ Mirrors holochain_conductor_api::state_dump::OpTimingsDump. One page of op timin
 
 | Member | Kind | Description |
 |---|---|---|
-| `AgentInfoDump[] peers { get; set; }` | property |  |
+| `AgentInfoDump[] peers { get; set; }` | property | Holochain's `peers` field (sent to / received from the conductor as-is). |
 | `object[] this_agent { get; set; }` | property | [AgentPubKey bytes, kitsune agent id (base64 string)], or null. |
-| `AgentInfoDump this_agent_info { get; set; }` | property |  |
+| `AgentInfoDump this_agent_info { get; set; }` | property | Holochain's `this_agent_info` field (sent to / received from the conductor as-is). |
 | `object[] this_dna { get; set; }` | property | [DnaHash bytes, kitsune space id (base64 string)], or null. |
 
 <a id="nextgensoftware-holochain-holonet-client-pausedappreasontype"></a>
@@ -2473,12 +2208,7 @@ Mirrors holochain_conductor_api::admin_interface::AdminResponse::PeerMetaInfo (a
 
 Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
-| Member | Kind | Description |
-|---|---|---|
-| `HoloNETClientAdmin.PeerMetaInfoReturnedCallBack(object object, IntPtr method)` | ctor |  |
-| `IAsyncResult BeginInvoke(object sender, PeerMetaInfoReturnedCallBackEventArgs e, AsyncCallback callback, object object)` | method |  |
-| `void EndInvoke(IAsyncResult result)` | method |  |
-| `void Invoke(object sender, PeerMetaInfoReturnedCallBackEventArgs e)` | method |  |
+Handler signature: `void PeerMetaInfoReturnedCallBack(object sender, PeerMetaInfoReturnedCallBackEventArgs e)` (the type of the `OnPeerMetaInfoReturnedCallBack` event).
 
 <a id="nextgensoftware-holochain-holonet-client-peermetainforeturnedcallbackeventargs"></a>
 ### PeerMetaInfoReturnedCallBackEventArgs (class)
@@ -2487,7 +2217,7 @@ Inherits / implements: `HoloNETDataReceivedBaseEventArgs`
 
 | Member | Kind | Description |
 |---|---|---|
-| `PeerMetaInfoResponse PeerMetaInfo { get; set; }` | property |  |
+| `PeerMetaInfoResponse PeerMetaInfo { get; set; }` | property | What the conductor returned for this request (peer meta info). |
 
 <a id="nextgensoftware-holochain-holonet-client-providememproofsrequest"></a>
 ### ProvideMemproofsRequest (class)
@@ -2496,7 +2226,7 @@ Mirrors the payload of AppRequest::ProvideMemproofs(MemproofMap) (Holochain 0.7.
 
 | Member | Kind | Description |
 |---|---|---|
-| `Dictionary<string, byte[]> MembraneProofs { get; set; }` | property |  |
+| `Dictionary<string, byte[]> MembraneProofs { get; set; }` | property | The membrane proof for each role (role name -> proof bytes). |
 
 <a id="nextgensoftware-holochain-holonet-client-provisioningstrategytype"></a>
 ### ProvisioningStrategyType (enum)
@@ -2511,12 +2241,7 @@ Mirrors the payload of AppRequest::ProvideMemproofs(MemproofMap) (Holochain 0.7.
 
 Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
-| Member | Kind | Description |
-|---|---|---|
-| `HoloNETClientAppBase.PublishCountersigningSessionTriggeredCallBack(object object, IntPtr method)` | ctor |  |
-| `IAsyncResult BeginInvoke(object sender, PublishCountersigningSessionTriggeredCallBackEventArgs e, AsyncCallback callback, object object)` | method |  |
-| `void EndInvoke(IAsyncResult result)` | method |  |
-| `void Invoke(object sender, PublishCountersigningSessionTriggeredCallBackEventArgs e)` | method |  |
+Handler signature: `void PublishCountersigningSessionTriggeredCallBack(object sender, PublishCountersigningSessionTriggeredCallBackEventArgs e)` (the type of the `OnPublishCountersigningSessionTriggeredCallBack` event).
 
 <a id="nextgensoftware-holochain-holonet-client-publishcountersigningsessiontriggeredcallbackeventargs"></a>
 ### PublishCountersigningSessionTriggeredCallBackEventArgs (class)
@@ -2537,12 +2262,7 @@ NOT VERIFIED / NOT WIRED against any real Holochain 0.7.0 conductor-facing confi
 
 Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
-| Member | Kind | Description |
-|---|---|---|
-| `HoloNETClientAppBase.ReadyForZomeCalls(object object, IntPtr method)` | ctor |  |
-| `IAsyncResult BeginInvoke(object sender, ReadyForZomeCallsEventArgs e, AsyncCallback callback, object object)` | method |  |
-| `void EndInvoke(IAsyncResult result)` | method |  |
-| `void Invoke(object sender, ReadyForZomeCallsEventArgs e)` | method |  |
+Handler signature: `void ReadyForZomeCalls(object sender, ReadyForZomeCallsEventArgs e)` (the type of the `OnReadyForZomeCalls` event).
 
 <a id="nextgensoftware-holochain-holonet-client-readyforzomecallseventargs"></a>
 ### ReadyForZomeCallsEventArgs (class)
@@ -2551,10 +2271,10 @@ Inherits / implements: `CallBackBaseEventArgs`
 
 | Member | Kind | Description |
 |---|---|---|
-| `ReadyForZomeCallsEventArgs(Uri endPoint, string dnaHash, string agentPubKey)` | ctor |  |
-| `string AgentPubKey { get; set; }` | property |  |
-| `string DnaHash { get; set; }` | property |  |
-| `Uri EndPoint { get; set; }` | property |  |
+| `ReadyForZomeCallsEventArgs(Uri endPoint, string dnaHash, string agentPubKey)` | ctor | Create the event args with these values (HoloNET raises them; you rarely construct one). |
+| `string AgentPubKey { get; set; }` | property | The agent public key (HoloHash string) this applies to. |
+| `string DnaHash { get; set; }` | property | The DNA hash (HoloHash string) this applies to. |
+| `Uri EndPoint { get; set; }` | property | The conductor WebSocket endpoint this came from. |
 
 <a id="nextgensoftware-holochain-holonet-client-record"></a>
 ### Record (class)
@@ -2595,12 +2315,7 @@ Inherits / implements: `IRecord`
 
 Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
-| Member | Kind | Description |
-|---|---|---|
-| `HoloNETClientAdmin.RecordsGraftedCallBack(object object, IntPtr method)` | ctor |  |
-| `IAsyncResult BeginInvoke(object sender, RecordsGraftedCallBackEventArgs e, AsyncCallback callback, object object)` | method |  |
-| `void EndInvoke(IAsyncResult result)` | method |  |
-| `void Invoke(object sender, RecordsGraftedCallBackEventArgs e)` | method |  |
+Handler signature: `void RecordsGraftedCallBack(object sender, RecordsGraftedCallBackEventArgs e)` (the type of the `OnRecordsGraftedCallBack` event).
 
 <a id="nextgensoftware-holochain-holonet-client-recordsgraftedcallbackeventargs"></a>
 ### RecordsGraftedCallBackEventArgs (class)
@@ -2631,12 +2346,7 @@ Inherits / implements: `HoloNETDataReceivedBaseEventArgs`
 
 Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
-| Member | Kind | Description |
-|---|---|---|
-| `HoloNETClientAppBase.SignalCallBack(object object, IntPtr method)` | ctor |  |
-| `IAsyncResult BeginInvoke(object sender, SignalCallBackEventArgs e, AsyncCallback callback, object object)` | method |  |
-| `void EndInvoke(IAsyncResult result)` | method |  |
-| `void Invoke(object sender, SignalCallBackEventArgs e)` | method |  |
+Handler signature: `void SignalCallBack(object sender, SignalCallBackEventArgs e)` (the type of the `OnSignalCallBack` event).
 
 <a id="nextgensoftware-holochain-holonet-client-signalcallbackeventargs"></a>
 ### SignalCallBackEventArgs (class)
@@ -2645,14 +2355,14 @@ Inherits / implements: `HoloNETDataReceivedBaseEventArgs`
 
 | Member | Kind | Description |
 |---|---|---|
-| `string AgentPubKey { get; set; }` | property |  |
-| `string DnaHash { get; set; }` | property |  |
+| `string AgentPubKey { get; set; }` | property | The agent public key (HoloHash string) this applies to. |
+| `string DnaHash { get; set; }` | property | The DNA hash (HoloHash string) this applies to. |
 | `string FromAgentPubKey { get; set; }` | property | Holochain 0.7.1+: the agent who sent a direct signal (null for zome signals and on 0.7.0). |
 | `bool IsDirectSignal { get; set; }` | property | True for a direct signal from another agent (send_direct_signal), false for one emitted by a zome. |
-| `ISignalData RawSignalData { get; set; }` | property |  |
-| `Dictionary<string, object> SignalData { get; set; }` | property |  |
-| `string SignalDataAsString { get; set; }` | property |  |
-| `SignalType SignalType { get; set; }` | property |  |
+| `ISignalData RawSignalData { get; set; }` | property | The raw signal: its MessagePack bytes are in Data. |
+| `Dictionary<string, object> SignalData { get; set; }` | property | The decoded signal payload as key/value pairs. |
+| `string SignalDataAsString { get; set; }` | property | The decoded signal payload as text (for logging). |
+| `SignalType SignalType { get; set; }` | property | Whether this is an app signal (emitted by a zome) or a system signal. |
 | `string SystemSignalType { get; set; }` | property | For system signals, the variant (e.g. "successful_countersigning", "restore_complete"). |
 
 <a id="nextgensoftware-holochain-holonet-client-signaldata"></a>
@@ -2662,15 +2372,15 @@ Inherits / implements: `ISignalData`
 
 | Member | Kind | Description |
 |---|---|---|
-| `byte[][] CellData { get; set; }` | property |  |
-| `byte[] Data { get; set; }` | property |  |
+| `byte[][] CellData { get; set; }` | property | The cell id the signal came from ([DNA hash, agent public key]). |
+| `byte[] Data { get; set; }` | property | The signal payload as MessagePack bytes (what the zome passed to emit_signal). |
 
 <a id="nextgensoftware-holochain-holonet-client-signalresponse"></a>
 ### SignalResponse (class)
 
 | Member | Kind | Description |
 |---|---|---|
-| `SignalData App { get; set; }` | property |  |
+| `SignalData App { get; set; }` | property | The app signal. |
 
 <a id="nextgensoftware-holochain-holonet-client-signaltype"></a>
 ### SignalType (enum)
@@ -2689,16 +2399,16 @@ The "value" of holochain_types::signal::Signal::App / AppDirect (Holochain 0.7.0
 |---|---|---|
 | `byte[][] cell_id { get; set; }` | property | CellId tuple: [0] = DnaHash, [1] = AgentPubKey. |
 | `byte[] from_agent { get; set; }` | property | Holochain 0.7.1+ app_direct only: the agent who sent the direct signal. |
-| `byte[] signal { get; set; }` | property |  |
-| `string zome_name { get; set; }` | property |  |
+| `byte[] signal { get; set; }` | property | Holochain's `signal` field (sent to / received from the conductor as-is). |
+| `string zome_name { get; set; }` | property | Holochain's `zome_name` field (sent to / received from the conductor as-is). |
 
 <a id="nextgensoftware-holochain-holonet-client-signature"></a>
 ### Signature (struct)
 
 | Member | Kind | Description |
 |---|---|---|
-| `Signature(byte[] value)` | ctor |  |
-| `byte[] Value { get; }` | property |  |
+| `Signature(byte[] value)` | ctor | A signature from its 64 raw bytes. |
+| `byte[] Value { get; }` | property | The raw signature bytes. |
 
 <a id="nextgensoftware-holochain-holonet-client-sourcechaincursor"></a>
 ### SourceChainCursor (static class)
@@ -2707,16 +2417,16 @@ Pagination cursor for dump_state (holochain_state_types::SourceChainCursor, an e
 
 | Member | Kind | Description |
 |---|---|---|
-| `static object ActionHash(byte[] actionHash)` | method |  |
-| `static object Sequence(uint actionSeq)` | method |  |
+| `static object ActionHash(byte[] actionHash)` | method | Start a source chain dump at this action. |
+| `static object Sequence(uint actionSeq)` | method | Start a source chain dump at this action sequence number. |
 
 <a id="nextgensoftware-holochain-holonet-client-sourcechainjsondump"></a>
 ### SourceChainJsonDump (class)
 
 | Member | Kind | Description |
 |---|---|---|
-| `int published_ops_count { get; set; }` | property |  |
-| `SourceChainJsonRecord[] records { get; set; }` | property |  |
+| `int published_ops_count { get; set; }` | property | Holochain's `published_ops_count` field (sent to / received from the conductor as-is). |
+| `SourceChainJsonRecord[] records { get; set; }` | property | Holochain's `records` field (sent to / received from the conductor as-is). |
 
 <a id="nextgensoftware-holochain-holonet-client-sourcechainjsonrecord"></a>
 ### SourceChainJsonRecord (class)
@@ -2724,21 +2434,16 @@ Pagination cursor for dump_state (holochain_state_types::SourceChainCursor, an e
 | Member | Kind | Description |
 |---|---|---|
 | `object action { get; set; }` | property | The action as decoded msgpack (its "type" says which kind). |
-| `byte[] action_address { get; set; }` | property |  |
+| `byte[] action_address { get; set; }` | property | Holochain's `action_address` field (sent to / received from the conductor as-is). |
 | `object entry { get; set; }` | property | The entry (tagged by "entry_type"), or null. |
-| `byte[] signature { get; set; }` | property |  |
+| `byte[] signature { get; set; }` | property | Holochain's `signature` field (sent to / received from the conductor as-is). |
 
 <a id="nextgensoftware-holochain-holonet-client-holonetclientadmin-statedumpedcallback"></a>
 ### HoloNETClientAdmin.StateDumpedCallBack (delegate)
 
 Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
-| Member | Kind | Description |
-|---|---|---|
-| `HoloNETClientAdmin.StateDumpedCallBack(object object, IntPtr method)` | ctor |  |
-| `IAsyncResult BeginInvoke(object sender, StateDumpedCallBackEventArgs e, AsyncCallback callback, object object)` | method |  |
-| `void EndInvoke(IAsyncResult result)` | method |  |
-| `void Invoke(object sender, StateDumpedCallBackEventArgs e)` | method |  |
+Handler signature: `void StateDumpedCallBack(object sender, StateDumpedCallBackEventArgs e)` (the type of the `OnStateDumpedCallBack` event).
 
 <a id="nextgensoftware-holochain-holonet-client-statedumpedcallbackeventargs"></a>
 ### StateDumpedCallBackEventArgs (class)
@@ -2747,7 +2452,7 @@ Inherits / implements: `HoloNETDataReceivedBaseEventArgs`
 
 | Member | Kind | Description |
 |---|---|---|
-| `string DumpedStateJSON { get; set; }` | property |  |
+| `string DumpedStateJSON { get; set; }` | property | What the conductor returned for this request (dumped state json). |
 
 <a id="nextgensoftware-holochain-holonet-client-storageinforesponse"></a>
 ### StorageInfoResponse (class)
@@ -2756,19 +2461,14 @@ Inherits / implements: `IStorageInfoResponse`
 
 | Member | Kind | Description |
 |---|---|---|
-| `DnaStorageBlob[] blobs { get; set; }` | property |  |
+| `DnaStorageBlob[] blobs { get; set; }` | property | Holochain's `blobs` field (sent to / received from the conductor as-is). |
 
 <a id="nextgensoftware-holochain-holonet-client-holonetclientadmin-storageinforeturnedcallback"></a>
 ### HoloNETClientAdmin.StorageInfoReturnedCallBack (delegate)
 
 Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
-| Member | Kind | Description |
-|---|---|---|
-| `HoloNETClientAdmin.StorageInfoReturnedCallBack(object object, IntPtr method)` | ctor |  |
-| `IAsyncResult BeginInvoke(object sender, StorageInfoReturnedCallBackEventArgs e, AsyncCallback callback, object object)` | method |  |
-| `void EndInvoke(IAsyncResult result)` | method |  |
-| `void Invoke(object sender, StorageInfoReturnedCallBackEventArgs e)` | method |  |
+Handler signature: `void StorageInfoReturnedCallBack(object sender, StorageInfoReturnedCallBackEventArgs e)` (the type of the `OnStorageInfoReturnedCallBack` event).
 
 <a id="nextgensoftware-holochain-holonet-client-storageinforeturnedcallbackeventargs"></a>
 ### StorageInfoReturnedCallBackEventArgs (class)
@@ -2777,7 +2477,7 @@ Inherits / implements: `HoloNETDataReceivedBaseEventArgs`
 
 | Member | Kind | Description |
 |---|---|---|
-| `IStorageInfoResponse StorageInfoResponse { get; set; }` | property |  |
+| `IStorageInfoResponse StorageInfoResponse { get; set; }` | property | What the conductor returned for this request (storage info response). |
 
 <a id="nextgensoftware-holochain-holonet-client-transportconnectionstats"></a>
 ### TransportConnectionStats (class)
@@ -2808,12 +2508,7 @@ NOT VERIFIED / NOT WIRED against any real Holochain 0.7.0 conductor-facing confi
 
 Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
-| Member | Kind | Description |
-|---|---|---|
-| `HoloNETClientAppBase.WasmHostFunctionsListedCallBack(object object, IntPtr method)` | ctor |  |
-| `IAsyncResult BeginInvoke(object sender, WasmHostFunctionsListedCallBackEventArgs e, AsyncCallback callback, object object)` | method |  |
-| `void EndInvoke(IAsyncResult result)` | method |  |
-| `void Invoke(object sender, WasmHostFunctionsListedCallBackEventArgs e)` | method |  |
+Handler signature: `void WasmHostFunctionsListedCallBack(object sender, WasmHostFunctionsListedCallBackEventArgs e)` (the type of the `OnWasmHostFunctionsListedCallBack` event).
 
 <a id="nextgensoftware-holochain-holonet-client-wasmhostfunctionslistedcallbackeventargs"></a>
 ### WasmHostFunctionsListedCallBackEventArgs (class)
@@ -2822,7 +2517,7 @@ Inherits / implements: `HoloNETDataReceivedBaseEventArgs`
 
 | Member | Kind | Description |
 |---|---|---|
-| `List<string> WasmHostFunctions { get; set; }` | property |  |
+| `List<string> WasmHostFunctions { get; set; }` | property | What the conductor returned for this request (wasm host functions). |
 
 <a id="nextgensoftware-holochain-holonet-client-zomecall"></a>
 ### ZomeCall (class)
@@ -2831,26 +2526,21 @@ Mirrors the Rust holochain_zome_types::zome_io::ZomeCallParams struct (Holochain
 
 | Member | Kind | Description |
 |---|---|---|
-| `byte[] cap_secret { get; set; }` | property |  |
-| `CellId cell_id { get; set; }` | property |  |
-| `long expires_at { get; set; }` | property |  |
-| `string fn_name { get; set; }` | property |  |
-| `byte[] nonce { get; set; }` | property |  |
-| `byte[] payload { get; set; }` | property |  |
-| `byte[] provenance { get; set; }` | property |  |
-| `string zome_name { get; set; }` | property |  |
+| `byte[] cap_secret { get; set; }` | property | Holochain's `cap_secret` field (sent to / received from the conductor as-is). |
+| `CellId cell_id { get; set; }` | property | Holochain's `cell_id` field (sent to / received from the conductor as-is). |
+| `long expires_at { get; set; }` | property | Holochain's `expires_at` field (sent to / received from the conductor as-is). |
+| `string fn_name { get; set; }` | property | Holochain's `fn_name` field (sent to / received from the conductor as-is). |
+| `byte[] nonce { get; set; }` | property | Holochain's `nonce` field (sent to / received from the conductor as-is). |
+| `byte[] payload { get; set; }` | property | Holochain's `payload` field (sent to / received from the conductor as-is). |
+| `byte[] provenance { get; set; }` | property | Holochain's `provenance` field (sent to / received from the conductor as-is). |
+| `string zome_name { get; set; }` | property | Holochain's `zome_name` field (sent to / received from the conductor as-is). |
 
 <a id="nextgensoftware-holochain-holonet-client-holonetclientadmin-zomecallcapabilitygrantedcallback"></a>
 ### HoloNETClientAdmin.ZomeCallCapabilityGrantedCallBack (delegate)
 
 Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
-| Member | Kind | Description |
-|---|---|---|
-| `HoloNETClientAdmin.ZomeCallCapabilityGrantedCallBack(object object, IntPtr method)` | ctor |  |
-| `IAsyncResult BeginInvoke(object sender, ZomeCallCapabilityGrantedCallBackEventArgs e, AsyncCallback callback, object object)` | method |  |
-| `void EndInvoke(IAsyncResult result)` | method |  |
-| `void Invoke(object sender, ZomeCallCapabilityGrantedCallBackEventArgs e)` | method |  |
+Handler signature: `void ZomeCallCapabilityGrantedCallBack(object sender, ZomeCallCapabilityGrantedCallBackEventArgs e)` (the type of the `OnZomeCallCapabilityGrantedCallBack` event).
 
 <a id="nextgensoftware-holochain-holonet-client-zomecallcapabilitygrantedcallbackeventargs"></a>
 ### ZomeCallCapabilityGrantedCallBackEventArgs (class)
@@ -2862,12 +2552,7 @@ Inherits / implements: `HoloNETDataReceivedBaseEventArgs`
 
 Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
-| Member | Kind | Description |
-|---|---|---|
-| `HoloNETClientAdmin.ZomeCallCapabilityRevokedCallBack(object object, IntPtr method)` | ctor |  |
-| `IAsyncResult BeginInvoke(object sender, ZomeCallCapabilityRevokedCallBackEventArgs e, AsyncCallback callback, object object)` | method |  |
-| `void EndInvoke(IAsyncResult result)` | method |  |
-| `void Invoke(object sender, ZomeCallCapabilityRevokedCallBackEventArgs e)` | method |  |
+Handler signature: `void ZomeCallCapabilityRevokedCallBack(object sender, ZomeCallCapabilityRevokedCallBackEventArgs e)` (the type of the `OnZomeCallCapabilityRevokedCallBack` event).
 
 <a id="nextgensoftware-holochain-holonet-client-zomecallcapabilityrevokedcallbackeventargs"></a>
 ### ZomeCallCapabilityRevokedCallBackEventArgs (class)
@@ -2881,9 +2566,9 @@ Mirrors holochain_conductor_api::app_interface::ZomeCallParamsSigned (Holochain 
 
 | Member | Kind | Description |
 |---|---|---|
-| `ZomeCallParamsSigned(byte[] bytes, byte[] signature)` | ctor |  |
-| `byte[] bytes { get; set; }` | property |  |
-| `byte[] signature { get; set; }` | property |  |
+| `ZomeCallParamsSigned(byte[] bytes, byte[] signature)` | ctor | Signed zome call parameters: the serialised call and its signature. |
+| `byte[] bytes { get; set; }` | property | Holochain's `bytes` field (sent to / received from the conductor as-is). |
+| `byte[] signature { get; set; }` | property | Holochain's `signature` field (sent to / received from the conductor as-is). |
 
 <a id="nextgensoftware-holochain-holonet-client-zomecallsigned"></a>
 ### ZomeCallSigned (class)
@@ -2892,7 +2577,7 @@ Inherits / implements: `ZomeCall`
 
 | Member | Kind | Description |
 |---|---|---|
-| `byte[] signature { get; set; }` | property |  |
+| `byte[] signature { get; set; }` | property | Holochain's `signature` field (sent to / received from the conductor as-is). |
 
 <a id="nextgensoftware-holochain-holonet-client-zomecalltosign"></a>
 ### ZomeCallToSign (class)
@@ -2901,11 +2586,11 @@ The fields of a zome call before signing. A signer chooses the provenance (agent
 
 | Member | Kind | Description |
 |---|---|---|
-| `byte[] CellIdAgentPubKey { get; set; }` | property |  |
-| `byte[] CellIdDnaHash { get; set; }` | property |  |
+| `byte[] CellIdAgentPubKey { get; set; }` | property | The agent public key of the cell being called. |
+| `byte[] CellIdDnaHash { get; set; }` | property | The DNA hash of the cell being called. |
 | `long ExpiresAt { get; set; }` | property | Microseconds since the Unix epoch. |
-| `string FnName { get; set; }` | property |  |
-| `byte[] Nonce { get; set; }` | property |  |
+| `string FnName { get; set; }` | property | The zome function being called. |
+| `byte[] Nonce { get; set; }` | property | The call's one-time nonce (replay protection). |
 | `byte[] Payload { get; set; }` | property | The msgpack-encoded zome function input. |
 | `string ZomeName { get; set; }` | property | This is the name of the rust zome in your hApp that this instance of the HoloNETEntryBaseClass maps onto. You can set this either through this property or through one of the constructors. |
 
@@ -2914,23 +2599,23 @@ The fields of a zome call before signing. A signer chooses the provenance (agent
 
 | Member | Kind | Description |
 |---|---|---|
-| `byte[] cap_secret` | field |  |
-| `byte[] cell_id_agent_pub_key` | field |  |
-| `byte[] cell_id_dna_hash` | field |  |
-| `long expires_at` | field |  |
-| `string fn_name` | field |  |
-| `byte[] nonce` | field |  |
-| `byte[] payload` | field |  |
-| `byte[] provenance` | field |  |
-| `string zome_name` | field |  |
+| `byte[] cap_secret` | field | Holochain's `cap_secret` field (sent to / received from the conductor as-is). |
+| `byte[] cell_id_agent_pub_key` | field | Holochain's `cell_id_agent_pub_key` field (sent to / received from the conductor as-is). |
+| `byte[] cell_id_dna_hash` | field | Holochain's `cell_id_dna_hash` field (sent to / received from the conductor as-is). |
+| `long expires_at` | field | Holochain's `expires_at` field (sent to / received from the conductor as-is). |
+| `string fn_name` | field | Holochain's `fn_name` field (sent to / received from the conductor as-is). |
+| `byte[] nonce` | field | Holochain's `nonce` field (sent to / received from the conductor as-is). |
+| `byte[] payload` | field | Holochain's `payload` field (sent to / received from the conductor as-is). |
+| `byte[] provenance` | field | Holochain's `provenance` field (sent to / received from the conductor as-is). |
+| `string zome_name` | field | Holochain's `zome_name` field (sent to / received from the conductor as-is). |
 
 <a id="nextgensoftware-holochain-holonet-client-zomedefinition"></a>
 ### ZomeDefinition (class)
 
 | Member | Kind | Description |
 |---|---|---|
-| `List<string> Dependencies { get; set; }` | property |  |
-| `byte[] wasm_hash { get; set; }` | property |  |
+| `List<string> Dependencies { get; set; }` | property | The integrity zomes this coordinator zome depends on. |
+| `byte[] wasm_hash { get; set; }` | property | Holochain's `wasm_hash` field (sent to / received from the conductor as-is). |
 | `string ZomeName { get; set; }` | property | This is the name of the rust zome in your hApp that this instance of the HoloNETEntryBaseClass maps onto. You can set this either through this property or through one of the constructors. |
 
 <a id="nextgensoftware-holochain-holonet-client-holonetclientappbase-zomefunctioncallback"></a>
@@ -2938,12 +2623,7 @@ The fields of a zome call before signing. A signer chooses the provenance (agent
 
 Inherits / implements: `MulticastDelegate`, `ICloneable`, `ISerializable`
 
-| Member | Kind | Description |
-|---|---|---|
-| `HoloNETClientAppBase.ZomeFunctionCallBack(object object, IntPtr method)` | ctor |  |
-| `IAsyncResult BeginInvoke(object sender, ZomeFunctionCallBackEventArgs e, AsyncCallback callback, object object)` | method |  |
-| `void EndInvoke(IAsyncResult result)` | method |  |
-| `void Invoke(object sender, ZomeFunctionCallBackEventArgs e)` | method |  |
+Handler signature: `void ZomeFunctionCallBack(object sender, ZomeFunctionCallBackEventArgs e)` (the type of the `OnZomeFunctionCallBack` event).
 
 <a id="nextgensoftware-holochain-holonet-client-zomefunctioncallbackeventargs"></a>
 ### ZomeFunctionCallBackEventArgs (class)
@@ -2955,7 +2635,7 @@ Inherits / implements: `HoloNETDataReceivedBaseEventArgs`
 | `Dictionary<string, string> KeyValuePair { get; set; }` | property | Contains all of the data returned from the zome call in a simple Dictionary keyvalue pair. The conductor for some reason returns a complex nested structure so is difficult and tedious to get to all the data needed or to quickly view all of it at once. |
 | `string KeyValuePairAsString { get; set; }` | property | Contains the same data from KeyValuePair but formatted as a simple string, which can be used for logging, displaying, etc. |
 | `Dictionary<object, object> RawZomeReturnData { get; set; }` | property | The raw binary data that the zome function returned. |
-| `List<Record> Records { get; set; }` | property |  |
+| `List<Record> Records { get; set; }` | property | What the conductor returned for this request (records). |
 | `string Zome { get; set; }` | property | The zome that made the request. |
 | `string ZomeFunction { get; set; }` | property | The zome function that made the request. |
 | `Dictionary<string, object> ZomeReturnData { get; set; }` | property | The parsed data that the zome function returned. HoloNET will parse & convert the best it can from the Rust Holochain Conductor format to a C# friendly one such as converting from base64 encoding, etc. |
@@ -3281,9 +2961,9 @@ Builds the wire form of holochain_integrity_types::capability::CapAccess. Rust: 
 
 | Member | Kind | Description |
 |---|---|---|
-| `static Dictionary<string, object> Assigned(byte[] secret, byte[][] assignees)` | method |  |
-| `static Dictionary<string, object> Transferable(byte[] secret)` | method |  |
-| `static Dictionary<string, object> Unrestricted()` | method |  |
+| `static Dictionary<string, object> Assigned(byte[] secret, byte[][] assignees)` | method | A grant only these agents may use, with this secret (what HoloNET uses for zome-call signing). |
+| `static Dictionary<string, object> Transferable(byte[] secret)` | method | A grant anyone holding this secret may use. |
+| `static Dictionary<string, object> Unrestricted()` | method | A grant anyone may use (Holochain 0.7 rejects this for zome-call signing; fine for e.g. recv_remote_signal). |
 
 <a id="nextgensoftware-holochain-holonet-client-data-admin-requests-objects-capgrantaccessassigned"></a>
 ### CapGrantAccessAssigned (class)
@@ -3340,8 +3020,8 @@ Inherits / implements: `IMessagePackFormatter<CellInfo>`, `IMessagePackFormatter
 
 | Member | Kind | Description |
 |---|---|---|
-| `CellInfo Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options)` | method |  |
-| `void Serialize(ref MessagePackWriter writer, CellInfo value, MessagePackSerializerOptions options)` | method |  |
+| `CellInfo Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options)` | method | MessagePack formatter plumbing used by HoloNET's serialiser (you don't call this). |
+| `void Serialize(ref MessagePackWriter writer, CellInfo value, MessagePackSerializerOptions options)` | method | MessagePack formatter plumbing used by HoloNET's serialiser (you don't call this). |
 
 <a id="nextgensoftware-holochain-holonet-client-data-admin-requests-objects-coordinatorbundle"></a>
 ### CoordinatorBundle (class)
@@ -3403,8 +3083,8 @@ Builds the wire form of holochain_integrity_types::capability::GrantedFunctions.
 | Member | Kind | Description |
 |---|---|---|
 | `Dictionary<string, object> Functions { get; set; }` | property | Holochain's `functions` field (sent to / received from the conductor as-is). |
-| `static GrantedFunctions All()` | method |  |
-| `static GrantedFunctions Listed(List<ValueTuple<string, string>> grants)` | method |  |
+| `static GrantedFunctions All()` | method | Grant every zome function. |
+| `static GrantedFunctions Listed(List<ValueTuple<string, string>> grants)` | method | Grant only these (zome, function) pairs. |
 
 <a id="nextgensoftware-holochain-holonet-client-data-admin-requests-objects-grantedfunctionstype"></a>
 ### GrantedFunctionsType (enum)
@@ -3454,27 +3134,27 @@ One integrity zome entry inside IntegrityManifest.zomes (Holochain 0.7.0). Mirro
 
 | Member | Kind | Description |
 |---|---|---|
-| `KitsuneAgent(byte[] data)` | ctor |  |
+| `KitsuneAgent(byte[] data)` | ctor | A Kitsune (Holochain networking) agent id from its raw bytes. |
 | `byte[] Data { get; set; }` | property | Holochain's `data` field (sent to / received from the conductor as-is). |
-| `byte[] GetData()` | method |  |
+| `byte[] GetData()` | method | The raw bytes. |
 
 <a id="nextgensoftware-holochain-holonet-client-data-admin-requests-objects-kitsunesignature"></a>
 ### KitsuneSignature (class)
 
 | Member | Kind | Description |
 |---|---|---|
-| `KitsuneSignature(byte[] data)` | ctor |  |
+| `KitsuneSignature(byte[] data)` | ctor | A Kitsune signature from its raw bytes. |
 | `byte[] Data { get; set; }` | property | Holochain's `data` field (sent to / received from the conductor as-is). |
-| `byte[] GetData()` | method |  |
+| `byte[] GetData()` | method | The raw bytes. |
 
 <a id="nextgensoftware-holochain-holonet-client-data-admin-requests-objects-kitsunespace"></a>
 ### KitsuneSpace (class)
 
 | Member | Kind | Description |
 |---|---|---|
-| `KitsuneSpace(byte[] data)` | ctor |  |
+| `KitsuneSpace(byte[] data)` | ctor | A Kitsune space (a DNA's network) id from its raw bytes. |
 | `byte[] Data { get; set; }` | property | Holochain's `data` field (sent to / received from the conductor as-is). |
-| `byte[] GetData()` | method |  |
+| `byte[] GetData()` | method | The raw bytes. |
 
 <a id="nextgensoftware-holochain-holonet-client-data-admin-requests-objects-rustduration"></a>
 ### RustDuration (struct)
@@ -3529,7 +3209,7 @@ Mirrors holochain_types::dna::dna_manifest::ZomeManifest (Holochain 0.7.0), used
 | Member | Kind | Description |
 |---|---|---|
 | `byte[] Data { get; set; }` | property | Holochain's `data` field (sent to / received from the conductor as-is). |
-| `string Type { get; set; }` | property | Holochain's `type` field (sent to / received from the conductor as-is). |
+| `string Type { get; set; }` | property | The conductor message type. |
 
 <a id="nextgensoftware-holochain-holonet-client-data-app-requests-appauthenticationrequest"></a>
 ### AppAuthenticationRequest (class)
@@ -3621,98 +3301,98 @@ Inherits / implements: `ICell`
 
 | Member | Kind | Description |
 |---|---|---|
-| `byte[] agent_pub_key { get; set; }` | property |  |
-| `string AgentPubKey { get; set; }` | property |  |
-| `AppInfoStatusEnum AppStatus { get; }` | property |  |
-| `string AppStatusReason { get; }` | property |  |
-| `Dictionary<string, List<CellInfo>> cell_info { get; set; }` | property |  |
-| `byte[][] CellId { get; set; }` | property |  |
-| `string DnaHash { get; set; }` | property |  |
-| `string installed_app_id { get; set; }` | property |  |
-| `AppManifest manifest { get; set; }` | property |  |
-| `Dictionary<string, object> status { get; set; }` | property |  |
+| `byte[] agent_pub_key { get; set; }` | property | Holochain's `agent_pub_key` field (sent to / received from the conductor as-is). |
+| `string AgentPubKey { get; set; }` | property | The agent public key (HoloHash string) this applies to. |
+| `AppInfoStatusEnum AppStatus { get; }` | property | The app's status as the conductor reports it (enabled, disabled, paused...). |
+| `string AppStatusReason { get; }` | property | Why the app is disabled or paused, if it is. |
+| `Dictionary<string, List<CellInfo>> cell_info { get; set; }` | property | Holochain's `cell_info` field (sent to / received from the conductor as-is). |
+| `byte[][] CellId { get; set; }` | property | The cell id: [DNA hash, agent public key] as raw bytes. |
+| `string DnaHash { get; set; }` | property | The DNA hash (HoloHash string) this applies to. |
+| `string installed_app_id { get; set; }` | property | Holochain's `installed_app_id` field (sent to / received from the conductor as-is). |
+| `AppManifest manifest { get; set; }` | property | Holochain's `manifest` field (sent to / received from the conductor as-is). |
+| `Dictionary<string, object> status { get; set; }` | property | Holochain's `status` field (sent to / received from the conductor as-is). |
 
 <a id="nextgensoftware-holochain-holonet-client-interfaces-iappinforesponse"></a>
 ### IAppInfoResponse (interface)
 
 | Member | Kind | Description |
 |---|---|---|
-| `AppInfo data { get; set; }` | property |  |
-| `string type { get; set; }` | property |  |
+| `AppInfo data { get; set; }` | property | Holochain's `data` field (sent to / received from the conductor as-is). |
+| `string type { get; set; }` | property | Holochain's `type` field (sent to / received from the conductor as-is). |
 
 <a id="nextgensoftware-holochain-holonet-client-interfaces-iappmanifest"></a>
 ### IAppManifest (interface)
 
 | Member | Kind | Description |
 |---|---|---|
-| `string description { get; set; }` | property |  |
-| `string manifest_version { get; set; }` | property |  |
-| `string name { get; set; }` | property |  |
-| `Roles[] roles { get; set; }` | property |  |
+| `string description { get; set; }` | property | Holochain's `description` field (sent to / received from the conductor as-is). |
+| `string manifest_version { get; set; }` | property | Holochain's `manifest_version` field (sent to / received from the conductor as-is). |
+| `string name { get; set; }` | property | Holochain's `name` field (sent to / received from the conductor as-is). |
+| `Roles[] roles { get; set; }` | property | Holochain's `roles` field (sent to / received from the conductor as-is). |
 
 <a id="nextgensoftware-holochain-holonet-client-interfaces-iappresponse"></a>
 ### IAppResponse (interface)
 
 | Member | Kind | Description |
 |---|---|---|
-| `object data { get; set; }` | property |  |
-| `string type { get; set; }` | property |  |
+| `object data { get; set; }` | property | Holochain's `data` field (sent to / received from the conductor as-is). |
+| `string type { get; set; }` | property | Holochain's `type` field (sent to / received from the conductor as-is). |
 
 <a id="nextgensoftware-holochain-holonet-client-interfaces-icell"></a>
 ### ICell (interface)
 
 | Member | Kind | Description |
 |---|---|---|
-| `DnaModifiers dna_modifiers { get; set; }` | property |  |
-| `string name { get; set; }` | property |  |
+| `DnaModifiers dna_modifiers { get; set; }` | property | Holochain's `dna_modifiers` field (sent to / received from the conductor as-is). |
+| `string name { get; set; }` | property | Holochain's `name` field (sent to / received from the conductor as-is). |
 
 <a id="nextgensoftware-holochain-holonet-client-interfaces-idnadefinition"></a>
 ### IDnaDefinition (interface)
 
 | Member | Kind | Description |
 |---|---|---|
-| `List<ZomeDefinition> CoordinatorZomes { get; set; }` | property |  |
-| `List<ZomeDefinition> IntegrityZomes { get; set; }` | property |  |
-| `IDnaModifiers Modifiers { get; set; }` | property |  |
-| `string Name { get; set; }` | property |  |
+| `List<ZomeDefinition> CoordinatorZomes { get; set; }` | property | The DNA's coordinator zomes (hot-swappable with UpdateCoordinatorsAsync). |
+| `List<ZomeDefinition> IntegrityZomes { get; set; }` | property | The DNA's integrity zomes (entry/link types and validation; they define the DNA hash). |
+| `IDnaModifiers Modifiers { get; set; }` | property | The DNA modifiers (network seed, properties, origin time) that make this DNA's hash. |
+| `string Name { get; set; }` | property | The DNA's name. |
 
 <a id="nextgensoftware-holochain-holonet-client-interfaces-idnadefinitionresponse"></a>
 ### IDnaDefinitionResponse (interface)
 
 | Member | Kind | Description |
 |---|---|---|
-| `DnaDefinitionResponseDetail data { get; set; }` | property |  |
-| `string type { get; set; }` | property |  |
+| `DnaDefinitionResponseDetail data { get; set; }` | property | Holochain's `data` field (sent to / received from the conductor as-is). |
+| `string type { get; set; }` | property | Holochain's `type` field (sent to / received from the conductor as-is). |
 
 <a id="nextgensoftware-holochain-holonet-client-interfaces-idnadefinitionresponsedetail"></a>
 ### IDnaDefinitionResponseDetail (interface)
 
 | Member | Kind | Description |
 |---|---|---|
-| `object coordinator_zomes_raw { get; set; }` | property |  |
-| `object integrity_zomes_raw { get; set; }` | property |  |
-| `DnaModifiers modifiers { get; set; }` | property |  |
-| `string name { get; set; }` | property |  |
+| `object coordinator_zomes_raw { get; set; }` | property | Holochain's `coordinator_zomes_raw` field (sent to / received from the conductor as-is). |
+| `object integrity_zomes_raw { get; set; }` | property | Holochain's `integrity_zomes_raw` field (sent to / received from the conductor as-is). |
+| `DnaModifiers modifiers { get; set; }` | property | Holochain's `modifiers` field (sent to / received from the conductor as-is). |
+| `string name { get; set; }` | property | Holochain's `name` field (sent to / received from the conductor as-is). |
 
 <a id="nextgensoftware-holochain-holonet-client-interfaces-idnamodifiers"></a>
 ### IDnaModifiers (interface)
 
 | Member | Kind | Description |
 |---|---|---|
-| `string network_seed { get; set; }` | property |  |
-| `long origin_time { get; set; }` | property |  |
-| `DateTime OriginTime { get; set; }` | property |  |
-| `object properties { get; set; }` | property |  |
-| `RustDuration quantum_time { get; set; }` | property |  |
+| `string network_seed { get; set; }` | property | Holochain's `network_seed` field (sent to / received from the conductor as-is). |
+| `long origin_time { get; set; }` | property | Holochain's `origin_time` field (sent to / received from the conductor as-is). |
+| `DateTime OriginTime { get; set; }` | property | The DNA's origin time (part of what makes its hash). |
+| `object properties { get; set; }` | property | Holochain's `properties` field (sent to / received from the conductor as-is). |
+| `RustDuration quantum_time { get; set; }` | property | Holochain's `quantum_time` field (sent to / received from the conductor as-is). |
 
 <a id="nextgensoftware-holochain-holonet-client-interfaces-ifullstatedumpedresponse"></a>
 ### IFullStateDumpedResponse (interface)
 
 | Member | Kind | Description |
 |---|---|---|
-| `FullIntegrationStateDump integration_dump { get; set; }` | property |  |
-| `P2pAgentsDump peer_dump { get; set; }` | property |  |
-| `SourceChainJsonDump source_chain_dump { get; set; }` | property |  |
+| `FullIntegrationStateDump integration_dump { get; set; }` | property | Holochain's `integration_dump` field (sent to / received from the conductor as-is). |
+| `P2pAgentsDump peer_dump { get; set; }` | property | Holochain's `peer_dump` field (sent to / received from the conductor as-is). |
+| `SourceChainJsonDump source_chain_dump { get; set; }` | property | Holochain's `source_chain_dump` field (sent to / received from the conductor as-is). |
 
 <a id="nextgensoftware-holochain-holonet-client-interfaces-iholonetclientadmin"></a>
 ### IHoloNETClientAdmin (interface)
@@ -3808,7 +3488,7 @@ Inherits / implements: `IHoloNETClientBase`
 | `Task<GetAppInfoCallBackEventArgs> GetAppInfoAsync(string installedAppId, ConductorResponseCallBackMode conductorResponseCallBackMode = WaitForHolochainConductorResponse, string id = null)` | method | Returns the full `AppInfo` for the given hApp: status, cell IDs, agent pub key, manifest, and more. |
 | `byte[] GetCapGrantSecret(byte[][] cellId)` | method | The capability secret HoloNET created for this cell's zome-call grant (null if it has none). |
 | `byte[] GetCapGrantSecret(string agentPubKey, string dnaHash)` | method | The capability secret HoloNET created for this cell's zome-call grant (null if it has none). |
-| `Task<byte[][]> GetCellIdAsync()` | method |  |
+| `Task<byte[][]> GetCellIdAsync()` | method | The cell id zome calls go to: HoloNETDNA.CellId, or built from its DnaHash and AgentPubKey (retrieving them from the conductor first if needed). |
 | `CompatibleCellsReturnedCallBackEventArgs GetCompatibleCells(byte[] dnaHash, string id = null)` | method | Returns cell IDs that share the same integrity DNA hash, indicating they can share data. |
 | `Task<CompatibleCellsReturnedCallBackEventArgs> GetCompatibleCellsAsync(byte[] dnaHash, ConductorResponseCallBackMode conductorResponseCallBackMode = WaitForHolochainConductorResponse, string id = null)` | method | Returns cell IDs that share the same integrity DNA hash, indicating they can share data. |
 | `DnaDefinitionReturnedCallBackEventArgs GetDnaDefinition(byte[] dnaHash, string id = null)` | method | Returns the full DNA definition (name, network seed, properties, integrity zomes, coordinator zomes) for the given DNA hash. |
@@ -3881,7 +3561,7 @@ Inherits / implements: `IHoloNETClientBase`
 
 | Member | Kind | Description |
 |---|---|---|
-| `AppInfo CachedAppInfo { get; set; }` | property |  |
+| `AppInfo CachedAppInfo { get; set; }` | property | The last app_info this client received (agent, DNA, cells, status). |
 | `bool IsReadyForZomesCalls { get; }` | property | This property is a boolean and will return true when HoloNET is ready for zome calls after the OnReadyForZomeCalls event is raised. |
 | `bool RetrievingAgentPubKeyAndDnaHash { get; }` | property | This property is a boolean and will return true when HoloNET is retrieving the AgentPubKey & DnaHash using one of the RetrieveAgentPubKeyAndDnaHash, RetrieveAgentPubKeyAndDnaHashFromSandbox or RetrieveAgentPubKeyAndDnaHashFromConductor methods (by default this will occur automatically after it has connected to the Holochain Conductor). |
 | `IZomeCallSigner ZomeCallSigner { get; set; }` | property | Optional external zome-call signer; when unset, HoloNET signs with locally authorized credentials. |
@@ -3951,7 +3631,7 @@ Inherits / implements: `IHoloNETClientBase`
 | `Task<AppInfoCallBackEventArgs> GetAppInfoAsync(string installedAppId = null, string roleName = null, ConductorResponseCallBackMode conductorResponseCallBackMode = WaitForHolochainConductorResponse)` | method | Gets AppInfo for the running hApp (role, cell ids, status). |
 | `AppPeerMetaInfoReturnedCallBackEventArgs GetAppPeerMetaInfo(string url, List<byte[]> dnaHashes = null, string id = null)` | method | Returns peer meta info for a given agent URL within the app network. |
 | `Task<AppPeerMetaInfoReturnedCallBackEventArgs> GetAppPeerMetaInfoAsync(string url, List<byte[]> dnaHashes = null, ConductorResponseCallBackMode conductorResponseCallBackMode = WaitForHolochainConductorResponse, string id = null)` | method | Returns peer meta info for a given agent URL within the app network. |
-| `Task<byte[][]> GetCellIdAsync()` | method |  |
+| `Task<byte[][]> GetCellIdAsync()` | method | The cell id zome calls go to: HoloNETDNA.CellId, or built from its DnaHash and AgentPubKey (retrieving them from the conductor first if needed). |
 | `CountersigningSessionStateReturnedCallBackEventArgs GetCountersigningSessionState(CellId cellId, string id = null)` | method | Returns the current state of an in-progress countersigning session. |
 | `Task<CountersigningSessionStateReturnedCallBackEventArgs> GetCountersigningSessionStateAsync(CellId cellId, ConductorResponseCallBackMode conductorResponseCallBackMode = WaitForHolochainConductorResponse, string id = null)` | method | Returns the current state of an in-progress countersigning session. |
 | `WasmHostFunctionsListedCallBackEventArgs ListWasmHostFunctions(string id = null)` | method | Returns the list of host functions exposed to WASM zomes by the conductor. |
@@ -3977,8 +3657,8 @@ Inherits / implements: `IHoloNETClientBase`
 
 | Member | Kind | Description |
 |---|---|---|
-| `Uri EndPoint { get; set; }` | property | This property is a shortcut to the EndPoint property on the WebSocket property. |
-| `IHoloNETDNA HoloNETDNA { get; set; }` | property |  |
+| `Uri EndPoint { get; set; }` | property | The conductor WebSocket endpoint this came from. |
+| `IHoloNETDNA HoloNETDNA { get; set; }` | property | The HoloNET settings in use (see HoloNETDNA). |
 | `bool IsConnecting { get; set; }` | property | True while ConnectAsync is in progress. |
 | `bool IsDisconnecting { get; set; }` | property | True while DisconnectAsync is in progress. |
 | `bool IsHoloNETDNALoaded { get; }` | property | True once the settings have been loaded (or set). |
@@ -4007,8 +3687,8 @@ Inherits / implements: `IHoloNETClientBase`
 | `byte[][] GetCellId(byte[] DnaHash, byte[] AgentPubKey)` | method | Build a cell id from a DNA hash and an agent public key (both as HoloHash strings). |
 | `byte[][] GetCellId(string DnaHash, string AgentPubKey)` | method | Build a cell id from a DNA hash and an agent public key (both as HoloHash strings). |
 | `Task<byte[][]> GetCellIdAsync()` | method | The cell id zome calls go to: HoloNETDNA.CellId, or built from its DnaHash and AgentPubKey (retrieving them from the conductor first if needed). |
-| `IHoloNETDNA LoadDNA()` | method | Load the settings from HoloNETDNA.json (HoloNETDNAManager.HoloNETDNAPath). |
-| `bool SaveDNA()` | method | Save the current settings to HoloNETDNA.json. |
+| `IHoloNETDNA LoadDNA()` | method | Load the settings from HoloNETDNA.json (defaults if it doesn't exist). |
+| `bool SaveDNA()` | method | Save the settings to HoloNETDNA.json. |
 | `void SendHoloNETRequest(byte[] data, HoloNETRequestType requestType, string id = "")` | method | This method allows you to send your own raw request to holochain. This method raises the OnDataReceived event once it has received a response from the Holochain conductor. Please see the Events section above for more info on how to use this event. You would rarely need to use this and we highly recommend you use the CallZomeFunctionAsync method instead. You can specify if HoloNET should wait until it has finished disconnecting and shutting down the conductors before returning to the caller or whether it should return immediately and then use the OnDisconnected, OnHolochainConductorsShutdownComplete & OnHoloNETShutdownComplete events to notify the caller. |
 | `void SendHoloNETRequest(HoloNETData holoNETData, HoloNETRequestType requestType, string id = "")` | method | This method allows you to send your own raw request to holochain. This method raises the OnDataReceived event once it has received a response from the Holochain conductor. Please see the Events section above for more info on how to use this event. You would rarely need to use this and we highly recommend you use the CallZomeFunctionAsync method instead. You can specify if HoloNET should wait until it has finished disconnecting and shutting down the conductors before returning to the caller or whether it should return immediately and then use the OnDisconnected, OnHolochainConductorsShutdownComplete & OnHoloNETShutdownComplete events to notify the caller. |
 | `Task SendHoloNETRequestAsync(byte[] data, HoloNETRequestType requestType, string id = "")` | method | This method allows you to send your own raw request to holochain. This method raises the OnDataReceived event once it has received a response from the Holochain conductor. Please see the Events section above for more info on how to use this event. You would rarely need to use this and we highly recommend you use the CallZomeFunctionAsync method instead. You can specify if HoloNET should wait until it has finished disconnecting and shutting down the conductors before returning to the caller or whether it should return immediately and then use the OnDisconnected, OnHolochainConductorsShutdownComplete & OnHoloNETShutdownComplete events to notify the caller. |
@@ -4025,27 +3705,27 @@ Inherits / implements: `IHoloNETClientBase`
 
 | Member | Kind | Description |
 |---|---|---|
-| `object data { get; set; }` | property |  |
-| `string type { get; set; }` | property |  |
+| `object data { get; set; }` | property | Holochain's `data` field (sent to / received from the conductor as-is). |
+| `string type { get; set; }` | property | Holochain's `type` field (sent to / received from the conductor as-is). |
 
 <a id="nextgensoftware-holochain-holonet-client-interfaces-iholonetdna"></a>
 ### IHoloNETDNA (interface)
 
 | Member | Kind | Description |
 |---|---|---|
-| `string AgentPubKey { get; set; }` | property | The AgentPubKey to use for Zome calls. If this is not set then HoloNET will automatically retrieve this along with the DnaHash after it connects (if the Connect method defaults are not overriden). |
+| `string AgentPubKey { get; set; }` | property | The agent public key (HoloHash string) this applies to. |
 | `byte[] AppAuthenticationToken { get; set; }` | property | Holochain 0.7 app-interface authentication token. When supplied, app clients send the mandatory authenticate envelope immediately after the WebSocket opens and before any conductor request. Admin clients never use this value. |
 | `bool AutoShutdownHolochainConductor { get; set; }` | property | Set this to true if you wish HoloNET to auto-shutdown the Holochain Conductor after it disconnects. Default is true. |
 | `bool AutoStartHolochainConductor { get; set; }` | property | Set this to true if you with HoloNET to auto-start the Holochain Conductor defined in the `FullPathToExternalHolochainConductorBinary parameter if `HolochainConductorToUse` is `Holochain`, otherwise if it`s `Hc` then it will use `FullPathToExternalHCToolBinary`. Default is true. |
 | `CacheConfig CacheConfig { get; set; }` | property | HoloNET client-side cache configuration (HoloNET-specific concept, not a Rust mirror). Not yet consumed by any caching implementation in HoloNET. |
-| `byte[][] CellId { get; set; }` | property | THe CellId to use for Zome calls (this contains the DnaHash and AgentPubKey). If this is not set then HoloNET will automatically retrieve this along with the AgentPubKey after it connects (if the Connect method defaults are not overriden). |
+| `byte[][] CellId { get; set; }` | property | The cell id: [DNA hash, agent public key] as raw bytes. |
 | `LoggingMode ConsoleLoggingMode { get; set; }` | property | This passes through to the static LogConfig.ConsoleLoggingMode property in [NextGenSoftware.Logging](https://www.nuget.org/packages/NextGenSoftware.Logging) package. It can be either `WarningsErrorsInfoAndDebug`, `WarningsErrorsAndInfo`, `WarningsAndErrors` or `ErrorsOnly`. |
 | `ConsoleColor DebugColour { get; set; }` | property | The colour to use for `Debug` log entries to the console. |
-| `string DnaHash { get; set; }` | property | The DnaHash to use for Zome calls. If this is not set then HoloNET will automatically retrieve this along with the AgentPubKey after it connects (if the Connect method defaults are not overriden). |
+| `string DnaHash { get; set; }` | property | The DNA hash (HoloHash string) this applies to. |
 | `EmbeddedHolochainVersion EmbeddedHolochainVersion { get; set; }` | property | Which bundled Holochain release to start when `HolochainConductorMode` is `UseEmbedded` (Embedded package only). Defaults to 0.7.1; set V0_7_0 for hApps built against hdk 0.7.0. |
 | `EnforceRequestToResponseIdMatchingBehaviour EnforceRequestToResponseIdMatchingBehaviour { get; set; }` | property | Controls what happens when a conductor response ID doesn't match a pending request. Options: AlwaysError, WarnOnly (default), Ignore. |
 | `ConsoleColor ErrorColour { get; set; }` | property | The colour to use for `Error` log entries to the console. |
-| `ErrorHandlingBehaviour ErrorHandlingBehaviour { get; set; }` | property |  |
+| `ErrorHandlingBehaviour ErrorHandlingBehaviour { get; set; }` | property | Whether errors only raise OnError (the default) or also throw. |
 | `LoggingMode FileLoggingMode { get; set; }` | property | This passes through to the static LogConfig.FileLoggingMode property in [NextGenSoftware.Logging](https://www.nuget.org/packages/NextGenSoftware.Logging) package. It can be either `WarningsErrorsInfoAndDebug`, `WarningsErrorsAndInfo`, `WarningsAndErrors` or `ErrorsOnly`. |
 | `string FullPathToCompiledHappFolder { get; set; }` | property | The full path to the compiled hApp that HoloNET will start the Holochain Conductor (currenty uses hc.exe) with and then make zome calls to. |
 | `string FullPathToExternalHCToolBinary { get; set; }` | property | The full path to the Holochain Conductor exe (hc.exe) that HoloNET will auto-start if `HolochainConductorToUse` is set to `Hc`. |
@@ -4059,7 +3739,7 @@ Inherits / implements: `IHoloNETClientBase`
 | `int IndentLogMessagesBy { get; set; }` | property | The amount of space to indent the log message by. NOTE: This is only relevant if the built-in DefaultLogger is used. |
 | `ConsoleColor InfoColour { get; set; }` | property | The colour to use for `Info` log entries to the console. |
 | `bool InsertExtraNewLineAfterLogMessage { get; set; }` | property | Set this to true to add additional space after the end of each log entry. NOTE: This is only relevant if the built-in DefaultLogger is used. |
-| `string InstalledAppId { get; set; }` | property | The Installed AppId that the AppAgent WebSocket will connect to (optional). If this is blank then it will be a generic App WebSocket and can connect to any hApp. |
+| `string InstalledAppId { get; set; }` | property | The installed app id. |
 | `KeystoreConfig KeystoreConfig { get; set; }` | property | Keystore connection configuration, mirroring holochain_conductor_api's KeystoreConfig. Not yet wired through to actual conductor config generation/admin API - out of scope here. |
 | `Kitsune2Config Kitsune2Config { get; set; }` | property | Kitsune2 networking sub-fields of ConductorConfig.network not already covered by NetworkConfig (bootstrap/relay URLs, target_arc_factor, advanced kitsune2 JSON; signal_url and webrtc_config removed in Holochain 0.7.0). Not yet wired through to any websocket/conductor call. |
 | `string LogFileName { get; set; }` | property | The name of the log file to create. |
@@ -4084,20 +3764,20 @@ Inherits / implements: `IHoloNETClientBase`
 
 | Member | Kind | Description |
 |---|---|---|
-| `byte[] data { get; set; }` | property |  |
-| `ulong id { get; set; }` | property |  |
-| `string type { get; set; }` | property |  |
+| `byte[] data { get; set; }` | property | Holochain's `data` field (sent to / received from the conductor as-is). |
+| `ulong id { get; set; }` | property | Holochain's `id` field (sent to / received from the conductor as-is). |
+| `string type { get; set; }` | property | Holochain's `type` field (sent to / received from the conductor as-is). |
 
 <a id="nextgensoftware-holochain-holonet-client-interfaces-iholonetresponse"></a>
 ### IHoloNETResponse (interface)
 
 | Member | Kind | Description |
 |---|---|---|
-| `byte[] data { get; set; }` | property |  |
-| `HoloNETResponseType HoloNETResponseType { get; set; }` | property |  |
-| `ulong id { get; set; }` | property |  |
-| `bool IsError { get; set; }` | property |  |
-| `string type { get; set; }` | property |  |
+| `byte[] data { get; set; }` | property | Holochain's `data` field (sent to / received from the conductor as-is). |
+| `HoloNETResponseType HoloNETResponseType { get; set; }` | property | Which kind of message this is (zome call response, signal, admin response...). |
+| `ulong id { get; set; }` | property | Holochain's `id` field (sent to / received from the conductor as-is). |
+| `bool IsError { get; set; }` | property | True when the call or the conductor reported an error (see Message). |
+| `string type { get; set; }` | property | Holochain's `type` field (sent to / received from the conductor as-is). |
 
 <a id="nextgensoftware-holochain-holonet-client-interfaces-irecord"></a>
 ### IRecord (interface)
@@ -4119,20 +3799,20 @@ Inherits / implements: `IHoloNETClientBase`
 | `string PreviousActionHash { get; set; }` | property | The previous ActionHash. |
 | `string Signature { get; set; }` | property | The signature of the entry. |
 | `long Timestamp { get; set; }` | property | The Unix timestamp (returned from the Holochain Conductor) |
-| `string Type { get; set; }` | property | Create/Update/Delete |
+| `string Type { get; set; }` | property | The conductor message type. |
 
 <a id="nextgensoftware-holochain-holonet-client-interfaces-isignaldata"></a>
 ### ISignalData (interface)
 
 | Member | Kind | Description |
 |---|---|---|
-| `byte[][] CellData { get; set; }` | property |  |
-| `byte[] Data { get; set; }` | property |  |
+| `byte[][] CellData { get; set; }` | property | The cell id the signal came from ([DNA hash, agent public key]). |
+| `byte[] Data { get; set; }` | property | The signal payload as MessagePack bytes (what the zome passed to emit_signal). |
 
 <a id="nextgensoftware-holochain-holonet-client-interfaces-istorageinforesponse"></a>
 ### IStorageInfoResponse (interface)
 
 | Member | Kind | Description |
 |---|---|---|
-| `DnaStorageBlob[] blobs { get; set; }` | property |  |
+| `DnaStorageBlob[] blobs { get; set; }` | property | Holochain's `blobs` field (sent to / received from the conductor as-is). |
 
