@@ -1,6 +1,6 @@
 # HoloNET API API reference
 
-Generated from `NextGenSoftware.Holochain.HoloNET.API` 4.2.0.0 (every public type and member, with its XML documentation where it has one). For guides and examples see the [documentation index](../README.md).
+Generated from `NextGenSoftware.Holochain.HoloNET.API` 4.4.0.0 (every public type and member, with its XML documentation where it has one). For guides and examples see the [documentation index](../README.md).
 
 - **NextGenSoftware.Holochain.HoloNET.API**: [HoloNETAPI](#nextgensoftware-holochain-holonet-api-holonetapi), [HoloNETAPIDNA](#nextgensoftware-holochain-holonet-api-holonetapidna), [HoloNETAPIDNAManager](#nextgensoftware-holochain-holonet-api-holonetapidnamanager), [HoloNETAPIHapp](#nextgensoftware-holochain-holonet-api-holonetapihapp), [HoloNETAPIResult&lt;T&gt;](#nextgensoftware-holochain-holonet-api-holonetapiresult-1), [HoloNETAPISignalEventArgs](#nextgensoftware-holochain-holonet-api-holonetapisignaleventargs)
 - **NextGenSoftware.Holochain.HoloNET.API.Interfaces**: [IHoloNETAPIDNA](#nextgensoftware-holochain-holonet-api-interfaces-iholonetapidna)

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Generates the sample game hApp with HoloNET ORM's HolochainHappGenerator (what WEB5 STAR uses), compiles it with cargo
+# Generates the sample game hApp (from WEB5 STAR's templates by default, or HoloNET ORM's generator), compiles it with cargo
 # (in WSL, wasm32 target) and packs it with the bundled hc, into .holochain-test/happ-<ver>-generated/holonet_game.happ.
 # The live tests (LiveGeneratedHappTests) then drive it with HoloNET ORM on a real conductor.
 # Usage: scripts/build-generated-happ.sh 0.7.1|0.7.0
@@ -13,8 +13,17 @@ D="$T/happ-$TAG-generated"
 HC="$REPO/NextGenSoftware.Holochain.HoloNET.Client/Resources/hc.exe"
 
 rm -rf "$SRC" "$D"
-HOLONET_GENERATE_HAPP_TO="$(cygpath -w "$SRC")" HOLONET_GENERATE_HAPP_VERSION="$V" \
-  dotnet test "$REPO/NextGenSoftware.Holochain.HoloNET.Client.Tests" --filter "FullyQualifiedName~WriteSampleHappForTheBuildScript" 2>&1 | grep -E "Passed!|Failed!|error" | tail -1
+# GENERATOR=star (default): WEB5 STAR's Holochain07 templates filled by HoloOASIS's template engine (the OASIS checkout next
+# to this one). GENERATOR=orm: HoloNET ORM's code generator (HolochainHappGenerator), for apps that don't use STAR.
+GENERATOR=${GENERATOR:-star}
+STAR_TESTS="$REPO/../OASIS/Providers/Network/TestProjects/NextGenSoftware.OASIS.API.Providers.HoloOASIS.UnitTests"
+if [ "$GENERATOR" = "star" ]; then
+  HOLONET_GENERATE_HAPP_TO="$(cygpath -w "$SRC")" HOLONET_GENERATE_HAPP_VERSION="$V" \
+    dotnet test "$STAR_TESTS" --filter "FullyQualifiedName~WriteSampleHappForHoloNETBuildScript" 2>&1 | grep -E "Passed!|Failed!|error" | tail -1
+else
+  HOLONET_GENERATE_HAPP_TO="$(cygpath -w "$SRC")" HOLONET_GENERATE_HAPP_VERSION="$V" \
+    dotnet test "$REPO/NextGenSoftware.Holochain.HoloNET.Client.Tests" --filter "FullyQualifiedName~WriteSampleHappForTheBuildScript" 2>&1 | grep -E "Passed!|Failed!|error" | tail -1
+fi
 [ -f "$SRC/Cargo.toml" ] || { echo "generation failed"; exit 1; }
 
 WSRC=$(wsl -e wslpath -a "$(cygpath -w "$SRC")" | tr -d '\r')

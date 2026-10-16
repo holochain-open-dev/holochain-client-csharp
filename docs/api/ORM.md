@@ -1,6 +1,6 @@
 # HoloNET ORM API reference
 
-Generated from `NextGenSoftware.Holochain.HoloNET.ORM` 4.2.0.0 (every public type and member, with its XML documentation where it has one). For guides and examples see the [documentation index](../README.md).
+Generated from `NextGenSoftware.Holochain.HoloNET.ORM` 4.4.0.0 (every public type and member, with its XML documentation where it has one). For guides and examples see the [documentation index](../README.md).
 
 - **NextGenSoftware.Holochain.HoloNET.Client**: [HoloNETCollectionLoadedResult&lt;T&gt;](#nextgensoftware-holochain-holonet-client-holonetcollectionloadedresult-1), [HoloNETCollectionSavedResult](#nextgensoftware-holochain-holonet-client-holonetcollectionsavedresult)
 - **NextGenSoftware.Holochain.HoloNET.ORM**: [IHoloNETAuditEntry](#nextgensoftware-holochain-holonet-orm-iholonetauditentry)

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
 	  <TargetFrameworks>netstandard2.1;net10.0</TargetFrameworks>
@@ -20,7 +20,9 @@
 	  <PackageIcon>hc logo.png</PackageIcon>
 	  <Authors>David Ellams (NextGen Software Ltd)</Authors>
 	  <PackageTags>holochain;net;unity;client</PackageTags>
-	  <PackageReleaseNotes>## v4.2.0 - Holochain 0.7.0 + 0.7.1, full test coverage pass
+	  <PackageReleaseNotes>## v4.4.0 - IHoloNETClientAdmin.AddAgentInfoAsync(IEnumerable&lt;string&gt;) (the Holochain 0.7 overload was missing from the interface); more XML docs; full docs at https://github.com/holochain-open-dev/holochain-client-csharp/tree/main/docs
+
+## v4.2.0 - Holochain 0.7.0 + 0.7.1, full test coverage pass
 
 Packages: NextGenSoftware.Holochain.HoloNET.Client (no conductor), .Client.Embedded (bundles Holochain 0.7.1 and 0.7.0, choose with HoloNETDNA.EmbeddedHolochainVersion), .Client.Embedded.Holochain071 (0.7.1 only) and .Client.Embedded.Holochain070 (0.7.0 only, about half the size).
 
@@ -121,7 +123,7 @@ Full changelog: https://github.com/holochain-open-dev/holochain-client-csharp/bl
 	  <!--<PackageLicenseExpression>GNU GPLv3</PackageLicenseExpression>-->
 	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
 	  <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-	  <Version>4.2.0</Version>
+	  <Version>4.4.0</Version>
 	  <!--<PackageLicenseFile>..\LICENSE</PackageLicenseFile>-->
 
 	  <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>

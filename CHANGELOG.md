@@ -1,6 +1,51 @@
 # Changelog
 
-## Unreleased (v4.3.0)
+## v4.4.0 - 2026-10-16 (Holochain 0.7.0 and 0.7.1)
+
+Every HoloNET package is now 4.4.0: Client, ORM, API, HyperNET, Manager and HDK, including all the Embedded variants.
+
+### hApp generation (WEB5 STAR + HoloNET ORM)
+- WEB5 STAR now generates hApps that actually build on Holochain 0.7. Its old Rust templates were written for the pre-RSM
+  hdk 0.0.50 (`#[zome]`, `hdk::commit_entry`, `ZomeApiResult`), so nothing it generated could compile on current Holochain.
+- New STAR templates in `DNATemplates/RustDNATemplates/Holochain07`, filled by HoloOASIS's template engine. For each zome,
+  they produce an integrity zome and a coordinator zome with create, get, update, delete and get-all for every entry, plus
+  anchored collections. They also write `dna.yaml`, `happ.yaml`, `build.sh` and the matching HoloNET ORM C# models.
+- Choose the version with the HoloOASIS `HolochainVersion` setting (`0.7.1` by default, or `0.7.0`).
+- HoloNET ORM has its own code-based generator, `HolochainHappGenerator` (plus `FromStarDnaFolder`), for apps that don't use STAR.
+- Tested end to end on both versions. A sample hApp is generated from the STAR templates and compiled with cargo. Its
+  generated C# models are compiled with Roslyn and drive the hApp on real 0.7.0 and 0.7.1 conductors: create, load,
+  update, change tracking, delete, and collection add, load, batch save and remove (`scripts/build-generated-happ.sh`,
+  `LiveGeneratedHappTests`).
+
+### HoloNET API
+- **Direct messages.** `SendSignalAsync(message, toAgentPubKeys)` and the `OnSignalReceived` event send and receive
+  text messages as remote signals, peer to peer, with nothing stored. `ReceiveSignal()` now returns the last message
+  received. `SendSignal()` and `ReceiveSignal()` used to be placeholders; `SendSignal()` is now obsolete.
+- XML docs for every public member.
+
+### HoloNET Client
+- `IHoloNETClientAdmin` now exposes `AddAgentInfoAsync(IEnumerable<string>)`. Before, only the obsolete pre-0.7
+  overload was on the interface.
+- More XML docs: `InstallEnableSignAndAttachHappEventArgs`, `HoloNETClientBase` and the admin events.
+
+### HoloNET Manager
+- The **Get Storage Info**, **Add Agent Info**, **Delete Clone Cell**, **Graft Records** and **Update Coordinators**
+  buttons work now; they used to say "Coming Soon".
+- **Dump State**, **Dump Full State**, **Dump Network Stats** and **Dump Network Metrics** now show their results.
+  Before, the results went to events nothing listened to.
+
+### HyperNET
+- XML docs for every public member. STAR's `hypernet start [zone] | stop | status | config` commands now run on
+  `HyperNETService`; they used to say "Coming Soon".
+
+### Documentation
+- New `docs/` folder:
+  - guides: getting started, Client, ORM, API, HyperNET, Manager, and STAR hApp generation;
+  - a generated API reference for every public type and member of Client, ORM, API and HyperNET
+    (`scripts/generate-api-docs.sh`).
+- The README's package list now covers the four Client/ORM variants, and the stale "Release Coming Soon" text is gone.
+
+## v4.3.0 - 2026-10-16 (HyperNET + HDK)
 
 ### HoloNET HyperNET: P2P multiplayer networking, built out
 HyperNET was a placeholder until now. It is now a working library, tested live with three players on Holochain 0.7.0 and 0.7.1:
