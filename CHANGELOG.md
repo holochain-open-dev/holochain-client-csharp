@@ -1,5 +1,33 @@
 # Changelog
 
+## Unreleased (v4.3.0)
+
+### HoloNET HyperNET: P2P multiplayer networking, built out
+HyperNET was a placeholder until now. It is now a working library, tested live with three players on Holochain 0.7.0 and 0.7.1:
+- `HyperNETSession`: join, leave and change zones. Presence in a zone is a DHT link (the only thing stored); everything
+  else is a direct remote signal between players, with no server in the middle.
+- Area of interest: game traffic goes to the players within `AreaOfInterestRadius`, at most `MaxFullRatePeers` (the nearest)
+  at full rate. The rest of the zone gets every `FarUpdateEvery`th position update. Moves smaller than `MinimumMoveToSend` aren't sent.
+- Unreliable (fire and forget) and reliable messages (acknowledged, retried, de-duplicated, `OnReliableMessageFailed`),
+  typed messages via MessagePack, `PingAsync` latency, `Stats`.
+- The zone list is re-read every `PeerRefreshInterval` (5 s) to catch missed join signals, and a heartbeat every
+  `HeartbeatInterval` (10 s) keeps idle players from hitting `PeerTimeout`.
+- `HyperNETService` and `HyperNETDNA`: start, stop and status for a long-running process (what WEB5 STAR's `hypernet` commands drive).
+- The OASIS hApp has the matching zome functions (`hypernet_join`, `hypernet_leave`, `hypernet_peers`, `hypernet_send`,
+  `recv_remote_signal`, plus an unrestricted grant for `recv_remote_signal` created in `init`) on main and on `holochain-0.7.0-maintenance`.
+  Two bugs found by the live tests are fixed there: `recv_remote_signal` took an `ExternIO`, which failed to decode every
+  real remote signal, and a multi-target `send_remote_signal` reached only one of several agents on the same conductor
+  (it now sends once per player).
+
+### HDK
+- `NextGenSoftware.Holochain.HoloNET.HDK` becomes a real metapackage: HoloNET Client, ORM, HyperNET, WEB5 STAR and HoloOASIS
+  (HoloNET Manager ships on its own as a desktop app). For now it carries Client, ORM and HyperNET: STAR and HoloOASIS are
+  behind `-p:HdkIncludeStar=true` until their NuGet packages install cleanly (STAR 2.0.3 needs `Ipfs.Http.Client` >= 0.42.0,
+  which isn't on NuGet, and HoloOASIS 2.0.4 pins the never-published HoloNET.Client 4.1.0).
+
+### Tests
+- The live-test sandbox uses Holochain's in-memory network (offline; no public bootstrap or relay).
+
 ## v4.2.0 - 2026-10-16 (Holochain 0.7.0 and 0.7.1)
 
 Published to NuGet as 4.2.0 for every HoloNET package (Client, Client.Embedded, ORM, ORM.Embedded, HDK, HyperNET,

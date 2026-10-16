@@ -19,7 +19,7 @@ SB="$T/sb-$TAG"
 start_sandbox() {
   taskkill //F //IM holochain.exe >/dev/null 2>&1
   rm -rf "$SB"; mkdir -p "$SB"
-  (cd "$SB" && echo "test-passphrase" | "$HC" sandbox --piped -H "$HOLOCHAIN" create --in-process-lair --root "$(cygpath -w "$SB")" >/dev/null 2>&1)
+  (cd "$SB" && echo "test-passphrase" | "$HC" sandbox --piped -H "$HOLOCHAIN" create --in-process-lair --root "$(cygpath -w "$SB")" network mem >/dev/null 2>&1)
   (cd "$SB" && echo "test-passphrase" | "$HC" sandbox --piped -H "$HOLOCHAIN" -f=$PORT run 0 > "$SB/conductor.log" 2>&1 &)
   for i in $(seq 1 60); do grep -q "Conductor launched" "$SB/conductor.log" 2>/dev/null && break; sleep 1; done
   grep -q "Conductor launched" "$SB/conductor.log" || { echo "conductor did not start"; cat "$SB/conductor.log"; exit 1; }

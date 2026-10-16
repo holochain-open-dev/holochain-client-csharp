@@ -178,51 +178,40 @@ This will help massively turbo charge the holochain ecosystem by opening it up t
 
 **We are a BIG fan of Holochain and are very passionate about it and see a BIG future for it! We feel this is the gateway to taking Holochain mainstream! ;-)**
 
-**Holochain Compatibility:** HoloNET's wire protocol (zome call signing shape, admin/app interface message types, conductor config) targets **Holochain 0.7.0**, verified directly against the real Rust source in the [holochain](https://github.com/holochain/holochain) repo at tag `holochain-0.7.0` (crates `holochain_conductor_api`, `holochain_types`, `holochain_zome_types`). See [CHANGELOG.md](CHANGELOG.md) for details of what changed in the 0.7.0 upgrade.
+**Holochain Compatibility:** HoloNET 4.2+ works with **Holochain 0.7.0 and 0.7.1** (both are tested end to end, against real conductors and the real [OASIS hApp](https://github.com/NextGenSoftwareUK/OASIS-Holochain-hApp), on every release). The wire protocol (zome call signing, admin/app interface messages, capability grants, app authentication tokens) is verified against the Holochain Rust source for both tags. See [CHANGELOG.md](CHANGELOG.md) for what changed, and [INTEGRATION_TESTING.md](INTEGRATION_TESTING.md) for how the live tests run.
 
-There are two versions of HoloNET:
+### Packages
 
-[NextGenSoftware.Holochain.HoloNET.Client](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.Client) - Lightweight version that does not come with the holochain binaries (hc.exe and holochain.exe).
+HoloNET Client and HoloNET ORM each come in four variants. Pick one per app; they share the same API and namespaces.
 
-[NextGenSoftware.Holochain.HoloNET.Client.Embedded](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.Client.Embedded) - This version comes with the holochain binaries (hc.exe and holochain.exe) integrated.
+| Package | Bundled Holochain conductor |
+|---|---|
+| [NextGenSoftware.Holochain.HoloNET.Client](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.Client) | None: lightweight, you run (or point it at) your own conductor. |
+| [NextGenSoftware.Holochain.HoloNET.Client.Embedded](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.Client.Embedded) | Both 0.7.1 and 0.7.0 (choose with `HoloNETDNA.EmbeddedHolochainVersion`; 0.7.1 by default). |
+| [NextGenSoftware.Holochain.HoloNET.Client.Embedded.Holochain071](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.Client.Embedded.Holochain071) | 0.7.1 only (smaller download). |
+| [NextGenSoftware.Holochain.HoloNET.Client.Embedded.Holochain070](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.Client.Embedded.Holochain070) | 0.7.0 only (smaller download). |
 
-You can also find the Test Harness here:
+The same four exist for the ORM: [NextGenSoftware.Holochain.HoloNET.ORM](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.ORM), `.ORM.Embedded`, `.ORM.Embedded.Holochain071` and `.ORM.Embedded.Holochain070`.
 
-[NextGenSoftware.Holochain.HoloNET.Client.TestHarness](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.Client.TestHarness)
+The rest of the HoloNET family:
 
-Read more on how to use the [Test Harness here](https://github.com/holochain-open-dev/holochain-client-csharp/tree/main/NextGenSoftware.Holochain.HoloNET.Client.TestHarness).
+[NextGenSoftware.Holochain.HoloNET.ORM](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.ORM) - HoloNET ORM (Object Relational Mapping) for very easy &amp; rapid development of hApps: HoloNETEntryBase, HoloNETAuditEntryBase, HoloNETCollection and HoloNETObservableCollection. Extend the first two to create entry models that map directly onto the structs in your Rust zome code; the other two are collections of them. Call simple CRUD methods (Load, Save, Delete, ...) and get change tracking, version control &amp; rollback for free. [WEB5 STAR](https://www.nuget.org/packages/NextGenSoftware.OASIS.STAR) can generate both the Rust and the C# side.
 
+[NextGenSoftware.Holochain.HoloNET.API](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.API) | [GitHub](https://github.com/NextGenSoftwareUK/HoloNET-API) - The simplest way in: a static key/value and object store on Holochain (`HoloNETAPI.SaveDataAsync`, `LoadDataAsync`, `SaveObjectAsync`, ...), with the hApp chosen through `HoloNETAPIHapp` (the bundled OASIS hApp by default).
 
-As of v3.0.0 there are now a number of addon packages for HoloNET:
+[NextGenSoftware.Holochain.HoloNET.HyperNET](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.HyperNET) - P2P multiplayer networking for games (Unity, Unreal through .NET, or any .NET app) with no game server in the middle. See [HyperNET](#hypernet) below.
 
-[NextGenSoftware.Holochain.HoloNET.ORM](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.ORM)
-The new HoloNET ORM (Object Relational Mapping) allowing very easy &amp; rapid development of hApps. This consists of the HoloNETEntryBase, HoloNETAuditEntryBase, HoloNETCollection and HoloNETObservsableCollection classes. The first two can be extended to create your HoloNET Entry models that map directly onto your data structs in your rust hApp zome code. The second two are collections of these entries. You can then simply call basic CRUD methods on your classes such as Load, Save, Delete, etc making it very quick and easy to build hApps without having to worry about the lower complexities of Holochain or configure and use the Holochain Conductor or API's. You also get change tracking, version control &amp; rollback functionality for free. HoloNET ORM allows any existing .net app/website/game/service to be rapidly and quickly converted to a Holochain hApp with very little code changes (you can simply add a new attribute to the properties in your models) and it will now map to your rust hApp structs (which WEB5 [NextGenSoftware.OASIS.STAR](https://www.nuget.org/packages/NextGenSoftware.OASIS.STAR)) can also dynamically generate (it generates rust and c# code). More documentation will be coming soon for this...
+[NextGenSoftware.Holochain.HoloNET.Manager](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.Manager) | [GitHub](https://github.com/NextGenSoftwareUK/HoloNET-Manager) - The WPF UI to HoloNET Client &amp; ORM (think launcher/dev store for .NET hApps), showcasing their advanced features with reusable backend and UI components. Ports to Uno, MAUI &amp; OpenSilver are planned. Also shipped as a download on the [GitHub releases](https://github.com/holochain-open-dev/holochain-client-csharp/releases).
 
-[NextGenSoftware.Holochain.HoloNET.ORM.Embedded](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.ORM.Embedded)
-This is exactly the same as above except it is using the embedded version of the HoloNET Client so it is integrated with the Holochain Conductor binaries.
+[NextGenSoftware.Holochain.HoloNET.HDK](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.HDK) - The HoloNET HDK metapackage: one reference that brings in HoloNET Client, HoloNET ORM, HoloNET HyperNET, WEB5 STAR ODK/HDK and HoloOASIS. Its STAR plugin extends the WEB5 STAR No/Low Code Generator so it can generate hApps from metadata on top of the HoloNET Client/ORM. (HoloNET Manager is a desktop app, so it ships on its own rather than inside the HDK.) **Current status:** the HDK package brings in Client, ORM and HyperNET. STAR and HoloOASIS will be added once their next NuGet releases install cleanly; until then, reference `NextGenSoftware.OASIS.STAR` directly if you need the generator.
 
-[NextGenSoftware.Holochain.HoloNET.Manager](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.Manager) | [GitHub](https://github.com/NextGenSoftwareUK/HoloNET-Manager)
-The new UI to HoloNET Client &amp; HoloNET ORM show casing all of their advanced features.  This has many generic backend and UI components that can be used to allow other .net devs to rapidly construct their own .net hApps using HoloNET HDK (HoloNET Client, HoloNET ORM, HoloNET Manager, WEB5 STAR ODK/HDK &amp; HoloNET HyperNET). The HoloNET Manager is currently implemented in WPF but we have plans to port this to Uno, MAUI &amp; OpenSilver meaning it can run natively on Windows, Mac, Linux, TV's, IPads, tablets, android, IOS &amp; web. The work for this has already begun so expect future releases soon...
+[NextGenSoftware.OASIS.STAR](https://www.nuget.org/packages/NextGenSoftware.OASIS.STAR) - The WEB5 STAR No/Low Code Generator: generates code for any supported OASIS provider (web2 and web3, including Holochain, IPFS, Solana, EOS, Ethereum, Telos, SEEDS, MongoDB, SQLite, Neo4j &amp; Azure), running on top of the OASIS/STAR COSMIC ORM.
 
-[NextGenSoftware.Holochain.HoloNET.Manager.Embedded](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.Manager.Embedded)
-This is exactly the same as above except it is using the embedded version of the HoloNET Client so it is integrated with the Holochain Conductor binaries.
+The Test Harness: [NextGenSoftware.Holochain.HoloNET.Client.TestHarness](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.Client.TestHarness) ([how to use it](https://github.com/holochain-open-dev/holochain-client-csharp/tree/main/NextGenSoftware.Holochain.HoloNET.Client.TestHarness)).
 
-[NextGenSoftware.Holochain.HoloNET.HDK](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.HDK)
-The new HoloNET HDK consisting of HoloNET Client, HoloNET ORM, HoloNET Manager, WEB5 STAR ODK/HDK &amp; HoloNET HyperNET. This package contains a plugin to the generic WEB5 STAR ODK No/Low Code Generator extending it so it can generate hApps from metadata built on top of the HoloNET Client/ORM. Release Coming Soon...
+**Legacy packages:** `HoloNET.Manager.Embedded`, `HoloNET.HDK.Embedded` and `HoloNET.HyperNET.Embedded` were v3 packages and are no longer updated. Reference the `.Embedded` Client (or ORM) variant you want alongside Manager, HDK or HyperNET instead.
 
-[NextGenSoftware.Holochain.HoloNET.HDK.Embedded](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.HDK.Embedded)
-This is exactly the same as above except it is using the embedded version of the HoloNET Client so it is integrated with the Holochain Conductor binaries.
-
-[NextGenSoftware.OASIS.STAR](https://www.nuget.org/packages/NextGenSoftware.OASIS.STAR)
-The new No/Low Code Generator allowing you to generate code for any supported OASIS Provider (web2 and web3) and currently supports Holochain, IPFS, Solana, EOS, Ethereum, Telos, SEEDS, MongoDB, SQLLite, Neo4j &amp; Azure. The generated code runs on top of OASIS/STAR COSMIC ORM making it a very easy and powerful way to share data between any web2 or web3 provider. Release Coming Soon...
-
-[NextGenSoftware.Holochain.HoloNET.HyperNET](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.HyperNET)
-This is built on top of the HoloNET Client &amp; HoloNET ORM and allows Unity and Unreal games to implement lag free P2P networking allowing near unlimited number of players to play online smashing previous limitations on classic cloud/server hosting. Release Coming Soon...
-
-[NextGenSoftware.Holochain.HoloNET.HyperNET.Embedded](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.HyperNET.Embedded)
-This is exactly the same as above except it is using the embedded version of the HoloNET Client so it is integrated with the Holochain Conductor binaries.
-
-The latest release notes can be found below:
+The release notes for v3.0.0 (the big rewrite) are below; for everything since, see [CHANGELOG.md](CHANGELOG.md) and the [GitHub releases](https://github.com/holochain-open-dev/holochain-client-csharp/releases).
 
 This release is a MAJOR release and milestone, HoloNET has been re-written from the ground up with many improvements, bug fixes etc. Part of this includes making it compatible with the latest beta version of Holochain. It has also been upgraded to work with the latest version of .NET (v8.0) so has even further performance improvements, bug fixes, etc.
 
@@ -238,7 +227,7 @@ Finally this release also features HoloNET HyperNET allowing Unity and Unreal ga
 
 This is the BIGGEST update to HoloNET to date and is pretty much a whole new product now! ;-)
 
-**NOTE:** The HoloNETClientAdmin, HoloNETCollection, and HoloNETObservableCollection sections have been fully documented below. Some older sections still reference v2/v3 behaviour — these will be updated as part of the v4 documentation refresh.
+**NOTE:** The HoloNETClientAdmin, HoloNETCollection, HoloNETObservableCollection and HyperNET sections below are up to date for v4.2+.
 
 Read more here:
 https://github.com/holochain-open-dev/holochain-client-csharp/releases/tag/v3.0.0
@@ -3273,6 +3262,44 @@ The External enum was to be used by any other external implementation that imple
 
 **More to come soon...**
 
+
+## HyperNET
+
+HoloNET HyperNET is P2P multiplayer networking for games. Players talk to each other directly over Holochain, with no game server in the middle to become the bottleneck, which is what normally limits how many players an online game (especially an MMO) can hold.
+
+How it keeps the traffic down:
+
+- **Zones.** The world is split into zones (a level, a region, a shard of an open world). A player's presence in a zone is the only thing written to the DHT; everything else is a direct signal between players.
+- **Area of interest.** You only send game traffic to the players near you (within `AreaOfInterestRadius`), and only the nearest `MaxFullRatePeers` of those get every update. Everyone else in the zone gets every `FarUpdateEvery`th position update, so they still know roughly where you are. Each player's bandwidth depends on how crowded their surroundings are, not on how many players are online.
+- **Unreliable and reliable messages.** Position and state updates are fire and forget (the next one replaces them). Events that must arrive (a hit, a trade, a chat line) can be sent reliably: acknowledged, re-sent until they arrive, delivered exactly once, or reported through `OnReliableMessageFailed`.
+- **Presence.** Joins and leaves are announced by signal, the zone list is re-read from the DHT every few seconds to catch anything missed, and a small heartbeat keeps idle players from timing out.
+- **Latency.** `PingAsync` measures the round trip to a player; `Stats` keeps counters and the average latency.
+
+```csharp
+// One HoloNET app agent per player (the OASIS hApp includes the HyperNET zome functions).
+var session = new HyperNETSession(appAgentClient, zone: "forest-1", playerName: "Alice",
+    new HyperNETOptions { AreaOfInterestRadius = 100, MaxFullRatePeers = 64 });
+
+session.OnPeerJoined += (s, e) => Console.WriteLine($"{e.Peer.PlayerName} arrived");
+session.OnPeerMoved  += (s, e) => MoveAvatar(e.Peer.AgentPubKey, e.Peer.Position.Value);
+session.OnMessage    += (s, e) => Handle(e.Channel, e.Payload, e.From);
+
+await session.JoinAsync();
+
+// Every frame (or tick): only sent when you actually moved, and only to the players who need it.
+await session.UpdatePositionAsync(new HyperNETVector3(x, y, z));
+
+// Game events: to your area of interest by default, or the whole zone, or specific players.
+await session.SendAsync("shot", new byte[] { 1 });
+await session.SendAsync("trade", new { item = "sword", qty = 1 }, HyperNETTarget.Specific, reliable: true, agentPubKeys: new[] { bob });
+
+// Crossing into the next zone.
+await session.ChangeZoneAsync("forest-2");
+```
+
+`HyperNETService` wraps all of this for a long-running process: it connects to the conductor (HoloNET's embedded one when you use an `.Embedded` package), installs the hApp if needed, and joins the zone in `HyperNETDNA.json`. WEB5 STAR's `hypernet start | stop | status | config` commands are built on it.
+
+**What to be honest about:** HyperNET removes the central server, so there is no server bill, no server-side player cap and no extra hop through a data centre. It doesn't make the network itself faster: latency is still the real distance between players (and players behind strict NATs relay through a Holochain relay). A very dense crowd in one spot still means more traffic for the players inside it, which `MaxFullRatePeers` caps. Signals aren't guaranteed, which is why reliable messages exist. And with no server there's no server-side authority, so anti-cheat has to come from validation rules in the hApp or from players checking each other.
 
 ## HoloOASIS
 

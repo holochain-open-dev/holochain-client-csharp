@@ -28,8 +28,14 @@ It runs the Client/ORM/API tests (`NextGenSoftware.Holochain.HoloNET.Client.Test
 
 Each run starts a fresh sandbox for that version (bundled `hc`, and `holochain.exe` from
 `%APPDATA%\NextGenSoftware\HoloNET\<version>\`, so Windows Firewall asks once per version), then runs the whole
-suite with coverage into `.holochain-test/coverage-<version>`. Test hApps live in `.holochain-test/happ-070*` and
-`happ-071*` (gitignored; build 0.7.1 ones from OASIS-Holochain-hApp main, 0.7.0 from its `holochain-0.7.0` tag).
+suite with coverage into `.holochain-test/coverage-<version>`. The sandbox uses Holochain's in-memory network
+(`hc sandbox create ... network mem`): the tests run offline, and the HyperNET tests' players (several agents on one
+conductor) reach each other without the public bootstrap and relay servers. Test hApps live in
+`.holochain-test/happ-070*` and `happ-071*` (gitignored; build 0.7.1 ones from OASIS-Holochain-hApp main, 0.7.0 from its
+`holochain-0.7.0-maintenance` branch).
+
+`LiveHyperNETTests` run three players in one zone: joins and leaves, unreliable and reliable messages, ping, area of
+interest, position updates and zone changes. Each player is its own installed app, so its own agent.
 
 Conductor auto-start / auto-shutdown tests start and kill conductors, so they only run on request and with no other
 conductor running:
