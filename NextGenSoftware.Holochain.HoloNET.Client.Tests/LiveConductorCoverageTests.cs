@@ -334,7 +334,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
         public async Task Live_AddAdminInterfaces_OpensANewAdminPort()
         {
             RequireConductorAndHapp();
-            ushort port = (ushort)new Random().Next(40000, 50000);
+            // Let the OS choose a bindable port: random numeric ports can be in
+            // Windows' excluded/reserved ranges even when no listener exists.
+            var reservation = new System.Net.Sockets.TcpListener(System.Net.IPAddress.Loopback, 0);
+            reservation.Start();
+            ushort port;
+            try { port = checked((ushort)((System.Net.IPEndPoint)reservation.LocalEndpoint).Port); }
+            finally { reservation.Stop(); }
             var admin = NewAdmin();
             Assert.False((await admin.ConnectAsync(AdminUri)).IsError);
             try
