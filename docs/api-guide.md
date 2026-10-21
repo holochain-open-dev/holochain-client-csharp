@@ -1,6 +1,6 @@
 # HoloNET API guide
 
-HoloNET API is the quickest way to put data on Holochain from .NET: static methods for a key/value store, an object store and direct messages. You don't need to write any Rust or set up a conductor; it uses the bundled OASIS hApp. Every member is listed in the [API reference](api/API.md).
+HoloNET API is the quickest way to use Holochain from .NET: **one line** to save, load or delete data and objects, share data with everyone in your app, get told when it changes, and message other agents. You don't need to write any Rust or set up a conductor: it uses the bundled OASIS hApp (or yours), and HoloNET installs and connects it on first use. Every member is listed in the [API reference](api/API.md).
 
 ```bash
 dotnet add package NextGenSoftware.Holochain.HoloNET.API
@@ -8,22 +8,25 @@ dotnet add package NextGenSoftware.Holochain.HoloNET.API
 
 To have HoloNET start its own conductor, also add an Embedded Client package (`NextGenSoftware.Holochain.HoloNET.Client.Embedded`). Without one, it connects to the conductor on HoloNET's default admin port.
 
-## Key/value data
+## Your data
 
 ```csharp
 using NextGenSoftware.Holochain.HoloNET.API;
 
 await HoloNETAPI.SaveDataAsync("theme", "dark");
+string theme = (await HoloNETAPI.LoadDataAsync("theme")).Result;
+await HoloNETAPI.DeleteDataAsync("theme");             // Result: true if it existed
 
-HoloNETAPIResult<string> theme = await HoloNETAPI.LoadDataAsync("theme");
-if (theme.IsSuccess)
-    Console.WriteLine(theme.Result); // "dark"
+// Any type: numbers, bools, dates, Guids, enums (stored in the invariant culture, so they load back the same anywhere).
+await HoloNETAPI.SaveDataAsync("score", 9001);
+int score = (await HoloNETAPI.LoadDataAsync<int>("score")).Result;
 
-// Work with the whole store:
-HoloNETAPI.Data["volume"] = "7";
-await HoloNETAPI.SaveAllDataAsync();
-var all = await HoloNETAPI.LoadAllDataAsync();  // all.Result is a Dictionary<string, string>
+// What's there.
+List<string> keys = (await HoloNETAPI.ListKeysAsync()).Result;
+bool hasScore = (await HoloNETAPI.ExistsAsync("score")).Result;
 ```
+
+Every call returns a `HoloNETAPIResult<T>` with `IsSuccess`, `Result` and `Message`. A missing key, an empty key or a value that won't convert is reported in `Message`; nothing throws.
 
 ## Objects
 
@@ -31,29 +34,101 @@ var all = await HoloNETAPI.LoadAllDataAsync();  // all.Result is a Dictionary<st
 public class Settings { public string Name { get; set; } public int Level { get; set; } }
 
 await HoloNETAPI.SaveObjectAsync("settings", new Settings { Name = "Ada", Level = 3 });
-HoloNETAPIResult<Settings> s = await HoloNETAPI.LoadObjectAsync<Settings>("settings");
+Settings s = (await HoloNETAPI.LoadObjectAsync<Settings>("settings")).Result;
+await HoloNETAPI.DeleteObjectAsync("settings");
+
+List<string> objectKeys = (await HoloNETAPI.ListKeysAsync(objects: true)).Result;
 ```
 
 Objects are stored as JSON.
 
-## Deleting
+## Working with everything at once
 
 ```csharp
-await HoloNETAPI.DeleteDataAsync("theme");      // Result: true if the key existed
-await HoloNETAPI.DeleteObjectAsync("settings");
-await HoloNETAPI.DeleteAllDataAsync();          // every value (objects are kept)
-await HoloNETAPI.DeleteAllObjectsAsync();       // every object (values are kept)
+var all = await HoloNETAPI.LoadAllDataAsync();    // fills HoloNETAPI.Data
+HoloNETAPI.Data["volume"] = "7";
+HoloNETAPI.Data.Remove("old");
+await HoloNETAPI.SaveAllDataAsync();               // writes only what changed; removed keys are deleted
+
+await HoloNETAPI.DeleteAllDataAsync();             // every value (objects are kept)
+await HoloNETAPI.DeleteAllObjectsAsync();          // every object (values are kept)
 ```
 
-A delete saves a new version of the store without the key. Earlier versions stay on your source chain, as Holochain keeps history.
+`LoadAllObjectsAsync`, `HoloNETAPI.Objects` and `SaveAllObjectsAsync` do the same for objects.
+
+## Shared data
+
+Data in a **namespace** that every agent in the app can read and write: a leaderboard, a room's settings, a shared list.
+
+```csharp
+await HoloNETAPI.SaveSharedDataAsync("leaderboard", "high-score", "9001");
+int best = (await HoloNETAPI.LoadSharedDataAsync<int>("leaderboard", "high-score")).Result;
+
+await HoloNETAPI.SaveSharedObjectAsync("room-42", "settings", new RoomSettings { MaxPlayers = 8 });
+var room = (await HoloNETAPI.LoadSharedObjectAsync<RoomSettings>("room-42", "settings")).Result;
+
+var everything = (await HoloNETAPI.LoadAllSharedDataAsync("leaderboard")).Result;
+var keys = (await HoloNETAPI.ListSharedKeysAsync("leaderboard")).Result;
+await HoloNETAPI.DeleteSharedDataAsync("leaderboard", "high-score");
+```
+
+Shared loads always read from the DHT, because anyone may have changed the data.
+
+Anyone in the app can write to a namespace. If only certain agents should be allowed to change something, enforce that with validation rules in your own hApp.
+
+## Change notifications
+
+Get told when someone else changes shared data:
+
+```csharp
+HoloNETAPI.OnDataChanged += (s, e) =>
+    Console.WriteLine($"{e.ByAgentPubKey} {(e.IsDeleted ? "deleted" : "changed")} {e.Namespace}/{e.Key}");
+
+await HoloNETAPI.SubscribeToChangesAsync("leaderboard");
+// ... later
+await HoloNETAPI.UnsubscribeFromChangesAsync("leaderboard");
+```
+
+Every shared save or delete tells the namespace's subscribers directly, as a remote signal. Notifications aren't guaranteed. If you can't afford to miss one, load the data again from time to time.
+
+## Messages
+
+```csharp
+HoloNETAPI.OnSignalReceived += (s, e) => Console.WriteLine($"{e.FromAgentPubKey}: {e.Message}");
+
+await HoloNETAPI.SendSignalAsync("hello", new[] { friendAgentPubKey });   // to specific agents
+await HoloNETAPI.SendSignalToAllAsync("server restarting in 5 minutes");  // to everyone using the API in this app
+string last = HoloNETAPI.ReceiveSignal();                                // the last message received
+```
+
+Messages go straight from agent to agent, and nothing is stored. Delivery isn't guaranteed. For acknowledged, retried messages, or for multiplayer, use [HyperNET](hypernet-guide.md).
+
+## Without async
+
+Every common call has a sync version, for Unity scripts, console apps and other code that doesn't use `async`:
+
+```csharp
+HoloNETAPI.SaveData("theme", "dark");
+string theme = HoloNETAPI.LoadData("theme").Result;
+int score = HoloNETAPI.LoadData<int>("score").Result;
+HoloNETAPI.DeleteData("theme");
+HoloNETAPI.SaveObject("settings", settings);
+var s = HoloNETAPI.LoadObject<Settings>("settings").Result;
+HoloNETAPI.SaveSharedData("leaderboard", "high-score", "9001");
+HoloNETAPI.SendSignalToAll("hello");
+bool exists = HoloNETAPI.Exists("theme").Result;
+var keys = HoloNETAPI.ListKeys().Result;
+```
 
 ## How it's stored
 
-- **One entry per agent.** The whole store is one entry on your agent's source chain, with the data and the objects in two fields.
-- **Its id.** The entry's id is `HoloNETAPI.StoreId`: `HoloNETAPIDNA.StoreId` if you set one, otherwise one derived from your agent key.
-- **Saving.** A save writes a new version of that entry, with what you've changed merged into what's already stored.
-- **Surviving restarts.** Your data is still there after a restart, because the API reinstalls nothing and finds the same agent and entry.
-- **Caching.** Loads are cached; pass `useCache: false` to read from the DHT again.
+- **One entry per key.** Each key is its own entry: a holon in the OASIS hApp, with the id `<store>/<data|object>/<key>`. Saving or loading one key costs the same however big your store is.
+- **Your store's id** is `HoloNETAPI.StoreId`: `HoloNETAPIDNA.StoreId` if you set one, otherwise one derived from your agent key. Shared data lives in `holonet-api-shared/<namespace>`.
+- **Deletes keep history.** A delete saves a deleted marker as the key's newest version. Holochain keeps history, so earlier versions remain on the DHT.
+- **Caching.** Loads of your own data are cached; pass `useCache: false` to read from the DHT again.
+- **Upgrading from 4.4.2 or earlier.** Those versions kept the whole store in one entry. The first time 4.5 starts, it copies that store into per-key storage, once.
+
+To keep the old one-entry store, set `HoloNETAPIDNA.StorageMode = "SingleEntry"`. Calls that name your own zome functions also use it, because they're meant for a custom hApp shaped like that store.
 
 ## Choosing the hApp
 
@@ -61,41 +136,18 @@ By default, the API uses the bundled OASIS hApp (`oasis.happ`, role `oasis`, ins
 
 ```csharp
 var happ = new HoloNETAPIHapp("my-app", @"C:\hApps\my.happ", "my-role");
-await HoloNETAPI.SaveDataAsync(happ, "theme", "dark");
+await HoloNETAPI.InitHoloNETAsync(happ);
 ```
-
-Your zome needs the same functions and fields as the OASIS avatar entry:
-
-- **Functions:** `create_entry_avatar`, `update_entry_avatar` and `get_avatar_by_id`.
-- **Fields:** `holonet_api_data` and `holonet_api_objects`.
-
-The function names are optional parameters on every method, so you can point them at your own functions.
 
 Whichever hApp you initialise with is remembered in `HoloNETAPIDNA.json`, so later one-line calls use it again, even after `ShutdownAsync` or a restart.
 
-The older overloads that take the hApp as three strings (`hAppId, hAppPath, hAppRole`) still work, but they're obsolete. With three leading strings, C# could silently pick a different overload, for example treating your app id as the zome name.
-
-## Direct messages
-
-Send a text message straight to other agents. It goes as a Holochain remote signal, peer to peer, and nothing is stored.
-
-```csharp
-HoloNETAPI.OnSignalReceived += (s, e) =>
-    Console.WriteLine($"{e.FromAgentPubKey}: {e.Message}");
-
-var sent = await HoloNETAPI.SendSignalAsync("hello", new[] { friendAgentPubKey });
-// sent.Result == number of agents it was sent to
-
-string last = HoloNETAPI.ReceiveSignal(); // the last message received
-```
-
-Delivery isn't guaranteed. For acknowledged, retried messages, or for multiplayer, use [HyperNET](hypernet-guide.md).
+Your hApp needs the OASIS hApp's holon functions for storage: `create_entry_holon`, `update_entry_holon`, `get_holon_by_id` and `get_holons_for_parent_by_id`. For messages, shared-data notifications and broadcasts, it needs its `hypernet_*` functions. Both come from the OASIS hApp's coordinator zome, which you can copy.
 
 ## Errors
 
-- **Results.** Every call returns a `HoloNETAPIResult<T>` with `IsSuccess`, `Result` and `Message`, plus `ZomeCallResult` with the underlying zome call.
-- **Events.** Errors are also raised through `HoloNETAPI.OnError`, and kept in `HoloNETAPI.LastError`.
+- Every result has `IsSuccess`, `Result` and `Message`, plus `ZomeCallResult` with the underlying zome call when there is one.
+- Errors are also raised through `HoloNETAPI.OnError`, and kept in `HoloNETAPI.LastError`.
 
 ## Lifetime
 
-The first call initialises everything: it connects, installs the hApp if needed, and issues the app token. You can do this up front with `await HoloNETAPI.InitHoloNETAsync()`. Call `await HoloNETAPI.ShutdownAsync()` when you're done; the next call starts again cleanly.
+The first call initialises everything: it connects, installs the hApp if needed, issues the app token, and joins the API's message zone. You can do this up front with `await HoloNETAPI.InitHoloNETAsync()`. Call `await HoloNETAPI.ShutdownAsync()` when you're done; the next call starts again cleanly.

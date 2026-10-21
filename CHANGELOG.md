@@ -1,5 +1,24 @@
 # Changelog
 
+## v4.5.0 - 2026-10-16
+
+HoloNET API 4.5.0. Everything else is unchanged.
+
+- **Per-key storage.** Each key is its own entry, so saving or loading one key costs the same however big the store is.
+  `SaveAllDataAsync` writes only what changed, and keys removed from `Data` are deleted. A store saved by 4.4.2 or earlier
+  (one entry) is copied over the first time 4.5 starts. `HoloNETAPIDNA.StorageMode = "SingleEntry"` keeps the old store.
+- **Shared data.** `SaveSharedDataAsync`, `LoadSharedDataAsync<T>`, `SaveSharedObjectAsync`, `LoadSharedObjectAsync<T>`,
+  `LoadAllSharedDataAsync`, `ListSharedKeysAsync` and `DeleteSharedDataAsync` work on a namespace every agent in the app can read and write.
+- **Change notifications.** `SubscribeToChangesAsync(ns)` plus the `OnDataChanged` event (who changed what), sent as remote
+  signals to the namespace's subscribers.
+- **Broadcast.** `SendSignalToAllAsync(message)` reaches everyone using the API in the app.
+- **Typed values.** `LoadDataAsync<int>("score")` and `SaveDataAsync("score", 9001)` cover numbers, bools, dates, Guids
+  and enums, stored in the invariant culture.
+- **Listing.** `ListKeysAsync()` and `ExistsAsync(key)`.
+- **Sync versions** of every common call (`SaveData`, `LoadData<T>`, `DeleteData`, `SaveObject`, `LoadObject<T>`,
+  `SaveSharedData`, `SendSignalToAll`, `Exists`, `ListKeys`, ...), for Unity scripts and console apps.
+- Tested live on Holochain 0.7.0 and 0.7.1, with a second agent for shared data, notifications and broadcasts.
+
 ## v4.4.2 - 2026-10-16
 
 HoloNET API 4.4.2. Everything else is unchanged.
