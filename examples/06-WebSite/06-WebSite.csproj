@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <!-- In your own site: dotnet add package NextGenSoftware.Holochain.HoloNET.API -->
+  <ItemGroup>
+    <ProjectReference Include="..\..\HoloNET-API\NextGenSoftware.Holochain.HoloNET.API\NextGenSoftware.Holochain.HoloNET.API.csproj" />
+    <ProjectReference Include="..\..\NextGenSoftware.Holochain.HoloNET.Client\NextGenSoftware.Holochain.HoloNET.Client.csproj" />
+  </ItemGroup>
+</Project>

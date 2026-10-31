@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- In your own app: dotnet add package NextGenSoftware.Holochain.HoloNET.ORM (HolochainHappGenerator lives in it). -->
+  <ItemGroup>
+    <ProjectReference Include="..\..\NextGenSoftware.Holochain.HoloNET.ORM\NextGenSoftware.Holochain.HoloNET.ORM.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- STAR's DNA description and the generated output are data, not part of this program. -->
+    <Compile Remove="StarOAPP\**" />
+    <Compile Remove="out-*\**" />
+    <None Include="StarOAPP\**" />
+  </ItemGroup>
+</Project>

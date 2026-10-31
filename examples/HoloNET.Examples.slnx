@@ -1,0 +1,18 @@
+<Solution>
+  <Project Path="../../NextGenSoftware-Libraries/NextGenSoftware.CLI.Engine/NextGenSoftware.CLI.Engine.csproj" />
+  <Project Path="../../NextGenSoftware-Libraries/NextGenSoftware.ErrorHandling/NextGenSoftware.ErrorHandling.csproj" />
+  <Project Path="../../NextGenSoftware-Libraries/NextGenSoftware.Logging/NextGenSoftware.Logging.csproj" />
+  <Project Path="../../NextGenSoftware-Libraries/NextGenSoftware.Utilities/NextGenSoftware.Utilities.csproj" />
+  <Project Path="../../NextGenSoftware-Libraries/NextGenSoftware.WebSocket/NextGenSoftware.WebSocket.csproj" />
+  <Project Path="../Chaos.NaCl/Chaos.NaCl.Portable.Standard.csproj" />
+  <Project Path="../HoloNET-API/NextGenSoftware.Holochain.HoloNET.API/NextGenSoftware.Holochain.HoloNET.API.csproj" />
+  <Project Path="../NextGenSoftware.Holochain.HoloNET.Client/NextGenSoftware.Holochain.HoloNET.Client.csproj" />
+  <Project Path="../NextGenSoftware.Holochain.HoloNET.HyperNET/NextGenSoftware.Holochain.HoloNET.HyperNET.csproj" />
+  <Project Path="../NextGenSoftware.Holochain.HoloNET.ORM/NextGenSoftware.Holochain.HoloNET.ORM.csproj" />
+  <Project Path="01-Client/01-Client.csproj" />
+  <Project Path="02-ORM/02-ORM.csproj" />
+  <Project Path="03-API/03-API.csproj" />
+  <Project Path="04-HyperNET/04-HyperNET.csproj" />
+  <Project Path="05-GenerateHapp/05-GenerateHapp.csproj" />
+  <Project Path="06-WebSite/06-WebSite.csproj" />
+</Solution>

@@ -1,0 +1,12 @@
+{
+  "OAPPName": "Space Game",
+  "OAPPDescription": "HoloNET example: a WEB5 STAR OAPP whose hApp is generated from STAR's Holochain 0.7 templates.",
+  "OAPPType": "OAPPTemplate",
+  "OAPPTemplateType": "Console",
+  "GenesisType": "Planet",
+  "CelestialBodyDnaFolder": "CelestialBodyDNA",
+  "GenesisFolder": "Generated",
+  "GenesisNamespace": "SpaceGame",
+  "ProviderType": "HoloOASIS",
+  "SkipStarnetOappCreate": true
+}

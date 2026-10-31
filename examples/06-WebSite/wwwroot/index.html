@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HoloNET Guestbook</title>
+  <!-- HoloNET example 06: everything on this page is stored on Holochain (HoloNET API shared data) and updates live. -->
+  <style>
+    :root { --bg:#0d1117; --panel:#161b22; --text:#e6edf3; --muted:#8b949e; --accent:#58a6ff; --border:#30363d; }
+    @media (prefers-color-scheme: light) { :root { --bg:#f6f8fa; --panel:#fff; --text:#1f2328; --muted:#59636e; --accent:#0969da; --border:#d0d7de; } }
+    * { box-sizing: border-box; }
+    body { margin:0; font:16px/1.5 system-ui, sans-serif; background:var(--bg); color:var(--text); }
+    main { max-width: 960px; margin: 0 auto; padding: 24px 16px; display:grid; gap:24px; grid-template-columns: 1fr; }
+    @media (min-width: 800px) { main { grid-template-columns: 2fr 1fr; } }
+    header { max-width:960px; margin:0 auto; padding:24px 16px 0; }
+    h1 { margin:0 0 4px; font-size: 1.6rem; }
+    header p { margin:0; color:var(--muted); }
+    section { background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:16px; }
+    h2 { margin:0 0 12px; font-size:1.1rem; }
+    form { display:grid; gap:8px; margin-bottom:16px; }
+    input, textarea, button { font:inherit; padding:8px 10px; border-radius:6px; border:1px solid var(--border); background:var(--bg); color:var(--text); }
+    button { background:var(--accent); color:#fff; border:none; cursor:pointer; }
+    ul { list-style:none; margin:0; padding:0; display:grid; gap:10px; }
+    li { border-top:1px solid var(--border); padding-top:10px; }
+    .who { font-weight:600; } .when { color:var(--muted); font-size:.85rem; margin-left:6px; }
+    ol { margin:0; padding-left:20px; } .live { color:var(--muted); font-size:.85rem; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>HoloNET Guestbook</h1>
+    <p>Stored on Holochain with <a href="https://docs.holonet.oasisomniverse.one/api-guide">HoloNET API</a> shared data. Open it in two browsers: changes appear in both instantly. <span class="live" id="live">connecting…</span></p>
+  </header>
+  <main>
+    <section>
+      <h2>Sign the guestbook</h2>
+      <form id="sign">
+        <input name="name" placeholder="Your name" required maxlength="40">
+        <textarea name="message" placeholder="Your message" required maxlength="280" rows="3"></textarea>
+        <button>Sign</button>
+      </form>
+      <ul id="entries"></ul>
+    </section>
+    <section>
+      <h2>Leaderboard</h2>
+      <form id="score">
+        <input name="name" placeholder="Your name" required maxlength="40">
+        <input name="score" type="number" min="0" placeholder="Score" required>
+        <button>Submit score</button>
+      </form>
+      <ol id="scores"></ol>
+    </section>
+  </main>
+  <script>
+    const $ = id => document.getElementById(id);
+    const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+
+    async function loadGuestbook() {
+      const entries = await (await fetch('/api/guestbook')).json();
+      $('entries').innerHTML = entries.map(e =>
+        `<li><span class="who">${esc(e.name)}</span><span class="when">${new Date(e.at).toLocaleString()}</span><div>${esc(e.message)}</div></li>`).join('')
+        || '<li>No messages yet - be the first.</li>';
+    }
+    async function loadScores() {
+      const scores = await (await fetch('/api/leaderboard')).json();
+      $('scores').innerHTML = scores.map(s => `<li>${esc(s.name)}: ${s.score}</li>`).join('') || '<li>No scores yet.</li>';
+    }
+    const post = (url, body) => fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+
+    $('sign').onsubmit = async e => {
+      e.preventDefault();
+      const f = new FormData(e.target);
+      await post('/api/guestbook', { name: f.get('name'), message: f.get('message') });
+      e.target.message.value = '';
+    };
+    $('score').onsubmit = async e => {
+      e.preventDefault();
+      const f = new FormData(e.target);
+      await post('/api/score', { name: f.get('name'), score: Number(f.get('score')) });
+    };
+
+    // Live updates: the server pushes the namespace that changed (from this site or any other agent on Holochain).
+    const events = new EventSource('/api/events');
+    events.onopen = () => $('live').textContent = '● live';
+    events.onerror = () => $('live').textContent = 'reconnecting…';
+    events.onmessage = e => { if (e.data === 'guestbook') loadGuestbook(); if (e.data === 'leaderboard') loadScores(); };
+
+    loadGuestbook();
+    loadScores();
+  </script>
+</body>
+</html>
