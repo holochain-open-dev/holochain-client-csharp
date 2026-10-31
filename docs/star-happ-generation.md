@@ -2,6 +2,8 @@
 
 WEB5 STAR (the OASIS low/no-code generator) can generate a complete Holochain hApp from a simple description of your data:
 
+**Runnable example:** [`examples/05-GenerateHapp`](../examples/05-GenerateHapp/Program.cs) (generating a hApp from code, and as a STAR OAPP). Tutorials: [learn.holonet.oasisomniverse.one](https://learn.holonet.oasisomniverse.one).
+
 - the Rust integrity and coordinator zomes;
 - the DNA and hApp manifests;
 - a build script;

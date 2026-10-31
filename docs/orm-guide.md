@@ -2,6 +2,8 @@
 
 The ORM maps your C# classes onto your hApp's entries. You call `SaveAsync`, `LoadAsync` and `DeleteAsync` on an object, and HoloNET makes the zome calls, tracks changes and keeps the hashes. Collections do the same for lists of entries.
 
+**Runnable example:** [`examples/02-ORM`](../examples/02-ORM/Program.cs) (entries, change tracking, audit entries and collections). Tutorials: [learn.holonet.oasisomniverse.one](https://learn.holonet.oasisomniverse.one).
+
 - Packages: `NextGenSoftware.Holochain.HoloNET.ORM`, with `.Embedded`, `.Embedded.Holochain071` and `.Embedded.Holochain070` variants.
 - Every member: [API reference](api/ORM.md). The README describes [HoloNETEntryBase](../README.md#holonetentrybaseclass), [HoloNETAuditEntryBase](../README.md#holonetauditentrybaseclass), [HoloNETCollection](../README.md#holonetcollection) and [HoloNETObservableCollection](../README.md#holonetobservablecollection) in full.
 

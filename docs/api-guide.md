@@ -2,6 +2,8 @@
 
 HoloNET API is the quickest way to use Holochain from .NET: **one line** to save, load or delete data and objects, share data with everyone in your app, get told when it changes, and message other agents. You don't need to write any Rust or set up a conductor: it uses the bundled OASIS hApp (or yours), and HoloNET installs and connects it on first use. Every member is listed in the [API reference](api/API.md).
 
+**Runnable example:** [`examples/03-API`](../examples/03-API/Program.cs) (every API feature). Tutorials: [learn.holonet.oasisomniverse.one](https://learn.holonet.oasisomniverse.one).
+
 ```bash
 dotnet add package NextGenSoftware.Holochain.HoloNET.API
 ```

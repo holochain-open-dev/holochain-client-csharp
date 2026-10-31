@@ -15,6 +15,10 @@ HoloNET is the .NET and Unity client for [Holochain](https://holochain.org), plu
 | Generate a hApp (Rust and C#) from metadata | [STAR hApp generation guide](star-happ-generation.md) |
 | Run the tests against real conductors | [Testing guide](../INTEGRATION_TESTING.md) |
 
+## Examples
+
+Runnable, commented examples of every feature are in [`examples/`](../examples/README.md): the Client, the ORM, the API, HyperNET, hApp generation (including a WEB5 STAR OAPP) and a web site on Holochain. All of them are run against Holochain 0.7.0 and 0.7.1 on every release. Step-by-step tutorials built on them are at [learn.holonet.oasisomniverse.one](https://learn.holonet.oasisomniverse.one).
+
 ## API reference
 
 These pages list every public type and member, generated from the compiled assemblies and their XML docs.

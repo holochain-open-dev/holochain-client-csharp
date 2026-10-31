@@ -2,6 +2,8 @@
 
 The Client is the connection to a Holochain conductor. Everything else in HoloNET (ORM, API, HyperNET, Manager) is built on it. The [API reference](api/Client.md) lists every member, and the [main README](../README.md#holonetclient) describes each event, method and property in detail.
 
+**Runnable example:** [`examples/01-Client`](../examples/01-Client/Program.cs) (connecting, installing, zome calls, signals and admin calls). Tutorials: [learn.holonet.oasisomniverse.one](https://learn.holonet.oasisomniverse.one).
+
 ## The two clients
 
 | Class | Connects to | Used for |

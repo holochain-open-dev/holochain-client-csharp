@@ -207,6 +207,8 @@ The rest of the HoloNET family:
 
 [NextGenSoftware.OASIS.STAR](https://www.nuget.org/packages/NextGenSoftware.OASIS.STAR) - The WEB5 STAR No/Low Code Generator: generates code for any supported OASIS provider (web2 and web3, including Holochain, IPFS, Solana, EOS, Ethereum, Telos, SEEDS, MongoDB, SQLite, Neo4j &amp; Azure), running on top of the OASIS/STAR COSMIC ORM.
 
+**Documentation:** [docs.holonet.oasisomniverse.one](https://docs.holonet.oasisomniverse.one) has every guide and the full API reference (also in [`docs/`](docs/README.md)). **Tutorials:** [learn.holonet.oasisomniverse.one](https://learn.holonet.oasisomniverse.one). **Examples:** [`examples/`](examples/README.md) has runnable, commented examples of the Client, ORM, API, HyperNET, hApp generation (including a WEB5 STAR OAPP) and a web site on Holochain.
+
 The Test Harness: [NextGenSoftware.Holochain.HoloNET.Client.TestHarness](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.Client.TestHarness) ([how to use it](https://github.com/holochain-open-dev/holochain-client-csharp/tree/main/NextGenSoftware.Holochain.HoloNET.Client.TestHarness)).
 
 **Legacy packages:** `HoloNET.Manager.Embedded`, `HoloNET.HDK.Embedded` and `HoloNET.HyperNET.Embedded` were v3 packages and are no longer updated. Reference the `.Embedded` Client (or ORM) variant you want alongside Manager, HDK or HyperNET instead.

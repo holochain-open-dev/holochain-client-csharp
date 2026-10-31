@@ -2,6 +2,8 @@
 
 HyperNET is P2P multiplayer networking for games (Unity, Unreal through .NET, or any .NET app) on Holochain 0.7.0 and 0.7.1. Players talk to each other directly over Holochain remote signals. There's no game server in the middle, so there's no server bottleneck, no server bill and no server-side player cap. Every member is listed in the [API reference](api/HyperNET.md).
 
+**Runnable example:** [`examples/04-HyperNET`](../examples/04-HyperNET/Program.cs) (three players in a zone). Tutorials: [learn.holonet.oasisomniverse.one](https://learn.holonet.oasisomniverse.one).
+
 ```bash
 dotnet add package NextGenSoftware.Holochain.HoloNET.HyperNET
 ```
