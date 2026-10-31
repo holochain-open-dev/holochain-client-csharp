@@ -132,6 +132,17 @@ var keys = HoloNETAPI.ListKeys().Result;
 
 To keep the old one-entry store, set `HoloNETAPIDNA.StorageMode = "SingleEntry"`. Calls that name your own zome functions also use it, because they're meant for a custom hApp shaped like that store.
 
+## Choosing the conductor
+
+With an `.Embedded` Client package, the API starts the conductor itself, so there's nothing to set up. To use a conductor you run yourself, or to change logging, make one call before the first API call:
+
+```csharp
+HoloNETAPI.UseConductor("ws://localhost:65464", logToConsole: false);   // HoloNET won't start or stop it
+
+// Or any HoloNET settings:
+HoloNETAPI.Configure(new HoloNETDNA { HolochainConductorMode = HolochainConductorModeEnum.UseEmbedded, LogToFile = false });
+```
+
 ## Choosing the hApp
 
 By default, the API uses the bundled OASIS hApp (`oasis.happ`, role `oasis`, installed app id `oasis`). To use a different one, pass a `HoloNETAPIHapp`:

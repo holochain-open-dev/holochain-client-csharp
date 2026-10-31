@@ -1,0 +1,22 @@
+/* HoloNET additions to the OASIS docs styles (generated pages from scripts/build-sites.py). */
+.content table { width: 100%; border-collapse: collapse; margin: 16px 0 24px; font-size: 14px; }
+.content th, .content td { border: 1px solid var(--border); padding: 8px 10px; text-align: left; vertical-align: top; }
+.content th { background: var(--surface-2); color: #fff; }
+.content td code, .content li code, .content p code { font-family: var(--font-mono); font-size: 13px; background: var(--surface-2); padding: 1px 5px; border-radius: 4px; }
+.table-wrap { overflow-x: auto; }
+.content h2 { margin-top: 40px; } .content h3 { margin-top: 28px; }
+.content ul, .content ol { padding-left: 22px; margin: 8px 0 16px; }
+.content li { margin: 4px 0; }
+.content p { margin: 10px 0; }
+.track-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 24px 0 40px; }
+@media (max-width: 760px) { .track-grid { grid-template-columns: 1fr; } }
+.track-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; display: block; text-decoration: none; transition: border-color .2s, box-shadow .2s; }
+.track-card:hover { border-color: var(--accent); box-shadow: 0 0 24px var(--accent-glow); text-decoration: none; }
+.track-card h3 { color: #fff; font-size: 16px; margin: 0 0 8px; }
+.track-card p { color: var(--text-dim); font-size: 13px; margin: 0; }
+
+/* The shared stylesheet both places .main in the grid's main column AND gives it a sidebar-width margin, so content
+   started two sidebar-widths in. The grid column already clears the (fixed) sidebar. */
+.main { margin-left: 0; min-width: 0; }
+@media (max-width: 900px) { .layout, .layout-no-rail { display: block; } .main { padding: 0 16px 60px; } }
+.track-card .card-time { margin-top: 10px; color: var(--accent); font-size: 12px; }
