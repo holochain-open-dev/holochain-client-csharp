@@ -66,7 +66,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
         [SkippableFact]
         public async Task Live_GeneratedHapp_ModelsCompileAndDoCrudAndCollections()
         {
-            Skip.If(string.IsNullOrEmpty(AdminUri) || string.IsNullOrEmpty(GeneratedDir) || !File.Exists(HappPath) || ModelsDir == null,
+            Skip.If(string.IsNullOrEmpty(AdminUri) || string.IsNullOrEmpty(GeneratedDir) || !File.Exists(HappPath) || ModelsDir == null || !Directory.Exists(ModelsDir),
                 "Needs a live conductor and the generated hApp (scripts/build-generated-happ.sh, run by scripts/run-live-tests.sh).");
 
             Assembly models = CompileModels();
