@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- In your own app: dotnet add package NextGenSoftware.Holochain.HoloNET.HyperNET -->
+  <ItemGroup>
+    <ProjectReference Include="..\..\NextGenSoftware.Holochain.HoloNET.HyperNET\NextGenSoftware.Holochain.HoloNET.HyperNET.csproj" />
+    <ProjectReference Include="..\..\NextGenSoftware.Holochain.HoloNET.Client\NextGenSoftware.Holochain.HoloNET.Client.csproj" />
+    <!-- Only for the bundled OASIS hApp (oasis.happ), which has HyperNET's zome functions. -->
+    <ProjectReference Include="..\..\HoloNET-API\NextGenSoftware.Holochain.HoloNET.API\NextGenSoftware.Holochain.HoloNET.API.csproj" />
+  </ItemGroup>
+</Project>
