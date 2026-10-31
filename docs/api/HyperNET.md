@@ -1,6 +1,6 @@
 # HoloNET HyperNET API reference
 
-Generated from `NextGenSoftware.Holochain.HoloNET.HyperNET` 4.4.0.0 (every public type and member, with its XML documentation where it has one). For guides and examples see the [documentation index](../README.md).
+Generated from `NextGenSoftware.Holochain.HoloNET.HyperNET` 4.5.0.0 (every public type and member, with its XML documentation where it has one). For guides and examples see the [documentation index](../README.md).
 
 - **NextGenSoftware.Holochain.HoloNET.HyperNET**: [HyperNET](#nextgensoftware-holochain-holonet-hypernet-hypernet), [HyperNETDNA](#nextgensoftware-holochain-holonet-hypernet-hypernetdna), [HyperNETDNAManager](#nextgensoftware-holochain-holonet-hypernet-hypernetdnamanager), [HyperNETErrorEventArgs](#nextgensoftware-holochain-holonet-hypernet-hyperneterroreventargs), [HyperNETMessageEventArgs](#nextgensoftware-holochain-holonet-hypernet-hypernetmessageeventargs), [HyperNETOptions](#nextgensoftware-holochain-holonet-hypernet-hypernetoptions), [HyperNETPeer](#nextgensoftware-holochain-holonet-hypernet-hypernetpeer), [HyperNETPeerEventArgs](#nextgensoftware-holochain-holonet-hypernet-hypernetpeereventargs), [HyperNETReliableFailedEventArgs](#nextgensoftware-holochain-holonet-hypernet-hypernetreliablefailedeventargs), [HyperNETService](#nextgensoftware-holochain-holonet-hypernet-hypernetservice), [HyperNETSession](#nextgensoftware-holochain-holonet-hypernet-hypernetsession), [HyperNETStats](#nextgensoftware-holochain-holonet-hypernet-hypernetstats), [HyperNETTarget](#nextgensoftware-holochain-holonet-hypernet-hypernettarget), [HyperNETVector3](#nextgensoftware-holochain-holonet-hypernet-hypernetvector3)
 
@@ -144,6 +144,7 @@ Inherits / implements: `IDisposable`
 | Member | Kind | Description |
 |---|---|---|
 | `HyperNETSession(IHoloNETClientAppAgent client, string zone, string playerName, HyperNETOptions options = null)` | ctor | A session for one player (one connected app agent) in a zone. Call JoinAsync to enter it. |
+| `string AgentPubKey { get; }` | property | Your agent public key: what other players pass to SendAsync(..., HyperNETTarget.Specific, agentPubKeys) and PingAsync to reach you. |
 | `bool IsJoined { get; }` | property | True between a successful JoinAsync and LeaveAsync. |
 | `HyperNETOptions Options { get; }` | property | How the session behaves (area of interest, reliability, timeouts). |
 | `IReadOnlyList<HyperNETPeer> Peers { get; }` | property | Everyone else in your zone. |

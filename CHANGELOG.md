@@ -1,5 +1,30 @@
 # Changelog
 
+## v4.5.1 - 2026-10-31
+
+HoloNET Client and HyperNET 4.5.0, API 4.5.1, HDK 4.5.0. ORM and Manager are unchanged.
+
+- **Examples.** [`examples/`](examples/README.md) has six runnable, commented examples:
+  - the Client;
+  - the ORM;
+  - every HoloNET API feature;
+  - HyperNET (three players);
+  - hApp generation, including a WEB5 STAR OAPP;
+  - a live web site on Holochain.
+
+  All six run against Holochain 0.7.0 and 0.7.1 in the release tests (`scripts/run-live-tests.sh`, `PROJECTS=examples`).
+  `examples/start-conductor.sh` and `.ps1` start a conductor from HoloNET's bundled binaries.
+- **Documentation sites:**
+  - [docs.holonet.oasisomniverse.one](https://docs.holonet.oasisomniverse.one) has every guide and the full API reference;
+  - [learn.holonet.oasisomniverse.one](https://learn.holonet.oasisomniverse.one) has six step-by-step tutorials.
+
+  Both are generated from the Markdown in this repo (`scripts/build-sites.py`).
+- **Client.** The app client that `InstallEnableSignAttachAndConnectToHappAsync` creates now inherits the admin client's
+  logging settings. It always logged to the console and to file with the defaults, whatever you had set.
+- **HoloNET API.** `Configure(holoNETDNA)` and `UseConductor(adminUri, logToConsole)` set the conductor and logging in one line.
+- **HyperNET.** `HyperNETSession.AgentPubKey` is your own key, which other players need to message or ping you.
+- **Tests.** The generated-hApp test now skips, saying why, when the generated sources are missing.
+
 ## v4.5.0 - 2026-10-16
 
 HoloNET API 4.5.0. Everything else is unchanged.

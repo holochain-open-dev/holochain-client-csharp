@@ -20,7 +20,9 @@
 	  <PackageIcon>hc logo.png</PackageIcon>
 	  <Authors>David Ellams (NextGen Software Ltd)</Authors>
 	  <PackageTags>holochain;net;unity;client</PackageTags>
-	  <PackageReleaseNotes>## v4.4.0 - IHoloNETClientAdmin.AddAgentInfoAsync(IEnumerable&lt;string&gt;) (the Holochain 0.7 overload was missing from the interface); more XML docs; full docs at https://github.com/holochain-open-dev/holochain-client-csharp/tree/main/docs
+	  <PackageReleaseNotes>## v4.5.0 - The app client created by InstallEnableSignAttachAndConnectToHappAsync now logs the way the admin client was told to (LogToConsole, LogToFile, LogPath, logging modes); it always used the defaults before.
+
+## v4.4.0 - IHoloNETClientAdmin.AddAgentInfoAsync(IEnumerable&lt;string&gt;) (the Holochain 0.7 overload was missing from the interface); more XML docs; full docs at https://github.com/holochain-open-dev/holochain-client-csharp/tree/main/docs
 
 ## v4.2.0 - Holochain 0.7.0 + 0.7.1, full test coverage pass
 
@@ -123,7 +125,7 @@ Full changelog: https://github.com/holochain-open-dev/holochain-client-csharp/bl
 	  <!--<PackageLicenseExpression>GNU GPLv3</PackageLicenseExpression>-->
 	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
 	  <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-	  <Version>4.4.0</Version>
+	  <Version>4.5.0</Version>
 	  <!--<PackageLicenseFile>..\LICENSE</PackageLicenseFile>-->
 
 	  <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>

@@ -1,6 +1,6 @@
 # HoloNET API API reference
 
-Generated from `NextGenSoftware.Holochain.HoloNET.API` 4.5.0.0 (every public type and member, with its XML documentation where it has one). For guides and examples see the [documentation index](../README.md).
+Generated from `NextGenSoftware.Holochain.HoloNET.API` 4.5.1.0 (every public type and member, with its XML documentation where it has one). For guides and examples see the [documentation index](../README.md).
 
 - **NextGenSoftware.Holochain.HoloNET.API**: [HoloNETAPI](#nextgensoftware-holochain-holonet-api-holonetapi), [HoloNETAPIDataChangedEventArgs](#nextgensoftware-holochain-holonet-api-holonetapidatachangedeventargs), [HoloNETAPIDNA](#nextgensoftware-holochain-holonet-api-holonetapidna), [HoloNETAPIDNAManager](#nextgensoftware-holochain-holonet-api-holonetapidnamanager), [HoloNETAPIHapp](#nextgensoftware-holochain-holonet-api-holonetapihapp), [HoloNETAPIResult&lt;T&gt;](#nextgensoftware-holochain-holonet-api-holonetapiresult-1), [HoloNETAPISignalEventArgs](#nextgensoftware-holochain-holonet-api-holonetapisignaleventargs)
 - **NextGenSoftware.Holochain.HoloNET.API.Interfaces**: [IHoloNETAPIDNA](#nextgensoftware-holochain-holonet-api-interfaces-iholonetapidna)
@@ -26,6 +26,7 @@ A simple key/value and object store on Holochain. Everything saved (Data and Obj
 | `EventHandler<HoloNETAPIDataChangedEventArgs> OnDataChanged` | event | Raised when another agent changes shared data in a namespace you subscribed to (SubscribeToChangesAsync). |
 | `EventHandler<string> OnError` | event | Raised for every error (they used to be silently dropped). |
 | `EventHandler<HoloNETAPISignalEventArgs> OnSignalReceived` | event | Raised when another agent sends this agent a message with SendSignalAsync: (sender's agent pub key, message). |
+| `static void Configure(HoloNETDNA holoNETDNA)` | method | Set the HoloNET settings the API uses: which conductor (HolochainConductorAdminURI, or HolochainConductorMode = UseEmbedded with an .Embedded package), whether HoloNET starts / stops it, and logging (LogToConsole, LogToFile...). Call before the first API call (or after ShutdownAsync); the app connection the API makes inherits the same logging. |
 | `static Task<HoloNETAPIResult<bool>> DeleteAllDataAsync(string zome = "oasis", string loadFunction = "get_avatar_by_id", string createFunction = "create_entry_avatar", string updateFunction = "update_entry_avatar")` | method | Delete every value (the objects are kept) and save the store. Result is true if there was anything to delete. |
 | `static Task<HoloNETAPIResult<bool>> DeleteAllObjectsAsync(string zome = "oasis", string loadFunction = "get_avatar_by_id", string createFunction = "create_entry_avatar", string updateFunction = "update_entry_avatar")` | method | Delete every object (the values are kept) and save the store. Result is true if there was anything to delete. |
 | `static HoloNETAPIResult<bool> DeleteData(string key)` | method | Sync version of DeleteDataAsync. |
@@ -93,6 +94,7 @@ A simple key/value and object store on Holochain. Everything saved (Data and Obj
 | `static Task ShutdownAsync()` | method | Disconnects the app and admin clients and forgets the cached store, so the next call initialises again. |
 | `static Task<HoloNETAPIResult<bool>> SubscribeToChangesAsync(string ns)` | method | Get OnDataChanged whenever another agent changes shared data in this namespace. Subscribers find each other through the hApp (a zone link, like HyperNET), and changes are announced to them as remote signals. |
 | `static Task<HoloNETAPIResult<bool>> UnsubscribeFromChangesAsync(string ns)` | method | Stop getting OnDataChanged for this namespace. |
+| `static void UseConductor(string adminUri, bool logToConsole = true)` | method | Use a conductor you run yourself (HoloNET won't start or stop it), optionally without console logging. |
 
 <a id="nextgensoftware-holochain-holonet-api-holonetapidatachangedeventargs"></a>
 ### HoloNETAPIDataChangedEventArgs (class)
