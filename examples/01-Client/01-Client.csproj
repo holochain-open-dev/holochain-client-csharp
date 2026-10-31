@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- In your own app: dotnet add package NextGenSoftware.Holochain.HoloNET.Client (or .Client.Embedded to bundle a conductor). -->
+  <ItemGroup>
+    <ProjectReference Include="..\..\NextGenSoftware.Holochain.HoloNET.Client\NextGenSoftware.Holochain.HoloNET.Client.csproj" />
+    <!-- Only for the bundled OASIS hApp (oasis.happ), which HoloNET API copies to the output folder. -->
+    <ProjectReference Include="..\..\HoloNET-API\NextGenSoftware.Holochain.HoloNET.API\NextGenSoftware.Holochain.HoloNET.API.csproj" />
+  </ItemGroup>
+</Project>

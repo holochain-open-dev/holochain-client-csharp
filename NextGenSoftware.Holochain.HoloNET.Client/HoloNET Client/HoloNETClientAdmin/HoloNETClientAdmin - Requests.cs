@@ -272,7 +272,17 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                         AutoShutdownHolochainConductor = false,
                         AgentPubKey = result.AgentPubKey,
                         DnaHash = result.DnaHash,
-                        AppAuthenticationToken = tokenResult.TokenIssued.token
+                        AppAuthenticationToken = tokenResult.TokenIssued.token,
+
+                        // The app client logs the way the admin client was told to (it used to always log to the console
+                        // and file with the defaults, whatever the admin client's settings said).
+                        LogToConsole = HoloNETDNA.LogToConsole,
+                        LogToFile = HoloNETDNA.LogToFile,
+                        LogPath = HoloNETDNA.LogPath,
+                        LogFileName = HoloNETDNA.LogFileName,
+                        MaxLogFileSize = HoloNETDNA.MaxLogFileSize,
+                        FileLoggingMode = HoloNETDNA.FileLoggingMode,
+                        ConsoleLoggingMode = HoloNETDNA.ConsoleLoggingMode
                     };
 
                     result.HoloNETClientAppAgent = new HoloNETClientAppAgent(hAppId, result.AgentPubKey, appDNA);

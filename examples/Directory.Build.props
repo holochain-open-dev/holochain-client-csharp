@@ -1,0 +1,16 @@
+<Project>
+  <!-- Common settings for every HoloNET example. They reference the HoloNET projects in this repo (so they always match
+       the source); in your own app reference the NuGet packages instead, e.g.
+         dotnet add package NextGenSoftware.Holochain.HoloNET.Client -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <IsPackable>false</IsPackable>
+    <NoWarn>$(NoWarn);CS1591;CS8632</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Shared\ExampleSetup.cs" Link="Shared\ExampleSetup.cs" />
+  </ItemGroup>
+</Project>
