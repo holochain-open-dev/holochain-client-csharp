@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- HoloNET API brings the HoloNET Client and the OASIS hApp it stores your data in (oasis.happ, copied next to your app). -->
+    <PackageReference Include="NextGenSoftware.Holochain.HoloNET.APIHOLONET_SUFFIX" Version="HOLONET_VERSION" />
+  </ItemGroup>
+
+</Project>

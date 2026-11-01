@@ -1,0 +1,96 @@
+{
+  "_comment": [
+    "The single list of every HoloNET NuGet package. The publish jobs, the packaging script and the CI check all read this file,",
+    "so a package that isn't listed here is never built, and CI fails when a packable project isn't listed (or a listed package",
+    "isn't produced). To add a library: add it here, then run  python scripts/holonet_packages.py check.",
+    "",
+    "version: ONE version for the whole family (lockstep). Every package is packed at it, whatever its csproj says.",
+    "Change it with  python scripts/holonet_packages.py set-version X.Y.Z  (also updates the csproj files and their release notes).",
+    "",
+    "variants (per library): none = the lightweight package, no conductor | both = .Embedded (Holochain 0.7.1 + 0.7.0, pick with",
+    "HoloNETDNA.EmbeddedHolochainVersion) | 0.7.1 = .Embedded.Holochain071 | 0.7.0 = .Embedded.Holochain070.",
+    "Only the Client carries the conductor binaries; every other library's Embedded variant depends on the matching Client package.",
+    "exclude_projects: projects that declare a package but are deliberately not published (templates, tests, examples). Paths relative to the repo; a trailing * matches a prefix."
+  ],
+  "version": "4.6.0",
+  "libraries": [
+    {
+      "id": "NextGenSoftware.Holochain.HoloNET.Client",
+      "project": "NextGenSoftware.Holochain.HoloNET.Client/NextGenSoftware.Holochain.HoloNET.Client.csproj",
+      "variants": [
+        "none",
+        "both",
+        "0.7.1",
+        "0.7.0"
+      ]
+    },
+    {
+      "id": "NextGenSoftware.Holochain.HoloNET.ORM",
+      "project": "NextGenSoftware.Holochain.HoloNET.ORM/NextGenSoftware.Holochain.HoloNET.ORM.csproj",
+      "variants": [
+        "none",
+        "both",
+        "0.7.1",
+        "0.7.0"
+      ]
+    },
+    {
+      "id": "NextGenSoftware.Holochain.HoloNET.HyperNET",
+      "project": "NextGenSoftware.Holochain.HoloNET.HyperNET/NextGenSoftware.Holochain.HoloNET.HyperNET.csproj",
+      "variants": [
+        "none",
+        "both",
+        "0.7.1",
+        "0.7.0"
+      ]
+    },
+    {
+      "id": "NextGenSoftware.Holochain.HoloNET.HDK",
+      "project": "NextGenSoftware.Holochain.HoloNET.HDK/NextGenSoftware.Holochain.HoloNET.HDK.csproj",
+      "variants": [
+        "none",
+        "both",
+        "0.7.1",
+        "0.7.0"
+      ]
+    },
+    {
+      "id": "NextGenSoftware.Holochain.HoloNET.Manager",
+      "project": "HoloNET-Manager/NextGenSoftware.Holochain.HoloNET.Manager/NextGenSoftware.Holochain.HoloNET.Manager.csproj",
+      "variants": [
+        "none",
+        "both",
+        "0.7.1",
+        "0.7.0"
+      ]
+    },
+    {
+      "id": "NextGenSoftware.Holochain.HoloNET.API",
+      "project": "HoloNET-API/NextGenSoftware.Holochain.HoloNET.API/NextGenSoftware.Holochain.HoloNET.API.csproj",
+      "variants": [
+        "none",
+        "both",
+        "0.7.1",
+        "0.7.0"
+      ]
+    },
+    {
+      "id": "NextGenSoftware.Holochain.HoloNET.Client.TestHarness",
+      "project": "NextGenSoftware.Holochain.HoloNET.Client.TestHarness/NextGenSoftware.Holochain.HoloNET.Client.TestHarness.csproj",
+      "variants": [
+        "none",
+        "both",
+        "0.7.1",
+        "0.7.0"
+      ]
+    }
+  ],
+  "exclude_projects": [
+    "NextGenSoftware.Holochain.HoloNET.Templates.*",
+    "UnoApp/*",
+    "examples/*",
+    "NextGenSoftware.Holochain.HoloNET.Client.Tests/*",
+    "NextGenSoftware.Holochain.HoloNET.Manager.Tests/*",
+    "scripts/*"
+  ]
+}

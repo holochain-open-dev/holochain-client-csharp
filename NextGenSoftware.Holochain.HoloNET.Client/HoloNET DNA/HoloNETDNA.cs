@@ -62,7 +62,15 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <summary>
         /// Tells HoloNET how to auto-start the Holochain Conductor. See the documentation at https://github.com/holochain-open-dev/holochain-client-csharp for more info.
         /// </summary>
-        public HolochainConductorModeEnum HolochainConductorMode { get; set; } = HolochainConductorModeEnum.UseSystemGlobal;
+        // Was always UseSystemGlobal, even in an .Embedded package, so "Embedded" never used its bundled conductor unless you set UseEmbedded
+        // yourself. Now an Embedded package defaults to its bundled conductor on Windows (the bundled holochain.exe / hc.exe are Windows
+        // binaries); everything else uses the holochain on the PATH, as before.
+        //public HolochainConductorModeEnum HolochainConductorMode { get; set; } = HolochainConductorModeEnum.UseSystemGlobal;
+        public HolochainConductorModeEnum HolochainConductorMode { get; set; } =
+            System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows) &&
+            (HoloNETClientBase.IsEmbeddedHolochainVersionBundled(EmbeddedHolochainVersion.V0_7_1) || HoloNETClientBase.IsEmbeddedHolochainVersionBundled(EmbeddedHolochainVersion.V0_7_0))
+                ? HolochainConductorModeEnum.UseEmbedded
+                : HolochainConductorModeEnum.UseSystemGlobal;
 
         /// <summary>
         /// This is the Holochain Conductor to use for the auto-start Holochain Conductor feature. It can be either `Holochain` or `Hc`.

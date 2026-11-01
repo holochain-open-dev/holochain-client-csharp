@@ -20,7 +20,9 @@
 	  <PackageIcon>hc logo.png</PackageIcon>
 	  <Authors>David Ellams (NextGen Software Ltd)</Authors>
 	  <PackageTags>holochain;net;unity;client</PackageTags>
-	  <PackageReleaseNotes>## v4.5.0 - The app client created by InstallEnableSignAttachAndConnectToHappAsync now logs the way the admin client was told to (LogToConsole, LogToFile, LogPath, logging modes); it always used the defaults before.
+	  <PackageReleaseNotes>## v4.6.0 - Part of the HoloNET 4.6.0 release (every HoloNET package is versioned together): https://github.com/holochain-open-dev/holochain-client-csharp/releases/tag/v4.6.0
+
+## v4.5.0 - The app client created by InstallEnableSignAttachAndConnectToHappAsync now logs the way the admin client was told to (LogToConsole, LogToFile, LogPath, logging modes); it always used the defaults before.
 
 ## v4.4.0 - IHoloNETClientAdmin.AddAgentInfoAsync(IEnumerable&lt;string&gt;) (the Holochain 0.7 overload was missing from the interface); more XML docs; full docs at https://github.com/holochain-open-dev/holochain-client-csharp/tree/main/docs
 
@@ -125,7 +127,7 @@ Full changelog: https://github.com/holochain-open-dev/holochain-client-csharp/bl
 	  <!--<PackageLicenseExpression>GNU GPLv3</PackageLicenseExpression>-->
 	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
 	  <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-	  <Version>4.5.0</Version>
+	  <Version>4.6.0</Version>
 	  <!--<PackageLicenseFile>..\LICENSE</PackageLicenseFile>-->
 
 	  <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
@@ -191,7 +193,9 @@ Full changelog: https://github.com/holochain-open-dev/holochain-client-csharp/bl
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Chaos.NaCl\Chaos.NaCl.Portable.Standard.csproj" />
+    <!-- Chaos.NaCl is a project in this repo, not a NuGet package: PrivateAssets=all keeps it out of the nuspec (it used to be listed as a
+         dependency on a Chaos.NaCl 1.0.0 that does not exist on nuget.org, which made the package uninstallable) and the target below ships its DLL inside the Client package. -->
+    <ProjectReference Include="..\Chaos.NaCl\Chaos.NaCl.Portable.Standard.csproj" PrivateAssets="all" />
     <ProjectReference Include="..\..\NextGenSoftware-Libraries\NextGenSoftware.Logging\NextGenSoftware.Logging.csproj" />
     <ProjectReference Include="..\..\NextGenSoftware-Libraries\NextGenSoftware.Utilities\NextGenSoftware.Utilities.csproj" />
     <ProjectReference Include="..\..\NextGenSoftware-Libraries\NextGenSoftware.WebSocket\NextGenSoftware.WebSocket.csproj" />
@@ -200,5 +204,14 @@ Full changelog: https://github.com/holochain-open-dev/holochain-client-csharp/bl
   <ItemGroup>
     <InternalsVisibleTo Include="NextGenSoftware.Holochain.HoloNET.Client.Tests" />
   </ItemGroup>
+
+  <PropertyGroup>
+    <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);IncludeChaosNaClInPackage</TargetsForTfmSpecificBuildOutput>
+  </PropertyGroup>
+  <Target Name="IncludeChaosNaClInPackage">
+    <ItemGroup>
+      <BuildOutputInPackage Include="$(OutDir)Chaos.NaCl.dll" />
+    </ItemGroup>
+  </Target>
 
 </Project>

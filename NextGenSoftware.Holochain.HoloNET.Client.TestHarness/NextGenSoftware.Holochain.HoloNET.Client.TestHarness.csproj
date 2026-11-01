@@ -4,7 +4,12 @@
     <OutputType>Exe</OutputType>
 	<TargetFramework>net10.0</TargetFramework>
 	<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-	<PackageId>NextGenSoftware.Holochain.HoloNET.Client.TestHarness</PackageId>
+	<!-- One project, four packages: the variant is a build property (-p:Embedded=true -p:EmbeddedHolochain=both|0.7.1|0.7.0) that also
+	     flows to the Client reference, so each variant depends on the matching Client.Embedded* package. See packages.json. -->
+	<PackageId Condition="'$(Embedded)' != 'true'">NextGenSoftware.Holochain.HoloNET.Client.TestHarness</PackageId>
+	<PackageId Condition="'$(Embedded)' == 'true' And ('$(EmbeddedHolochain)' == '' Or '$(EmbeddedHolochain)' == 'both')">NextGenSoftware.Holochain.HoloNET.Client.TestHarness.Embedded</PackageId>
+	<PackageId Condition="'$(Embedded)' == 'true' And '$(EmbeddedHolochain)' == '0.7.1'">NextGenSoftware.Holochain.HoloNET.Client.TestHarness.Embedded.Holochain071</PackageId>
+	<PackageId Condition="'$(Embedded)' == 'true' And '$(EmbeddedHolochain)' == '0.7.0'">NextGenSoftware.Holochain.HoloNET.Client.TestHarness.Embedded.Holochain070</PackageId>
 	<Company>NextGen Software Ltd</Company>
 	<Product>HoloNET Test Harness</Product>
 	<Title>HoloNET Test Harness</Title>
@@ -14,7 +19,9 @@
 	<PackageIcon>hc logo.png</PackageIcon>
 	<Authors>David Ellams (NextGen Software Ltd)</Authors>
 	<PackageTags>holochain;net;unity</PackageTags>
-	<PackageReleaseNotes>## v4.1.0 — Holochain 0.7.0 Wire Protocol Upgrade
+	<PackageReleaseNotes>## v4.6.0 - Part of the HoloNET 4.6.0 release (every HoloNET package is versioned together): https://github.com/holochain-open-dev/holochain-client-csharp/releases/tag/v4.6.0
+
+## v4.1.0 — Holochain 0.7.0 Wire Protocol Upgrade
 
 Tracks HoloNET Client v4.1.0: full Holochain 0.7.0 conductor support.
 - Conductor paths now configurable via HOLONET_* environment variables (no more hardcoded paths).
@@ -99,7 +106,7 @@ Tracks HoloNET Client v4.1.0: full Holochain 0.7.0 conductor support.
 	<!--<PackageLicenseExpression>GNU GPLv3</PackageLicenseExpression>-->
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-	<Version>4.1.0</Version>
+	<Version>4.6.0</Version>
 	<!--<PackageLicenseFile>..\LICENSE</PackageLicenseFile>-->
 
 	<AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>

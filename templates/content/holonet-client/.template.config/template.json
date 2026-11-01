@@ -1,0 +1,124 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "NextGen Software Ltd",
+  "classifications": [
+    "HoloNET",
+    "Holochain",
+    "Console",
+    "Client"
+  ],
+  "identity": "NextGenSoftware.Holochain.HoloNET.Templates.Client",
+  "name": "HoloNET Client app (full control of a Holochain conductor)",
+  "description": "A console app that connects to a Holochain conductor, installs your hApp, calls its zome functions and listens for signals, with the HoloNET Client. Use it when you have your own hApp or need every Holochain feature.",
+  "shortName": "holonet-client",
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
+  "sourceName": "HoloNETApp",
+  "preferNameDirectory": true,
+  "symbols": {
+    "Conductor": {
+      "type": "parameter",
+      "datatype": "choice",
+      "defaultValue": "auto",
+      "description": "Where the Holochain conductor comes from.",
+      "choices": [
+        {
+          "choice": "auto",
+          "description": "The bundled conductor on Windows; otherwise one you start (start-conductor script included)."
+        },
+        {
+          "choice": "embedded",
+          "description": "Bundle the conductor in the app (Windows only)."
+        },
+        {
+          "choice": "external",
+          "description": "Use a conductor you run yourself on ws://localhost:7777 (start-conductor script included)."
+        }
+      ]
+    },
+    "HolochainVersion": {
+      "type": "parameter",
+      "datatype": "choice",
+      "defaultValue": "both",
+      "description": "With a bundled conductor: which Holochain version(s) to bundle.",
+      "choices": [
+        {
+          "choice": "both",
+          "description": "0.7.1 and 0.7.0 (choose at run time with HoloNETDNA.EmbeddedHolochainVersion)."
+        },
+        {
+          "choice": "0.7.1",
+          "description": "0.7.1 only (smaller)."
+        },
+        {
+          "choice": "0.7.0",
+          "description": "0.7.0 only (smaller)."
+        }
+      ]
+    },
+    "HoloNETVersion": {
+      "type": "parameter",
+      "datatype": "text",
+      "defaultValue": "4.6.0",
+      "description": "The HoloNET package version.",
+      "replaces": "HOLONET_VERSION"
+    },
+    "OS": {
+      "type": "bind",
+      "binding": "env:OS"
+    },
+    "UseEmbedded": {
+      "type": "computed",
+      "value": "(Conductor == \"embedded\" || (Conductor == \"auto\" && OS == \"Windows_NT\"))"
+    },
+    "Suffix": {
+      "type": "generated",
+      "generator": "switch",
+      "replaces": "HOLONET_SUFFIX",
+      "parameters": {
+        "evaluator": "C++",
+        "datatype": "string",
+        "cases": [
+          {
+            "condition": "(UseEmbedded && HolochainVersion == \"0.7.1\")",
+            "value": ".Embedded.Holochain071"
+          },
+          {
+            "condition": "(UseEmbedded && HolochainVersion == \"0.7.0\")",
+            "value": ".Embedded.Holochain070"
+          },
+          {
+            "condition": "(UseEmbedded)",
+            "value": ".Embedded"
+          },
+          {
+            "condition": "(!UseEmbedded)",
+            "value": ""
+          }
+        ]
+      }
+    }
+  },
+  "sources": [
+    {
+      "modifiers": [
+        {
+          "condition": "(UseEmbedded)",
+          "exclude": [
+            "start-conductor.sh",
+            "start-conductor.ps1"
+          ]
+        }
+      ]
+    }
+  ],
+  "postActions": [
+    {
+      "description": "Restore the NuGet packages",
+      "actionId": "210D431B-A78B-4D2F-B762-4ED3E3EA9025",
+      "continueOnError": true
+    }
+  ]
+}
