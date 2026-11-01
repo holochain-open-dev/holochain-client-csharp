@@ -1,5 +1,26 @@
 # Changelog
 
+## v4.6.0 - 2026-11-01
+
+Every HoloNET package is now released together at one version, in four conductor variants, with project templates.
+
+- **28 library packages (7 libraries x 4 variants) plus a template pack.** Client, ORM, HyperNET, HDK, Manager, API and the Test Harness each come as
+  no conductor, `.Embedded` (Holochain 0.7.1 and 0.7.0), `.Embedded.Holochain071` and `.Embedded.Holochain070`. Each variant depends on the matching
+  Client variant, so conductors are never duplicated. The full list is in [docs/packages.md](docs/packages.md), generated from `packages.json`.
+- **`dotnet new` templates:** `NextGenSoftware.Holochain.HoloNET.Templates` adds `holonet-console`, `-worker`, `-webapi`, `-mvc`, `-razor`, `-blazor`,
+  `-blazorwasm`, `-wpf`, `-winforms`, `-winui`, `-avalonia`, `-maui`, `-maui-blazor`, `-uno`, `-android`, `-ios` and `-unity`. `--HoloNET api|client|orm|hypernet`
+  picks the library, `--Conductor` and `--HolochainVersion` pick the conductor. See [docs/templates.md](docs/templates.md).
+- **Fixed: the Client could not be installed from NuGet.** It depended on a `Chaos.NaCl` 1.0.0 package that is not on nuget.org. The assembly is now inside the Client package.
+- **HDK:** no longer includes WEB5 STAR and HoloOASIS by default. STAR 2.0.6 pulls in OASIS provider packages that depend on the same missing `Chaos.NaCl`, so a HDK with them could not be installed.
+  `-p:HdkIncludeStar=true` turns them back on once those packages are fixed.
+- **API:** targets .NET Standard 2.1 as well as .NET 10 (Unity). The default `oasis.happ` is now found next to the app, so `dotnet run` from the project folder works.
+- **Embedded by default:** on Windows, a Client with a bundled conductor now uses it by default (`HolochainConductorMode` was `UseSystemGlobal`, which ignored it). The Manager picks the bundled conductor when there is one.
+- **.NET 10:** the API, and the Blazor and WinForms templates, are on .NET 10 (the Client, ORM, HyperNET and API keep .NET Standard 2.1 for Unity).
+- **One script keeps the list complete:** `python scripts/holonet_packages.py check | pack | verify-packed | smoke | verify-nuget | set-version | docs`. A public workflow
+  checks the list on every push, and the publish workflows build everything from it.
+- **Sandbox:** [sandbox.holonet.oasisomniverse.one](https://sandbox.holonet.oasisomniverse.one) (service in [`sandbox/`](sandbox/README.md)): try the API, Client, ORM and HyperNET from a browser.
+- **Docs and learn sites:** new Templates and Packages pages, and two tutorials ([Up and running in 5 minutes](docs/learn/00-up-and-running-in-5-minutes.md), [A template for every app](docs/learn/07-a-template-for-every-app.md)).
+
 ## v4.5.1 - 2026-10-31
 
 HoloNET Client and HyperNET 4.5.0, API 4.5.1, HDK 4.5.0. ORM and Manager are unchanged.

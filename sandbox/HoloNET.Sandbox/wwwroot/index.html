@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HoloNET Sandbox</title>
+<meta name="description" content="Try HoloNET in your browser: save and load data on Holochain, post to a shared board that every visitor sees, and run the API, Client, ORM and HyperNET demos. Nothing to install.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg-deep:#030714;--bg-card:rgba(10,18,50,.75);--bg-card2:rgba(8,14,38,.9);
+  --cyan:#3b82f6;--violet:#8b5cf6;--gold:#f0a500;--green:#34d399;--red:#f87171;
+  --heading:#e8f4ff;--heading-sub:#a8c8f0;--text:#d0e4ff;--text-dim:#8aa0c8;
+  --border:rgba(59,130,246,.18);--border-v:rgba(139,92,246,.3);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg-deep);color:var(--text);font-family:'Rajdhani',sans-serif;font-size:18px;line-height:1.55;min-height:100vh}
+a{color:var(--cyan)}
+code,pre,input,textarea,button{font-family:'Share Tech Mono',monospace}
+.nav{position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:20px;padding:0 20px;min-height:60px;background:rgba(3,7,20,.94);border-bottom:1px solid var(--border);flex-wrap:wrap}
+.brand{font-family:'Orbitron',sans-serif;font-weight:700;letter-spacing:.12em;color:var(--cyan);text-decoration:none;font-size:15px}
+.nav .links{display:flex;gap:18px;margin-left:auto;flex-wrap:wrap}
+.nav .links a{font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:.1em;text-decoration:none;color:#a8bfd8;text-transform:uppercase}
+.nav .links a:hover{color:var(--cyan)}
+main{max-width:1040px;margin:0 auto;padding:36px 20px 80px}
+h1{font-family:'Orbitron',sans-serif;font-size:clamp(24px,5vw,38px);color:var(--heading);letter-spacing:.06em;margin-bottom:10px}
+h2{font-family:'Orbitron',sans-serif;font-size:18px;color:var(--heading);letter-spacing:.1em;margin:44px 0 12px}
+p.lead{color:var(--heading-sub);max-width:760px;margin-bottom:18px}
+.status{display:inline-flex;align-items:center;gap:8px;font-family:'Share Tech Mono',monospace;font-size:13px;padding:6px 12px;border:1px solid var(--border);border-radius:999px;background:var(--bg-card)}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--text-dim)}
+.dot.ok{background:var(--green);box-shadow:0 0 8px var(--green)}.dot.bad{background:var(--red)}
+.tabs{display:flex;gap:8px;margin:28px 0 0;flex-wrap:wrap}
+.tab{padding:10px 18px;border:1px solid var(--border);border-bottom:0;border-radius:8px 8px 0 0;background:transparent;color:#a8bfd8;cursor:pointer;font-size:13px;letter-spacing:.08em;text-transform:uppercase}
+.tab[aria-selected=true]{background:var(--bg-card);color:var(--heading);border-color:var(--cyan)}
+.panel{border:1px solid var(--border);border-radius:0 8px 8px 8px;background:var(--bg-card);padding:22px}
+.panel[hidden]{display:none}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+input,textarea{background:var(--bg-card2);border:1px solid var(--border);border-radius:6px;color:var(--heading);padding:10px 12px;font-size:14px;min-width:0}
+input:focus,textarea:focus,button:focus-visible{outline:2px solid var(--cyan);outline-offset:1px}
+input.key{width:200px}input.val{flex:1;min-width:200px}
+button.btn{background:var(--cyan);color:#fff;border:0;border-radius:6px;padding:10px 18px;font-size:13px;letter-spacing:.08em;cursor:pointer;text-transform:uppercase}
+button.btn:hover{filter:brightness(1.12)}button.btn[disabled]{opacity:.5;cursor:not-allowed}
+button.btn.violet{background:var(--violet)}button.btn.ghost{background:transparent;border:1px solid var(--border);color:#a8bfd8}
+table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:top;word-break:break-word}
+th{color:var(--text-dim);font-weight:400;font-size:12px;letter-spacing:.1em;text-transform:uppercase}
+pre{background:var(--bg-card2);border:1px solid var(--border);border-radius:6px;padding:14px;overflow:auto;font-size:13px;color:#cfe3ff;white-space:pre-wrap;word-break:break-word}
+.msg{padding:10px 0;border-bottom:1px solid var(--border)}.msg b{color:var(--heading)}.msg small{color:var(--text-dim)}
+.note{color:var(--text-dim);font-size:15px;margin-top:10px}
+.err{color:var(--red);font-size:15px;margin-top:8px;min-height:1.2em}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.card{border:1px solid var(--border);border-radius:8px;padding:16px;background:var(--bg-card)}
+.card h3{font-family:'Orbitron',sans-serif;font-size:13px;color:var(--heading);letter-spacing:.1em;margin-bottom:6px}
+.demo-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.chip{padding:7px 14px;border:1px solid var(--border);border-radius:999px;background:transparent;color:#a8bfd8;cursor:pointer;font-size:13px}
+.chip[aria-pressed=true]{background:var(--violet);border-color:var(--violet);color:#fff}
+details{margin-top:14px}summary{cursor:pointer;color:var(--heading-sub)}
+footer{border-top:1px solid var(--border);padding:24px 20px;text-align:center;color:var(--text-dim);font-size:14px}
+@media (max-width:600px){main{padding:24px 16px 60px}.panel{padding:14px}input.key{width:100%}}
+</style>
+</head>
+<body>
+<header class="nav">
+  <a class="brand" href="https://holonet.oasisomniverse.one">HOLONET</a>
+  <nav class="links" aria-label="HoloNET sites">
+    <a href="https://holonet.oasisomniverse.one">Home</a>
+    <a href="https://docs.holonet.oasisomniverse.one">Docs</a>
+    <a href="https://learn.holonet.oasisomniverse.one">Learn</a>
+    <a href="https://github.com/holochain-open-dev/holochain-client-csharp">GitHub</a>
+  </nav>
+</header>
+
+<main>
+  <h1>HoloNET Sandbox</h1>
+  <p class="lead">Try HoloNET with nothing to install. This page talks to a real Holochain conductor through the HoloNET API: save and load your own data, post to a board that every visitor shares, and run the API, Client, ORM and HyperNET demos.</p>
+  <p><span class="status" role="status" aria-live="polite"><span class="dot" id="dot"></span><span id="status-text">Connecting to the sandbox...</span></span></p>
+  <p class="note">The sandbox is shared and public: don't put anything private in it. Your keys disappear after 30 minutes idle, and the board keeps the latest 100 messages.</p>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" id="tab-store" aria-selected="true" aria-controls="panel-store">Your data</button>
+    <button class="tab" role="tab" id="tab-board" aria-selected="false" aria-controls="panel-board">Shared board</button>
+    <button class="tab" role="tab" id="tab-demos" aria-selected="false" aria-controls="panel-demos">Run a demo</button>
+  </div>
+
+  <section class="panel" id="panel-store" role="tabpanel" aria-labelledby="tab-store">
+    <p class="lead">Each key is its own entry on Holochain, saved with <code>HoloNETAPI.SaveDataAsync(key, value)</code>. Only you see these keys.</p>
+    <form class="row" id="store-form">
+      <input class="key" id="key" placeholder="key" aria-label="Key" maxlength="40" required>
+      <input class="val" id="value" placeholder="value" aria-label="Value" maxlength="500">
+      <button class="btn" type="submit">Save</button>
+    </form>
+    <div class="err" id="store-err" role="alert"></div>
+    <table><thead><tr><th>Key</th><th>Value</th><th></th></tr></thead><tbody id="store-rows"></tbody></table>
+    <p class="note" id="store-empty">Nothing saved yet. Try the key <code>greeting</code> with the value <code>Hello, Holochain!</code>.</p>
+    <pre>await HoloNETAPI.SaveDataAsync("greeting", "Hello, Holochain!");
+string greeting = (await HoloNETAPI.LoadDataAsync("greeting")).Result;
+await HoloNETAPI.DeleteDataAsync("greeting");</pre>
+  </section>
+
+  <section class="panel" id="panel-board" role="tabpanel" aria-labelledby="tab-board" hidden>
+    <p class="lead">Shared data every agent can read and write, with <code>HoloNETAPI.SaveSharedDataAsync(ns, key, value)</code>. Everyone using this page sees the same board.</p>
+    <form class="row" id="board-form">
+      <input class="key" id="board-name" placeholder="your name" aria-label="Your name" maxlength="24">
+      <input class="val" id="board-text" placeholder="say something" aria-label="Message" maxlength="280" required>
+      <button class="btn violet" type="submit">Post</button>
+      <button class="btn ghost" type="button" id="board-refresh">Refresh</button>
+    </form>
+    <div class="err" id="board-err" role="alert"></div>
+    <div id="board-list"></div>
+  </section>
+
+  <section class="panel" id="panel-demos" role="tabpanel" aria-labelledby="tab-demos" hidden>
+    <p class="lead">One click runs the same demo that <code>dotnet new holonet-...</code> gives you, on the sandbox's conductor. The code is fixed: the page can't run anything else.</p>
+    <div class="demo-tabs" id="demo-chips"></div>
+    <pre id="demo-code"></pre>
+    <div class="row"><button class="btn violet" id="demo-run" type="button">Run this demo</button></div>
+    <div class="err" id="demo-err" role="alert"></div>
+    <pre id="demo-out" aria-live="polite">The result appears here.</pre>
+  </section>
+
+  <h2>Take it home</h2>
+  <div class="grid">
+    <div class="card"><h3>Start an app</h3><p><code>dotnet new install NextGenSoftware.Holochain.HoloNET.Templates</code> then <code>dotnet new holonet-blazor -n MyApp</code>. 17 app types. <a href="https://docs.holonet.oasisomniverse.one/templates">Templates</a></p></div>
+    <div class="card"><h3>Learn</h3><p>From five minutes to a multiplayer game. <a href="https://learn.holonet.oasisomniverse.one">Tutorials</a></p></div>
+    <div class="card"><h3>Read the docs</h3><p>Every guide and the full API reference. <a href="https://docs.holonet.oasisomniverse.one">Documentation</a></p></div>
+  </div>
+
+  <details>
+    <summary>Backend settings</summary>
+    <p class="note">The sandbox backend is a small service, in <a href="https://github.com/holochain-open-dev/holochain-client-csharp/tree/main/sandbox">sandbox/</a> in the HoloNET repository. To run your own, see its README, then point this page at it:</p>
+    <div class="row" style="margin-top:10px">
+      <input class="val" id="api-base" aria-label="Sandbox backend URL" placeholder="https://...">
+      <button class="btn ghost" type="button" id="api-save">Use this backend</button>
+    </div>
+  </details>
+</main>
+
+<footer>HoloNET · Holochain 0.7.0 and 0.7.1 · part of the <a href="https://oasisomniverse.one">OASIS Omniverse</a></footer>
+
+<script>
+(function () {
+  'use strict';
+  var HOSTED = 'https://api.sandbox.holonet.oasisomniverse.one';
+  var onStaticHost = location.hostname === 'sandbox.holonet.oasisomniverse.one';
+  var base = onStaticHost ? HOSTED : location.origin;      // served by the sandbox service itself: same origin
+  try { var saved = localStorage.getItem('holonet-sandbox-api'); if (saved) base = saved; } catch (e) {}
+  var sid = null;
+
+  function $(id) { return document.getElementById(id); }
+  function el(tag, text, cls) { var e = document.createElement(tag); if (text != null) e.textContent = text; if (cls) e.className = cls; return e; }
+
+  async function api(method, path, body) {
+    var res = await fetch(base + path, { method: method, headers: body ? { 'Content-Type': 'application/json' } : undefined, body: body ? JSON.stringify(body) : undefined });
+    var data = null;
+    try { data = await res.json(); } catch (e) {}
+    if (!res.ok) { var err = new Error((data && data.error) || ('The sandbox answered ' + res.status)); err.status = res.status; throw err; }
+    return data;
+  }
+  function say(id, msg) { $(id).textContent = msg || ''; }
+
+  // ---- connection and session ----
+  async function startSession() {
+    var s = await api('POST', '/api/session');
+    sid = s.sessionId;
+    try { sessionStorage.setItem('holonet-sandbox-session', sid); } catch (e) {}
+  }
+  async function connect() {
+    $('api-base').value = base;
+    try {
+      var st = await api('GET', '/api/status');
+      $('dot').className = 'dot ' + (st.ready ? 'ok' : 'bad');
+      $('status-text').textContent = st.ready ? 'Connected to a Holochain conductor' : ('The sandbox is up but its conductor is not answering' + (st.message ? ': ' + st.message : ''));
+      if (st.ready) {
+        try { sid = sessionStorage.getItem('holonet-sandbox-session'); } catch (e) {}
+        if (sid) { try { await refreshStore(); } catch (e) { sid = null; } }
+        if (!sid) { await startSession(); await refreshStore(); }
+        refreshBoard();
+      }
+    } catch (e) {
+      $('dot').className = 'dot bad';
+      $('status-text').textContent = 'Cannot reach the sandbox backend (' + base + ').';
+      say('store-err', 'The hosted sandbox is not available right now. You can run it yourself: see the README in sandbox/ in the HoloNET repository, or use the Backend settings below.');
+    }
+  }
+
+  // ---- your data ----
+  async function refreshStore() {
+    var data = await api('GET', '/api/store/' + sid);
+    var body = $('store-rows'); body.replaceChildren();
+    data.items.forEach(function (it) {
+      var tr = el('tr'); tr.appendChild(el('td', it.key)); tr.appendChild(el('td', it.value == null ? '(unreadable)' : it.value));
+      var td = el('td'); var del = el('button', 'Delete', 'btn ghost'); del.type = 'button';
+      del.addEventListener('click', async function () { try { await api('DELETE', '/api/store/' + sid + '/' + encodeURIComponent(it.key)); await refreshStore(); } catch (e) { say('store-err', e.message); } });
+      td.appendChild(del); tr.appendChild(td); body.appendChild(tr);
+    });
+    $('store-empty').hidden = data.items.length > 0;
+  }
+  $('store-form').addEventListener('submit', async function (ev) {
+    ev.preventDefault(); say('store-err', '');
+    try { await api('PUT', '/api/store/' + sid + '/' + encodeURIComponent($('key').value.trim()), { value: $('value').value }); $('value').value = ''; await refreshStore(); }
+    catch (e) { if (e.status === 404) { try { await startSession(); } catch (x) {} } say('store-err', e.message); }
+  });
+
+  // ---- board ----
+  async function refreshBoard() {
+    try {
+      var data = await api('GET', '/api/board'); var list = $('board-list'); list.replaceChildren();
+      if (!data.messages.length) list.appendChild(el('p', 'No messages yet. Be the first.', 'note'));
+      data.messages.forEach(function (m) { var d = el('div', null, 'msg'); d.appendChild(el('b', m.name)); d.appendChild(document.createTextNode(': ' + m.text)); list.appendChild(d); });
+    } catch (e) { say('board-err', e.message); }
+  }
+  $('board-form').addEventListener('submit', async function (ev) {
+    ev.preventDefault(); say('board-err', '');
+    try { await api('POST', '/api/board', { name: $('board-name').value, text: $('board-text').value }); $('board-text').value = ''; await refreshBoard(); }
+    catch (e) { say('board-err', e.message); }
+  });
+  $('board-refresh').addEventListener('click', refreshBoard);
+
+  // ---- demos ----
+  var demos = [], current = null;
+  function chooseDemo(name) {
+    current = name;
+    document.querySelectorAll('#demo-chips .chip').forEach(function (c) { c.setAttribute('aria-pressed', String(c.dataset.name === name)); });
+    var d = demos.find(function (x) { return x.name === name; }); $('demo-code').textContent = d ? d.code : '';
+    $('demo-out').textContent = 'The result appears here.'; say('demo-err', '');
+  }
+  async function loadDemos() {
+    try {
+      demos = await api('GET', '/api/demos'); var chips = $('demo-chips'); chips.replaceChildren();
+      var labels = { api: 'HoloNET API', client: 'HoloNET Client', orm: 'HoloNET ORM', hypernet: 'HoloNET HyperNET' };
+      demos.forEach(function (d) { var c = el('button', labels[d.name] || d.name, 'chip'); c.type = 'button'; c.dataset.name = d.name; c.setAttribute('aria-pressed', 'false'); c.addEventListener('click', function () { chooseDemo(d.name); }); chips.appendChild(c); });
+      if (demos.length) chooseDemo(demos[0].name);
+    } catch (e) { say('demo-err', e.message); }
+  }
+  $('demo-run').addEventListener('click', async function () {
+    if (!current) return; var btn = $('demo-run'); btn.disabled = true; say('demo-err', ''); $('demo-out').textContent = 'Running... (the first run can take a few seconds)';
+    try { var r = await api('POST', '/api/demos/' + current + '/run'); $('demo-out').textContent = r.output || '(no output)'; }
+    catch (e) { say('demo-err', e.message); $('demo-out').textContent = ''; }
+    btn.disabled = false;
+  });
+
+  // ---- tabs and settings ----
+  var tabs = ['store', 'board', 'demos'];
+  tabs.forEach(function (t) {
+    $('tab-' + t).addEventListener('click', function () {
+      tabs.forEach(function (o) { $('tab-' + o).setAttribute('aria-selected', String(o === t)); $('panel-' + o).hidden = o !== t; });
+      if (t === 'board') refreshBoard();
+    });
+  });
+  $('api-save').addEventListener('click', function () {
+    var v = $('api-base').value.trim().replace(/\/+$/, '');
+    if (!/^https?:\/\//.test(v)) { say('store-err', 'Enter a URL that starts with http:// or https://'); return; }
+    try { localStorage.setItem('holonet-sandbox-api', v); } catch (e) {}
+    base = v; connect(); loadDemos();
+  });
+
+  connect(); loadDemos();
+})();
+</script>
+</body>
+</html>

@@ -27,6 +27,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\NextGenSoftware.Holochain.HoloNET.Client\NextGenSoftware.Holochain.HoloNET.Client.csproj" />
+    <!-- The Client keeps Chaos.NaCl private (its DLL ships inside the Client package), so a project that uses it directly references it. -->
+    <ProjectReference Include="..\Chaos.NaCl\Chaos.NaCl.Portable.Standard.csproj" />
     <ProjectReference Include="..\NextGenSoftware.Holochain.HoloNET.ORM\NextGenSoftware.Holochain.HoloNET.ORM.csproj" />
     <ProjectReference Include="..\HoloNET-API\NextGenSoftware.Holochain.HoloNET.API\NextGenSoftware.Holochain.HoloNET.API.csproj" />
     <ProjectReference Include="..\NextGenSoftware.Holochain.HoloNET.HyperNET\NextGenSoftware.Holochain.HoloNET.HyperNET.csproj" />

@@ -34,66 +34,30 @@ jobs:
         with:
           dotnet-version: '10.x'
 
-      - name: Build all projects
-        shell: pwsh
-        run: |
-          $projects = @(
-            "NextGenSoftware.Holochain.HoloNET.Client\NextGenSoftware.Holochain.HoloNET.Client.csproj",
-            "NextGenSoftware.Holochain.HoloNET.ORM\NextGenSoftware.Holochain.HoloNET.ORM.csproj",
-            "NextGenSoftware.Holochain.HoloNET.HDK\NextGenSoftware.Holochain.HoloNET.HDK.csproj",
-            "NextGenSoftware.Holochain.HoloNET.HyperNET\NextGenSoftware.Holochain.HoloNET.HyperNET.csproj",
-            "HoloNET-Manager\NextGenSoftware.Holochain.HoloNET.Manager\NextGenSoftware.Holochain.HoloNET.Manager.csproj",
-            "HoloNET-API\NextGenSoftware.Holochain.HoloNET.API\NextGenSoftware.Holochain.HoloNET.API.csproj"
-          )
-          $failed = 0
-          foreach ($proj in $projects) {
-            Write-Host "Building $proj..."
-            dotnet build $proj --configuration Release
-            if ($LASTEXITCODE -ne 0) { $failed++; Write-Host "BUILD FAILED: $proj" }
-          }
-          if ($failed -gt 0) { exit 1 }
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
 
-      - name: Pack all packages
-        shell: pwsh
-        run: |
-          $nupkgsDir = ".\nupkgs"
-          New-Item -ItemType Directory -Force -Path $nupkgsDir | Out-Null
+      # Everything below is driven by packages.json (the one list of every package): see scripts/holonet_packages.py and docs/packages.md.
+      # Nothing here names a project, so a new library or variant can't be forgotten.
+      - name: Check the package manifest against the repository
+        run: python scripts/holonet_packages.py check
 
-          # Non-embedded packages (standard variants)
-          $projects = @(
-            "NextGenSoftware.Holochain.HoloNET.Client\NextGenSoftware.Holochain.HoloNET.Client.csproj",
-            "NextGenSoftware.Holochain.HoloNET.ORM\NextGenSoftware.Holochain.HoloNET.ORM.csproj",
-            "NextGenSoftware.Holochain.HoloNET.HDK\NextGenSoftware.Holochain.HoloNET.HDK.csproj",
-            "NextGenSoftware.Holochain.HoloNET.HyperNET\NextGenSoftware.Holochain.HoloNET.HyperNET.csproj",
-            "HoloNET-Manager\NextGenSoftware.Holochain.HoloNET.Manager\NextGenSoftware.Holochain.HoloNET.Manager.csproj",
-            "HoloNET-API\NextGenSoftware.Holochain.HoloNET.API\NextGenSoftware.Holochain.HoloNET.API.csproj"
-          )
-          $succeeded = 0; $failed = 0
-          foreach ($proj in $projects) {
-            Write-Host "Packing $proj (non-embedded)..."
-            dotnet pack $proj --configuration Release --output $nupkgsDir --no-build
-            if ($LASTEXITCODE -eq 0) { $succeeded++ } else { $failed++; Write-Host "FAILED: $proj" }
-          }
+      - name: Build and pack every package (every library x every variant, plus the templates)
+        run: python scripts/holonet_packages.py pack nupkgs
 
-          # Embedded variants for Client and ORM (include Holochain binaries, enable conductor auto-start)
-          $embeddedProjects = @(
-            "NextGenSoftware.Holochain.HoloNET.Client\NextGenSoftware.Holochain.HoloNET.Client.csproj",
-            "NextGenSoftware.Holochain.HoloNET.ORM\NextGenSoftware.Holochain.HoloNET.ORM.csproj"
-          )
-          foreach ($proj in $embeddedProjects) {
-            Write-Host "Packing $proj (embedded)..."
-            dotnet pack $proj --configuration Release --output $nupkgsDir -p:Embedded=true -p:DefineConstants=EMBEDDED
-            if ($LASTEXITCODE -eq 0) { $succeeded++ } else { $failed++; Write-Host "FAILED (embedded): $proj" }
-          }
+      - name: Verify the packed packages
+        run: python scripts/holonet_packages.py verify-packed nupkgs
 
-          Write-Host "Pack complete: $succeeded succeeded, $failed failed"
-          if ($failed -gt 0) { exit 1 }
+      - name: Smoke test - install every library package into a fresh app and build it
+        run: python scripts/holonet_packages.py smoke nupkgs
 
       - name: Push all packages to NuGet.org
         shell: pwsh
         run: |
           $pushFailed = 0
-          Get-ChildItem -Path .\nupkgs\*.nupkg | ForEach-Object {
+          Get-ChildItem -Path nupkgs/*.nupkg | ForEach-Object {
             Write-Host "Pushing $($_.Name)..."
             dotnet nuget push $_.FullName `
               --source https://api.nuget.org/v3/index.json `
@@ -102,3 +66,6 @@ jobs:
             if ($LASTEXITCODE -ne 0) { $pushFailed++ }
           }
           if ($pushFailed -gt 0) { exit 1 }
+
+      - name: Verify every package is on NuGet.org at this version
+        run: python scripts/holonet_packages.py verify-nuget --wait 30

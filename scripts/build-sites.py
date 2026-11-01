@@ -17,6 +17,7 @@ GITHUB = 'https://github.com/holochain-open-dev/holochain-client-csharp/blob/mai
 GITHUB_TREE = 'https://github.com/holochain-open-dev/holochain-client-csharp/tree/main/'
 DOCS_URL = 'https://docs.holonet.oasisomniverse.one'
 LEARN_URL = 'https://learn.holonet.oasisomniverse.one'
+SANDBOX_URL = 'https://sandbox.holonet.oasisomniverse.one'
 
 # (slug, source, title, section, badge) - slug '' is the home page.
 DOCS_PAGES = [
@@ -279,9 +280,9 @@ def main():
     learn_site = {'name': 'LEARN HOLONET', 'sub': 'Tutorials', 'tagline': 'Step-by-step tutorials for building .NET apps, sites and games on Holochain with HoloNET.', 'domain': 'learn.holonet.oasisomniverse.one', 'package': 'holonet-learn-website'}
 
     build(docs_site, DOCS_PAGES, a.docs, LEARN_PAGES, LEARN_URL,
-          [(LEARN_URL, 'Tutorials ↗', True), (GITHUB_TREE + 'examples', 'Examples on GitHub ↗', True), ('https://github.com/holochain-open-dev/holochain-client-csharp', 'GitHub ↗', True)])
+          [(LEARN_URL, 'Tutorials ↗', True), (SANDBOX_URL, 'Sandbox ↗', True), (GITHUB_TREE + 'examples', 'Examples on GitHub ↗', True), ('https://github.com/holochain-open-dev/holochain-client-csharp', 'GitHub ↗', True)])
     build(learn_site, LEARN_PAGES, a.learn, DOCS_PAGES, DOCS_URL,
-          [(DOCS_URL, 'Docs & API reference ↗', True), (GITHUB_TREE + 'examples', 'Examples ↗', True), ('https://github.com/holochain-open-dev/holochain-client-csharp', 'GitHub ↗', True)],
+          [(DOCS_URL, 'Docs & API reference ↗', True), (SANDBOX_URL, 'Sandbox ↗', True), (GITHUB_TREE + 'examples', 'Examples ↗', True), ('https://github.com/holochain-open-dev/holochain-client-csharp', 'GitHub ↗', True)],
           extra_home=learn_home)
 
 

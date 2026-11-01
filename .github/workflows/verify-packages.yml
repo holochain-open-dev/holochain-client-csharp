@@ -1,0 +1,28 @@
+name: Verify packages
+
+# Checks packages.json (the one list of every HoloNET package) against the repository on every push and pull request:
+# every project that makes a package is listed, every variant exists, every version matches, and docs/packages.md is current.
+# It is how a package can never be missed again. Run it yourself with:  python scripts/holonet_packages.py check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (with submodules when the token is available)
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          token: ${{ secrets.PRIVATE_SUBMODULE_PAT || github.token }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Check the package manifest
+        run: python scripts/holonet_packages.py check
