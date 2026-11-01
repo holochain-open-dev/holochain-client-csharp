@@ -1,0 +1,225 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "NextGen Software Ltd",
+  "classifications": [
+    "HoloNET",
+    "Holochain",
+    "Desktop",
+    "WinUI"
+  ],
+  "identity": "NextGenSoftware.Holochain.HoloNET.Templates.Winui",
+  "name": "HoloNET WinUI 3 app",
+  "description": "A WinUI 3 app with HoloNET already wired in: choose the HoloNET library (API, Client, ORM or HyperNET) and whether to bundle the Holochain conductor.",
+  "shortName": "holonet-winui",
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
+  "sourceName": "HoloNETApp",
+  "preferNameDirectory": true,
+  "symbols": {
+    "HoloNET": {
+      "type": "parameter",
+      "datatype": "choice",
+      "defaultValue": "api",
+      "description": "Which HoloNET library the app uses.",
+      "choices": [
+        {
+          "choice": "api",
+          "description": "HoloNET API: one line to save, load, delete, share and message (simplest)."
+        },
+        {
+          "choice": "client",
+          "description": "HoloNET Client: full control of the conductor, zome calls and signals."
+        },
+        {
+          "choice": "orm",
+          "description": "HoloNET ORM: save and load your own C# classes (includes the Client)."
+        },
+        {
+          "choice": "hypernet",
+          "description": "HoloNET HyperNET: real-time player-to-player messaging (includes the Client)."
+        }
+      ]
+    },
+    "HolochainVersion": {
+      "type": "parameter",
+      "datatype": "choice",
+      "defaultValue": "both",
+      "description": "With a bundled conductor: which Holochain version(s) to bundle.",
+      "choices": [
+        {
+          "choice": "both",
+          "description": "Holochain 0.7.1 and 0.7.0 (pick at run time with HoloNETDNA.EmbeddedHolochainVersion)."
+        },
+        {
+          "choice": "0.7.1",
+          "description": "0.7.1 only (smaller)."
+        },
+        {
+          "choice": "0.7.0",
+          "description": "0.7.0 only (smaller)."
+        }
+      ]
+    },
+    "HoloNETVersion": {
+      "type": "parameter",
+      "datatype": "text",
+      "defaultValue": "4.6.0",
+      "description": "The HoloNET package version.",
+      "replaces": "HOLONET_VERSION"
+    },
+    "OS": {
+      "type": "bind",
+      "binding": "env:OS"
+    },
+    "UseApi": {
+      "type": "computed",
+      "value": "(HoloNET == \"api\")"
+    },
+    "UseClient": {
+      "type": "computed",
+      "value": "(HoloNET == \"client\")"
+    },
+    "UseOrm": {
+      "type": "computed",
+      "value": "(HoloNET == \"orm\")"
+    },
+    "UseHyperNet": {
+      "type": "computed",
+      "value": "(HoloNET == \"hypernet\")"
+    },
+    "LibraryId": {
+      "type": "generated",
+      "generator": "switch",
+      "replaces": "HOLONET_LIBRARY_ID",
+      "parameters": {
+        "evaluator": "C++",
+        "datatype": "string",
+        "cases": [
+          {
+            "condition": "(UseApi)",
+            "value": "API"
+          },
+          {
+            "condition": "(UseClient)",
+            "value": "Client"
+          },
+          {
+            "condition": "(UseOrm)",
+            "value": "ORM"
+          },
+          {
+            "condition": "(UseHyperNet)",
+            "value": "HyperNET"
+          }
+        ]
+      }
+    },
+    "LibraryName": {
+      "type": "generated",
+      "generator": "switch",
+      "replaces": "HOLONET_LIBRARY_NAME",
+      "parameters": {
+        "evaluator": "C++",
+        "datatype": "string",
+        "cases": [
+          {
+            "condition": "(UseApi)",
+            "value": "API"
+          },
+          {
+            "condition": "(UseClient)",
+            "value": "Client"
+          },
+          {
+            "condition": "(UseOrm)",
+            "value": "ORM"
+          },
+          {
+            "condition": "(UseHyperNet)",
+            "value": "HyperNET"
+          }
+        ]
+      }
+    },
+    "PackageSuffix": {
+      "type": "generated",
+      "generator": "switch",
+      "replaces": "HOLONET_PKG_SUFFIX",
+      "parameters": {
+        "evaluator": "C++",
+        "datatype": "string",
+        "cases": [
+          {
+            "condition": "(UseEmbedded && HolochainVersion == \"0.7.1\")",
+            "value": ".Embedded.Holochain071"
+          },
+          {
+            "condition": "(UseEmbedded && HolochainVersion == \"0.7.0\")",
+            "value": ".Embedded.Holochain070"
+          },
+          {
+            "condition": "(UseEmbedded)",
+            "value": ".Embedded"
+          },
+          {
+            "condition": "(!UseEmbedded)",
+            "value": ""
+          }
+        ]
+      }
+    },
+    "Conductor": {
+      "type": "parameter",
+      "datatype": "choice",
+      "defaultValue": "auto",
+      "description": "Where the Holochain conductor comes from.",
+      "choices": [
+        {
+          "choice": "auto",
+          "description": "Bundled in the app on Windows; otherwise one you start (start-conductor script included)."
+        },
+        {
+          "choice": "embedded",
+          "description": "Bundle the conductor in the app (Windows only)."
+        },
+        {
+          "choice": "external",
+          "description": "Use a conductor you run yourself on ws://localhost:7777 (start-conductor script included)."
+        }
+      ]
+    },
+    "UseEmbedded": {
+      "type": "computed",
+      "value": "(Conductor == \"embedded\" || (Conductor == \"auto\" && OS == \"Windows_NT\"))"
+    }
+  },
+  "sources": [
+    {
+      "exclude": [
+        "**/bin/**",
+        "**/obj/**",
+        "**/.vs/**",
+        "**/*.user",
+        "**/.sandbox/**"
+      ],
+      "modifiers": [
+        {
+          "condition": "(UseEmbedded)",
+          "exclude": [
+            "start-conductor.sh",
+            "start-conductor.ps1"
+          ]
+        }
+      ]
+    }
+  ],
+  "postActions": [
+    {
+      "description": "Restore the NuGet packages",
+      "actionId": "210D431B-A78B-4D2F-B762-4ED3E3EA9025",
+      "continueOnError": true
+    }
+  ]
+}

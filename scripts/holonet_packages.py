@@ -96,9 +96,111 @@ def check():
             if 'NextGenSoftware.Holochain.HoloNET.Client.csproj' not in text:
                 errors.append(f'{lib["project"]}: has Embedded variants but no ProjectReference to the HoloNET Client')
 
+    if not docs(check_only=True):
+        errors.append('docs/packages.md is out of date: run python scripts/holonet_packages.py docs')
     if errors:
         fail(errors, 'check failed')
     print(f'OK: {len(ids)} packages from {len(m["libraries"])} projects at version {m["version"]}.')
+
+
+# ---- docs: docs/packages.md is generated from the manifest, so the list can never go stale --------------------------------
+def packages_markdown(m):
+    version = m['version']
+    libs = [l for l in m['libraries'] if l.get('kind') != 'templates']
+    tpl = next((l for l in m['libraries'] if l.get('kind') == 'templates'), None)
+    n_total = len(packages(m))
+    lines = [
+        '# Packages',
+        '',
+        '<!-- Generated from packages.json by `python scripts/holonet_packages.py docs`. Do not edit by hand. -->',
+        '',
+        f'HoloNET is {len(libs)} libraries, each published as {len(SUFFIX)} NuGet packages, plus a template pack: **{n_total} packages**, all released together at **version {version}**.',
+        'Every package has the same version, so you never have to work out which versions go together.',
+        '',
+        '## The libraries',
+        '',
+        '| Library | What it is |',
+        '|---|---|',
+    ]
+    for l in libs:
+        lines.append(f"| `{l['id']}` | {l['description']} |")
+    lines += [
+        '',
+        '## The four packages for each library',
+        '',
+        'Holochain needs a conductor (the program that runs your hApp). Each library comes in four packages, which differ only in the conductor they bundle:',
+        '',
+        '| Package suffix | Bundles | Use it when |',
+        '|---|---|---|',
+        '| *(none)* | no conductor | You run a conductor yourself (`hc sandbox`, a launcher, a server), or the app is a browser or phone app. |',
+        '| `.Embedded` | Holochain 0.7.1 **and** 0.7.0 | You want HoloNET to start and stop the conductor for you (Windows). Choose the version at run time with `HoloNETDNA.EmbeddedHolochainVersion`. |',
+        '| `.Embedded.Holochain071` | Holochain 0.7.1 only | The same, with a smaller download. |',
+        '| `.Embedded.Holochain070` | Holochain 0.7.0 only | The same, for hApps built against 0.7.0. |',
+        '',
+        'The bundled conductors are Windows programs. On other systems use the package with no suffix and run your own conductor. Use one variant per app: they have the same API and namespaces.',
+        'ORM, HyperNET, HDK, Manager, API and TestHarness depend on the Client variant that matches their own, so an `.Embedded.Holochain071` package always pulls in the Client with 0.7.1 and nothing else.',
+        '',
+        '## All packages',
+        '',
+        '| Package | Version |',
+        '|---|---|',
+    ]
+    for _, _, pid in packages(m):
+        lines.append(f'| [`{pid}`](https://www.nuget.org/packages/{pid}) | {version} |')
+    lines += ['']
+    if tpl:
+        lines += [
+            '## Project templates',
+            '',
+            f"`{tpl['id']}` is not a library: it adds `dotnet new` templates that create a ready-to-run project with HoloNET already wired in, for the popular .NET app types. See [Templates](templates).",
+            '',
+            '```bash',
+            f"dotnet new install {tpl['id']}",
+            'dotnet new holonet-blazor -n MyApp --HoloNET orm',
+            '```',
+            '',
+        ]
+    lines += [
+        '## Which one do I want?',
+        '',
+        '| You want | Package |',
+        '|---|---|',
+        '| To save and load data in one line | `NextGenSoftware.Holochain.HoloNET.API` (add `.Embedded` on Windows to bundle the conductor) |',
+        "| To call your own hApp's zome functions | `NextGenSoftware.Holochain.HoloNET.Client` |",
+        '| To work with your own C# classes | `NextGenSoftware.Holochain.HoloNET.ORM` |',
+        '| Multiplayer networking | `NextGenSoftware.Holochain.HoloNET.HyperNET` |',
+        '| Everything in one reference | `NextGenSoftware.Holochain.HoloNET.HDK` |',
+        '| To start a new app | `dotnet new install NextGenSoftware.Holochain.HoloNET.Templates`, then `dotnet new holonet-<app type>` |',
+        '',
+        '## For maintainers: keeping this list complete',
+        '',
+        'The list lives in one file, [`packages.json`](https://github.com/holochain-open-dev/holochain-client-csharp/blob/main/packages.json), and one script,',
+        '[`scripts/holonet_packages.py`](https://github.com/holochain-open-dev/holochain-client-csharp/blob/main/scripts/holonet_packages.py), checks, packs and verifies it. A public workflow runs the check on every push,',
+        'so a package cannot be forgotten.',
+        '',
+        '| Command | What it does |',
+        '|---|---|',
+        '| `check` | The manifest and the repository agree: every project that makes a package is listed, every variant exists, every version matches, and this page is current. |',
+        '| `pack <folder>` | Builds and packs every package. |',
+        '| `verify-packed <folder>` | Every expected package exists and each depends only on its own variant. |',
+        '| `smoke <folder>` | Installs every package into a fresh app, builds it, runs it, and checks the conductors it bundles. |',
+        '| `verify-nuget` | After publishing: every package is on nuget.org at this version. |',
+        '| `set-version X.Y.Z` | Moves the whole family to a new version. |',
+        '| `docs` | Regenerates this page. |',
+        '',
+    ]
+    return chr(10).join(lines)
+
+
+def docs(check_only=False):
+    m = manifest()
+    path = os.path.join(REPO, 'docs', 'packages.md')
+    text = packages_markdown(m)
+    current = io.open(path, encoding='utf-8-sig', newline='').read().replace(chr(13) + chr(10), chr(10)) if os.path.exists(path) else None
+    if check_only:
+        return current == text
+    io.open(path, 'w', encoding='utf-8', newline=chr(10)).write(text)
+    print('Wrote docs/packages.md')
 
 
 # ---- pack ------------------------------------------------------------------------------------------------------------
@@ -150,6 +252,8 @@ def verify_packed(out):
         path = os.path.join(out, expected[pid])
         if not os.path.exists(path):
             continue
+        if lib.get('kind') == 'templates':
+            continue   # a template pack depends on nothing; the template tests check what it generates
         deps = nuspec_deps(path)
         family = {d: v for d, v in deps.items() if d.startswith(FAMILY_PREFIX)}
         for d, v in family.items():
@@ -179,6 +283,8 @@ def smoke(out):
     failures = []
     try:
         for lib, variant, pid in packages(m):
+            if lib.get('kind') == 'templates':
+                continue   # not a library: python templates/test_templates.py <packages dir> builds and runs what it generates
             name = 'smoke-' + re.sub(r'[^A-Za-z0-9]', '-', pid[len(FAMILY_PREFIX):])
             d = os.path.join(work, name)
             os.makedirs(d)
@@ -198,7 +304,7 @@ def smoke(out):
         shutil.rmtree(work, ignore_errors=True)
     if failures:
         fail([f'{p}: {e}' for p, e in failures], 'smoke failed')
-    print(f'OK: every one of the {len(packages(m))} packages installs and builds in a fresh app.')
+    print(f'OK: every one of the {len([x for x in packages(m) if x[0].get("kind") != "templates"])} library packages installs and builds in a fresh app.')
 
 
 # ---- verify-nuget ----------------------------------------------------------------------------------------------------
@@ -247,6 +353,10 @@ def set_version(new):
     if os.path.exists(hn):
         raw = io.open(hn, encoding='utf-8-sig', newline='').read()
         io.open(hn, 'w', encoding='utf-8', newline='').write(re.sub(r'(public const string Version = ")[^"]+(")', r'\g<1>' + new + r'\2', raw))
+    for tj in glob.glob(os.path.join(REPO, 'templates', 'content', '*', '.template.config', 'template.json')):
+        t = io.open(tj, encoding='utf-8').read()
+        io.open(tj, 'w', encoding='utf-8', newline='').write(t.replace('"defaultValue": "' + old + '"', '"defaultValue": "' + new + '"'))
+    docs()
     print(f'Family version {old} -> {new}. Add its CHANGELOG.md section, then commit, push and run the publish job.')
 
 
@@ -267,6 +377,8 @@ def main():
         smoke(a[1])
     elif a[0] == 'verify-nuget':
         verify_nuget(int(a[a.index('--wait') + 1]) if '--wait' in a else 0)
+    elif a[0] == 'docs':
+        docs()
     elif a[0] == 'set-version':
         set_version(a[1])
     else:

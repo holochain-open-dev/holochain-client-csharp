@@ -1,0 +1,10 @@
+{
+  "background_color": "#ffffff",
+  "description": "HoloNETApp",
+  "display": "standalone",
+  "name": "HoloNETApp",
+  "short_name": "HoloNETApp",
+  "start_url": "/index.html",
+  "theme_color": "#ffffff",
+  "scope": "/"
+}

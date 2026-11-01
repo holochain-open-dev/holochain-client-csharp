@@ -1,0 +1,16 @@
+<Window x:Class="HoloNETApp.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="HoloNET">
+    <Grid Padding="24" RowSpacing="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <!-- Runs the HoloNET demo (HoloNETDemo.cs) and shows what happened. -->
+        <Button x:Name="RunButton" Content="Run the HoloNET demo" Click="RunButton_Click" />
+        <ScrollViewer Grid.Row="1">
+            <TextBlock x:Name="Output" FontFamily="Consolas" TextWrapping="Wrap" IsTextSelectionEnabled="True" />
+        </ScrollViewer>
+    </Grid>
+</Window>

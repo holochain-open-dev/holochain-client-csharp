@@ -1,5 +1,7 @@
 # Getting started
 
+**Fastest way:** start from a template. `dotnet new install NextGenSoftware.Holochain.HoloNET.Templates`, then `dotnet new holonet-console -n MyApp` (or `holonet-blazor`, `holonet-wpf`, `holonet-maui`, ...) gives you a project that already runs. See [Templates](templates.md) and the [5-minute tutorial](https://learn.holonet.oasisomniverse.one/tutorials/00-up-and-running-in-5-minutes). The rest of this page is for adding HoloNET to an app you already have.
+
 ## 1. Pick a package
 
 | You want | Package |
@@ -10,13 +12,13 @@
 | Entry models and collections on top | the matching `NextGenSoftware.Holochain.HoloNET.ORM*` variant |
 | Just save and load data | `NextGenSoftware.Holochain.HoloNET.API` |
 | Multiplayer networking | `NextGenSoftware.Holochain.HoloNET.HyperNET` |
-| Everything in one reference (Client, ORM, HyperNET, WEB5 STAR, HoloOASIS) | `NextGenSoftware.Holochain.HoloNET.HDK` |
+| Everything in one reference (Client, ORM, HyperNET) | `NextGenSoftware.Holochain.HoloNET.HDK` |
 
 ```bash
 dotnet add package NextGenSoftware.Holochain.HoloNET.Client.Embedded
 ```
 
-Use one Client/ORM variant per app. They have the same API and namespaces; only the bundled conductor differs.
+Use one variant per app. They have the same API and namespaces; only the bundled conductor differs. Every library comes in the same four variants (none, `.Embedded`, `.Embedded.Holochain071`, `.Embedded.Holochain070`); see [Packages](packages.md) for the full list. The bundled conductors are Windows programs: on other systems use the package with no suffix and run your own conductor.
 
 ## 2. Which Holochain version?
 

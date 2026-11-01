@@ -182,7 +182,9 @@ This will help massively turbo charge the holochain ecosystem by opening it up t
 
 ### Packages
 
-HoloNET Client and HoloNET ORM each come in four variants. Pick one per app; they share the same API and namespaces.
+**Quickest start:** `dotnet new install NextGenSoftware.Holochain.HoloNET.Templates`, then `dotnet new holonet-<app type> -n MyApp` for a ready-to-run console, worker, Web API, MVC, Razor, Blazor, WPF, WinForms, WinUI, Avalonia, MAUI, Uno, Android, iOS or Unity app with HoloNET already wired in (`--HoloNET api|client|orm|hypernet` chooses the library). See [Templates](docs/templates.md).
+
+Every HoloNET library (Client, ORM, HyperNET, HDK, Manager, API and the Test Harness) comes in four variants: 28 packages, all released together at the same version, plus the template pack. The full list is in [Packages](docs/packages.md). Pick one variant per app; they share the same API and namespaces.
 
 | Package | Bundled Holochain conductor |
 |---|---|
@@ -191,7 +193,7 @@ HoloNET Client and HoloNET ORM each come in four variants. Pick one per app; the
 | [NextGenSoftware.Holochain.HoloNET.Client.Embedded.Holochain071](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.Client.Embedded.Holochain071) | 0.7.1 only (smaller download). |
 | [NextGenSoftware.Holochain.HoloNET.Client.Embedded.Holochain070](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.Client.Embedded.Holochain070) | 0.7.0 only (smaller download). |
 
-The same four exist for the ORM: [NextGenSoftware.Holochain.HoloNET.ORM](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.ORM), `.ORM.Embedded`, `.ORM.Embedded.Holochain071` and `.ORM.Embedded.Holochain070`.
+The same four exist for every other library: [NextGenSoftware.Holochain.HoloNET.ORM](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.ORM), `.ORM.Embedded`, `.ORM.Embedded.Holochain071` and `.ORM.Embedded.Holochain070`, and the same for `.HyperNET`, `.HDK`, `.Manager`, `.API` and `.Client.TestHarness`. Each depends on the Client variant that matches it, so the conductors are never duplicated. The bundled conductors are Windows programs; on other systems use the package with no suffix and run your own conductor.
 
 The rest of the HoloNET family:
 
@@ -203,7 +205,7 @@ The rest of the HoloNET family:
 
 [NextGenSoftware.Holochain.HoloNET.Manager](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.Manager) | [GitHub](https://github.com/NextGenSoftwareUK/HoloNET-Manager) - The WPF UI to HoloNET Client &amp; ORM (think launcher/dev store for .NET hApps), showcasing their advanced features with reusable backend and UI components. Ports to Uno, MAUI &amp; OpenSilver are planned. Also shipped as a download on the [GitHub releases](https://github.com/holochain-open-dev/holochain-client-csharp/releases).
 
-[NextGenSoftware.Holochain.HoloNET.HDK](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.HDK) - The HoloNET HDK metapackage: one reference that brings in HoloNET Client, HoloNET ORM, HoloNET HyperNET, WEB5 STAR ODK/HDK and HoloOASIS. Its STAR plugin extends the WEB5 STAR No/Low Code Generator so it can generate hApps from metadata on top of the HoloNET Client/ORM. (HoloNET Manager is a desktop app, so it ships on its own rather than inside the HDK.) (4.4.1+ includes STAR 2.0.6 and HoloOASIS 2.0.6; `-p:HdkIncludeStar=false` builds a HoloNET-only HDK.)
+[NextGenSoftware.Holochain.HoloNET.HDK](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.HDK) - The HoloNET HDK metapackage: one reference that brings in HoloNET Client, HoloNET ORM and HoloNET HyperNET. (HoloNET Manager is a desktop app, so it ships on its own rather than inside the HDK.) From 4.6.0 it no longer includes WEB5 STAR and HoloOASIS by default: the published STAR 2.0.6 packages depend on a `Chaos.NaCl` package that is not on nuget.org, so a HDK that included them could not be installed. Add `NextGenSoftware.OASIS.STAR` yourself once that is fixed, or build the HDK with `-p:HdkIncludeStar=true`.
 
 [NextGenSoftware.OASIS.STAR](https://www.nuget.org/packages/NextGenSoftware.OASIS.STAR) - The WEB5 STAR No/Low Code Generator: generates code for any supported OASIS provider (web2 and web3, including Holochain, IPFS, Solana, EOS, Ethereum, Telos, SEEDS, MongoDB, SQLite, Neo4j &amp; Azure), running on top of the OASIS/STAR COSMIC ORM.
 
@@ -211,7 +213,9 @@ The rest of the HoloNET family:
 
 The Test Harness: [NextGenSoftware.Holochain.HoloNET.Client.TestHarness](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.Client.TestHarness) ([how to use it](https://github.com/holochain-open-dev/holochain-client-csharp/tree/main/NextGenSoftware.Holochain.HoloNET.Client.TestHarness)).
 
-**Legacy packages:** `HoloNET.Manager.Embedded`, `HoloNET.HDK.Embedded` and `HoloNET.HyperNET.Embedded` were v3 packages and are no longer updated. Reference the `.Embedded` Client (or ORM) variant you want alongside Manager, HDK or HyperNET instead.
+**Project templates:** [NextGenSoftware.Holochain.HoloNET.Templates](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.Templates) adds `dotnet new holonet-console`, `holonet-blazor`, `holonet-wpf`, `holonet-maui` and a dozen more, each with HoloNET wired in. See [Templates](docs/templates.md).
+
+**Legacy packages:** `HoloNET.Manager.Embedded`, `HoloNET.HDK.Embedded` and `HoloNET.HyperNET.Embedded` were v3 packages and are no longer updated. Their replacements are `NextGenSoftware.Holochain.HoloNET.Manager.Embedded`, `.HDK.Embedded` and `.HyperNET.Embedded` (and the `.Holochain071` / `.Holochain070` variants), from 4.6.0.
 
 The release notes for v3.0.0 (the big rewrite) are below; for everything since, see [CHANGELOG.md](CHANGELOG.md) and the [GitHub releases](https://github.com/holochain-open-dev/holochain-client-csharp/releases).
 

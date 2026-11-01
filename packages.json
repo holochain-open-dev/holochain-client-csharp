@@ -22,7 +22,9 @@
         "both",
         "0.7.1",
         "0.7.0"
-      ]
+      ],
+      "name": "Client",
+      "description": "Connect to a Holochain conductor, install hApps, call zome functions and receive signals. Everything else builds on it."
     },
     {
       "id": "NextGenSoftware.Holochain.HoloNET.ORM",
@@ -32,7 +34,9 @@
         "both",
         "0.7.1",
         "0.7.0"
-      ]
+      ],
+      "name": "ORM",
+      "description": "Save, load, change and delete your own C# classes on Holochain, with change tracking and collections. Includes the Client."
     },
     {
       "id": "NextGenSoftware.Holochain.HoloNET.HyperNET",
@@ -42,7 +46,9 @@
         "both",
         "0.7.1",
         "0.7.0"
-      ]
+      ],
+      "name": "HyperNET",
+      "description": "Real-time player-to-player messaging for games and apps: zones, area of interest, reliable messages. Includes the Client."
     },
     {
       "id": "NextGenSoftware.Holochain.HoloNET.HDK",
@@ -52,7 +58,9 @@
         "both",
         "0.7.1",
         "0.7.0"
-      ]
+      ],
+      "name": "HDK",
+      "description": "Everything in one package: the Client, ORM and HyperNET. WEB5 STAR and HoloOASIS are not included yet because the STAR packages cannot be installed at the moment."
     },
     {
       "id": "NextGenSoftware.Holochain.HoloNET.Manager",
@@ -62,7 +70,9 @@
         "both",
         "0.7.1",
         "0.7.0"
-      ]
+      ],
+      "name": "Manager",
+      "description": "HoloNET Manager: a Windows (WPF) app and library for running a conductor and managing hApps."
     },
     {
       "id": "NextGenSoftware.Holochain.HoloNET.API",
@@ -72,7 +82,9 @@
         "both",
         "0.7.1",
         "0.7.0"
-      ]
+      ],
+      "name": "API",
+      "description": "The simple API: one line to save, load and delete data, share it with every agent and hear when it changes. Includes the Client and the OASIS hApp."
     },
     {
       "id": "NextGenSoftware.Holochain.HoloNET.Client.TestHarness",
@@ -82,7 +94,19 @@
         "both",
         "0.7.1",
         "0.7.0"
-      ]
+      ],
+      "name": "Client.TestHarness",
+      "description": "A ready-to-run test harness that exercises the Client and ORM against a live conductor."
+    },
+    {
+      "id": "NextGenSoftware.Holochain.HoloNET.Templates",
+      "project": "templates/NextGenSoftware.Holochain.HoloNET.Templates.csproj",
+      "variants": [
+        "none"
+      ],
+      "kind": "templates",
+      "name": "Templates",
+      "description": "dotnet new templates for 17 app types (console, web, desktop, mobile, Unity) with HoloNET wired in: choose the Client, ORM, API or HyperNET."
     }
   ],
   "exclude_projects": [

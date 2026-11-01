@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <!-- The HoloNET sandbox: a small web service that lets anyone try HoloNET from a browser (sandbox.holonet.oasisomniverse.one).
+       It uses the HoloNET API, Client, ORM and HyperNET against a Holochain conductor that runs next to it (see README.md).
+       It never runs code a visitor sends: the browser page can only call the fixed operations in Program.cs. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <IsPackable>false</IsPackable>
+    <RootNamespace>HoloNETSandbox</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\HoloNET-API\NextGenSoftware.Holochain.HoloNET.API\NextGenSoftware.Holochain.HoloNET.API.csproj" />
+    <ProjectReference Include="..\..\NextGenSoftware.Holochain.HoloNET.Client\NextGenSoftware.Holochain.HoloNET.Client.csproj" />
+    <ProjectReference Include="..\..\NextGenSoftware.Holochain.HoloNET.ORM\NextGenSoftware.Holochain.HoloNET.ORM.csproj" />
+    <ProjectReference Include="..\..\NextGenSoftware.Holochain.HoloNET.HyperNET\NextGenSoftware.Holochain.HoloNET.HyperNET.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -317,8 +317,247 @@ public class MainActivity : Activity
 ''')
 
 
+def p_avalonia(d):
+    sub_re(f'{d}/MainWindow.axaml', r'Title="HoloNETApp">.*</Window>', '''Title="HoloNET">
+    <DockPanel Margin="16">
+        <!-- Runs the HoloNET demo (HoloNETDemo.cs) and shows what happened. -->
+        <Button x:Name="RunButton" DockPanel.Dock="Top" Content="Run the HoloNET demo" Click="RunButton_Click" />
+        <TextBox x:Name="Output" Margin="0,12,0,0" IsReadOnly="True" TextWrapping="Wrap" FontFamily="Consolas,Menlo,monospace" />
+    </DockPanel>
+</Window>''')
+    wr(f'{d}/MainWindow.axaml.cs', '''using Avalonia.Controls;
+using Avalonia.Interactivity;
+
+namespace HoloNETApp;
+
+public partial class MainWindow : Window
+{
+    public MainWindow()
+    {
+        InitializeComponent();
+    }
+
+    private async void RunButton_Click(object? sender, RoutedEventArgs e)
+    {
+        RunButton.IsEnabled = false;
+        Output.Text = "Running...";
+        Output.Text = await HoloNETDemos.HoloNETDemo.RunAsync();
+        RunButton.IsEnabled = true;
+    }
+}
+''')
+
+
+def p_uno(d):
+    sub_re(f'{d}/MainPage.xaml', r'<ScrollViewer IsTabStop="True">.*</ScrollViewer>', '''<ScrollViewer IsTabStop="True">
+    <StackPanel Padding="24" Spacing="16">
+      <TextBlock Text="HoloNET" FontSize="28" />
+      <!-- Runs the HoloNET demo (HoloNETDemo.cs) and shows what happened. -->
+      <Button x:Name="RunButton" Content="Run the HoloNET demo" Click="RunButton_Click" />
+      <TextBlock x:Name="Output" FontFamily="Consolas" TextWrapping="Wrap" IsTextSelectionEnabled="True" />
+    </StackPanel>
+  </ScrollViewer>''')
+    wr(f'{d}/MainPage.xaml.cs', '''namespace HoloNETApp;
+
+public sealed partial class MainPage : Page
+{
+    public MainPage()
+    {
+        this.InitializeComponent();
+    }
+
+    private async void RunButton_Click(object sender, RoutedEventArgs e)
+    {
+        RunButton.IsEnabled = false;
+        Output.Text = "Running...";
+        Output.Text = await HoloNETDemos.HoloNETDemo.RunAsync();
+        RunButton.IsEnabled = true;
+    }
+}
+''')
+    # Uno uses central package management: the version lives in Directory.Packages.props
+    sub(os.path.join(os.path.dirname(d), 'Directory.Packages.props'), '<ItemGroup>\n  </ItemGroup>', '''<ItemGroup>
+    <PackageVersion Include="NextGenSoftware.Holochain.HoloNET.HOLONET_LIBRARY_IDHOLONET_PKG_SUFFIX" Version="HOLONET_VERSION" />
+    <!--#if (!UseApi)-->
+    <PackageVersion Include="NextGenSoftware.Holochain.HoloNET.APIHOLONET_PKG_SUFFIX" Version="HOLONET_VERSION" />
+    <!--#endif-->
+  </ItemGroup>''')
+
+
+def base_winui(d):
+    wr(f'{d}/HoloNETApp.csproj', '''<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+    <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+    <RootNamespace>HoloNETApp</RootNamespace>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <Platforms>x86;x64;ARM64</Platforms>
+    <RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
+    <RuntimeIdentifier Condition="'$(RuntimeIdentifier)' == ''">win-x64</RuntimeIdentifier>
+    <UseWinUI>true</UseWinUI>
+    <WindowsPackageType>None</WindowsPackageType>
+    <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="2.6.4" />
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.2957" />
+  </ItemGroup>
+</Project>
+''')
+    wr(f'{d}/app.manifest', '''<?xml version="1.0" encoding="utf-8"?>
+<assembly manifestVersion="1.0" xmlns="urn:schemas-microsoft-com:asm.v1">
+  <assemblyIdentity version="1.0.0.0" name="HoloNETApp.app" />
+  <application xmlns="urn:schemas-microsoft-com:asm.v3">
+    <windowsSettings>
+      <dpiAwareness xmlns="http://schemas.microsoft.com/SMI/2016/WindowsSettings">PerMonitorV2</dpiAwareness>
+    </windowsSettings>
+  </application>
+</assembly>
+''')
+    wr(f'{d}/App.xaml', '''<Application x:Class="HoloNETApp.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>
+''')
+    wr(f'{d}/App.xaml.cs', '''using Microsoft.UI.Xaml;
+
+namespace HoloNETApp;
+
+public partial class App : Application
+{
+    private Window? window;
+
+    public App()
+    {
+        InitializeComponent();
+    }
+
+    protected override void OnLaunched(LaunchActivatedEventArgs args)
+    {
+        window = new MainWindow();
+        window.Activate();
+    }
+}
+''')
+    wr(f'{d}/MainWindow.xaml', '''<Window x:Class="HoloNETApp.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="HoloNET">
+    <Grid Padding="24" RowSpacing="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <!-- Runs the HoloNET demo (HoloNETDemo.cs) and shows what happened. -->
+        <Button x:Name="RunButton" Content="Run the HoloNET demo" Click="RunButton_Click" />
+        <ScrollViewer Grid.Row="1">
+            <TextBlock x:Name="Output" FontFamily="Consolas" TextWrapping="Wrap" IsTextSelectionEnabled="True" />
+        </ScrollViewer>
+    </Grid>
+</Window>
+''')
+    wr(f'{d}/MainWindow.xaml.cs', '''using Microsoft.UI.Xaml;
+
+namespace HoloNETApp;
+
+public sealed partial class MainWindow : Window
+{
+    public MainWindow()
+    {
+        InitializeComponent();
+    }
+
+    private async void RunButton_Click(object sender, RoutedEventArgs e)
+    {
+        RunButton.IsEnabled = false;
+        Output.Text = "Running...";
+        Output.Text = await HoloNETDemos.HoloNETDemo.RunAsync();
+        RunButton.IsEnabled = true;
+    }
+}
+''')
+
+
+def p_winui(d):
+    pass
+
+
+def base_unity(d):
+    # Not a dotnet project: a Unity "Assets" starter. NuGetForUnity installs the packages listed in packages.config.
+    wr(f'{d}/Assets/packages.config', '''<?xml version="1.0" encoding="utf-8"?>
+<packages>
+  <package id="NextGenSoftware.Holochain.HoloNET.HOLONET_LIBRARY_IDHOLONET_PKG_SUFFIX" version="HOLONET_VERSION" manual="true" />
+  <!--#if (!UseApi)-->
+  <package id="NextGenSoftware.Holochain.HoloNET.APIHOLONET_PKG_SUFFIX" version="HOLONET_VERSION" manual="true" />
+  <!--#endif-->
+</packages>
+''')
+    wr(f'{d}/Packages/manifest.json', '''{
+  "dependencies": {
+    "com.github-glitchenzo.nugetforunity": "https://github.com/GlitchEnzo/NuGetForUnity.git?path=/src/NuGetForUnity"
+  }
+}
+''')
+    wr(f'{d}/Assets/HoloNET/HoloNETBehaviour.cs', '''using UnityEngine;
+
+// Add this component to any GameObject. It shows a button that runs the HoloNET demo (HoloNETDemo.cs) and the text it returns.
+public class HoloNETBehaviour : MonoBehaviour
+{
+    private string output = "";
+    private bool busy;
+
+    private async void Run()
+    {
+        busy = true;
+        output = "Running...";
+        output = await HoloNETDemos.HoloNETDemo.RunAsync();
+        busy = false;
+    }
+
+    private void OnGUI()
+    {
+        GUI.enabled = !busy;
+        if (GUI.Button(new Rect(20, 20, 260, 40), "Run the HoloNET demo"))
+            Run();
+        GUI.enabled = true;
+        GUI.Label(new Rect(20, 70, Screen.width - 40, Screen.height - 90), output);
+    }
+}
+''')
+
+
+def p_unity(d):
+    pass
+
+
 def p_ios(d):
-    pass  # filled in below once the stock iOS files are inspected
+    sub_re(f'{d}/SceneDelegate.cs', r"// Create a 'UIViewController' with a single 'UILabel'.*?Window.RootViewController = vc;", '''// A button that runs the HoloNET demo (HoloNETDemo.cs) and a label for what happened.
+			var vc = new UIViewController ();
+			vc.View!.BackgroundColor = UIColor.SystemBackground;
+			var button = UIButton.FromType (UIButtonType.System);
+			button.SetTitle ("Run the HoloNET demo", UIControlState.Normal);
+			button.Frame = new CoreGraphics.CGRect (20, 80, Window!.Frame.Width - 40, 44);
+			var output = new UILabel (new CoreGraphics.CGRect (20, 140, Window.Frame.Width - 40, Window.Frame.Height - 180)) { Lines = 0, Font = UIFont.GetMonospacedSystemFont (13, UIFontWeight.Regular) };
+			button.TouchUpInside += async (s, e) => {
+				button.Enabled = false;
+				output.Text = "Running...";
+				output.Text = await HoloNETDemos.HoloNETDemo.RunAsync ();
+				button.Enabled = true;
+			};
+			vc.View.AddSubview (button);
+			vc.View.AddSubview (output);
+
+			Window.RootViewController = vc;''')
 
 
 # key, dotnet new args, patch fn, display name, classifications, forced external (no bundled conductor), project file TFM fix
@@ -335,23 +574,29 @@ TYPES = [
     ('maui', ['maui'], p_maui, '.NET MAUI app', ['MAUI', 'Mobile', 'Desktop'], True),
     ('maui-blazor', ['maui-blazor'], p_mauiblazor, '.NET MAUI Blazor Hybrid app', ['MAUI', 'Blazor', 'Mobile'], True),
     ('android', ['android'], p_android, 'Android app', ['Android', 'Mobile'], True),
+    ('winui', base_winui, p_winui, 'WinUI 3 app', ['Desktop', 'WinUI'], False),
+    ('unity', base_unity, p_unity, 'Unity project starter (Assets folder)', ['Unity', 'Game'], False, 'Assets/HoloNET', False, True),
+    ('ios', ['ios'], p_ios, 'iOS app', ['iOS', 'Mobile'], True),
+    ('avalonia', ['avalonia.app'], p_avalonia, 'Avalonia app', ['Desktop', 'Avalonia'], False),
+    ('uno', ['unoapp'], p_uno, 'Uno Platform app', ['Uno', 'Mobile', 'Desktop', 'WebAssembly'], True, 'HoloNETApp', True),
 ]
 
 
-def package_block(forced_external):
+def package_block(forced_external, cpm=False):
     """The HoloNET package references for the generated csproj. HOLONET_* tokens are replaced by the template engine."""
+    ver = '' if cpm else ' Version="HOLONET_VERSION"'
     return '''
   <ItemGroup>
     <!-- HoloNET: the library chosen with the HoloNET option (api, client, orm or hypernet). HOLONET_PKG_SUFFIX is .Embedded* when the Holochain conductor
          is bundled in the app (the Conductor option, Windows only) and empty when you run your own conductor. -->
-    <PackageReference Include="NextGenSoftware.Holochain.HoloNET.HOLONET_LIBRARY_IDHOLONET_PKG_SUFFIX" Version="HOLONET_VERSION" />
+    <PackageReference Include="NextGenSoftware.Holochain.HoloNET.HOLONET_LIBRARY_IDHOLONET_PKG_SUFFIX"%(ver)s />
     <!--#if (!UseApi)-->
     <!-- Only for the OASIS hApp (oasis.happ) the demo installs: HoloNET API copies it next to your app. Use your own .happ and drop this. -->
-    <PackageReference Include="NextGenSoftware.Holochain.HoloNET.APIHOLONET_PKG_SUFFIX" Version="HOLONET_VERSION" />
+    <PackageReference Include="NextGenSoftware.Holochain.HoloNET.APIHOLONET_PKG_SUFFIX"%(ver)s />
     <!--#endif-->
   </ItemGroup>
 
-'''
+''' % {'ver': ver}
 
 
 def template_json(key, name, classifications, forced_external):
@@ -427,7 +672,36 @@ def template_json(key, name, classifications, forced_external):
     }
 
 
+def unity_readme():
+    return r'''# HoloNETApp (Unity)
+
+A Unity starter with [HoloNET](https://holonet.oasisomniverse.one) wired in (Unity 2021.3 or newer, which supports .NET Standard 2.1 and async/await).
+
+This is an **Assets-only starter**, not a complete Unity project: create a new Unity project, then copy the `Assets` and `Packages` folders from here into it.
+It has not been tested in the Unity editor; the HoloNET code (`HoloNETDemo.cs`) is compiled against .NET Standard 2.1, which Unity uses, by the template tests.
+
+## Set up
+
+1. Copy `Assets/` and `Packages/manifest.json` (merge the `dependencies` line if you already have a manifest) into your Unity project.
+2. Let Unity import [NuGetForUnity](https://github.com/GlitchEnzo/NuGetForUnity). In **NuGet > Restore Packages** it installs the HoloNET packages listed in `Assets/packages.config`.
+3. Add the `HoloNETBehaviour` component (Assets/HoloNET) to any GameObject and press Play.
+
+## The conductor
+
+Unity cannot start Holochain itself in the editor, so run a conductor on your machine first (`./start-conductor.sh` or `.\start-conductor.ps1`; ws://localhost:7777),
+or, in a Windows standalone build, create this starter with `--Conductor embedded` to bundle it. The conductor installs the hApp from a path on *its* machine:
+set `HoloNETDemo.HappPath` to where `oasis.happ` is (the HoloNET API package puts it in `Assets/Packages/NextGenSoftware.Holochain.HoloNET.API.*/`).
+
+## Learn more
+
+- [Documentation](https://docs.holonet.oasisomniverse.one) and [tutorials](https://learn.holonet.oasisomniverse.one)
+- [All HoloNET packages and templates](https://docs.holonet.oasisomniverse.one/packages)
+'''
+
+
 def readme(key, name, forced_external):
+    if key == 'unity':
+        return unity_readme()
     cond = ('This app type cannot host a Holochain conductor, so it connects to one you run on your development machine\n'
             '(`ws://localhost:7777`). Start it with `./start-conductor.sh` (Git Bash, Linux, macOS) or `.\\start-conductor.ps1` (PowerShell), and set\n'
             '`HoloNETDemo.AdminUri` (an Android emulator reaches your machine at `ws://10.0.2.2:7777`). The conductor installs the hApp from a path on\n'
@@ -468,29 +742,35 @@ Created with `dotnet new holonet-{key} --HoloNET api` (the default). The other c
 '''
 
 
-def build(key, base_args, patch, name, classes, forced):
+def build(key, base_args, patch, name, classes, forced, proj='', cpm=False, nocsproj=False):
     out = os.path.join(CONTENT, 'holonet-' + key)
     if os.path.isdir(out):
         shutil.rmtree(out)
     with tempfile.TemporaryDirectory(prefix='holonet-tpl-') as tmp:
-        r = subprocess.run(['dotnet', 'new'] + base_args + ['-n', 'HoloNETApp', '-o', tmp, '--force'], capture_output=True, text=True)
-        if r.returncode != 0:
-            raise SystemExit(f'dotnet new {" ".join(base_args)} failed:\n{r.stdout}{r.stderr}')
+        if callable(base_args):
+            base_args(tmp)   # no stock `dotnet new` template for this app type (WinUI 3's ship with Visual Studio): a function writes the base project
+        else:
+            r = subprocess.run(['dotnet', 'new'] + base_args + ['-n', 'HoloNETApp', '-o', tmp, '--force'], capture_output=True, text=True)
+            if r.returncode != 0:
+                raise SystemExit(f'dotnet new {" ".join(base_args)} failed:\n{r.stdout}{r.stderr}')
         shutil.copytree(tmp, out, ignore=shutil.ignore_patterns('bin', 'obj', '*.user', '.vs'))
-    csproj = os.path.join(out, 'HoloNETApp.csproj')
-    s = rd(csproj)
-    s = s.replace('<Nullable>enable</Nullable>', '<Nullable>disable</Nullable>')
-    i = s.rindex('</Project>')
-    wr(csproj, s[:i].rstrip('\n') + '\n' + package_block(forced) + s[i:])
+    root = out
+    out = os.path.join(out, proj) if proj else out
+    if not nocsproj:
+        csproj = os.path.join(out, 'HoloNETApp.csproj')
+        s = rd(csproj)
+        s = s.replace('<Nullable>enable</Nullable>', '<Nullable>disable</Nullable>')
+        i = s.rindex('</Project>')
+        wr(csproj, s[:i].rstrip('\n') + '\n' + package_block(forced, cpm) + s[i:])
     patch(out)
     demo = rd(os.path.join(SHARED, 'HoloNETDemo.cs')).replace('HOLONET_LIB_TEXT', 'HOLONET_LIBRARY_NAME')
     if forced:
         demo = demo.replace('//#if (!UseEmbedded)\n            dna.HolochainConductorAdminURI', '//#if (true)\n            dna.HolochainConductorAdminURI')
     wr(os.path.join(out, 'HoloNETDemo.cs'), demo)
-    wr(os.path.join(out, 'README.md'), readme(key, name, forced))
+    wr(os.path.join(root, 'README.md'), readme(key, name, forced))
     for f in ('start-conductor.sh', 'start-conductor.ps1', '.gitignore'):
-        shutil.copy(os.path.join(SHARED, f), os.path.join(out, f))
-    cfg = os.path.join(out, '.template.config')
+        shutil.copy(os.path.join(SHARED, f), os.path.join(root, f))
+    cfg = os.path.join(root, '.template.config')
     wr(os.path.join(cfg, 'template.json'), json.dumps(template_json(key, name, classes, forced), indent=2) + '\n')
     print('built holonet-' + key)
 
