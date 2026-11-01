@@ -75,7 +75,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
             string appId = "generated-" + Guid.NewGuid().ToString("N").Substring(0, 6);
             var admin = new HoloNETClientAdmin(new HoloNETDNA { AutoStartHolochainConductor = false, AutoShutdownHolochainConductor = false, HolochainConductorAdminURI = AdminUri });
             Assert.True((await admin.ConnectAsync(AdminUri)).IsConnected);
-            var installed = await Step("install", admin.InstallEnableSignAttachAndConnectToHappAsync(appId, HappPath, "holonet_game"), 120);
+            var installed = await Step("install", admin.InstallEnableSignAttachAndConnectToHappAsync(appId, HappPath, "holonet_game"), 300);   // the conductor compiles a never-seen zome on install; that can take minutes on a busy machine
             Assert.True(installed.IsAppConnected, "install: " + installed.Message);
             IHoloNETClientAppAgent client = installed.HoloNETClientAppAgent;
 

@@ -1,4 +1,4 @@
-@HoloNETApp_HostAddress = http://localhost:5069
+@HoloNETApp_HostAddress = http://localhost:5001
 
 GET {{HoloNETApp_HostAddress}}/weatherforecast/
 Accept: application/json

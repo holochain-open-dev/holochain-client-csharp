@@ -4,7 +4,7 @@
     <OutputType>Exe</OutputType>
     <Nullable>disable</Nullable>
     <ImplicitUsings>true</ImplicitUsings>
-    <SupportedOSPlatformVersion>13.0</SupportedOSPlatformVersion>
+    <SupportedOSPlatformVersion>15.0</SupportedOSPlatformVersion>
 
     <!--
       Enable full trimming in Release mode.

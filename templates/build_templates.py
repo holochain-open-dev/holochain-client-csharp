@@ -492,15 +492,31 @@ def p_winui(d):
     pass
 
 
+# What NuGetForUnity must restore for the HoloNET libraries on .NET Standard 2.1 (the dependency closure, minus what Unity provides itself).
+UNITY_DEPENDENCIES = [
+    ('BetterConsoleTables', '1.1.3'), ('Colorful.Console', '1.2.15'), ('ConsoleTables', '2.6.2'), ('MessagePack', '2.5.303'), ('MessagePack.Annotations', '2.5.303'),
+    ('Microsoft.Bcl.AsyncInterfaces', '8.0.0'), ('Microsoft.Extensions.Logging.Abstractions', '1.0.0'), ('Microsoft.NET.StringTools', '17.6.3'), ('NBitcoin', '9.0.3'),
+    ('NextGenSoftware.CLI.Engine', '2.0.4'), ('NextGenSoftware.ErrorHandling', '2.0.4'), ('NextGenSoftware.Logging', '2.0.4'), ('NextGenSoftware.Utilities', '2.0.4'),
+    ('NextGenSoftware.WebSocket', '2.0.4'), ('Nito.AsyncEx.Context', '5.1.2'), ('Nito.AsyncEx.Tasks', '5.1.2'), ('Nito.Disposables', '2.2.1'),
+    ('Portable.BouncyCastle', '1.9.0'), ('ShellProgressBar', '5.2.0'), ('SshNet.Security.Cryptography', '1.3.0'), ('System.Buffers', '4.5.1'),
+    ('System.Collections.Immutable', '6.0.0'), ('System.Memory', '4.5.5'), ('System.Numerics.Vectors', '4.4.0'), ('System.Runtime.CompilerServices.Unsafe', '6.0.0'),
+    ('System.Text.Encodings.Web', '8.0.0'), ('System.Text.Json', '8.0.6'), ('System.Threading.Tasks.Extensions', '4.5.4'), ('Wcwidth', '1.0.0'), ('YamlDotNet', '13.7.1'),
+]
+
+
 def base_unity(d):
     # Not a dotnet project: a Unity "Assets" starter. NuGetForUnity installs the packages listed in packages.config.
     wr(f'{d}/Assets/packages.config', '''<?xml version="1.0" encoding="utf-8"?>
 <packages>
-  <package id="NextGenSoftware.Holochain.HoloNET.HOLONET_LIBRARY_IDHOLONET_PKG_SUFFIX" version="HOLONET_VERSION" manual="true" />
+  <package id="NextGenSoftware.Holochain.HoloNET.HOLONET_LIBRARY_IDHOLONET_PKG_SUFFIX" version="HOLONET_VERSION" manuallyInstalled="true" />
   <!--#if (!UseApi)-->
-  <package id="NextGenSoftware.Holochain.HoloNET.APIHOLONET_PKG_SUFFIX" version="HOLONET_VERSION" manual="true" />
+  <package id="NextGenSoftware.Holochain.HoloNET.APIHOLONET_PKG_SUFFIX" version="HOLONET_VERSION" manuallyInstalled="true" />
   <!--#endif-->
-</packages>
+  <!--#if (!UseClient)-->
+  <package id="NextGenSoftware.Holochain.HoloNET.ClientHOLONET_PKG_SUFFIX" version="HOLONET_VERSION" />
+  <!--#endif-->
+  <!-- NuGetForUnity restores only what is listed here, so every dependency is listed (Newtonsoft.Json comes from Unity's own package). -->
+''' + ''.join(f'  <package id="{i}" version="{v}" />\n' for i, v in UNITY_DEPENDENCIES) + '''</packages>
 ''')
     wr(f'{d}/Packages/manifest.json', '''{
   "dependencies": {
@@ -520,6 +536,10 @@ public class HoloNETBehaviour : MonoBehaviour
     {
         busy = true;
         output = "Running...";
+        // NuGetForUnity keeps the HoloNET API package's oasis.happ under Assets/Packages: use it.
+        var happ = System.IO.Directory.GetFiles(System.IO.Path.Combine(Application.dataPath, "Packages"), "oasis.happ", System.IO.SearchOption.AllDirectories);
+        if (happ.Length > 0)
+            HoloNETDemos.HoloNETDemo.HappPath = happ[0];
         output = await HoloNETDemos.HoloNETDemo.RunAsync();
         busy = false;
     }
@@ -678,7 +698,7 @@ def unity_readme():
 A Unity starter with [HoloNET](https://holonet.oasisomniverse.one) wired in (Unity 2021.3 or newer, which supports .NET Standard 2.1 and async/await).
 
 This is an **Assets-only starter**, not a complete Unity project: create a new Unity project, then copy the `Assets` and `Packages` folders from here into it.
-It has not been tested in the Unity editor; the HoloNET code (`HoloNETDemo.cs`) is compiled against .NET Standard 2.1, which Unity uses, by the template tests.
+It is tested in the Unity 2022.3 editor: the packages restore through NuGetForUnity, the scripts compile, and the demo runs against the bundled conductor.
 
 ## Set up
 
@@ -688,9 +708,9 @@ It has not been tested in the Unity editor; the HoloNET code (`HoloNETDemo.cs`) 
 
 ## The conductor
 
-Unity cannot start Holochain itself in the editor, so run a conductor on your machine first (`./start-conductor.sh` or `.\start-conductor.ps1`; ws://localhost:7777),
-or, in a Windows standalone build, create this starter with `--Conductor embedded` to bundle it. The conductor installs the hApp from a path on *its* machine:
-set `HoloNETDemo.HappPath` to where `oasis.happ` is (the HoloNET API package puts it in `Assets/Packages/NextGenSoftware.Holochain.HoloNET.API.*/`).
+On Windows the default (`--Conductor embedded`) bundles the Holochain conductor: HoloNET starts and stops it for you, in the editor and in standalone builds.
+On other platforms create the starter with `--Conductor external`, and run a conductor first (`./start-conductor.sh` or `.\start-conductor.ps1`; ws://localhost:7777).
+`HoloNETBehaviour` finds `oasis.happ` (the HoloNET API package puts it under `Assets/Packages`); to use your own hApp set `HoloNETDemo.HappPath`.
 
 ## Learn more
 

@@ -4,6 +4,11 @@
 
 Every HoloNET package is now released together at one version, in four conductor variants, with project templates.
 
+- **A conductor that already has the app installed no longer fails the first run.** The conductor enables the app before its cells have started, so signing
+  credentials could answer `CellNotRunning`; the admin client now asks again for a few seconds. HoloNETAPI also stops the conductor it started when the app exits
+  (it used to outlive the app, and the next run attached to it).
+- **Unity starter works.** `Assets/packages.config` lists the whole dependency closure (NuGetForUnity restores only what is listed), and `templates/test_unity.py`
+  restores the packages, compiles and runs the demo in a real Unity 2022.3 editor.
 - **28 library packages (7 libraries x 4 variants) plus a template pack.** Client, ORM, HyperNET, HDK, Manager, API and the Test Harness each come as
   no conductor, `.Embedded` (Holochain 0.7.1 and 0.7.0), `.Embedded.Holochain071` and `.Embedded.Holochain070`. Each variant depends on the matching
   Client variant, so conductors are never duplicated. The full list is in [docs/packages.md](docs/packages.md), generated from `packages.json`.

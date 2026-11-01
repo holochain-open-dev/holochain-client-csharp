@@ -130,7 +130,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                                 }
 
                                 result.IsAppEnabled = true;
-                                result.ZomeCallCapabilityGrantedResult = await AuthorizeSigningCredentialsAndGrantZomeCallCapabilityAsync(result.AppInstalledResult.CellId, capGrantAccessType, grantedFunctionsType, grantedFunctions);
+                                result.ZomeCallCapabilityGrantedResult = await AuthorizeWhenCellRunningAsync(result.AppInstalledResult.CellId, capGrantAccessType, grantedFunctionsType, grantedFunctions);
 
                                 if (result.ZomeCallCapabilityGrantedResult != null && !result.ZomeCallCapabilityGrantedResult.IsError)
                                 {
@@ -179,6 +179,23 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             return result;
         }
 
+        /// <summary>
+        /// A conductor that already has the app installed (a restart, or a previous run's data folder) enables it before its cells have started, so the first
+        /// signing request can answer CellNotRunning. That is temporary: ask again for a few seconds before reporting an error.
+        /// </summary>
+        private async Task<ZomeCallCapabilityGrantedCallBackEventArgs> AuthorizeWhenCellRunningAsync(byte[][] cellId, CapGrantAccessType capGrantAccessType, GrantedFunctionsType grantedFunctionsType, List<(string, string)> grantedFunctions)
+        {
+            var granted = await AuthorizeSigningCredentialsAndGrantZomeCallCapabilityAsync(cellId, capGrantAccessType, grantedFunctionsType, grantedFunctions);
+
+            for (int attempt = 0; attempt < 40 && granted != null && granted.IsError && granted.Message != null && granted.Message.Contains("CellNotRunning"); attempt++)
+            {
+                await Task.Delay(250);
+                granted = await AuthorizeSigningCredentialsAndGrantZomeCallCapabilityAsync(cellId, capGrantAccessType, grantedFunctionsType, grantedFunctions);
+            }
+
+            return granted;
+        }
+
         /// <summary>Enables an already installed app, signs credentials for its cell and attaches an app interface (the steps after install).</summary>
         private async Task EnableSignAndAttachInstalledHappAsync(InstallEnableSignAndAttachHappEventArgs result, string hAppId, CapGrantAccessType capGrantAccessType, GrantedFunctionsType grantedFunctionsType, List<(string, string)> grantedFunctions, bool log, Action<string, LogType> loggingFunction)
         {
@@ -191,7 +208,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
 
             result.IsAppEnabled = true;
-            result.ZomeCallCapabilityGrantedResult = await AuthorizeSigningCredentialsAndGrantZomeCallCapabilityAsync(result.CellId, capGrantAccessType, grantedFunctionsType, grantedFunctions);
+            result.ZomeCallCapabilityGrantedResult = await AuthorizeWhenCellRunningAsync(result.CellId, capGrantAccessType, grantedFunctionsType, grantedFunctions);
 
             if (result.ZomeCallCapabilityGrantedResult == null || result.ZomeCallCapabilityGrantedResult.IsError)
             {

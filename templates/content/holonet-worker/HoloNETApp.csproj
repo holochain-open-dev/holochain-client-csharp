@@ -4,7 +4,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>disable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <UserSecretsId>dotnet-HoloNETApp-ff23fd59-cf7a-4b28-bb6d-3d95aabe2681</UserSecretsId>
+    <UserSecretsId>dotnet-HoloNETApp-f80c54f5-a7cd-4e3f-83f6-745345114997</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>

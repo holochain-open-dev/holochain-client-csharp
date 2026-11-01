@@ -10,6 +10,10 @@ public class HoloNETBehaviour : MonoBehaviour
     {
         busy = true;
         output = "Running...";
+        // NuGetForUnity keeps the HoloNET API package's oasis.happ under Assets/Packages: use it.
+        var happ = System.IO.Directory.GetFiles(System.IO.Path.Combine(Application.dataPath, "Packages"), "oasis.happ", System.IO.SearchOption.AllDirectories);
+        if (happ.Length > 0)
+            HoloNETDemos.HoloNETDemo.HappPath = happ[0];
         output = await HoloNETDemos.HoloNETDemo.RunAsync();
         busy = false;
     }

@@ -3,7 +3,7 @@
 A Unity starter with [HoloNET](https://holonet.oasisomniverse.one) wired in (Unity 2021.3 or newer, which supports .NET Standard 2.1 and async/await).
 
 This is an **Assets-only starter**, not a complete Unity project: create a new Unity project, then copy the `Assets` and `Packages` folders from here into it.
-It has not been tested in the Unity editor; the HoloNET code (`HoloNETDemo.cs`) is compiled against .NET Standard 2.1, which Unity uses, by the template tests.
+It is tested in the Unity 2022.3 editor: the packages restore through NuGetForUnity, the scripts compile, and the demo runs against the bundled conductor.
 
 ## Set up
 
@@ -13,9 +13,9 @@ It has not been tested in the Unity editor; the HoloNET code (`HoloNETDemo.cs`) 
 
 ## The conductor
 
-Unity cannot start Holochain itself in the editor, so run a conductor on your machine first (`./start-conductor.sh` or `.\start-conductor.ps1`; ws://localhost:7777),
-or, in a Windows standalone build, create this starter with `--Conductor embedded` to bundle it. The conductor installs the hApp from a path on *its* machine:
-set `HoloNETDemo.HappPath` to where `oasis.happ` is (the HoloNET API package puts it in `Assets/Packages/NextGenSoftware.Holochain.HoloNET.API.*/`).
+On Windows the default (`--Conductor embedded`) bundles the Holochain conductor: HoloNET starts and stops it for you, in the editor and in standalone builds.
+On other platforms create the starter with `--Conductor external`, and run a conductor first (`./start-conductor.sh` or `.\start-conductor.ps1`; ws://localhost:7777).
+`HoloNETBehaviour` finds `oasis.happ` (the HoloNET API package puts it under `Assets/Packages`); to use your own hApp set `HoloNETDemo.HappPath`.
 
 ## Learn more
 

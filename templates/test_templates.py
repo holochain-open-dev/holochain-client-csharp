@@ -13,14 +13,15 @@ TYPES = sorted(d[len('holonet-'):] for d in os.listdir(os.path.join(HERE, 'conte
 
 
 # Multi-target apps are built one target at a time, so a missing workload for one (e.g. wasm-tools) is reported on its own.
-FRAMEWORKS = {'uno': ['net10.0-desktop', 'net10.0-android']}
+FRAMEWORKS = {'uno': ['net10.0-desktop', 'net10.0-android', 'net10.0-browserwasm'], 'maui': ['net10.0-windows10.0.19041.0', 'net10.0-android'], 'maui-blazor': ['net10.0-windows10.0.19041.0', 'net10.0-android']}
 
 
 # What each library's demo prints when it works (HoloNETDemo.cs).
 MARKERS = {'api': 'greeting = Hello, Holochain!', 'client': 'Created an avatar', 'orm': 'Updated and deleted.', 'hypernet': 'Message delivered.'}
 CONSOLE_TYPES = ('console',)
 WEB_PATHS = {'webapi': '/holonet', 'mvc': '/HoloNET', 'razor': '/HoloNET'}
-DESKTOP_TYPES = ('wpf', 'winforms', 'avalonia', 'winui')
+DESKTOP_TYPES = ('wpf', 'winforms', 'avalonia', 'winui', 'maui', 'maui-blazor', 'uno')
+RUN_FRAMEWORK = {'maui': 'net10.0-windows10.0.19041.0', 'maui-blazor': 'net10.0-windows10.0.19041.0', 'uno': 'net10.0-desktop'}
 
 
 def kill_tree(proc):
@@ -69,11 +70,13 @@ def run_checks(t, lib, project, env):
             kill_tree(proc)
     if t in DESKTOP_TYPES:
         exe_dir = os.path.join(project)
-        proc = subprocess.Popen(['dotnet', 'run', '--project', project, '--no-build'], env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        time.sleep(15)
+        fw = ['-f', RUN_FRAMEWORK[t]] if t in RUN_FRAMEWORK else []
+        if t == 'uno': project = os.path.join(project, os.path.basename(project))   # the solution folder holds the project folder
+        proc = subprocess.Popen(['dotnet', 'run', '--project', project, '--no-build'] + fw, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        time.sleep(25)
         alive = proc.poll() is None
         kill_tree(proc)
-        return None if alive else 'the app exited within 15 seconds of starting'
+        return None if alive else 'the app exited within 25 seconds of starting'
     return None
 
 
