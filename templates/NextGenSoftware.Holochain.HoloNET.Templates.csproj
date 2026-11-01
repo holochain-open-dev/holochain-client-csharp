@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- The "dotnet new" template pack: dotnet new install NextGenSoftware.Holochain.HoloNET.Templates
+       Then:  dotnet new holonet-api | holonet-client   (see templates/README.md for the full list).
+       Part of the lockstep HoloNET release (packages.json). Content folders are templates, not code, so nothing here compiles. -->
+  <PropertyGroup>
+    <PackageType>Template</PackageType>
+    <TargetFramework>net10.0</TargetFramework>
+    <PackageId>NextGenSoftware.Holochain.HoloNET.Templates</PackageId>
+    <Title>HoloNET project templates</Title>
+    <Version>4.6.0</Version>
+    <Authors>NextGen Software Ltd</Authors>
+    <Description>dotnet new templates for HoloNET: a one-line HoloNET API app, a full HoloNET Client app and more, each with the bundled Holochain conductor (0.7.0 and 0.7.1) or your own.</Description>
+    <PackageTags>holochain;holonet;dotnet-new;templates</PackageTags>
+    <PackageProjectUrl>https://holonet.oasisomniverse.one</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/holochain-open-dev/holochain-client-csharp</RepositoryUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <IncludeContentInPack>true</IncludeContentInPack>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <NoWarn>$(NoWarn);NU5128;NU5111</NoWarn>
+    <EnableDefaultItems>false</EnableDefaultItems>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="content\**\*" Exclude="content\**\bin\**;content\**\obj\**;content\**\.sandbox\**" />
+    <Compile Remove="**\*" />
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+</Project>
