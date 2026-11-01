@@ -1,0 +1,22 @@
+@page "/holonet"
+
+<PageTitle>HoloNET</PageTitle>
+
+<h1>HoloNET</h1>
+<p>This page runs the HoloNET demo in HoloNETDemo.cs (HoloNET HOLONET_LIBRARY_NAME).</p>
+
+<button class="btn btn-primary" @onclick="Run" disabled="@busy">@(busy ? "Running..." : "Run the HoloNET demo")</button>
+<pre class="mt-3">@output</pre>
+
+@code {
+    private bool busy;
+    private string output = "";
+
+    private async Task Run()
+    {
+        busy = true;
+        output = "";
+        output = await HoloNETDemos.HoloNETDemo.RunAsync();
+        busy = false;
+    }
+}

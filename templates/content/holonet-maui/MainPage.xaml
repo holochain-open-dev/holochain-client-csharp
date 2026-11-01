@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="HoloNETApp.MainPage">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="24" Spacing="16">
+            <Label Text="HoloNET" Style="{StaticResource Headline}" SemanticProperties.HeadingLevel="Level1" />
+            <Label Text="Runs the HoloNET demo in HoloNETDemo.cs (HoloNET HOLONET_LIBRARY_NAME)." />
+            <Button x:Name="RunBtn" Text="Run the HoloNET demo" Clicked="OnRunClicked" HorizontalOptions="Fill" />
+            <Label x:Name="OutputLabel" FontFamily="Consolas" />
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>
