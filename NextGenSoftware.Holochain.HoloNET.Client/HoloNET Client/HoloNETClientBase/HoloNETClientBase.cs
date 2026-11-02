@@ -1514,7 +1514,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// </summary>
         protected virtual async Task CreateHolochainConductorConfigAsync(string fullPathToHolochainExe)
         {
-            string sandboxWorkingDirectory = Path.Combine(Path.GetTempPath(), $"HoloNET_{Guid.NewGuid():N}");
+            // The conductor's keystore (lair) listens on a Unix socket inside this folder, and a socket path must be shorter than about 104 characters on macOS
+            // (SUN_LEN): the macOS temp folder (/var/folders/...) is too long for it, so use /tmp there and on Linux.
+            string tempRoot = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows) || !Directory.Exists("/tmp") ? Path.GetTempPath() : "/tmp";
+            string sandboxWorkingDirectory = Path.Combine(tempRoot, $"hn_{Guid.NewGuid().ToString("N").Substring(0, 8)}");
             Directory.CreateDirectory(sandboxWorkingDirectory);
 
             using (Process createConfigProcess = new Process())
