@@ -13,6 +13,10 @@ on:
     paths:
       - 'NextGenSoftware.Holochain.HoloNET.Client/**'
       - 'tools/ConductorDownloadSmoke/**'
+      - 'tools/EmbeddedConductorSmoke/**'
+      - 'scripts/holonet_packages.py'
+      - 'scripts/fetch_conductors.py'
+      - 'packages.json'
       - '.github/workflows/conductor-download.yml'
 
 jobs:
@@ -41,3 +45,38 @@ jobs:
         working-directory: holochain-client-csharp
         shell: bash
         run: dotnet run --project tools/ConductorDownloadSmoke -c Release -- "${{ github.event.inputs.holochain_version || '0.7.1' }}"
+
+  # The offline Embedded packages for Linux and macOS: pack one on the machine it is for, install it from a local folder and start + connect to the conductor it carries,
+  # with AutoDownloadConductor off (nothing is downloaded) and no holochain on the PATH.
+  embedded:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-latest, id: Client.Embedded.LinuxX64 }
+          - { os: ubuntu-latest, id: Client.Embedded.LinuxX64.Holochain070 }
+          - { os: ubuntu-24.04-arm, id: Client.Embedded.LinuxArm64.Holochain071 }
+          - { os: ubuntu-24.04-arm, id: Client.Embedded.LinuxArm64.Holochain070 }
+          - { os: macos-latest, id: Client.Embedded.MacArm64 }
+          - { os: macos-latest, id: Client.Embedded.MacArm64.Holochain071 }
+          - { os: macos-15-intel, id: Client.Embedded.MacX64.Holochain071 }
+          - { os: macos-15-intel, id: Client.Embedded.MacX64.Holochain070 }
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: holochain-client-csharp
+      - uses: actions/checkout@v4
+        with:
+          repository: NextGenSoftwareUK/NextGenSoftware-Libraries
+          path: NextGenSoftware-Libraries
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - name: Pack the package for this computer
+        working-directory: holochain-client-csharp
+        run: python3 scripts/holonet_packages.py pack "$RUNNER_TEMP/packed" --only NextGenSoftware.Holochain.HoloNET.${{ matrix.id }}
+      - name: Start and connect from the bundled conductor
+        working-directory: holochain-client-csharp
+        run: dotnet run --project tools/EmbeddedConductorSmoke -c Release -p:EmbeddedPackageId=NextGenSoftware.Holochain.HoloNET.${{ matrix.id }} -p:EmbeddedPackageSource="$RUNNER_TEMP/packed"

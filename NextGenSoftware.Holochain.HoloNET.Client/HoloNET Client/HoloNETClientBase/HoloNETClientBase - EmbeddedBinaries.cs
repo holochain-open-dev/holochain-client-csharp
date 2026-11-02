@@ -20,6 +20,39 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 Directory.CreateDirectory(directory);
 
             File.WriteAllBytes(path, bytes);
+            HolochainConductorDownloader.MakeExecutable(path); // no-op on Windows
+        }
+
+        /// <summary>This computer's runtime identifier as the Embedded packages name it: win-x64, linux-x64, linux-arm64, osx-x64 or osx-arm64 (null for anything else).</summary>
+        public static string CurrentEmbeddedPlatform()
+        {
+            bool arm = System.Runtime.InteropServices.RuntimeInformation.OSArchitecture == System.Runtime.InteropServices.Architecture.Arm64;
+            bool x64 = System.Runtime.InteropServices.RuntimeInformation.OSArchitecture == System.Runtime.InteropServices.Architecture.X64;
+
+            if (!arm && !x64)
+                return null;
+
+            if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows))
+                return x64 ? "win-x64" : null;
+
+            if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Linux))
+                return arm ? "linux-arm64" : "linux-x64";
+
+            if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.OSX))
+                return arm ? "osx-arm64" : "osx-x64";
+
+            return null;
+        }
+
+        /// <summary>
+        /// True when the conductors this build bundles are for the computer it is running on: the Embedded package for Windows on Windows, .Embedded.LinuxX64 on
+        /// x64 Linux and so on. A package for another system (or the lightweight package, which bundles none) is not usable here.
+        /// </summary>
+        public static bool IsEmbeddedBundleForThisComputer()
+        {
+            string platform = CurrentEmbeddedPlatform();
+            return platform != null && typeof(HoloNETClientBase).Assembly.GetManifestResourceInfo("HoloNET.Embedded.platform." + platform) != null
+                && (IsEmbeddedHolochainVersionBundled(EmbeddedHolochainVersion.V0_7_1) || IsEmbeddedHolochainVersionBundled(EmbeddedHolochainVersion.V0_7_0));
         }
 
         /// <summary>Folder name for a bundled release, e.g. "0.7.1".</summary>
@@ -31,8 +64,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// release so switching versions doesn't overwrite the other.
         /// </summary>
         protected string EmbeddedBinaryPath(string exe) =>
-            Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData), "NextGenSoftware", "HoloNET",
-                EmbeddedHolochainVersionString(EffectiveEmbeddedHolochainVersion()), exe);
+            Path.Combine(HolochainConductorDownloader.CacheFolder(EmbeddedHolochainVersionString(EffectiveEmbeddedHolochainVersion())),
+                HolochainConductorDownloader.FileName(Path.GetFileNameWithoutExtension(exe))); // holochain.exe on Windows, holochain on Linux and macOS
 
         private static string EmbeddedResourceName(string exe, EmbeddedHolochainVersion version) =>
             $"HoloNET.Embedded.{exe}-{EmbeddedHolochainVersionString(version)}.exe";

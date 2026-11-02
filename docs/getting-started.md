@@ -7,7 +7,7 @@
 | You want | Package |
 |---|---|
 | HoloNET to start its own Holochain conductor, on any OS (simplest) | `NextGenSoftware.Holochain.HoloNET.Client`: if no conductor is installed it downloads the official one the first time (`AutoDownloadConductor`, see [Where the conductor comes from](conductor.md)) |
-| The same, but it must work offline or never download | `NextGenSoftware.Holochain.HoloNET.Client.Embedded` (bundles 0.7.1 and 0.7.0, Windows) |
+| The same, but it must work offline or never download | `NextGenSoftware.Holochain.HoloNET.Client.Embedded` (bundles 0.7.1 and 0.7.0, Windows; `.Embedded.LinuxX64`, `.LinuxArm64`, `.MacX64` and `.MacArm64` for Linux and macOS) |
 | The same, with a smaller download | `.Client.Embedded.Holochain071` or `.Client.Embedded.Holochain070` |
 | To use a conductor you already run (`hc sandbox`, a launcher, a server) | `NextGenSoftware.Holochain.HoloNET.Client`, with `AutoStartHolochainConductor = false` |
 | Entry models and collections on top | the matching `NextGenSoftware.Holochain.HoloNET.ORM*` variant |
@@ -19,7 +19,7 @@
 dotnet add package NextGenSoftware.Holochain.HoloNET.Client.Embedded
 ```
 
-Use one variant per app. They have the same API and namespaces; only the bundled conductor differs. Every library comes in the same four variants (none, `.Embedded`, `.Embedded.Holochain071`, `.Embedded.Holochain070`); see [Packages](packages.md) for the full list. The bundled conductors are Windows programs: on other systems use the package with no suffix and run your own conductor.
+Use one variant per app. They have the same API and namespaces; only the bundled conductor differs. Every library comes in the same four variants (none, `.Embedded`, `.Embedded.Holochain071`, `.Embedded.Holochain070`); see [Packages](packages.md) for the full list. `.Embedded` bundles the Windows conductors; Linux and macOS have their own offline packages (`.Embedded.LinuxX64`, `.LinuxArm64`, `.MacX64`, `.MacArm64`, each with `.Holochain071` / `.Holochain070` or both) for the Client, ORM, HyperNET and API. Or use the package with no suffix and HoloNET downloads the conductor.
 
 ## 2. Which Holochain version?
 

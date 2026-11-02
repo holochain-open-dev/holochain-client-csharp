@@ -2,7 +2,7 @@
 
 <!-- Generated from packages.json by `python scripts/holonet_packages.py docs`. Do not edit by hand. -->
 
-HoloNET is 7 libraries, each published as 4 NuGet packages, plus a template pack: **29 packages**, all released together at **version 4.6.0**.
+HoloNET is 7 libraries, each published as 4 NuGet packages (more for the ones with Linux and macOS conductors), plus a template pack: **77 packages**, all released together at **version 4.6.0**.
 Every package has the same version, so you never have to work out which versions go together.
 
 ## The libraries
@@ -28,8 +28,23 @@ Holochain needs a conductor (the program that runs your hApp). Each library come
 | `.Embedded.Holochain071` | Holochain 0.7.1 only | The same, with a smaller download. |
 | `.Embedded.Holochain070` | Holochain 0.7.0 only | The same, for hApps built against 0.7.0. |
 
-The bundled conductors are Windows programs. On other systems use the package with no suffix and run your own conductor. Use one variant per app: they have the same API and namespaces.
+Those are the Windows conductors. For Linux and macOS see the next section; for browser and phone apps use the package with no suffix and run your own conductor. Use one variant per app: they have the same API and namespaces.
 ORM, HyperNET, HDK, Manager, API and TestHarness depend on the Client variant that matches their own, so an `.Embedded.Holochain071` package always pulls in the Client with 0.7.1 and nothing else.
+
+## Offline packages for Linux and macOS
+
+`Client`, `ORM`, `HyperNET`, `API` also come with the conductor bundled for Linux and macOS, so an app works with no internet and nothing to install. Each package holds one operating system and processor (so none is bigger than the Windows ones), and the same three Holochain choices:
+
+| Package suffix | For |
+|---|---|
+| `.Embedded.LinuxX64` | Linux x64 |
+| `.Embedded.LinuxArm64` | Linux arm64 |
+| `.Embedded.MacX64` | macOS Intel |
+| `.Embedded.MacArm64` | macOS Apple Silicon |
+
+Add `.Holochain071` or `.Holochain070` after the platform for a single Holochain version, for example `NextGenSoftware.Holochain.HoloNET.Client.Embedded.LinuxArm64.Holochain071`. With no version suffix the package holds 0.7.1 and 0.7.0 and you choose with `HoloNETDNA.EmbeddedHolochainVersion`.
+You do not have to use these: with the plain package HoloNET downloads the right conductor the first time ([where the conductor comes from](conductor.md)). Use them when the machine is offline or you want a fixed, tested conductor inside the package.
+A package built for another system is noticed at run time and HoloNET falls back to the conductor on the PATH or the download.
 
 ## All packages
 
@@ -39,14 +54,50 @@ ORM, HyperNET, HDK, Manager, API and TestHarness depend on the Client variant th
 | [`NextGenSoftware.Holochain.HoloNET.Client.Embedded`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.Client.Embedded) | 4.6.0 |
 | [`NextGenSoftware.Holochain.HoloNET.Client.Embedded.Holochain071`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.Client.Embedded.Holochain071) | 4.6.0 |
 | [`NextGenSoftware.Holochain.HoloNET.Client.Embedded.Holochain070`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.Client.Embedded.Holochain070) | 4.6.0 |
+| [`NextGenSoftware.Holochain.HoloNET.Client.Embedded.LinuxX64`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.Client.Embedded.LinuxX64) | 4.6.0 |
+| [`NextGenSoftware.Holochain.HoloNET.Client.Embedded.LinuxX64.Holochain071`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.Client.Embedded.LinuxX64.Holochain071) | 4.6.0 |
+| [`NextGenSoftware.Holochain.HoloNET.Client.Embedded.LinuxX64.Holochain070`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.Client.Embedded.LinuxX64.Holochain070) | 4.6.0 |
+| [`NextGenSoftware.Holochain.HoloNET.Client.Embedded.LinuxArm64`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.Client.Embedded.LinuxArm64) | 4.6.0 |
+| [`NextGenSoftware.Holochain.HoloNET.Client.Embedded.LinuxArm64.Holochain071`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.Client.Embedded.LinuxArm64.Holochain071) | 4.6.0 |
+| [`NextGenSoftware.Holochain.HoloNET.Client.Embedded.LinuxArm64.Holochain070`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.Client.Embedded.LinuxArm64.Holochain070) | 4.6.0 |
+| [`NextGenSoftware.Holochain.HoloNET.Client.Embedded.MacX64`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.Client.Embedded.MacX64) | 4.6.0 |
+| [`NextGenSoftware.Holochain.HoloNET.Client.Embedded.MacX64.Holochain071`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.Client.Embedded.MacX64.Holochain071) | 4.6.0 |
+| [`NextGenSoftware.Holochain.HoloNET.Client.Embedded.MacX64.Holochain070`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.Client.Embedded.MacX64.Holochain070) | 4.6.0 |
+| [`NextGenSoftware.Holochain.HoloNET.Client.Embedded.MacArm64`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.Client.Embedded.MacArm64) | 4.6.0 |
+| [`NextGenSoftware.Holochain.HoloNET.Client.Embedded.MacArm64.Holochain071`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.Client.Embedded.MacArm64.Holochain071) | 4.6.0 |
+| [`NextGenSoftware.Holochain.HoloNET.Client.Embedded.MacArm64.Holochain070`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.Client.Embedded.MacArm64.Holochain070) | 4.6.0 |
 | [`NextGenSoftware.Holochain.HoloNET.ORM`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.ORM) | 4.6.0 |
 | [`NextGenSoftware.Holochain.HoloNET.ORM.Embedded`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.ORM.Embedded) | 4.6.0 |
 | [`NextGenSoftware.Holochain.HoloNET.ORM.Embedded.Holochain071`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.ORM.Embedded.Holochain071) | 4.6.0 |
 | [`NextGenSoftware.Holochain.HoloNET.ORM.Embedded.Holochain070`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.ORM.Embedded.Holochain070) | 4.6.0 |
+| [`NextGenSoftware.Holochain.HoloNET.ORM.Embedded.LinuxX64`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.ORM.Embedded.LinuxX64) | 4.6.0 |
+| [`NextGenSoftware.Holochain.HoloNET.ORM.Embedded.LinuxX64.Holochain071`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.ORM.Embedded.LinuxX64.Holochain071) | 4.6.0 |
+| [`NextGenSoftware.Holochain.HoloNET.ORM.Embedded.LinuxX64.Holochain070`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.ORM.Embedded.LinuxX64.Holochain070) | 4.6.0 |
+| [`NextGenSoftware.Holochain.HoloNET.ORM.Embedded.LinuxArm64`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.ORM.Embedded.LinuxArm64) | 4.6.0 |
+| [`NextGenSoftware.Holochain.HoloNET.ORM.Embedded.LinuxArm64.Holochain071`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.ORM.Embedded.LinuxArm64.Holochain071) | 4.6.0 |
+| [`NextGenSoftware.Holochain.HoloNET.ORM.Embedded.LinuxArm64.Holochain070`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.ORM.Embedded.LinuxArm64.Holochain070) | 4.6.0 |
+| [`NextGenSoftware.Holochain.HoloNET.ORM.Embedded.MacX64`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.ORM.Embedded.MacX64) | 4.6.0 |
+| [`NextGenSoftware.Holochain.HoloNET.ORM.Embedded.MacX64.Holochain071`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.ORM.Embedded.MacX64.Holochain071) | 4.6.0 |
+| [`NextGenSoftware.Holochain.HoloNET.ORM.Embedded.MacX64.Holochain070`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.ORM.Embedded.MacX64.Holochain070) | 4.6.0 |
+| [`NextGenSoftware.Holochain.HoloNET.ORM.Embedded.MacArm64`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.ORM.Embedded.MacArm64) | 4.6.0 |
+| [`NextGenSoftware.Holochain.HoloNET.ORM.Embedded.MacArm64.Holochain071`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.ORM.Embedded.MacArm64.Holochain071) | 4.6.0 |
+| [`NextGenSoftware.Holochain.HoloNET.ORM.Embedded.MacArm64.Holochain070`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.ORM.Embedded.MacArm64.Holochain070) | 4.6.0 |
 | [`NextGenSoftware.Holochain.HoloNET.HyperNET`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.HyperNET) | 4.6.0 |
 | [`NextGenSoftware.Holochain.HoloNET.HyperNET.Embedded`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.HyperNET.Embedded) | 4.6.0 |
 | [`NextGenSoftware.Holochain.HoloNET.HyperNET.Embedded.Holochain071`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.HyperNET.Embedded.Holochain071) | 4.6.0 |
 | [`NextGenSoftware.Holochain.HoloNET.HyperNET.Embedded.Holochain070`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.HyperNET.Embedded.Holochain070) | 4.6.0 |
+| [`NextGenSoftware.Holochain.HoloNET.HyperNET.Embedded.LinuxX64`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.HyperNET.Embedded.LinuxX64) | 4.6.0 |
+| [`NextGenSoftware.Holochain.HoloNET.HyperNET.Embedded.LinuxX64.Holochain071`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.HyperNET.Embedded.LinuxX64.Holochain071) | 4.6.0 |
+| [`NextGenSoftware.Holochain.HoloNET.HyperNET.Embedded.LinuxX64.Holochain070`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.HyperNET.Embedded.LinuxX64.Holochain070) | 4.6.0 |
+| [`NextGenSoftware.Holochain.HoloNET.HyperNET.Embedded.LinuxArm64`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.HyperNET.Embedded.LinuxArm64) | 4.6.0 |
+| [`NextGenSoftware.Holochain.HoloNET.HyperNET.Embedded.LinuxArm64.Holochain071`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.HyperNET.Embedded.LinuxArm64.Holochain071) | 4.6.0 |
+| [`NextGenSoftware.Holochain.HoloNET.HyperNET.Embedded.LinuxArm64.Holochain070`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.HyperNET.Embedded.LinuxArm64.Holochain070) | 4.6.0 |
+| [`NextGenSoftware.Holochain.HoloNET.HyperNET.Embedded.MacX64`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.HyperNET.Embedded.MacX64) | 4.6.0 |
+| [`NextGenSoftware.Holochain.HoloNET.HyperNET.Embedded.MacX64.Holochain071`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.HyperNET.Embedded.MacX64.Holochain071) | 4.6.0 |
+| [`NextGenSoftware.Holochain.HoloNET.HyperNET.Embedded.MacX64.Holochain070`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.HyperNET.Embedded.MacX64.Holochain070) | 4.6.0 |
+| [`NextGenSoftware.Holochain.HoloNET.HyperNET.Embedded.MacArm64`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.HyperNET.Embedded.MacArm64) | 4.6.0 |
+| [`NextGenSoftware.Holochain.HoloNET.HyperNET.Embedded.MacArm64.Holochain071`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.HyperNET.Embedded.MacArm64.Holochain071) | 4.6.0 |
+| [`NextGenSoftware.Holochain.HoloNET.HyperNET.Embedded.MacArm64.Holochain070`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.HyperNET.Embedded.MacArm64.Holochain070) | 4.6.0 |
 | [`NextGenSoftware.Holochain.HoloNET.HDK`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.HDK) | 4.6.0 |
 | [`NextGenSoftware.Holochain.HoloNET.HDK.Embedded`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.HDK.Embedded) | 4.6.0 |
 | [`NextGenSoftware.Holochain.HoloNET.HDK.Embedded.Holochain071`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.HDK.Embedded.Holochain071) | 4.6.0 |
@@ -59,6 +110,18 @@ ORM, HyperNET, HDK, Manager, API and TestHarness depend on the Client variant th
 | [`NextGenSoftware.Holochain.HoloNET.API.Embedded`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.API.Embedded) | 4.6.0 |
 | [`NextGenSoftware.Holochain.HoloNET.API.Embedded.Holochain071`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.API.Embedded.Holochain071) | 4.6.0 |
 | [`NextGenSoftware.Holochain.HoloNET.API.Embedded.Holochain070`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.API.Embedded.Holochain070) | 4.6.0 |
+| [`NextGenSoftware.Holochain.HoloNET.API.Embedded.LinuxX64`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.API.Embedded.LinuxX64) | 4.6.0 |
+| [`NextGenSoftware.Holochain.HoloNET.API.Embedded.LinuxX64.Holochain071`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.API.Embedded.LinuxX64.Holochain071) | 4.6.0 |
+| [`NextGenSoftware.Holochain.HoloNET.API.Embedded.LinuxX64.Holochain070`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.API.Embedded.LinuxX64.Holochain070) | 4.6.0 |
+| [`NextGenSoftware.Holochain.HoloNET.API.Embedded.LinuxArm64`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.API.Embedded.LinuxArm64) | 4.6.0 |
+| [`NextGenSoftware.Holochain.HoloNET.API.Embedded.LinuxArm64.Holochain071`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.API.Embedded.LinuxArm64.Holochain071) | 4.6.0 |
+| [`NextGenSoftware.Holochain.HoloNET.API.Embedded.LinuxArm64.Holochain070`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.API.Embedded.LinuxArm64.Holochain070) | 4.6.0 |
+| [`NextGenSoftware.Holochain.HoloNET.API.Embedded.MacX64`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.API.Embedded.MacX64) | 4.6.0 |
+| [`NextGenSoftware.Holochain.HoloNET.API.Embedded.MacX64.Holochain071`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.API.Embedded.MacX64.Holochain071) | 4.6.0 |
+| [`NextGenSoftware.Holochain.HoloNET.API.Embedded.MacX64.Holochain070`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.API.Embedded.MacX64.Holochain070) | 4.6.0 |
+| [`NextGenSoftware.Holochain.HoloNET.API.Embedded.MacArm64`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.API.Embedded.MacArm64) | 4.6.0 |
+| [`NextGenSoftware.Holochain.HoloNET.API.Embedded.MacArm64.Holochain071`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.API.Embedded.MacArm64.Holochain071) | 4.6.0 |
+| [`NextGenSoftware.Holochain.HoloNET.API.Embedded.MacArm64.Holochain070`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.API.Embedded.MacArm64.Holochain070) | 4.6.0 |
 | [`NextGenSoftware.Holochain.HoloNET.Client.TestHarness`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.Client.TestHarness) | 4.6.0 |
 | [`NextGenSoftware.Holochain.HoloNET.Client.TestHarness.Embedded`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.Client.TestHarness.Embedded) | 4.6.0 |
 | [`NextGenSoftware.Holochain.HoloNET.Client.TestHarness.Embedded.Holochain071`](https://www.nuget.org/packages/NextGenSoftware.Holochain.HoloNET.Client.TestHarness.Embedded.Holochain071) | 4.6.0 |

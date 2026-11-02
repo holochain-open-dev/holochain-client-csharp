@@ -10,11 +10,19 @@
   python scripts/holonet_packages.py set-version X.Y.Z       one new version for the whole family (manifest, csproj files, release notes)
 
 Variants: none = no conductor; both = .Embedded (Holochain 0.7.1 and 0.7.0); 0.7.1 = .Embedded.Holochain071; 0.7.0 = .Embedded.Holochain070.
+Those are for Windows. The libraries that list "platforms" in packages.json also have the same three for Linux and macOS, written "<version>@<platform>":
+.Embedded.LinuxX64 / .LinuxArm64 / .MacX64 / .MacArm64, then .Holochain071 / .Holochain070 (both versions = nothing after the platform).
 """
 import glob, io, json, os, re, shutil, subprocess, sys, tempfile, time, urllib.request, xml.etree.ElementTree as ET, zipfile
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SUFFIX = {'none': '', 'both': '.Embedded', '0.7.1': '.Embedded.Holochain071', '0.7.0': '.Embedded.Holochain070'}
+PLATFORM_SUFFIX = {'linux-x64': '.LinuxX64', 'linux-arm64': '.LinuxArm64', 'osx-x64': '.MacX64', 'osx-arm64': '.MacArm64'}
+PLATFORM_NAME = {'linux-x64': 'Linux x64', 'linux-arm64': 'Linux arm64', 'osx-x64': 'macOS Intel', 'osx-arm64': 'macOS Apple Silicon'}
+VERSION_SUFFIX = {'both': '', '0.7.1': '.Holochain071', '0.7.0': '.Holochain070'}
+# Matches a package id's Embedded part, whichever platform and version it is for.
+EMBEDDED_RE = r'\.Embedded(?:\.(?:LinuxX64|LinuxArm64|MacX64|MacArm64))?(?:\.Holochain07[01])?$'
+NUGET_LIMIT_MB = 250   # nuget.org rejects bigger packages
 CLIENT = 'NextGenSoftware.Holochain.HoloNET.Client'
 FAMILY_PREFIX = 'NextGenSoftware.Holochain.HoloNET.'
 
@@ -23,14 +31,39 @@ def manifest():
     return json.load(io.open(os.path.join(REPO, 'packages.json'), encoding='utf-8'))
 
 
+def split_variant(variant):
+    """'0.7.1@linux-x64' -> ('0.7.1', 'linux-x64'); a Windows variant such as '0.7.1' -> ('0.7.1', None)."""
+    version, _, platform = variant.partition('@')
+    return version, platform or None
+
+
+def suffix(variant):
+    version, platform = split_variant(variant)
+    if platform:
+        return '.Embedded' + PLATFORM_SUFFIX[platform] + VERSION_SUFFIX[version]
+    return SUFFIX[variant]
+
+
+def variants(lib):
+    """Every variant of a library: the Windows ones it lists, then each listed platform x (both, 0.7.1, 0.7.0)."""
+    extra = [f'{v}@{p}' for p in lib.get('platforms', []) for v in ('both', '0.7.1', '0.7.0')]
+    return list(lib['variants']) + extra
+
+
 def packages(m=None):
     """(library, variant, package id) for everything a release produces."""
     m = m or manifest()
-    return [(lib, v, lib['id'] + SUFFIX[v]) for lib in m['libraries'] for v in lib['variants']]
+    return [(lib, v, lib['id'] + suffix(v)) for lib in m['libraries'] for v in variants(lib)]
 
 
 def props(variant):
-    return [] if variant == 'none' else ['-p:Embedded=true', '-p:EmbeddedHolochain=' + variant]
+    if variant == 'none':
+        return []
+    version, platform = split_variant(variant)
+    p = ['-p:Embedded=true', '-p:EmbeddedHolochain=' + version]
+    if platform:
+        p += ['-p:EmbeddedPlatform=' + platform, '-p:EmbeddedPackageSuffix=' + suffix(variant)[len('.Embedded'):]]
+    return p
 
 
 def run(cmd, cwd=REPO, check=True):
@@ -73,12 +106,17 @@ def check(partial=False):
         for v in lib['variants']:
             if v != 'none' and (lib['id'] + SUFFIX[v]) not in re.findall(r'<PackageId[^>]*>([^<]+)</PackageId>', text):
                 errors.append(f'{lib["project"]}: manifest says variant "{v}" but the project has no PackageId {lib["id"]}{SUFFIX[v]}')
+        if lib.get('platforms') and (lib['id'] + '.Embedded$(EmbeddedPackageSuffix)') not in re.findall(r'<PackageId[^>]*>([^<]+)</PackageId>', text):
+            errors.append(f'{lib["project"]}: the manifest lists platforms but the project has no PackageId {lib["id"]}.Embedded$(EmbeddedPackageSuffix)')
+        for pl in lib.get('platforms', []):
+            if pl not in PLATFORM_SUFFIX:
+                errors.append(f'{lib["id"]}: unknown platform {pl}')
         csproj_version = re.search(r'<Version>([^<]+)</Version>', text)
         if not csproj_version or csproj_version.group(1) != m['version']:
             errors.append(f'{lib["project"]}: <Version> is {csproj_version.group(1) if csproj_version else "missing"}, but the family version is {m["version"]} (run set-version)')
         # Variants are build properties on one project, never copies.
-        if text.count('<PackageId') > 4:
-            errors.append(f'{lib["project"]}: more than four PackageId lines (variants must be build properties, not copies)')
+        if text.count('<PackageId') > (5 if lib.get('platforms') else 4):
+            errors.append(f'{lib["project"]}: too many PackageId lines (variants must be build properties, not copies)')
 
     # Every packable project in the repo must be listed, or excluded on purpose.
     excluded = [os.path.normpath(p) for p in m.get('exclude_projects', [])]
@@ -96,7 +134,7 @@ def check(partial=False):
 
     # Embedded libraries must reference the Client as a project reference (so the property flows), not copy it.
     for lib in m['libraries']:
-        if lib['id'] != CLIENT and len(lib['variants']) > 1 and os.path.exists(os.path.join(REPO, lib['project'])):
+        if lib['id'] != CLIENT and len(variants(lib)) > 1 and os.path.exists(os.path.join(REPO, lib['project'])):
             text = io.open(os.path.join(REPO, lib['project']), encoding='utf-8-sig').read()
             if 'NextGenSoftware.Holochain.HoloNET.Client.csproj' not in text:
                 errors.append(f'{lib["project"]}: has Embedded variants but no ProjectReference to the HoloNET Client')
@@ -121,7 +159,7 @@ def packages_markdown(m):
         '',
         '<!-- Generated from packages.json by `python scripts/holonet_packages.py docs`. Do not edit by hand. -->',
         '',
-        f'HoloNET is {len(libs)} libraries, each published as {len(SUFFIX)} NuGet packages, plus a template pack: **{n_total} packages**, all released together at **version {version}**.',
+        f'HoloNET is {len(libs)} libraries, each published as {len(SUFFIX)} NuGet packages (more for the ones with Linux and macOS conductors), plus a template pack: **{n_total} packages**, all released together at **version {version}**.',
         'Every package has the same version, so you never have to work out which versions go together.',
         '',
         '## The libraries',
@@ -144,9 +182,31 @@ def packages_markdown(m):
         '| `.Embedded.Holochain071` | Holochain 0.7.1 only | The same, with a smaller download. |',
         '| `.Embedded.Holochain070` | Holochain 0.7.0 only | The same, for hApps built against 0.7.0. |',
         '',
-        'The bundled conductors are Windows programs. On other systems use the package with no suffix and run your own conductor. Use one variant per app: they have the same API and namespaces.',
+        'Those are the Windows conductors. For Linux and macOS see the next section; for browser and phone apps use the package with no suffix and run your own conductor. Use one variant per app: they have the same API and namespaces.',
         'ORM, HyperNET, HDK, Manager, API and TestHarness depend on the Client variant that matches their own, so an `.Embedded.Holochain071` package always pulls in the Client with 0.7.1 and nothing else.',
         '',
+    ]
+    plat_libs = [l for l in libs if l.get('platforms')]
+    if plat_libs:
+        names = ', '.join(f"`{l['name']}`" for l in plat_libs)
+        lines += [
+            '## Offline packages for Linux and macOS',
+            '',
+            f'{names} also come with the conductor bundled for Linux and macOS, so an app works with no internet and nothing to install. Each package holds one operating system and processor (so none is bigger than the Windows ones), and the same three Holochain choices:',
+            '',
+            '| Package suffix | For |',
+            '|---|---|',
+        ]
+        for pl in PLATFORM_SUFFIX:
+            lines.append(f'| `.Embedded{PLATFORM_SUFFIX[pl]}` | {PLATFORM_NAME[pl]} |')
+        lines += [
+            '',
+            'Add `.Holochain071` or `.Holochain070` after the platform for a single Holochain version, for example `NextGenSoftware.Holochain.HoloNET.Client.Embedded.LinuxArm64.Holochain071`. With no version suffix the package holds 0.7.1 and 0.7.0 and you choose with `HoloNETDNA.EmbeddedHolochainVersion`.',
+            'You do not have to use these: with the plain package HoloNET downloads the right conductor the first time ([where the conductor comes from](conductor.md)). Use them when the machine is offline or you want a fixed, tested conductor inside the package.',
+            'A package built for another system is noticed at run time and HoloNET falls back to the conductor on the PATH or the download.',
+            '',
+        ]
+    lines += [
         '## All packages',
         '',
         '| Package | Version |',
@@ -221,6 +281,9 @@ def pack(out, only=None):
     for lib, variant, pid in packages(m):
         if only and pid not in only and lib['id'] not in only:
             continue
+        _, platform = split_variant(variant)
+        if platform:
+            run([sys.executable, os.path.join(REPO, 'scripts', 'fetch_conductors.py'), platform])   # downloads + SHA-256 checks; a no-op once present
         # The version comes from each csproj (set-version writes it; check enforces it equals the manifest). It must NOT be a
         # global -p:Version: that flows into referenced projects too (e.g. Chaos.NaCl), giving them a different assembly
         # version from the copy that other packages bring, which breaks the HDK build (CS1704).
@@ -261,13 +324,16 @@ def verify_packed(out):
             continue
         if lib.get('kind') == 'templates':
             continue   # a template pack depends on nothing; the template tests check what it generates
+        size_mb = os.path.getsize(path) / 1048576
+        if size_mb > NUGET_LIMIT_MB:
+            errors.append(f'{pid}: {size_mb:.0f} MB is over the {NUGET_LIMIT_MB} MB nuget.org limit')
         deps = nuspec_deps(path)
         family = {d: v for d, v in deps.items() if d.startswith(FAMILY_PREFIX)}
         for d, v in family.items():
             if v and not v.startswith(version) and not v.startswith('[' + version):
                 errors.append(f'{pid}: depends on {d} {v}, not the family version {version}')
-            want = SUFFIX[variant]
-            base = re.sub(r'\.Embedded(\.Holochain07[01])?$', '', d)
+            want = suffix(variant)
+            base = re.sub(EMBEDDED_RE, '', d)
             if d != base + want:
                 errors.append(f'{pid}: depends on {d}, but a "{variant}" package must depend on {base}{want} (variants must not mix)')
         if lib['id'] != CLIENT and not any(d.startswith(CLIENT) for d in family) and not any(d.startswith(FAMILY_PREFIX) for d in family):

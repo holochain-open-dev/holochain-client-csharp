@@ -8,6 +8,8 @@
 	  <PackageId Condition="'$(Embedded)' == 'true' And ('$(EmbeddedHolochain)' == '' Or '$(EmbeddedHolochain)' == 'both')">NextGenSoftware.Holochain.HoloNET.Client.Embedded</PackageId>
 	  <PackageId Condition="'$(Embedded)' == 'true' And '$(EmbeddedHolochain)' == '0.7.1'">NextGenSoftware.Holochain.HoloNET.Client.Embedded.Holochain071</PackageId>
 	  <PackageId Condition="'$(Embedded)' == 'true' And '$(EmbeddedHolochain)' == '0.7.0'">NextGenSoftware.Holochain.HoloNET.Client.Embedded.Holochain070</PackageId>
+	  <!-- Linux / macOS Embedded packages: scripts/holonet_packages.py passes -p:EmbeddedPlatform=linux-x64|linux-arm64|osx-x64|osx-arm64 and -p:EmbeddedPackageSuffix=.LinuxX64.Holochain071 etc. -->
+	  <PackageId Condition="'$(Embedded)' == 'true' And '$(EmbeddedPackageSuffix)' != ''">NextGenSoftware.Holochain.HoloNET.Client.Embedded$(EmbeddedPackageSuffix)</PackageId>
 	  <Company>NextGen Software Ltd</Company>
 	  <Product>HoloNET Holochain Client</Product>
 	  <Title>HoloNET Holochain Client</Title>
@@ -156,14 +158,34 @@ Full changelog: https://github.com/holochain-open-dev/holochain-client-csharp/bl
     <EmbeddedResource Include="Resources\ConductorHashes.json" LogicalName="HoloNET.ConductorHashes.json" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(Embedded)' == 'true' And '$(EmbeddedHolochain)' != '0.7.0'">
+  <PropertyGroup Condition="'$(Embedded)' == 'true' And '$(EmbeddedPlatform)' == ''">
+    <EmbeddedPlatform>win-x64</EmbeddedPlatform>
+  </PropertyGroup>
+
+  <!-- Says which operating system and processor this Embedded package's conductors are for (HoloNET.Embedded.platform.<rid>), so a Linux package used on Windows is noticed. -->
+  <ItemGroup Condition="'$(Embedded)' == 'true'">
+    <EmbeddedResource Include="Resources\platform-marker.txt" LogicalName="HoloNET.Embedded.platform.$(EmbeddedPlatform)" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(Embedded)' == 'true' And '$(EmbeddedPlatform)' == 'win-x64' And '$(EmbeddedHolochain)' != '0.7.0'">
     <EmbeddedResource Include="Resources\holochain.exe" LogicalName="HoloNET.Embedded.holochain-0.7.1.exe" />
     <EmbeddedResource Include="Resources\hc.exe" LogicalName="HoloNET.Embedded.hc-0.7.1.exe" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(Embedded)' == 'true' And '$(EmbeddedHolochain)' != '0.7.1'">
+  <ItemGroup Condition="'$(Embedded)' == 'true' And '$(EmbeddedPlatform)' == 'win-x64' And '$(EmbeddedHolochain)' != '0.7.1'">
     <EmbeddedResource Include="Resources\holochain-0.7.0.exe" LogicalName="HoloNET.Embedded.holochain-0.7.0.exe" />
     <EmbeddedResource Include="Resources\hc-0.7.0.exe" LogicalName="HoloNET.Embedded.hc-0.7.0.exe" />
+  </ItemGroup>
+
+  <!-- Linux and macOS: the official binaries, downloaded and SHA-256 checked by scripts/fetch_conductors.py before the build. The resource names are the same as on Windows. -->
+  <ItemGroup Condition="'$(Embedded)' == 'true' And '$(EmbeddedPlatform)' != 'win-x64' And '$(EmbeddedHolochain)' != '0.7.0'">
+    <EmbeddedResource Include="Resources\conductors\$(EmbeddedPlatform)\holochain-0.7.1" LogicalName="HoloNET.Embedded.holochain-0.7.1.exe" />
+    <EmbeddedResource Include="Resources\conductors\$(EmbeddedPlatform)\hc-0.7.1" LogicalName="HoloNET.Embedded.hc-0.7.1.exe" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(Embedded)' == 'true' And '$(EmbeddedPlatform)' != 'win-x64' And '$(EmbeddedHolochain)' != '0.7.1'">
+    <EmbeddedResource Include="Resources\conductors\$(EmbeddedPlatform)\holochain-0.7.0" LogicalName="HoloNET.Embedded.holochain-0.7.0.exe" />
+    <EmbeddedResource Include="Resources\conductors\$(EmbeddedPlatform)\hc-0.7.0" LogicalName="HoloNET.Embedded.hc-0.7.0.exe" />
   </ItemGroup>
 
   <ItemGroup>

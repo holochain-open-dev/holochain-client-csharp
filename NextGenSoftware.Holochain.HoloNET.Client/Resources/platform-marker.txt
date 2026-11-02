@@ -1,0 +1,1 @@
+Embedded platform marker (file content is irrelevant; its resource name says which OS/CPU the package carries)

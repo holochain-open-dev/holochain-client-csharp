@@ -10,6 +10,8 @@
     "variants (per library): none = the lightweight package, no conductor | both = .Embedded (Holochain 0.7.1 + 0.7.0, pick with",
     "HoloNETDNA.EmbeddedHolochainVersion) | 0.7.1 = .Embedded.Holochain071 | 0.7.0 = .Embedded.Holochain070.",
     "Only the Client carries the conductor binaries; every other library's Embedded variant depends on the matching Client package.",
+  "platforms (per library): the Client, ORM, HyperNET and API also come as offline Embedded packages for Linux and macOS: every platform x (both | 0.7.1 | 0.7.0),",
+  "named .Embedded.LinuxX64 / .LinuxArm64 / .MacX64 / .MacArm64 (+ .Holochain071 / .Holochain070). Their conductors are downloaded and SHA-256 checked by scripts/fetch_conductors.py at pack time.",
     "exclude_projects: projects that declare a package but are deliberately not published (templates, tests, examples). Paths relative to the repo; a trailing * matches a prefix."
   ],
   "version": "4.6.0",
@@ -23,6 +25,7 @@
         "0.7.1",
         "0.7.0"
       ],
+   "platforms": ["linux-x64", "linux-arm64", "osx-x64", "osx-arm64"],
       "name": "Client",
       "description": "Connect to a Holochain conductor, install hApps, call zome functions and receive signals. Everything else builds on it."
     },
@@ -35,6 +38,7 @@
         "0.7.1",
         "0.7.0"
       ],
+   "platforms": ["linux-x64", "linux-arm64", "osx-x64", "osx-arm64"],
       "name": "ORM",
       "description": "Save, load, change and delete your own C# classes on Holochain, with change tracking and collections. Includes the Client."
     },
@@ -47,6 +51,7 @@
         "0.7.1",
         "0.7.0"
       ],
+   "platforms": ["linux-x64", "linux-arm64", "osx-x64", "osx-arm64"],
       "name": "HyperNET",
       "description": "Real-time player-to-player messaging for games and apps: zones, area of interest, reliable messages. Includes the Client."
     },
@@ -83,6 +88,7 @@
         "0.7.1",
         "0.7.0"
       ],
+   "platforms": ["linux-x64", "linux-arm64", "osx-x64", "osx-arm64"],
       "name": "API",
       "description": "The simple API: one line to save, load and delete data, share it with every agent and hear when it changes. Includes the Client and the OASIS hApp."
     },

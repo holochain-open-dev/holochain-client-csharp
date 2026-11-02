@@ -93,5 +93,32 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
                 if (Directory.Exists(folder)) Directory.Delete(folder, true);
             }
         }
+
+        [Fact]
+        public void EmbeddedPlatform_MatchesTheDownloadAssetForThisComputer()
+        {
+            string platform = HoloNETClientBase.CurrentEmbeddedPlatform();
+            Assert.NotNull(platform);
+
+            // win-x64 <-> x86_64-pc-windows-msvc, linux-arm64 <-> aarch64-unknown-linux-gnu, osx-x64 <-> x86_64-apple-darwin, and so on.
+            string triple = HolochainConductorDownloader.PlatformTriple();
+            string expected = platform switch
+            {
+                "win-x64" => "x86_64-pc-windows-msvc",
+                "linux-x64" => "x86_64-unknown-linux-gnu",
+                "linux-arm64" => "aarch64-unknown-linux-gnu",
+                "osx-x64" => "x86_64-apple-darwin",
+                "osx-arm64" => "aarch64-apple-darwin",
+                _ => null
+            };
+            Assert.Equal(expected, triple);
+        }
+
+        [Fact]
+        public void LightweightPackage_BundlesNoConductorForThisComputer()
+        {
+            // The tests build the lightweight Client: no Embedded package, so UseEmbedded falls back to the PATH / download on Linux and macOS.
+            Assert.False(HoloNETClientBase.IsEmbeddedBundleForThisComputer());
+        }
     }
 }

@@ -268,3 +268,6 @@ NextGenSoftware.OASIS.API.ONODE.WebUI.HTML/react-app/yarn.lock
 *.map
 
 /.holochain-test/
+
+# Conductors the Linux/macOS Embedded packages bundle are downloaded at pack time (scripts/fetch_conductors.py)
+NextGenSoftware.Holochain.HoloNET.Client/Resources/conductors/

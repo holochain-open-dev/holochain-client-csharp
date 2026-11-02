@@ -205,7 +205,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             return null;
         }
 
-        private static void MakeExecutable(string path)
+        internal static void MakeExecutable(string path)
         {
             if (IsWindows)
                 return;

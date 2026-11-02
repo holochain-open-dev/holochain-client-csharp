@@ -598,8 +598,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             string conductorVersion = string.IsNullOrWhiteSpace(HoloNETDNA.HolochainConductorVersion) ? EmbeddedHolochainVersionString(HoloNETDNA.EmbeddedHolochainVersion) : HoloNETDNA.HolochainConductorVersion.Trim();
             HolochainConductorModeEnum conductorMode = HoloNETDNA.HolochainConductorMode;
 
-            // The conductors bundled in the Embedded packages are Windows binaries; elsewhere use the one on the PATH, or the one HoloNET downloads.
-            if (conductorMode == HolochainConductorModeEnum.UseEmbedded && !onWindows)
+            // The Windows Embedded packages bundle Windows binaries, the .Embedded.Linux*/.Mac* packages bundle theirs. Anywhere the bundled conductor is not for this
+            // computer (the lightweight package, or a package for another system) use the one on the PATH, or the one HoloNET downloads.
+            // (On Windows the lightweight package still fails with its usual "install the Embedded package" message.)
+            if (conductorMode == HolochainConductorModeEnum.UseEmbedded && !IsEmbeddedBundleForThisComputer()
+                && (!onWindows || IsEmbeddedHolochainVersionBundled(EmbeddedHolochainVersion.V0_7_1) || IsEmbeddedHolochainVersionBundled(EmbeddedHolochainVersion.V0_7_0)))
                 conductorMode = HolochainConductorModeEnum.UseSystemGlobal;
 
             try
