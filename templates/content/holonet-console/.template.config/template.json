@@ -177,7 +177,7 @@
       "choices": [
         {
           "choice": "auto",
-          "description": "Bundled in the app on Windows; otherwise one you start (start-conductor script included)."
+          "description": "Bundled in the app on Windows; elsewhere HoloNET starts the Holochain on this computer, downloading the official one the first time."
         },
         {
           "choice": "embedded",
@@ -192,6 +192,10 @@
     "UseEmbedded": {
       "type": "computed",
       "value": "(Conductor == \"embedded\" || (Conductor == \"auto\" && OS == \"Windows_NT\"))"
+    },
+    "YouStartConductor": {
+      "type": "computed",
+      "value": "(Conductor == \"external\")"
     }
   },
   "sources": [

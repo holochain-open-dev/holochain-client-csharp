@@ -9,6 +9,7 @@ HoloNET is the .NET and Unity client for [Holochain](https://holochain.org), plu
 | Start a new app in your favourite .NET app type (one command) | [Templates](templates.md) |
 | Pick a package and make your first zome call | [Getting started](getting-started.md) |
 | See every package and which one to pick | [Packages](packages.md) |
+| Know where the conductor comes from (installed, bundled or downloaded for you) | [Where the conductor comes from](conductor.md) |
 | Store and load data with no Rust and no setup | [HoloNET API guide](api-guide.md) |
 | Map your C# classes onto your hApp's entries | [HoloNET ORM guide](orm-guide.md) |
 | Talk to the conductor directly (admin, app, signals) | [HoloNET Client guide](client-guide.md) |

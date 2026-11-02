@@ -161,6 +161,22 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             return null;
         }
 
+        private readonly System.Text.StringBuilder _conductorOutput = new System.Text.StringBuilder();
+
+        private void KeepConductorOutput(string line)
+        {
+            if (line == null)
+                return;
+
+            lock (_conductorOutput)
+            {
+                _conductorOutput.AppendLine(line);
+
+                if (_conductorOutput.Length > 8000)
+                    _conductorOutput.Remove(0, _conductorOutput.Length - 6000);
+            }
+        }
+
         private string HcHolochainPathArgument() => string.IsNullOrEmpty(_hcHolochainPath) ? "" : $" -H '{_hcHolochainPath}'";
 
         protected int _currentId = 0;
@@ -839,8 +855,10 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                         _conductorProcess.StartInfo.RedirectStandardInput = true;
                         _conductorProcess.StartInfo.RedirectStandardOutput = true;
                         _conductorProcess.StartInfo.RedirectStandardError = true;
-                        _conductorProcess.OutputDataReceived += (s, e) => { }; // drained, so the conductor never blocks on a full pipe
-                        _conductorProcess.ErrorDataReceived += (s, e) => { };
+                        // Drained, so the conductor never blocks on a full pipe; the last few KB are kept to explain a conductor that does not start.
+                        lock (_conductorOutput) _conductorOutput.Clear();
+                        _conductorProcess.OutputDataReceived += (s, e) => KeepConductorOutput(e.Data);
+                        _conductorProcess.ErrorDataReceived += (s, e) => KeepConductorOutput(e.Data);
                     }
 
                     _conductorProcess.Start();
@@ -858,7 +876,14 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     //await Task.Delay(HoloNETDNA.SecondsToWaitForHolochainConductorToStart * 1000); // Give the conductor 5 (default) seconds to start up...
                     // Wait until the admin port accepts connections (at most SecondsToWaitForHolochainConductorToStart): a fixed
                     // delay was either too short (hc generate on a slow machine) or wasted time when the conductor was quicker.
-                    await WaitForConductorPortAsync(EndPoint, Math.Max(HoloNETDNA.SecondsToWaitForHolochainConductorToStart, 1) * 1000);
+                    if (!await WaitForConductorPortAsync(EndPoint, Math.Max(HoloNETDNA.SecondsToWaitForHolochainConductorToStart, 1) * 1000))
+                    {
+                        string exited = !onWindows && _conductorProcess.HasExited ? $" The conductor process exited with code {_conductorProcess.ExitCode}." : "";
+                        string output;
+                        lock (_conductorOutput) output = _conductorOutput.ToString().Trim();
+                        Logger.Log($"The Holochain conductor did not open {EndPoint} within {HoloNETDNA.SecondsToWaitForHolochainConductorToStart} seconds.{exited}{(output.Length > 0 ? " Its output:" + Environment.NewLine + output : "")}", LogType.Warning);
+                    }
+
                     OnHolochainConductorStarted?.Invoke(this, new HolochainConductorStartedEventArgs());
                 }
             }

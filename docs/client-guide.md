@@ -24,6 +24,9 @@ The most used settings:
 | `HolochainConductorMode` | `UseSystemGlobal` | `UseEmbedded` starts the conductor an `.Embedded` package bundles. `UseExternal` starts one at `FullPathToExternalHolochainConductorBinary`. `UseSystemGlobal` uses the `holochain` on your PATH. |
 | `EmbeddedHolochainVersion` | `V0_7_1` | Which bundled conductor to start (dual-version Embedded package). |
 | `AutoStartHolochainConductor` / `AutoShutdownHolochainConductor` | `true` | Start the conductor on connect and stop it on disconnect. Turn both off for a conductor you run yourself. |
+| `AutoDownloadConductor` | `true` | When a conductor is needed and none is installed, download the official one for this OS and CPU (SHA-256 checked) the first time. Set `false` on machines that must not download. See [Where the conductor comes from](conductor.md). |
+| `HolochainConductorVersion` | empty | Which Holochain release to download, for example `"0.7.1"`. Empty uses `EmbeddedHolochainVersion`. |
+| `AllowUnverifiedConductorDownload` | `false` | Download a release with no known SHA-256 unchecked. Leave off. |
 | `AppAuthenticationToken` | none | The app-interface token (Holochain 0.6+). Issued for you by the helper. |
 | `InstalledAppId`, `AgentPubKey`, `DnaHash`, `CellId` | found after connect | Which app and cell zome calls go to. |
 | `LogToConsole`, `LogToFile`, `LogPath`, `FileLoggingMode` | on, AppData | Logging. |

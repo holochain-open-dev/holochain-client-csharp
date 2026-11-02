@@ -25,6 +25,7 @@ DOCS_PAGES = [
     ('getting-started', 'docs/getting-started.md', 'Getting started', 'Overview', 'Guide'),
     ('templates', 'docs/templates.md', 'Project templates', 'Overview', 'Guide'),
     ('packages', 'docs/packages.md', 'Packages', 'Overview', 'Guide'),
+    ('conductor', 'docs/conductor.md', 'Where the conductor comes from', 'Overview', 'Guide'),
     ('examples', 'examples/README.md', 'Examples', 'Overview', 'Examples'),
     ('client-guide', 'docs/client-guide.md', 'HoloNET Client', 'Guides', 'Guide'),
     ('orm-guide', 'docs/orm-guide.md', 'HoloNET ORM', 'Guides', 'Guide'),

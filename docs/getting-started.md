@@ -6,9 +6,10 @@
 
 | You want | Package |
 |---|---|
-| HoloNET to start its own Holochain conductor (simplest) | `NextGenSoftware.Holochain.HoloNET.Client.Embedded` (bundles 0.7.1 and 0.7.0) |
-| The same, but a smaller download | `.Client.Embedded.Holochain071` or `.Client.Embedded.Holochain070` |
-| To use a conductor you already run (`hc sandbox`, a launcher, a server) | `NextGenSoftware.Holochain.HoloNET.Client` |
+| HoloNET to start its own Holochain conductor, on any OS (simplest) | `NextGenSoftware.Holochain.HoloNET.Client`: if no conductor is installed it downloads the official one the first time (`AutoDownloadConductor`, see [Where the conductor comes from](conductor.md)) |
+| The same, but it must work offline or never download | `NextGenSoftware.Holochain.HoloNET.Client.Embedded` (bundles 0.7.1 and 0.7.0, Windows) |
+| The same, with a smaller download | `.Client.Embedded.Holochain071` or `.Client.Embedded.Holochain070` |
+| To use a conductor you already run (`hc sandbox`, a launcher, a server) | `NextGenSoftware.Holochain.HoloNET.Client`, with `AutoStartHolochainConductor = false` |
 | Entry models and collections on top | the matching `NextGenSoftware.Holochain.HoloNET.ORM*` variant |
 | Just save and load data | `NextGenSoftware.Holochain.HoloNET.API` |
 | Multiplayer networking | `NextGenSoftware.Holochain.HoloNET.HyperNET` |

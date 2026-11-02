@@ -7,7 +7,9 @@ endpoint just calls `HoloNETDemo.RunAsync()` and shows the text it returns.
 
 ## Run it
 
-On Windows the default is a bundled conductor (the app starts and stops Holochain itself). Otherwise start one first, in another terminal:
+On Windows the default is a bundled conductor (the app starts and stops Holochain itself). On Linux and macOS HoloNET starts the Holochain on your
+computer, and the first time it downloads the official one (checked against a SHA-256) into your user folder; nothing to install.
+To use a conductor you run yourself instead, create the project with `--Conductor external` and start one first, in another terminal:
 
 ```bash
 ./start-conductor.sh        # Git Bash, Linux, macOS (needs Holochain 0.7.x on your PATH)

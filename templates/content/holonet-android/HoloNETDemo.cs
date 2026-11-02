@@ -38,8 +38,12 @@ namespace HoloNETDemos
             var dna = new HoloNETDNA { LogToConsole = false };
 //#if (true)
             dna.HolochainConductorAdminURI = AdminUri;
+//#if (true)
             dna.AutoStartHolochainConductor = false;     // you start the conductor yourself (see the start-conductor script)
             dna.AutoShutdownHolochainConductor = false;
+//#else
+            // Nothing bundled and no conductor of your own: HoloNET starts the Holochain on this computer, or downloads the official one the first time (HoloNETDNA.AutoDownloadConductor).
+//#endif
 //#endif
             return dna;
         }

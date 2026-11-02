@@ -664,10 +664,11 @@ def template_json(key, name, classifications, forced_external):
             'type': 'parameter', 'datatype': 'choice', 'defaultValue': 'auto',
             'description': 'Where the Holochain conductor comes from.',
             'choices': [
-                {'choice': 'auto', 'description': 'Bundled in the app on Windows; otherwise one you start (start-conductor script included).'},
+                {'choice': 'auto', 'description': 'Bundled in the app on Windows; elsewhere HoloNET starts the Holochain on this computer, downloading the official one the first time.'},
                 {'choice': 'embedded', 'description': 'Bundle the conductor in the app (Windows only).'},
                 {'choice': 'external', 'description': 'Use a conductor you run yourself on ws://localhost:7777 (start-conductor script included).'}]}
         sym['UseEmbedded'] = {'type': 'computed', 'value': '(Conductor == "embedded" || (Conductor == "auto" && OS == "Windows_NT"))'}
+        sym['YouStartConductor'] = {'type': 'computed', 'value': '(Conductor == "external")'}
     # the symbol switch conditions reference UseEmbedded and HolochainVersion: forced-external apps have neither a choice nor a version
     if forced_external:
         for case in sym['PackageSuffix']['parameters']['cases']:
@@ -727,7 +728,9 @@ def readme(key, name, forced_external):
             '`HoloNETDemo.AdminUri` (an Android emulator reaches your machine at `ws://10.0.2.2:7777`). The conductor installs the hApp from a path on\n'
             "*its* machine: set `HoloNETDemo.HappPath` to where `oasis.happ` (or your own `.happ`) is on the conductor's computer."
             if forced_external else
-            'On Windows the default is a bundled conductor (the app starts and stops Holochain itself). Otherwise start one first, in another terminal:\n\n'
+            'On Windows the default is a bundled conductor (the app starts and stops Holochain itself). On Linux and macOS HoloNET starts the Holochain on your\n'
+            'computer, and the first time it downloads the official one (checked against a SHA-256) into your user folder; nothing to install.\n'
+            'To use a conductor you run yourself instead, create the project with `--Conductor external` and start one first, in another terminal:\n\n'
             '```bash\n./start-conductor.sh        # Git Bash, Linux, macOS (needs Holochain 0.7.x on your PATH)\n.\\start-conductor.ps1       # PowerShell\n```\n\n'
             'Choose with `--Conductor auto|embedded|external` and `--HolochainVersion both|0.7.1|0.7.0` when you create the project.')
     return f'''# HoloNETApp
@@ -785,7 +788,7 @@ def build(key, base_args, patch, name, classes, forced, proj='', cpm=False, nocs
     patch(out)
     demo = rd(os.path.join(SHARED, 'HoloNETDemo.cs')).replace('HOLONET_LIB_TEXT', 'HOLONET_LIBRARY_NAME')
     if forced:
-        demo = demo.replace('//#if (!UseEmbedded)\n            dna.HolochainConductorAdminURI', '//#if (true)\n            dna.HolochainConductorAdminURI')
+        demo = demo.replace('//#if (!UseEmbedded)\n            dna.HolochainConductorAdminURI', '//#if (true)\n            dna.HolochainConductorAdminURI').replace('//#if (YouStartConductor)', '//#if (true)')
     wr(os.path.join(out, 'HoloNETDemo.cs'), demo)
     wr(os.path.join(root, 'README.md'), readme(key, name, forced))
     for f in ('start-conductor.sh', 'start-conductor.ps1', '.gitignore'):
