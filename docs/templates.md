@@ -43,7 +43,7 @@ Every template has the same options.
 | Option | Values | What it does |
 |---|---|---|
 | `--HoloNET` | `api` (default), `client`, `orm`, `hypernet` | Which HoloNET library the app uses. |
-| `--Conductor` | `auto` (default), `embedded`, `external` | `embedded` bundles the Holochain conductor in the app (Windows) and starts and stops it for you. `external` uses a conductor you run yourself on `ws://localhost:7777`. `auto` is `embedded` on Windows and `external` elsewhere. |
+| `--Conductor` | `auto` (default), `embedded`, `external` | `embedded` bundles the Holochain conductor in the app (Windows) and starts and stops it for you. `external` uses a conductor you run yourself on `ws://localhost:7777`. `auto` is `embedded` on Windows; elsewhere HoloNET starts the Holochain on your computer and, the first time, downloads the official one (`AutoDownloadConductor`, see [Where the conductor comes from](conductor.md)). Mobile, browser and tablet templates always use `external`. |
 | `--HolochainVersion` | `both` (default), `0.7.1`, `0.7.0` | With a bundled conductor: which Holochain version(s) to bundle. `both` lets you choose at run time with `HoloNETDNA.EmbeddedHolochainVersion`; one version gives a smaller app. |
 | `--HoloNETVersion` | e.g. `4.6.0` | The HoloNET package version to use (defaults to the version the templates were released with). |
 

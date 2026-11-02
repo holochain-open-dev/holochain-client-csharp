@@ -4,6 +4,7 @@
 
 Every HoloNET package is now released together at one version, in four conductor variants, with project templates.
 
+- **HoloNET downloads the conductor for you (`HoloNETDNA.AutoDownloadConductor`, on by default).** When no conductor is installed, the Client downloads the official `holochain` and `hc` for the computer's OS and CPU (Windows x64, Linux x64/arm64, macOS Intel/Apple Silicon) from Holochain's stable releases, checks them against a pinned SHA-256 (`scripts/update_conductor_hashes.py` builds the table; releases newer than the table use the digest GitHub publishes) and caches them in `%APPDATA%/NextGenSoftware/HoloNET/<version>/` (`HOLONET_CONDUCTOR_FOLDER` overrides it). New settings: `AutoDownloadConductor`, `HolochainConductorVersion`, `AllowUnverifiedConductorDownload`. The conductor now starts without PowerShell on Linux and macOS, so the plain Client works there, and in containers. Embedded packages stay for offline use. A CI job proves it on Ubuntu, macOS and Windows. See `docs/conductor.md`.
 - **A conductor that already has the app installed no longer fails the first run.** The conductor enables the app before its cells have started, so signing
   credentials could answer `CellNotRunning`; the admin client now asks again for a few seconds. HoloNETAPI also stops the conductor it started when the app exits
   (it used to outlive the app, and the next run attached to it).

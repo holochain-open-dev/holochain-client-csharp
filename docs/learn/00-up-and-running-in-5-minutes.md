@@ -1,7 +1,7 @@
 # Up and running in 5 minutes
 
 **You'll build:** a working .NET app that saves and loads data on Holochain, from one command, in the kind of app you already build (web, desktop, mobile, game).
-**Time:** 5 minutes. **You need:** the [.NET 10 SDK](https://dotnet.microsoft.com/download). On Windows that's all; elsewhere you also need [Holochain 0.7.x](https://developer.holochain.org/get-started) for the conductor.
+**Time:** 5 minutes. **You need:** the [.NET 10 SDK](https://dotnet.microsoft.com/download). That's all: on Windows the app bundles the conductor, and on Linux and macOS HoloNET downloads the official one the first time it runs (see [Where the conductor comes from](https://docs.holonet.oasisomniverse.one/conductor)). Mobile and browser templates connect to a conductor you run.
 
 HoloNET has project templates for the popular .NET app types, each with HoloNET already wired in. You choose the app type, and which HoloNET library it uses.
 
@@ -43,7 +43,7 @@ missing key: IsSuccess = False
 
 For a web or desktop template, open the **HoloNET** page or press the **Run the HoloNET demo** button.
 
-**Not on Windows, or a mobile / browser template?** Those use a conductor you run yourself. Start one in another terminal with the script that came with your project:
+**A mobile or browser template, or a project created with `--Conductor external`?** Those use a conductor you run yourself. Start one in another terminal with the script that came with your project (it needs Holochain 0.7.x on your PATH):
 
 ```bash
 ./start-conductor.sh
