@@ -120,6 +120,47 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             return false;
         }
 
+        /// <summary>
+        /// The path of "holochain" or "hc" to start: the one on the PATH (unless HoloNETDNA.HolochainConductorVersion pins a version), otherwise, when
+        /// HoloNETDNA.AutoDownloadConductor is on, the cached copy of the version needed, downloading it first if it is not there yet.
+        /// </summary>
+        private async Task<string> ResolveConductorToolAsync(string tool, string version)
+        {
+            string fileName = HolochainConductorDownloader.FileName(tool);
+
+            if (string.IsNullOrWhiteSpace(HoloNETDNA.HolochainConductorVersion))
+            {
+                string onPath = FindOnPath(fileName);
+
+                if (onPath != null)
+                    return onPath;
+            }
+
+            if (!HoloNETDNA.AutoDownloadConductor)
+                return fileName; // as before: the operating system looks for it
+
+            return await HolochainConductorDownloader.EnsureAsync(tool, version, HoloNETDNA.AllowUnverifiedConductorDownload, message => Logger.Log(message, LogType.Info, true));
+        }
+
+        private static string FindOnPath(string fileName)
+        {
+            foreach (string folder in (Environment.GetEnvironmentVariable("PATH") ?? "").Split(Path.PathSeparator))
+            {
+                try
+                {
+                    string candidate = Path.Combine(folder.Trim('"'), fileName);
+
+                    if (File.Exists(candidate))
+                        return candidate;
+                }
+                catch (ArgumentException)
+                {
+                }
+            }
+
+            return null;
+        }
+
         private string HcHolochainPathArgument() => string.IsNullOrEmpty(_hcHolochainPath) ? "" : $" -H '{_hcHolochainPath}'";
 
         protected int _currentId = 0;
@@ -535,6 +576,15 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         {
             string fullPathToHcExe = "hc.exe";
             string fullPathToHolochainExe = "holochain.exe";
+            bool onWindows = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows);
+            string directFileName = null; // not Windows: the conductor is started directly, without PowerShell
+            string directArguments = null;
+            string conductorVersion = string.IsNullOrWhiteSpace(HoloNETDNA.HolochainConductorVersion) ? EmbeddedHolochainVersionString(HoloNETDNA.EmbeddedHolochainVersion) : HoloNETDNA.HolochainConductorVersion.Trim();
+            HolochainConductorModeEnum conductorMode = HoloNETDNA.HolochainConductorMode;
+
+            // The conductors bundled in the Embedded packages are Windows binaries; elsewhere use the one on the PATH, or the one HoloNET downloads.
+            if (conductorMode == HolochainConductorModeEnum.UseEmbedded && !onWindows)
+                conductorMode = HolochainConductorModeEnum.UseSystemGlobal;
 
             try
             {
@@ -572,7 +622,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                 if (HoloNETDNA.HolochainConductorToUse == HolochainConductorEnum.HcDevTool)
                 {
-                    switch (HoloNETDNA.HolochainConductorMode)
+                    switch (conductorMode)
                     {
                         case HolochainConductorModeEnum.UseExternal:
                             fullPathToHcExe = HoloNETDNA.FullPathToExternalHCToolBinary;
@@ -627,13 +677,14 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                                 }
 
                         case HolochainConductorModeEnum.UseSystemGlobal:
-                            fullPathToHcExe = "hc.exe";
+                            fullPathToHcExe = await ResolveConductorToolAsync("hc", conductorVersion);
+                            _hcHolochainPath = await ResolveConductorToolAsync("holochain", conductorVersion); // hc launches holochain
                             break;
                     }
                 }
                 else
                 {
-                    switch (HoloNETDNA.HolochainConductorMode)
+                    switch (conductorMode)
                     {
                         case HolochainConductorModeEnum.UseExternal:
                             //_conductorProcess.StartInfo.FileName = HoloNETDNA.FullPathToExternalHolochainConductorBinary; // overwritten with PowerShell.exe below, so the external path was never used
@@ -687,7 +738,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                                 }
 
                         case HolochainConductorModeEnum.UseSystemGlobal:
-                            fullPathToHolochainExe = "holochain.exe";
+                            fullPathToHolochainExe = await ResolveConductorToolAsync("holochain", conductorVersion);
                             break;
                     }
                 }
@@ -712,6 +763,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                         // `--run=<port>` only sets an *app* port (the admin port was random, so HoloNET couldn't connect);
                         // -f fixes the admin port. hc also needs to know which holochain to launch (-H), and lair runs in-process.
                         _conductorProcess.StartInfo.Arguments = $"-NoExit -Command \"'' | & '{fullPathToHcExe}' s --piped -f={EndPoint.Port}{HcHolochainPathArgument()} generate '{HoloNETDNA.FullPathToCompiledHappFolder}' --in-process-lair --run=0\""; // --run needs a value: 0 = one app interface on a free port
+                        directFileName = fullPathToHcExe;
+                        directArguments = $"s --piped -f={EndPoint.Port}{(string.IsNullOrEmpty(_hcHolochainPath) ? "" : $" -H \"{_hcHolochainPath}\"")} generate \"{HoloNETDNA.FullPathToCompiledHappFolder}\" --in-process-lair --run=0";
                     }
 
                     if (HoloNETDNA.ShowHolochainConductorWindow)
@@ -763,6 +816,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
                             //TrueProcessStart("PowerShell.exe -NoExit -Command \"'' | {fullPathToHolochainExe} --piped\"");
                             _conductorProcess.StartInfo.Arguments = $"-NoExit -Command \"'' | {fullPathToHolochainExe} --piped -c '{HoloNETDNA.HolochainConductorConfigPath}'\"";
+                            directFileName = fullPathToHolochainExe;
+                            directArguments = $"--piped -c \"{HoloNETDNA.HolochainConductorConfigPath}\"";
                         }
                         else
                         {
@@ -774,7 +829,30 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     }
 
                     _conductorProcessesBeforeStart = new HashSet<int>(Process.GetProcessesByName("holochain").Concat(Process.GetProcessesByName("hc")).Select(x => x.Id));
+                    if (!onWindows)
+                    {
+                        // No PowerShell here: run the conductor itself. --piped reads the (empty) keystore passphrase from stdin, which `'' |` supplied on Windows.
+                        _conductorProcess.StartInfo.FileName = directFileName;
+                        _conductorProcess.StartInfo.Arguments = directArguments;
+                        _conductorProcess.StartInfo.UseShellExecute = false;
+                        _conductorProcess.StartInfo.CreateNoWindow = true;
+                        _conductorProcess.StartInfo.RedirectStandardInput = true;
+                        _conductorProcess.StartInfo.RedirectStandardOutput = true;
+                        _conductorProcess.StartInfo.RedirectStandardError = true;
+                        _conductorProcess.OutputDataReceived += (s, e) => { }; // drained, so the conductor never blocks on a full pipe
+                        _conductorProcess.ErrorDataReceived += (s, e) => { };
+                    }
+
                     _conductorProcess.Start();
+
+                    if (!onWindows)
+                    {
+                        _conductorProcess.BeginOutputReadLine();
+                        _conductorProcess.BeginErrorReadLine();
+                        _conductorProcess.StandardInput.WriteLine();
+                        _conductorProcess.StandardInput.Flush();
+                    }
+
                     _conductorProcessSessionId = _conductorProcess.Id;
 
                     //await Task.Delay(HoloNETDNA.SecondsToWaitForHolochainConductorToStart * 1000); // Give the conductor 5 (default) seconds to start up...

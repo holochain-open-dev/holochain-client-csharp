@@ -27,6 +27,9 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Interfaces
         HolochainConductorModeEnum HolochainConductorMode { get; set; }
         HolochainConductorEnum HolochainConductorToUse { get; set; }
         EmbeddedHolochainVersion EmbeddedHolochainVersion { get; set; }
+        bool AutoDownloadConductor { get; set; }
+        string HolochainConductorVersion { get; set; }
+        bool AllowUnverifiedConductorDownload { get; set; }
         ConsoleColor InfoColour { get; set; }
         string InstalledAppId { get; set; }
         string LogFileName { get; set; }

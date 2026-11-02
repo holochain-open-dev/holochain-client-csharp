@@ -121,6 +121,26 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         public EmbeddedHolochainVersion EmbeddedHolochainVersion { get; set; } = EmbeddedHolochainVersion.V0_7_1;
 
         /// <summary>
+        /// When HoloNET needs a conductor (AutoStartHolochainConductor) and cannot find one (none on the PATH, or no cached copy), it downloads the right
+        /// holochain and hc for this operating system and processor from the official Holochain releases, checks them against a SHA-256, and keeps them in
+        /// %APPDATA%/NextGenSoftware/HoloNET/&lt;version&gt;/ so it only happens once. Defaults to true. Set it to false on machines that must not download
+        /// (use an Embedded package, FullPathToExternalHolochainConductorBinary, or copy the binaries into that folder in advance).
+        /// </summary>
+        public bool AutoDownloadConductor { get; set; } = true;
+
+        /// <summary>
+        /// The Holochain release AutoDownloadConductor fetches, for example "0.7.1". Empty (the default) uses EmbeddedHolochainVersion (0.7.1).
+        /// HoloNET speaks the Holochain 0.7 conductor API, so other releases may not work even though they download.
+        /// </summary>
+        public string HolochainConductorVersion { get; set; } = "";
+
+        /// <summary>
+        /// Only for a release that has neither a SHA-256 in HoloNET's table nor a digest published on GitHub: set this to true to download it without
+        /// checking it. Defaults to false, which refuses.
+        /// </summary>
+        public bool AllowUnverifiedConductorDownload { get; set; } = false;
+
+        /// <summary>
         /// Set this to true if you wish HoloNET to allow only ONE Holochain Conductor to run at a time. The default is false.
         /// </summary>
         public bool OnlyAllowOneHolochainConductorToRunAtATime { get; set; } = false;

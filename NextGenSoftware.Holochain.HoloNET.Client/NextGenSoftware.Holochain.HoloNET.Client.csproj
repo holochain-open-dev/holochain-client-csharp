@@ -151,6 +151,11 @@ Full changelog: https://github.com/holochain-open-dev/holochain-client-csharp/bl
     <Compile Remove="Properties\Resources.Designer.cs" />
   </ItemGroup>
 
+  <!-- The SHA-256 of every downloadable Holochain conductor (scripts/update_conductor_hashes.py); HolochainConductorDownloader checks downloads against it. -->
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\ConductorHashes.json" LogicalName="HoloNET.ConductorHashes.json" />
+  </ItemGroup>
+
   <ItemGroup Condition="'$(Embedded)' == 'true' And '$(EmbeddedHolochain)' != '0.7.0'">
     <EmbeddedResource Include="Resources\holochain.exe" LogicalName="HoloNET.Embedded.holochain-0.7.1.exe" />
     <EmbeddedResource Include="Resources\hc.exe" LogicalName="HoloNET.Embedded.hc-0.7.1.exe" />

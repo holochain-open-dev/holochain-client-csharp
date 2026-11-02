@@ -1,0 +1,122 @@
+{
+ "0.5.3": {
+  "hc-aarch64-apple-darwin": "21122555062727d6c5822245a7165691aaad2ebc3d805af6848d28e9e2a86667",
+  "hc-aarch64-unknown-linux-gnu": "657f00cf449567fccf0a9bea49bae4a816dffacff42819270dcc2c37cbfeba8f",
+  "hc-x86_64-apple-darwin": "12a61545df4ed43ed6cca539439e17155919ccf7590a30ade8da6c58a7066380",
+  "hc-x86_64-pc-windows-msvc.exe": "6009e7cddfe213c115b8af358a7bc73d3445bf4b23d23b868056f86caaa7b88b",
+  "hc-x86_64-unknown-linux-gnu": "4214bdc94bfe1c8ad3adf05404951a2d6d2d949017075380ac21a9656889629f",
+  "holochain-aarch64-apple-darwin": "1c0768c155b39ba0030af478802908ae22803043b8f8f617fba84f21e1d266da",
+  "holochain-aarch64-unknown-linux-gnu": "df0480081805e23723e817bf11ea89335bcaff93b7b9fe5e5dc223ce37ff2192",
+  "holochain-x86_64-apple-darwin": "98f6310b0362336b7e583acced311cb13b48958caa324f003597c1a8213a39a1",
+  "holochain-x86_64-pc-windows-msvc.exe": "49e8a67e36a1937e879d670ba15323c9780e519e09c840eb07ce626276073d76",
+  "holochain-x86_64-unknown-linux-gnu": "957c71ca4f7e9f89caf1c5287a4a7ac0691491d1d59c94e770c89e6204485c97"
+ },
+ "0.5.4": {
+  "hc-aarch64-apple-darwin": "00aed0ebee7058cf7aed57914bab06906ce275d776f20be2137d21e4794ce703",
+  "hc-aarch64-unknown-linux-gnu": "f474f7d93e2a3e43c040b1aaa2feba8c5fccb84d1913df4ca5240c921c6e68dc",
+  "hc-x86_64-apple-darwin": "2f709cad51e25431711a551ef6692a3d19673dce7b9cd2c04ef3f18fdc9d2d01",
+  "hc-x86_64-pc-windows-msvc.exe": "a689e59bcea8b04d20c429e417a1361a935c65a2054fe1619a939c099aaa1c4e",
+  "hc-x86_64-unknown-linux-gnu": "74800856a95ff4a8f2a8f6246dfb6c2c7d464679feff0937d5365c483156bb42",
+  "holochain-aarch64-apple-darwin": "ef4d7e1748fb11de6e6c81d68c60f867c2b3928414e03bfc33add9bc694887e5",
+  "holochain-aarch64-unknown-linux-gnu": "30ce849280875bc5b5b7e8b82322d19c5a3cadbf613284e2fd005656b938fbd7",
+  "holochain-x86_64-apple-darwin": "ec67500b74d23d2e301443fdef127e6ed5946cdc5816c1e0e8cd0400452f7ff8",
+  "holochain-x86_64-pc-windows-msvc.exe": "6ac554453c1d6cc2e8c78ab74bc2d6669e5e9bdbe22d3fb762e4874fed0569fc",
+  "holochain-x86_64-unknown-linux-gnu": "a72e6b7966eb12307d41b694829e463f58671f7093cf55fb91acc99444c5ccad"
+ },
+ "0.5.5": {
+  "hc-aarch64-apple-darwin": "e08f257e572231a3df0a284ba023ab77d79176f5a5a68bb26f9f68203712e9da",
+  "hc-aarch64-unknown-linux-gnu": "6acea8c9d6c4b5fb0fc38b6b2b821c22774b576103d15c4884ee2838f2090fa1",
+  "hc-x86_64-apple-darwin": "dc30ad96ee223043c1ac3b8d64e77eba5cb95d3cf71c73fa4176d476d96b3ed8",
+  "hc-x86_64-pc-windows-msvc.exe": "037daa33327b7575e3c83a875ba0e3b0fc7612c7a1cb6967c201fff3702bfb87",
+  "hc-x86_64-unknown-linux-gnu": "cd01c2cc02790e731cdc22e1d7d3ce0a320709a4c9ef688444fdadf3d2806937",
+  "holochain-aarch64-apple-darwin": "3e6ca494feb90cee9cb75a13c44ab32ba2e70d98bd4c912469d1a460e0fc4105",
+  "holochain-aarch64-unknown-linux-gnu": "123315639f48496f93c6f2e3be506c1dd2166ee7b469367a1fdcbe7138940d21",
+  "holochain-x86_64-apple-darwin": "ac9b0c34a14e70a3b397ce78779950d8df1f635d70ed84359ca6664b93ed6a47",
+  "holochain-x86_64-pc-windows-msvc.exe": "9940698b8b8264a19022848e9e8af03e2a5ce83321675c43f3aa76f6044633d1",
+  "holochain-x86_64-unknown-linux-gnu": "87edc0853d5e2bb1fd582ee1562ebc574894280882519004ef172547ece3f33c"
+ },
+ "0.5.6": {
+  "hc-aarch64-apple-darwin": "0b2599bb2cffc59ba677a9ff3544abcdac51f820d90a81e65797705fa41495cf",
+  "hc-aarch64-unknown-linux-gnu": "d72fc3d5ed13f5d9723171016d60f540d6b39be560c9c814cd5bfd79a7e0ecbb",
+  "hc-x86_64-apple-darwin": "b1a192547651c3277a5d55f6ae43eea21e3aaac964e46d7c263789ea07b134e4",
+  "hc-x86_64-pc-windows-msvc.exe": "b90b8e7e967c3faf83aaa9545dcb76081a794d1f30d902bf437173130cd7b2d7",
+  "hc-x86_64-unknown-linux-gnu": "1ff594b824359ee71deb51ffdec55bb7833b3ec591033b475785ef880fd44bf7",
+  "holochain-aarch64-apple-darwin": "73f69575486b3f3b6367ef880bf37972e92ab5ed3ca3b4c18af4c5d772dc9901",
+  "holochain-aarch64-unknown-linux-gnu": "2d1f1c7d3e2250fc4b4ab27aab1e032b901acf5e0783df399224f73d26625a06",
+  "holochain-x86_64-apple-darwin": "e6d6ae73330269ba6d5ea55786b65771b0c68ad1f1af0e2e38f81c7896f69011",
+  "holochain-x86_64-pc-windows-msvc.exe": "bae7aa5c2b87fc311854083b645232c44fa3b3746d752791321bdf8996e5f5f2",
+  "holochain-x86_64-unknown-linux-gnu": "a47349df597521125d32d83603199637c0d9ef2379a16c1e95678c4e96b5a124"
+ },
+ "0.6.0": {
+  "hc-aarch64-apple-darwin": "ca2d0cdeb695545caa08cd6363fc06627fb819bbee4e8ad943e6d62d483c1171",
+  "hc-aarch64-unknown-linux-gnu": "ee9f44085ca49140dc8282d7e9bf38c9219b70770094925a14ec67ffc640df5d",
+  "hc-x86_64-apple-darwin": "1c3030bd7b4a3a8e99e0471599504fbccb9279a260ac57369091b301553589c3",
+  "hc-x86_64-pc-windows-msvc.exe": "1ab8421329ec71a500dd88e915e57947ae94420d10c4110c0c6af9acc6e597db",
+  "hc-x86_64-unknown-linux-gnu": "fde3c6dea6006e84539aacd1709648a94954ff7e4289ceca235b2a28cd4f1c7a",
+  "holochain-aarch64-apple-darwin": "3e81929d4ba5ed58b3e7039f39918aded5a7efe2463a7d602f67001116b22686",
+  "holochain-aarch64-unknown-linux-gnu": "63f8be96c3798df8230ca4f071c6b5ec0c43ec5a8001801259ee09323bd8f62b",
+  "holochain-x86_64-apple-darwin": "3eedddac194797139080e3caa99da5cb8b654cf52aa982b9f0e61d5590f595bd",
+  "holochain-x86_64-pc-windows-msvc.exe": "06cf8651a994745708c52694627d15e2f3735b9cb8a9dd8344bbcafc55be8374",
+  "holochain-x86_64-unknown-linux-gnu": "f32316941fd67ece3e53dd5284323c67160ba29f5b9c2ed5d7bc2183cf5862f6"
+ },
+ "0.6.1": {
+  "hc-aarch64-apple-darwin": "8e9f83d2d03b0d06c699670538fd2ce38cf35b3a882fbb0afefa09b624aba86c",
+  "hc-aarch64-unknown-linux-gnu": "732fbf5f9d410e3ae2ff71fec38c9a76de573fae0c637a76cfa59ba84665b23a",
+  "hc-x86_64-apple-darwin": "842b6d9c39641091e10cd8a18146922e12ce9b6ad29769764c3e814860323b11",
+  "hc-x86_64-pc-windows-msvc.exe": "51aeff266981d88f2e763a474ff1f7653af02b2d19c2e897b008a19287ac12cb",
+  "hc-x86_64-unknown-linux-gnu": "c17892252db3abd8a6e095cd46ed15a42fc0cc7a40a55d4dc72e9d135fb4fce8",
+  "holochain-aarch64-apple-darwin": "cfff436e181b7afb1e86cd12bb5a337954493328229c79c1dc9db5a1519c7851",
+  "holochain-aarch64-unknown-linux-gnu": "263be8307257a08c46a1b7d547c26cd213a7ab986602498c15eccb2618107246",
+  "holochain-x86_64-apple-darwin": "12e6424578899d5fa8847b0e4be709848370277587b552e7520eebfb03f9b7d8",
+  "holochain-x86_64-pc-windows-msvc.exe": "8bf0355d5ff203a91d981c210676300ac12e3aa2669a0f002e6e6ae3747fe747",
+  "holochain-x86_64-unknown-linux-gnu": "423f1111773c83c4c4f07e0bb338289d9bf0c5fa53dd31414b05b0dc8119ada7"
+ },
+ "0.6.2": {
+  "hc-aarch64-apple-darwin": "089aa79cefc9aa23316e4c3ced97c4dc7961851812ff08f8f364ff0fea6577eb",
+  "hc-aarch64-unknown-linux-gnu": "2024b42d1011289c17c69d94dd18d7ea72019098dec3b5a10484c4b59fccc332",
+  "hc-x86_64-apple-darwin": "8e77fc12637a90b57d3be35f981ee8cfdcaf6e705279c1bd78ed0daeb45a5c91",
+  "hc-x86_64-pc-windows-msvc.exe": "bb8ff6f75af101504c03eaa0df98a180372aed40ad5f3b3aadc126e6a230df2b",
+  "hc-x86_64-unknown-linux-gnu": "65987232eb8c80ed87a88721b67b49d3d34acfbd169d2ceb6ce62b0eec165d7d",
+  "holochain-aarch64-apple-darwin": "0578b015862b4d3e3b72cb283813f96f18d07a14a1f598a71520cb193a9ef6b8",
+  "holochain-aarch64-unknown-linux-gnu": "21e7a9d3b79a7f4165647cddae510710f3495f901997e3cb9b94c1dbc8c5964f",
+  "holochain-x86_64-apple-darwin": "506cf5c25215bc59ae9a99fa40ac442f7c69b7660bc940dc6b1a5dc294101d65",
+  "holochain-x86_64-pc-windows-msvc.exe": "e4111bee861eb554586e681f84612a59fbca7f611d20fd223febd4d25ed636e5",
+  "holochain-x86_64-unknown-linux-gnu": "5b340975e5f4cc96b63614d78567e5ff56488fe93e3943f144c62eb1847027d5"
+ },
+ "0.6.3": {
+  "hc-aarch64-apple-darwin": "31b85ba728505cbf96f23cd6e9f7b0e662896cb2378e9364db9e2575c44396b8",
+  "hc-aarch64-unknown-linux-gnu": "c3af9db37f71f5e36e17745f878a042bfaf64463d872011a142ffe9fd2e13566",
+  "hc-x86_64-apple-darwin": "ecc4a497bcb84bd3971a505f07fcc0fcc7ca62c09216913fe5e0517630cf24c4",
+  "hc-x86_64-pc-windows-msvc.exe": "4fc47bf4ff3c4c4e2f7519b456d4ee99e471a5290f1fcc3ca35c814f2119b914",
+  "hc-x86_64-unknown-linux-gnu": "767afe87676e9caa069cc2366fbb5311f11f2ecc705f0977c2734e59fe9cf716",
+  "holochain-aarch64-apple-darwin": "3deb3a58489595dc277900d69cb8cbbda0298d62d6752946ce86202317ec7911",
+  "holochain-aarch64-unknown-linux-gnu": "ef94206be6abc9450985ef2bedc856444c67edccb922d0e42fd8fdfcce44b534",
+  "holochain-x86_64-apple-darwin": "2aca132148522a6089e602a7d697efec539019d4625e8a6ce24fc743c845b531",
+  "holochain-x86_64-pc-windows-msvc.exe": "1e90a03b13dbb0698dfc03f87bf437061837d0316d2a0ead375696c3cca5c0d2",
+  "holochain-x86_64-unknown-linux-gnu": "e82116cfcf28e3009a369929f76fe9c752688f0497383442279ff160bdb4a9cd"
+ },
+ "0.7.0": {
+  "hc-aarch64-apple-darwin": "4b5b11c85954caf918ed902eb52caad25ba4f34a47328771e138f5d247aeef50",
+  "hc-aarch64-unknown-linux-gnu": "fca45395c716a79bfb87e1b7d6ebe695e8fd5fb79348224c6fb24be354341761",
+  "hc-x86_64-apple-darwin": "8333ede23dd59a9f6f31aba06aac963cb25178a3dac25ec7257fa04fdad2d210",
+  "hc-x86_64-pc-windows-msvc.exe": "643ed26e84a7ae72a454bd78b9427b50883fb1306406ba7b5fa4857c61c6b322",
+  "hc-x86_64-unknown-linux-gnu": "f1eca56b97bc2261324e00e0e86a274f7dc8363f73264e697fd0c0216b2aac23",
+  "holochain-aarch64-apple-darwin": "fa44e56402294221cad34933bfe12e079460aa22acf98723f5b4e68e3e33cc3b",
+  "holochain-aarch64-unknown-linux-gnu": "a01a6b0be4a6fa52276fb0aca94559a05457bbad495bdd01802208d3f3649e51",
+  "holochain-x86_64-apple-darwin": "53d48d0f92fdfb2d70cd302a3782df142ab324c023943319d2c33226a79dea0c",
+  "holochain-x86_64-pc-windows-msvc.exe": "5d9bd8cf28c45645158d56198cfec38d04ac4cf620ba89ca37db2f7c46d7b3d2",
+  "holochain-x86_64-unknown-linux-gnu": "ffa40a0c6fab5ce062c4af76328dfe2de143256ddf791a504d72bca698a9ba20"
+ },
+ "0.7.1": {
+  "hc-aarch64-apple-darwin": "dc5f1895c720b1bf3fa29bc0e41d421acc80fb956a5a6d82ba076bc16a793c4f",
+  "hc-aarch64-unknown-linux-gnu": "0b3f605ca7acf71d876f10eacf59a08ebbe6b07c0b5c43928157f521052721c6",
+  "hc-x86_64-apple-darwin": "db9da483333e52cc295819f1f15d64c56b39d94e17b3a31af5630717f24150e3",
+  "hc-x86_64-pc-windows-msvc.exe": "7b00c9515e9de6af0f5ba0f2ae5b37f27090169de5fa42af0184913129873c42",
+  "hc-x86_64-unknown-linux-gnu": "56eb7de100a77a1883fd606a30b33bc2c17bd5b3bd32935304d4f6e34cbff718",
+  "holochain-aarch64-apple-darwin": "5a2a4b1db5e2aa2cfa6b2b480c12633de92a20850852a2c58a97721a19771ad6",
+  "holochain-aarch64-unknown-linux-gnu": "dcf9ad7f90ae32b2a3dab6b6bae560760403c5bba94d7c02da608930c42cb2fa",
+  "holochain-x86_64-apple-darwin": "9fcbcb770ef7d60bd6c6a8ca94a4a715ffd24d8b4daf43fb1b76a162b0493a40",
+  "holochain-x86_64-pc-windows-msvc.exe": "59261119a3ad3e51cd33d996be3110d39a5c4d1cc7c34c173a28efec137bb5b1",
+  "holochain-x86_64-unknown-linux-gnu": "0c14700874349c8417c4bfebfe845e7ab036757442e4388e50dd622bb3c89974"
+ }
+}
