@@ -2,7 +2,7 @@
 """Everything about HoloNET's NuGet packages, driven by packages.json (the single list of packages and variants).
 
   python scripts/holonet_packages.py list                    every package id that a release produces
-  python scripts/holonet_packages.py check                   fast, no build: manifest vs the repo's projects (run by CI on every push)
+  python scripts/holonet_packages.py check [--partial]       fast, no build: manifest vs the repo's projects (run by CI on every push; --partial skips projects in private submodules that are not checked out)
   python scripts/holonet_packages.py pack <out> [--only ID]  build + pack every package (all variants) at the family version
   python scripts/holonet_packages.py verify-packed <out>     exactly the expected .nupkg files, right version, variants consistent
   python scripts/holonet_packages.py smoke <out>             install each package into a fresh app (local feed + nuget.org) and build it
@@ -48,9 +48,11 @@ def fail(errors, what):
 
 
 # ---- check: manifest vs the repository (no build) --------------------------------------------------------------------
-def check():
+def check(partial=False):
+    """partial: skip libraries whose project is missing (private submodules a public CI run cannot clone); a release always runs the full check."""
     m = manifest()
     errors = []
+    skipped = []
     ids = [p[2] for p in packages(m)]
     for dup in {i for i in ids if ids.count(i) > 1}:
         errors.append(f'package id listed twice: {dup}')
@@ -59,7 +61,10 @@ def check():
     for lib in m['libraries']:
         path = os.path.join(REPO, lib['project'])
         if not os.path.exists(path):
-            errors.append(f'{lib["id"]}: project not found: {lib["project"]}')
+            if partial:
+                skipped.append(lib['id'])
+            else:
+                errors.append(f'{lib["id"]}: project not found: {lib["project"]}')
             continue
         text = io.open(path, encoding='utf-8-sig').read()
         base = re.findall(r'<PackageId[^>]*>' + re.escape(lib['id']) + r'(\.Embedded(?:\.Holochain07[01])?)?</PackageId>', text)
@@ -91,7 +96,7 @@ def check():
 
     # Embedded libraries must reference the Client as a project reference (so the property flows), not copy it.
     for lib in m['libraries']:
-        if lib['id'] != CLIENT and len(lib['variants']) > 1:
+        if lib['id'] != CLIENT and len(lib['variants']) > 1 and os.path.exists(os.path.join(REPO, lib['project'])):
             text = io.open(os.path.join(REPO, lib['project']), encoding='utf-8-sig').read()
             if 'NextGenSoftware.Holochain.HoloNET.Client.csproj' not in text:
                 errors.append(f'{lib["project"]}: has Embedded variants but no ProjectReference to the HoloNET Client')
@@ -101,6 +106,8 @@ def check():
     if errors:
         fail(errors, 'check failed')
     print(f'OK: {len(ids)} packages from {len(m["libraries"])} projects at version {m["version"]}.')
+    if skipped:
+        print(f'NOTE: not checked against the repository (private submodule not available here): {", ".join(skipped)}. The release workflow runs the full check.')
 
 
 # ---- docs: docs/packages.md is generated from the manifest, so the list can never go stale --------------------------------
@@ -368,7 +375,7 @@ def main():
         for _, _, pid in packages():
             print(pid)
     elif a[0] == 'check':
-        check()
+        check(partial='--partial' in a)
     elif a[0] == 'pack':
         pack(a[1], [a[i + 1] for i, x in enumerate(a) if x == '--only'])
     elif a[0] == 'verify-packed':

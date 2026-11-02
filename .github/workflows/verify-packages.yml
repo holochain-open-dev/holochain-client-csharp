@@ -14,15 +14,14 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout (with submodules when the token is available)
+      # The private submodules (API, HDK, ...) cannot be cloned without a token, so this run checks what is in this repository (--partial); the release
+      # workflow (OASIS publish-holonet.yml) has the token and runs the full check before it publishes.
+      - name: Checkout
         uses: actions/checkout@v4
-        with:
-          submodules: recursive
-          token: ${{ secrets.PRIVATE_SUBMODULE_PAT || github.token }}
 
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
 
       - name: Check the package manifest
-        run: python scripts/holonet_packages.py check
+        run: python scripts/holonet_packages.py check --partial
