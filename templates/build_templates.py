@@ -766,7 +766,8 @@ On other platforms create the starter with `--Conductor external`, and run a con
 def readme(key, name, forced_external):
     if key == 'unity':
         return unity_readme()
-    cond = ('This app type cannot host a Holochain conductor, so it connects to one you run on your development machine\n'
+    cond = ('This app type does not bundle a Holochain conductor yet, so it connects to one you run on your development machine\n'
+            '(browsers cannot host a conductor; phones can, through the OASIS Edge runtime that Our World uses, but these templates do not wire it in yet)\n'
             '(`ws://localhost:7777`). Start it with `./start-conductor.sh` (Git Bash, Linux, macOS) or `.\\start-conductor.ps1` (PowerShell), and set\n'
             '`HoloNETDemo.AdminUri` (an Android emulator reaches your machine at `ws://10.0.2.2:7777`). The conductor installs the hApp from a path on\n'
             "*its* machine: set `HoloNETDemo.HappPath` to where `oasis.happ` (or your own `.happ`) is on the conductor's computer."

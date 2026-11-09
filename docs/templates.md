@@ -139,7 +139,7 @@ You can generate a hApp from your C# classes: see [Generating hApps](star-happ-g
 
 ## Running on mobile and in the browser
 
-Browsers and phones can't run a Holochain conductor, so the Blazor WebAssembly, MAUI, MAUI Blazor, Uno, Android and iOS templates connect to one you run.
+Browsers can't run a Holochain conductor, so the Blazor WebAssembly template always connects to one you run. Phones can: Holochain runs on Android, either through the shared Holochain Service Runtime or a conductor embedded in the app (this is how Our World runs on phones, through the OASIS Edge runtime), and an iOS conductor is built and tested on the simulator. The MAUI, MAUI Blazor, Uno, Android and iOS templates don't bundle one yet, so while you develop they connect to one you run.
 
 - Start a conductor on your development computer with the included script. It listens on `ws://localhost:7777`.
 - Set `HoloNETDemo.AdminUri` to reach it. An Android emulator reaches your computer at `ws://10.0.2.2:7777`; a real device needs your computer's address on the network.

@@ -85,7 +85,7 @@ button.Click += async (s, e) => output.Text = await HoloNETDemos.HoloNETDemo.Run
 button.TouchUpInside += async (s, e) => output.Text = await HoloNETDemos.HoloNETDemo.RunAsync ();
 ```
 
-A phone can't run a Holochain conductor, so these apps connect to one on your computer or a server. Set `HoloNETDemo.AdminUri` to reach it (an Android emulator uses `ws://10.0.2.2:7777`)
+A phone can run a Holochain conductor (Our World does, through the OASIS Edge runtime on Android), but these templates don't bundle one yet, so they connect to one on your computer or a server. Set `HoloNETDemo.AdminUri` to reach it (an Android emulator uses `ws://10.0.2.2:7777`)
 and `HoloNETDemo.HappPath` to where the hApp is on the conductor's computer.
 
 ## Games: Unity
