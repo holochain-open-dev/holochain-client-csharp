@@ -580,15 +580,58 @@ def p_ios(d):
 			Window.RootViewController = vc;''')
 
 
+def p_grpc(d):
+    sub(f'{d}/Program.cs', 'app.Run();', '''// GET /holonet runs the HoloNET demo (HoloNETDemo.cs) and returns what happened. Your gRPC services (Services/) can call HoloNETDemo the same way.
+app.MapGet("/holonet", async () => Results.Text(await HoloNETDemos.HoloNETDemo.RunAsync()));
+
+app.Run();''')
+
+
+def p_classlib(d):
+    if os.path.exists(f'{d}/Class1.cs'):
+        os.remove(f'{d}/Class1.cs')
+    wr(f'{d}/HoloNETService.cs', '''namespace HoloNETApp;
+
+/// <summary>Reference this library from any app to use HoloNET. Replace the demo call with your own HoloNET code (see HoloNETDemo.cs).</summary>
+public static class HoloNETService
+{
+    /// <summary>Runs the HoloNET demo (HoloNETDemo.cs) and returns what happened.</summary>
+    public static Task<string> RunDemoAsync() => HoloNETDemos.HoloNETDemo.RunAsync();
+}
+''')
+
+
+def p_xunit(d):
+    if os.path.exists(f'{d}/UnitTest1.cs'):
+        os.remove(f'{d}/UnitTest1.cs')
+    wr(f'{d}/HoloNETTests.cs', '''namespace HoloNETApp;
+
+public class HoloNETTests
+{
+    // An integration test: it starts (or connects to) a conductor, so it needs Holochain available (see README.md).
+    // Replace the demo with the HoloNET calls your own code makes.
+    [Fact]
+    public async Task HoloNETDemoRuns()
+    {
+        var result = await HoloNETDemos.HoloNETDemo.RunAsync();
+        Assert.False(string.IsNullOrWhiteSpace(result));
+    }
+}
+''')
+
+
 # key, dotnet new args, patch fn, display name, classifications, forced external (no bundled conductor), project file TFM fix
 TYPES = [
     ('console', ['console'], p_console, 'Console app', ['Console'], False),
     ('worker', ['worker'], p_worker, 'Worker Service (background service)', ['Service', 'Worker'], False),
     ('webapi', ['webapi'], p_webapi, 'ASP.NET Core Web API', ['Web', 'API'], False),
+    ('grpc', ['grpc'], p_grpc, 'ASP.NET Core gRPC service', ['Web', 'gRPC', 'Service'], False),
     ('mvc', ['mvc'], p_mvc, 'ASP.NET Core MVC web app', ['Web', 'MVC'], False),
     ('razor', ['razor'], p_razor, 'ASP.NET Core Razor Pages web app', ['Web', 'Razor'], False),
     ('blazor', ['blazor'], p_blazor, 'Blazor Web App (server)', ['Web', 'Blazor'], False),
     ('blazorwasm', ['blazorwasm'], p_blazorwasm, 'Blazor WebAssembly app', ['Web', 'Blazor', 'WebAssembly'], True),
+    ('classlib', ['classlib'], p_classlib, 'Class library', ['Library'], False),
+    ('xunit', ['xunit'], p_xunit, 'xUnit test project', ['Test', 'xUnit'], False),
     ('wpf', ['wpf'], p_wpf, 'WPF app', ['Desktop', 'WPF'], False),
     ('winforms', ['winforms'], p_winforms, 'Windows Forms app', ['Desktop', 'WinForms'], False),
     ('maui', ['maui'], p_maui, '.NET MAUI app', ['MAUI', 'Mobile', 'Desktop'], True),

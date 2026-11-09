@@ -31,6 +31,9 @@ dotnet new holonet-webapi -n MyApp --HoloNET client    # a Web API using the Hol
 | `holonet-uno` | Uno Platform | a button on the main page | No: connects to your conductor |
 | `holonet-android` | Android (native) | a button on the main activity | No: connects to your conductor |
 | `holonet-ios` | iOS (native) | a button on the main screen | No: connects to your conductor |
+| `holonet-grpc` | ASP.NET Core gRPC service | `GET /holonet` endpoint in `Program.cs` | Yes (Windows) |
+| `holonet-classlib` | Class library | `HoloNETService.cs` | Yes (Windows) |
+| `holonet-xunit` | xUnit test project | `HoloNETTests.cs` | Yes (Windows) |
 | `holonet-unity` | Unity (an `Assets` starter) | a `HoloNETBehaviour` component | Windows standalone builds |
 
 Why some can't bundle a conductor: Holochain's conductor is a desktop program. A browser, a phone or a tablet can't run it, so those apps connect to a
