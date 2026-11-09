@@ -24,7 +24,7 @@ Holochain needs a conductor (the program that runs your hApp). Each library come
 | Package suffix | Bundles | Use it when |
 |---|---|---|
 | *(none)* | no conductor | You run a conductor yourself (`hc sandbox`, a launcher, a server), or the app is a browser or phone app. |
-| `.Embedded` | Holochain 0.7.1 **and** 0.7.0 | You want HoloNET to start and stop the conductor for you (Windows). Choose the version at run time with `HoloNETDNA.EmbeddedHolochainVersion`. |
+| `.Embedded` | Holochain 0.7.1 **and** 0.7.0 | You want HoloNET to start and stop the conductor for you (Windows x64; for Linux and macOS use `.Embedded.LinuxX64`, `.LinuxArm64`, `.MacX64` or `.MacArm64`, below). Choose the version at run time with `HoloNETDNA.EmbeddedHolochainVersion`. |
 | `.Embedded.Holochain071` | Holochain 0.7.1 only | The same, with a smaller download. |
 | `.Embedded.Holochain070` | Holochain 0.7.0 only | The same, for hApps built against 0.7.0. |
 
@@ -141,7 +141,7 @@ dotnet new holonet-blazor -n MyApp --HoloNET orm
 
 | You want | Package |
 |---|---|
-| To save and load data in one line | `NextGenSoftware.Holochain.HoloNET.API` (add `.Embedded` on Windows to bundle the conductor) |
+| To save and load data in one line | `NextGenSoftware.Holochain.HoloNET.API` (add `.Embedded` on Windows, or `.Embedded.LinuxX64`, `.LinuxArm64`, `.MacX64` or `.MacArm64` on Linux and macOS, to bundle the conductor) |
 | To call your own hApp's zome functions | `NextGenSoftware.Holochain.HoloNET.Client` |
 | To work with your own C# classes | `NextGenSoftware.Holochain.HoloNET.ORM` |
 | Multiplayer networking | `NextGenSoftware.Holochain.HoloNET.HyperNET` |
