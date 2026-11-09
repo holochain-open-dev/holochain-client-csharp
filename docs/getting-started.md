@@ -65,6 +65,8 @@ else
     Console.WriteLine(result.ZomeReturnHash); // the new record's ActionHash
 ```
 
+On an Android phone use the Holochain runtime on the phone (the shared [Holochain Service Runtime](https://github.com/NextGenSoftwareUK/android-service-runtime) or a built-in conductor, as Our World does through the [OASIS Edge runtime](https://github.com/NextGenSoftwareUK/OASIS/releases)); the `holonet-android` template wires it in ([details](templates#running-on-mobile-and-in-the-browser)).
+
 To use your own conductor (the non-Embedded package), point at its admin port and turn auto-start off:
 
 ```csharp

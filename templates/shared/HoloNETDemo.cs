@@ -48,7 +48,51 @@ namespace HoloNETDemos
             return dna;
         }
 
+//#if (AndroidRuntimeApp)
+#if ANDROID
+        /// <summary>On Android: use the Holochain runtime on the phone (the shared Holochain Service Runtime when it is installed, otherwise the built-in conductor)
+        /// instead of a conductor you run. Set to false to connect to AdminUri as before. Needs the bridge .aar files (see README.md).</summary>
+        public static bool UseAndroidRuntime { get; set; } = true;
+
+        /// <summary>The installed app id used with the phone's runtime.</summary>
+        public static string AndroidAppId { get; set; } = "oasis";
+
+        private static AndroidRuntimeSession _androidSession;
+        private static bool _androidStatusHooked;
+
+        /// <summary>Starts the phone's Holochain runtime (shared first, then built-in), installs the hApp and returns an app connection whose zome calls the runtime signs.</summary>
+        public static async Task<HoloNETClientAppAgent> ConnectToAndroidRuntimeAsync(StringBuilder log)
+        {
+            if (!_androidStatusHooked)
+            {
+                _androidStatusHooked = true;
+                // "awaiting_approval" means: the user must approve Holochain access in the notification the shared runtime posted.
+                HoloNETAndroidRuntime.StatusChanged += (status, message) => System.Diagnostics.Debug.WriteLine("[holochain runtime] " + status + ": " + message);
+            }
+            _androidSession ??= await HoloNETAndroidRuntime.StartAsync(HoloNETAndroidRuntime.LoadHapp(HappPath), AndroidAppId);
+            log.AppendLine("Holochain runtime on this phone: " + _androidSession.Mode + " (app interface port " + _androidSession.Port + ").");
+
+            var dna = CreateDNA();
+            dna.HolochainConductorAppAgentURI = "ws://127.0.0.1:" + _androidSession.Port;
+            dna.AppAuthenticationToken = _androidSession.AuthenticationToken;
+            dna.InstalledAppId = AndroidAppId;
+            dna.AutoStartHolochainConductor = false;
+            dna.AutoShutdownHolochainConductor = false;
+            var client = new HoloNETClientAppAgent(AndroidAppId, null, dna) { ZomeCallSigner = new AndroidRuntimeZomeCallSigner() };
+            var connected = await client.ConnectAsync(AndroidAppId, new Uri(dna.HolochainConductorAppAgentURI),
+                retrieveAgentPubKeyAndDnaHashFromSandbox: false, automaticallyAttemptToRetrieveFromSandBoxIfConductorFails: false);
+            if (connected == null || !connected.IsConnected)
+                throw new InvalidOperationException("Could not connect to the Holochain runtime on this phone: " + connected?.Message);
+            return client;
+        }
+#endif
+//#endif
+
 //#if (UseApi)
+//#if (AndroidRuntime)
+        // On Android the HoloNET API still connects to a conductor you run (AdminUri): it installs the hApp through the conductor admin interface, which the
+        // phone's runtime does not expose to apps. Create the project with --HoloNET client or orm to use the runtime on the phone (see README.md).
+//#endif
         private static bool _configured;
 
         /// <summary>HoloNET API: one line each to save, load and delete data, share it, and hear when it changes.</summary>
@@ -80,6 +124,12 @@ namespace HoloNETDemos
         /// <summary>HoloNET Client: connect to the conductor, install a hApp, make a zome call and uninstall again.</summary>
         public static async Task<string> RunAsync()
         {
+//#if (AndroidRuntime)
+#if ANDROID
+            if (UseAndroidRuntime && HoloNETAndroidRuntime.IsBridgeAvailable)
+                return await RunOnAndroidRuntimeAsync();
+#endif
+//#endif
             var log = new StringBuilder();
             HoloNETClientAdmin admin = null;
             string appId = null;
@@ -115,6 +165,27 @@ namespace HoloNETDemos
             }
             return log.ToString();
         }
+//#if (AndroidRuntime)
+#if ANDROID
+        // The same demo on the phone's runtime: there is no admin connection, so the hApp is installed by the runtime and the call is signed by it.
+        private static async Task<string> RunOnAndroidRuntimeAsync()
+        {
+            var log = new StringBuilder();
+            try
+            {
+                var client = await ConnectToAndroidRuntimeAsync(log);
+                var created = await client.CallZomeFunctionAsync("oasis", "create_entry_avatar", new System.Collections.Generic.Dictionary<string, object>
+                {
+                    ["id"] = Guid.NewGuid().ToString(), ["username"] = "ada", ["email"] = "ada@example.com", ["first_name"] = "Ada"
+                });
+                log.AppendLine(created.IsError ? "Zome call failed: " + created.Message : "Created an avatar, ActionHash " + created.Records[0].ActionHash);
+                await client.DisconnectAsync();
+            }
+            catch (Exception ex) { log.AppendLine("HoloNET error: " + ex.Message); }
+            return log.ToString();
+        }
+#endif
+//#endif
 //#endif
 //#if (UseOrm)
 
@@ -133,6 +204,12 @@ namespace HoloNETDemos
         /// <summary>HoloNET ORM: save, load, change and delete your own C# classes.</summary>
         public static async Task<string> RunAsync()
         {
+//#if (AndroidRuntime)
+#if ANDROID
+            if (UseAndroidRuntime && HoloNETAndroidRuntime.IsBridgeAvailable)
+                return await RunOnAndroidRuntimeAsync();
+#endif
+//#endif
             var log = new StringBuilder();
             HoloNETClientAdmin admin = null;
             IHoloNETClientAppAgent client = null;
@@ -172,8 +249,39 @@ namespace HoloNETDemos
             }
             return log.ToString();
         }
+//#if (AndroidRuntime)
+#if ANDROID
+        // The same demo on the phone's runtime: there is no admin connection, so the hApp is installed by the runtime and the calls are signed by it.
+        private static async Task<string> RunOnAndroidRuntimeAsync()
+        {
+            var log = new StringBuilder();
+            IHoloNETClientAppAgent client = null;
+            try
+            {
+                client = await ConnectToAndroidRuntimeAsync(log);
+                var ada = new Avatar(client) { Id = Guid.NewGuid().ToString(), Username = "ada", Email = "ada@example.com", FirstName = "Ada", Karma = 7 };
+                var saved = await ada.SaveAsync();
+                log.AppendLine(saved.IsError ? "Save failed: " + saved.Message : "Saved " + ada.FirstName + ", ActionHash " + ada.ActionHash);
+                var loaded = new Avatar(client);
+                await loaded.LoadAsync(ada.ActionHash);
+                loaded.FirstName = "Grace";
+                log.AppendLine("Loaded " + loaded.Username + "; edited, changed? " + loaded.HasEntryChanged());
+                await loaded.SaveAsync();
+                await loaded.DeleteAsync();
+                log.AppendLine("Updated and deleted.");
+            }
+            catch (Exception ex) { log.AppendLine("HoloNET error: " + ex.Message); }
+            finally { if (client != null) await client.DisconnectAsync(); }
+            return log.ToString();
+        }
+#endif
+//#endif
 //#endif
 //#if (UseHyperNet)
+//#if (AndroidRuntime)
+        // On Android HyperNET still connects to a conductor you run (AdminUri): its two-player demo installs two apps through the admin interface. Create the
+        // project with --HoloNET client or orm to use the runtime on the phone (see README.md).
+//#endif
 
         /// <summary>HoloNET HyperNET: two players join a zone, one sends a message and the other receives it.</summary>
         public static async Task<string> RunAsync()

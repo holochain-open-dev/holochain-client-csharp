@@ -150,6 +150,14 @@
         ]
       }
     },
+    "AndroidRuntime": {
+      "type": "computed",
+      "value": "false"
+    },
+    "AndroidRuntimeApp": {
+      "type": "computed",
+      "value": "false"
+    },
     "UseEmbedded": {
       "type": "computed",
       "value": "false"

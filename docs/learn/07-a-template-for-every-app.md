@@ -85,8 +85,11 @@ button.Click += async (s, e) => output.Text = await HoloNETDemos.HoloNETDemo.Run
 button.TouchUpInside += async (s, e) => output.Text = await HoloNETDemos.HoloNETDemo.RunAsync ();
 ```
 
-A phone can run a Holochain conductor (Our World does, through the OASIS Edge runtime on Android), but these templates don't bundle one yet, so they connect to one on your computer or a server. The Android and iOS runtimes are in [android-service-runtime](https://github.com/NextGenSoftwareUK/android-service-runtime/releases) and the [OASIS Edge releases](https://github.com/NextGenSoftwareUK/OASIS/releases). Set `HoloNETDemo.AdminUri` to reach it (an Android emulator uses `ws://10.0.2.2:7777`)
-and `HoloNETDemo.HappPath` to where the hApp is on the conductor's computer.
+On Android the templates (`holonet-android`, `holonet-maui`, `holonet-maui-blazor`, `holonet-uno`) use the Holochain runtime on the phone, the way Our World does through the OASIS Edge runtime: the app asks the phone's shared **Holochain Service Runtime** for access (the user approves a notification once) and, if it isn't installed or isn't approved in time, **falls back to a conductor built into the app**. Create the project with `--HoloNET client` or `--HoloNET orm` to use it, and put the runtime libraries in `runtime/android` (see the project's README). This is ready to test rather than verified: the shared runtime is proven on an emulator, the template's wrapper compiles but hasn't been run on a device, and the runtime libraries aren't published as downloads yet.
+
+An iPhone can't run a separate conductor, so the iOS runtime links one into the app. It runs on the simulator but isn't proven on a physical iPhone yet, so `holonet-ios` still connects to a conductor you run. Set `HoloNETDemo.AdminUri` to reach it (an Android emulator uses `ws://10.0.2.2:7777`) and `HoloNETDemo.HappPath` to where the hApp is on the conductor's computer.
+
+The runtimes: [android-service-runtime](https://github.com/NextGenSoftwareUK/android-service-runtime) (source, Android releases [oasis-holochain-0.7-v1.0.0](https://github.com/NextGenSoftwareUK/android-service-runtime/releases/tag/oasis-holochain-0.7-v1.0.0), iOS releases [oasis-ios-conductor-v0.7.1](https://github.com/NextGenSoftwareUK/android-service-runtime/releases/tag/oasis-ios-conductor-v0.7.1)) and the [OASIS Edge releases](https://github.com/NextGenSoftwareUK/OASIS/releases) (`OASIS-Edge-Runtime-v1.2.0`, `OASIS-Edge-Unity-v1.1.0`, `OGEngineClient-Edge-v2.1.0`). The full details are in the [templates guide](https://docs.holonet.oasisomniverse.one/templates#running-on-mobile-and-in-the-browser).
 
 ## Games: Unity
 

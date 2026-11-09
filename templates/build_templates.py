@@ -10,6 +10,9 @@ Each generated template has the same options:
     --HolochainVersion both|0.7.1|0.7.0       with a bundled conductor, which Holochain version(s) to bundle
 The wiring is one file, HoloNETDemo.cs (templates/shared/HoloNETDemo.cs), plus a small screen / page / endpoint per app type that
 calls it. The content folders are generated: change this script or templates/shared, not the output.
+
+The Android-capable types (android, maui, maui-blazor, uno) also get HoloNETAndroidRuntime.cs: on Android they start the Holochain runtime on the phone
+(the shared Holochain Service Runtime when installed, otherwise the conductor built into the app) instead of connecting to a conductor you run.
 """
 import io, json, os, re, shutil, subprocess, sys, tempfile
 
@@ -42,6 +45,11 @@ def sub_re(path, pattern, repl, flags=re.S):
         raise SystemExit(f'patch pattern not found in {path}:\n{pattern}')
     wr(path, n)
 
+
+# App types that run on Android and can use the Holochain runtime on the phone (templates/shared/HoloNETAndroidRuntime.cs).
+ANDROID_RUNTIME = {'android', 'maui', 'maui-blazor', 'uno'}
+# App types that run on iOS: the iOS conductor runs on the simulator only so far, so they still connect to a conductor you run.
+IOS_TYPES = {'ios', 'maui', 'maui-blazor', 'uno'}
 
 DEMO_CALL = 'await HoloNETDemos.HoloNETDemo.RunAsync()'
 RAZOR_PAGE = '''@page "/holonet"
@@ -645,9 +653,18 @@ TYPES = [
 ]
 
 
-def package_block(forced_external, cpm=False):
+def package_block(forced_external, cpm=False, android_runtime=False):
     """The HoloNET package references for the generated csproj. HOLONET_* tokens are replaced by the template engine."""
     ver = '' if cpm else ' Version="HOLONET_VERSION"'
+    runtime = '''  <ItemGroup Condition="'$(TargetPlatformIdentifier)' == 'android'">
+    <!-- The Holochain runtime for Android: put the bridge and runtime .aar files in runtime/android (see README.md). The hApp is packed as an Android asset
+         because an Android app cannot read files next to it. -->
+    <AndroidAarLibrary Include="runtime/android/*.aar" />
+    <AndroidAsset Include="$(NuGetPackageRoot)nextgensoftware.holochain.holonet.api/HOLONET_VERSION/contentFiles/any/net8.0/oasis.happ" Link="oasis.happ"
+                  Condition="Exists('$(NuGetPackageRoot)nextgensoftware.holochain.holonet.api/HOLONET_VERSION/contentFiles/any/net8.0/oasis.happ')" />
+  </ItemGroup>
+
+''' if android_runtime else ''
     return '''
   <ItemGroup>
     <!-- HoloNET: the library chosen with the HoloNET option (api, client, orm or hypernet). HOLONET_PKG_SUFFIX is .Embedded* when the Holochain conductor
@@ -659,7 +676,7 @@ def package_block(forced_external, cpm=False):
     <!--#endif-->
   </ItemGroup>
 
-''' % {'ver': ver}
+''' % {'ver': ver} + runtime
 
 
 def template_json(key, name, classifications, forced_external):
@@ -698,6 +715,13 @@ def template_json(key, name, classifications, forced_external):
             {'condition': '(UseEmbedded)', 'value': '.Embedded'},
             {'condition': '(!UseEmbedded)', 'value': ''}]}},
     }
+    has_runtime = key in ANDROID_RUNTIME
+    sym['AndroidRuntime'] = {'type': 'computed', 'value': 'true' if has_runtime else 'false'}
+    sym['AndroidRuntimeApp'] = {'type': 'computed', 'value': '(AndroidRuntime && (UseClient || UseOrm))' if has_runtime else 'false'}
+    if key == 'android':
+        # An Android-only app uses the runtime on the phone, which the Client and ORM libraries support (the API and HyperNET need a conductor admin connection).
+        sym['HoloNET']['defaultValue'] = 'client'
+        sym['HoloNET']['description'] = 'Which HoloNET library the app uses (client and orm use the Holochain runtime on the phone).'
     if forced_external:
         sym['UseEmbedded'] = {'type': 'computed', 'value': 'false'}
         # (no Conductor / HolochainVersion choice: this app type cannot host a conductor, so it connects to one you run)
@@ -763,20 +787,101 @@ On other platforms create the starter with `--Conductor external`, and run a con
 '''
 
 
+RUNTIME_LINKS = '''- Source: [android-service-runtime](https://github.com/NextGenSoftwareUK/android-service-runtime) (a fork of [holochain/android-service-runtime](https://github.com/holochain/android-service-runtime); our Holochain 0.7 work is on the [`oasis/holochain-0.7`](https://github.com/NextGenSoftwareUK/android-service-runtime/tree/oasis/holochain-0.7) branch)
+- Android releases: [oasis-holochain-0.7-v1.0.0](https://github.com/NextGenSoftwareUK/android-service-runtime/releases/tag/oasis-holochain-0.7-v1.0.0) (pre-release: arm64 and x86_64 runtime APKs, build manifest, SHA256SUMS) and [oasis-runtime-v0.2.0-holochain-0.7](https://github.com/NextGenSoftwareUK/android-service-runtime/releases/tag/oasis-runtime-v0.2.0-holochain-0.7)
+- iOS releases: [oasis-ios-conductor-v0.7.1](https://github.com/NextGenSoftwareUK/android-service-runtime/releases/tag/oasis-ios-conductor-v0.7.1) and [oasis-ios-conductor-v0.1.1](https://github.com/NextGenSoftwareUK/android-service-runtime/releases/tag/oasis-ios-conductor-v0.1.1)
+- OASIS Edge runtime (what Our World uses): [OASIS releases](https://github.com/NextGenSoftwareUK/OASIS/releases): `OASIS-Edge-Runtime-v1.2.0`, `OASIS-Edge-Unity-v1.1.0`, `OGEngineClient-Edge-v2.1.0`
+- The bridge this template calls: [android-runtime](https://github.com/holochain-open-dev/holochain-client-csharp/tree/main/android-runtime) in the HoloNET repo'''
+
+
+def android_runtime_folder_readme():
+    return '''# Holochain runtime libraries for Android
+
+Put the Holochain Android libraries (`.aar` files) in this folder. The project includes every `*.aar` here when it builds for Android
+(`HoloNETApp.csproj`), and `HoloNETAndroidRuntime.cs` finds the bridge class in them.
+
+You need three libraries, built from the runtime source (see the links in the main README.md):
+
+| File | What it is |
+|---|---|
+| `holochain-client.aar` | Client for the Holochain Service Runtime (the shared conductor on the phone), with the Holochain 0.7 parcelers |
+| `holochain-service.aar` | The Holochain conductor as an Android service: used for the built-in conductor when the phone has no shared runtime |
+| `holonet-android-bridge.aar` | The Kotlin bridge that picks shared or built-in and signs zome calls (source: `android-runtime/` in the HoloNET repo) |
+
+The conductor library is large (about 100 MB, arm64 only), so these are not shipped in the template. Without them the app still builds,
+`HoloNETAndroidRuntime.IsBridgeAvailable` is false, and the demo connects to a conductor you run (`HoloNETDemo.AdminUri`).
+'''
+
+
+ANDROID_SECTION = '''
+## Holochain on the phone (Android)
+
+On Android the app starts the Holochain runtime **on the phone**, the same way Our World does (OASIS Edge):
+
+1. If the phone has the **Holochain Service Runtime** app installed, the app asks it for access and shows nothing more than a system
+   notification the user approves once. The app then uses the phone's one shared conductor (every Holochain app on the phone shares it).
+2. If the runtime is not installed, is not approved in time (60 seconds by default), or setup fails, the app **falls back to the conductor built into
+   the app** (a foreground service).
+3. If the bridge libraries are not in `runtime/android` (see `runtime/android/README.md`), the app connects to a conductor you run instead
+   (`HoloNETDemo.AdminUri`).
+
+Zome calls are signed by the conductor (`AndroidRuntimeZomeCallSigner`), because an app has no admin access to grant itself signing credentials.
+The demo uses the runtime with `--HoloNET client` or `--HoloNET orm`. The HoloNET API and HyperNET libraries install the hApp through the conductor's
+admin interface, which the phone's runtime does not expose to apps, so with those two the app still connects to a conductor you run.
+
+**Status: not yet run on a physical phone.** The shared-runtime path is proven by the OASIS team on an x86_64 emulator, not on a physical phone, and this
+template's wrapper has been compiled for Android but not run on a device or emulator. Please test it on yours and tell us what you find.
+
+To try it: install the runtime on the emulator or phone (`adb install android-service-runtime-0.2.0-holochain-0.7-x86_64-debug.apk` for an x86_64
+emulator, the arm64 APK for a phone), put the `.aar` files in `runtime/android`, run the app and approve the notification.
+
+Runtime source and releases:
+
+''' + RUNTIME_LINKS + '''
+'''
+
+IOS_SECTION = '''
+## Holochain on iOS
+
+An iPhone cannot run a separate conductor process, so the iOS runtime links the conductor into the app. The OASIS team has built it
+(`HolochainConductor.xcframework` with Swift bindings) and runs it on the **iOS simulator**: it starts, installs the OASIS hApp and signs a zome call.
+It is **not yet proven on a physical iPhone**, and these templates do not wire it in: on iOS the app connects to a conductor you run
+(`HoloNETDemo.AdminUri`). Runtime source and releases:
+
+''' + RUNTIME_LINKS + '''
+'''
+
+
 def readme(key, name, forced_external):
     if key == 'unity':
         return unity_readme()
-    cond = ('This app type does not bundle a Holochain conductor yet, so it connects to one you run on your development machine\n'
-            '(browsers cannot host a conductor; phones can, through the OASIS Edge runtime that Our World uses, but these templates do not wire it in yet)\n'
-            '(`ws://localhost:7777`). Start it with `./start-conductor.sh` (Git Bash, Linux, macOS) or `.\\start-conductor.ps1` (PowerShell), and set\n'
-            '`HoloNETDemo.AdminUri` (an Android emulator reaches your machine at `ws://10.0.2.2:7777`). The conductor installs the hApp from a path on\n'
-            "*its* machine: set `HoloNETDemo.HappPath` to where `oasis.happ` (or your own `.happ`) is on the conductor's computer."
-            if forced_external else
+    if forced_external:
+        if key == 'blazorwasm':
+            why = 'Browsers cannot host a conductor, so this app connects to one you run on your development machine'
+        elif key in ANDROID_RUNTIME:
+            why = ('On Android this app uses the Holochain runtime on the phone (see "Holochain on the phone (Android)" below). Everywhere else it does not bundle\n'
+                   'a conductor, so it connects to one you run on your development machine')
+        elif key == 'ios':
+            why = ('This app does not bundle a Holochain conductor yet (an iOS conductor exists but is only proven on the simulator: see "Holochain on iOS" below),\n'
+                   'so it connects to one you run on your development machine')
+        else:
+            why = 'This app type does not bundle a Holochain conductor, so it connects to one you run on your development machine'
+        cond = (why + '\n(`ws://localhost:7777`). Start it with `./start-conductor.sh` (Git Bash, Linux, macOS) or `.\\start-conductor.ps1` (PowerShell), and set\n'
+                '`HoloNETDemo.AdminUri` (an Android emulator reaches your machine at `ws://10.0.2.2:7777`). The conductor installs the hApp from a path on\n'
+                "*its* machine: set `HoloNETDemo.HappPath` to where `oasis.happ` (or your own `.happ`) is on the conductor's computer.")
+    else:
+        cond = (
             'On Windows the default is a bundled conductor (the app starts and stops Holochain itself). On Linux and macOS HoloNET starts the Holochain on your\n'
             'computer, and the first time it downloads the official one (checked against a SHA-256) into your user folder; nothing to install.\n'
             'To use a conductor you run yourself instead, create the project with `--Conductor external` and start one first, in another terminal:\n\n'
             '```bash\n./start-conductor.sh        # Git Bash, Linux, macOS (needs Holochain 0.7.x on your PATH)\n.\\start-conductor.ps1       # PowerShell\n```\n\n'
             'Choose with `--Conductor auto|embedded|external` and `--HolochainVersion both|0.7.1|0.7.0` when you create the project.')
+    extra = ''
+    if key in ANDROID_RUNTIME:
+        extra += ANDROID_SECTION
+    if key in IOS_TYPES:
+        extra += IOS_SECTION
+    default = 'client' if key == 'android' else 'api'
     return f'''# HoloNETApp
 
 A {name} with [HoloNET](https://holonet.oasisomniverse.one) wired in.
@@ -789,10 +894,10 @@ endpoint just calls `HoloNETDemo.RunAsync()` and shows the text it returns.
 {cond}
 
 Then run the app as usual for this app type (`dotnet run`, or press F5 in your IDE).
-
+{extra}
 ## Switch the HoloNET library
 
-Created with `dotnet new holonet-{key} --HoloNET api` (the default). The other choices:
+Created with `dotnet new holonet-{key} --HoloNET {default}` (the default). The other choices:
 
 | `--HoloNET` | What it is |
 |---|---|
@@ -828,12 +933,15 @@ def build(key, base_args, patch, name, classes, forced, proj='', cpm=False, nocs
         s = rd(csproj)
         s = s.replace('<Nullable>enable</Nullable>', '<Nullable>disable</Nullable>')
         i = s.rindex('</Project>')
-        wr(csproj, s[:i].rstrip('\n') + '\n' + package_block(forced, cpm) + s[i:])
+        wr(csproj, s[:i].rstrip('\n') + '\n' + package_block(forced, cpm, key in ANDROID_RUNTIME) + s[i:])
     patch(out)
     demo = rd(os.path.join(SHARED, 'HoloNETDemo.cs')).replace('HOLONET_LIB_TEXT', 'HOLONET_LIBRARY_NAME')
     if forced:
         demo = demo.replace('//#if (!UseEmbedded)\n            dna.HolochainConductorAdminURI', '//#if (true)\n            dna.HolochainConductorAdminURI').replace('//#if (YouStartConductor)', '//#if (true)')
     wr(os.path.join(out, 'HoloNETDemo.cs'), demo)
+    if key in ANDROID_RUNTIME:
+        wr(os.path.join(out, 'HoloNETAndroidRuntime.cs'), rd(os.path.join(SHARED, 'HoloNETAndroidRuntime.cs')))
+        wr(os.path.join(out, 'runtime', 'android', 'README.md'), android_runtime_folder_readme())
     wr(os.path.join(root, 'README.md'), readme(key, name, forced))
     for f in ('start-conductor.sh', 'start-conductor.ps1', '.gitignore'):
         shutil.copy(os.path.join(SHARED, f), os.path.join(root, f))

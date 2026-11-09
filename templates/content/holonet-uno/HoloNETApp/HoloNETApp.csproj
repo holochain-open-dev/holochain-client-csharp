@@ -36,4 +36,12 @@
     <!--#endif-->
   </ItemGroup>
 
+  <ItemGroup Condition="'$(TargetPlatformIdentifier)' == 'android'">
+    <!-- The Holochain runtime for Android: put the bridge and runtime .aar files in runtime/android (see README.md). The hApp is packed as an Android asset
+         because an Android app cannot read files next to it. -->
+    <AndroidAarLibrary Include="runtime/android/*.aar" />
+    <AndroidAsset Include="$(NuGetPackageRoot)nextgensoftware.holochain.holonet.api/HOLONET_VERSION/contentFiles/any/net8.0/oasis.happ" Link="oasis.happ"
+                  Condition="Exists('$(NuGetPackageRoot)nextgensoftware.holochain.holonet.api/HOLONET_VERSION/contentFiles/any/net8.0/oasis.happ')" />
+  </ItemGroup>
+
 </Project>

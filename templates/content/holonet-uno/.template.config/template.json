@@ -152,6 +152,14 @@
         ]
       }
     },
+    "AndroidRuntime": {
+      "type": "computed",
+      "value": "true"
+    },
+    "AndroidRuntimeApp": {
+      "type": "computed",
+      "value": "(AndroidRuntime && (UseClient || UseOrm))"
+    },
     "UseEmbedded": {
       "type": "computed",
       "value": "false"

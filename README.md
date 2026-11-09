@@ -182,7 +182,7 @@ This will help massively turbo charge the holochain ecosystem by opening it up t
 
 ### Packages
 
-**Quickest start:** `dotnet new install NextGenSoftware.Holochain.HoloNET.Templates`, then `dotnet new holonet-<app type> -n MyApp` for a ready-to-run console, worker, Web API, MVC, Razor, Blazor, WPF, WinForms, WinUI, Avalonia, MAUI, Uno, Android, iOS or Unity app with HoloNET already wired in (`--HoloNET api|client|orm|hypernet` chooses the library). See [Templates](docs/templates.md).
+**Quickest start:** `dotnet new install NextGenSoftware.Holochain.HoloNET.Templates`, then `dotnet new holonet-<app type> -n MyApp` for a ready-to-run console, worker, Web API, MVC, Razor, Blazor, WPF, WinForms, WinUI, Avalonia, MAUI, Uno, Android, iOS or Unity app with HoloNET already wired in (`--HoloNET api|client|orm|hypernet` chooses the library). See [Templates](docs/templates.md). On Android the MAUI, MAUI Blazor, Uno and Android templates use the Holochain runtime on the phone (the shared [Holochain Service Runtime](https://github.com/NextGenSoftwareUK/android-service-runtime) when installed, else a built-in conductor; ready to test, not yet proven on a physical phone); the iOS conductor ([releases](https://github.com/NextGenSoftwareUK/android-service-runtime/releases/tag/oasis-ios-conductor-v0.7.1)) runs on the simulator only so far. Our World runs on phones through the [OASIS Edge runtime](https://github.com/NextGenSoftwareUK/OASIS/releases).
 
 Every HoloNET library (Client, ORM, HyperNET, HDK, Manager, API and the Test Harness) comes in four variants: 28 packages, all released together at the same version, plus the template pack. The full list is in [Packages](docs/packages.md). Pick one variant per app; they share the same API and namespaces.
 
