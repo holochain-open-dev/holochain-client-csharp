@@ -169,7 +169,7 @@ def page_html(site, slug, title, desc, body, toc, nav, badge, section):
     <div class="sidebar-footer">
       <a href="https://holonet.oasisomniverse.one" target="_blank">holonet.oasisomniverse.one</a>
       <a href="https://github.com/holochain-open-dev/holochain-client-csharp" target="_blank">GitHub</a>
-      <a href="https://www.nuget.org/packages?q=NextGenSoftware.Holochain.HoloNET" target="_blank">NuGet</a>
+      <a href="https://www.nuget.org/profiles/OASISOmniverse" target="_blank">NuGet</a>
       <a href="https://oasisomniverse.one" target="_blank">oasisomniverse.one</a>
     </div>
   </aside>
