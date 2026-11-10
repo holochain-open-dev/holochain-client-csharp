@@ -839,7 +839,7 @@ The first time you build for Android, the project downloads the Holochain runtim
 
 | File | What it is |
 |---|---|
-| `holochain-client.aar` | Client for the Holochain Service Runtime (the shared conductor on the phone), with the Holochain 0.7 parcelers |
+| `holochain-client.aar` | Client for the Holochain Service Runtime (the shared conductor on the phone), with the Holochain 0.7.1 parcelers |
 | `holochain-service.aar` | The Holochain conductor as an Android service (arm64 only): the built-in conductor used when the phone has no shared runtime |
 | `holonet-android-bridge.aar` | The Kotlin bridge that picks shared or built-in and signs zome calls (source: `android-runtime/` in the HoloNET repo) |
 | `holochain-android-dependencies.zip` | The bridge's runtime dependencies (unpacked here as `.jar` / `.aar` files) |
@@ -879,7 +879,7 @@ Runtime source and releases:
 IOS_SECTION = '''
 ## Holochain on iOS
 
-An iPhone cannot run a separate conductor process, so the conductor is linked into the app (Holochain 0.7 with the wasmi interpreter, because iOS forbids
+An iPhone cannot run a separate conductor process, so the conductor is linked into the app (Holochain 0.7.1 with the wasmi interpreter, because iOS forbids
 JIT). On iOS the app starts it with `HoloNETIosRuntime.cs`, which calls `HoloNETIosBridge.xcframework`: put that in `runtime/ios` (see `runtime/ios/README.md`).
 Without it the app connects to a conductor you run (`HoloNETDemo.AdminUri`).
 
@@ -894,7 +894,7 @@ def ios_runtime_folder_readme():
     return '''# Holochain conductor for iOS
 
 Put `HoloNETIosBridge.xcframework` in this folder. The project links it into the app (`HoloNETApp.csproj`, `NativeReference`) and `HoloNETIosRuntime.cs`
-calls its C functions (`holo_ios_*`). It contains the Holochain 0.7 conductor (wasmi interpreter, device and Apple-silicon simulator) and the bridge.
+calls its C functions (`holo_ios_*`). It contains the Holochain 0.7.1 conductor (wasmi interpreter, device and Apple-silicon simulator) and the bridge.
 
 Download `HoloNETIosBridge.xcframework.zip` (about 127 MB) from the [oasis-holochain-0.7-v1.1.0](https://github.com/NextGenSoftwareUK/android-service-runtime/releases/tag/oasis-holochain-0.7-v1.1.0) release and unzip it here. It is built by that repository's `oasis-ios-bridge` workflow, which compiles the Swift C-ABI bridge and merges it with the
 [oasis-ios-conductor-v0.7.1](https://github.com/NextGenSoftwareUK/android-service-runtime/releases/tag/oasis-ios-conductor-v0.7.1) conductor.

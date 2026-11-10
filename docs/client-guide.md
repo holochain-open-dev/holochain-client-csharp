@@ -40,7 +40,7 @@ var admin = new HoloNETClientAdmin(new HoloNETDNA { HolochainConductorMode = Hol
 HoloNETConnectedEventArgs connected = await admin.ConnectAsync();
 ```
 
-**The one-call install.** `InstallEnableSignAttachAndConnectToHappAsync(appId, happPath, roleName)` does every step Holochain 0.7 needs:
+**The one-call install.** `InstallEnableSignAttachAndConnectToHappAsync(appId, happPath, roleName)` does every step Holochain 0.7.0 and 0.7.1 need:
 
 1. Generates an agent key and installs the app. An app that's already installed is kept, with its agent, unless you pass `uninstallhAppIfAlreadyInstalled: true`.
 2. Enables it.

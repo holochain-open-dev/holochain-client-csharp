@@ -9,7 +9,7 @@ WEB5 STAR (the OASIS low/no-code generator) can generate a complete Holochain hA
 - a build script;
 - the matching C# HoloNET ORM models.
 
-You describe what you want in C#. STAR writes everything else from its **Holochain 0.7 templates** (`STAR ODK/NextGenSoftware.OASIS.STAR/DNATemplates/RustDNATemplates/Holochain07`), filled by HoloOASIS's template engine. To change what STAR generates, edit the templates; you don't need to recompile anything.
+You describe what you want in C#. STAR writes everything else from its **Holochain 0.7 templates** (for 0.7.0 and 0.7.1) (`STAR ODK/NextGenSoftware.OASIS.STAR/DNATemplates/RustDNATemplates/Holochain07`), filled by HoloOASIS's template engine. To change what STAR generates, edit the templates; you don't need to recompile anything.
 
 What you get:
 

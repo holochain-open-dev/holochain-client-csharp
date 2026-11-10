@@ -31,9 +31,9 @@ Holochain needs a conductor (the program that runs your hApp). Each library come
 Those are the Windows conductors. For Linux and macOS see the next section; for browser apps use the package with no suffix and run your own conductor; Android apps use the package with no suffix and the Holochain runtime on the phone (see [Templates](templates#running-on-mobile-and-in-the-browser)). Use one variant per app: they have the same API and namespaces.
 ORM, HyperNET, HDK, Manager, API and TestHarness depend on the Client variant that matches their own, so an `.Embedded.Holochain071` package always pulls in the Client with 0.7.1 and nothing else.
 
-## Offline packages for Linux and macOS
+## Offline packages for Windows, Linux and macOS
 
-`Client`, `ORM`, `HyperNET`, `API` also come with the conductor bundled for Linux and macOS, so an app works with no internet and nothing to install. Each package holds one operating system and processor (so none is bigger than the Windows ones), and the same three Holochain choices:
+`Client`, `ORM`, `HyperNET`, `API` also come with the conductor bundled for Windows (the plain `.Embedded` packages above) and for Linux and macOS (the packages below), so an app works with no internet and nothing to install on all three. Each package holds one operating system and processor (so none is bigger than the Windows ones), and the same three Holochain choices:
 
 | Package suffix | For |
 |---|---|

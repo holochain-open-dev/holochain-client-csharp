@@ -19,7 +19,7 @@ The class keeps the package name `one.oasisomniverse.holooasis.unity.HolochainUn
 Published build: the [oasis-holochain-0.7-v1.1.0](https://github.com/NextGenSoftwareUK/android-service-runtime/releases/tag/oasis-holochain-0.7-v1.1.0) release has the three `.aar` files and the bridge's dependencies (built by the `oasis-android-libraries` workflow in the runtime repository, which also holds a copy of this bridge in `oasis/android-bridge`). The templates download it on the first build. The bridge compiles against the Holochain runtime libraries, which come from
 [android-service-runtime](https://github.com/NextGenSoftwareUK/android-service-runtime) (branch `oasis/holochain-0.7`):
 
-- `client` and `service` for Holochain 0.7, built from that source with Rust and the Android NDK (the conductor library is about 100 MB unpacked, arm64 only).
+- `client` and `service` for Holochain 0.7.1, built from that source with Rust and the Android NDK (the conductor library is about 100 MB unpacked, arm64 only).
 - The workflow builds them, then the bridge, and publishes the release. Run it by pushing a tag `oasis-android-libs-v*` on that branch.
 
 ## Status

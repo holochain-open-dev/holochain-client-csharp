@@ -45,7 +45,7 @@ var client = app.HoloNETClientAppAgent;
 Console.WriteLine("My agent: " + app.AgentPubKey);
 ```
 
-That one call does everything Holochain 0.7 needs:
+That one call does everything Holochain 0.7.0 and 0.7.1 need:
 1. Generates an agent key.
 2. Installs the hApp.
 3. Enables it.

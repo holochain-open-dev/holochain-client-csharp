@@ -17,7 +17,7 @@ Then run the app as usual for this app type (`dotnet run`, or press F5 in your I
 
 ## Holochain on iOS
 
-An iPhone cannot run a separate conductor process, so the conductor is linked into the app (Holochain 0.7 with the wasmi interpreter, because iOS forbids
+An iPhone cannot run a separate conductor process, so the conductor is linked into the app (Holochain 0.7.1 with the wasmi interpreter, because iOS forbids
 JIT). On iOS the app starts it with `HoloNETIosRuntime.cs`, which calls `HoloNETIosBridge.xcframework`: put that in `runtime/ios` (see `runtime/ios/README.md`).
 Without it the app connects to a conductor you run (`HoloNETDemo.AdminUri`).
 

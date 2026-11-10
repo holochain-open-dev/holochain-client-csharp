@@ -36,7 +36,7 @@ var dna = new HoloNETDNA { EmbeddedHolochainVersion = EmbeddedHolochainVersion.V
 
 ## 3. Install a hApp and call a zome function
 
-The admin client does the whole Holochain 0.7 setup in one call:
+The admin client does the whole Holochain 0.7.0 and 0.7.1 setup in one call:
 
 1. Generates an agent key.
 2. Installs the `.happ` (or keeps it if it's already installed).
@@ -90,11 +90,11 @@ var admin = new HoloNETClientAdmin(new HoloNETDNA
 - **Your own entry types as C# classes:** see the [HoloNET ORM guide](orm-guide.md).
 - **Multiplayer:** see the [HyperNET guide](hypernet-guide.md).
 
-## 5. Things that trip people up on Holochain 0.7
+## 5. Things that trip people up on Holochain 0.7.0 and 0.7.1
 
 - **ActionHash vs EntryHash.** Updates and deletes take the ActionHash of the record (`result.ZomeReturnHash` after a create). The ORM handles this for you.
 - **App authentication tokens.** Since 0.6, every app-interface connection needs a token from the admin API. `InstallEnableSignAttachAndConnectToHappAsync` gets one. If you connect an app client yourself, call `admin.IssueAppAuthenticationTokenAsync` and set `HoloNETDNA.AppAuthenticationToken`.
-- **Capability grants.** Holochain 0.7 rejects unrestricted grants for zome-call signing. HoloNET defaults to `CapGrantAccessType.Assigned`, which is correct.
+- **Capability grants.** Holochain 0.7.0 and 0.7.1 reject unrestricted grants for zome-call signing. HoloNET defaults to `CapGrantAccessType.Assigned`, which is correct.
 - **Sync methods inside events.** Every method has a sync version, and they are safe to call from inside HoloNET's own event handlers. Prefer the `Async` versions anyway.
 
 ## 6. Logging

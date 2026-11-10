@@ -190,9 +190,9 @@ def packages_markdown(m):
     if plat_libs:
         names = ', '.join(f"`{l['name']}`" for l in plat_libs)
         lines += [
-            '## Offline packages for Linux and macOS',
+            '## Offline packages for Windows, Linux and macOS',
             '',
-            f'{names} also come with the conductor bundled for Linux and macOS, so an app works with no internet and nothing to install. Each package holds one operating system and processor (so none is bigger than the Windows ones), and the same three Holochain choices:',
+            f'{names} also come with the conductor bundled for Windows (the plain `.Embedded` packages above) and for Linux and macOS (the packages below), so an app works with no internet and nothing to install on all three. Each package holds one operating system and processor (so none is bigger than the Windows ones), and the same three Holochain choices:',
             '',
             '| Package suffix | For |',
             '|---|---|',

@@ -1,6 +1,6 @@
 # Generate a hApp from your classes
 
-**You'll build:** a complete Holochain 0.7 hApp (the Rust zomes, manifests and a build script) and the matching C# models, generated from a description of your data. You don't write any Rust.
+**You'll build:** a complete Holochain 0.7.x hApp (0.7.0 and 0.7.1) (the Rust zomes, manifests and a build script) and the matching C# models, generated from a description of your data. You don't write any Rust.
 **Time:** 20 minutes (plus the first Rust build). **You need:** [Rust](https://rustup.rs) with `rustup target add wasm32-unknown-unknown`, and Holochain's `hc` (bundled with HoloNET on Windows).
 **Finished code:** [`examples/05-GenerateHapp`](https://github.com/holochain-open-dev/holochain-client-csharp/blob/main/examples/05-GenerateHapp/Program.cs) and its [STAR OAPP](https://github.com/holochain-open-dev/holochain-client-csharp/tree/main/examples/05-GenerateHapp/StarOAPP).
 
@@ -35,7 +35,7 @@ public class Game : ZomeDNA
    star light
    ```
 
-2. Give it the folder with your DNA file. STAR writes the OAPP, plus the hApp in `<OAPP folder>/Rust`, from its editable Holochain 0.7 templates.
+2. Give it the folder with your DNA file. STAR writes the OAPP, plus the hApp in `<OAPP folder>/Rust`, from its editable Holochain 0.7 templates (for 0.7.0 and 0.7.1).
 
 ## 2b. ...or generate it from code
 
@@ -80,7 +80,7 @@ await fleet.LoadCollectionAsync("fleet-1");
 
 ## What just happened
 
-- **Coverage.** The generator wrote everything Holochain 0.7 needs for each entry: CRUD, a list of all entries, anchored collections, and a `validate` callback ready for your rules.
+- **Coverage.** The generator wrote everything Holochain 0.7.0 and 0.7.1 need for each entry: CRUD, a list of all entries, anchored collections, and a `validate` callback ready for your rules.
 - **Matching models.** The C# models use the zome functions the generated hApp has, so they work together without changes.
 - **It's yours.** Add validation rules, extra zome functions or links between entries. HoloNET's own tests generate this kind of hApp, compile it with cargo, and drive it with the ORM on real 0.7.0 and 0.7.1 conductors.
 
