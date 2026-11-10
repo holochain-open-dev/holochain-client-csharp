@@ -4,7 +4,7 @@
     <OutputType>Exe</OutputType>
     <Nullable>disable</Nullable>
     <ImplicitUsings>true</ImplicitUsings>
-    <SupportedOSPlatformVersion>15.0</SupportedOSPlatformVersion>
+    <SupportedOSPlatformVersion>13.0</SupportedOSPlatformVersion>
 
     <!--
       Enable full trimming in Release mode.
@@ -21,6 +21,17 @@
     <!-- Only for the OASIS hApp (oasis.happ) the demo installs: HoloNET API copies it next to your app. Use your own .happ and drop this. -->
     <PackageReference Include="NextGenSoftware.Holochain.HoloNET.APIHOLONET_PKG_SUFFIX" Version="HOLONET_VERSION" />
     <!--#endif-->
+  </ItemGroup>
+
+  <PropertyGroup Condition="'$(TargetPlatformIdentifier)' == 'ios'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(TargetPlatformIdentifier)' == 'ios'">
+    <!-- The conductor for iOS: put HoloNETIosBridge.xcframework in runtime/ios (see runtime/ios/README.md). It is linked into the app. -->
+    <NativeReference Include="runtime/ios/HoloNETIosBridge.xcframework" Kind="Static" ForceLoad="true" Condition="Exists('runtime/ios/HoloNETIosBridge.xcframework')"
+                     Frameworks="Security SystemConfiguration Network CoreFoundation" LinkerFlags="-lresolv" />
+    <BundleResource Include="$(NuGetPackageRoot)nextgensoftware.holochain.holonet.api/HOLONET_VERSION/content/oasis.happ" Link="oasis.happ"
+                    Condition="Exists('$(NuGetPackageRoot)nextgensoftware.holochain.holonet.api/HOLONET_VERSION/content/oasis.happ')" />
   </ItemGroup>
 
 </Project>

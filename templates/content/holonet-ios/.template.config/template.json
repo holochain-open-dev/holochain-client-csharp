@@ -150,13 +150,9 @@
         ]
       }
     },
-    "AndroidRuntime": {
+    "PhoneRuntime": {
       "type": "computed",
-      "value": "false"
-    },
-    "AndroidRuntimeApp": {
-      "type": "computed",
-      "value": "false"
+      "value": "true"
     },
     "UseEmbedded": {
       "type": "computed",

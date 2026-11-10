@@ -48,6 +48,8 @@ def sub_re(path, pattern, repl, flags=re.S):
 
 # App types that run on Android and can use the Holochain runtime on the phone (templates/shared/HoloNETAndroidRuntime.cs).
 ANDROID_RUNTIME = {'android', 'maui', 'maui-blazor', 'uno'}
+# ... and iOS (the iOS bridge is built by CI but not yet proven on a physical iPhone)
+PHONE_RUNTIME = ANDROID_RUNTIME | {'ios'}
 # App types that run on iOS: the iOS conductor runs on the simulator only so far, so they still connect to a conductor you run.
 IOS_TYPES = {'ios', 'maui', 'maui-blazor', 'uno'}
 
@@ -653,18 +655,59 @@ TYPES = [
 ]
 
 
-def package_block(forced_external, cpm=False, android_runtime=False):
+def package_block(forced_external, cpm=False, android_runtime=False, ios_runtime=False, minimal_deps=False):
     """The HoloNET package references for the generated csproj. HOLONET_* tokens are replaced by the template engine."""
     ver = '' if cpm else ' Version="HOLONET_VERSION"'
     runtime = '''  <ItemGroup Condition="'$(TargetPlatformIdentifier)' == 'android'">
     <!-- The Holochain runtime for Android: put the bridge and runtime .aar files in runtime/android (see README.md). The hApp is packed as an Android asset
          because an Android app cannot read files next to it. -->
     <AndroidAarLibrary Include="runtime/android/*.aar" />
-    <AndroidAsset Include="$(NuGetPackageRoot)nextgensoftware.holochain.holonet.api/HOLONET_VERSION/contentFiles/any/net8.0/oasis.happ" Link="oasis.happ"
-                  Condition="Exists('$(NuGetPackageRoot)nextgensoftware.holochain.holonet.api/HOLONET_VERSION/contentFiles/any/net8.0/oasis.happ')" />
+    <AndroidJavaLibrary Include="runtime/android/*.jar" />
+    <AndroidAsset Include="$(NuGetPackageRoot)nextgensoftware.holochain.holonet.api/HOLONET_VERSION/content/oasis.happ" Link="oasis.happ"
+                  Condition="Exists('$(NuGetPackageRoot)nextgensoftware.holochain.holonet.api/HOLONET_VERSION/content/oasis.happ')" />
   </ItemGroup>
 
+  <!-- First build for Android: download the Holochain runtime libraries (about 38 MB) from the android-service-runtime release into runtime/android.
+       Set HoloNETDownloadRuntime=false to skip it and put your own libraries there. -->
+  <PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
+    <!-- The Holochain Android runtime libraries need Android 8.1 (API 27) or newer. -->
+    <SupportedOSPlatformVersion>27.0</SupportedOSPlatformVersion>
+  </PropertyGroup>
+  <PropertyGroup>
+    <HoloNETRuntimeDeps Condition="'$(HoloNETRuntimeDeps)' == ''">MINIMAL_DEPS</HoloNETRuntimeDeps>
+    <HoloNETRuntimeUrl Condition="'$(HoloNETRuntimeUrl)' == ''">https://github.com/NextGenSoftwareUK/android-service-runtime/releases/download/oasis-android-libs-v1.0.0</HoloNETRuntimeUrl>
+  </PropertyGroup>
+  <Target Name="HoloNETFetchAndroidRuntime" BeforeTargets="ResolveAssemblyReferences;_ResolveAars;_GenerateJavaDesignerForComponent" Condition="'$(TargetPlatformIdentifier)' == 'android' And '$(HoloNETDownloadRuntime)' != 'false' And !Exists('$(MSBuildProjectDirectory)/runtime/android/holochain-service.aar')">
+    <DownloadFile SourceUrl="$(HoloNETRuntimeUrl)/holochain-client.aar" DestinationFolder="$(MSBuildProjectDirectory)/runtime/android" SkipUnchangedFiles="true" />
+    <DownloadFile SourceUrl="$(HoloNETRuntimeUrl)/holochain-service.aar" DestinationFolder="$(MSBuildProjectDirectory)/runtime/android" SkipUnchangedFiles="true" />
+    <DownloadFile SourceUrl="$(HoloNETRuntimeUrl)/holonet-android-bridge.aar" DestinationFolder="$(MSBuildProjectDirectory)/runtime/android" SkipUnchangedFiles="true" />
+    <DownloadFile SourceUrl="$(HoloNETRuntimeUrl)/holochain-android-dependencies.zip" DestinationFolder="$(MSBuildProjectDirectory)/runtime/android/dependencies-zip" SkipUnchangedFiles="true" />
+    <Unzip SourceFiles="$(MSBuildProjectDirectory)/runtime/android/dependencies-zip/holochain-android-dependencies.zip" DestinationFolder="$(MSBuildProjectDirectory)/runtime/android" OverwriteReadOnlyFiles="true" />
+    <!-- MAUI and Uno bring their own AndroidX, Material and Kotlin libraries: keep only the Holochain libraries and JNA, or the duplicates fail the build. -->
+    <ItemGroup Condition="'$(HoloNETRuntimeDeps)' == 'minimal'">
+      <HoloNETDropLib Include="$(MSBuildProjectDirectory)/runtime/android/*.aar;$(MSBuildProjectDirectory)/runtime/android/*.jar"
+                      Exclude="$(MSBuildProjectDirectory)/runtime/android/holochain-*.aar;$(MSBuildProjectDirectory)/runtime/android/holonet-*.aar;$(MSBuildProjectDirectory)/runtime/android/jna-*.aar" />
+    </ItemGroup>
+    <Delete Files="@(HoloNETDropLib)" />
+    <ItemGroup>
+      <AndroidAarLibrary Include="$(MSBuildProjectDirectory)/runtime/android/*.aar" />
+      <AndroidJavaLibrary Include="$(MSBuildProjectDirectory)/runtime/android/*.jar" />
+    </ItemGroup>
+  </Target>
+
 ''' if android_runtime else ''
+    ios = '''  <PropertyGroup Condition="'$(TargetPlatformIdentifier)' == 'ios'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(TargetPlatformIdentifier)' == 'ios'">
+    <!-- The conductor for iOS: put HoloNETIosBridge.xcframework in runtime/ios (see runtime/ios/README.md). It is linked into the app. -->
+    <NativeReference Include="runtime/ios/HoloNETIosBridge.xcframework" Kind="Static" ForceLoad="true" Condition="Exists('runtime/ios/HoloNETIosBridge.xcframework')"
+                     Frameworks="Security SystemConfiguration Network CoreFoundation" LinkerFlags="-lresolv" />
+    <BundleResource Include="$(NuGetPackageRoot)nextgensoftware.holochain.holonet.api/HOLONET_VERSION/content/oasis.happ" Link="oasis.happ"
+                    Condition="Exists('$(NuGetPackageRoot)nextgensoftware.holochain.holonet.api/HOLONET_VERSION/content/oasis.happ')" />
+  </ItemGroup>
+
+''' if ios_runtime else ''
     return '''
   <ItemGroup>
     <!-- HoloNET: the library chosen with the HoloNET option (api, client, orm or hypernet). HOLONET_PKG_SUFFIX is .Embedded* when the Holochain conductor
@@ -676,7 +719,7 @@ def package_block(forced_external, cpm=False, android_runtime=False):
     <!--#endif-->
   </ItemGroup>
 
-''' % {'ver': ver} + runtime
+''' % {'ver': ver} + runtime.replace('MINIMAL_DEPS', 'minimal' if minimal_deps else 'full') + ios
 
 
 def template_json(key, name, classifications, forced_external):
@@ -715,13 +758,7 @@ def template_json(key, name, classifications, forced_external):
             {'condition': '(UseEmbedded)', 'value': '.Embedded'},
             {'condition': '(!UseEmbedded)', 'value': ''}]}},
     }
-    has_runtime = key in ANDROID_RUNTIME
-    sym['AndroidRuntime'] = {'type': 'computed', 'value': 'true' if has_runtime else 'false'}
-    sym['AndroidRuntimeApp'] = {'type': 'computed', 'value': '(AndroidRuntime && (UseClient || UseOrm))' if has_runtime else 'false'}
-    if key == 'android':
-        # An Android-only app uses the runtime on the phone, which the Client and ORM libraries support (the API and HyperNET need a conductor admin connection).
-        sym['HoloNET']['defaultValue'] = 'client'
-        sym['HoloNET']['description'] = 'Which HoloNET library the app uses (client and orm use the Holochain runtime on the phone).'
+    sym['PhoneRuntime'] = {'type': 'computed', 'value': 'true' if key in PHONE_RUNTIME else 'false'}
     if forced_external:
         sym['UseEmbedded'] = {'type': 'computed', 'value': 'false'}
         # (no Conductor / HolochainVersion choice: this app type cannot host a conductor, so it connects to one you run)
@@ -788,28 +825,30 @@ On other platforms create the starter with `--Conductor external`, and run a con
 
 
 RUNTIME_LINKS = '''- Source: [android-service-runtime](https://github.com/NextGenSoftwareUK/android-service-runtime) (a fork of [holochain/android-service-runtime](https://github.com/holochain/android-service-runtime); our Holochain 0.7 work is on the [`oasis/holochain-0.7`](https://github.com/NextGenSoftwareUK/android-service-runtime/tree/oasis/holochain-0.7) branch)
-- Android releases: [oasis-holochain-0.7-v1.0.0](https://github.com/NextGenSoftwareUK/android-service-runtime/releases/tag/oasis-holochain-0.7-v1.0.0) (pre-release: arm64 and x86_64 runtime APKs, build manifest, SHA256SUMS) and [oasis-runtime-v0.2.0-holochain-0.7](https://github.com/NextGenSoftwareUK/android-service-runtime/releases/tag/oasis-runtime-v0.2.0-holochain-0.7)
+- Android libraries for apps (client, service, bridge, dependencies; Holochain 0.7, arm64): [oasis-android-libs-v1.0.0](https://github.com/NextGenSoftwareUK/android-service-runtime/releases/tag/oasis-android-libs-v1.0.0)
+- iOS bridge for .NET apps (the `holo_ios_*` C ABI with the conductor, device and simulator): [oasis-ios-bridge-v1.0.0](https://github.com/NextGenSoftwareUK/android-service-runtime/releases/tag/oasis-ios-bridge-v1.0.0)
+- Android runtime app releases: [oasis-holochain-0.7-v1.0.0](https://github.com/NextGenSoftwareUK/android-service-runtime/releases/tag/oasis-holochain-0.7-v1.0.0) (pre-release: arm64 and x86_64 runtime APKs, build manifest, SHA256SUMS) and [oasis-runtime-v0.2.0-holochain-0.7](https://github.com/NextGenSoftwareUK/android-service-runtime/releases/tag/oasis-runtime-v0.2.0-holochain-0.7)
 - iOS releases: [oasis-ios-conductor-v0.7.1](https://github.com/NextGenSoftwareUK/android-service-runtime/releases/tag/oasis-ios-conductor-v0.7.1) and [oasis-ios-conductor-v0.1.1](https://github.com/NextGenSoftwareUK/android-service-runtime/releases/tag/oasis-ios-conductor-v0.1.1)
-- OASIS Edge runtime (what Our World uses): [OASIS releases](https://github.com/NextGenSoftwareUK/OASIS/releases): `OASIS-Edge-Runtime-v1.2.0`, `OASIS-Edge-Unity-v1.1.0`, `OGEngineClient-Edge-v2.1.0`
+- OASIS Edge runtime (what Our World uses), by product: [Edge Runtime only](https://github.com/NextGenSoftwareUK/OASIS/releases/tag/OASIS-Edge-Runtime-v1.2.0), [OGEngineClient + Edge](https://github.com/NextGenSoftwareUK/OASIS/releases/tag/OGEngineClient-Edge-v2.1.0), [OGEngineClient + Edge + Unity](https://github.com/NextGenSoftwareUK/OASIS/releases/tag/OASIS-Edge-Unity-v1.1.0), [OGEngineClient RemoteOnly](https://github.com/NextGenSoftwareUK/OASIS/releases/tag/OGEngineClient-RemoteOnly-v2.1.0), all in the [OASIS releases](https://github.com/NextGenSoftwareUK/OASIS/releases)
 - The bridge this template calls: [android-runtime](https://github.com/holochain-open-dev/holochain-client-csharp/tree/main/android-runtime) in the HoloNET repo'''
 
 
 def android_runtime_folder_readme():
     return '''# Holochain runtime libraries for Android
 
-Put the Holochain Android libraries (`.aar` files) in this folder. The project includes every `*.aar` here when it builds for Android
-(`HoloNETApp.csproj`), and `HoloNETAndroidRuntime.cs` finds the bridge class in them.
-
-You need three libraries, built from the runtime source (see the links in the main README.md):
+The first time you build for Android, the project downloads the Holochain runtime libraries from the
+[oasis-android-libs-v1.0.0](https://github.com/NextGenSoftwareUK/android-service-runtime/releases/tag/oasis-android-libs-v1.0.0) release (about 38 MB) into this folder, and includes every `*.aar` and `*.jar` here
+(`HoloNETApp.csproj`). `HoloNETAndroidRuntime.cs` then finds the bridge class in them.
 
 | File | What it is |
 |---|---|
 | `holochain-client.aar` | Client for the Holochain Service Runtime (the shared conductor on the phone), with the Holochain 0.7 parcelers |
-| `holochain-service.aar` | The Holochain conductor as an Android service: used for the built-in conductor when the phone has no shared runtime |
+| `holochain-service.aar` | The Holochain conductor as an Android service (arm64 only): the built-in conductor used when the phone has no shared runtime |
 | `holonet-android-bridge.aar` | The Kotlin bridge that picks shared or built-in and signs zome calls (source: `android-runtime/` in the HoloNET repo) |
+| `holochain-android-dependencies.zip` | The bridge's runtime dependencies (unpacked here as `.jar` / `.aar` files) |
 
-The conductor library is large (about 100 MB, arm64 only), so these are not shipped in the template. Without them the app still builds,
-`HoloNETAndroidRuntime.IsBridgeAvailable` is false, and the demo connects to a conductor you run (`HoloNETDemo.AdminUri`).
+To use your own build instead, set `HoloNETDownloadRuntime=false` (`dotnet build -p:HoloNETDownloadRuntime=false`) and put your files here.
+The libraries need Android 8.1 (API 27) or newer, so the template sets that as the minimum.
 '''
 
 
@@ -822,18 +861,18 @@ On Android the app starts the Holochain runtime **on the phone**, the same way O
    notification the user approves once. The app then uses the phone's one shared conductor (every Holochain app on the phone shares it).
 2. If the runtime is not installed, is not approved in time (60 seconds by default), or setup fails, the app **falls back to the conductor built into
    the app** (a foreground service).
-3. If the bridge libraries are not in `runtime/android` (see `runtime/android/README.md`), the app connects to a conductor you run instead
-   (`HoloNETDemo.AdminUri`).
+3. The runtime libraries are downloaded into `runtime/android` on the first build (see `runtime/android/README.md`). If they are missing (for example you
+   built with `-p:HoloNETDownloadRuntime=false`), the app connects to a conductor you run instead (`HoloNETDemo.AdminUri`).
 
-Zome calls are signed by the conductor (`AndroidRuntimeZomeCallSigner`), because an app has no admin access to grant itself signing credentials.
-The demo uses the runtime with `--HoloNET client` or `--HoloNET orm`. The HoloNET API and HyperNET libraries install the hApp through the conductor's
-admin interface, which the phone's runtime does not expose to apps, so with those two the app still connects to a conductor you run.
+Zome calls are signed by the conductor, because an app has no admin access to grant itself signing credentials. It works with every `--HoloNET`
+choice: the Client and ORM demos use the app connection directly, the API uses `HoloNETAPI.UseAppClientAsync`, and the HyperNET demo joins a zone as the
+one player the runtime holds.
 
 **Status: not yet run on a physical phone.** The shared-runtime path is proven by the OASIS team on an x86_64 emulator, not on a physical phone, and this
-template's wrapper has been compiled for Android but not run on a device or emulator. Please test it on yours and tell us what you find.
+template's wrapper has been compiled and packed with the real libraries for Android, but not run on a device or emulator. Please test it on yours and tell us what you find.
 
 To try it: install the runtime on the emulator or phone (`adb install android-service-runtime-0.2.0-holochain-0.7-x86_64-debug.apk` for an x86_64
-emulator, the arm64 APK for a phone), put the `.aar` files in `runtime/android`, run the app and approve the notification.
+emulator, the arm64 APK for a phone), build and run the app, and approve the notification.
 
 Runtime source and releases:
 
@@ -843,12 +882,28 @@ Runtime source and releases:
 IOS_SECTION = '''
 ## Holochain on iOS
 
-An iPhone cannot run a separate conductor process, so the iOS runtime links the conductor into the app. The OASIS team has built it
-(`HolochainConductor.xcframework` with Swift bindings) and runs it on the **iOS simulator**: it starts, installs the OASIS hApp and signs a zome call.
-It is **not yet proven on a physical iPhone**, and these templates do not wire it in: on iOS the app connects to a conductor you run
-(`HoloNETDemo.AdminUri`). Runtime source and releases:
+An iPhone cannot run a separate conductor process, so the conductor is linked into the app (Holochain 0.7 with the wasmi interpreter, because iOS forbids
+JIT). On iOS the app starts it with `HoloNETIosRuntime.cs`, which calls `HoloNETIosBridge.xcframework`: put that in `runtime/ios` (see `runtime/ios/README.md`).
+Without it the app connects to a conductor you run (`HoloNETDemo.AdminUri`).
+
+**Status:** the conductor runs on the **iOS simulator** in the OASIS team's CI (it starts, installs the OASIS hApp and signs a zome call). It is **not yet proven
+on a physical iPhone**, and this template's wrapper has **not been compiled or run by us on a Mac**. Treat it as ready to test. Runtime source and releases:
 
 ''' + RUNTIME_LINKS + '''
+'''
+
+
+def ios_runtime_folder_readme():
+    return '''# Holochain conductor for iOS
+
+Put `HoloNETIosBridge.xcframework` in this folder. The project links it into the app (`HoloNETApp.csproj`, `NativeReference`) and `HoloNETIosRuntime.cs`
+calls its C functions (`holo_ios_*`). It contains the Holochain 0.7 conductor (wasmi interpreter, device and Apple-silicon simulator) and the bridge.
+
+Download `HoloNETIosBridge.xcframework.zip` (about 127 MB) from the [oasis-ios-bridge-v1.0.0](https://github.com/NextGenSoftwareUK/android-service-runtime/releases/tag/oasis-ios-bridge-v1.0.0) release and unzip it here. It is built by that repository's `oasis-ios-bridge` workflow, which compiles the Swift C-ABI bridge and merges it with the
+[oasis-ios-conductor-v0.7.1](https://github.com/NextGenSoftwareUK/android-service-runtime/releases/tag/oasis-ios-conductor-v0.7.1) conductor.
+
+The bridge build confirmed the `holo_ios_*` symbols are in the library for device and simulator; it has not been linked into a .NET app by us. The bridge build confirmed the `holo_ios_*` symbols are in the library for device and simulator; it has not been linked into a .NET app by us. Without it the app still builds, `HoloNETIosRuntime.IsBridgeAvailable` is false, and the demo connects to a conductor you run (`HoloNETDemo.AdminUri`).
+The conductor is large (about 200 MB per slice before the linker strips it).
 '''
 
 
@@ -859,11 +914,11 @@ def readme(key, name, forced_external):
         if key == 'blazorwasm':
             why = 'Browsers cannot host a conductor, so this app connects to one you run on your development machine'
         elif key in ANDROID_RUNTIME:
-            why = ('On Android this app uses the Holochain runtime on the phone (see "Holochain on the phone (Android)" below). Everywhere else it does not bundle\n'
+            why = ('On Android (and iOS, see below) this app uses the Holochain runtime on the phone (see "Holochain on the phone (Android)" below). Everywhere else it does not bundle\n'
                    'a conductor, so it connects to one you run on your development machine')
         elif key == 'ios':
-            why = ('This app does not bundle a Holochain conductor yet (an iOS conductor exists but is only proven on the simulator: see "Holochain on iOS" below),\n'
-                   'so it connects to one you run on your development machine')
+            why = ('On iOS this app can run the conductor inside the app (see "Holochain on iOS" below). Without the runtime library it does not bundle\n'
+                   'a conductor, so it connects to one you run on your development machine')
         else:
             why = 'This app type does not bundle a Holochain conductor, so it connects to one you run on your development machine'
         cond = (why + '\n(`ws://localhost:7777`). Start it with `./start-conductor.sh` (Git Bash, Linux, macOS) or `.\\start-conductor.ps1` (PowerShell), and set\n'
@@ -933,7 +988,7 @@ def build(key, base_args, patch, name, classes, forced, proj='', cpm=False, nocs
         s = rd(csproj)
         s = s.replace('<Nullable>enable</Nullable>', '<Nullable>disable</Nullable>')
         i = s.rindex('</Project>')
-        wr(csproj, s[:i].rstrip('\n') + '\n' + package_block(forced, cpm, key in ANDROID_RUNTIME) + s[i:])
+        wr(csproj, s[:i].rstrip('\n') + '\n' + package_block(forced, cpm, key in ANDROID_RUNTIME, key in IOS_TYPES, key != 'android') + s[i:])
     patch(out)
     demo = rd(os.path.join(SHARED, 'HoloNETDemo.cs')).replace('HOLONET_LIB_TEXT', 'HOLONET_LIBRARY_NAME')
     if forced:
@@ -942,6 +997,9 @@ def build(key, base_args, patch, name, classes, forced, proj='', cpm=False, nocs
     if key in ANDROID_RUNTIME:
         wr(os.path.join(out, 'HoloNETAndroidRuntime.cs'), rd(os.path.join(SHARED, 'HoloNETAndroidRuntime.cs')))
         wr(os.path.join(out, 'runtime', 'android', 'README.md'), android_runtime_folder_readme())
+    if key in IOS_TYPES:
+        wr(os.path.join(out, 'HoloNETIosRuntime.cs'), rd(os.path.join(SHARED, 'HoloNETIosRuntime.cs')))
+        wr(os.path.join(out, 'runtime', 'ios', 'README.md'), ios_runtime_folder_readme())
     wr(os.path.join(root, 'README.md'), readme(key, name, forced))
     for f in ('start-conductor.sh', 'start-conductor.ps1', '.gitignore'):
         shutil.copy(os.path.join(SHARED, f), os.path.join(root, f))

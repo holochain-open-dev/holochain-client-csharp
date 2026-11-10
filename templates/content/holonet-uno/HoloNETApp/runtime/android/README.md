@@ -1,15 +1,15 @@
 # Holochain runtime libraries for Android
 
-Put the Holochain Android libraries (`.aar` files) in this folder. The project includes every `*.aar` here when it builds for Android
-(`HoloNETApp.csproj`), and `HoloNETAndroidRuntime.cs` finds the bridge class in them.
-
-You need three libraries, built from the runtime source (see the links in the main README.md):
+The first time you build for Android, the project downloads the Holochain runtime libraries from the
+[oasis-android-libs-v1.0.0](https://github.com/NextGenSoftwareUK/android-service-runtime/releases/tag/oasis-android-libs-v1.0.0) release (about 38 MB) into this folder, and includes every `*.aar` and `*.jar` here
+(`HoloNETApp.csproj`). `HoloNETAndroidRuntime.cs` then finds the bridge class in them.
 
 | File | What it is |
 |---|---|
 | `holochain-client.aar` | Client for the Holochain Service Runtime (the shared conductor on the phone), with the Holochain 0.7 parcelers |
-| `holochain-service.aar` | The Holochain conductor as an Android service: used for the built-in conductor when the phone has no shared runtime |
+| `holochain-service.aar` | The Holochain conductor as an Android service (arm64 only): the built-in conductor used when the phone has no shared runtime |
 | `holonet-android-bridge.aar` | The Kotlin bridge that picks shared or built-in and signs zome calls (source: `android-runtime/` in the HoloNET repo) |
+| `holochain-android-dependencies.zip` | The bridge's runtime dependencies (unpacked here as `.jar` / `.aar` files) |
 
-The conductor library is large (about 100 MB, arm64 only), so these are not shipped in the template. Without them the app still builds,
-`HoloNETAndroidRuntime.IsBridgeAvailable` is false, and the demo connects to a conductor you run (`HoloNETDemo.AdminUri`).
+To use your own build instead, set `HoloNETDownloadRuntime=false` (`dotnet build -p:HoloNETDownloadRuntime=false`) and put your files here.
+The libraries need Android 8.1 (API 27) or newer, so the template sets that as the minimum.

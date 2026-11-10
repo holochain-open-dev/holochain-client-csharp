@@ -21,8 +21,8 @@
     "HoloNET": {
       "type": "parameter",
       "datatype": "choice",
-      "defaultValue": "client",
-      "description": "Which HoloNET library the app uses (client and orm use the Holochain runtime on the phone).",
+      "defaultValue": "api",
+      "description": "Which HoloNET library the app uses.",
       "choices": [
         {
           "choice": "api",
@@ -150,13 +150,9 @@
         ]
       }
     },
-    "AndroidRuntime": {
+    "PhoneRuntime": {
       "type": "computed",
       "value": "true"
-    },
-    "AndroidRuntimeApp": {
-      "type": "computed",
-      "value": "(AndroidRuntime && (UseClient || UseOrm))"
     },
     "UseEmbedded": {
       "type": "computed",

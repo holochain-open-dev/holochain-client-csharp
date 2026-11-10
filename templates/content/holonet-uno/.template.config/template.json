@@ -152,13 +152,9 @@
         ]
       }
     },
-    "AndroidRuntime": {
+    "PhoneRuntime": {
       "type": "computed",
       "value": "true"
-    },
-    "AndroidRuntimeApp": {
-      "type": "computed",
-      "value": "(AndroidRuntime && (UseClient || UseOrm))"
     },
     "UseEmbedded": {
       "type": "computed",

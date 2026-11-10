@@ -40,8 +40,48 @@
     <!-- The Holochain runtime for Android: put the bridge and runtime .aar files in runtime/android (see README.md). The hApp is packed as an Android asset
          because an Android app cannot read files next to it. -->
     <AndroidAarLibrary Include="runtime/android/*.aar" />
-    <AndroidAsset Include="$(NuGetPackageRoot)nextgensoftware.holochain.holonet.api/HOLONET_VERSION/contentFiles/any/net8.0/oasis.happ" Link="oasis.happ"
-                  Condition="Exists('$(NuGetPackageRoot)nextgensoftware.holochain.holonet.api/HOLONET_VERSION/contentFiles/any/net8.0/oasis.happ')" />
+    <AndroidJavaLibrary Include="runtime/android/*.jar" />
+    <AndroidAsset Include="$(NuGetPackageRoot)nextgensoftware.holochain.holonet.api/HOLONET_VERSION/content/oasis.happ" Link="oasis.happ"
+                  Condition="Exists('$(NuGetPackageRoot)nextgensoftware.holochain.holonet.api/HOLONET_VERSION/content/oasis.happ')" />
+  </ItemGroup>
+
+  <!-- First build for Android: download the Holochain runtime libraries (about 38 MB) from the android-service-runtime release into runtime/android.
+       Set HoloNETDownloadRuntime=false to skip it and put your own libraries there. -->
+  <PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
+    <!-- The Holochain Android runtime libraries need Android 8.1 (API 27) or newer. -->
+    <SupportedOSPlatformVersion>27.0</SupportedOSPlatformVersion>
+  </PropertyGroup>
+  <PropertyGroup>
+    <HoloNETRuntimeDeps Condition="'$(HoloNETRuntimeDeps)' == ''">minimal</HoloNETRuntimeDeps>
+    <HoloNETRuntimeUrl Condition="'$(HoloNETRuntimeUrl)' == ''">https://github.com/NextGenSoftwareUK/android-service-runtime/releases/download/oasis-android-libs-v1.0.0</HoloNETRuntimeUrl>
+  </PropertyGroup>
+  <Target Name="HoloNETFetchAndroidRuntime" BeforeTargets="ResolveAssemblyReferences;_ResolveAars;_GenerateJavaDesignerForComponent" Condition="'$(TargetPlatformIdentifier)' == 'android' And '$(HoloNETDownloadRuntime)' != 'false' And !Exists('$(MSBuildProjectDirectory)/runtime/android/holochain-service.aar')">
+    <DownloadFile SourceUrl="$(HoloNETRuntimeUrl)/holochain-client.aar" DestinationFolder="$(MSBuildProjectDirectory)/runtime/android" SkipUnchangedFiles="true" />
+    <DownloadFile SourceUrl="$(HoloNETRuntimeUrl)/holochain-service.aar" DestinationFolder="$(MSBuildProjectDirectory)/runtime/android" SkipUnchangedFiles="true" />
+    <DownloadFile SourceUrl="$(HoloNETRuntimeUrl)/holonet-android-bridge.aar" DestinationFolder="$(MSBuildProjectDirectory)/runtime/android" SkipUnchangedFiles="true" />
+    <DownloadFile SourceUrl="$(HoloNETRuntimeUrl)/holochain-android-dependencies.zip" DestinationFolder="$(MSBuildProjectDirectory)/runtime/android/dependencies-zip" SkipUnchangedFiles="true" />
+    <Unzip SourceFiles="$(MSBuildProjectDirectory)/runtime/android/dependencies-zip/holochain-android-dependencies.zip" DestinationFolder="$(MSBuildProjectDirectory)/runtime/android" OverwriteReadOnlyFiles="true" />
+    <!-- MAUI and Uno bring their own AndroidX, Material and Kotlin libraries: keep only the Holochain libraries and JNA, or the duplicates fail the build. -->
+    <ItemGroup Condition="'$(HoloNETRuntimeDeps)' == 'minimal'">
+      <HoloNETDropLib Include="$(MSBuildProjectDirectory)/runtime/android/*.aar;$(MSBuildProjectDirectory)/runtime/android/*.jar"
+                      Exclude="$(MSBuildProjectDirectory)/runtime/android/holochain-*.aar;$(MSBuildProjectDirectory)/runtime/android/holonet-*.aar;$(MSBuildProjectDirectory)/runtime/android/jna-*.aar" />
+    </ItemGroup>
+    <Delete Files="@(HoloNETDropLib)" />
+    <ItemGroup>
+      <AndroidAarLibrary Include="$(MSBuildProjectDirectory)/runtime/android/*.aar" />
+      <AndroidJavaLibrary Include="$(MSBuildProjectDirectory)/runtime/android/*.jar" />
+    </ItemGroup>
+  </Target>
+
+  <PropertyGroup Condition="'$(TargetPlatformIdentifier)' == 'ios'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(TargetPlatformIdentifier)' == 'ios'">
+    <!-- The conductor for iOS: put HoloNETIosBridge.xcframework in runtime/ios (see runtime/ios/README.md). It is linked into the app. -->
+    <NativeReference Include="runtime/ios/HoloNETIosBridge.xcframework" Kind="Static" ForceLoad="true" Condition="Exists('runtime/ios/HoloNETIosBridge.xcframework')"
+                     Frameworks="Security SystemConfiguration Network CoreFoundation" LinkerFlags="-lresolv" />
+    <BundleResource Include="$(NuGetPackageRoot)nextgensoftware.holochain.holonet.api/HOLONET_VERSION/content/oasis.happ" Link="oasis.happ"
+                    Condition="Exists('$(NuGetPackageRoot)nextgensoftware.holochain.holonet.api/HOLONET_VERSION/content/oasis.happ')" />
   </ItemGroup>
 
 </Project>
