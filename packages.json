@@ -118,6 +118,7 @@
   "exclude_projects": [
     "NextGenSoftware.Holochain.HoloNET.Templates.*",
     "UnoApp/*",
+    "Archived/*",
     "examples/*",
     "NextGenSoftware.Holochain.HoloNET.Client.Tests/*",
     "NextGenSoftware.Holochain.HoloNET.Manager.Tests/*",

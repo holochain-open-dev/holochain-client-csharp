@@ -10,51 +10,51 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NextGenSoftware.Logging.NLo
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Templates", "Templates", "{6A6A8C26-11FE-4F40-B401-F95C7A672F4D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NextGenSoftware.Holochain.HoloNET.Templates.MAUI", "NextGenSoftware.Holochain.HoloNET.Templates.MAUI\NextGenSoftware.Holochain.HoloNET.Templates.MAUI.csproj", "{63D18968-6876-40ED-8250-6A080BE2DE4D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NextGenSoftware.Holochain.HoloNET.Templates.MAUI", "Archived\NextGenSoftware.Holochain.HoloNET.Templates.MAUI\NextGenSoftware.Holochain.HoloNET.Templates.MAUI.csproj", "{63D18968-6876-40ED-8250-6A080BE2DE4D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NextGenSoftware.Holochain.HoloNET.Templates.MAUIBlazor", "NextGenSoftware.Holochain.HoloNET.Templates.MAUIBlazor\NextGenSoftware.Holochain.HoloNET.Templates.MAUIBlazor.csproj", "{01EE3418-09AB-48B4-8F55-A28EEEFB389D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NextGenSoftware.Holochain.HoloNET.Templates.MAUIBlazor", "Archived\NextGenSoftware.Holochain.HoloNET.Templates.MAUIBlazor\NextGenSoftware.Holochain.HoloNET.Templates.MAUIBlazor.csproj", "{01EE3418-09AB-48B4-8F55-A28EEEFB389D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NextGenSoftware.Holochain.HoloNET.Templates.WinForms", "NextGenSoftware.Holochain.HoloNET.Templates.WinForms\NextGenSoftware.Holochain.HoloNET.Templates.WinForms.csproj", "{090F226A-A2CE-4703-8EBA-20F8AE9FCB4C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NextGenSoftware.Holochain.HoloNET.Templates.WinForms", "Archived\NextGenSoftware.Holochain.HoloNET.Templates.WinForms\NextGenSoftware.Holochain.HoloNET.Templates.WinForms.csproj", "{090F226A-A2CE-4703-8EBA-20F8AE9FCB4C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnoApp", "UnoApp\UnoApp\UnoApp.csproj", "{BD6BC365-19A8-4E53-B65F-1E20DDD0695D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnoApp", "Archived\UnoApp\UnoApp\UnoApp.csproj", "{BD6BC365-19A8-4E53-B65F-1E20DDD0695D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnoApp.Base", "UnoApp\UnoApp.Base\UnoApp.Base.csproj", "{8F3DFA68-B0F2-4C39-991E-A62D7C7414B0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnoApp.Base", "Archived\UnoApp\UnoApp.Base\UnoApp.Base.csproj", "{8F3DFA68-B0F2-4C39-991E-A62D7C7414B0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnoApp.Server", "UnoApp\UnoApp.Server\UnoApp.Server.csproj", "{09CC316A-BE53-4ED3-A10D-F104FB40E047}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnoApp.Server", "Archived\UnoApp\UnoApp.Server\UnoApp.Server.csproj", "{09CC316A-BE53-4ED3-A10D-F104FB40E047}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnoApp.DataContracts", "UnoApp\UnoApp.DataContracts\UnoApp.DataContracts.csproj", "{EE91A085-F4BA-4E90-A174-D34709A0290D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnoApp.DataContracts", "Archived\UnoApp\UnoApp.DataContracts\UnoApp.DataContracts.csproj", "{EE91A085-F4BA-4E90-A174-D34709A0290D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnoApp.MauiControls", "UnoApp\UnoApp.MauiControls\UnoApp.MauiControls.csproj", "{794C6D6A-0F4C-40D1-95C3-CEF2447E1AB8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnoApp.MauiControls", "Archived\UnoApp\UnoApp.MauiControls\UnoApp.MauiControls.csproj", "{794C6D6A-0F4C-40D1-95C3-CEF2447E1AB8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnoApp.Tests", "UnoApp\UnoApp.Tests\UnoApp.Tests.csproj", "{22815C3F-37B2-4F41-9CE5-154661566D8D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnoApp.Tests", "Archived\UnoApp\UnoApp.Tests\UnoApp.Tests.csproj", "{22815C3F-37B2-4F41-9CE5-154661566D8D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnoApp.UITests", "UnoApp\UnoApp.UITests\UnoApp.UITests.csproj", "{202EACBE-05CA-4B9A-980B-A52F3DF30164}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnoApp.UITests", "Archived\UnoApp\UnoApp.UITests\UnoApp.UITests.csproj", "{202EACBE-05CA-4B9A-980B-A52F3DF30164}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnoApp.Mobile", "UnoApp\UnoApp.Mobile\UnoApp.Mobile.csproj", "{762453E0-5A85-417D-A8BC-63E248017819}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnoApp.Mobile", "Archived\UnoApp\UnoApp.Mobile\UnoApp.Mobile.csproj", "{762453E0-5A85-417D-A8BC-63E248017819}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnoApp.Windows", "UnoApp\UnoApp.Windows\UnoApp.Windows.csproj", "{CC6DA776-A3A2-46A6-BE1D-FF978C9D6D81}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnoApp.Windows", "Archived\UnoApp\UnoApp.Windows\UnoApp.Windows.csproj", "{CC6DA776-A3A2-46A6-BE1D-FF978C9D6D81}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnoApp.Wasm", "UnoApp\UnoApp.Wasm\UnoApp.Wasm.csproj", "{1C714D03-7B9D-4FB8-82FE-D322A0F7AD50}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnoApp.Wasm", "Archived\UnoApp\UnoApp.Wasm\UnoApp.Wasm.csproj", "{1C714D03-7B9D-4FB8-82FE-D322A0F7AD50}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnoApp.Skia.Gtk", "UnoApp\UnoApp.Skia.Gtk\UnoApp.Skia.Gtk.csproj", "{55A6D622-5E87-45DB-808A-3830BE2779C4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnoApp.Skia.Gtk", "Archived\UnoApp\UnoApp.Skia.Gtk\UnoApp.Skia.Gtk.csproj", "{55A6D622-5E87-45DB-808A-3830BE2779C4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnoApp.Skia.Wpf", "UnoApp\UnoApp.Skia.WPF\UnoApp.Skia.Wpf.csproj", "{DF76C04E-64F1-4CA1-BD3F-14E48F456805}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnoApp.Skia.Wpf", "Archived\UnoApp\UnoApp.Skia.WPF\UnoApp.Skia.Wpf.csproj", "{DF76C04E-64F1-4CA1-BD3F-14E48F456805}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnoApp.Skia.Linux.FrameBuffer", "UnoApp\UnoApp.Skia.Linux.FrameBuffer\UnoApp.Skia.Linux.FrameBuffer.csproj", "{C99D7CB6-1AAA-444B-A1B4-5DC00CA33F40}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnoApp.Skia.Linux.FrameBuffer", "Archived\UnoApp\UnoApp.Skia.Linux.FrameBuffer\UnoApp.Skia.Linux.FrameBuffer.csproj", "{C99D7CB6-1AAA-444B-A1B4-5DC00CA33F40}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NextGenSoftware.Holochain.HoloNET.Templates.Blazor", "NextGenSoftware.Holochain.HoloNET.Templates.Blazor\NextGenSoftware.Holochain.HoloNET.Templates.Blazor\NextGenSoftware.Holochain.HoloNET.Templates.Blazor.csproj", "{628612A9-3A64-4A7C-BF77-2100669BC33A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NextGenSoftware.Holochain.HoloNET.Templates.Blazor", "Archived\NextGenSoftware.Holochain.HoloNET.Templates.Blazor\NextGenSoftware.Holochain.HoloNET.Templates.Blazor\NextGenSoftware.Holochain.HoloNET.Templates.Blazor.csproj", "{628612A9-3A64-4A7C-BF77-2100669BC33A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NextGenSoftware.Holochain.HoloNET.Templates.Blazor.Client", "NextGenSoftware.Holochain.HoloNET.Templates.Blazor\NextGenSoftware.Holochain.HoloNET.Templates.Blazor.Client\NextGenSoftware.Holochain.HoloNET.Templates.Blazor.Client.csproj", "{6A671E97-4DF8-4CDF-8099-442EA3153648}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NextGenSoftware.Holochain.HoloNET.Templates.Blazor.Client", "Archived\NextGenSoftware.Holochain.HoloNET.Templates.Blazor\NextGenSoftware.Holochain.HoloNET.Templates.Blazor.Client\NextGenSoftware.Holochain.HoloNET.Templates.Blazor.Client.csproj", "{6A671E97-4DF8-4CDF-8099-442EA3153648}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Blazor", "Blazor", "{CD87E6B1-0CA9-419C-9366-CD38BA5A615F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NextGenSoftware.Holochain.HoloNET.Templates.BlazorStandalone", "NextGenSoftware.Holochain.HoloNET.Templates.BlazorStandalone\NextGenSoftware.Holochain.HoloNET.Templates.BlazorStandalone.csproj", "{E5DE6C8D-9C13-4577-B2C2-6592D37BCD9F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NextGenSoftware.Holochain.HoloNET.Templates.BlazorStandalone", "Archived\NextGenSoftware.Holochain.HoloNET.Templates.BlazorStandalone\NextGenSoftware.Holochain.HoloNET.Templates.BlazorStandalone.csproj", "{E5DE6C8D-9C13-4577-B2C2-6592D37BCD9F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NextGenSoftware.Holochain.HoloNET.Templates.OpenSilver.Browser", "NextGenSoftware.Holochain.HoloNET.Templates.OpenSilver\NextGenSoftware.Holochain.HoloNET.Templates.OpenSilver.Browser\NextGenSoftware.Holochain.HoloNET.Templates.OpenSilver.Browser.csproj", "{3BE2087A-AB63-41CF-A031-4856F695A5EC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NextGenSoftware.Holochain.HoloNET.Templates.OpenSilver.Browser", "Archived\NextGenSoftware.Holochain.HoloNET.Templates.OpenSilver\NextGenSoftware.Holochain.HoloNET.Templates.OpenSilver.Browser\NextGenSoftware.Holochain.HoloNET.Templates.OpenSilver.Browser.csproj", "{3BE2087A-AB63-41CF-A031-4856F695A5EC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NextGenSoftware.Holochain.HoloNET.Templates.OpenSilver", "NextGenSoftware.Holochain.HoloNET.Templates.OpenSilver\NextGenSoftware.Holochain.HoloNET.Templates.OpenSilver\NextGenSoftware.Holochain.HoloNET.Templates.OpenSilver.csproj", "{569EA812-525D-4FCE-8BC9-904F968F93E3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NextGenSoftware.Holochain.HoloNET.Templates.OpenSilver", "Archived\NextGenSoftware.Holochain.HoloNET.Templates.OpenSilver\NextGenSoftware.Holochain.HoloNET.Templates.OpenSilver\NextGenSoftware.Holochain.HoloNET.Templates.OpenSilver.csproj", "{569EA812-525D-4FCE-8BC9-904F968F93E3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NextGenSoftware.Holochain.HoloNET.Templates.OpenSilver.Simulator", "NextGenSoftware.Holochain.HoloNET.Templates.OpenSilver\NextGenSoftware.Holochain.HoloNET.Templates.OpenSilver.Simulator\NextGenSoftware.Holochain.HoloNET.Templates.OpenSilver.Simulator.csproj", "{88471353-7A97-4C3A-8CD2-D13F2F0FA458}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NextGenSoftware.Holochain.HoloNET.Templates.OpenSilver.Simulator", "Archived\NextGenSoftware.Holochain.HoloNET.Templates.OpenSilver\NextGenSoftware.Holochain.HoloNET.Templates.OpenSilver.Simulator\NextGenSoftware.Holochain.HoloNET.Templates.OpenSilver.Simulator.csproj", "{88471353-7A97-4C3A-8CD2-D13F2F0FA458}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NextGenSoftware.Holochain.HoloNET.ORM", "NextGenSoftware.Holochain.HoloNET.ORM\NextGenSoftware.Holochain.HoloNET.ORM.csproj", "{2E03EE11-49F6-410C-91D3-E81ACF750688}"
 EndProject
