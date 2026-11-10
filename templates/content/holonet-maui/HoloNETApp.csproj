@@ -97,7 +97,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <HoloNETRuntimeDeps Condition="'$(HoloNETRuntimeDeps)' == ''">minimal</HoloNETRuntimeDeps>
-    <HoloNETRuntimeUrl Condition="'$(HoloNETRuntimeUrl)' == ''">https://github.com/NextGenSoftwareUK/android-service-runtime/releases/download/oasis-android-libs-v1.0.0</HoloNETRuntimeUrl>
+    <HoloNETRuntimeUrl Condition="'$(HoloNETRuntimeUrl)' == ''">https://github.com/NextGenSoftwareUK/android-service-runtime/releases/download/oasis-holochain-0.7-v1.1.0</HoloNETRuntimeUrl>
   </PropertyGroup>
   <Target Name="HoloNETFetchAndroidRuntime" BeforeTargets="ResolveAssemblyReferences;_ResolveAars;_GenerateJavaDesignerForComponent" Condition="'$(TargetPlatformIdentifier)' == 'android' And '$(HoloNETDownloadRuntime)' != 'false' And !Exists('$(MSBuildProjectDirectory)/runtime/android/holochain-service.aar')">
     <DownloadFile SourceUrl="$(HoloNETRuntimeUrl)/holochain-client.aar" DestinationFolder="$(MSBuildProjectDirectory)/runtime/android" SkipUnchangedFiles="true" />

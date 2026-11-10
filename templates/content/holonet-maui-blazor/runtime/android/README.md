@@ -1,7 +1,7 @@
 # Holochain runtime libraries for Android
 
 The first time you build for Android, the project downloads the Holochain runtime libraries from the
-[oasis-android-libs-v1.0.0](https://github.com/NextGenSoftwareUK/android-service-runtime/releases/tag/oasis-android-libs-v1.0.0) release (about 38 MB) into this folder, and includes every `*.aar` and `*.jar` here
+[oasis-holochain-0.7-v1.1.0](https://github.com/NextGenSoftwareUK/android-service-runtime/releases/tag/oasis-holochain-0.7-v1.1.0) release (about 38 MB) into this folder, and includes every `*.aar` and `*.jar` here
 (`HoloNETApp.csproj`). `HoloNETAndroidRuntime.cs` then finds the bridge class in them.
 
 | File | What it is |

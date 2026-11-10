@@ -675,7 +675,7 @@ def package_block(forced_external, cpm=False, android_runtime=False, ios_runtime
   </PropertyGroup>
   <PropertyGroup>
     <HoloNETRuntimeDeps Condition="'$(HoloNETRuntimeDeps)' == ''">MINIMAL_DEPS</HoloNETRuntimeDeps>
-    <HoloNETRuntimeUrl Condition="'$(HoloNETRuntimeUrl)' == ''">https://github.com/NextGenSoftwareUK/android-service-runtime/releases/download/oasis-android-libs-v1.0.0</HoloNETRuntimeUrl>
+    <HoloNETRuntimeUrl Condition="'$(HoloNETRuntimeUrl)' == ''">https://github.com/NextGenSoftwareUK/android-service-runtime/releases/download/oasis-holochain-0.7-v1.1.0</HoloNETRuntimeUrl>
   </PropertyGroup>
   <Target Name="HoloNETFetchAndroidRuntime" BeforeTargets="ResolveAssemblyReferences;_ResolveAars;_GenerateJavaDesignerForComponent" Condition="'$(TargetPlatformIdentifier)' == 'android' And '$(HoloNETDownloadRuntime)' != 'false' And !Exists('$(MSBuildProjectDirectory)/runtime/android/holochain-service.aar')">
     <DownloadFile SourceUrl="$(HoloNETRuntimeUrl)/holochain-client.aar" DestinationFolder="$(MSBuildProjectDirectory)/runtime/android" SkipUnchangedFiles="true" />
@@ -825,10 +825,7 @@ On other platforms create the starter with `--Conductor external`, and run a con
 
 
 RUNTIME_LINKS = '''- Source: [android-service-runtime](https://github.com/NextGenSoftwareUK/android-service-runtime) (a fork of [holochain/android-service-runtime](https://github.com/holochain/android-service-runtime); our Holochain 0.7 work is on the [`oasis/holochain-0.7`](https://github.com/NextGenSoftwareUK/android-service-runtime/tree/oasis/holochain-0.7) branch)
-- Android libraries for apps (client, service, bridge, dependencies; Holochain 0.7, arm64): [oasis-android-libs-v1.0.0](https://github.com/NextGenSoftwareUK/android-service-runtime/releases/tag/oasis-android-libs-v1.0.0)
-- iOS bridge for .NET apps (the `holo_ios_*` C ABI with the conductor, device and simulator): [oasis-ios-bridge-v1.0.0](https://github.com/NextGenSoftwareUK/android-service-runtime/releases/tag/oasis-ios-bridge-v1.0.0)
-- Android runtime app releases: [oasis-holochain-0.7-v1.0.0](https://github.com/NextGenSoftwareUK/android-service-runtime/releases/tag/oasis-holochain-0.7-v1.0.0) (pre-release: arm64 and x86_64 runtime APKs, build manifest, SHA256SUMS) and [oasis-runtime-v0.2.0-holochain-0.7](https://github.com/NextGenSoftwareUK/android-service-runtime/releases/tag/oasis-runtime-v0.2.0-holochain-0.7)
-- iOS releases: [oasis-ios-conductor-v0.7.1](https://github.com/NextGenSoftwareUK/android-service-runtime/releases/tag/oasis-ios-conductor-v0.7.1) and [oasis-ios-conductor-v0.1.1](https://github.com/NextGenSoftwareUK/android-service-runtime/releases/tag/oasis-ios-conductor-v0.1.1)
+- Holochain 0.7 for OASIS: Android + iOS, one release with everything ([oasis-holochain-0.7-v1.1.0](https://github.com/NextGenSoftwareUK/android-service-runtime/releases/tag/oasis-holochain-0.7-v1.1.0)): the runtime apps (APKs), the Android libraries the templates download, the iOS conductor and the iOS bridge, with checksums and notes on what is proven
 - OASIS Edge runtime (what Our World uses), by product: [Edge Runtime only](https://github.com/NextGenSoftwareUK/OASIS/releases/tag/OASIS-Edge-Runtime-v1.2.0), [OGEngineClient + Edge](https://github.com/NextGenSoftwareUK/OASIS/releases/tag/OGEngineClient-Edge-v2.1.0), [OGEngineClient + Edge + Unity](https://github.com/NextGenSoftwareUK/OASIS/releases/tag/OASIS-Edge-Unity-v1.1.0), [OGEngineClient RemoteOnly](https://github.com/NextGenSoftwareUK/OASIS/releases/tag/OGEngineClient-RemoteOnly-v2.1.0), all in the [OASIS releases](https://github.com/NextGenSoftwareUK/OASIS/releases)
 - The bridge this template calls: [android-runtime](https://github.com/holochain-open-dev/holochain-client-csharp/tree/main/android-runtime) in the HoloNET repo'''
 
@@ -837,7 +834,7 @@ def android_runtime_folder_readme():
     return '''# Holochain runtime libraries for Android
 
 The first time you build for Android, the project downloads the Holochain runtime libraries from the
-[oasis-android-libs-v1.0.0](https://github.com/NextGenSoftwareUK/android-service-runtime/releases/tag/oasis-android-libs-v1.0.0) release (about 38 MB) into this folder, and includes every `*.aar` and `*.jar` here
+[oasis-holochain-0.7-v1.1.0](https://github.com/NextGenSoftwareUK/android-service-runtime/releases/tag/oasis-holochain-0.7-v1.1.0) release (about 38 MB) into this folder, and includes every `*.aar` and `*.jar` here
 (`HoloNETApp.csproj`). `HoloNETAndroidRuntime.cs` then finds the bridge class in them.
 
 | File | What it is |
@@ -899,7 +896,7 @@ def ios_runtime_folder_readme():
 Put `HoloNETIosBridge.xcframework` in this folder. The project links it into the app (`HoloNETApp.csproj`, `NativeReference`) and `HoloNETIosRuntime.cs`
 calls its C functions (`holo_ios_*`). It contains the Holochain 0.7 conductor (wasmi interpreter, device and Apple-silicon simulator) and the bridge.
 
-Download `HoloNETIosBridge.xcframework.zip` (about 127 MB) from the [oasis-ios-bridge-v1.0.0](https://github.com/NextGenSoftwareUK/android-service-runtime/releases/tag/oasis-ios-bridge-v1.0.0) release and unzip it here. It is built by that repository's `oasis-ios-bridge` workflow, which compiles the Swift C-ABI bridge and merges it with the
+Download `HoloNETIosBridge.xcframework.zip` (about 127 MB) from the [oasis-holochain-0.7-v1.1.0](https://github.com/NextGenSoftwareUK/android-service-runtime/releases/tag/oasis-holochain-0.7-v1.1.0) release and unzip it here. It is built by that repository's `oasis-ios-bridge` workflow, which compiles the Swift C-ABI bridge and merges it with the
 [oasis-ios-conductor-v0.7.1](https://github.com/NextGenSoftwareUK/android-service-runtime/releases/tag/oasis-ios-conductor-v0.7.1) conductor.
 
 The bridge build confirmed the `holo_ios_*` symbols are in the library for device and simulator; it has not been linked into a .NET app by us. The bridge build confirmed the `holo_ios_*` symbols are in the library for device and simulator; it has not been linked into a .NET app by us. Without it the app still builds, `HoloNETIosRuntime.IsBridgeAvailable` is false, and the demo connects to a conductor you run (`HoloNETDemo.AdminUri`).

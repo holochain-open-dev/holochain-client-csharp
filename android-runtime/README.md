@@ -16,7 +16,7 @@ The class keeps the package name `one.oasisomniverse.holooasis.unity.HolochainUn
 
 ## Building the libraries
 
-Published build: the [oasis-android-libs-v1.0.0](https://github.com/NextGenSoftwareUK/android-service-runtime/releases/tag/oasis-android-libs-v1.0.0) release has the three `.aar` files and the bridge's dependencies (built by the `oasis-android-libraries` workflow in the runtime repository, which also holds a copy of this bridge in `oasis/android-bridge`). The templates download it on the first build. The bridge compiles against the Holochain runtime libraries, which come from
+Published build: the [oasis-holochain-0.7-v1.1.0](https://github.com/NextGenSoftwareUK/android-service-runtime/releases/tag/oasis-holochain-0.7-v1.1.0) release has the three `.aar` files and the bridge's dependencies (built by the `oasis-android-libraries` workflow in the runtime repository, which also holds a copy of this bridge in `oasis/android-bridge`). The templates download it on the first build. The bridge compiles against the Holochain runtime libraries, which come from
 [android-service-runtime](https://github.com/NextGenSoftwareUK/android-service-runtime) (branch `oasis/holochain-0.7`):
 
 - `client` and `service` for Holochain 0.7, built from that source with Rust and the Android NDK (the conductor library is about 100 MB unpacked, arm64 only).
@@ -28,4 +28,4 @@ Published build: the [oasis-android-libs-v1.0.0](https://github.com/NextGenSoftw
   and a signed `call_zome` succeeds; with the old v0.1.5 runtime it reports `shared_unavailable` and falls back.
 - **Not yet run on a physical phone**, and not yet run from a .NET (non-Unity) app: `HoloNETAndroidRuntime.cs` builds for Android with the real libraries (they are packed into the APK) but has not been run on a
   device or emulator.
-- Android only. iOS has a separate conductor and bridge ([oasis-ios-bridge-v1.0.0](https://github.com/NextGenSoftwareUK/android-service-runtime/releases/tag/oasis-ios-bridge-v1.0.0)) that runs on the simulator and is not yet proven on a physical iPhone.
+- Android only. iOS has a separate conductor and bridge ([oasis-holochain-0.7-v1.1.0](https://github.com/NextGenSoftwareUK/android-service-runtime/releases/tag/oasis-holochain-0.7-v1.1.0)) that runs on the simulator and is not yet proven on a physical iPhone.
