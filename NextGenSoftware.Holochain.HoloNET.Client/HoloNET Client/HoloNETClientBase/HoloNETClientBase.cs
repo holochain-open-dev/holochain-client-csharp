@@ -163,6 +163,13 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
 
         private readonly System.Text.StringBuilder _conductorOutput = new System.Text.StringBuilder();
 
+        /// <summary>Returns a snapshot of the bounded native conductor output captured on Linux.</summary>
+        protected string GetConductorOutput()
+        {
+            lock (_conductorOutput)
+                return _conductorOutput.ToString();
+        }
+
         private void KeepConductorOutput(string line)
         {
             if (line == null)
@@ -882,8 +889,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     if (!await WaitForConductorPortAsync(EndPoint, Math.Max(HoloNETDNA.SecondsToWaitForHolochainConductorToStart, 1) * 1000))
                     {
                         string exited = !onWindows && _conductorProcess.HasExited ? $" The conductor process exited with code {_conductorProcess.ExitCode}." : "";
-                        string output;
-                        lock (_conductorOutput) output = _conductorOutput.ToString().Trim();
+                        var output = GetConductorOutput().Trim();
                         Logger.Log($"The Holochain conductor did not open {EndPoint} within {HoloNETDNA.SecondsToWaitForHolochainConductorToStart} seconds.{exited}{(output.Length > 0 ? " Its output:" + Environment.NewLine + output : "")}", LogType.Warning);
                     }
 
