@@ -164,6 +164,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         private readonly System.Text.StringBuilder _conductorOutput = new System.Text.StringBuilder();
 
         /// <summary>Returns a snapshot of the bounded native conductor output captured on Linux.</summary>
+        protected virtual bool CaptureTimedConductorSpans => false;
+
         protected string GetConductorOutput()
         {
             lock (_conductorOutput)
@@ -843,7 +845,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                             //TrueProcessStart("PowerShell.exe -NoExit -Command \"'' | {fullPathToHolochainExe} --piped\"");
                             _conductorProcess.StartInfo.Arguments = $"-NoExit -Command \"'' | {fullPathToHolochainExe} --piped -c '{HoloNETDNA.HolochainConductorConfigPath}'\"";
                             directFileName = fullPathToHolochainExe;
-                            directArguments = $"--piped -c \"{HoloNETDNA.HolochainConductorConfigPath}\"";
+                            directArguments = $"--piped -c \"{HoloNETDNA.HolochainConductorConfigPath}\"" + (CaptureTimedConductorSpans ? " --structured LogTimed" : "");
                         }
                         else
                         {
