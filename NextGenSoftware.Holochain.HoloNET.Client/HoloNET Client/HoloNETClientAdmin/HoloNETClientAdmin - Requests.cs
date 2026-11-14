@@ -141,7 +141,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                                     }
 
                                     result.IsAppSigned = true;
-                                    result.AppInterfaceAttachedResult = await AttachAppInterfaceAsync();
+                                    result.AppInterfaceAttachedResult = await GetOrAttachAppInterfaceAsync(hAppId);
 
                                     if (result.AppInterfaceAttachedResult != null && !result.AppInterfaceAttachedResult.IsError)
                                     {
@@ -217,7 +217,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
             }
 
             result.IsAppSigned = true;
-            result.AppInterfaceAttachedResult = await AttachAppInterfaceAsync();
+            result.AppInterfaceAttachedResult = await GetOrAttachAppInterfaceAsync(hAppId);
 
             if (result.AppInterfaceAttachedResult == null || result.AppInterfaceAttachedResult.IsError)
             {
@@ -537,6 +537,30 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         {
             //return _signingCredentialsForCell[$"{agentPubKey}:{dnaHash}"].CapSecret; // threw KeyNotFoundException for a cell with no credentials
             return _signingCredentialsForCell.TryGetValue($"{agentPubKey}:{dnaHash}", out SigningCredentials credentials) ? credentials.CapSecret : null;
+        }
+
+        private async Task<AppInterfaceAttachedCallBackEventArgs> GetOrAttachAppInterfaceAsync(string installedAppId)
+        {
+            var interfaces = await ListInterfacesAsync();
+            if (interfaces == null || interfaces.IsError)
+                return new AppInterfaceAttachedCallBackEventArgs
+                {
+                    IsError = true,
+                    Message = interfaces?.Message ?? "The conductor did not list app interfaces."
+                };
+
+            var existing = interfaces.AppInterfaces.FirstOrDefault(
+                appInterface => appInterface.InstalledAppId == installedAppId);
+            if (existing != null)
+                return new AppInterfaceAttachedCallBackEventArgs { Port = existing.Port };
+
+            return await CallFunctionAsync(HoloNETRequestType.AdminAttachAppInterface, "attach_app_interface",
+                new AttachAppInterfaceRequest
+                {
+                    danger_bind_addr = "127.0.0.1",
+                    installed_app_id = installedAppId
+                }, _taskCompletionAppInterfaceAttachedCallBack, "OnAppInterfaceAttachedCallBack",
+                ConductorResponseCallBackMode.WaitForHolochainConductorResponse, null);
         }
 
         public async Task<AppInterfaceAttachedCallBackEventArgs> AttachAppInterfaceAsync(UInt16? port = null, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
