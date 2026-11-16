@@ -28,15 +28,19 @@ if (railLinks.length) {
   headings.forEach(h => observer.observe(h));
 }
 
-// ── Mobile sidebar toggle ───────────────────────────────────
+// ── Slide-out menu (animated hamburger at every width) ───────
 const menuBtn = document.querySelector('.mobile-menu-btn');
 const sidebar = document.querySelector('.sidebar');
 if (menuBtn && sidebar) {
-  menuBtn.addEventListener('click', () => sidebar.classList.toggle('open'));
+  menuBtn.innerHTML = '<span></span><span></span><span></span>';
+  menuBtn.setAttribute('aria-label', 'Menu');
+  const setOpen = o => { sidebar.classList.toggle('open', o); menuBtn.classList.toggle('open', o); };
+  menuBtn.addEventListener('click', () => setOpen(!sidebar.classList.contains('open')));
   document.addEventListener('click', e => {
-    if (sidebar.classList.contains('open') && !sidebar.contains(e.target) && e.target !== menuBtn)
-      sidebar.classList.remove('open');
+    if (sidebar.classList.contains('open') && !sidebar.contains(e.target) && !menuBtn.contains(e.target)) setOpen(false);
   });
+  sidebar.addEventListener('click', e => { if (e.target.closest('a')) setOpen(false); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') setOpen(false); });
 }
 
 // ── Mark current nav item active ───────────────────────────

@@ -600,3 +600,19 @@ td code { font-size: 12px; }
 @media (min-width: 781px) {
   .mobile-menu-btn { display: none; }
 }
+
+
+/* ─── Slide-out menu at every width (same as oasisomniverse.one) ─── */
+.layout{grid-template-columns:minmax(0,1fr) var(--rail-w)!important;grid-template-areas:"main rail"!important}
+.layout-no-rail{grid-template-columns:minmax(0,1fr)!important;grid-template-areas:"main"!important}
+@media(max-width:1100px){.layout{grid-template-columns:minmax(0,1fr)!important;grid-template-areas:"main"!important}}
+.main{margin:0 auto!important;width:100%;max-width:calc(var(--content-max) + 128px)!important;padding:0 40px 80px!important}
+@media(max-width:780px){.main{padding:0 16px 60px!important}}
+.sidebar{left:auto!important;right:0;width:min(78vw,320px)!important;max-width:none!important;transform:translateX(100%)!important;visibility:hidden;pointer-events:none;transition:transform .3s ease,visibility .3s!important;border-right:0!important;border-left:1px solid var(--border);z-index:999!important}
+.sidebar.open{transform:translateX(0)!important;visibility:visible;pointer-events:auto}
+.mobile-menu-btn{display:flex!important;flex-direction:column;justify-content:center;gap:5px;position:fixed!important;top:14px!important;right:16px!important;left:auto!important;width:38px!important;height:38px!important;padding:8px;background:transparent!important;border:0!important;font-size:0!important;z-index:1000!important;cursor:pointer}
+.mobile-menu-btn span{display:block;width:22px;height:2px;background:var(--accent);border-radius:2px;transition:transform .25s,opacity .25s}
+.mobile-menu-btn.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.mobile-menu-btn.open span:nth-child(2){opacity:0}
+.mobile-menu-btn.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.rail{padding-top:64px!important}
