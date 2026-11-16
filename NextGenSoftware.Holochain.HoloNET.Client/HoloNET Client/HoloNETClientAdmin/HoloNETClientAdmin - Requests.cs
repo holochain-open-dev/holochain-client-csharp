@@ -1770,11 +1770,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <returns></returns>
         public Task<CoordinatorsUpdatedCallBackEventArgs> UpdateCoordinatorsAsync(CellId cellId, string path,
             ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
-            => SendCoordinatorUpdateAsync(cellId, new CoordinatorSource { Type = "path", Value = path }, conductorResponseCallBackMode, id);
+            => SendCoordinatorUpdateAsync(cellId, new CoordinatorUpdateSource { Type = "path", Value = path }, conductorResponseCallBackMode, id);
 
         public Task<CoordinatorsUpdatedCallBackEventArgs> UpdateCoordinatorsAsync(CellId cellId, CoordinatorBundle bundle,
             ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
-            => SendCoordinatorUpdateAsync(cellId, new CoordinatorSource { Type = "bundle", Value = bundle }, conductorResponseCallBackMode, id);
+            => SendCoordinatorUpdateAsync(cellId, new CoordinatorUpdateSource { Type = "bundle", Value = bundle }, conductorResponseCallBackMode, id);
 
         private async Task<CoordinatorsUpdatedCallBackEventArgs> UpdateCoordinatorsAsync(byte[] dnaHash, string path, CoordinatorBundle bundle,
             ConductorResponseCallBackMode conductorResponseCallBackMode, string id)
@@ -1798,7 +1798,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                 : await UpdateCoordinatorsAsync(cellId, bundle, conductorResponseCallBackMode, id);
         }
 
-        private Task<CoordinatorsUpdatedCallBackEventArgs> SendCoordinatorUpdateAsync(CellId cellId, CoordinatorSource source,
+        private Task<CoordinatorsUpdatedCallBackEventArgs> SendCoordinatorUpdateAsync(CellId cellId, CoordinatorUpdateSource source,
             ConductorResponseCallBackMode conductorResponseCallBackMode, string id)
         {
             return CallFunctionAsync(HoloNETRequestType.AdminUpdateCoordinators, "update_coordinators",

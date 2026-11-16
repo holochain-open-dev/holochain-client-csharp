@@ -10,11 +10,11 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests
         public CellId CellId { get; set; }
 
         [Key("source")]
-        public CoordinatorSource Source { get; set; }
+        public CoordinatorUpdateSource Source { get; set; }
     }
 
     [MessagePackObject]
-    public class CoordinatorSource
+    public class CoordinatorUpdateSource
     {
         [Key("type")]
         public string Type { get; set; }
