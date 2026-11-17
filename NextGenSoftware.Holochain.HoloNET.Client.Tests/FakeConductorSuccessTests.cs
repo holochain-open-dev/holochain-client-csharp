@@ -141,7 +141,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
         {
             Assert.Equal("{\"x\":1}", (await Admin("dump_state", FakeConductor.Ok("state_dumped", "{\"x\":1}"), a => a.DumpStateAsync(Cell))).DumpedStateJSON);
             Assert.Equal("{\"c\":1}", (await Admin("dump_conductor_state", FakeConductor.Ok("conductor_state_dumped", "{\"c\":1}"), a => a.DumpConductorStateAsync())).DumpedStateJSON);
-            await Admin("update_coordinators", FakeConductor.Ok("coordinators_updated", null), a => a.UpdateCoordinatorsAsync(Dna(), new CoordinatorBundle()));
+            await Admin("update_coordinators", FakeConductor.Ok("coordinators_updated", null), a => a.UpdateCoordinatorsAsync(new CellId(Dna(), Agent()), new CoordinatorBundle()));
             await Admin("delete_clone_cell", FakeConductor.Ok("clone_cell_deleted", null), a => a.DeleteCloneCellAsync("app", Cell));
             await Admin("graft_records", FakeConductor.Ok("records_grafted", null), a => a.GraftRecordsAsync(Cell, false, new object[0]));
             await Admin("add_agent_info", FakeConductor.Ok("agent_info_added", null), a => a.AddAgentInfoAsync(new[] { "{}" }));

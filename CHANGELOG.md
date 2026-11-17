@@ -1,5 +1,11 @@
 # Changelog
 
+## v4.6.1 - 2026-11-17
+
+- Reuse the persisted app-bound WebSocket listener when reconnecting. If none exists, create a listener bound to that app on loopback.
+- Fix the Holochain 0.7.1 coordinator-update request encoding.
+- Add bounded diagnostics for managed Linux conductor startup.
+
 ## v4.6.0 - 2026-11-01
 
 Every HoloNET package is now released together at one version, in four conductor variants, with project templates.

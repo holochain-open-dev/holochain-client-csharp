@@ -1,4 +1,3 @@
-﻿
 using MessagePack;
 using NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests.Objects;
 
@@ -7,15 +6,20 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Data.Admin.Requests
     [MessagePackObject]
     public class UpdateCoordinatorsRequest
     {
-        [Key("dnaHash")]
-        public byte[] dnaHash { get; set; }
+        [Key("cell_id")]
+        public CellId CellId { get; set; }
 
-        [Key("path")]
-        public string path { get; set; } //Can be either path OR bundle but not both.
+        [Key("source")]
+        public CoordinatorUpdateSource Source { get; set; }
+    }
 
-        [Key("bundle")]
-        public CoordinatorBundle bundle { get; set; } //Can be either path OR bundle but not both.
+    [MessagePackObject]
+    public class CoordinatorUpdateSource
+    {
+        [Key("type")]
+        public string Type { get; set; }
+
+        [Key("value")]
+        public object Value { get; set; }
     }
 }
-
-//flattened CoordinatorSource (path and bundle) into HoloNETAdminUpdateCoordinatorsRequest

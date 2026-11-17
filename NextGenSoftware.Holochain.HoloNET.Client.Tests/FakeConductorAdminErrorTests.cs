@@ -47,7 +47,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
                 ["revoke_app_authentication_token"] = async a => await a.RevokeAppAuthenticationTokenAsync(new byte[] { 1 }),
                 ["revoke_zome_call_capability"] = async a => await a.RevokeZomeCallCapabilityAsync(Action(), new CellId(Dna(), Agent())),
                 ["uninstall_app"] = async a => await a.UninstallAppAsync("app"),
-                ["update_coordinators"] = async a => await a.UpdateCoordinatorsAsync(Dna(), new CoordinatorBundle()),
+                ["update_coordinators"] = async a => await a.UpdateCoordinatorsAsync(new CellId(Dna(), Agent()), new CoordinatorBundle()),
                 ["app_info"] = async a => await a.GetAppInfoAsync("app"),
                 ["dump_conductor_state"] = async a => await a.DumpConductorStateAsync(),
             };
