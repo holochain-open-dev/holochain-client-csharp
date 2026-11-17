@@ -3,6 +3,10 @@ name: Publish NuGet Packages
 on:
   workflow_dispatch:
 
+concurrency:
+  group: holonet-publish
+  cancel-in-progress: false
+
 permissions:
   contents: write
 
@@ -56,6 +60,37 @@ jobs:
       - name: Smoke test - install every library package into a fresh app and build it
         run: python scripts/holonet_packages.py smoke nupkgs
 
+      - name: Verify release notes in every package
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $version = (Get-Content packages.json -Raw | ConvertFrom-Json).version
+          if ($version -notmatch '^\d+\.\d+\.\d+$') { throw 'Invalid package version' }
+          $tag = "v$version"
+          $main = Get-Content CHANGELOG.md -Raw
+          $heading = '(?ms)^## ' + [regex]::Escape($tag) + ' - [^\r\n]+\r?\n(.*?)(?=^## |\z)'
+          $section = [regex]::Match($main, $heading)
+          if (!$section.Success -or !$section.Groups[1].Value.Trim()) { throw "Missing release notes for $tag" }
+          $notes = Join-Path $env:RUNNER_TEMP 'holonet-release-notes.md'
+          Set-Content -LiteralPath $notes -Value $section.Groups[1].Value.Trim() -Encoding utf8
+          Add-Type -AssemblyName System.IO.Compression.FileSystem
+          $expected = $section.Groups[1].Value.Trim().Replace("`r`n", "`n")
+          foreach ($package in Get-ChildItem -LiteralPath nupkgs -Filter '*.nupkg' -File) {
+            $zip = [IO.Compression.ZipFile]::OpenRead($package.FullName)
+            try {
+              $entry = $zip.Entries | Where-Object Name -like '*.nuspec' | Select-Object -First 1
+              if (!$entry) { throw "Missing package manifest in $($package.Name)" }
+              $reader = [IO.StreamReader]::new($entry.Open())
+              try { [xml]$metadata = $reader.ReadToEnd() } finally { $reader.Dispose() }
+              $actual = [string]$metadata.package.metadata.releaseNotes
+              if (!$actual.Replace("`r`n", "`n").Contains($expected)) {
+                throw "Release notes do not match the changelog in $($package.Name)"
+              }
+            } finally { $zip.Dispose() }
+          }
+          git ls-remote --exit-code --tags origin "refs/tags/$tag" | Out-Null
+          if ($LASTEXITCODE -ne 2) { throw "Expected the unpublished tag $tag" }
+
       - name: Push all packages to NuGet.org
         shell: pwsh
         run: |
@@ -80,14 +115,8 @@ jobs:
         run: |
           $ErrorActionPreference = 'Stop'
           $version = (Get-Content packages.json -Raw | ConvertFrom-Json).version
-          if ($version -notmatch '^\d+\.\d+\.\d+$') { throw 'Invalid package version' }
           $tag = "v$version"
-          $main = Get-Content CHANGELOG.md -Raw
-          $heading = '(?ms)^## ' + [regex]::Escape($tag) + ' - [^\r\n]+\r?\n(.*?)(?=^## |\z)'
-          $section = [regex]::Match($main, $heading)
-          if (!$section.Success -or !$section.Groups[1].Value.Trim()) { throw "Missing release notes for $tag" }
           $notes = Join-Path $env:RUNNER_TEMP 'holonet-release-notes.md'
-          Set-Content -LiteralPath $notes -Value $section.Groups[1].Value.Trim() -Encoding utf8
           $packages = @(Get-ChildItem -LiteralPath nupkgs -Filter '*.nupkg' -File | ForEach-Object FullName)
           if (!$packages.Count) { throw 'No verified packages to upload' }
           gh release create $tag @packages --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --title "HoloNET $version" --notes-file $notes
