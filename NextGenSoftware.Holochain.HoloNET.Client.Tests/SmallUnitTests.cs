@@ -231,6 +231,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
                     "install_app" => FakeConductor.Ok("app_installed", FakeConductorFlowTests.AppInfo("x", "provisioned", "disabled")),
                     "enable_app" => FakeConductor.Ok("app_enabled", FakeConductorFlowTests.AppInfo("x")),
                     "grant_zome_call_capability" => FakeConductor.Ok("zome_call_capability_granted", null),
+                    "list_app_interfaces" => FakeConductor.Ok("app_interfaces_listed", new object[0]),
                     "attach_app_interface" => FakeConductor.Ok("app_interface_attached", new Dictionary<string, object> { ["port"] = 1 }), // nothing listens on 1
                     "issue_app_authentication_token" => FakeConductor.Ok("app_authentication_token_issued", new Dictionary<string, object> { ["token"] = new[] { 1 }, ["expires_at"] = null }),
                     _ => FakeConductor.Error()

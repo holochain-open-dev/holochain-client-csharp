@@ -54,6 +54,8 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
                     case "install_app": installed = true; return FakeConductor.Ok("app_installed", AppInfo(appId, cellType, "disabled"));
                     case "enable_app": return FakeConductor.Ok("app_enabled", AppInfo(appId));
                     case "grant_zome_call_capability": return FakeConductor.Ok("zome_call_capability_granted", null);
+                    // The client reuses an app's persisted interface when the conductor lists one, so a conductor with none yet must answer this before the attach.
+                    case "list_app_interfaces": return FakeConductor.Ok("app_interfaces_listed", new object[0]);
                     case "attach_app_interface": return FakeConductor.Ok("app_interface_attached", new Dictionary<string, object> { ["port"] = fake.Port });
                     case "issue_app_authentication_token": return FakeConductor.Ok("app_authentication_token_issued", new Dictionary<string, object> { ["token"] = new[] { 1, 2, 3 }, ["expires_at"] = null });
                     case "app_info": return FakeConductor.Ok("app_info", AppInfo(appId));
