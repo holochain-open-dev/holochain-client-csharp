@@ -43,8 +43,14 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
 
         private static async Task<T> Step<T>(string name, Task<T> task, int seconds = 60)
         {
+            // Time every phase so a slow step shows where the time went (conductor, zome compile, call) instead of only that it timed out.
+            var watch = System.Diagnostics.Stopwatch.StartNew();
             if (await Task.WhenAny(task, Task.Delay(TimeSpan.FromSeconds(seconds))) != task)
+            {
+                Console.Error.WriteLine($"[live-happ] '{name}' TIMED OUT after {watch.Elapsed.TotalSeconds:F1}s (limit {seconds}s)");
                 throw new TimeoutException($"'{name}' did not complete within {seconds}s.");
+            }
+            Console.Error.WriteLine($"[live-happ] '{name}' took {watch.Elapsed.TotalSeconds:F1}s (limit {seconds}s)");
             return await task;
         }
 
@@ -75,7 +81,7 @@ namespace NextGenSoftware.Holochain.HoloNET.Client.Tests
             string appId = "generated-" + Guid.NewGuid().ToString("N").Substring(0, 6);
             var admin = new HoloNETClientAdmin(new HoloNETDNA { AutoStartHolochainConductor = false, AutoShutdownHolochainConductor = false, HolochainConductorAdminURI = AdminUri });
             Assert.True((await admin.ConnectAsync(AdminUri)).IsConnected);
-            var installed = await Step("install", admin.InstallEnableSignAttachAndConnectToHappAsync(appId, HappPath, "holonet_game"), 300);   // the conductor compiles a never-seen zome on install; that can take minutes on a busy machine
+            var installed = await Step("install", admin.InstallEnableSignAttachAndConnectToHappAsync(appId, HappPath, "holonet_game"), 900);   // the conductor compiles a never-seen zome on install; on a shared CI runner that also runs the whole suite it exceeded 300s (CI run 44987938790). 900s is a ceiling, Step() logs the real time
             Assert.True(installed.IsAppConnected, "install: " + installed.Message);
             IHoloNETClientAppAgent client = installed.HoloNETClientAppAgent;
 
