@@ -1,0 +1,38 @@
+# HoloNETApp
+
+A ASP.NET Core Web API (Native AOT) with [HoloNET](https://holonet.oasisomniverse.one) wired in.
+
+Everything HoloNET does in this app is in **`HoloNETDemo.cs`**: read it, then replace it with your own code. Each screen / page /
+endpoint just calls `HoloNETDemo.RunAsync()` and shows the text it returns.
+
+## Run it
+
+On Windows the default is a bundled conductor (the app starts and stops Holochain itself). On Linux and macOS HoloNET starts the Holochain on your
+computer, and the first time it downloads the official one (checked against a SHA-256) into your user folder; nothing to install.
+To use a conductor you run yourself instead, create the project with `--Conductor external` and start one first, in another terminal:
+
+```bash
+./start-conductor.sh        # Git Bash, Linux, macOS (needs Holochain 0.7.x on your PATH)
+.\start-conductor.ps1       # PowerShell
+```
+
+Choose with `--Conductor auto|embedded|external` and `--HolochainVersion both|0.7.1|0.7.0` when you create the project.
+
+Run `dotnet run`, then open `/holonet`. To build the native executable: `dotnet publish -c Release -r win-x64` (or `linux-x64`, `osx-arm64`); it needs the platform C++ build tools (see [Native AOT prerequisites](https://learn.microsoft.com/dotnet/core/deploying/native-aot/#prerequisites)). **Experimental:** HoloNET, MessagePack and Newtonsoft.Json report AOT and trim warnings (they use reflection), so a native executable is not verified to run; `dotnet run` and `dotnet publish` without `PublishAot` work normally. Native publish also needs the C++ build tools on your PATH (run it from a Developer Command Prompt).
+
+## Switch the HoloNET library
+
+Created with `dotnet new holonet-webapiaot --HoloNET api` (the default). The other choices:
+
+| `--HoloNET` | What it is |
+|---|---|
+| `api` | One line to save, load and delete data, share it with every agent, and hear when it changes. Simplest. |
+| `client` | Full control of the conductor: install a hApp, make zome calls, receive signals. |
+| `orm` | Save, load and change your own C# classes (includes the Client). |
+| `hypernet` | Real-time player-to-player messaging: zones, area of interest, reliable messages (includes the Client). |
+
+## Learn more
+
+- [Documentation](https://docs.holonet.oasisomniverse.one) and [tutorials](https://learn.holonet.oasisomniverse.one)
+- [Examples](https://github.com/holochain-open-dev/holochain-client-csharp/tree/main/examples)
+- [All HoloNET packages and templates](https://docs.holonet.oasisomniverse.one/packages)

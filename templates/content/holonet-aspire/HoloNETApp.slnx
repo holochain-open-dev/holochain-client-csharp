@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="HoloNETApp.AppHost/HoloNETApp.AppHost.csproj" />
+  <Project Path="HoloNETApp/HoloNETApp.csproj" />
+</Solution>

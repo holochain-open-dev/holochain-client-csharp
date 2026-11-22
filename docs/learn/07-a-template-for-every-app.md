@@ -49,6 +49,29 @@ public async Task OnGetAsync() => Result = await HoloNETDemos.HoloNETDemo.RunAsy
 
 Blazor WebAssembly runs in the browser, which can't host a conductor, so it connects to one you run (see the templates reference).
 
+## More web and service types: minimal, Native AOT, SignalR, MCP, Orleans
+
+```csharp
+// holonet-web and holonet-webapiaot (Native AOT): GET /holonet
+app.MapGet("/holonet", async () => Results.Text(await HoloNETDemos.HoloNETDemo.RunAsync()));
+```
+
+```csharp
+// holonet-signalr: HoloNETHub.cs. Browsers call RunDemo over a live connection (wwwroot/index.html shows how).
+public Task<string> RunDemo() => HoloNETDemos.HoloNETDemo.RunAsync();
+```
+
+```csharp
+// holonet-mcpserver: Tools/HoloNETTools.cs. An AI client (Claude, Copilot) calls this tool to use Holochain.
+[McpServerTool]
+public Task<string> RunHoloNETDemo() => HoloNETDemos.HoloNETDemo.RunAsync();
+```
+
+```csharp
+// holonet-orleans: HoloNETGrain.cs. A grain that wraps HoloNET, so Orleans can place it on any silo.
+public Task<string> RunDemoAsync() => HoloNETDemos.HoloNETDemo.RunAsync();
+```
+
 ## Desktop: WPF, WinForms, WinUI, Avalonia
 
 ```csharp

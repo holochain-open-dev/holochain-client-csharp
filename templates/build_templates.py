@@ -630,6 +630,487 @@ public class HoloNETTests
 ''')
 
 
+
+def p_web(d):
+    sub(f'{d}/Program.cs', 'app.Run();', """// GET /holonet runs the HoloNET demo (HoloNETDemo.cs) and returns what happened.
+app.MapGet("/holonet", async () => Results.Text(await HoloNETDemos.HoloNETDemo.RunAsync()));
+
+app.Run();""")
+
+
+def p_webapiaot(d):
+    sub(f'{d}/Program.cs', 'app.Run();', """// GET /holonet runs the HoloNET demo (HoloNETDemo.cs) and returns what happened.
+app.MapGet("/holonet", async () => Results.Text(await HoloNETDemos.HoloNETDemo.RunAsync()))
+   .WithName("HoloNETDemo");
+
+app.Run();""")
+
+
+def p_mcpserver(d):
+    os.remove(f'{d}/Tools/RandomNumberTools.cs')
+    wr(f'{d}/Tools/HoloNETTools.cs', """using System.ComponentModel;
+using ModelContextProtocol.Server;
+
+/// <summary>MCP tools that let an AI client (Claude, Copilot, ...) use Holochain through HoloNET. Replace the demo with your own HoloNET calls (see HoloNETDemo.cs).</summary>
+internal class HoloNETTools
+{
+    [McpServerTool]
+    [Description("Runs the HoloNET demo: connects to a Holochain conductor, installs the hApp, and saves, loads and changes some data. Returns what happened.")]
+    public Task<string> RunHoloNETDemo() => HoloNETDemos.HoloNETDemo.RunAsync();
+}
+""")
+    sub(f'{d}/Program.cs', '.WithTools<RandomNumberTools>()', '.WithTools<HoloNETTools>()')
+
+
+def p_mstest(d):
+    os.remove(f'{d}/Test1.cs')
+    wr(f'{d}/HoloNETTests.cs', """namespace HoloNETApp;
+
+[TestClass]
+public class HoloNETTests
+{
+    // An integration test: it starts (or connects to) a conductor, so it needs Holochain available (see README.md).
+    // Replace the demo with the HoloNET calls your own code makes.
+    [TestMethod]
+    public async Task HoloNETDemoRuns()
+    {
+        var result = await HoloNETDemos.HoloNETDemo.RunAsync();
+        Assert.IsFalse(string.IsNullOrWhiteSpace(result));
+    }
+}
+""")
+
+
+def p_nunit(d):
+    os.remove(f'{d}/UnitTest1.cs')
+    wr(f'{d}/HoloNETTests.cs', """namespace HoloNETApp;
+
+public class HoloNETTests
+{
+    // An integration test: it starts (or connects to) a conductor, so it needs Holochain available (see README.md).
+    // Replace the demo with the HoloNET calls your own code makes.
+    [Test]
+    public async Task HoloNETDemoRuns()
+    {
+        var result = await HoloNETDemos.HoloNETDemo.RunAsync();
+        Assert.That(string.IsNullOrWhiteSpace(result), Is.False);
+    }
+}
+""")
+
+
+def p_platformlib(d):
+    # the class libraries for WPF, Windows Forms, MAUI, Android, iOS and Mac Catalyst: the same HoloNETService as the plain class library
+    if os.path.exists(f'{d}/Class1.cs'):
+        os.remove(f'{d}/Class1.cs')
+    wr(f'{d}/HoloNETService.cs', """namespace HoloNETApp;
+
+/// <summary>Reference this library from any app to use HoloNET. Replace the demo call with your own HoloNET code (see HoloNETDemo.cs).</summary>
+public static class HoloNETService
+{
+    /// <summary>Runs the HoloNET demo (HoloNETDemo.cs) and returns what happened.</summary>
+    public static Task<string> RunDemoAsync() => HoloNETDemos.HoloNETDemo.RunAsync();
+}
+""")
+
+
+def p_razorclasslib(d):
+    os.remove(f'{d}/Component1.razor')
+    for f in ('Component1.razor.css',):
+        if os.path.exists(f'{d}/{f}'):
+            os.remove(f'{d}/{f}')
+    wr(f'{d}/HoloNETPanel.razor', """<button class="btn btn-primary" @onclick="Run" disabled="@busy">@(busy ? "Running..." : "Run the HoloNET demo")</button>
+<pre class="mt-3">@output</pre>
+
+@code {
+    // Drop <HoloNETPanel /> into any Blazor or Razor app that references this library. It runs the HoloNET demo in HoloNETDemo.cs (HoloNET HOLONET_LIBRARY_NAME).
+    private bool busy;
+    private string output = "";
+
+    private async Task Run()
+    {
+        busy = true;
+        output = "";
+        output = await HoloNETDemos.HoloNETDemo.RunAsync();
+        busy = false;
+    }
+}
+""")
+
+
+def p_avalonia_mvvm(d):
+    wr(f'{d}/ViewModels/MainViewModel.cs', """using System.Threading.Tasks;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+
+namespace HoloNETApp.ViewModels;
+
+public partial class MainViewModel : ViewModelBase
+{
+    [ObservableProperty]
+    public partial string Output { get; set; } = "";
+
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(RunCommand))]
+    public partial bool IsBusy { get; set; }
+
+    // Runs the HoloNET demo (HoloNETDemo.cs) and shows what happened.
+    [RelayCommand(CanExecute = nameof(CanRun))]
+    private async Task RunAsync()
+    {
+        IsBusy = true;
+        Output = "Running...";
+        Output = await HoloNETDemos.HoloNETDemo.RunAsync();
+        IsBusy = false;
+    }
+
+    private bool CanRun() => !IsBusy;
+}
+""")
+    sub_re(f'{d}/Views/MainWindow.axaml', r'<TextBox Text="\{Binding Greeting\}".*?/>', """<DockPanel Margin="16">
+        <Button DockPanel.Dock="Top" Content="Run the HoloNET demo" Command="{Binding RunCommand}" />
+        <TextBox Margin="0,12,0,0" Text="{Binding Output}" IsReadOnly="True" TextWrapping="Wrap" FontFamily="Consolas,Menlo,monospace" />
+    </DockPanel>""")
+
+
+def p_maccatalyst(d):
+    sub_re(f'{d}/SceneDelegate.cs', r"// Create a 'UIViewController' with a single 'UILabel'.*?Window.RootViewController = vc;", """// A button that runs the HoloNET demo (HoloNETDemo.cs) and a label for what happened.
+			var vc = new UIViewController ();
+			vc.View!.BackgroundColor = UIColor.SystemBackground;
+			var button = UIButton.FromType (UIButtonType.System);
+			button.SetTitle ("Run the HoloNET demo", UIControlState.Normal);
+			button.Frame = new CoreGraphics.CGRect (20, 80, Window!.Frame.Width - 40, 44);
+			var output = new UILabel (new CoreGraphics.CGRect (20, 140, Window.Frame.Width - 40, Window.Frame.Height - 180)) { Lines = 0, Font = UIFont.GetMonospacedSystemFont (13, UIFontWeight.Regular) };
+			button.TouchUpInside += async (s, e) => {
+				button.Enabled = false;
+				output.Text = "Running...";
+				output.Text = await HoloNETDemos.HoloNETDemo.RunAsync ();
+				button.Enabled = true;
+			};
+			vc.View.AddSubview (button);
+			vc.View.AddSubview (output);
+
+			Window.RootViewController = vc;""")
+
+
+
+def add_to_csproj(d, xml):
+    path = f'{d}/HoloNETApp.csproj'
+    t = rd(path)
+    i = t.rindex('</Project>')
+    wr(path, t[:i].rstrip('\n') + '\n' + xml + t[i:])
+
+
+def p_signalr(d):
+    wr(f'{d}/Program.cs', """using HoloNETApp;
+
+var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddSignalR();
+
+var app = builder.Build();
+app.UseDefaultFiles();
+app.UseStaticFiles();
+
+// Browsers connect to /holonet-hub (see wwwroot/index.html).
+app.MapHub<HoloNETHub>("/holonet-hub");
+
+app.Run();
+""")
+    wr(f'{d}/HoloNETHub.cs', """using Microsoft.AspNetCore.SignalR;
+
+namespace HoloNETApp;
+
+/// <summary>A SignalR hub that gives browsers (or any SignalR client) a live connection to Holochain through HoloNET.
+/// To push Holochain signals to every browser, inject IHubContext&lt;HoloNETHub&gt; where you receive them and call Clients.All.SendAsync("HoloNETSignal", ...).</summary>
+public class HoloNETHub : Hub
+{
+    // Runs the HoloNET demo (HoloNETDemo.cs) and returns what happened.
+    public Task<string> RunDemo() => HoloNETDemos.HoloNETDemo.RunAsync();
+
+    // Sends a message to every connected browser.
+    public Task Broadcast(string message) => Clients.All.SendAsync("HoloNETMessage", Context.ConnectionId, message);
+}
+""")
+    wr(f'{d}/wwwroot/index.html', """<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>HoloNET SignalR</title>
+  <script src="https://cdn.jsdelivr.net/npm/@microsoft/signalr@8/dist/browser/signalr.min.js"></script>
+</head>
+<body style="font-family: sans-serif; margin: 2rem">
+  <h1>HoloNET + SignalR</h1>
+  <p>This page talks to the hub in HoloNETHub.cs, which runs the HoloNET demo in HoloNETDemo.cs.</p>
+  <button id="run">Run the HoloNET demo</button>
+  <pre id="output"></pre>
+  <script>
+    const connection = new signalR.HubConnectionBuilder().withUrl("/holonet-hub").withAutomaticReconnect().build();
+    connection.on("HoloNETMessage", (from, message) => { output.textContent += from + ": " + message + "\n"; });
+    connection.start().then(() => {
+      run.onclick = async () => {
+        run.disabled = true;
+        output.textContent = "Running...";
+        output.textContent = await connection.invoke("RunDemo");
+        run.disabled = false;
+      };
+    });
+  </script>
+</body>
+</html>
+""")
+
+
+def p_nativeaot(d):
+    wr(f'{d}/Program.cs', """// Runs the HoloNET demo (HoloNETDemo.cs) and prints what happened. Publish a native, self-contained executable with: dotnet publish -c Release -r win-x64 (or linux-x64, osx-arm64)
+Console.WriteLine(await HoloNETDemos.HoloNETDemo.RunAsync());
+""")
+    sub(f'{d}/HoloNETApp.csproj', '<Nullable>disable</Nullable>', '<Nullable>disable</Nullable>\n    <PublishAot>true</PublishAot>\n    <InvariantGlobalization>true</InvariantGlobalization>')
+
+
+def p_orleans(d):
+    add_to_csproj(d, """  <ItemGroup>
+    <PackageReference Include="Microsoft.Orleans.Server" Version="10.4.2" />
+  </ItemGroup>
+""")
+    wr(f'{d}/Program.cs', """using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using HoloNETApp;
+
+// An Orleans silo with a grain that uses HoloNET. Add more silos (or a client) to spread grains across machines.
+using var host = Host.CreateDefaultBuilder(args)
+    .UseOrleans(silo => silo.UseLocalhostClustering())
+    .Build();
+await host.StartAsync();
+
+var grain = host.Services.GetRequiredService<IGrainFactory>().GetGrain<IHoloNETGrain>("demo");
+Console.WriteLine(await grain.RunDemoAsync());
+
+await host.StopAsync();
+""")
+    wr(f'{d}/IHoloNETGrain.cs', """namespace HoloNETApp;
+
+public interface IHoloNETGrain : IGrainWithStringKey
+{
+    Task<string> RunDemoAsync();
+}
+""")
+    wr(f'{d}/HoloNETGrain.cs', """namespace HoloNETApp;
+
+/// <summary>A grain that runs the HoloNET demo (HoloNETDemo.cs). Replace it with grains that wrap your own HoloNET calls.</summary>
+public class HoloNETGrain : Grain, IHoloNETGrain
+{
+    public Task<string> RunDemoAsync() => HoloNETDemos.HoloNETDemo.RunAsync();
+}
+""")
+
+
+def base_godot(d):
+    wr(f'{d}/HoloNETApp.csproj', """<Project Sdk="Godot.NET.Sdk/4.7.2">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+    <RootNamespace>HoloNETApp</RootNamespace>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+</Project>
+""")
+    wr(f'{d}/project.godot', """; Engine configuration file.
+config_version=5
+
+[application]
+
+config/name="HoloNETApp"
+run/main_scene="res://Main.tscn"
+config/features=PackedStringArray("4.7", "C#")
+
+[dotnet]
+
+project/assembly_name="HoloNETApp"
+""")
+    wr(f'{d}/Main.tscn', """[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://HoloNETNode.cs" id="1"]
+
+[node name="Main" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1")
+""")
+
+
+def p_godot(d):
+    wr(f'{d}/HoloNETNode.cs', """using Godot;
+
+// Attached to the Main scene. A button that runs the HoloNET demo (HoloNETDemo.cs) and a label for what happened.
+public partial class HoloNETNode : Control
+{
+    public override void _Ready()
+    {
+        var box = new VBoxContainer();
+        box.SetAnchorsPreset(LayoutPreset.FullRect);
+        AddChild(box);
+
+        var button = new Button { Text = "Run the HoloNET demo" };
+        var output = new Label { AutowrapMode = TextServer.AutowrapMode.WordSmart, SizeFlagsVertical = SizeFlags.ExpandFill };
+        box.AddChild(button);
+        box.AddChild(output);
+
+        button.Pressed += async () =>
+        {
+            button.Disabled = true;
+            output.Text = "Running...";
+            output.Text = await HoloNETDemos.HoloNETDemo.RunAsync();
+            button.Disabled = false;
+        };
+    }
+}
+""")
+
+
+
+def p_wpfusercontrollib(d):
+    for f in ('UserControl1.xaml', 'UserControl1.xaml.cs'):
+        os.remove(f'{d}/{f}')
+    wr(f'{d}/HoloNETControl.xaml', """<UserControl x:Class="HoloNETApp.HoloNETControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- Drop <local:HoloNETControl /> into any WPF window. It runs the HoloNET demo in HoloNETDemo.cs (HoloNET HOLONET_LIBRARY_NAME) and shows what happened. -->
+    <DockPanel Margin="16">
+        <Button x:Name="RunButton" DockPanel.Dock="Top" Content="Run the HoloNET demo" Click="RunButton_Click" />
+        <TextBox x:Name="Output" Margin="0,12,0,0" IsReadOnly="True" TextWrapping="Wrap" FontFamily="Consolas" VerticalScrollBarVisibility="Auto" />
+    </DockPanel>
+</UserControl>
+""")
+    wr(f'{d}/HoloNETControl.xaml.cs', """using System.Windows;
+using System.Windows.Controls;
+
+namespace HoloNETApp;
+
+public partial class HoloNETControl : UserControl
+{
+    public HoloNETControl()
+    {
+        InitializeComponent();
+    }
+
+    private async void RunButton_Click(object sender, RoutedEventArgs e)
+    {
+        RunButton.IsEnabled = false;
+        Output.Text = "Running...";
+        Output.Text = await HoloNETDemos.HoloNETDemo.RunAsync();
+        RunButton.IsEnabled = true;
+    }
+}
+""")
+
+
+def p_winformscontrollib(d):
+    for f in ('UserControl1.cs', 'UserControl1.Designer.cs'):
+        os.remove(f'{d}/{f}')
+    wr(f'{d}/HoloNETControl.cs', """namespace HoloNETApp;
+
+/// <summary>Drop this control onto any Windows Forms form. It runs the HoloNET demo (HoloNETDemo.cs) and shows what happened.</summary>
+public class HoloNETControl : UserControl
+{
+    private readonly Button runButton = new() { Text = "Run the HoloNET demo", Dock = DockStyle.Top, Height = 32 };
+    private readonly TextBox output = new() { Multiline = true, ReadOnly = true, Dock = DockStyle.Fill, ScrollBars = ScrollBars.Vertical, Font = new Font("Consolas", 9F) };
+
+    public HoloNETControl()
+    {
+        Controls.Add(output);
+        Controls.Add(runButton);
+        runButton.Click += async (s, e) =>
+        {
+            runButton.Enabled = false;
+            output.Text = "Running...";
+            output.Text = await HoloNETDemos.HoloNETDemo.RunAsync();
+            runButton.Enabled = true;
+        };
+    }
+}
+""")
+
+
+
+def p_terminalgui(d):
+    add_to_csproj(d, """  <ItemGroup>
+    <PackageReference Include="Terminal.Gui" Version="2.6.0" />
+  </ItemGroup>
+""")
+    wr(f'{d}/Program.cs', """using Terminal.Gui.App;
+using Terminal.Gui.ViewBase;
+using Terminal.Gui.Views;
+
+// A terminal UI: a button that runs the HoloNET demo (HoloNETDemo.cs) and a text area for what happened.
+using IApplication app = Application.Create().Init();
+
+var window = new Window { Title = "HoloNET (Esc to quit)" };
+var button = new Button { Text = "Run the HoloNET demo", X = 1, Y = 1 };
+var output = new TextView { X = 1, Y = 3, Width = Dim.Fill(1), Height = Dim.Fill(1), ReadOnly = true, WordWrap = true };
+
+button.Accepting += async (s, e) =>
+{
+    e.Handled = true;
+    output.Text = "Running...";
+    output.Text = await HoloNETDemos.HoloNETDemo.RunAsync();
+};
+
+window.Add(button, output);
+app.Run(window);
+""")
+
+
+
+def base_aspire(d):
+    # An Aspire solution: an AppHost that starts the HoloNET service (a minimal web app) and gives it the Aspire dashboard, health checks and telemetry.
+    wr(f'{d}/HoloNETApp.slnx', """<Solution>
+  <Project Path="HoloNETApp.AppHost/HoloNETApp.AppHost.csproj" />
+  <Project Path="HoloNETApp/HoloNETApp.csproj" />
+</Solution>
+""")
+    wr(f'{d}/HoloNETApp.AppHost/HoloNETApp.AppHost.csproj', """<Project Sdk="Aspire.AppHost.Sdk/13.6.5">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../HoloNETApp/HoloNETApp.csproj" />
+  </ItemGroup>
+</Project>
+""")
+    wr(f'{d}/HoloNETApp.AppHost/Program.cs', """var builder = DistributedApplication.CreateBuilder(args);
+
+// The HoloNET service (../HoloNETApp). Add more services, databases or containers here and give them a reference to it.
+builder.AddProject<Projects.HoloNETApp>("holonet");
+
+builder.Build().Run();
+""")
+    wr(f'{d}/HoloNETApp/HoloNETApp.csproj', """<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+</Project>
+""")
+    wr(f'{d}/HoloNETApp/Program.cs', """var builder = WebApplication.CreateBuilder(args);
+var app = builder.Build();
+
+// GET /holonet runs the HoloNET demo (HoloNETDemo.cs) and returns what happened.
+app.MapGet("/holonet", async () => Results.Text(await HoloNETDemos.HoloNETDemo.RunAsync()));
+
+app.Run();
+""")
+
+
+def p_aspire(d):
+    pass
+
+
 # key, dotnet new args, patch fn, display name, classifications, forced external (no bundled conductor), project file TFM fix
 TYPES = [
     ('console', ['console'], p_console, 'Console app', ['Console'], False),
@@ -652,6 +1133,28 @@ TYPES = [
     ('ios', ['ios'], p_ios, 'iOS app', ['iOS', 'Mobile'], True),
     ('avalonia', ['avalonia.app'], p_avalonia, 'Avalonia app', ['Desktop', 'Avalonia'], False),
     ('uno', ['unoapp'], p_uno, 'Uno Platform app', ['Uno', 'Mobile', 'Desktop', 'WebAssembly'], True, 'HoloNETApp', True),
+    ('web', ['web'], p_web, 'ASP.NET Core Empty web app', ['Web', 'Empty'], False),
+    ('webapiaot', ['webapiaot'], p_webapiaot, 'ASP.NET Core Web API (Native AOT)', ['Web', 'API', 'AOT'], False),
+    ('mcpserver', ['mcpserver'], p_mcpserver, 'MCP server (lets AI clients use Holochain)', ['AI', 'MCP', 'Service'], False),
+    ('mstest', ['mstest'], p_mstest, 'MSTest test project', ['Test', 'MSTest'], False),
+    ('nunit', ['nunit'], p_nunit, 'NUnit test project', ['Test', 'NUnit'], False),
+    ('wpflib', ['wpflib'], p_platformlib, 'WPF class library', ['Library', 'WPF'], False),
+    ('wpfusercontrollib', ['wpfusercontrollib'], p_wpfusercontrollib, 'WPF user control library', ['Library', 'WPF', 'Control'], False),
+    ('winformscontrollib', ['winformscontrollib'], p_winformscontrollib, 'Windows Forms control library', ['Library', 'WinForms', 'Control'], False),
+    ('winformslib', ['winformslib'], p_platformlib, 'Windows Forms class library', ['Library', 'WinForms'], False),
+    ('razorclasslib', ['razorclasslib'], p_razorclasslib, 'Razor class library (a Blazor component)', ['Library', 'Razor', 'Blazor'], False),
+    ('mauilib', ['mauilib'], p_platformlib, '.NET MAUI class library', ['Library', 'MAUI', 'Mobile'], True),
+    ('androidlib', ['androidlib'], p_platformlib, 'Android class library', ['Library', 'Android', 'Mobile'], True),
+    ('ioslib', ['ioslib'], p_platformlib, 'iOS class library', ['Library', 'iOS', 'Mobile'], True),
+    ('maccatalystlib', ['maccatalystlib'], p_platformlib, 'Mac Catalyst class library', ['Library', 'macOS', 'Mac Catalyst'], True),
+    ('maccatalyst', ['maccatalyst'], p_maccatalyst, 'Mac Catalyst app', ['macOS', 'Mac Catalyst'], True),
+    ('avalonia-mvvm', ['avalonia.mvvm'], p_avalonia_mvvm, 'Avalonia MVVM app', ['Desktop', 'Avalonia', 'MVVM'], False),
+    ('signalr', ['web'], p_signalr, 'ASP.NET Core SignalR app', ['Web', 'SignalR', 'Real-time'], False),
+    ('nativeaot', ['console'], p_nativeaot, 'Native AOT console app', ['Console', 'AOT'], False),
+    ('orleans', ['console'], p_orleans, 'Orleans app (distributed grains)', ['Orleans', 'Distributed', 'Actor'], False),
+    ('terminalgui', ['console'], p_terminalgui, 'Terminal UI app (Terminal.Gui)', ['Console', 'TUI'], False),
+    ('aspire', base_aspire, p_aspire, 'Aspire app (AppHost and a HoloNET service)', ['Aspire', 'Cloud', 'Web'], False, 'HoloNETApp'),
+    ('godot', base_godot, p_godot, 'Godot 4 (C#) project', ['Godot', 'Game'], False),
 ]
 
 
@@ -904,6 +1407,33 @@ The conductor is large (about 200 MB per slice before the linker strips it).
 '''
 
 
+
+RUN_HINTS = {
+    'web': 'Run `dotnet run`, then open `/holonet` in a browser (the port is printed when it starts).',
+    'webapiaot': 'Run `dotnet run`, then open `/holonet`. To build the native executable: `dotnet publish -c Release -r win-x64` (or `linux-x64`, `osx-arm64`); it needs the platform C++ build tools (see [Native AOT prerequisites](https://learn.microsoft.com/dotnet/core/deploying/native-aot/#prerequisites)). **Experimental:** HoloNET, MessagePack and Newtonsoft.Json report AOT and trim warnings (they use reflection), so a native executable is not verified to run; `dotnet run` and `dotnet publish` without `PublishAot` work normally. Native publish also needs the C++ build tools on your PATH (run it from a Developer Command Prompt).',
+    'nativeaot': 'Run `dotnet run`. To build the native executable: `dotnet publish -c Release -r win-x64` (or `linux-x64`, `osx-arm64`); it needs the platform C++ build tools (see [Native AOT prerequisites](https://learn.microsoft.com/dotnet/core/deploying/native-aot/#prerequisites)). **Experimental:** HoloNET, MessagePack and Newtonsoft.Json report AOT and trim warnings (they use reflection), so a native executable is not verified to run; `dotnet run` and `dotnet publish` without `PublishAot` work normally. Native publish also needs the C++ build tools on your PATH (run it from a Developer Command Prompt).',
+    'signalr': 'Run `dotnet run`, then open the site root in a browser and press the button: it calls the hub in `HoloNETHub.cs` over SignalR. Any SignalR client (JavaScript, .NET, Java, Swift) can connect to `/holonet-hub`.',
+    'mcpserver': 'This is a stdio MCP server, so an AI client starts it. Add it to your client, for example in Claude Desktop or Claude Code: `claude mcp add holonet -- dotnet run --project <path to this folder>`. Then ask the AI to "run the HoloNET demo". Logs go to stderr because stdout carries the MCP messages.',
+    'aspire': 'Run `dotnet run --project HoloNETApp.AppHost`: the Aspire dashboard opens, and the `holonet` service it starts answers `GET /holonet` with what the HoloNET demo did. Needs the Aspire prerequisites (a container runtime is only needed if you add containers).',
+    'terminalgui': 'Run `dotnet run` in a terminal: press the button to run the HoloNET demo, Esc to quit. Terminal.Gui 2.x.',
+    'orleans': 'Run `dotnet run`: it starts a local Orleans silo, calls the grain in `HoloNETGrain.cs` and prints what happened. For a real cluster, replace `UseLocalhostClustering()` with your clustering provider.',
+    'godot': 'Open this folder in the [Godot 4 .NET editor](https://godotengine.org/download) (the .NET build, not the standard one), build the C# project (the hammer icon) and press Play. Godot 4.7 or newer. On export, include the HoloNET DLLs Godot copies next to the game.',
+    'mstest': 'Run `dotnet test`. This is an integration test: it needs a conductor (bundled on Windows, or the one the start-conductor script runs).',
+    'nunit': 'Run `dotnet test`. This is an integration test: it needs a conductor (bundled on Windows, or the one the start-conductor script runs).',
+    'xunit': 'Run `dotnet test`. This is an integration test: it needs a conductor (bundled on Windows, or the one the start-conductor script runs).',
+    'razorclasslib': 'This is a library. Reference it from a Blazor or Razor app (`dotnet add reference <path to this project>`) and add `<HoloNETPanel />` to a page.',
+    'classlib': 'This is a library. Reference it from any app (`dotnet add reference <path to this project>`) and call `HoloNETService.RunDemoAsync()`.',
+    'wpflib': 'This is a library. Reference it from your WPF app (`dotnet add reference <path to this project>`) and call `HoloNETService.RunDemoAsync()`.',
+    'wpfusercontrollib': 'This is a library. Reference it from your WPF app (`dotnet add reference <path to this project>`) and add `<local:HoloNETControl />` to a window.',
+    'winformscontrollib': 'This is a library. Reference it from your Windows Forms app (`dotnet add reference <path to this project>`) and add a `HoloNETControl` to a form.',
+    'winformslib': 'This is a library. Reference it from your Windows Forms app (`dotnet add reference <path to this project>`) and call `HoloNETService.RunDemoAsync()`.',
+    'mauilib': 'This is a library. Reference it from your .NET MAUI app (`dotnet add reference <path to this project>`) and call `HoloNETService.RunDemoAsync()`.',
+    'androidlib': 'This is a library. Reference it from your Android app (`dotnet add reference <path to this project>`) and call `HoloNETService.RunDemoAsync()`. To start the Holochain runtime on the phone, use `holonet-android` (or `holonet-maui`) instead.',
+    'ioslib': 'This is a library. Reference it from your iOS app (`dotnet add reference <path to this project>`) and call `HoloNETService.RunDemoAsync()`. Building iOS projects needs a Mac (or a paired Mac from Windows).',
+    'maccatalystlib': 'This is a library. Reference it from your Mac Catalyst app (`dotnet add reference <path to this project>`) and call `HoloNETService.RunDemoAsync()`. Building Mac Catalyst projects needs a Mac.',
+    'maccatalyst': 'Build and run on a Mac: `dotnet build -t:Run -f net10.0-maccatalyst`, or press F5 in Visual Studio for Mac / Rider. Mac Catalyst needs a Mac to build; we have not compiled this template on one.',
+}
+
 def readme(key, name, forced_external):
     if key == 'unity':
         return unity_readme()
@@ -945,7 +1475,7 @@ endpoint just calls `HoloNETDemo.RunAsync()` and shows the text it returns.
 
 {cond}
 
-Then run the app as usual for this app type (`dotnet run`, or press F5 in your IDE).
+{RUN_HINTS.get(key, 'Then run the app as usual for this app type (`dotnet run`, or press F5 in your IDE).')}
 {extra}
 ## Switch the HoloNET library
 

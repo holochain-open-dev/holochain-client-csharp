@@ -1,0 +1,16 @@
+<button class="btn btn-primary" @onclick="Run" disabled="@busy">@(busy ? "Running..." : "Run the HoloNET demo")</button>
+<pre class="mt-3">@output</pre>
+
+@code {
+    // Drop <HoloNETPanel /> into any Blazor or Razor app that references this library. It runs the HoloNET demo in HoloNETDemo.cs (HoloNET HOLONET_LIBRARY_NAME).
+    private bool busy;
+    private string output = "";
+
+    private async Task Run()
+    {
+        busy = true;
+        output = "";
+        output = await HoloNETDemos.HoloNETDemo.RunAsync();
+        busy = false;
+    }
+}

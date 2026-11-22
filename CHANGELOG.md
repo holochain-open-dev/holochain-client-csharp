@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased
+
+More `dotnet new` templates: every common .NET app, library and test project type now has a HoloNET template (42 in all), generated from the standard .NET templates by `templates/build_templates.py`.
+
+- **Web and services:** `holonet-web` (ASP.NET Core Empty), `holonet-webapiaot` (Web API, Native AOT), `holonet-signalr` (a hub that gives browsers a live connection to Holochain), `holonet-mcpserver` (an MCP server, so AI clients such as Claude can use Holochain), `holonet-nativeaot` (Native AOT console), `holonet-orleans` (a grain that wraps HoloNET), `holonet-terminalgui` (a Terminal.Gui app) and `holonet-aspire` (an Aspire AppHost plus a HoloNET service).
+- **Desktop and mobile:** `holonet-avalonia-mvvm` and `holonet-maccatalyst`. The Mac Catalyst template is created and restored here but not compiled by us (it needs a Mac).
+- **Games:** `holonet-godot` (a Godot 4 C# project).
+- **Libraries:** WPF, Windows Forms, Razor (a `<HoloNETPanel />` component), MAUI, Android, iOS and Mac Catalyst class libraries, and WPF user control and Windows Forms control libraries.
+- **Tests:** `holonet-mstest` and `holonet-nunit`, alongside `holonet-xunit`.
+- Each new template's README says how to run it (for example how to add the MCP server to Claude, or how to publish the native executable), and `templates/test_templates.py` builds and run-checks them.
+
 ## v4.6.0 - 2026-11-01
 
 Every HoloNET package is now released together at one version, in four conductor variants, with project templates.

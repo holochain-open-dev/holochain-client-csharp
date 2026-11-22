@@ -13,14 +13,17 @@ TYPES = sorted(d[len('holonet-'):] for d in os.listdir(os.path.join(HERE, 'conte
 
 
 # Multi-target apps are built one target at a time, so a missing workload for one (e.g. wasm-tools) is reported on its own.
-FRAMEWORKS = {'uno': ['net10.0-desktop', 'net10.0-android', 'net10.0-browserwasm'], 'maui': ['net10.0-windows10.0.19041.0', 'net10.0-android'], 'maui-blazor': ['net10.0-windows10.0.19041.0', 'net10.0-android']}
+FRAMEWORKS = {'uno': ['net10.0-desktop', 'net10.0-android', 'net10.0-browserwasm'], 'maui': ['net10.0-windows10.0.19041.0', 'net10.0-android'], 'maui-blazor': ['net10.0-windows10.0.19041.0', 'net10.0-android'],
+              'mauilib': ['net10.0-windows10.0.19041.0', 'net10.0-android'], 'androidlib': ['net10.0-android']}
+# Apple targets cannot be built on Windows (they need a Mac): these are only created and restored here, and the README says they are not compiled by us.
+RESTORE_ONLY = ('ios', 'ioslib', 'maccatalyst', 'maccatalystlib')
 
 
 # What each library's demo prints when it works (HoloNETDemo.cs).
 MARKERS = {'api': 'greeting = Hello, Holochain!', 'client': 'Created an avatar', 'orm': 'Updated and deleted.', 'hypernet': 'Message delivered.'}
-CONSOLE_TYPES = ('console',)
-WEB_PATHS = {'webapi': '/holonet', 'mvc': '/HoloNET', 'razor': '/HoloNET'}
-DESKTOP_TYPES = ('wpf', 'winforms', 'avalonia', 'winui', 'maui', 'maui-blazor', 'uno')
+CONSOLE_TYPES = ('console', 'nativeaot', 'orleans')
+WEB_PATHS = {'webapi': '/holonet', 'web': '/holonet', 'webapiaot': '/holonet', 'mvc': '/HoloNET', 'razor': '/HoloNET'}
+DESKTOP_TYPES = ('wpf', 'winforms', 'avalonia', 'avalonia-mvvm', 'winui', 'maui', 'maui-blazor', 'uno')
 RUN_FRAMEWORK = {'maui': 'net10.0-windows10.0.19041.0', 'maui-blazor': 'net10.0-windows10.0.19041.0', 'uno': 'net10.0-desktop'}
 
 
@@ -51,7 +54,7 @@ def run_checks(t, lib, project, env):
             time.sleep(1)
         kill_tree(proc)
         return None if marker in ''.join(lines) else 'log did not contain "' + marker + '":' + chr(10) + ''.join(lines)[-500:]
-    if t in WEB_PATHS or t in ('blazor', 'razor', 'mvc', 'webapi'):
+    if t in WEB_PATHS or t in ('blazor',):
         port = free_port()
         proc = subprocess.Popen(['dotnet', 'run', '--project', project, '--no-build', '--urls', f'http://127.0.0.1:{port}'], env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         try:
@@ -136,7 +139,8 @@ def main():
                 problem = check_unity(os.path.join(work, name), feed, env, work)
         if not problem and not r.returncode and t != 'unity':
             for fw in FRAMEWORKS.get(t, [None]):
-                b = run(['dotnet', 'build', os.path.join(work, name), '-nologo', '-v', 'q'] + (['-f', fw] if fw else []), env=env)
+                verb = 'restore' if t in RESTORE_ONLY else 'build'
+                b = run(['dotnet', verb, os.path.join(work, name), '-nologo', '-v', 'q'] + (['-f', fw] if fw and verb == 'build' else []), env=env)
                 if b.returncode:
                     problem = ((fw + ': ') if fw else '') + (chr(10).join(l for l in (b.stdout + b.stderr).splitlines() if ' error ' in l)[:700] or 'build failed')
                     break

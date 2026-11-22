@@ -1,0 +1,9 @@
+<UserControl x:Class="HoloNETApp.HoloNETControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- Drop <local:HoloNETControl /> into any WPF window. It runs the HoloNET demo in HoloNETDemo.cs (HoloNET HOLONET_LIBRARY_NAME) and shows what happened. -->
+    <DockPanel Margin="16">
+        <Button x:Name="RunButton" DockPanel.Dock="Top" Content="Run the HoloNET demo" Click="RunButton_Click" />
+        <TextBox x:Name="Output" Margin="0,12,0,0" IsReadOnly="True" TextWrapping="Wrap" FontFamily="Consolas" VerticalScrollBarVisibility="Auto" />
+    </DockPanel>
+</UserControl>

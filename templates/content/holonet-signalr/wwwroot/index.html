@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>HoloNET SignalR</title>
+  <script src="https://cdn.jsdelivr.net/npm/@microsoft/signalr@8/dist/browser/signalr.min.js"></script>
+</head>
+<body style="font-family: sans-serif; margin: 2rem">
+  <h1>HoloNET + SignalR</h1>
+  <p>This page talks to the hub in HoloNETHub.cs, which runs the HoloNET demo in HoloNETDemo.cs.</p>
+  <button id="run">Run the HoloNET demo</button>
+  <pre id="output"></pre>
+  <script>
+    const connection = new signalR.HubConnectionBuilder().withUrl("/holonet-hub").withAutomaticReconnect().build();
+    connection.on("HoloNETMessage", (from, message) => { output.textContent += from + ": " + message + "
+"; });
+    connection.start().then(() => {
+      run.onclick = async () => {
+        run.disabled = true;
+        output.textContent = "Running...";
+        output.textContent = await connection.invoke("RunDemo");
+        run.disabled = false;
+      };
+    });
+  </script>
+</body>
+</html>
