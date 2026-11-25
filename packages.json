@@ -117,6 +117,7 @@
   ],
   "exclude_projects": [
     "NextGenSoftware.Holochain.HoloNET.Templates.*",
+    "templates/content/*",
     "UnoApp/*",
     "Archived/*",
     "examples/*",
