@@ -22,7 +22,15 @@
 	  <PackageIcon>hc logo.png</PackageIcon>
 	  <Authors>David Ellams (NextGen Software Ltd)</Authors>
 	  <PackageTags>holochain;net;unity;client</PackageTags>
-	  <PackageReleaseNotes>## v4.6.0 - Part of the HoloNET 4.6.0 release (every HoloNET package is versioned together): https://github.com/holochain-open-dev/holochain-client-csharp/releases/tag/v4.6.0
+	  <PackageReleaseNotes>HoloNET 4.6.1
+
+- Reuse the persisted app-bound WebSocket listener when reconnecting. If none exists, create a listener bound to that app on loopback.
+- Fix the Holochain 0.7.1 coordinator-update request encoding.
+- Add bounded diagnostics for managed Linux conductor startup.
+
+Release: https://github.com/holochain-open-dev/holochain-client-csharp/releases/tag/v4.6.1
+
+## v4.6.0 - Part of the HoloNET 4.6.0 release (every HoloNET package is versioned together): https://github.com/holochain-open-dev/holochain-client-csharp/releases/tag/v4.6.0
 
 ## v4.5.0 - The app client created by InstallEnableSignAttachAndConnectToHappAsync now logs the way the admin client was told to (LogToConsole, LogToFile, LogPath, logging modes); it always used the defaults before.
 
@@ -129,7 +137,7 @@ Full changelog: https://github.com/holochain-open-dev/holochain-client-csharp/bl
 	  <!--<PackageLicenseExpression>GNU GPLv3</PackageLicenseExpression>-->
 	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
 	  <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-	  <Version>4.6.0</Version>
+	  <Version>4.6.1</Version>
 	  <!--<PackageLicenseFile>..\LICENSE</PackageLicenseFile>-->
 
 	  <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>

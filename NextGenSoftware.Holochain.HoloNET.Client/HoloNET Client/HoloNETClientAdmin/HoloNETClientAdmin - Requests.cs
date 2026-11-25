@@ -1768,14 +1768,42 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
         /// <param name="conductorResponseCallBackMode">The Concuctor Response CallBack Mode, set this to 'WaitForHolochainConductorResponse' if you want the function to wait for the Holochain Conductor response before returning that response or set it to 'UseCallBackEvents' to return from the function immediately and then raise the 'OnDumpFullStateCallBack' event when the conductor responds.   </param>
         /// <param name="id">The request id, leave null if you want HoloNET to manage this for you.</param>
         /// <returns></returns>
-        private async Task<CoordinatorsUpdatedCallBackEventArgs> UpdateCoordinatorsAsync(byte[] dnaHash, string path, CoordinatorBundle bundle, ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
+        public Task<CoordinatorsUpdatedCallBackEventArgs> UpdateCoordinatorsAsync(CellId cellId, string path,
+            ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
+            => SendCoordinatorUpdateAsync(cellId, new CoordinatorUpdateSource { Type = "path", Value = path }, conductorResponseCallBackMode, id);
+
+        public Task<CoordinatorsUpdatedCallBackEventArgs> UpdateCoordinatorsAsync(CellId cellId, CoordinatorBundle bundle,
+            ConductorResponseCallBackMode conductorResponseCallBackMode = ConductorResponseCallBackMode.WaitForHolochainConductorResponse, string id = null)
+            => SendCoordinatorUpdateAsync(cellId, new CoordinatorUpdateSource { Type = "bundle", Value = bundle }, conductorResponseCallBackMode, id);
+
+        private async Task<CoordinatorsUpdatedCallBackEventArgs> UpdateCoordinatorsAsync(byte[] dnaHash, string path, CoordinatorBundle bundle,
+            ConductorResponseCallBackMode conductorResponseCallBackMode, string id)
         {
-            return await CallFunctionAsync(HoloNETRequestType.AdminUpdateCoordinators, "update_coordinators", new UpdateCoordinatorsRequest()
-            {
-                dnaHash = dnaHash,
-                path = path,
-                bundle = bundle
-            }, _taskCompletionCoordinatorsUpdatedCallBack, "OnCoordinatorsUpdatedCallBack", conductorResponseCallBackMode, id);
+            var cells = await ListCellIdsAsync();
+            if (cells.IsError)
+                return new CoordinatorsUpdatedCallBackEventArgs { IsError = true, Message = cells.Message };
+
+            var matches = System.Linq.Enumerable.ToArray(System.Linq.Enumerable.Where(cells.CellIds,
+                candidate => candidate?.Length == 2 && System.Linq.Enumerable.SequenceEqual(candidate[0], dnaHash)));
+            if (matches.Length != 1)
+                return new CoordinatorsUpdatedCallBackEventArgs
+                {
+                    IsError = true,
+                    Message = "A DNA hash must identify exactly one running cell. Specify a CellId when updating an individual cell."
+                };
+
+            var cellId = new CellId(matches[0][0], matches[0][1]);
+            return bundle == null
+                ? await UpdateCoordinatorsAsync(cellId, path, conductorResponseCallBackMode, id)
+                : await UpdateCoordinatorsAsync(cellId, bundle, conductorResponseCallBackMode, id);
+        }
+
+        private Task<CoordinatorsUpdatedCallBackEventArgs> SendCoordinatorUpdateAsync(CellId cellId, CoordinatorUpdateSource source,
+            ConductorResponseCallBackMode conductorResponseCallBackMode, string id)
+        {
+            return CallFunctionAsync(HoloNETRequestType.AdminUpdateCoordinators, "update_coordinators",
+                new UpdateCoordinatorsRequest { CellId = cellId, Source = source },
+                _taskCompletionCoordinatorsUpdatedCallBack, "OnCoordinatorsUpdatedCallBack", conductorResponseCallBackMode, id);
         }
 
         // New in Holochain 0.7.0 - Admin API.
