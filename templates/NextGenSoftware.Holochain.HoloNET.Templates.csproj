@@ -18,6 +18,8 @@
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <NoWarn>$(NoWarn);NU5128;NU5111</NoWarn>
     <EnableDefaultItems>false</EnableDefaultItems>
+    <!-- Template content includes dot-files (.gitignore, .mcp/server.json): pack them too. -->
+    <NoDefaultExcludes>true</NoDefaultExcludes>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="content\**\*" Exclude="content\**\bin\**;content\**\obj\**;content\**\.sandbox\**" />
