@@ -31,6 +31,8 @@ Release: https://github.com/holochain-open-dev/holochain-client-csharp/releases/
     <EnableDefaultItems>false</EnableDefaultItems>
     <!-- Template content includes dot-files (.gitignore, .mcp/server.json): pack them too. -->
     <NoDefaultExcludes>true</NoDefaultExcludes>
+    <!-- start-conductor.ps1 is template content copied into new projects, not an install script. -->
+    <NoWarn>$(NoWarn);NU5110;NU5111</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="content\**\*" Exclude="content\**\bin\**;content\**\obj\**;content\**\.sandbox\**" />
