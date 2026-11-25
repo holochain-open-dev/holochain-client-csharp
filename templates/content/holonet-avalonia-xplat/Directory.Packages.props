@@ -1,0 +1,26 @@
+<Project>
+    <!-- https://learn.microsoft.com/en-us/nuget/consume-packages/central-package-management -->
+    <PropertyGroup>
+        <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    </PropertyGroup>
+    <ItemGroup>
+        <!-- Avalonia packages -->
+        <!-- Important: keep version in sync! -->
+        <PackageVersion Include="Avalonia" Version="12.1.0" />
+        <PackageVersion Include="Avalonia.Themes.Fluent" Version="12.1.0" />
+        <PackageVersion Include="Avalonia.Fonts.Inter" Version="12.1.0" />
+        <PackageVersion Include="Avalonia.Desktop" Version="12.1.0" />
+        <PackageVersion Include="Avalonia.iOS" Version="12.1.0" />
+        <PackageVersion Include="Avalonia.Browser" Version="12.1.0" />
+        <PackageVersion Include="Avalonia.Android" Version="12.1.0" />
+        <PackageVersion Include="AvaloniaUI.DiagnosticsSupport" Version="2.2.3" />
+
+        <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+
+        <PackageVersion Include="Xamarin.AndroidX.Core.SplashScreen" Version="1.0.1.15" />
+        <PackageVersion Include="NextGenSoftware.Holochain.HoloNET.HOLONET_LIBRARY_IDHOLONET_PKG_SUFFIX" Version="HOLONET_VERSION" />
+        <!--#if (!UseApi)-->
+        <PackageVersion Include="NextGenSoftware.Holochain.HoloNET.APIHOLONET_PKG_SUFFIX" Version="HOLONET_VERSION" />
+        <!--#endif-->
+    </ItemGroup>
+</Project>

@@ -13,6 +13,8 @@ dotnet new holonet-webapi -n MyApp --HoloNET client    # a Web API using the Hol
 
 ## The templates
 
+The templates from `holonet-web` onwards in this table are new: they are on the `Development` branch and ship in the next HoloNET release (the 4.6.0 template pack on NuGet has the ones above them).
+
 | Template | App type | Runs the HoloNET demo from | Bundled conductor |
 |---|---|---|---|
 | `holonet-console` | Console app | `Program.cs` | Yes (Windows) |
@@ -42,6 +44,8 @@ dotnet new holonet-webapi -n MyApp --HoloNET client    # a Web API using the Hol
 | `holonet-nativeaot` | Native AOT console app (experimental: HoloNET reports AOT warnings) | `Program.cs` | Yes (Windows) |
 | `holonet-orleans` | Orleans (distributed grains) | `HoloNETGrain` | Yes (Windows) |
 | `holonet-avalonia-mvvm` | Avalonia MVVM (Windows, Linux, macOS) | a command in `MainViewModel` | Yes (Windows) |
+| `holonet-avalonia-xplat` | Avalonia cross-platform (desktop, browser, Android, iOS heads sharing one view) | a command in `MainViewModel` | No: connects to your conductor |
+| `holonet-androidwear` | Wear OS (Android Wear) | a button on the main activity | No: connects to your conductor |
 | `holonet-maccatalyst` | Mac Catalyst (native) | a button on the main screen | No: connects to your conductor (not compiled by us on a Mac) |
 | `holonet-godot` | Godot 4 (C#) | a button in the `Main` scene | Windows exports |
 | `holonet-terminalgui` | Terminal UI (Terminal.Gui) | a button in the terminal window | Yes (Windows) |

@@ -1,0 +1,11 @@
+﻿<Solution>
+  <Project Path="HoloNETApp.Android/HoloNETApp.Android.csproj">
+    <Deploy />
+  </Project>
+  <Project Path="HoloNETApp.Browser/HoloNETApp.Browser.csproj" />
+  <Project Path="HoloNETApp.Desktop/HoloNETApp.Desktop.csproj" />
+  <Project Path="HoloNETApp.iOS/HoloNETApp.iOS.csproj">
+    <Deploy />
+  </Project>
+  <Project Path="HoloNETApp/HoloNETApp.csproj" />
+</Solution>

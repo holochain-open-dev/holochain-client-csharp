@@ -17,6 +17,8 @@ FRAMEWORKS = {'uno': ['net10.0-desktop', 'net10.0-android', 'net10.0-browserwasm
               'mauilib': ['net10.0-windows10.0.19041.0', 'net10.0-android'], 'androidlib': ['net10.0-android']}
 # Apple targets cannot be built on Windows (they need a Mac): these are only created and restored here, and the README says they are not compiled by us.
 RESTORE_ONLY = ('ios', 'ioslib', 'maccatalyst', 'maccatalystlib')
+# Multi-project solutions: build these heads one at a time (the iOS head needs a Mac).
+HEADS = {'avalonia-xplat': ['HoloNETApp.Desktop', 'HoloNETApp.Browser', 'HoloNETApp.Android']}
 
 
 # What each library's demo prints when it works (HoloNETDemo.cs).
@@ -138,12 +140,16 @@ def main():
             if t == 'unity':
                 problem = check_unity(os.path.join(work, name), feed, env, work)
         if not problem and not r.returncode and t != 'unity':
-            for fw in FRAMEWORKS.get(t, [None]):
+            targets = [os.path.join(work, name, h.replace('HoloNETApp', name), h.replace('HoloNETApp', name) + '.csproj') for h in HEADS[t]] if t in HEADS else [os.path.join(work, name)]
+            for target in targets:
+              for fw in FRAMEWORKS.get(t, [None]):
                 verb = 'restore' if t in RESTORE_ONLY else 'build'
-                b = run(['dotnet', verb, os.path.join(work, name), '-nologo', '-v', 'q'] + (['-f', fw] if fw and verb == 'build' else []), env=env)
+                b = run(['dotnet', verb, target, '-nologo', '-v', 'q'] + (['-f', fw] if fw and verb == 'build' else []), env=env)
                 if b.returncode:
                     problem = ((fw + ': ') if fw else '') + (chr(10).join(l for l in (b.stdout + b.stderr).splitlines() if ' error ' in l)[:700] or 'build failed')
                     break
+              if problem:
+                break
         if not problem and do_run and t != 'unity' and not r.returncode:
             try:
                 problem = run_checks(t, lib, os.path.join(work, name), env)

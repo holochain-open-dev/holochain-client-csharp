@@ -738,7 +738,7 @@ def p_razorclasslib(d):
 """)
 
 
-def p_avalonia_mvvm(d):
+def p_avalonia_mvvm(d, view='Views/MainWindow.axaml'):
     wr(f'{d}/ViewModels/MainViewModel.cs', """using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -767,7 +767,7 @@ public partial class MainViewModel : ViewModelBase
     private bool CanRun() => !IsBusy;
 }
 """)
-    sub_re(f'{d}/Views/MainWindow.axaml', r'<TextBox Text="\{Binding Greeting\}".*?/>', """<DockPanel Margin="16">
+    sub_re(f'{d}/{view}', r'<TextBox Text="\{Binding Greeting\}".*?/>', """<DockPanel Margin="16">
         <Button DockPanel.Dock="Top" Content="Run the HoloNET demo" Command="{Binding RunCommand}" />
         <TextBox Margin="0,12,0,0" Text="{Binding Output}" IsReadOnly="True" TextWrapping="Wrap" FontFamily="Consolas,Menlo,monospace" />
     </DockPanel>""")
@@ -1111,6 +1111,18 @@ def p_aspire(d):
     pass
 
 
+
+def p_avalonia_xplat(d):
+    # The shared project holds the view model and the view every head (desktop, browser, Android, iOS) shows.
+    p_avalonia_mvvm(d, 'Views/MainView.axaml')
+    sub(os.path.join(os.path.dirname(d), 'Directory.Packages.props'), '    </ItemGroup>\n</Project>', """        <PackageVersion Include="NextGenSoftware.Holochain.HoloNET.HOLONET_LIBRARY_IDHOLONET_PKG_SUFFIX" Version="HOLONET_VERSION" />
+        <!--#if (!UseApi)-->
+        <PackageVersion Include="NextGenSoftware.Holochain.HoloNET.APIHOLONET_PKG_SUFFIX" Version="HOLONET_VERSION" />
+        <!--#endif-->
+    </ItemGroup>
+</Project>""")
+
+
 # key, dotnet new args, patch fn, display name, classifications, forced external (no bundled conductor), project file TFM fix
 TYPES = [
     ('console', ['console'], p_console, 'Console app', ['Console'], False),
@@ -1128,6 +1140,7 @@ TYPES = [
     ('maui', ['maui'], p_maui, '.NET MAUI app', ['MAUI', 'Mobile', 'Desktop'], True),
     ('maui-blazor', ['maui-blazor'], p_mauiblazor, '.NET MAUI Blazor Hybrid app', ['MAUI', 'Blazor', 'Mobile'], True),
     ('android', ['android'], p_android, 'Android app', ['Android', 'Mobile'], True),
+    ('androidwear', ['androidwear'], p_android, 'Wear OS (Android Wear) app', ['Android', 'Wear', 'Mobile'], True),
     ('winui', base_winui, p_winui, 'WinUI 3 app', ['Desktop', 'WinUI'], False),
     ('unity', base_unity, p_unity, 'Unity project starter (Assets folder)', ['Unity', 'Game'], False, 'Assets/HoloNET', False, True),
     ('ios', ['ios'], p_ios, 'iOS app', ['iOS', 'Mobile'], True),
@@ -1149,6 +1162,7 @@ TYPES = [
     ('maccatalystlib', ['maccatalystlib'], p_platformlib, 'Mac Catalyst class library', ['Library', 'macOS', 'Mac Catalyst'], True),
     ('maccatalyst', ['maccatalyst'], p_maccatalyst, 'Mac Catalyst app', ['macOS', 'Mac Catalyst'], True),
     ('avalonia-mvvm', ['avalonia.mvvm'], p_avalonia_mvvm, 'Avalonia MVVM app', ['Desktop', 'Avalonia', 'MVVM'], False),
+    ('avalonia-xplat', ['avalonia.xplat'], p_avalonia_xplat, 'Avalonia cross-platform app (desktop, browser, Android, iOS)', ['Desktop', 'Avalonia', 'Mobile', 'WebAssembly'], True, 'HoloNETApp', True),
     ('signalr', ['web'], p_signalr, 'ASP.NET Core SignalR app', ['Web', 'SignalR', 'Real-time'], False),
     ('nativeaot', ['console'], p_nativeaot, 'Native AOT console app', ['Console', 'AOT'], False),
     ('orleans', ['console'], p_orleans, 'Orleans app (distributed grains)', ['Orleans', 'Distributed', 'Actor'], False),
@@ -1431,6 +1445,8 @@ RUN_HINTS = {
     'androidlib': 'This is a library. Reference it from your Android app (`dotnet add reference <path to this project>`) and call `HoloNETService.RunDemoAsync()`. To start the Holochain runtime on the phone, use `holonet-android` (or `holonet-maui`) instead.',
     'ioslib': 'This is a library. Reference it from your iOS app (`dotnet add reference <path to this project>`) and call `HoloNETService.RunDemoAsync()`. Building iOS projects needs a Mac (or a paired Mac from Windows).',
     'maccatalystlib': 'This is a library. Reference it from your Mac Catalyst app (`dotnet add reference <path to this project>`) and call `HoloNETService.RunDemoAsync()`. Building Mac Catalyst projects needs a Mac.',
+    'avalonia-xplat': 'Run the desktop head with `dotnet run --project HoloNETApp.Desktop`. The browser, Android and iOS heads (`HoloNETApp.Browser`, `HoloNETApp.Android`, `HoloNETApp.iOS`) share the view and view model in `HoloNETApp`; they connect to a conductor you run (a browser cannot host one). iOS needs a Mac to build.',
+    'androidwear': 'Build and deploy to a Wear OS emulator or watch: `dotnet build -t:Run -f net10.0-android`. A watch cannot run a conductor, so set `HoloNETDemo.AdminUri` to one on your network (an emulator reaches your computer at `ws://10.0.2.2:7777`).',
     'maccatalyst': 'Build and run on a Mac: `dotnet build -t:Run -f net10.0-maccatalyst`, or press F5 in Visual Studio for Mac / Rider. Mac Catalyst needs a Mac to build; we have not compiled this template on one.',
 }
 
