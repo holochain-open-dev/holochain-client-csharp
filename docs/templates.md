@@ -13,7 +13,7 @@ dotnet new holonet-webapi -n MyApp --HoloNET client    # a Web API using the Hol
 
 ## The templates
 
-The templates from `holonet-web` onwards in this table are new: they are on the `Development` branch and ship in the next HoloNET release (the 4.6.0 template pack on NuGet has the ones above them).
+The templates from `holonet-web` onwards in this table were added in HoloNET 4.6.2.
 
 | Template | App type | Runs the HoloNET demo from | Bundled conductor |
 |---|---|---|---|

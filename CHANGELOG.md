@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## v4.6.2 - 2026-11-25
 
 More `dotnet new` templates: every common .NET app, library and test project type now has a HoloNET template (45 in all), generated from the standard .NET templates by `templates/build_templates.py`.
 
@@ -12,6 +12,12 @@ More `dotnet new` templates: every common .NET app, library and test project typ
 - **Tests:** `holonet-mstest` and `holonet-nunit`, alongside `holonet-xunit`.
 - **Fixed: templates installed from the NuGet package had no `.gitignore`.** NuGet leaves out dot-files by default; the pack now includes them (`NoDefaultExcludes`), which also keeps `holonet-mcpserver`'s `.mcp/server.json`.
 - Each new template's README says how to run it (for example how to add the MCP server to Claude, or how to publish the native executable), and `templates/test_templates.py` builds and run-checks them.
+
+## v4.6.1 - 2026-11-17
+
+- Reuse the persisted app-bound WebSocket listener when reconnecting. If none exists, create a listener bound to that app on loopback.
+- Fix the Holochain 0.7.1 coordinator-update request encoding.
+- Add bounded diagnostics for managed Linux conductor startup.
 
 ## v4.6.0 - 2026-11-01
 
