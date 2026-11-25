@@ -7,8 +7,12 @@
     <TargetFramework>net10.0</TargetFramework>
     <PackageId>NextGenSoftware.Holochain.HoloNET.Templates</PackageId>
     <Title>HoloNET project templates</Title>
-    <Version>4.6.1</Version>
-    <PackageReleaseNotes>HoloNET 4.6.1
+    <Version>4.6.2</Version>
+    <PackageReleaseNotes>## v4.6.2 - Part of the HoloNET 4.6.2 release (every HoloNET package is versioned together): https://github.com/holochain-open-dev/holochain-client-csharp/releases/tag/v4.6.2
+
+45 templates: every common .NET app, library and test project type (web, SignalR, MCP server, Native AOT, Orleans, Terminal.Gui, Aspire, Avalonia MVVM and cross-platform, Wear OS, Mac Catalyst, OpenSilver, Godot, WPF/WinForms/Razor/MAUI/Android/iOS libraries, MSTest, NUnit). Installed templates now keep their .gitignore.
+
+HoloNET 4.6.1
 
 - Reuse the persisted app-bound WebSocket listener when reconnecting. If none exists, create a listener bound to that app on loopback.
 - Fix the Holochain 0.7.1 coordinator-update request encoding.

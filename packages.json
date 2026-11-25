@@ -14,7 +14,7 @@
   "named .Embedded.LinuxX64 / .LinuxArm64 / .MacX64 / .MacArm64 (+ .Holochain071 / .Holochain070). Their conductors are downloaded and SHA-256 checked by scripts/fetch_conductors.py at pack time.",
     "exclude_projects: projects that declare a package but are deliberately not published (templates, tests, examples). Paths relative to the repo; a trailing * matches a prefix."
   ],
-  "version": "4.6.1",
+  "version": "4.6.2",
   "libraries": [
     {
       "id": "NextGenSoftware.Holochain.HoloNET.Client",
