@@ -1123,6 +1123,39 @@ def p_avalonia_xplat(d):
 </Project>""")
 
 
+
+def p_opensilver(d):
+    # OpenSilver lists its files explicitly (EnableDefaultItems is false), so the demo file is added to the shared project.
+    sub(f'{d}/HoloNETApp.csproj', '<Compile Include="MainPage.xaml.cs" />', '<Compile Include="MainPage.xaml.cs" />\n    <Compile Include="HoloNETDemo.cs" />')
+    sub_re(f'{d}/MainPage.xaml', r'<Grid Background="White">.*</Grid>', """<StackPanel Background="White" Margin="32">
+        <!-- Runs the HoloNET demo (HoloNETDemo.cs) and shows what happened. -->
+        <Button x:Name="RunButton" Content="Run the HoloNET demo" Click="RunButton_Click" HorizontalAlignment="Left" />
+        <TextBlock x:Name="Output" Margin="0,12,0,0" TextWrapping="Wrap" FontFamily="Consolas" />
+    </StackPanel>""")
+    wr(f'{d}/MainPage.xaml.cs', """using System.Windows;
+using System.Windows.Controls;
+
+namespace HoloNETApp
+{
+    public partial class MainPage : Page
+    {
+        public MainPage()
+        {
+            this.InitializeComponent();
+        }
+
+        private async void RunButton_Click(object sender, RoutedEventArgs e)
+        {
+            RunButton.IsEnabled = false;
+            Output.Text = "Running...";
+            Output.Text = await HoloNETDemos.HoloNETDemo.RunAsync();
+            RunButton.IsEnabled = true;
+        }
+    }
+}
+""")
+
+
 # key, dotnet new args, patch fn, display name, classifications, forced external (no bundled conductor), project file TFM fix
 TYPES = [
     ('console', ['console'], p_console, 'Console app', ['Console'], False),
@@ -1162,6 +1195,7 @@ TYPES = [
     ('maccatalystlib', ['maccatalystlib'], p_platformlib, 'Mac Catalyst class library', ['Library', 'macOS', 'Mac Catalyst'], True),
     ('maccatalyst', ['maccatalyst'], p_maccatalyst, 'Mac Catalyst app', ['macOS', 'Mac Catalyst'], True),
     ('avalonia-mvvm', ['avalonia.mvvm'], p_avalonia_mvvm, 'Avalonia MVVM app', ['Desktop', 'Avalonia', 'MVVM'], False),
+    ('opensilver', ['opensilverapp'], p_opensilver, 'OpenSilver app (Silverlight-style XAML in the browser)', ['Web', 'OpenSilver', 'WebAssembly'], True, 'HoloNETApp'),
     ('avalonia-xplat', ['avalonia.xplat'], p_avalonia_xplat, 'Avalonia cross-platform app (desktop, browser, Android, iOS)', ['Desktop', 'Avalonia', 'Mobile', 'WebAssembly'], True, 'HoloNETApp', True),
     ('signalr', ['web'], p_signalr, 'ASP.NET Core SignalR app', ['Web', 'SignalR', 'Real-time'], False),
     ('nativeaot', ['console'], p_nativeaot, 'Native AOT console app', ['Console', 'AOT'], False),
@@ -1447,6 +1481,7 @@ RUN_HINTS = {
     'maccatalystlib': 'This is a library. Reference it from your Mac Catalyst app (`dotnet add reference <path to this project>`) and call `HoloNETService.RunDemoAsync()`. Building Mac Catalyst projects needs a Mac.',
     'avalonia-xplat': 'Run the desktop head with `dotnet run --project HoloNETApp.Desktop`. The browser, Android and iOS heads (`HoloNETApp.Browser`, `HoloNETApp.Android`, `HoloNETApp.iOS`) share the view and view model in `HoloNETApp`; they connect to a conductor you run (a browser cannot host one). iOS needs a Mac to build.',
     'androidwear': 'Build and deploy to a Wear OS emulator or watch: `dotnet build -t:Run -f net10.0-android`. A watch cannot run a conductor, so set `HoloNETDemo.AdminUri` to one on your network (an emulator reaches your computer at `ws://10.0.2.2:7777`).',
+    'opensilver': 'Run the browser head with `dotnet run --project HoloNETApp.Browser`, or the desktop simulator with `dotnet run --project HoloNETApp.Simulator` (Windows). Both share `HoloNETApp`. A browser cannot host a conductor, so the app connects to one you run. The browser head needs the WebAssembly build tools: `dotnet workload install wasm-tools`. Generating this template needs `dotnet new install OpenSilver.Templates`.',
     'maccatalyst': 'Build and run on a Mac: `dotnet build -t:Run -f net10.0-maccatalyst`, or press F5 in Visual Studio for Mac / Rider. Mac Catalyst needs a Mac to build; we have not compiled this template on one.',
 }
 

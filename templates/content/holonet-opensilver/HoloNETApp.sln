@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34310.174
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HoloNETApp.Browser", "HoloNETApp.Browser\HoloNETApp.Browser.csproj", "{B92196DE-E2F5-4B03-AF55-66DF6AE71913}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HoloNETApp", "HoloNETApp\HoloNETApp.csproj", "{619F346E-F90C-4BA0-B684-23B145A0A81D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HoloNETApp.Simulator", "HoloNETApp.Simulator\HoloNETApp.Simulator.csproj", "{8CA19392-565A-4D22-978B-240C86A50D1E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B92196DE-E2F5-4B03-AF55-66DF6AE71913}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B92196DE-E2F5-4B03-AF55-66DF6AE71913}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B92196DE-E2F5-4B03-AF55-66DF6AE71913}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B92196DE-E2F5-4B03-AF55-66DF6AE71913}.Release|Any CPU.Build.0 = Release|Any CPU
+		{619F346E-F90C-4BA0-B684-23B145A0A81D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{619F346E-F90C-4BA0-B684-23B145A0A81D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{619F346E-F90C-4BA0-B684-23B145A0A81D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{619F346E-F90C-4BA0-B684-23B145A0A81D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8CA19392-565A-4D22-978B-240C86A50D1E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8CA19392-565A-4D22-978B-240C86A50D1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8CA19392-565A-4D22-978B-240C86A50D1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8CA19392-565A-4D22-978B-240C86A50D1E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7DF0CC05-699E-4A12-830B-902059CA6042}
+	EndGlobalSection
+EndGlobal

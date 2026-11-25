@@ -2,10 +2,11 @@
 
 ## Unreleased
 
-More `dotnet new` templates: every common .NET app, library and test project type now has a HoloNET template (44 in all), generated from the standard .NET templates by `templates/build_templates.py`.
+More `dotnet new` templates: every common .NET app, library and test project type now has a HoloNET template (45 in all), generated from the standard .NET templates by `templates/build_templates.py`.
 
 - **Web and services:** `holonet-web` (ASP.NET Core Empty), `holonet-webapiaot` (Web API, Native AOT), `holonet-signalr` (a hub that gives browsers a live connection to Holochain), `holonet-mcpserver` (an MCP server, so AI clients such as Claude can use Holochain), `holonet-nativeaot` (Native AOT console), `holonet-orleans` (a grain that wraps HoloNET), `holonet-terminalgui` (a Terminal.Gui app) and `holonet-aspire` (an Aspire AppHost plus a HoloNET service).
 - **Desktop and mobile:** `holonet-avalonia-mvvm`, `holonet-avalonia-xplat` (desktop, browser, Android and iOS heads sharing one view) `holonet-androidwear` (Wear OS) and `holonet-maccatalyst`. The Mac Catalyst template is created and restored here but not compiled by us (it needs a Mac).
+- **Browser:** `holonet-opensilver` (OpenSilver: Silverlight-style XAML running in the browser, with a desktop simulator).
 - **Games:** `holonet-godot` (a Godot 4 C# project).
 - **Libraries:** WPF, Windows Forms, Razor (a `<HoloNETPanel />` component), MAUI, Android, iOS and Mac Catalyst class libraries, and WPF user control and Windows Forms control libraries.
 - **Tests:** `holonet-mstest` and `holonet-nunit`, alongside `holonet-xunit`.

@@ -18,7 +18,7 @@ FRAMEWORKS = {'uno': ['net10.0-desktop', 'net10.0-android', 'net10.0-browserwasm
 # Apple targets cannot be built on Windows (they need a Mac): these are only created and restored here, and the README says they are not compiled by us.
 RESTORE_ONLY = ('ios', 'ioslib', 'maccatalyst', 'maccatalystlib')
 # Multi-project solutions: build these heads one at a time (the iOS head needs a Mac).
-HEADS = {'avalonia-xplat': ['HoloNETApp.Desktop', 'HoloNETApp.Browser', 'HoloNETApp.Android']}
+HEADS = {'avalonia-xplat': ['HoloNETApp.Desktop', 'HoloNETApp.Browser', 'HoloNETApp.Android'], 'opensilver': ['HoloNETApp', 'HoloNETApp.Browser', 'HoloNETApp.Simulator']}
 
 
 # What each library's demo prints when it works (HoloNETDemo.cs).
