@@ -46,6 +46,7 @@ The templates from `holonet-web` onwards in this table are new: they are on the 
 | `holonet-avalonia-mvvm` | Avalonia MVVM (Windows, Linux, macOS) | a command in `MainViewModel` | Yes (Windows) |
 | `holonet-avalonia-xplat` | Avalonia cross-platform (desktop, browser, Android, iOS heads sharing one view) | a command in `MainViewModel` | No: connects to your conductor |
 | `holonet-androidwear` | Wear OS (Android Wear) | a button on the main activity | No: connects to your conductor |
+| `holonet-opensilver` | OpenSilver (Silverlight-style XAML in the browser, plus a desktop simulator) | a button on the main page | No: connects to your conductor |
 | `holonet-maccatalyst` | Mac Catalyst (native) | a button on the main screen | No: connects to your conductor (not compiled by us on a Mac) |
 | `holonet-godot` | Godot 4 (C#) | a button in the `Main` scene | Windows exports |
 | `holonet-terminalgui` | Terminal UI (Terminal.Gui) | a button in the terminal window | Yes (Windows) |
