@@ -13,6 +13,8 @@ dotnet new holonet-webapi -n MyApp --HoloNET client    # a Web API using the Hol
 
 ## The templates
 
+The templates from `holonet-web` onwards in this table are new: they are on the `Development` branch and ship in the next HoloNET release (the 4.6.0 template pack on NuGet has the ones above them).
+
 | Template | App type | Runs the HoloNET demo from | Bundled conductor |
 |---|---|---|---|
 | `holonet-console` | Console app | `Program.cs` | Yes (Windows) |
@@ -35,6 +37,30 @@ dotnet new holonet-webapi -n MyApp --HoloNET client    # a Web API using the Hol
 | `holonet-classlib` | Class library | `HoloNETService.cs` | Yes (Windows) |
 | `holonet-xunit` | xUnit test project | `HoloNETTests.cs` | Yes (Windows) |
 | `holonet-unity` | Unity (an `Assets` starter) | a `HoloNETBehaviour` component | Windows standalone builds |
+| `holonet-web` | ASP.NET Core Empty (minimal) | `GET /holonet` | Yes (Windows) |
+| `holonet-webapiaot` | ASP.NET Core Web API, Native AOT (experimental: HoloNET reports AOT warnings) | `GET /holonet` | Yes (Windows) |
+| `holonet-signalr` | ASP.NET Core SignalR | the `HoloNETHub` hub and `wwwroot/index.html` | Yes (Windows) |
+| `holonet-mcpserver` | MCP server (lets AI clients such as Claude call Holochain) | the `RunHoloNETDemo` tool | Yes (Windows) |
+| `holonet-nativeaot` | Native AOT console app (experimental: HoloNET reports AOT warnings) | `Program.cs` | Yes (Windows) |
+| `holonet-orleans` | Orleans (distributed grains) | `HoloNETGrain` | Yes (Windows) |
+| `holonet-avalonia-mvvm` | Avalonia MVVM (Windows, Linux, macOS) | a command in `MainViewModel` | Yes (Windows) |
+| `holonet-avalonia-xplat` | Avalonia cross-platform (desktop, browser, Android, iOS heads sharing one view) | a command in `MainViewModel` | No: connects to your conductor |
+| `holonet-androidwear` | Wear OS (Android Wear) | a button on the main activity | No: connects to your conductor |
+| `holonet-maccatalyst` | Mac Catalyst (native) | a button on the main screen | No: connects to your conductor (not compiled by us on a Mac) |
+| `holonet-godot` | Godot 4 (C#) | a button in the `Main` scene | Windows exports |
+| `holonet-terminalgui` | Terminal UI (Terminal.Gui) | a button in the terminal window | Yes (Windows) |
+| `holonet-aspire` | Aspire (AppHost plus a HoloNET service) | `GET /holonet` on the `holonet` service | Yes (Windows) |
+| `holonet-wpfusercontrollib` | WPF user control library (`<local:HoloNETControl />`) | `HoloNETControl.xaml` | Yes (Windows) |
+| `holonet-winformscontrollib` | Windows Forms control library (`HoloNETControl`) | `HoloNETControl.cs` | Yes (Windows) |
+| `holonet-mstest` | MSTest test project | `HoloNETTests.cs` | Yes (Windows) |
+| `holonet-nunit` | NUnit test project | `HoloNETTests.cs` | Yes (Windows) |
+| `holonet-wpflib` | WPF class library | `HoloNETService.cs` | Yes (Windows) |
+| `holonet-winformslib` | Windows Forms class library | `HoloNETService.cs` | Yes (Windows) |
+| `holonet-razorclasslib` | Razor class library (a `<HoloNETPanel />` Blazor component) | `HoloNETPanel.razor` | Yes (Windows) |
+| `holonet-mauilib` | .NET MAUI class library | `HoloNETService.cs` | No: connects to your conductor |
+| `holonet-androidlib` | Android class library | `HoloNETService.cs` | No: connects to your conductor |
+| `holonet-ioslib` | iOS class library | `HoloNETService.cs` | No: connects to your conductor (not compiled by us on a Mac) |
+| `holonet-maccatalystlib` | Mac Catalyst class library | `HoloNETService.cs` | No: connects to your conductor (not compiled by us on a Mac) |
 
 Why some don't bundle a conductor: a browser can't host one, and on a phone the conductor comes from the runtime libraries rather than the template, so those apps connect to a
 conductor you run on your computer (or on a server) instead when the libraries aren't there. See [Running on mobile and in the browser](#running-on-mobile-and-in-the-browser).

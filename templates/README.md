@@ -6,7 +6,7 @@ dotnet new install NextGenSoftware.Holochain.HoloNET.Templates
 
 | Command | What you get |
 |---|---|
-| `dotnet new holonet-<app type>` | See the list below. |
+| `dotnet new holonet-<app type>` | One per .NET app type: console, worker, web (empty, API, API Native AOT, MVC, Razor, Blazor, SignalR, gRPC), MCP server, Orleans, Aspire, Terminal.Gui, Native AOT console, WPF, Windows Forms, WinUI, Avalonia (plain, MVVM and cross-platform), MAUI, MAUI Blazor, Uno, Android, iOS, Mac Catalyst, Unity, Godot, class and control libraries (plain, WPF, Windows Forms, Razor, MAUI, Android, iOS, Mac Catalyst) and test projects (xUnit, MSTest, NUnit). Full list with what each does: [docs/templates.md](../docs/templates.md). |
 | `dotnet new holonet-client` | Full control: connect, install your hApp, zome calls, signals (HoloNET Client). |
 
 Options: `--Conductor auto|embedded|external` (bundle Holochain in the app, Windows; or use one you start), `--HolochainVersion both|0.7.1|0.7.0`.
