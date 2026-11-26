@@ -834,8 +834,18 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                         //the current working directory pointing at it) and prints a "Created config at <path>" line to stdout. There are
                         //also no interactive passphrase prompts to pipe answers into anymore because the config it generates defaults to
                         //the LairServerInProc keystore, which does not require a passphrase for an unencrypted local sandbox/dev setup.
-                        if (!File.Exists(HoloNETDNA.HolochainConductorConfigPath))
+                        // A config is only reused when this conductor version wrote it and its data folder still exists: a config from another
+                        // Holochain release can be rejected outright (0.7.1 refuses the old network.signal_url field), and the data folder of a
+                        // config created under the temp folder disappears when temp is cleaned, so either one left the conductor unable to start.
+                        string conductorVersionLine = await GetConductorVersionLineAsync(fullPathToHolochainExe);
+
+                        if (!IsConductorConfigReusable(HoloNETDNA.HolochainConductorConfigPath, conductorVersionLine))
+                        {
                             await CreateHolochainConductorConfigAsync(fullPathToHolochainExe);
+
+                            if (File.Exists(HoloNETDNA.HolochainConductorConfigPath))
+                                File.WriteAllText(ConductorConfigVersionMarkerPath(HoloNETDNA.HolochainConductorConfigPath), conductorVersionLine ?? "");
+                        }
 
                         //Once the config file has been created we can update it with the correct port and then launch it.
                         if (File.Exists(HoloNETDNA.HolochainConductorConfigPath))
@@ -1577,6 +1587,72 @@ namespace NextGenSoftware.Holochain.HoloNET.Client
                     Directory.CreateDirectory(targetDirectory);
 
                 File.Copy(generatedConfigPath, HoloNETDNA.HolochainConductorConfigPath, true);
+            }
+        }
+
+        /// <summary>The file beside a conductor config that records which conductor (its `holochain --version` line) generated it.</summary>
+        public static string ConductorConfigVersionMarkerPath(string configPath) => configPath + ".holochain-version";
+
+        /// <summary>
+        /// True when the conductor config at <paramref name="configPath"/> can be used by the conductor whose `holochain --version` line is
+        /// <paramref name="conductorVersionLine"/>: the config exists, that same conductor version generated it (see ConductorConfigVersionMarkerPath)
+        /// and the data_root_path it names still exists. Otherwise a new config has to be generated.
+        /// </summary>
+        public static bool IsConductorConfigReusable(string configPath, string conductorVersionLine)
+        {
+            if (string.IsNullOrEmpty(configPath) || !File.Exists(configPath) || string.IsNullOrWhiteSpace(conductorVersionLine))
+                return false;
+
+            string marker = ConductorConfigVersionMarkerPath(configPath);
+
+            if (!File.Exists(marker) || File.ReadAllText(marker).Trim() != conductorVersionLine.Trim())
+                return false;
+
+            string dataRoot = GetConductorConfigDataRootPath(File.ReadAllText(configPath));
+            return !string.IsNullOrEmpty(dataRoot) && Directory.Exists(dataRoot);
+        }
+
+        /// <summary>The data_root_path value of a conductor-config.yaml, or null when it has none.</summary>
+        public static string GetConductorConfigDataRootPath(string config)
+        {
+            foreach (string rawLine in (config ?? "").Split('\n'))
+            {
+                string line = rawLine.TrimEnd('\r');
+
+                if (line.StartsWith("data_root_path:"))
+                {
+                    string value = line.Substring("data_root_path:".Length).Trim().Trim('\'', '"');
+                    return value.Length == 0 || value == "null" ? null : value;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>The first line `holochain --version` prints (for example "holochain 0.7.1"), or null when it cannot be run.</summary>
+        protected virtual async Task<string> GetConductorVersionLineAsync(string fullPathToHolochainExe)
+        {
+            try
+            {
+                using (Process versionProcess = new Process())
+                {
+                    versionProcess.StartInfo.FileName = fullPathToHolochainExe;
+                    versionProcess.StartInfo.Arguments = "--version";
+                    versionProcess.StartInfo.UseShellExecute = false;
+                    versionProcess.StartInfo.RedirectStandardOutput = true;
+                    versionProcess.StartInfo.RedirectStandardError = true;
+                    versionProcess.StartInfo.CreateNoWindow = true;
+                    versionProcess.Start();
+                    string output = await versionProcess.StandardOutput.ReadToEndAsync();
+                    versionProcess.WaitForExit(10000);
+                    string first = output.Split('\n').Select(l => l.Trim()).FirstOrDefault(l => l.Length > 0);
+                    return versionProcess.ExitCode == 0 ? first : null;
+                }
+            }
+            catch (Exception ex)
+            {
+                HandleError($"Error in HoloNETClient.GetConductorVersionLineAsync running '{fullPathToHolochainExe} --version'.", ex);
+                return null;
             }
         }
 

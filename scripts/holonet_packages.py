@@ -139,6 +139,16 @@ def check(partial=False):
             if 'NextGenSoftware.Holochain.HoloNET.Client.csproj' not in text:
                 errors.append(f'{lib["project"]}: has Embedded variants but no ProjectReference to the HoloNET Client')
 
+    for tj in template_json_files():
+        found = TEMPLATE_VERSION_RE.search(io.open(tj, encoding='utf-8').read())
+        rel = os.path.relpath(tj, REPO)
+        if not found:
+            errors.append(f'{rel}: no HoloNETVersion parameter')
+        else:
+            value = re.search(r'"defaultValue":\s*"([^"]*)"', found.group(0)).group(1)
+            if value != m['version']:
+                errors.append(f'{rel}: HoloNETVersion defaults to {value}, not the family version {m["version"]} (run set-version)')
+
     if not docs(check_only=True):
         errors.append('docs/packages.md is out of date: run python scripts/holonet_packages.py docs')
     if errors:
@@ -404,6 +414,14 @@ def verify_nuget(wait_minutes=0):
 
 
 # ---- set-version -----------------------------------------------------------------------------------------------------
+# The HoloNETVersion parameter of a template.json, whose defaultValue is the package version a new project references.
+TEMPLATE_VERSION_RE = re.compile(r'("HoloNETVersion":\s*\{[^}]*?"defaultValue":\s*")[^"]*(")', re.S)
+
+
+def template_json_files():
+    return sorted(glob.glob(os.path.join(REPO, 'templates', 'content', '*', '.template.config', 'template.json')))
+
+
 def set_version(new):
     if not re.fullmatch(r'\d+\.\d+\.\d+', new):
         sys.exit('version must look like 4.6.0')
@@ -426,9 +444,9 @@ def set_version(new):
     if os.path.exists(hn):
         raw = io.open(hn, encoding='utf-8-sig', newline='').read()
         io.open(hn, 'w', encoding='utf-8', newline='').write(re.sub(r'(public const string Version = ")[^"]+(")', r'\g<1>' + new + r'\2', raw))
-    for tj in glob.glob(os.path.join(REPO, 'templates', 'content', '*', '.template.config', 'template.json')):
+    for tj in template_json_files():
         t = io.open(tj, encoding='utf-8').read()
-        io.open(tj, 'w', encoding='utf-8', newline='').write(t.replace('"defaultValue": "' + old + '"', '"defaultValue": "' + new + '"'))
+        io.open(tj, 'w', encoding='utf-8', newline='').write(TEMPLATE_VERSION_RE.sub(r'\g<1>' + new + r'', t, count=1))
     docs()
     print(f'Family version {old} -> {new}. Add its CHANGELOG.md section, then commit, push and run the publish job.')
 

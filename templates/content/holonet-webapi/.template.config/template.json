@@ -65,7 +65,7 @@
     "HoloNETVersion": {
       "type": "parameter",
       "datatype": "text",
-      "defaultValue": "4.6.1",
+      "defaultValue": "4.6.2",
       "description": "The HoloNET package version.",
       "replaces": "HOLONET_VERSION"
     },
